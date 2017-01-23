@@ -1,9 +1,5 @@
 package uk.ac.ebi.quickgo.rest.search;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import uk.ac.ebi.quickgo.common.SearchableField;
 import uk.ac.ebi.quickgo.rest.comm.FilterContext;
 import uk.ac.ebi.quickgo.rest.search.query.AbstractField;
@@ -17,6 +13,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.FIRST_CURSOR;
 import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.createCursorPage;
@@ -176,6 +176,8 @@ public final class SearchDispatcher {
                         QueryRequest nextQueryRequest =
                                 createNextCursorQueryRequest(queryTemplate, firstQueryRequest, nextCursor, nextPageSize);
 
+                        LOGGER.info("download iteration info: {} wanted, {} fetched, {} page size, {} next page size"
+                                , limit, fetchedCount.getValue(), pageSize, nextPageSize);
                         return transformer.applyTransformations(
                                 searchService.findByQuery(nextQueryRequest),
                                 context);

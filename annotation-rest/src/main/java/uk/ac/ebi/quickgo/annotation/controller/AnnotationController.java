@@ -1,17 +1,5 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import org.slf4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.task.TaskExecutor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
 import uk.ac.ebi.quickgo.annotation.model.StatisticsGroup;
@@ -30,17 +18,32 @@ import uk.ac.ebi.quickgo.rest.search.request.converter.FilterConverterFactory;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformerChain;
 
-import javax.validation.Valid;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
+import javax.validation.Valid;
+import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static java.util.Arrays.asList;
 import static org.slf4j.LoggerFactory.getLogger;
 import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.searchAndTransform;
+import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.streamSearchResults;
+import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.createFirstCursorPage;
 
 /**
  * Provides RESTful endpoints for retrieving Gene Ontology (GO) Annotations to gene products.
@@ -101,6 +104,7 @@ public class AnnotationController {
     private final SearchService<Annotation> annotationSearchService;
 
     private final DefaultSearchQueryTemplate queryTemplate;
+    private final DefaultSearchQueryTemplate downloadQueryTemplate;
     private final FilterConverterFactory converterFactory;
     private final ResultTransformerChain<QueryResult<Annotation>> resultTransformerChain;
     private final StatisticsService statsService;
@@ -131,8 +135,9 @@ public class AnnotationController {
         this.statsService = statsService;
         this.resultTransformerChain = resultTransformerChain;
 
-        this.queryTemplate = new DefaultSearchQueryTemplate();
-        this.queryTemplate.setReturnedFields(annotationRetrievalConfig.getSearchReturnedFields());
+        this.queryTemplate = createSearchQueryTemplate(annotationRetrievalConfig);
+        this.downloadQueryTemplate = createDownloadSearchQueryTemplate(annotationRetrievalConfig);
+
         this.taskExecutor = taskExecutor;
     }
 
@@ -151,10 +156,7 @@ public class AnnotationController {
     @RequestMapping(value = "/search", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<Annotation>> annotationLookup(
             @Valid @ModelAttribute AnnotationRequest request, BindingResult bindingResult) {
-
-        if (bindingResult.hasErrors()) {
-            throw new ParameterBindingException(bindingResult);
-        }
+        checkBindingErrors(bindingResult);
 
         FilterQueryInfo filterQueryInfo = extractFilterQueryInfo(request);
 
@@ -166,6 +168,78 @@ public class AnnotationController {
 
         return searchAndTransform(queryRequest, annotationSearchService, resultTransformerChain,
                 filterQueryInfo.getFilterContext());
+    }
+
+    /**
+     * Return statistics based on the search result.
+     *
+     * The statistics are subdivided into two areas, each with
+     * @return a {@link QueryResult} instance containing the results of the search
+     */
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Statistics have been calculated for the annotation result set " +
+                    "obtained from the application of the filter parameters"),
+            @ApiResponse(code = 500, message = "Internal server error occurred whilst producing statistics",
+                    response = ResponseExceptionHandler.ErrorInfo.class),
+            @ApiResponse(code = 400, message = "Bad request due to a validation issue encountered in one of the " +
+                    "filters", response = ResponseExceptionHandler.ErrorInfo.class)})
+    @ApiOperation(value = "Generate statistic on the annotation result set obtained from applying the filters.")
+    @RequestMapping(value = "/stats", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<QueryResult<StatisticsGroup>> annotationStats(
+            @Valid @ModelAttribute AnnotationRequest request, BindingResult bindingResult) {
+        checkBindingErrors(bindingResult);
+
+        QueryResult<StatisticsGroup> stats = statsService.calculate(request);
+        return new ResponseEntity<>(stats, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/downloadSearch",
+            method = {RequestMethod.GET},
+            produces = {"text/gaf", "text/gpad"})
+    public ResponseEntity<ResponseBodyEmitter> downloadLookup(
+            @Valid @ModelAttribute AnnotationRequest request,
+            BindingResult bindingResult,
+            @RequestParam int downloadCount,
+            @RequestHeader("Accept") MediaType mediaTypeAcceptHeader) {
+        checkBindingErrors(bindingResult);
+
+        FilterQueryInfo filterQueryInfo = extractFilterQueryInfo(request);
+
+        QueryRequest queryRequest = downloadQueryTemplate.newBuilder()
+                .setQuery(QuickGOQuery.createAllQuery())
+                .addFilters(filterQueryInfo.getFilterQueries())
+                .setPage(createFirstCursorPage(request.getLimit()))
+                .build();
+
+        // -1 indicates no timeout
+        ResponseBodyEmitter emitter = new ResponseBodyEmitter();
+        taskExecutor.execute(() -> emitStreamWithMediaType(
+                emitter,
+                streamSearchResults(queryRequest, queryTemplate, annotationSearchService,
+                        resultTransformerChain, filterQueryInfo.getFilterContext(), downloadCount),
+                mediaTypeAcceptHeader));
+
+        return ResponseEntity
+                .ok()
+                .headers(createHttpDownloadHeader(mediaTypeAcceptHeader))
+                .body(emitter);
+    }
+
+    private DefaultSearchQueryTemplate createSearchQueryTemplate(
+            SearchServiceConfig.AnnotationCompositeRetrievalConfig annotationRetrievalConfig) {
+        DefaultSearchQueryTemplate template = new DefaultSearchQueryTemplate();
+        template.setReturnedFields(annotationRetrievalConfig.getSearchReturnedFields());
+        return template;
+    }
+
+    private DefaultSearchQueryTemplate createDownloadSearchQueryTemplate(
+            SearchServiceConfig.AnnotationCompositeRetrievalConfig annotationRetrievalConfig) {
+        DefaultSearchQueryTemplate template = new DefaultSearchQueryTemplate();
+        template.setReturnedFields(annotationRetrievalConfig.getSearchReturnedFields());
+        annotationRetrievalConfig.getSortCriteria()
+                .forEach(criterion ->
+                        template.addSortCriterion(criterion.getSortField().getField(), criterion.getSortOrder()));
+        return template;
     }
 
     private FilterQueryInfo extractFilterQueryInfo(
@@ -189,68 +263,22 @@ public class AnnotationController {
                 return filterContexts.stream().reduce(new FilterContext(), FilterContext::merge);
             }
         };
-
     }
 
-    private interface FilterQueryInfo {
-        Set<QuickGOQuery> getFilterQueries();
-
-        FilterContext getFilterContext();
-    }
-
-    /**
-     * Return statistics based on the search result.
-     *
-     * The statistics are subdivided into two areas, each with
-     * @return a {@link QueryResult} instance containing the results of the search
-     */
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Statistics have been calculated for the annotation result set " +
-                    "obtained from the application of the filter parameters"),
-            @ApiResponse(code = 500, message = "Internal server error occurred whilst producing statistics",
-                    response = ResponseExceptionHandler.ErrorInfo.class),
-            @ApiResponse(code = 400, message = "Bad request due to a validation issue encountered in one of the " +
-                    "filters", response = ResponseExceptionHandler.ErrorInfo.class)})
-    @ApiOperation(value = "Generate statistic on the annotation result set obtained from applying the filters.")
-    @RequestMapping(value = "/stats", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<QueryResult<StatisticsGroup>> annotationStats(
-            @Valid @ModelAttribute AnnotationRequest request, BindingResult bindingResult) {
-
+    private void checkBindingErrors(BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             throw new ParameterBindingException(bindingResult);
         }
-
-        QueryResult<StatisticsGroup> stats = statsService.calculate(request);
-        return new ResponseEntity<>(stats, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/download",
-            method = {RequestMethod.GET},
-            produces = {"text/gaf", "text/gpad"})
-    public ResponseEntity<ResponseBodyEmitter> downloadContent(
-            @RequestParam(defaultValue = "10") int limit, @RequestHeader("Accept") MediaType acceptHeader) {
-        LOGGER.info("Request received");
-
-        // -1 indicates no timeout
-        ResponseBodyEmitter emitter = new ResponseBodyEmitter(-1L);
-
-        taskExecutor.execute(() -> {
-            emitStreamWithMediaType(emitter, new FakeResultStreamGenerator().fakeGoodResultEntityStream(limit),
-                    acceptHeader);
-        });
-        ResponseEntity<ResponseBodyEmitter> response = ResponseEntity.ok().body(emitter);
-        // todo: for now I'm not setting headers to make the response be returned as a file.
-        // todo: test that a client-abort behaves as expected
-        // how to make the response come as a file:
-        /*
-            HttpHeaders httpHeaders = new HttpHeaders();
-            httpHeaders.setContentDispositionFormData("attachment", "myInterestingAndRelevantFileName.txt");
-            response = ResponseEntity.ok().headers(httpHeaders).body(emitter);
-         */
-
-        LOGGER.info("Servlet thread released");
-
-        return response;
+    private HttpHeaders createHttpDownloadHeader(MediaType mediaType) {
+        HttpHeaders httpHeaders = new HttpHeaders();
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter format = DateTimeFormatter.ofPattern("-N-yyyyMMdd");
+        String extension = "." + mediaType.getSubtype();
+        String fileName = "QuickGO-annotations" + now.format(format) + extension;
+        httpHeaders.setContentDispositionFormData("attachment", fileName);
+        return httpHeaders;
     }
 
     private void emitStreamWithMediaType(
@@ -260,25 +288,15 @@ public class AnnotationController {
         try {
             emitter.send(annotationResultStream, mediaType);
         } catch (IOException e) {
-            LOGGER.error("Failed to emit annotation result", e);
+            LOGGER.error("Failed to stream annotation results", e);
         }
         emitter.complete();
-        LOGGER.info("Emitted streamed response -- which will be written by the HTTP message converter for: " +
-                mediaType);
+        LOGGER.info("Emitted response stream -- which will be written by the HTTP message converter for: " + mediaType);
     }
 
-    class FakeResultStreamGenerator {
-        Stream<QueryResult<Annotation>> fakeGoodResultEntityStream(int limit) {
-            return Stream.generate(() -> {
-                List<Annotation> annotations = asList(new Annotation(), new Annotation());
-                try {
-                    Thread.sleep(2);
-                    LOGGER.info("sleeping...");
-                } catch (InterruptedException e) {
-                    LOGGER.error("Error sleeping", e);
-                }
-                return new QueryResult.Builder<>(100, annotations).build();
-            }).limit(limit);
-        }
+    private interface FilterQueryInfo {
+        Set<QuickGOQuery> getFilterQueries();
+
+        FilterContext getFilterContext();
     }
 }

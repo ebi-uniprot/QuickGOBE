@@ -9,7 +9,6 @@ import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
-import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -23,12 +22,14 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.*;
 import static uk.ac.ebi.quickgo.annotation.IdGeneratorUtil.createGPId;
@@ -85,9 +86,38 @@ public class AnnotationControllerIT {
         repository.save(genericDocs);
     }
 
+    // DOWNLOAD
+    @Test
+    public void canDownload() throws Exception {
+        createGenericDocs(20).forEach(repository::save);
+
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/downloadSearch")
+                        .header("Accept", "text/gaf")
+                        .param("limit", "7")
+                        .param("downloadCount", "10"));
+//        MvcResult mvcResult = mockMvc.perform(
+//                get(RESOURCE_URL + "/downloadSearch")
+//                        .header("Accept", "text/gaf")
+//                        .param("limit", "7")
+//                        .param("downloadCount", "10"))
+//                .andExpect(request().asyncStarted())
+//                .andReturn();
+//
+//        mockMvc.perform(asyncDispatch(mvcResult))
+//                .andExpect(status().isOk())
+//                .andDo(MvcResult::getAsyncResult)
+//                .andDo(print());
+
+        response
+                .andExpect(request().asyncStarted())
+                .andDo(MvcResult::getAsyncResult)
+                .andDo(print());
+    }
+
     // CONSISTENT ORDER
     @Test
-    public void annotationsAlwaysReturnedInOrderWrittenToRepository() throws Exception{
+    public void annotationsAlwaysReturnedInOrderWrittenToRepository() throws Exception {
         repository.deleteAll();
         String geneProductId1 = "AAAAA";
         String geneProductId2 = "BBBBB";
@@ -119,7 +149,6 @@ public class AnnotationControllerIT {
                 .andExpect(fieldInRowHasValue(GENEPRODUCT_ID_FIELD, 2, geneProductId1));
 
     }
-
 
     // ASSIGNED BY
     @Test
@@ -572,9 +601,8 @@ public class AnnotationControllerIT {
                 .andExpect(itemExistsExpectedTimes(ASSIGNED_BY_FIELD, genericDocs.get(1).assignedBy, 1));
     }
 
-
     @Test
-    public void idValidationTestWorksCorrectlyForGeneProductIDWithFeature()throws Exception {
+    public void idValidationTestWorksCorrectlyForGeneProductIDWithFeature() throws Exception {
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search")
                         .param(GENE_PRODUCT_ID_PARAM.getName(), "P19712:PRO_0000038050"));
@@ -1263,7 +1291,7 @@ public class AnnotationControllerIT {
     @Test
     public void filterByExtensionRelationship() throws Exception {
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
-                                                         .param(EXTENSION_PARAM.getName(), EXTENSION_RELATIONSHIP1));
+                .param(EXTENSION_PARAM.getName(), EXTENSION_RELATIONSHIP1));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -1275,7 +1303,7 @@ public class AnnotationControllerIT {
     @Test
     public void filterByExtensionDatabase() throws Exception {
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
-                                                         .param(EXTENSION_PARAM.getName(), EXTENSION_DB1));
+                .param(EXTENSION_PARAM.getName(), EXTENSION_DB1));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -1289,7 +1317,7 @@ public class AnnotationControllerIT {
     @Test
     public void filterById() throws Exception {
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
-                                                         .param(EXTENSION_PARAM.getName(), EXTENSION_ID1));
+                .param(EXTENSION_PARAM.getName(), EXTENSION_ID1));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -1301,7 +1329,7 @@ public class AnnotationControllerIT {
     @Test
     public void filterByExtensionTarget1() throws Exception {
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
-                                                         .param(EXTENSION_PARAM.getName(), EXTENSION_1));
+                .param(EXTENSION_PARAM.getName(), EXTENSION_1));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -1313,7 +1341,7 @@ public class AnnotationControllerIT {
     @Test
     public void filterByExtensionTarget2() throws Exception {
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
-                                                         .param(EXTENSION_PARAM.getName(), EXTENSION_2));
+                .param(EXTENSION_PARAM.getName(), EXTENSION_2));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -1325,7 +1353,7 @@ public class AnnotationControllerIT {
     @Test
     public void filterByExtensionTarget3() throws Exception {
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
-                                                         .param(EXTENSION_PARAM.getName(), EXTENSION_3));
+                .param(EXTENSION_PARAM.getName(), EXTENSION_3));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -1343,7 +1371,7 @@ public class AnnotationControllerIT {
         repository.save(doc);
 
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
-                                                         .param(EXTENSION_PARAM.getName(), extension));
+                .param(EXTENSION_PARAM.getName(), extension));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -1368,7 +1396,7 @@ public class AnnotationControllerIT {
         String fullSearch = extension1 + "," + extension2;
 
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
-                                                         .param(EXTENSION_PARAM.getName(), fullSearch));
+                .param(EXTENSION_PARAM.getName(), fullSearch));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -1380,7 +1408,7 @@ public class AnnotationControllerIT {
     @Test
     public void multipleMatchingExtensionFilterValuesForAnAnnotationReturnsItOnlyOnce() throws Exception {
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
-                                                         .param(EXTENSION_PARAM.getName(),  EXTENSIONS.get(0)));
+                .param(EXTENSION_PARAM.getName(), EXTENSIONS.get(0)));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -1390,10 +1418,10 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void exactMatchRequestedThatMatchesExceptForDBReturnsNoAnnotations() throws Exception{
-        String filter = asExtension(EXTENSION_RELATIONSHIP1,"SOME_OTHER_DB", EXTENSION_ID1);
+    public void exactMatchRequestedThatMatchesExceptForDBReturnsNoAnnotations() throws Exception {
+        String filter = asExtension(EXTENSION_RELATIONSHIP1, "SOME_OTHER_DB", EXTENSION_ID1);
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
-                                                         .param(EXTENSION_PARAM.getName(), filter));
+                .param(EXTENSION_PARAM.getName(), filter));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -1402,10 +1430,10 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void exactMatchRequestedThatMatchesExceptForIDReturnsNoAnnotations() throws Exception{
-        String filter = asExtension(EXTENSION_RELATIONSHIP1,EXTENSION_DB1, "9999999");
+    public void exactMatchRequestedThatMatchesExceptForIDReturnsNoAnnotations() throws Exception {
+        String filter = asExtension(EXTENSION_RELATIONSHIP1, EXTENSION_DB1, "9999999");
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
-                                                         .param(EXTENSION_PARAM.getName(), filter));
+                .param(EXTENSION_PARAM.getName(), filter));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -1414,10 +1442,10 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void exactMatchRequestedThatMatchesExceptForRelationshipReturnsNoAnnotations() throws Exception{
-        String filter = asExtension("something_syntactically_valid_here",EXTENSION_DB1, EXTENSION_ID1);
+    public void exactMatchRequestedThatMatchesExceptForRelationshipReturnsNoAnnotations() throws Exception {
+        String filter = asExtension("something_syntactically_valid_here", EXTENSION_DB1, EXTENSION_ID1);
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
-                                                         .param(EXTENSION_PARAM.getName(), filter));
+                .param(EXTENSION_PARAM.getName(), filter));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -1426,10 +1454,10 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void exactMatchRequestedThatMatchesOnlyRelationshipReturnsNoAnnotations() throws Exception{
-        String filter = asExtension(EXTENSION_RELATIONSHIP1,"SOME_OTHER_DB", "9999999");
+    public void exactMatchRequestedThatMatchesOnlyRelationshipReturnsNoAnnotations() throws Exception {
+        String filter = asExtension(EXTENSION_RELATIONSHIP1, "SOME_OTHER_DB", "9999999");
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
-                                                         .param(EXTENSION_PARAM.getName(), filter));
+                .param(EXTENSION_PARAM.getName(), filter));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -1441,7 +1469,7 @@ public class AnnotationControllerIT {
     public void exactMatchRequestedThatMatchesOnlyDBReturnsNoAnnotations() throws Exception {
         String filter = asExtension("unused_valid_relationship", EXTENSION_DB1, "9999999");
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
-                                                         .param(EXTENSION_PARAM.getName(), filter));
+                .param(EXTENSION_PARAM.getName(), filter));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -1450,10 +1478,10 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void exactMatchRequestedThatMatchesOnlyIDReturnsNoAnnotations() throws Exception{
-        String filter = asExtension("unused_valid_relationship","SOME_OTHER_DB", EXTENSION_ID1);
+    public void exactMatchRequestedThatMatchesOnlyIDReturnsNoAnnotations() throws Exception {
+        String filter = asExtension("unused_valid_relationship", "SOME_OTHER_DB", EXTENSION_ID1);
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
-                                                         .param(EXTENSION_PARAM.getName(), filter));
+                .param(EXTENSION_PARAM.getName(), filter));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -1465,7 +1493,7 @@ public class AnnotationControllerIT {
     public void multipleTargetsRequestedThatExistButInDifferentOrderReturnsAnnotations() throws Exception {
         String filter = String.format("%s,%s", EXTENSION_2, EXTENSION_1);
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
-                                                         .param(EXTENSION_PARAM.getName(), filter));
+                .param(EXTENSION_PARAM.getName(), filter));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -1475,10 +1503,10 @@ public class AnnotationControllerIT {
 
     @Test
     public void multipleTargetsRequestedButOnlyOneOfWhichExistsReturnsAnnotations() throws Exception {
-        String unknownExt = asExtension("unused_valid_relationship","SOME_OTHER_DB", "9999999");
+        String unknownExt = asExtension("unused_valid_relationship", "SOME_OTHER_DB", "9999999");
         String filter = String.format("%s,%s", unknownExt, EXTENSION_1);
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
-                                                         .param(EXTENSION_PARAM.getName(), filter));
+                .param(EXTENSION_PARAM.getName(), filter));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -1501,7 +1529,7 @@ public class AnnotationControllerIT {
         // Solr) order.
         String filter = String.format("%s,%s", newExtension, EXTENSION_3);
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
-                                                         .param(EXTENSION_PARAM.getName(), filter));
+                .param(EXTENSION_PARAM.getName(), filter));
 
         String expected = "A0A000";
 

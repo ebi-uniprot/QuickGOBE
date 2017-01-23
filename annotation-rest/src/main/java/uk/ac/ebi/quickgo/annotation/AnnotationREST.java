@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.annotation;
 
-import uk.ac.ebi.quickgo.annotation.service.search.DownloadConfig;
+import uk.ac.ebi.quickgo.annotation.service.download.DownloadConfig;
 import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.annotation.validation.loader.ValidationConfig;
 import uk.ac.ebi.quickgo.rest.controller.SwaggerConfig;
