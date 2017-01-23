@@ -38,20 +38,24 @@ import java.util.regex.Pattern;
  * !Project_name: UniProt GO Annotation (UniProt-GOA)
  * !URL: http://www.ebi.ac.uk/GOA
  * !Contact Email: goa@ebi.ac.uk
- * !Date downloaded from the QuickGO browser: 20170118
+ * !Date downloaded from the QuickGO browser: 20170123
  * !Filtering parameters selected to generate file:
- * GAnnotation?tax=261292&count=25&select=normal&advanced=&termUse=ancestor&slimTypes=IPO%3D
- * UniProtKB	F8GCE8	Nit79A3_0905		GO:0000166	GO_REF:0000038	IEA	UniProtKB-KW:KW-0547	F 5-formyltetrahydrofolate cyclo-ligase	F8GCE8_NITSI|Nit79A3_0905	protein	taxon:261292	20170107	UniProt
- * UniProtKB	F8GCE8	Nit79A3_0905		GO:0005524	GO_REF:0000038	IEA	UniProtKB-KW:KW-0067	F 5-formyltetrahydrofolate cyclo-ligase	F8GCE8_NITSI|Nit79A3_0905	protein	taxon:261292	20170107	UniProt
- * UniProtKB	F8GCE8	Nit79A3_0905		GO:0016874	GO_REF:0000038	IEA	UniProtKB-KW:KW-0436	F 5-formyltetrahydrofolate cyclo-ligase	F8GCE8_NITSI|Nit79A3_0905	protein	taxon:261292	20170107	UniProt
- * UniProtKB	F8GCE8	Nit79A3_0905		GO:0030272	GO_REF:0000003	IEA	EC:6.3.3.2	F	5-formyltetrahydrofolate cyclo-ligase	F8GCE8_NITSI|Nit79A3_0905	protein	taxon:261292	20170107	UniProt
- * UniProtKB	F8GCE8	Nit79A3_0905		GO:0046872	GO_REF:0000038	IEA	UniProtKB-KW:KW-0479	F 5-formyltetrahydrofolate cyclo-ligase	F8GCE8_NITSI|Nit79A3_0905	protein	taxon:261292	20170107	UniProt
- * UniProtKB	F8GCE9	Nit79A3_0906		GO:0003677	GO_REF:0000002	IEA	InterPro:IPR000445	F	A/G-specific adenine glycosylase	F8GCE9_NITSI|Nit79A3_0906	protein	taxon:261292	20170107	InterPro
- * UniProtKB	F8GCE9	Nit79A3_0906		GO:0003824	GO_REF:0000002	IEA	InterPro:IPR011257	F	A/G-specific adenine glycosylase	F8GCE9_NITSI|Nit79A3_0906	protein	taxon:261292	20170107	InterPro
- * UniProtKB	F8GCE9	Nit79A3_0906		GO:0006281	GO_REF:0000002	IEA	InterPro:IPR011257	P	A/G-specific adenine glycosylase	F8GCE9_NITSI|Nit79A3_0906	protein	taxon:261292	20170107	InterPro
- * UniProtKB	F8GCE9	Nit79A3_0906		GO:0006284	GO_REF:0000002	IEA	InterPro:IPR003265|InterPro:IPR005760 P	A/G-specific adenine glycosylase	F8GCE9_NITSI|Nit79A3_0906	protein	taxon:261292	20170107	InterPro
- * UniProtKB	F8GCE9	Nit79A3_0906		GO:0016787	GO_REF:0000002	IEA	InterPro:IPR015797	F	A/G-specific adenine glycosylase	F8GCE9_NITSI|Nit79A3_0906	protein	taxon:261292	20170107	InterPro
- *
+ * GAnnotation?count=25&protein=Q4VCS5&select=normal&advanced=&termUse=ancestor&slimTypes=IPO%3D
+ * UniProtKB	Q4VCS5	AMOT		GO:0001570	GO_REF:0000107	IEA	UniProtKB:Q8VHG2|ensembl:ENSMUSP00000108455	P	Angiomotin	AMOT_HUMAN|AMOT|KIAA1071	protein	taxon:9606	20170107	Ensembl
+ * UniProtKB	Q4VCS5	AMOT		GO:0001701	GO_REF:0000107	IEA	UniProtKB:Q8VHG2|ensembl:ENSMUSP00000108455	P	Angiomotin	AMOT_HUMAN|AMOT|KIAA1071	protein	taxon:9606	20170107	Ensembl
+ * UniProtKB	Q4VCS5	AMOT		GO:0001702	GO_REF:0000107	IEA	UniProtKB:Q8VHG2|ensembl:ENSMUSP00000108455	P	Angiomotin	AMOT_HUMAN|AMOT|KIAA1071	protein	taxon:9606	20170107	Ensembl
+ * UniProtKB	Q4VCS5	AMOT		GO:0001725	PMID:16043488	IDA		C	Angiomotin	AMOT_HUMAN|AMOT|KIAA1071	protein	taxon:9606	20051207	UniProt		UniProtKB:Q4VCS5-1
+ * UniProtKB	Q4VCS5	AMOT		GO:0001726	PMID:11257124	IDA		C	Angiomotin	AMOT_HUMAN|AMOT|KIAA1071	protein	taxon:9606	20091109	MGI
+ * UniProtKB	Q4VCS5	AMOT		GO:0003365	GO_REF:0000107	IEA	UniProtKB:Q8VHG2|ensembl:ENSMUSP00000108455	P	Angiomotin	AMOT_HUMAN|AMOT|KIAA1071	protein	taxon:9606	20170107	Ensembl
+ * UniProtKB	Q4VCS5	AMOT		GO:0004872	PMID:11257124	IDA		F	Angiomotin	AMOT_HUMAN|AMOT|KIAA1071	protein	taxon:9606	20091109	MGI
+ * UniProtKB	Q4VCS5	AMOT		GO:0005515	PMID:11257124	IPI	UniProtKB:P00747	F	Angiomotin	AMOT_HUMAN|AMOT|KIAA1071	protein	taxon:9606	20051212	HGNC
+ * UniProtKB	Q4VCS5	AMOT		GO:0005515	PMID:16043488	IPI	UniProtKB:Q6RHR9-2	F	Angiomotin	AMOT_HUMAN|AMOT|KIAA1071	protein	taxon:9606	20051207	UniProt		UniProtKB:Q4VCS5-1
+ * UniProtKB	Q4VCS5	AMOT		GO:0005515	PMID:19615732	IPI	UniProtKB:P35240	F	Angiomotin	AMOT_HUMAN|AMOT|KIAA1071	protein	taxon:9606	20170108	IntAct
+ * UniProtKB	Q4VCS5	AMOT		GO:0005515	PMID:21187284	IPI	UniProtKB:P46937	F	Angiomotin	AMOT_HUMAN|AMOT|KIAA1071	protein	taxon:9606	20120124	UniProt		UniProtKB:Q4VCS5-1
+ * UniProtKB	Q4VCS5	AMOT		GO:0005515	PMID:21481793	IPI	UniProtKB:P35240	F	Angiomotin	AMOT_HUMAN|AMOT|KIAA1071	protein	taxon:9606	20170108	IntAct		UniProtKB:Q4VCS5-1
+ * UniProtKB	Q4VCS5	AMOT		GO:0005515	PMID:21481793	IPI	UniProtKB:P35240	F	Angiomotin	AMOT_HUMAN|AMOT|KIAA1071	protein	taxon:9606	20170108	IntAct		UniProtKB:Q4VCS5-2
+ * UniProtKB	Q4VCS5	AMOT		GO:0005515	PMID:21481793	IPI	UniProtKB:P35240	F	Angiomotin	AMOT_HUMAN|AMOT|KIAA1071	protein	taxon:9606	20170108	IntAct
+ * UniProtKB	Q4VCS5	AMOT		GO:0005515	PMID:21481793	IPI	UniProtKB:Q68EM7	F	Angiomotin	AMOT_HUMAN|AMOT|KIAA1071	protein	taxon:9606	20170108	IntAct
  */
 public class AnnotationToGAF {
     static final String OUTPUT_DELIMITER = "\t";
