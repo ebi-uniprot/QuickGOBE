@@ -75,6 +75,12 @@ public class AnnotationToGAF {
     private static final Pattern INTACT_CANONICAL_PATTERN = Pattern.compile(INTACT_CANONICAL_REGEX);
     private static final DateFormat YYYYMMDD_DATE_FORMAT = new SimpleDateFormat("yyyyMMdd");
 
+    private ConversionUtil conversionUtil;
+
+    public AnnotationToGAF(ConversionUtil conversionUtil) {
+        this.conversionUtil = conversionUtil;
+    }
+
     /**
      * Convert an {@link Annotation} to a String representation.
      * @param annotation
@@ -90,7 +96,7 @@ public class AnnotationToGAF {
                 annotation.goId + OUTPUT_DELIMITER +
                 annotation.reference + OUTPUT_DELIMITER +
                 annotation.evidenceCode + OUTPUT_DELIMITER +
-                toWithFromString(annotation.withFrom) + OUTPUT_DELIMITER +
+                conversionUtil.withFromAsString(annotation.withFrom) + OUTPUT_DELIMITER +
                 Aspect.fromScientificName(annotation.goAspect).character + OUTPUT_DELIMITER +
                 OUTPUT_DELIMITER +   // name - in GP core e.g. '5-formyltetrahydrofolate cyclo-ligase' optional not used
                 OUTPUT_DELIMITER +   //synonym, - in GP core  e.g. 'Nit79A3_0905' optional not used
@@ -98,7 +104,7 @@ public class AnnotationToGAF {
                 "taxon:" + annotation.taxonId + OUTPUT_DELIMITER +
                 toYMD(annotation.date) + OUTPUT_DELIMITER +
                 annotation.assignedBy + OUTPUT_DELIMITER +
-                toExtensionsString(annotation.extensions) + OUTPUT_DELIMITER +
+                conversionUtil.extensionsAsString(annotation.extensions) + OUTPUT_DELIMITER +
                 (UNIPROT_KB.equals(idElements[0]) ? String.format("%s:%s", UNIPROT_KB, idElements[1]) : "");
     }
 
@@ -173,7 +179,6 @@ public class AnnotationToGAF {
                            return sr.asXref();
                        })
                        .collect(Collectors.joining(COMMA)).toString();
-
     }
 
     public enum Aspect {
