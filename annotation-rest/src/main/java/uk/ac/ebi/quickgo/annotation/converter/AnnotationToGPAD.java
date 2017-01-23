@@ -40,7 +40,7 @@ import uk.ac.ebi.quickgo.annotation.model.Converter;
  */
 public class AnnotationToGPAD implements Converter {
 
-    private static final String OUTPUT_DELIMITER = "\t";
+    public static final String OUTPUT_DELIMITER = "\t";
 
 
     private ConversionUtil conversionUtil;
@@ -62,7 +62,7 @@ public class AnnotationToGPAD implements Converter {
                 annotation.evidenceCode + OUTPUT_DELIMITER +
                 conversionUtil.withFromAsString(annotation.withFrom) + OUTPUT_DELIMITER +
                 annotation.interactingTaxonId + OUTPUT_DELIMITER +
-                annotation.date + OUTPUT_DELIMITER +
+                conversionUtil.toYMD(annotation.date) + OUTPUT_DELIMITER +
                 annotation.assignedBy + OUTPUT_DELIMITER +
                 conversionUtil.extensionsAsString(annotation.extensions) + OUTPUT_DELIMITER + //Contains go evidence code only e.g. 'go_evidence=IEA'
                 "goEvidence="+annotation.goEvidence;
