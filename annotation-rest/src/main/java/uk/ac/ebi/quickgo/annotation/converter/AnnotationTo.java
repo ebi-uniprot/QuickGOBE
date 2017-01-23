@@ -15,11 +15,18 @@ import java.util.stream.Collectors;
  * Time: 17:01
  * Created with IntelliJ IDEA.
  */
-class ConversionUtil {
+abstract class AnnotationTo {
     private static final String ID_DELIMITER = ":";
     private static final String COMMA = ",";
     private static final String PIPE = "|";
     private static final DateFormat YYYYMMDD_DATE_FORMAT = new SimpleDateFormat("yyyyMMdd");
+
+    /**
+     * Convert an annotation to a String based representation. The implementing class determines the format.
+     * @param annotation instance
+     * @return String representation.
+     */
+    abstract String convert(Annotation annotation);
 
     String withFromAsString(List<Annotation.ConnectedXRefs> connectedXRefs) {
         return connectedXRefs.stream()
@@ -61,5 +68,10 @@ class ConversionUtil {
 
     public String toYMD(Date date) {
         return YYYYMMDD_DATE_FORMAT.format(date);
+    }
+
+
+    protected String idOrSlimmedId(Annotation annotation) {
+        return annotation.slimmedIds.isEmpty() ? annotation.goId : annotation.slimmedIds.get(0);
     }
 }
