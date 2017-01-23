@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
  * Created with IntelliJ IDEA.
  */
 public class ConversionUtil {
-
+    private static final String ID_DELIMITER = ":";
     private static final String COMMA = ",";
     private static final String PIPE = "|";
     private static final DateFormat YYYYMMDD_DATE_FORMAT = new SimpleDateFormat("yyyyMMdd");
@@ -52,7 +52,6 @@ public class ConversionUtil {
                        .collect(Collectors.joining(COMMA)).toString();
     }
 
-    private static final String ID_DELIMITER = ":";
     public String[] idToComponents(Annotation annotation) {
 
         return annotation.id.split(ID_DELIMITER);
