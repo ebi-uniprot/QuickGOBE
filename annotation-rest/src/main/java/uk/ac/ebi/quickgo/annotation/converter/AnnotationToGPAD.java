@@ -1,7 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.converter;
 
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
-import uk.ac.ebi.quickgo.annotation.model.Converter;
 
 /**
  * @author Tony Wardell
@@ -37,31 +36,26 @@ import uk.ac.ebi.quickgo.annotation.model.Converter;
  * UniProtKB	A0A000	involved_in	GO:0033014	GO_REF:0000002	ECO:0000256	InterPro:IPR010961		20170107	InterPro		go_evidence=IEA
  *
  */
-public class AnnotationToGPAD implements Converter {
+public class AnnotationToGPAD extends AnnotationTo {
 
     static final String OUTPUT_DELIMITER = "\t";
-    private ConversionUtil conversionUtil;
-
-    AnnotationToGPAD(ConversionUtil conversionUtil) {
-        this.conversionUtil = conversionUtil;
-    }
 
     @Override
     public String convert(Annotation annotation) {
 
-        String[] idElements = conversionUtil.idToComponents(annotation);
+        String[] idElements = idToComponents(annotation);
 
         return idElements[0] + OUTPUT_DELIMITER +
                 idElements[1] + OUTPUT_DELIMITER +
                 annotation.qualifier + OUTPUT_DELIMITER +
-                annotation.goId + OUTPUT_DELIMITER +
+                idOrSlimmedId(annotation)+ OUTPUT_DELIMITER +
                 annotation.reference + OUTPUT_DELIMITER +
                 annotation.evidenceCode + OUTPUT_DELIMITER +
-                conversionUtil.withFromAsString(annotation.withFrom) + OUTPUT_DELIMITER +
+                withFromAsString(annotation.withFrom) + OUTPUT_DELIMITER +
                 annotation.interactingTaxonId + OUTPUT_DELIMITER +
-                conversionUtil.toYMD(annotation.date) + OUTPUT_DELIMITER +
+                toYMD(annotation.date) + OUTPUT_DELIMITER +
                 annotation.assignedBy + OUTPUT_DELIMITER +
-                conversionUtil.extensionsAsString(annotation.extensions) + OUTPUT_DELIMITER + //Contains go evidence code only e.g. 'go_evidence=IEA'
+                extensionsAsString(annotation.extensions) + OUTPUT_DELIMITER + //Contains go evidence code only e.g. 'go_evidence=IEA'
                 "goEvidence="+annotation.goEvidence;
     }
 }

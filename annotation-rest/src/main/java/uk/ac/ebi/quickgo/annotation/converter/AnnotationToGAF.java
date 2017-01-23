@@ -57,7 +57,7 @@ import java.util.regex.Pattern;
  * UniProtKB	Q4VCS5	AMOT		GO:0005515	PMID:21481793	IPI	UniProtKB:P35240	F	Angiomotin	AMOT_HUMAN|AMOT|KIAA1071	protein	taxon:9606	20170108	IntAct
  * UniProtKB	Q4VCS5	AMOT		GO:0005515	PMID:21481793	IPI	UniProtKB:Q68EM7	F	Angiomotin	AMOT_HUMAN|AMOT|KIAA1071	protein	taxon:9606	20170108	IntAct
  */
-public class AnnotationToGAF {
+public class AnnotationToGAF extends AnnotationTo{
     static final String OUTPUT_DELIMITER = "\t";
     private static final String UNIPROT_KB = "UniProtKB";
     private static final int CANONICAL_GROUP_NUMBER = 2;
@@ -71,40 +71,33 @@ public class AnnotationToGAF {
     private static final String INTACT_CANONICAL_REGEX = "^(?:IntAct:)(EBI-[0-9]+)$";
     private static final Pattern INTACT_CANONICAL_PATTERN = Pattern.compile(INTACT_CANONICAL_REGEX);
 
-    private final ConversionUtil conversionUtil;
-
-    AnnotationToGAF(ConversionUtil conversionUtil) {
-        this.conversionUtil = conversionUtil;
-    }
-
-
-
     /**
      * Convert an {@link Annotation} to a String representation.
      * @param annotation instance
      * @return String TSV delimited representation of an annotation in GAF format.
      */
     public String convert(Annotation annotation) {
-        String[] idElements = conversionUtil.idToComponents(annotation);
+        String[] idElements = idToComponents(annotation);
 
         return idElements[0] + OUTPUT_DELIMITER +
                 toCanonical(annotation.id) + OUTPUT_DELIMITER +
                 annotation.symbol + OUTPUT_DELIMITER +
                 annotation.qualifier + OUTPUT_DELIMITER +
-                annotation.goId + OUTPUT_DELIMITER +
+                idOrSlimmedId(annotation)+ OUTPUT_DELIMITER +
                 annotation.reference + OUTPUT_DELIMITER +
                 annotation.evidenceCode + OUTPUT_DELIMITER +
-                conversionUtil.withFromAsString(annotation.withFrom) + OUTPUT_DELIMITER +
+                withFromAsString(annotation.withFrom) + OUTPUT_DELIMITER +
                 Aspect.fromScientificName(annotation.goAspect).character + OUTPUT_DELIMITER +
                 OUTPUT_DELIMITER +   // name - in GP core e.g. '5-formyltetrahydrofolate cyclo-ligase' optional not used
                 OUTPUT_DELIMITER +   //synonym, - in GP core  e.g. 'Nit79A3_0905' optional not used
                 toGeneProductType(idElements[0]) + OUTPUT_DELIMITER +
                 "taxon:" + annotation.taxonId + OUTPUT_DELIMITER +
-                conversionUtil.toYMD(annotation.date) + OUTPUT_DELIMITER +
+                toYMD(annotation.date) + OUTPUT_DELIMITER +
                 annotation.assignedBy + OUTPUT_DELIMITER +
-                conversionUtil.extensionsAsString(annotation.extensions) + OUTPUT_DELIMITER +
+                extensionsAsString(annotation.extensions) + OUTPUT_DELIMITER +
                 (UNIPROT_KB.equals(idElements[0]) ? String.format("%s:%s", UNIPROT_KB, idElements[1]) : "");
     }
+
 
     /**
      * Extract the canonical version of the id, removing the variation or isoform suffix if it exists.
