@@ -28,26 +28,26 @@ public class AnnotationMocker {
     private static final String COMMA = ",";
     private static final List<List<Supplier<Annotation.SimpleXRef>>> WITH_FROM = asList(
             singletonList(IPR_1), asList(IPR_2, IPR_3));
-    static final String WITH_FROM_AS_STRING = IPR_1 + "|" + IPR_2 + "," + IPR_3;
+    public static final String WITH_FROM_AS_STRING = IPR_1 + "|" + IPR_2 + "," + IPR_3;
     private static final List<List<Supplier<Annotation.QualifiedXref>>> EXTENSIONS = asList(
             singletonList(OCCURS_IN_CL_1),
             asList(OCCURS_IN_CL_2, OCCURS_IN_CL_3));
-    static final String EXTENSIONS_AS_STRING = OCCURS_IN_CL_1 + "|" + OCCURS_IN_CL_2 + "," + OCCURS_IN_CL_3;
-    static final String SYMBOL = "atf4-creb1_mouse";
-    static final String QUALIFIER = "enables";
-    static final String REFERENCE = "PMID:12871976";
+    public static final String EXTENSIONS_AS_STRING = OCCURS_IN_CL_1 + "|" + OCCURS_IN_CL_2 + "," + OCCURS_IN_CL_3;
+    public static final String SYMBOL = "atf4-creb1_mouse";
+    public static final String QUALIFIER = "enables";
+    public static final String REFERENCE = "PMID:12871976";
     private static final String GENE_PRODUCT_ID = "IntAct:EBI-10043081";
-    static final String EVIDENCE_CODE = "ECO:0000353";
+    public static final String EVIDENCE_CODE = "ECO:0000353";
     private static final String ASSIGNED_BY = "IntAct";
     private static final String GO_EVIDENCE = "IPI";
     private static final String GO_ASPECT = "molecular_function";
-    static final int TAXON_ID = 12345;
-    static final String DB = "IntAct";
-    static final String ID = "EBI-10043081";
-    static final String GO_ID = "GO:0003824";
+    public static final int TAXON_ID = 12345;
+    public static final String DB = "IntAct";
+    public static final String ID = "EBI-10043081";
+    public static final String GO_ID = "GO:0003824";
     private static final Date DATE = Date.from(
             LocalDate.of(2012, 10, 2).atStartOfDay(ZoneId.systemDefault()).toInstant());
-    static final String DATE_AS_STRING = "20121002";
+    public static final String DATE_AS_STRING = "20121002";
 
 
     public static Annotation createValidAnnotation() {

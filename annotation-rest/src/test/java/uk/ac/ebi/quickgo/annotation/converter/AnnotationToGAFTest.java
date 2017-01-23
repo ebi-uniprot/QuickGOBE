@@ -1,4 +1,9 @@
-package uk.ac.ebi.quickgo.annotation.model;
+package uk.ac.ebi.quickgo.annotation.converter;
+
+import uk.ac.ebi.quickgo.annotation.converter.AnnotationToGAF;
+import uk.ac.ebi.quickgo.annotation.model.Annotation;
+import uk.ac.ebi.quickgo.annotation.model.AnnotationMocker;
+import uk.ac.ebi.quickgo.annotation.model.ConversionUtil;
 
 import org.junit.Before;
 import org.junit.Ignore;

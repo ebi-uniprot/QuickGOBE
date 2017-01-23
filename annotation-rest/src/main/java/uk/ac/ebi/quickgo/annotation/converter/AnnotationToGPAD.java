@@ -1,4 +1,8 @@
-package uk.ac.ebi.quickgo.annotation.model;
+package uk.ac.ebi.quickgo.annotation.converter;
+
+import uk.ac.ebi.quickgo.annotation.model.Annotation;
+import uk.ac.ebi.quickgo.annotation.model.ConversionUtil;
+import uk.ac.ebi.quickgo.annotation.model.Converter;
 
 /**
  * @author Tony Wardell
@@ -34,18 +38,21 @@ package uk.ac.ebi.quickgo.annotation.model;
  * UniProtKB	A0A000	involved_in	GO:0033014	GO_REF:0000002	ECO:0000256	InterPro:IPR010961		20170107	InterPro		go_evidence=IEA
  *
  */
-public class AnnotationToGPAD {
+public class AnnotationToGPAD implements Converter {
 
-    private static final String ID_DELIMITER = ":";
     private static final String OUTPUT_DELIMITER = "\t";
 
-    public String interactingTaxonId;
 
-    public Annotation annotation;
+    private ConversionUtil conversionUtil;
 
-    public String toTSV() {
+    public AnnotationToGPAD(ConversionUtil conversionUtil) {
+        this.conversionUtil = conversionUtil;
+    }
 
-        String[] idElements = annotation.id.split(ID_DELIMITER);
+    @Override
+    public String convert(Annotation annotation) {
+
+        String[] idElements = conversionUtil.idToComponents(annotation);
 
         return idElements[0] + OUTPUT_DELIMITER +
                 idElements[1] + OUTPUT_DELIMITER +
@@ -53,11 +60,11 @@ public class AnnotationToGPAD {
                 annotation.goId + OUTPUT_DELIMITER +
                 annotation.reference + OUTPUT_DELIMITER +
                 annotation.evidenceCode + OUTPUT_DELIMITER +
-                annotation.withFrom + OUTPUT_DELIMITER +
-                interactingTaxonId + OUTPUT_DELIMITER +
+                conversionUtil.withFromAsString(annotation.withFrom) + OUTPUT_DELIMITER +
+                annotation.interactingTaxonId + OUTPUT_DELIMITER +
                 annotation.date + OUTPUT_DELIMITER +
                 annotation.assignedBy + OUTPUT_DELIMITER +
-                annotation.extensions + OUTPUT_DELIMITER + //Contains go evidence code only e.g. 'go_evidence=IEA'
+                conversionUtil.extensionsAsString(annotation.extensions) + OUTPUT_DELIMITER + //Contains go evidence code only e.g. 'go_evidence=IEA'
                 "goEvidence="+annotation.goEvidence;
     }
 }
