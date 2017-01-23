@@ -6,6 +6,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -45,7 +46,7 @@ abstract class AnnotationTo {
 
     }
 
-    public String extensionsAsString(List<Annotation.ConnectedXRefs> connectedXRefs) {
+    String extensionsAsString(List<Annotation.ConnectedXRefs> connectedXRefs) {
         return connectedXRefs.stream()
                              .map(this::qualifiedRefAndToString)
                              .collect(Collectors.joining(PIPE));
@@ -72,6 +73,7 @@ abstract class AnnotationTo {
 
 
     protected String idOrSlimmedId(Annotation annotation) {
-        return annotation.slimmedIds.isEmpty() ? annotation.goId : annotation.slimmedIds.get(0);
+        return Objects.isNull(annotation.slimmedIds) || annotation.slimmedIds.isEmpty() ? annotation.goId : annotation
+                .slimmedIds.get(0);
     }
 }
