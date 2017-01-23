@@ -43,3 +43,11 @@ annotation:
       - doi
       - go_ref
       - reactome
+  download:
+    taskExecutor:
+      corePoolSize: 4
+      maxPoolSize: 8
+      queueCapacity: 100
+      keepAliveSeconds: 7200
+      allowCoreThreadTimeout: true
+      waitForTasksToCompleteOnShutdown: false
