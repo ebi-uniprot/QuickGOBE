@@ -77,28 +77,7 @@ public class AnnotationToGAF {
         this.conversionUtil = conversionUtil;
     }
 
-    /**
-     * Extract the canonical version of the id, removing the variation or isoform suffix if it exists.
-     * @param id Annotation id, could had isoform or variant suffix.
-     * @return canonical form of the id with the soform or variant suffix removed.
-     */
-    private static String toCanonical(String id) {
-        Matcher uniprotMatcher = UNIPROT_CANONICAL_PATTERN.matcher(id);
-        if (uniprotMatcher.matches()) {
-            return uniprotMatcher.group(CANONICAL_GROUP_NUMBER);
-        }
-        Matcher rnaMatcher = RNA_CENTRAL_CANONICAL_PATTERN.matcher(id);
-        if (rnaMatcher.matches()) {
-            return rnaMatcher.group(CANONICAL_GROUP_NUMBER);
-        }
 
-        Matcher intactMatcher = INTACT_CANONICAL_PATTERN.matcher(id);
-        if (intactMatcher.matches()) {
-            return intactMatcher.group(INTACT_GROUP_NUMBER);
-        }
-        throw new IllegalArgumentException(String.format("Can not extract the canonical version of the id from %s",
-                                                         id));
-    }
 
     /**
      * Convert an {@link Annotation} to a String representation.
@@ -126,6 +105,30 @@ public class AnnotationToGAF {
                 conversionUtil.extensionsAsString(annotation.extensions) + OUTPUT_DELIMITER +
                 (UNIPROT_KB.equals(idElements[0]) ? String.format("%s:%s", UNIPROT_KB, idElements[1]) : "");
     }
+
+    /**
+     * Extract the canonical version of the id, removing the variation or isoform suffix if it exists.
+     * @param id Annotation id, could had isoform or variant suffix.
+     * @return canonical form of the id with the soform or variant suffix removed.
+     */
+    private static String toCanonical(String id) {
+        Matcher uniprotMatcher = UNIPROT_CANONICAL_PATTERN.matcher(id);
+        if (uniprotMatcher.matches()) {
+            return uniprotMatcher.group(CANONICAL_GROUP_NUMBER);
+        }
+        Matcher rnaMatcher = RNA_CENTRAL_CANONICAL_PATTERN.matcher(id);
+        if (rnaMatcher.matches()) {
+            return rnaMatcher.group(CANONICAL_GROUP_NUMBER);
+        }
+
+        Matcher intactMatcher = INTACT_CANONICAL_PATTERN.matcher(id);
+        if (intactMatcher.matches()) {
+            return intactMatcher.group(INTACT_GROUP_NUMBER);
+        }
+        throw new IllegalArgumentException(String.format("Can not extract the canonical version of the id from %s",
+                                                         id));
+    }
+
 
     private String toGeneProductType(String idElement) {
         System.out.println(idElement);
