@@ -1,7 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.converter;
 
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
-import uk.ac.ebi.quickgo.annotation.model.ConversionUtil;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

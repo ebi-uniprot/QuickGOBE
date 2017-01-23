@@ -1,4 +1,6 @@
-package uk.ac.ebi.quickgo.annotation.model;
+package uk.ac.ebi.quickgo.annotation.converter;
+
+import uk.ac.ebi.quickgo.annotation.model.Annotation;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
