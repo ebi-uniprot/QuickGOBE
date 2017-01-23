@@ -215,7 +215,9 @@ public class Annotation {
             return id;
         }
 
-        public abstract String asXref();
+        public String asXref() {
+            return String.format("%s:%s", db, id);
+        }
 
         @Override public boolean equals(Object o) {
             if (this == o) {
@@ -257,10 +259,10 @@ public class Annotation {
                     '}';
         }
 
-        @Override
-        public String asXref() {
-            return String.format("%s:%s", db, id);
-        }
+//        @Override
+//        public String asXref() {
+//            return String.format("%s:%s", db, id);
+//        }
     }
 
     /**
