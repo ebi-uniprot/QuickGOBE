@@ -30,7 +30,7 @@ abstract class AnnotationTo {
 
     String withFromAsString(List<Annotation.ConnectedXRefs> connectedXRefs) {
         return connectedXRefs.stream()
-                             .map(itemList -> simpleRefAndToString(itemList))
+                             .map(this::simpleRefAndToString)
                              .collect(Collectors.joining(PIPE));
     }
 
@@ -47,7 +47,7 @@ abstract class AnnotationTo {
 
     public String extensionsAsString(List<Annotation.ConnectedXRefs> connectedXRefs) {
         return connectedXRefs.stream()
-                             .map(itemList -> qualifiedRefAndToString(itemList))
+                             .map(this::qualifiedRefAndToString)
                              .collect(Collectors.joining(PIPE));
     }
 
