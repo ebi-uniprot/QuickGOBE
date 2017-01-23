@@ -52,6 +52,8 @@ public class Annotation {
     @JsonFormat(shape= JsonFormat.Shape.STRING, pattern = "yyyyMMdd")
     public Date date;
 
+    public String interactingTaxonId;
+
     @Override public String toString() {
         return "Annotation{" +
                 "id='" + id + '\'' +
