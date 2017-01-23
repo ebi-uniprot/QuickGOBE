@@ -64,6 +64,7 @@ public class SearchServiceConfig {
                     "evidenceCode,reference,withFrom,taxonId,assignedBy,extensions,symbol";
     private static final String SOLR_ANNOTATION_QUERY_REQUEST_HANDLER = "/query";
     private static final String DEFAULT_DOWNLOAD_SORT_FIELDS = "rowNumber,id";
+    private static final int DEFAULT_DOWNLOAD_PAGE_SIZE = 5000;
 
     @Value("${geneproduct.db.xref.valid.regexes}")
     String xrefValidationRegexFile;
@@ -75,6 +76,9 @@ public class SearchServiceConfig {
 
     @Value("${annotation.download.sort.fields:" + DEFAULT_DOWNLOAD_SORT_FIELDS + "}")
     private String defaultDownloadSortFields;
+
+    @Value("${annotation.download.page.size:" + DEFAULT_DOWNLOAD_PAGE_SIZE + "}")
+    private int downloadPageSize;
 
     @Bean
     public SearchService<Annotation> annotationSearchService(
@@ -131,10 +135,14 @@ public class SearchServiceConfig {
         return new AnnotationCompositeRetrievalConfig() {
 
             @Override
-            public List<SortCriterion> getSortCriteria() {
+            public List<SortCriterion> getDownloadSortCriteria() {
                 return Stream.of(defaultDownloadSortFields.split(COMMA))
                         .map(downloadSortField -> new SortCriterion(downloadSortField, SortCriterion.SortOrder.ASC))
                         .collect(Collectors.toList());
+            }
+
+            @Override public int getDownloadPageSize() {
+                return downloadPageSize;
             }
 
             @Override
@@ -198,6 +206,7 @@ public class SearchServiceConfig {
     }
 
     public interface AnnotationCompositeRetrievalConfig extends SolrRetrievalConfig, ServiceRetrievalConfig {
-        List<SortCriterion> getSortCriteria();
+        List<SortCriterion> getDownloadSortCriteria();
+        int getDownloadPageSize();
     }
 }

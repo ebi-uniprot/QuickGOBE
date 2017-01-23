@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
+import uk.ac.ebi.quickgo.annotation.model.AnnotationDownloadRequest;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
 import uk.ac.ebi.quickgo.annotation.model.StatisticsGroup;
 import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
@@ -127,6 +128,7 @@ public class AnnotationController {
         checkArgument(resultTransformerChain != null,
                 "The ResultTransformerChain<QueryResult<Annotation>> cannot be null.");
         checkArgument(statsService != null, "Annotation stats service cannot be null.");
+        checkArgument(taskExecutor != null, "TaskExecutor cannot be null."); // todo: test
 
         this.annotationSearchService = annotationSearchService;
         this.validationHelper = validationHelper;
@@ -197,9 +199,8 @@ public class AnnotationController {
             method = {RequestMethod.GET},
             produces = {"text/gaf", "text/gpad"})
     public ResponseEntity<ResponseBodyEmitter> downloadLookup(
-            @Valid @ModelAttribute AnnotationRequest request,
+            @Valid @ModelAttribute AnnotationDownloadRequest request,
             BindingResult bindingResult,
-            @RequestParam int downloadCount,
             @RequestHeader("Accept") MediaType mediaTypeAcceptHeader) {
         checkBindingErrors(bindingResult);
 
@@ -208,15 +209,16 @@ public class AnnotationController {
         QueryRequest queryRequest = downloadQueryTemplate.newBuilder()
                 .setQuery(QuickGOQuery.createAllQuery())
                 .addFilters(filterQueryInfo.getFilterQueries())
-                .setPage(createFirstCursorPage(request.getLimit()))
                 .build();
 
         // -1 indicates no timeout
+        // todo: instantiate with -1 and find way to test this
+        // maybe relevant: https://jira.spring.io/browse/SPR-13079
         ResponseBodyEmitter emitter = new ResponseBodyEmitter();
         taskExecutor.execute(() -> emitStreamWithMediaType(
                 emitter,
                 streamSearchResults(queryRequest, queryTemplate, annotationSearchService,
-                        resultTransformerChain, filterQueryInfo.getFilterContext(), downloadCount),
+                        resultTransformerChain, filterQueryInfo.getFilterContext(), request.getDownloadLimit()),
                 mediaTypeAcceptHeader));
 
         return ResponseEntity
@@ -226,17 +228,18 @@ public class AnnotationController {
     }
 
     private DefaultSearchQueryTemplate createSearchQueryTemplate(
-            SearchServiceConfig.AnnotationCompositeRetrievalConfig annotationRetrievalConfig) {
+            SearchServiceConfig.AnnotationCompositeRetrievalConfig retrievalConfig) {
         DefaultSearchQueryTemplate template = new DefaultSearchQueryTemplate();
-        template.setReturnedFields(annotationRetrievalConfig.getSearchReturnedFields());
+        template.setReturnedFields(retrievalConfig.getSearchReturnedFields());
         return template;
     }
 
     private DefaultSearchQueryTemplate createDownloadSearchQueryTemplate(
-            SearchServiceConfig.AnnotationCompositeRetrievalConfig annotationRetrievalConfig) {
+            SearchServiceConfig.AnnotationCompositeRetrievalConfig retrievalConfig) {
         DefaultSearchQueryTemplate template = new DefaultSearchQueryTemplate();
-        template.setReturnedFields(annotationRetrievalConfig.getSearchReturnedFields());
-        annotationRetrievalConfig.getSortCriteria()
+        template.setReturnedFields(retrievalConfig.getSearchReturnedFields());
+        template.setPage(createFirstCursorPage(retrievalConfig.getDownloadPageSize()));
+        retrievalConfig.getDownloadSortCriteria()
                 .forEach(criterion ->
                         template.addSortCriterion(criterion.getSortField().getField(), criterion.getSortOrder()));
         return template;

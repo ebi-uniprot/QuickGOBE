@@ -95,7 +95,7 @@ public class AnnotationControllerIT {
                 get(RESOURCE_URL + "/downloadSearch")
                         .header("Accept", "text/gaf")
                         .param("limit", "7")
-                        .param("downloadCount", "10"));
+                        .param("downloadLimit", "10"));
 //        MvcResult mvcResult = mockMvc.perform(
 //                get(RESOURCE_URL + "/downloadSearch")
 //                        .header("Accept", "text/gaf")

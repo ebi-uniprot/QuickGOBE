@@ -105,7 +105,7 @@ public class AnnotationRequest {
     @ApiModelProperty(
             value = "Number of results per page.",
             allowableValues = "range[" + MIN_ENTRIES_PER_PAGE + "," + MAX_ENTRIES_PER_PAGE + "]")
-    private int limit = DEFAULT_ENTRIES_PER_PAGE;
+    protected int limit = DEFAULT_ENTRIES_PER_PAGE;
 
     @ApiModelProperty(
             value = "Page number of the result set to display.",

@@ -65,6 +65,10 @@ public class DefaultSearchQueryTemplate {
         this.sortCriteria.add(new SortCriterion(field, order));
     }
 
+    public void setPage(Page page) {
+        this.page = page;
+    }
+
     public Builder newBuilder() {
         return new Builder(this);
     }
