@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.annotation.converter;
 
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 
+import java.util.StringJoiner;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -79,25 +80,25 @@ public class AnnotationToGAF extends AnnotationTo implements Function<Annotation
          */
         public String apply(Annotation annotation) {
             String[] idElements = idToComponents(annotation);
-
-            return idElements[0] + OUTPUT_DELIMITER +
-                    toCanonical(annotation.id) + OUTPUT_DELIMITER +
-                    annotation.symbol + OUTPUT_DELIMITER +
-                    annotation.qualifier + OUTPUT_DELIMITER +
-                    idOrSlimmedId(annotation) + OUTPUT_DELIMITER +
-                    annotation.reference + OUTPUT_DELIMITER +
-                    annotation.evidenceCode + OUTPUT_DELIMITER +
-                    withFromAsString(annotation.withFrom) + OUTPUT_DELIMITER +
-                    Aspect.fromScientificName(annotation.goAspect).character + OUTPUT_DELIMITER +
-                    OUTPUT_DELIMITER +
-                    // name - in GP core e.g. '5-formyltetrahydrofolate cyclo-ligase' optional not used
-                    OUTPUT_DELIMITER +   //synonym, - in GP core  e.g. 'Nit79A3_0905' optional not used
-                    toGeneProductType(idElements[0]) + OUTPUT_DELIMITER +
-                    "taxon:" + annotation.taxonId + OUTPUT_DELIMITER +
-                    toYMD(annotation.date) + OUTPUT_DELIMITER +
-                    annotation.assignedBy + OUTPUT_DELIMITER +
-                    extensionsAsString(annotation.extensions) + OUTPUT_DELIMITER +
-                    (UNIPROT_KB.equals(idElements[0]) ? String.format("%s:%s", UNIPROT_KB, idElements[1]) : "");
+            StringJoiner tsvJoiner = new StringJoiner(OUTPUT_DELIMITER);
+            return tsvJoiner.add(idElements[0])
+                            .add(toCanonical(annotation.id))
+                            .add(annotation.symbol)
+                            .add(annotation.qualifier)
+                            .add(idOrSlimmedId(annotation))
+                            .add(annotation.reference)
+                            .add(annotation.evidenceCode)
+                            .add(withFromAsString(annotation.withFrom))
+                            .add(Aspect.fromScientificName(annotation.goAspect).character)
+                            .add("")   // name - in GP core optional not used
+                            .add("")   //synonym, - in GP core  e.g. 'Nit79A3_0905' optional not used
+                            .add(toGeneProductType(idElements[0]))
+                            .add("taxon:" + annotation.taxonId)
+                            .add(toYMD(annotation.date))
+                            .add(annotation.assignedBy)
+                            .add(extensionsAsString(annotation.extensions))
+                            .add((UNIPROT_KB.equals(idElements[0]) ? String.format("%s:%s", UNIPROT_KB,
+                                                                                   idElements[1]) : "")).toString();
         }
 
     /**
