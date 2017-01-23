@@ -39,12 +39,10 @@ import uk.ac.ebi.quickgo.annotation.model.Converter;
  */
 public class AnnotationToGPAD implements Converter {
 
-    public static final String OUTPUT_DELIMITER = "\t";
-
-
+    static final String OUTPUT_DELIMITER = "\t";
     private ConversionUtil conversionUtil;
 
-    public AnnotationToGPAD(ConversionUtil conversionUtil) {
+    AnnotationToGPAD(ConversionUtil conversionUtil) {
         this.conversionUtil = conversionUtil;
     }
 
