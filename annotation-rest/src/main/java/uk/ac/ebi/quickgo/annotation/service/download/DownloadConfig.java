@@ -5,6 +5,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.web.servlet.config.annotation.AsyncSupportConfigurer;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 /**
  * Configuration beans and details used for annotation downloads.
@@ -17,7 +19,21 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 @ConfigurationProperties(prefix = "annotation.download")
 public class DownloadConfig {
 
+    private static final int DEFAULT_DOWNLOAD_EMITTER_TIMEOUT_MILLIS = 5 * 60 * 1000;
+
     private TaskExecutorProperties taskExecutor = new TaskExecutorProperties();
+    private int defaultEmitterTimeout = DEFAULT_DOWNLOAD_EMITTER_TIMEOUT_MILLIS;
+
+    @Bean
+    public WebMvcConfigurerAdapter asyncWebMvcConfigurerAdapter() {
+        return new WebMvcConfigurerAdapter() {
+            @Override
+            public void configureAsyncSupport(AsyncSupportConfigurer configurer) {
+                configurer.setDefaultTimeout(defaultEmitterTimeout);
+                super.configureAsyncSupport(configurer);
+            }
+        };
+    }
 
     @Bean
     public ThreadPoolTaskExecutor taskExecutor(ThreadPoolTaskExecutor configurableTaskExecutor) {

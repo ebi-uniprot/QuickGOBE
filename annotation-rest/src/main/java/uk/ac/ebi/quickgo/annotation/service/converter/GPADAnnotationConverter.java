@@ -21,6 +21,6 @@ public class GPADAnnotationConverter {
     }
 
     public String convert(Annotation annotation) {
-        return "value1\tvalue2\tvalue3\tvalue4";
+        return annotation.geneProductId+"\t"+annotation.goId+"\tvalue2\tvalue3\tvalue4";
     }
 }

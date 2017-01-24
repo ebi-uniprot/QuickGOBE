@@ -8,7 +8,10 @@ import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.*;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.StringJoiner;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -22,14 +25,13 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import static java.util.Arrays.asList;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.*;
 import static uk.ac.ebi.quickgo.annotation.IdGeneratorUtil.createGPId;
@@ -84,35 +86,6 @@ public class AnnotationControllerIT {
 
         genericDocs = createGenericDocs(NUMBER_OF_GENERIC_DOCS);
         repository.save(genericDocs);
-    }
-
-    // DOWNLOAD
-    @Test
-    public void canDownload() throws Exception {
-        createGenericDocs(20).forEach(repository::save);
-
-        ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/downloadSearch")
-                        .header("Accept", "text/gaf")
-                        .param("limit", "7")
-                        .param("downloadLimit", "10"));
-//        MvcResult mvcResult = mockMvc.perform(
-//                get(RESOURCE_URL + "/downloadSearch")
-//                        .header("Accept", "text/gaf")
-//                        .param("limit", "7")
-//                        .param("downloadCount", "10"))
-//                .andExpect(request().asyncStarted())
-//                .andReturn();
-//
-//        mockMvc.perform(asyncDispatch(mvcResult))
-//                .andExpect(status().isOk())
-//                .andDo(MvcResult::getAsyncResult)
-//                .andDo(print());
-
-        response
-                .andExpect(request().asyncStarted())
-                .andDo(MvcResult::getAsyncResult)
-                .andDo(print());
     }
 
     // CONSISTENT ORDER
@@ -1521,7 +1494,7 @@ public class AnnotationControllerIT {
         String newExtension = "results_in_development_of(UBERON:8888888)";
         final String newGeneProduct = "A0A123";
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc(newGeneProduct);
-        doc.extensions = Arrays.asList(newExtension, EXTENSION_3);
+        doc.extensions = asList(newExtension, EXTENSION_3);
         repository.save(doc);
 
         //Although this filter will match the newly added Annotation for two extension strings (the existing test

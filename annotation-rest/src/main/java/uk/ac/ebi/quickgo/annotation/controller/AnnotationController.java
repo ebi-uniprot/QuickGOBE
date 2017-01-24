@@ -41,6 +41,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.slf4j.LoggerFactory.getLogger;
+import static org.springframework.http.HttpHeaders.ACCEPT;
 import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.searchAndTransform;
 import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.streamSearchResults;
 import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.createFirstCursorPage;
@@ -127,7 +128,7 @@ public class AnnotationController {
         checkArgument(resultTransformerChain != null,
                 "The ResultTransformerChain<QueryResult<Annotation>> cannot be null.");
         checkArgument(statsService != null, "Annotation stats service cannot be null.");
-        checkArgument(taskExecutor != null, "TaskExecutor cannot be null."); // todo: test
+        checkArgument(taskExecutor != null, "TaskExecutor cannot be null.");
 
         this.annotationSearchService = annotationSearchService;
         this.validationHelper = validationHelper;
@@ -197,10 +198,12 @@ public class AnnotationController {
     @RequestMapping(value = "/downloadSearch",
             method = {RequestMethod.GET},
             produces = {"text/gaf", "text/gpad"})
+    // todo: add text/gaf and gpad media types explicitly, which other classes can make use of. Could put in a
+    // MediaTypes class in annotation....http package.
     public ResponseEntity<ResponseBodyEmitter> downloadLookup(
             @Valid @ModelAttribute AnnotationRequest request,
             BindingResult bindingResult,
-            @RequestHeader("Accept") MediaType mediaTypeAcceptHeader) {
+            @RequestHeader(ACCEPT) MediaType mediaTypeAcceptHeader) {
         checkBindingErrors(bindingResult);
 
         FilterQueryInfo filterQueryInfo = extractFilterQueryInfo(request);
@@ -210,9 +213,6 @@ public class AnnotationController {
                 .addFilters(filterQueryInfo.getFilterQueries())
                 .build();
 
-        // -1 indicates no timeout
-        // todo: instantiate with -1 and find way to test this
-        // maybe relevant: https://jira.spring.io/browse/SPR-13079
         ResponseBodyEmitter emitter = new ResponseBodyEmitter();
         taskExecutor.execute(() -> emitStreamWithMediaType(
                 emitter,
@@ -280,6 +280,7 @@ public class AnnotationController {
         String extension = "." + mediaType.getSubtype();
         String fileName = "QuickGO-annotations" + now.format(format) + extension;
         httpHeaders.setContentDispositionFormData("attachment", fileName);
+        httpHeaders.setContentType(mediaType);
         return httpHeaders;
     }
 
@@ -291,6 +292,7 @@ public class AnnotationController {
             emitter.send(annotationResultStream, mediaType);
         } catch (IOException e) {
             LOGGER.error("Failed to stream annotation results", e);
+            emitter.completeWithError(e);
         }
         emitter.complete();
         LOGGER.info("Emitted response stream -- which will be written by the HTTP message converter for: " + mediaType);
