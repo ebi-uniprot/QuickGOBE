@@ -215,7 +215,7 @@ public class AnnotationRequest {
 
     @ApiModelProperty(
             value = "Gene ontology evidence codes of the 'goId's found within the annotations. Accepts comma " +
-                    "separated values",
+                    "separated values.",
             example = "EXP,IDA")
     private String goIdEvidence;
 
