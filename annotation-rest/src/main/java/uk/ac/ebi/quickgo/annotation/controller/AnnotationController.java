@@ -1,7 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
-import uk.ac.ebi.quickgo.annotation.model.AnnotationDownloadRequest;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
 import uk.ac.ebi.quickgo.annotation.model.StatisticsGroup;
 import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
@@ -199,7 +198,7 @@ public class AnnotationController {
             method = {RequestMethod.GET},
             produces = {"text/gaf", "text/gpad"})
     public ResponseEntity<ResponseBodyEmitter> downloadLookup(
-            @Valid @ModelAttribute AnnotationDownloadRequest request,
+            @Valid @ModelAttribute AnnotationRequest request,
             BindingResult bindingResult,
             @RequestHeader("Accept") MediaType mediaTypeAcceptHeader) {
         checkBindingErrors(bindingResult);

@@ -290,4 +290,11 @@ public class AnnotationRequestTest {
         annotationRequest.setEvidenceCode(ecoId);
         assertThat(annotationRequest.getEvidenceCode(), arrayContaining(ecoId));
     }
+
+    @Test
+    public void setAndGetDownloadLimit() {
+        int limit = 12345;
+        annotationRequest.setDownloadLimit(limit);
+        assertThat(annotationRequest.getDownloadLimit(), is(limit));
+    }
 }
