@@ -23,6 +23,9 @@ abstract class AnnotationTo {
     private static final DateFormat YYYYMMDD_DATE_FORMAT = new SimpleDateFormat("yyyyMMdd");
 
     String withFromAsString(List<Annotation.ConnectedXRefs> connectedXRefs) {
+        if (connectedXRefs == null || connectedXRefs.size() == 0) {
+            return "";
+        }
         return connectedXRefs.stream()
                              .map(this::simpleRefAndToString)
                              .collect(Collectors.joining(PIPE));

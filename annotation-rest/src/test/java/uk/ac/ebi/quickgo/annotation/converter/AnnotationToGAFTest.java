@@ -183,6 +183,20 @@ public class AnnotationToGAFTest {
     }
 
     @Test
+    public void testForNullInWithFrom(){
+        annotation.withFrom = null;
+        String[] elements = annotationToElements(annotation);
+        assertThat(elements[COL_WITH], is(""));
+    }
+
+    @Test
+    public void testForEmptyWithFrom(){
+        annotation.withFrom = new ArrayList<>();
+        String[] elements = annotationToElements(annotation);
+        assertThat(elements[COL_WITH], is(""));
+    }
+
+    @Test
     public void testForNullInExtensions(){
         annotation.extensions = null;
         String[] elements = annotationToElements(annotation);
