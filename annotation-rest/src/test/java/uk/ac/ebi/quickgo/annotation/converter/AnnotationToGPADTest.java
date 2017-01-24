@@ -3,6 +3,7 @@ package uk.ac.ebi.quickgo.annotation.converter;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationMocker;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import org.junit.Before;
 import org.junit.Test;
@@ -43,8 +44,7 @@ public class AnnotationToGPADTest {
 
     @Test
     public void createGAFStringFromAnnotationModelContainingIntAct(){
-        String converted = annotationToGPAD.apply(annotation);
-        String[] elements = converted.split(AnnotationToGPAD.OUTPUT_DELIMITER);
+        String[] elements = annotationToElements(annotation);
         assertThat(elements[COL_DB], is(DB));
         assertThat(elements[COL_DB_OBJECT_ID], is(ID));
         assertThat(elements[COL_QUALIFIER], is(QUALIFIER));
@@ -63,8 +63,27 @@ public class AnnotationToGPADTest {
     public void slimmedToGoIdReplacesGoIdIfItExists(){
         final String slimmedToGoId = "GO:0005524";
         annotation.slimmedIds = Arrays.asList(slimmedToGoId);
-        String converted = annotationToGPAD.apply(annotation);
-        String[] elements = converted.split(AnnotationToGAF.OUTPUT_DELIMITER);
+        String[] elements = annotationToElements(annotation);
         assertThat(elements[COL_GO_ID], is(slimmedToGoId));
     }
+
+    @Test
+    public void testForNullInExtensions(){
+        annotation.extensions = null;
+        String[] elements = annotationToElements(annotation);
+        assertThat(elements[COL_ANNOTATION_EXTENSION], is(""));
+    }
+
+    @Test
+    public void testForEmptyExtensions(){
+        annotation.extensions = new ArrayList<>();
+        String[] elements = annotationToElements(annotation);
+        assertThat(elements[COL_ANNOTATION_EXTENSION], is(""));
+    }
+
+    private String[] annotationToElements(Annotation annotation) {
+        return annotationToGPAD.apply(annotation)
+                              .split(AnnotationToGAF.OUTPUT_DELIMITER, -1);
+    }
+
 }
