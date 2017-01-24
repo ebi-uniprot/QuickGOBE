@@ -3,6 +3,7 @@ package uk.ac.ebi.quickgo.annotation.converter;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationMocker;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -50,10 +51,8 @@ public class AnnotationToGAFTest {
 
     @Test
     public void createGAFStringFromAnnotationModelContainingIntAct(){
-        String converted = annotationToGAF.apply(annotation);
         final String gpType = "complex";
-
-        String[] elements = converted.split(AnnotationToGAF.OUTPUT_DELIMITER);
+        String[] elements = annotationToElements(annotation);
         assertThat(elements[COL_DB], is(DB));
         assertThat(elements[COL_DB_OBJECT_ID], is(ID));
         assertThat(elements[COL_DB_OBJECT_SYMBOL], is(SYMBOL));
@@ -82,9 +81,7 @@ public class AnnotationToGAFTest {
         annotation.geneProductId = gpId;
         annotation.assignedBy = db;
         annotation.symbol = gpId;
-        String converted = annotationToGAF.apply(annotation);
-
-        String[] elements = converted.split("\t");
+        String[] elements = annotationToElements(annotation);
         assertThat(elements[COL_DB], is(db));
         assertThat(elements[COL_DB_OBJECT_ID], is(gpIdCanonical));
         assertThat(elements[COL_DB_OBJECT_SYMBOL], is(gpId));
@@ -114,9 +111,7 @@ public class AnnotationToGAFTest {
         annotation.geneProductId = gpId;
         annotation.assignedBy = db;
         annotation.symbol = gpId;
-        String converted = annotationToGAF.apply(annotation);
-
-        String[] elements = converted.split("\t");
+        String[] elements = annotationToElements(annotation);
         assertThat(elements[COL_DB], is(db));
         assertThat(elements[COL_DB_OBJECT_ID], is(gpIdCanonical));
         assertThat(elements[COL_DB_OBJECT_SYMBOL], is(gpId));
@@ -144,9 +139,7 @@ public class AnnotationToGAFTest {
         String gpIdCanonical = "Q9P2J5";
         String db = "IntAct";
         annotation.id = String.format("%s:%s",db,gpId);
-        String converted = annotationToGAF.apply(annotation);
-
-        String[] elements = converted.split("\t");
+        String[] elements = annotationToElements(annotation);
         assertThat(elements[COL_DB], is(DB));
         assertThat(elements[COL_DB_OBJECT_ID], is(gpIdCanonical));
         assertThat(elements[COL_DB_OBJECT_SYMBOL], is(gpId));
@@ -168,8 +161,7 @@ public class AnnotationToGAFTest {
     @Test
     public void createGAFStringFromAnnotationWhereAspectIsBiologicalProcess(){
         annotation.goAspect = "biological_process";
-        String converted = annotationToGAF.apply(annotation);
-        String[] elements = converted.split("\t");
+        String[] elements = annotationToElements(annotation);
         assertThat(elements[COL_ASPECT], is("P"));
 
     }
@@ -177,8 +169,7 @@ public class AnnotationToGAFTest {
     @Test
     public void createGAFStringFromAnnotationWhereAspectIsCellularComponent(){
         annotation.goAspect = "cellular_component";
-        String converted = annotationToGAF.apply(annotation);
-        String[] elements = converted.split("\t");
+        String[] elements = annotationToElements(annotation);
         assertThat(elements[COL_ASPECT], is("C"));
 
     }
@@ -187,9 +178,27 @@ public class AnnotationToGAFTest {
     public void slimmedToGoIdReplacesGoIdIfItExists(){
         final String slimmedToGoId = "GO:0005524";
         annotation.slimmedIds = Arrays.asList(slimmedToGoId);
-        String converted = annotationToGAF.apply(annotation);
-        String[] elements = converted.split(AnnotationToGAF.OUTPUT_DELIMITER);
+        String[] elements = annotationToElements(annotation);
         assertThat(elements[COL_GO_ID], is(slimmedToGoId));
+    }
+
+    @Test
+    public void testForNullInExtensions(){
+        annotation.extensions = null;
+        String[] elements = annotationToElements(annotation);
+        assertThat(elements[COL_ANNOTATION_EXTENSION], is(""));
+    }
+
+    @Test
+    public void testForEmptyExtensions(){
+        annotation.extensions = new ArrayList<>();
+        String[] elements = annotationToElements(annotation);
+        assertThat(elements[COL_ANNOTATION_EXTENSION], is(""));
+    }
+
+    private String[] annotationToElements(Annotation annotation) {
+        return annotationToGAF.apply(annotation)
+                              .split(AnnotationToGAF.OUTPUT_DELIMITER, -1);
     }
 
 }
