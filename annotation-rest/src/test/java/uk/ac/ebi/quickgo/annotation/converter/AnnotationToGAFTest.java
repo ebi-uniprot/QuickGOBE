@@ -132,10 +132,9 @@ public class AnnotationToGAFTest {
     }
 
     @Test
-    @Ignore // "Q9P2J5" does not match IntAct regex
     public void createGAFStringFromAnnotationModelContainingIntActWithVariantOrIsoForm(){
         final String gpType = "complex";
-        String gpId = "Q9P2J5-3";
+        String gpId = "IntAct:EBI-10043081";
         String gpIdCanonical = "Q9P2J5";
         String db = "IntAct";
         annotation.id = String.format("%s:%s",db,gpId);
