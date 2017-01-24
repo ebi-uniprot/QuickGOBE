@@ -40,6 +40,9 @@ abstract class AnnotationTo {
     }
 
     String extensionsAsString(List<Annotation.ConnectedXRefs> connectedXRefs) {
+        if (connectedXRefs == null || connectedXRefs.size() == 0) {
+            return "";
+        }
         return connectedXRefs.stream()
                              .map(this::qualifiedRefAndToString)
                              .collect(Collectors.joining(PIPE));
