@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.annotation.converter;
 
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 
+import java.util.StringJoiner;
 import java.util.function.Function;
 
 /**
@@ -44,20 +45,20 @@ public class AnnotationToGPAD extends AnnotationTo implements Function<Annotatio
 
     @Override
     public String apply(Annotation annotation) {
-
+        StringJoiner tsvJoiner = new StringJoiner(OUTPUT_DELIMITER);
         String[] idElements = idToComponents(annotation);
+        return tsvJoiner.add(idElements[0])
+                        .add(idElements[1])
+                        .add(annotation.qualifier)
+                        .add(idOrSlimmedId(annotation))
+                        .add(annotation.reference)
+                        .add(annotation.evidenceCode)
+                        .add(withFromAsString(annotation.withFrom))
+                        .add(annotation.interactingTaxonId)
+                        .add(toYMD(annotation.date))
+                        .add(annotation.assignedBy)
+                        .add(extensionsAsString(annotation.extensions))
+                        .add("goEvidence=" + annotation.goEvidence).toString();
 
-        return idElements[0] + OUTPUT_DELIMITER +
-                idElements[1] + OUTPUT_DELIMITER +
-                annotation.qualifier + OUTPUT_DELIMITER +
-                idOrSlimmedId(annotation)+ OUTPUT_DELIMITER +
-                annotation.reference + OUTPUT_DELIMITER +
-                annotation.evidenceCode + OUTPUT_DELIMITER +
-                withFromAsString(annotation.withFrom) + OUTPUT_DELIMITER +
-                annotation.interactingTaxonId + OUTPUT_DELIMITER +
-                toYMD(annotation.date) + OUTPUT_DELIMITER +
-                annotation.assignedBy + OUTPUT_DELIMITER +
-                extensionsAsString(annotation.extensions) + OUTPUT_DELIMITER + //Contains go evidence code only e.g. 'go_evidence=IEA'
-                "goEvidence="+annotation.goEvidence;
     }
 }
