@@ -9,8 +9,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -24,7 +22,6 @@ import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.*;
  * Created 07/04/16
  * @author Edd
  */
-@RunWith(MockitoJUnitRunner.class)
 public class SearchDispatcherTest {
     private static class MockSearchableField implements SearchableField {
 

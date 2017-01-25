@@ -1,17 +1,5 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import org.slf4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.task.TaskExecutor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
 import uk.ac.ebi.quickgo.annotation.model.StatisticsGroup;
@@ -30,16 +18,23 @@ import uk.ac.ebi.quickgo.rest.search.request.converter.FilterConverterFactory;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformerChain;
 
-import javax.validation.Valid;
-import java.io.IOException;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Stream;
+import javax.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static java.util.Arrays.asList;
-import static org.slf4j.LoggerFactory.getLogger;
 import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.searchAndTransform;
 
 /**
@@ -94,8 +89,6 @@ import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.searchAndTransform;
 @RestController
 @RequestMapping(value = "/annotation")
 public class AnnotationController {
-    private static final Logger LOGGER = getLogger(AnnotationController.class);
-
     private final ControllerValidationHelper validationHelper;
 
     private final SearchService<Annotation> annotationSearchService;
@@ -104,7 +97,6 @@ public class AnnotationController {
     private final FilterConverterFactory converterFactory;
     private final ResultTransformerChain<QueryResult<Annotation>> resultTransformerChain;
     private final StatisticsService statsService;
-    private final TaskExecutor taskExecutor;
 
     @Autowired
     public AnnotationController(SearchService<Annotation> annotationSearchService,
@@ -112,8 +104,7 @@ public class AnnotationController {
             ControllerValidationHelper validationHelper,
             FilterConverterFactory converterFactory,
             ResultTransformerChain<QueryResult<Annotation>> resultTransformerChain,
-            StatisticsService statsService,
-            TaskExecutor taskExecutor) {
+            StatisticsService statsService) {
         checkArgument(annotationSearchService != null, "The SearchService<Annotation> instance passed " +
                 "to the constructor of AnnotationController should not be null.");
         checkArgument(annotationRetrievalConfig != null, "The SearchServiceConfig" +
@@ -133,7 +124,6 @@ public class AnnotationController {
 
         this.queryTemplate = new DefaultSearchQueryTemplate();
         this.queryTemplate.setReturnedFields(annotationRetrievalConfig.getSearchReturnedFields());
-        this.taskExecutor = taskExecutor;
     }
 
     /**
@@ -222,63 +212,5 @@ public class AnnotationController {
 
         QueryResult<StatisticsGroup> stats = statsService.calculate(request);
         return new ResponseEntity<>(stats, HttpStatus.OK);
-    }
-
-    @RequestMapping(value = "/download",
-            method = {RequestMethod.GET},
-            produces = {"text/gaf", "text/gpad"})
-    public ResponseEntity<ResponseBodyEmitter> downloadContent(
-            @RequestParam(defaultValue = "10") int limit, @RequestHeader("Accept") MediaType acceptHeader) {
-        LOGGER.info("Request received");
-
-        // -1 indicates no timeout
-        ResponseBodyEmitter emitter = new ResponseBodyEmitter(-1L);
-
-        taskExecutor.execute(() -> {
-            emitStreamWithMediaType(emitter, new FakeResultStreamGenerator().fakeGoodResultEntityStream(limit),
-                    acceptHeader);
-        });
-        ResponseEntity<ResponseBodyEmitter> response = ResponseEntity.ok().body(emitter);
-        // todo: for now I'm not setting headers to make the response be returned as a file.
-        // todo: test that a client-abort behaves as expected
-        // how to make the response come as a file:
-        /*
-            HttpHeaders httpHeaders = new HttpHeaders();
-            httpHeaders.setContentDispositionFormData("attachment", "myInterestingAndRelevantFileName.txt");
-            response = ResponseEntity.ok().headers(httpHeaders).body(emitter);
-         */
-
-        LOGGER.info("Servlet thread released");
-
-        return response;
-    }
-
-    private void emitStreamWithMediaType(
-            ResponseBodyEmitter emitter,
-            Stream<QueryResult<Annotation>> annotationResultStream,
-            MediaType mediaType) {
-        try {
-            emitter.send(annotationResultStream, mediaType);
-        } catch (IOException e) {
-            LOGGER.error("Failed to emit annotation result", e);
-        }
-        emitter.complete();
-        LOGGER.info("Emitted streamed response -- which will be written by the HTTP message converter for: " +
-                mediaType);
-    }
-
-    class FakeResultStreamGenerator {
-        Stream<QueryResult<Annotation>> fakeGoodResultEntityStream(int limit) {
-            return Stream.generate(() -> {
-                List<Annotation> annotations = asList(new Annotation(), new Annotation());
-                try {
-                    Thread.sleep(2);
-                    LOGGER.info("sleeping...");
-                } catch (InterruptedException e) {
-                    LOGGER.error("Error sleeping", e);
-                }
-                return new QueryResult.Builder<>(100, annotations).build();
-            }).limit(limit);
-        }
     }
 }
