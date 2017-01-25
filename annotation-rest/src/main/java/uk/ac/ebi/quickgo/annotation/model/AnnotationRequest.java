@@ -227,7 +227,7 @@ public class AnnotationRequest {
             example = "occurs_in(CL:0000032),transports_or_maintains_localization_of(UniProtKB:P10288)|" +
                     "results_in_formation_of(UBERON:0003070),occurs_in(CL:0000032),occurs_in(CL:0000008)," +
                     "results_in_formation_of(UBERON:0001675)")
-    private String[] extensions;
+    private String extension;
 
     private final Map<String, String[]> filterMap = new HashMap<>();
 
