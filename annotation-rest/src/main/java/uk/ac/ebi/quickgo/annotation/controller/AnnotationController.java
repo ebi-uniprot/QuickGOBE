@@ -27,6 +27,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Stream;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,8 +41,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static java.util.Arrays.asList;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.http.HttpHeaders.ACCEPT;
+import static uk.ac.ebi.quickgo.annotation.service.http.GAFHttpMessageConverter.GAF_MEDIA_TYPE_STRING;
+import static uk.ac.ebi.quickgo.annotation.service.http.GPADHttpMessageConverter.GPAD_MEDIA_TYPE_STRING;
 import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.searchAndTransform;
 import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.streamSearchResults;
 import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.createFirstCursorPage;
@@ -110,6 +114,7 @@ public class AnnotationController {
     private final ResultTransformerChain<QueryResult<Annotation>> resultTransformerChain;
     private final StatisticsService statsService;
     private final TaskExecutor taskExecutor;
+    private static final String gafMediaType = MediaType.toString(asList(new MediaType("text", "gaf")));
 
     @Autowired
     public AnnotationController(SearchService<Annotation> annotationSearchService,
@@ -196,14 +201,12 @@ public class AnnotationController {
     }
 
     @RequestMapping(value = "/downloadSearch",
-            method = {RequestMethod.GET},
-            produces = {"text/gaf", "text/gpad"})
-    // todo: add text/gaf and gpad media types explicitly, which other classes can make use of. Could put in a
-    // MediaTypes class in annotation....http package.
+            method = {RequestMethod.GET}, produces = {GPAD_MEDIA_TYPE_STRING, GAF_MEDIA_TYPE_STRING})
     public ResponseEntity<ResponseBodyEmitter> downloadLookup(
             @Valid @ModelAttribute AnnotationRequest request,
             BindingResult bindingResult,
-            @RequestHeader(ACCEPT) MediaType mediaTypeAcceptHeader) {
+            @RequestHeader(ACCEPT) MediaType mediaTypeAcceptHeader,
+            HttpServletRequest servletRequest) {
         checkBindingErrors(bindingResult);
 
         FilterQueryInfo filterQueryInfo = extractFilterQueryInfo(request);
@@ -214,6 +217,14 @@ public class AnnotationController {
                 .build();
 
         ResponseBodyEmitter emitter = new ResponseBodyEmitter();
+        try {
+            emitter.send((" ! " + servletRequest.getRequestURL().toString() +
+                                  " : " + servletRequest.getRequestURI() + ":" + servletRequest.getQueryString()),
+                    MediaType.TEXT_PLAIN);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         taskExecutor.execute(() -> emitStreamWithMediaType(
                 emitter,
                 streamSearchResults(queryRequest, queryTemplate, annotationSearchService,

@@ -37,6 +37,8 @@ import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.c
 
 /**
  * Tests whether the downloading functionality of the {@link AnnotationController} works as expected.
+ * The functional tests relating to the filtering of results are covered by {@link AnnotationControllerIT} since the
+ * search results found used by the download functionality is unchanged.
  *
  * Created 24/01/17
  * @author Edd
@@ -117,20 +119,19 @@ public class AnnotationControllerDownloadIT {
     }
 
     @Test
-    public void downloadLimitTooLargeCausesException() throws Exception {
+    public void downloadLimitTooLargeCausesBadRequest() throws Exception {
         ResultActions response = mockMvc.perform(
                 get(DOWNLOAD_SEARCH_URL)
-                        .header(ACCEPT, GPAD_MEDIA_TYPE)
+                        .header(ACCEPT, GAF_MEDIA_TYPE)
                         .param(DOWNLOAD_LIMIT_PARAM, Integer.toString(MAX_DOWNLOAD_NUMBER + 1)));
-        // todo: check how to handle in async setup
-        // todo:
+
         response
                 .andDo(print())
                 .andExpect(status().isBadRequest());
     }
 
     @Test
-    public void downloadLimitTooSmallCausesException() throws Exception {
+    public void downloadLimitTooSmallCausesBadRequest() throws Exception {
         ResultActions response = mockMvc.perform(
                 get(DOWNLOAD_SEARCH_URL)
                         .header(ACCEPT, GPAD_MEDIA_TYPE)
