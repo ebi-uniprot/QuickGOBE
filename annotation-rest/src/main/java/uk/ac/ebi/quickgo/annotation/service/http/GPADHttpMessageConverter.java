@@ -75,7 +75,6 @@ public class GPADHttpMessageConverter extends AbstractHttpMessageConverter<Objec
         } else {
             writeAnnotations(out, (Stream<QueryResult<Annotation>>) object);
         }
-
     }
 
     private void writeError(OutputStream out, ResponseExceptionHandler.ErrorInfo errorInfo) throws IOException {

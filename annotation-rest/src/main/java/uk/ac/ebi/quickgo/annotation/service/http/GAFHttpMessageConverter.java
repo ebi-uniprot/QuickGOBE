@@ -75,7 +75,6 @@ public class GAFHttpMessageConverter extends AbstractHttpMessageConverter<Object
         } else {
             writeAnnotations(out, (Stream<QueryResult<Annotation>>) object);
         }
-
     }
 
     private void writeError(OutputStream out, ResponseExceptionHandler.ErrorInfo errorInfo) throws IOException {
