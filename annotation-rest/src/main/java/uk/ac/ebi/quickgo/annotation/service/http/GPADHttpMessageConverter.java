@@ -32,15 +32,17 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class GPADHttpMessageConverter extends AbstractHttpMessageConverter<Object> {
     private static final String TYPE = "text";
     private static final String SUB_TYPE = "gpad";
+    private static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
 
-    public static final MediaType MEDIA_TYPE = new MediaType(TYPE, SUB_TYPE, Charset.forName("UTF-8"));
+    public static final MediaType GPAD_MEDIA_TYPE = new MediaType(TYPE, SUB_TYPE, DEFAULT_CHARSET);
     public static final String GPAD_MEDIA_TYPE_STRING = TYPE + "/" + SUB_TYPE;
 
     private static final Logger GPAD_LOGGER = getLogger(GPADHttpMessageConverter.class);
+    private static final int FLUSH_INTERVAL = 5000;
     private final GPADAnnotationConverter converter;
 
     public GPADHttpMessageConverter(GPADAnnotationConverter converter) {
-        super(MEDIA_TYPE);
+        super(GPAD_MEDIA_TYPE);
         this.converter = converter;
     }
 
@@ -91,17 +93,12 @@ public class GPADHttpMessageConverter extends AbstractHttpMessageConverter<Objec
                 try {
                     out.write((converter.convert(annotation) + "\n").getBytes());
                     counter.getAndIncrement();
+
+                    if (counter.get() % FLUSH_INTERVAL == 0) {
+                        out.flush();
+                    }
                 } catch (IOException e) {
                     GPAD_LOGGER.error("Could not write annotation in GPAD format: " + annotation, e);
-                }
-                // flush occasionally
-                // todo: currently flushing every 20, to see effects. Future, flush every 10000 or so, or forget it?
-                if (counter.get() % 20 == 0) {
-                    try {
-                        out.flush();
-                    } catch (IOException e) {
-                        GPAD_LOGGER.error("Could not flush stream", e);
-                    }
                 }
             });
         });

@@ -14,7 +14,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -34,6 +33,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.createGenericDocs;
+import static uk.ac.ebi.quickgo.annotation.service.http.GAFHttpMessageConverter.GAF_MEDIA_TYPE;
+import static uk.ac.ebi.quickgo.annotation.service.http.GPADHttpMessageConverter.GPAD_MEDIA_TYPE;
 
 /**
  * Tests whether the downloading functionality of the {@link AnnotationController} works as expected.
@@ -53,10 +54,7 @@ public class AnnotationControllerDownloadIT {
 
     private static final int NUMBER_OF_GENERIC_DOCS = 10;
     private static final String DOWNLOAD_SEARCH_URL = "/annotation/downloadSearch";
-    private static final String MEDIA_TYPE_TEXT_GAF = "text/gaf";
     private static final String DOWNLOAD_LIMIT_PARAM = "downloadLimit";
-    private static final MediaType GAF_MEDIA_TYPE = new MediaType("text", "gaf");
-    private static final MediaType GPAD_MEDIA_TYPE = new MediaType("text", "gpad");
     private static final int MIN_DOWNLOAD_NUMBER = 1;
     private static final int MAX_DOWNLOAD_NUMBER = 50000;
 
@@ -86,7 +84,7 @@ public class AnnotationControllerDownloadIT {
     public void canDownloadInGafFormat() throws Exception {
         ResultActions response = mockMvc.perform(
                 get(DOWNLOAD_SEARCH_URL)
-                        .header(ACCEPT, MEDIA_TYPE_TEXT_GAF)
+                        .header(ACCEPT, GAF_MEDIA_TYPE)
                         .param(DOWNLOAD_LIMIT_PARAM, "10"));
 
         List<String> storedIds = getFieldValuesFromRepo(doc -> doc.geneProductId);

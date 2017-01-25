@@ -32,15 +32,17 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class GAFHttpMessageConverter extends AbstractHttpMessageConverter<Object> {
     private static final String TYPE = "text";
     private static final String SUB_TYPE = "gaf";
+    private static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
 
-    public static final MediaType MEDIA_TYPE = new MediaType(TYPE, SUB_TYPE, Charset.forName("UTF-8"));
+    public static final MediaType GAF_MEDIA_TYPE = new MediaType(TYPE, SUB_TYPE, DEFAULT_CHARSET);
     public static final String GAF_MEDIA_TYPE_STRING = TYPE + "/" + SUB_TYPE;
 
     private static final Logger GAF_LOGGER = getLogger(GAFHttpMessageConverter.class);
+    private static final int FLUSH_INTERVAL = 5000;
     private final GAFAnnotationConverter converter;
 
     public GAFHttpMessageConverter(GAFAnnotationConverter converter) {
-        super(MEDIA_TYPE);
+        super(GAF_MEDIA_TYPE);
         this.converter = converter;
     }
 
@@ -66,7 +68,8 @@ public class GAFHttpMessageConverter extends AbstractHttpMessageConverter<Object
         dispatchWriting(annotationStream, out);
     }
 
-    @SuppressWarnings("unchecked") private void dispatchWriting(Object object, OutputStream out) throws IOException {
+    @SuppressWarnings("unchecked")
+    private void dispatchWriting(Object object, OutputStream out) throws IOException {
         if (object instanceof ResponseExceptionHandler.ErrorInfo) {
             writeError(out, (ResponseExceptionHandler.ErrorInfo) object);
         } else {
@@ -76,7 +79,7 @@ public class GAFHttpMessageConverter extends AbstractHttpMessageConverter<Object
     }
 
     private void writeError(OutputStream out, ResponseExceptionHandler.ErrorInfo errorInfo) throws IOException {
-        out.write(("URL:\n\t" + errorInfo.getUrl()+"\n").getBytes());
+        out.write(("URL:\n\t" + errorInfo.getUrl() + "\n").getBytes());
         out.write(("Messages:\n\t" + errorInfo.getMessages().stream().collect(Collectors.joining(",\n"))).getBytes());
     }
 
@@ -91,21 +94,16 @@ public class GAFHttpMessageConverter extends AbstractHttpMessageConverter<Object
                 try {
                     out.write((converter.convert(annotation) + "\n").getBytes());
                     counter.getAndIncrement();
-                } catch (IOException e) {
-                    GAF_LOGGER.error("Could not write annotation in GPAD format: " + annotation, e);
-                }
-                // flush occasionally
-                // todo: currently flushing every 20, to see effects. Future, flush every 10000 or so, or forget it?
-                if (counter.get() % 20 == 0) {
-                    try {
+
+                    if (counter.get() % FLUSH_INTERVAL == 0) {
                         out.flush();
-                    } catch (IOException e) {
-                        GAF_LOGGER.error("Could not flush stream", e);
                     }
+                } catch (IOException e) {
+                    GAF_LOGGER.error("Could not write annotation in GAF format: " + annotation, e);
                 }
             });
         });
-        GAF_LOGGER.info("Written " + counter.get() + " GPAD annotations");
+        GAF_LOGGER.info("Written " + counter.get() + " GAF annotations");
     }
 
     private void writeHeaderLines(OutputStream out, List<String> headerLines) {
