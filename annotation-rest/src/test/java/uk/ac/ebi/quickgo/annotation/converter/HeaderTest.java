@@ -1,78 +1,89 @@
 package uk.ac.ebi.quickgo.annotation.converter;
 
-import uk.ac.ebi.quickgo.annotation.validation.loader.ValidationConfig;
-import uk.ac.ebi.quickgo.annotation.validation.service.JobTestRunnerConfig;
-
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.SpringApplicationContextLoader;
-import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 /**
  * @author Tony Wardell
  * Date: 25/01/2017
  * Time: 17:00
  * Created with IntelliJ IDEA.
  */
-//@RunWith(SpringJUnit4ClassRunner.class)
-//@ContextConfiguration(class = loader = SpringApplicationContextLoader.class)
 public class HeaderTest {
 
-    public static final String FILE_LOC = "C:\\Users\\twardell\\IdeaProjects\\QuickGOBE\\annotation-rest\\src\\test" +
-                                          "\\resources" +
-                                          "/ONTOLOGY_IRI.dat.gz";
-    public static final String URI = "/QuickGO/services/annotation/search";
-    @Value("${download.ontology.source}")
-    private Resource[] resources;
-
+    private static final String FILE_LOC = "C:\\Users\\twardell\\IdeaProjects\\QuickGOBE\\annotation-rest\\src\\test" +
+            "\\resources/ONTOLOGY_IRI.dat.gz";
+    private static final DateFormat YYYYMMDD_DATE_FORMAT = new SimpleDateFormat("yyyyMMdd");
+    private static final String URI = "/QuickGO/services/annotation/search";
     private static final Map<String, String[]> mockParameterMap = new HashMap<>();
-    static {
-        mockParameterMap.put("assignedBy", new String[] {"foo","bar"} );
+    private static final String todaysDate;
 
+    static {
+        mockParameterMap.put("assignedBy", new String[]{"foo", "bar"});
+        mockParameterMap.put("evidence", new String[]{"ECO:12345"});
+        todaysDate = YYYYMMDD_DATE_FORMAT.format(new Date());
     }
 
-    @Mock ResponseBodyEmitter mockEmitter = mock(ResponseBodyEmitter.class);
-    @Mock HttpServletRequest mockRequest = mock(HttpServletRequest.class);
-    @Mock MediaType mockMediaType = mock(MediaType.class);
+    private @Mock ResponseBodyEmitter mockEmitter = mock(ResponseBodyEmitter.class);
+    private @Mock HttpServletRequest mockRequest = mock(HttpServletRequest.class);
+    private @Mock MediaType mockMediaType = mock(MediaType.class);
+    private Header header;
 
     @Before
-    public void setup(){
-        when(mockMediaType.getSubtype()).thenReturn("GAF");
+    public void setup() {
         when(mockRequest.getRequestURI()).thenReturn(URI);
         when(mockRequest.getParameterMap()).thenReturn(mockParameterMap);
-    }
 
-
-    @Test
-    public void produceHeader() throws Exception{
         Paths.get(".").getFileSystem().getRootDirectories();
         Path ontologyPath = Paths.get(FILE_LOC);
-        Header header = new Header(ontologyPath);
-        header.write(mockEmitter, mockRequest,mockMediaType);
+        header = new Header(ontologyPath);
+    }
+
+    @Test
+    public void produceGAFHeader() throws Exception {
+        when(mockMediaType.getSubtype()).thenReturn("GAF");
+        header.write(mockEmitter, mockRequest, mockMediaType);
 
         //Test
         verify(mockEmitter).send("!gaf-version: 2.1", MediaType.TEXT_PLAIN);
+        testRestOfHeader();
+    }
+
+    @Test
+    public void produceGPADHeader() throws Exception {
+        when(mockMediaType.getSubtype()).thenReturn("GPAD");
+        header.write(mockEmitter, mockRequest, mockMediaType);
+
+        //Test
+        verify(mockEmitter).send("!gpa-version: 1.1", MediaType.TEXT_PLAIN);
+        testRestOfHeader();
+    }
+    private void testRestOfHeader() throws IOException {
         verify(mockEmitter).send("!" + Header.PROJECT_NAME, MediaType.TEXT_PLAIN);
         verify(mockEmitter).send("!" + Header.URL, MediaType.TEXT_PLAIN);
         verify(mockEmitter).send("!" + Header.EMAIL, MediaType.TEXT_PLAIN);
-        verify(mockEmitter).send("!" + Header.DATE + "20170126", MediaType.TEXT_PLAIN);
+        verify(mockEmitter).send("!" + Header.DATE + todaysDate, MediaType.TEXT_PLAIN);
         verify(mockEmitter).send("!" + Header.FILTERS_INTRO, MediaType.TEXT_PLAIN);
-        verify(mockEmitter).send("!" + URI + "?assignedBy=foo,bar", MediaType.TEXT_PLAIN);
+        verify(mockEmitter).send("!" + URI + "?assignedBy=foo,bar&evidence=ECO:12345", MediaType.TEXT_PLAIN);
+        verify(mockEmitter).send("!" + "http://purl.obolibrary.org/obo/eco/releases/2017-01-06/eco.owl",
+                                 MediaType.TEXT_PLAIN);
+        verify(mockEmitter).send("!" + "http://purl.obolibrary.org/obo/go/releases/2017-01-12/go.owl",
+                                 MediaType.TEXT_PLAIN);
     }
 }
