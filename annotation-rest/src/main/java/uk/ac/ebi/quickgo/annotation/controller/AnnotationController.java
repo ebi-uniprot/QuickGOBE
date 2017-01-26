@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -150,7 +151,8 @@ public class AnnotationController {
     @ApiOperation(value = "Search for all annotations that match the filter criteria provided by the client.")
     @RequestMapping(value = "/search", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<Annotation>> annotationLookup(
-            @Valid @ModelAttribute AnnotationRequest request, BindingResult bindingResult) {
+            @Valid @ModelAttribute AnnotationRequest request,
+            BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
             throw new ParameterBindingException(bindingResult);
@@ -228,7 +230,8 @@ public class AnnotationController {
             method = {RequestMethod.GET},
             produces = {"text/gaf", "text/gpad"})
     public ResponseEntity<ResponseBodyEmitter> downloadContent(
-            @RequestParam(defaultValue = "10") int limit, @RequestHeader("Accept") MediaType acceptHeader) {
+            @RequestParam(defaultValue = "10") int limit, @RequestHeader("Accept") MediaType acceptHeader,
+            HttpServletRequest request) {
         LOGGER.info("Request received");
 
         // -1 indicates no timeout
