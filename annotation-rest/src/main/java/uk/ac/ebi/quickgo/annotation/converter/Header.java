@@ -1,15 +1,17 @@
 package uk.ac.ebi.quickgo.annotation.converter;
 
+import uk.ac.ebi.quickgo.common.loader.GZIPFiles;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.FileTime;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 
@@ -39,19 +41,20 @@ import static java.util.Arrays.stream;
  */
 public class Header {
 
-    private static final String PROJECT_NAME = "Project_name: UniProt GO Annotation (UniProt-GOA)";
-    private static final String URL = "URL: http://www.ebi.ac.uk/GOA";
-    private static final String EMAIL = "Contact Email: goa@ebi.ac.uk";
-    private static final String FILTERS_INTRO = "Filtering parameters selected to generate file:";
-    private static final String GAF_VERSION = "gaf-version: 2.1";
-    private static final String GPAD_VERSION = "gpa-version: 1.1";
+    static final String PROJECT_NAME = "Project_name: UniProt GO Annotation (UniProt-GOA)";
+    static final String URL = "URL: http://www.ebi.ac.uk/GOA";
+    static final String EMAIL = "Contact Email: goa@ebi.ac.uk";
+    static final String DATE = " * !Date downloaded from the QuickGO browser: ";
+
+    static final String FILTERS_INTRO = "Filtering parameters selected to generate file:";
+    static final String GAF_VERSION = "gaf-version: 2.1";
+    static final String GPAD_VERSION = "gpa-version: 1.1";
     private static final DateFormat YYYYMMDD_DATE_FORMAT = new SimpleDateFormat("yyyyMMdd");
-    private static final String HEADER_LINE_PREFIX = " ! ";
+    private static final String HEADER_LINE_PREFIX = "!";
     private final Path ontologyPath;
     private List<String> savedOntologyLines;
-    private String previousTimeStamp;
+    private FileTime previousTimeStamp;
 
-    @Autowired
     public Header(Path ontologyPath) {
         this.ontologyPath = ontologyPath;
     }
@@ -87,11 +90,11 @@ public class Header {
     }
 
     private String date() {
-        return YYYYMMDD_DATE_FORMAT.format(new Date());
+        return DATE + YYYYMMDD_DATE_FORMAT.format(new Date());
     }
 
     private String request(HttpServletRequest request) {
-        return request.getRequestURI() + parameterString(request);
+        return request.getRequestURI() + "?" + parameterString(request);
     }
 
     private String parameterString(HttpServletRequest request) {
@@ -105,14 +108,14 @@ public class Header {
 
     private List<String> ontology() {
         try {
-            String lastModifiedTime = (String) Files.getAttribute(ontologyPath, "lastModifiedTime");
+            FileTime lastModifiedTime = (FileTime)Files.getAttribute(ontologyPath, "lastModifiedTime");
 
             if (!lastModifiedTime.equals(previousTimeStamp)) {
                 previousTimeStamp = lastModifiedTime;
-                savedOntologyLines = Files.readAllLines(ontologyPath).stream()
-                                          .skip(1)
-                                          .map(s -> s.substring(s.indexOf("http:")))
-                                          .collect(Collectors.toList());
+                savedOntologyLines = GZIPFiles.lines(ontologyPath)
+                                              .skip(1)
+                                              .map(s -> s.substring(s.indexOf("http:")))
+                                              .collect(Collectors.toList());
 
             }
         } catch (Exception e) {
