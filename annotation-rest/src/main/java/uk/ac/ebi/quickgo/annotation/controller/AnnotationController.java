@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
+import uk.ac.ebi.quickgo.annotation.converter.Header;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
 import uk.ac.ebi.quickgo.annotation.model.StatisticsGroup;
@@ -106,6 +107,7 @@ public class AnnotationController {
     private final ResultTransformerChain<QueryResult<Annotation>> resultTransformerChain;
     private final StatisticsService statsService;
     private final TaskExecutor taskExecutor;
+    private final Header header;
 
     @Autowired
     public AnnotationController(SearchService<Annotation> annotationSearchService,
@@ -114,7 +116,8 @@ public class AnnotationController {
             FilterConverterFactory converterFactory,
             ResultTransformerChain<QueryResult<Annotation>> resultTransformerChain,
             StatisticsService statsService,
-            TaskExecutor taskExecutor) {
+            TaskExecutor taskExecutor,
+            Header header) {
         checkArgument(annotationSearchService != null, "The SearchService<Annotation> instance passed " +
                 "to the constructor of AnnotationController should not be null.");
         checkArgument(annotationRetrievalConfig != null, "The SearchServiceConfig" +
@@ -124,6 +127,7 @@ public class AnnotationController {
         checkArgument(resultTransformerChain != null,
                 "The ResultTransformerChain<QueryResult<Annotation>> cannot be null.");
         checkArgument(statsService != null, "Annotation stats service cannot be null.");
+        checkArgument(header != null, "Header cannot be null.");
 
         this.annotationSearchService = annotationSearchService;
         this.validationHelper = validationHelper;
@@ -135,6 +139,7 @@ public class AnnotationController {
         this.queryTemplate = new DefaultSearchQueryTemplate();
         this.queryTemplate.setReturnedFields(annotationRetrievalConfig.getSearchReturnedFields());
         this.taskExecutor = taskExecutor;
+        this.header = header;
     }
 
     /**
@@ -236,6 +241,7 @@ public class AnnotationController {
 
         // -1 indicates no timeout
         ResponseBodyEmitter emitter = new ResponseBodyEmitter(-1L);
+        header.write(emitter, request, acceptHeader);
 
         taskExecutor.execute(() -> {
             emitStreamWithMediaType(emitter, new FakeResultStreamGenerator().fakeGoodResultEntityStream(limit),
