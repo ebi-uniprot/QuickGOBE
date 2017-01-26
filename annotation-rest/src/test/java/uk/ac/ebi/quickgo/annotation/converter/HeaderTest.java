@@ -11,8 +11,12 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 
 import static org.mockito.Mockito.mock;
@@ -25,10 +29,10 @@ import static org.mockito.Mockito.when;
  * Time: 17:00
  * Created with IntelliJ IDEA.
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringApplicationConfiguration(classes = HeaderTestConfig.class)
 public class HeaderTest {
 
-    private static final String FILE_LOC = "C:\\Users\\twardell\\IdeaProjects\\QuickGOBE\\annotation-rest\\src\\test" +
-            "\\resources/ONTOLOGY_IRI.dat.gz";
     private static final DateFormat YYYYMMDD_DATE_FORMAT = new SimpleDateFormat("yyyyMMdd");
     private static final String URI = "/QuickGO/services/annotation/search";
     private static final Map<String, String[]> mockParameterMap = new HashMap<>();
@@ -43,14 +47,15 @@ public class HeaderTest {
     private @Mock ResponseBodyEmitter mockEmitter = mock(ResponseBodyEmitter.class);
     private @Mock HttpServletRequest mockRequest = mock(HttpServletRequest.class);
     private @Mock MediaType mockMediaType = mock(MediaType.class);
+
+    @Autowired
     private Header header;
 
+
     @Before
-    public void setup() {
+    public void setup() throws IOException {
         when(mockRequest.getRequestURI()).thenReturn(URI);
         when(mockRequest.getParameterMap()).thenReturn(mockParameterMap);
-        Path ontologyPath = Paths.get(FILE_LOC);
-        header = new Header(ontologyPath);
     }
 
     @Test
