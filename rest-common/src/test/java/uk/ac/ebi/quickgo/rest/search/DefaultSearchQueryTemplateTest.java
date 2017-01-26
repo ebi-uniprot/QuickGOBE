@@ -13,6 +13,8 @@ import org.junit.rules.ExpectedException;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.createCursorPage;
+import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.createFirstCursorPage;
 
 /**
  * Created 11/04/16
@@ -186,7 +188,7 @@ public class DefaultSearchQueryTemplateTest {
         DefaultSearchQueryTemplate.Builder requestBuilder = createBuilder();
         int pageSize = 22;
         String cursor = "fakeCursor";
-        CursorPage expectedPage = CursorPage.createCursorPage(cursor, pageSize);
+        CursorPage expectedPage = createCursorPage(cursor, pageSize);
 
         Page abstractRetrievedPage = requestBuilder
                 .setPage(expectedPage)
@@ -267,6 +269,17 @@ public class DefaultSearchQueryTemplateTest {
         checkSortCriterion(sortCriteria.get(0), sortField0, sortOrder0);
         checkSortCriterion(sortCriteria.get(1), sortField1, sortOrder1);
         checkSortCriterion(sortCriteria.get(2), sortField2, sortOrder2);
+    }
+
+    @Test
+    public void templatePageIsUsedByBuilder() {
+        Page cursorPage = createFirstCursorPage(12345);
+        defaultSearchQueryTemplate.setPage(cursorPage);
+        QueryRequest request = defaultSearchQueryTemplate
+                .newBuilder()
+                .setQuery(new AllQuery())
+                .build();
+        assertThat(request.getPage(), is(cursorPage));
     }
 
     private void checkSortCriterion(SortCriterion criterion, String field, SortCriterion.SortOrder order) {
