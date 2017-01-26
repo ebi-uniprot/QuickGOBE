@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 
 import static java.util.Arrays.stream;
@@ -39,6 +40,7 @@ import static java.util.Arrays.stream;
  * !Filtering parameters selected to generate file:
  * GAnnotation?count=25&protein=A0A000&select=normal&advanced=&termUse=ancestor&slimTypes=IPO%3D
  */
+@Component
 public class Header {
 
     static final String PROJECT_NAME = "Project_name: UniProt GO Annotation (UniProt-GOA)";
