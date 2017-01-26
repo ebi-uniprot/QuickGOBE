@@ -91,6 +91,11 @@ public class HeaderTest {
         header.write(mockEmitter, mockRequest, mockMediaType);
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void pathToOntologyFileIsNull() throws Exception {
+      new Header(null);
+    }
+
     private void testRestOfHeader() throws IOException {
         verify(mockEmitter).send("!" + Header.PROJECT_NAME, MediaType.TEXT_PLAIN);
         verify(mockEmitter).send("!" + Header.URL, MediaType.TEXT_PLAIN);

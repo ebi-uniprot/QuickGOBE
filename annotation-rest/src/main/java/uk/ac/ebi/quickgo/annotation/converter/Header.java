@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.annotation.converter;
 
 import uk.ac.ebi.quickgo.common.loader.GZIPFiles;
 
+import com.google.common.base.Preconditions;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -58,6 +59,7 @@ public class Header {
     private FileTime previousTimeStamp;
 
     public Header(Path ontologyPath) {
+        Preconditions.checkArgument(ontologyPath != null, "The path to the ontology file must not be null");
         this.ontologyPath = ontologyPath;
     }
 
