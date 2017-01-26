@@ -61,7 +61,7 @@ public class HeaderTest {
         header.write(mockEmitter, mockRequest, mockMediaType);
 
         //Test
-        verify(mockEmitter).send("!gaf-version: 2.1", MediaType.TEXT_PLAIN);
+        verify(mockEmitter).send("!" + Header.GAF_VERSION, MediaType.TEXT_PLAIN);
         testRestOfHeader();
     }
 
@@ -71,7 +71,7 @@ public class HeaderTest {
         header.write(mockEmitter, mockRequest, mockMediaType);
 
         //Test
-        verify(mockEmitter).send("!gpa-version: 1.1", MediaType.TEXT_PLAIN);
+        verify(mockEmitter).send("!" + Header.GPAD_VERSION, MediaType.TEXT_PLAIN);
         testRestOfHeader();
     }
     private void testRestOfHeader() throws IOException {
