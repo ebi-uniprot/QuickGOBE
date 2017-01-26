@@ -134,14 +134,14 @@ public class AnnotationToGAFTest {
     @Test
     public void createGAFStringFromAnnotationModelContainingIntActWithVariantOrIsoForm(){
         final String gpType = "complex";
-        String gpId = "IntAct:EBI-10043081";
-        String gpIdCanonical = "Q9P2J5";
+        String gpId = "EBI-10043081";
+        String gpIdCanonical = "EBI-10043081";
         String db = "IntAct";
         annotation.id = String.format("%s:%s",db,gpId);
         String[] elements = annotationToElements(annotation);
         assertThat(elements[COL_DB], is(DB));
         assertThat(elements[COL_DB_OBJECT_ID], is(gpIdCanonical));
-        assertThat(elements[COL_DB_OBJECT_SYMBOL], is(gpId));
+        assertThat(elements[COL_DB_OBJECT_SYMBOL], is(SYMBOL));
         assertThat(elements[COL_QUALIFIER], is(QUALIFIER));
         assertThat(elements[COL_GO_ID], is(GO_ID));
         assertThat(elements[COL_REFERENCE], is(REFERENCE));
