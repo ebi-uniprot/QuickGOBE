@@ -49,8 +49,6 @@ public class HeaderTest {
     public void setup() {
         when(mockRequest.getRequestURI()).thenReturn(URI);
         when(mockRequest.getParameterMap()).thenReturn(mockParameterMap);
-
-        Paths.get(".").getFileSystem().getRootDirectories();
         Path ontologyPath = Paths.get(FILE_LOC);
         header = new Header(ontologyPath);
     }
@@ -74,6 +72,20 @@ public class HeaderTest {
         verify(mockEmitter).send("!" + Header.GPAD_VERSION, MediaType.TEXT_PLAIN);
         testRestOfHeader();
     }
+
+    @Test(expected = RuntimeException.class)
+    public void headerOutputThrowsExceptionWhenOntologyFileIsNotAvailable() throws Exception {
+        Path ontologyPath = Paths.get("/nowhere/city");
+        header = new Header(ontologyPath);
+        header.write(mockEmitter, mockRequest, mockMediaType);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void headerOutputThrowsExceptionWhenMediaTypeIsUnexpected() throws Exception {
+        when(mockMediaType.getSubtype()).thenReturn("FOOBAR");
+        header.write(mockEmitter, mockRequest, mockMediaType);
+    }
+
     private void testRestOfHeader() throws IOException {
         verify(mockEmitter).send("!" + Header.PROJECT_NAME, MediaType.TEXT_PLAIN);
         verify(mockEmitter).send("!" + Header.URL, MediaType.TEXT_PLAIN);
