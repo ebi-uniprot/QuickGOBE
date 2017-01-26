@@ -26,12 +26,12 @@ public class QueryRequestTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void nullQueryThrowsException() throws Exception {
+    public void nullQueryThrowsException() {
         new QueryRequest.Builder(null);
     }
 
     @Test
-    public void buildsQueryRequestOnlyWithQuery() throws Exception {
+    public void buildsQueryRequestOnlyWithQuery() {
         QueryRequest request = new QueryRequest.Builder(query).build();
 
         assertThat(request.getQuery(), is(equalTo(query)));
@@ -41,12 +41,12 @@ public class QueryRequestTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void invalidPageParametersThrowsException() throws Exception {
+    public void invalidPageParametersThrowsException() {
         new QueryRequest.Builder(query).setPage(new RegularPage(-1, 2)).build();
     }
 
     @Test
-    public void buildsQueryRequestWithQueryAndRegularPageParameterComponents() throws Exception {
+    public void buildsQueryRequestWithQueryAndRegularPageParameterComponents() {
         int pageNumber = 1;
         int pageSize = 2;
         QueryRequest request = new QueryRequest.Builder(query)
@@ -66,14 +66,14 @@ public class QueryRequestTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void invalidFacetFieldThrowsException() throws Exception {
+    public void invalidFacetFieldThrowsException() {
         new QueryRequest.Builder(query)
                 .addFacetField(null)
                 .build();
     }
 
     @Test
-    public void buildsQueryRequestWithQueryAndTwoFacetFields() throws Exception {
+    public void buildsQueryRequestWithQueryAndTwoFacetFields() {
         String facetField1 = "facet1";
         String facetField2 = "facet2";
 
@@ -93,7 +93,7 @@ public class QueryRequestTest {
     }
 
     @Test
-    public void buildsQueryRequestWithQueryAndFilterQuery() throws Exception {
+    public void buildsQueryRequestWithQueryAndFilterQuery() {
         QuickGOQuery filterQuery1 = QuickGOQuery.createQuery("field2", "value2");
         QuickGOQuery filterQuery2 = QuickGOQuery.createQuery("field3", "value3");
 
@@ -110,7 +110,7 @@ public class QueryRequestTest {
     }
 
     @Test
-    public void addFilterQueryToQueryRequest() throws Exception {
+    public void addFilterQueryToQueryRequest() {
         QueryRequest request = new QueryRequest.Builder(query)
                 .build();
 

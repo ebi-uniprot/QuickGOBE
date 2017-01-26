@@ -121,9 +121,8 @@ public class SearchDispatcherTest {
     // validate filter queries ----------------------------------------------
     @Test
     public void allSearchableFieldsColonValueAreValidForFilterQueries() {
-        List<String> filterQueries = Collections.singletonList(MockSearchableField.SEARCHABLE_FIELD)
-                .stream()
-                .map(field -> field +":pretendValue")
+        List<String> filterQueries = Stream.of(MockSearchableField.SEARCHABLE_FIELD)
+                .map(field -> field + ":pretendValue")
                 .collect(Collectors.toList());
 
         assertThat(isValidFilterQueries(searchableField, filterQueries), is(true));
