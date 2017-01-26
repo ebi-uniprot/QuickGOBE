@@ -9,10 +9,13 @@ import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
@@ -43,6 +46,7 @@ import static java.util.Arrays.stream;
  */
 @Component
 public class Header {
+    Logger logger = LoggerFactory.getLogger(Header.class);
 
     static final String PROJECT_NAME = "Project_name: UniProt GO Annotation (UniProt-GOA)";
     static final String URL = "URL: http://www.ebi.ac.uk/GOA";
@@ -123,7 +127,8 @@ public class Header {
 
             }
         } catch (Exception e) {
-            throw new RuntimeException("Failed to load the version of the ontology", e);
+            savedOntologyLines = Collections.emptyList();
+            logger.error("Failed to load the version of the ontology", e);
         }
         return savedOntologyLines;
     }

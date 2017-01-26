@@ -20,6 +20,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -78,12 +79,20 @@ public class HeaderTest {
         testRestOfHeader();
     }
 
-    @Test(expected = RuntimeException.class)
-    public void headerOutputThrowsExceptionWhenOntologyFileIsNotAvailable() throws Exception {
+    @Test
+    public void headerOutputDoesNotContainOntologyInformationWhenFileIsNotAvailable() throws Exception {
         Path ontologyPath = Paths.get("/nowhere/city");
+        when(mockMediaType.getSubtype()).thenReturn("GAF");
         header = new Header(ontologyPath);
         header.write(mockEmitter, mockRequest, mockMediaType);
+        verify(mockEmitter, never()).send("!" + "http://purl.obolibrary.org/obo/eco/releases/2017-01-06/eco.owl",
+                                 MediaType.TEXT_PLAIN);
+        verify(mockEmitter, never()).send("!" + "http://purl.obolibrary.org/obo/go/releases/2017-01-12/go.owl",
+                                 MediaType.TEXT_PLAIN);
+        verify(mockEmitter, never()).send("!", MediaType.TEXT_PLAIN);
+        verify(mockEmitter, never()).send("!", MediaType.TEXT_PLAIN);
     }
+
 
     @Test(expected = IllegalArgumentException.class)
     public void headerOutputThrowsExceptionWhenMediaTypeIsUnexpected() throws Exception {
