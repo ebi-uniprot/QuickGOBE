@@ -18,7 +18,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 @EnableScheduling
 @ConfigurationProperties(prefix = "annotation.download")
 public class DownloadConfig {
-
     private static final int DEFAULT_DOWNLOAD_EMITTER_TIMEOUT_MILLIS = 5 * 60 * 1000;
 
     private TaskExecutorProperties taskExecutor = new TaskExecutorProperties();

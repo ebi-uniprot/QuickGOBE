@@ -1,17 +1,5 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import org.slf4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.task.TaskExecutor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
 import uk.ac.ebi.quickgo.annotation.model.StatisticsGroup;
@@ -53,7 +41,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static java.util.Arrays.asList;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static uk.ac.ebi.quickgo.annotation.service.http.GAFHttpMessageConverter.GAF_MEDIA_TYPE_STRING;
@@ -115,6 +102,9 @@ import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.createFirstCursorPa
 @RequestMapping(value = "/annotation")
 public class AnnotationController {
     private static final Logger LOGGER = getLogger(AnnotationController.class);
+    public static final DateTimeFormatter DOWNLOAD_FILE_NAME_DATE_FORMATTER =
+            DateTimeFormatter.ofPattern("-N-yyyyMMdd");
+    public static final String DOWNLOAD_FILE_NAME_PREFIX = "QuickGO-annotations";
 
     private final ControllerValidationHelper validationHelper;
 
@@ -126,7 +116,6 @@ public class AnnotationController {
     private final ResultTransformerChain<QueryResult<Annotation>> resultTransformerChain;
     private final StatisticsService statsService;
     private final TaskExecutor taskExecutor;
-    private static final String gafMediaType = MediaType.toString(asList(new MediaType("text", "gaf")));
 
     @Autowired
     public AnnotationController(SearchService<Annotation> annotationSearchService,
@@ -299,9 +288,8 @@ public class AnnotationController {
     private HttpHeaders createHttpDownloadHeader(MediaType mediaType) {
         HttpHeaders httpHeaders = new HttpHeaders();
         LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter format = DateTimeFormatter.ofPattern("-N-yyyyMMdd");
         String extension = "." + mediaType.getSubtype();
-        String fileName = "QuickGO-annotations" + now.format(format) + extension;
+        String fileName = DOWNLOAD_FILE_NAME_PREFIX + now.format(DOWNLOAD_FILE_NAME_DATE_FORMATTER) + extension;
         httpHeaders.setContentDispositionFormData("attachment", fileName);
         httpHeaders.setContentType(mediaType);
         return httpHeaders;
