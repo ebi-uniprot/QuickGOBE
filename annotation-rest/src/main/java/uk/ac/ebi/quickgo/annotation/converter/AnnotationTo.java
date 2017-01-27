@@ -55,7 +55,6 @@ abstract class AnnotationTo {
     }
 
     public String[] idToComponents(Annotation annotation) {
-
         return annotation.id.split(ID_DELIMITER);
     }
 
