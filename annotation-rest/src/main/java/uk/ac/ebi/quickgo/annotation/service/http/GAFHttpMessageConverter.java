@@ -28,7 +28,8 @@ import static org.slf4j.LoggerFactory.getLogger;
  * @author Edd
  */
 public class GAFHttpMessageConverter extends AbstractHttpMessageConverter<Stream<QueryResult<Annotation>>> {
-    private static final MediaType MEDIA_TYPE = new MediaType("text", "gaf", Charset.forName("utf-8"));
+    public static final String SUB_TYPE = "gaf";
+    private static final MediaType MEDIA_TYPE = new MediaType("text", SUB_TYPE, Charset.forName("utf-8"));
     private static final Logger GAF_LOGGER = getLogger(GAFHttpMessageConverter.class);
     private final GAFAnnotationConverter converter;
 

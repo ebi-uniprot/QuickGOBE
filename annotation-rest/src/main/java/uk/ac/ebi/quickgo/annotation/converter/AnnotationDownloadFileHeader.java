@@ -1,5 +1,7 @@
 package uk.ac.ebi.quickgo.annotation.converter;
 
+import uk.ac.ebi.quickgo.annotation.service.http.GAFHttpMessageConverter;
+import uk.ac.ebi.quickgo.annotation.service.http.GPADHttpMessageConverter;
 import uk.ac.ebi.quickgo.common.loader.GZIPFiles;
 
 import com.google.common.base.Preconditions;
@@ -22,11 +24,9 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter
 import static java.util.Arrays.stream;
 
 /**
- * @author Tony Wardell
- * Date: 25/01/2017
- * Time: 10:09
- * Created with IntelliJ IDEA.
+ * Produce a header for downloaded files.
  *
+ * Example of a header for a GAF file.
  * !gaf-version: 2.1
  * !Project_name: UniProt GO Annotation (UniProt-GOA)
  * !URL: http://www.ebi.ac.uk/GOA
@@ -35,6 +35,7 @@ import static java.util.Arrays.stream;
  * !Filtering parameters selected to generate file:
  * GAnnotation?count=25&protein=Q4VCS5&select=normal&advanced=&termUse=ancestor&slimTypes=IPO%3D
  *
+ * Example of a header for a GPAD file:
  * !gpa-version: 1.1
  * !Project_name: UniProt GO Annotation (UniProt-GOA)
  * !URL: http://www.ebi.ac.uk/GOA
@@ -42,6 +43,11 @@ import static java.util.Arrays.stream;
  * !Date downloaded from the QuickGO browser: 20170117
  * !Filtering parameters selected to generate file:
  * GAnnotation?count=25&protein=A0A000&select=normal&advanced=&termUse=ancestor&slimTypes=IPO%3D
+ *
+ * @author Tony Wardell
+ * Date: 25/01/2017
+ * Time: 10:09
+ * Created with IntelliJ IDEA.
  */
 @Component
 public class AnnotationDownloadFileHeader {
@@ -65,6 +71,12 @@ public class AnnotationDownloadFileHeader {
         this.ontologyPath = ontologyPath;
     }
 
+    /**
+     * Write the contents of the header to the ResponseBodyEmitter instance.
+     * @param emitter streams the header content to the client
+     * @param request holds the URI and parameter list to be added to the header information.
+     * @param acceptHeader holds the response type 'GAF' or 'GPAD';
+     */
     public void write(ResponseBodyEmitter emitter, HttpServletRequest request, MediaType acceptHeader) {
         send(emitter, version(acceptHeader));
         send(emitter, PROJECT_NAME);
@@ -86,10 +98,10 @@ public class AnnotationDownloadFileHeader {
     }
 
     private String version(MediaType acceptHeader) {
-        switch (acceptHeader.getSubtype().toLowerCase()) {
-            case "gaf":
+        switch (acceptHeader.getSubtype()) {
+            case GAFHttpMessageConverter.SUB_TYPE:
                 return GAF_VERSION;
-            case "gpad":
+            case GPADHttpMessageConverter.SUB_TYPE:
                 return GPAD_VERSION;
         }
         throw new IllegalArgumentException("Unknown Mime Type subtype requested: " + acceptHeader.getSubtype());
