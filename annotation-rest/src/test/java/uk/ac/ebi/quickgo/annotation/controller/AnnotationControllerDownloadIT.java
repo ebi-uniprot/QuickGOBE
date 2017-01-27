@@ -87,7 +87,8 @@ public class AnnotationControllerDownloadIT {
                         .header(ACCEPT, GAF_MEDIA_TYPE)
                         .param(DOWNLOAD_LIMIT_PARAM, "100"));
 
-        List<String> storedIds = getFieldValuesFromRepo(doc -> doc.geneProductId);
+        List<String> storedIds = getFieldValuesFromRepo(doc -> doc.geneProductId.substring(10)).subList(0, 100);
+        // todo: tidy substring and subList
 
         response
                 .andExpect(request().asyncStarted())

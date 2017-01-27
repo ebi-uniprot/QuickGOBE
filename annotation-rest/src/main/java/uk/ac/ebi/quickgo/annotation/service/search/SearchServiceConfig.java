@@ -64,7 +64,7 @@ public class SearchServiceConfig {
                     "evidenceCode,reference,withFrom,taxonId,assignedBy,extensions,symbol";
     private static final String SOLR_ANNOTATION_QUERY_REQUEST_HANDLER = "/query";
     private static final String DEFAULT_DOWNLOAD_SORT_FIELDS = "id,rowNumber";
-    private static final int DEFAULT_DOWNLOAD_PAGE_SIZE = 5;
+    private static final int DEFAULT_DOWNLOAD_PAGE_SIZE = 4; // todo: change to 5000, and set to e.g., 4 in tests
 
     @Value("${geneproduct.db.xref.valid.regexes}")
     String xrefValidationRegexFile;
