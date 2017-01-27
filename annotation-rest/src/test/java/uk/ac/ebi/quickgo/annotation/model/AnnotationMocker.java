@@ -54,7 +54,7 @@ public class AnnotationMocker {
     public static Annotation createValidAnnotation() {
         Annotation annotation = new Annotation();
         annotation.id = DB + ":" + ID;
-        annotation.extensions = connectedXrefs(EXTENSIONS);
+        annotation.extensions = connectedQualifiedXrefs(EXTENSIONS);
         annotation.taxonId  = TAXON_ID;
         annotation.goAspect = GO_ASPECT;     //todo is this populated
         annotation.goEvidence = GO_EVIDENCE;
@@ -65,16 +65,26 @@ public class AnnotationMocker {
         annotation.qualifier = QUALIFIER;
         annotation.symbol = SYMBOL;
         annotation.reference = REFERENCE;
-        annotation.withFrom = connectedXrefs(WITH_FROM);
+        annotation.withFrom = connectedSimpleXrefs(WITH_FROM);
         annotation.goId = GO_ID;
         annotation.interactingTaxonId = INTERACTING_TAXON_ID;
         return annotation;
     }
 
-    private static <T extends Annotation.AbstractXref> List<Annotation.ConnectedXRefs> connectedXrefs(
-            List<List<Supplier<T>>> items) {
+    private static List<Annotation.ConnectedXRefs<Annotation.SimpleXRef>> connectedSimpleXrefs(
+            List<List<Supplier<Annotation.SimpleXRef>>> items) {
         return items.stream().map(itemList -> {
-                                      Annotation.ConnectedXRefs<T> xrefs = new Annotation.ConnectedXRefs<>();
+                                      Annotation.ConnectedXRefs<Annotation.SimpleXRef> xrefs = new Annotation.ConnectedXRefs<>();
+                                      itemList.stream().map(Supplier::get).forEach(xrefs::addXref);
+                                      return xrefs;
+                                  }
+        ).collect(Collectors.toList());
+    }
+
+    private static List<Annotation.ConnectedXRefs<Annotation.QualifiedXref>> connectedQualifiedXrefs(
+            List<List<Supplier<Annotation.QualifiedXref>>> items) {
+        return items.stream().map(itemList -> {
+                                      Annotation.ConnectedXRefs<Annotation.QualifiedXref> xrefs = new Annotation.ConnectedXRefs<>();
                                       itemList.stream().map(Supplier::get).forEach(xrefs::addXref);
                                       return xrefs;
                                   }

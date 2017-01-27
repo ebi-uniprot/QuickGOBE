@@ -33,14 +33,14 @@ public class Annotation {
 
     public String reference;
 
-    public List<ConnectedXRefs> withFrom;
+    public List<ConnectedXRefs<Annotation.SimpleXRef>> withFrom;
 
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     public int taxonId;
 
     public String assignedBy;
 
-    public List<ConnectedXRefs> extensions;
+    public List<ConnectedXRefs<Annotation.QualifiedXref>> extensions;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public List<String> slimmedIds;
@@ -258,11 +258,6 @@ public class Annotation {
                     ", id='" + id + '\'' +
                     '}';
         }
-
-//        @Override
-//        public String asXref() {
-//            return String.format("%s:%s", db, id);
-//        }
     }
 
     /**

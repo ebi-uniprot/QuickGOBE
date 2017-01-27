@@ -22,7 +22,7 @@ abstract class AnnotationTo {
     private static final String PIPE = "|";
     private static final DateFormat YYYYMMDD_DATE_FORMAT = new SimpleDateFormat("yyyyMMdd");
 
-    String withFromAsString(List<Annotation.ConnectedXRefs> connectedXRefs) {
+    String withFromAsString(List<Annotation.ConnectedXRefs<Annotation.SimpleXRef>> connectedXRefs) {
         if (connectedXRefs == null || connectedXRefs.size() == 0) {
             return "";
         }
@@ -31,18 +31,14 @@ abstract class AnnotationTo {
                              .collect(Collectors.joining(PIPE));
     }
 
-    private String simpleRefAndToString(Annotation.ConnectedXRefs itemList) {
+    private String simpleRefAndToString(Annotation.ConnectedXRefs<Annotation.SimpleXRef> itemList) {
         return itemList.getConnectedXrefs()
                        .stream()
-                       .map(cr -> {
-                           Annotation.SimpleXRef sr = ((Annotation.SimpleXRef) cr);
-                           return sr.asXref();
-                       })
-                       .collect(Collectors.joining(COMMA)).toString();
-
+                       .map(Annotation.SimpleXRef::asXref)
+                       .collect(Collectors.joining(COMMA));
     }
 
-    String extensionsAsString(List<Annotation.ConnectedXRefs> connectedXRefs) {
+    String extensionsAsString(List<Annotation.ConnectedXRefs<Annotation.QualifiedXref>> connectedXRefs) {
         if (connectedXRefs == null || connectedXRefs.size() == 0) {
             return "";
         }
@@ -51,14 +47,11 @@ abstract class AnnotationTo {
                              .collect(Collectors.joining(PIPE));
     }
 
-    private String qualifiedRefAndToString(Annotation.ConnectedXRefs itemList) {
+    private String qualifiedRefAndToString(Annotation.ConnectedXRefs<Annotation.QualifiedXref> itemList) {
         return itemList.getConnectedXrefs()
                        .stream()
-                       .map(cr -> {
-                           Annotation.QualifiedXref sr = ((Annotation.QualifiedXref) cr);
-                           return sr.asXref();
-                       })
-                       .collect(Collectors.joining(COMMA)).toString();
+                       .map(Annotation.QualifiedXref::asXref)
+                       .collect(Collectors.joining(COMMA));
     }
 
     public String[] idToComponents(Annotation annotation) {
