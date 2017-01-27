@@ -290,7 +290,6 @@ public class Annotation {
             QualifiedXref that = (QualifiedXref) o;
 
             return qualifier != null ? qualifier.equals(that.qualifier) : that.qualifier == null;
-
         }
 
         @Override
@@ -311,6 +310,5 @@ public class Annotation {
                     ", qualifier='" + qualifier + '\'' +
                     '}';
         }
-
     }
 }
