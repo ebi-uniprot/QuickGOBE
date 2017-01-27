@@ -47,6 +47,7 @@ model:
       goAspect: aspect
     }
 
-download:
-  ontology:
-    source: classpath:ONTOLOGY_IRI.dat.gz
+annotation:
+  download:
+    ontology:
+        source: classpath:ONTOLOGY_IRI.dat.gz
