@@ -8,41 +8,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Convert an {@link Annotation}  to a String representation. See http://geneontology
- * .org/page/go-annotation-file-gaf-format-21}
+ * Convert an {@link Annotation}  to a String representation.
+ * See http://geneontology.org/page/go-annotation-file-gaf-format-21}
  *
- * @author Tony Wardell
- * Date: 17/01/2017
- * Time: 11:54
- * Created with IntelliJ IDEA.
- *
- * Column	Content	Required?	Cardinality	Example
- * 1	DB	required	1	UniProtKB
- * 2	DB Object ID	required	1	P12345
- * 3	DB Object Symbol	required	1	PHO3
- * 4	Qualifier	optional	0 or greater	NOT
- * 5	GO ID	required	1	GO:0003993
- * 6	DB:Reference (|DB:Reference)	required	1 or greater	PMID:2676709
- * 7	Evidence Code	required	1	IMP
- * 8	With (or) From	optional	0 or greater	GO:0000346
- * 9	Aspect	required	1	F
- * 10	DB Object Name	optional	0 or 1	Toll-like receptor 4
- * 11	DB Object Synonym (|Synonym)	optional	0 or greater	hToll|Tollbooth
- * 12	DB Object Type	required	1	protein
- * 13	Taxon(|taxon)	required	1 or 2	taxon:9606
- * 14	Date	required	1	20090118
- * 15	Assigned By	required	1	SGD
- * 16	Annotation Extension	optional	0 or greater	part_of(CL:0000576)
- * 17	Gene Product Form ID	optional	0 or 1	UniProtKB:P12345-2
- *
- *
- * !gaf-version: 2.1
- * !Project_name: UniProt GO Annotation (UniProt-GOA)
- * !URL: http://www.ebi.ac.uk/GOA
- * !Contact Email: goa@ebi.ac.uk
- * !Date downloaded from the QuickGO browser: 20170123
- * !Filtering parameters selected to generate file:
- * GAnnotation?count=25&protein=Q4VCS5&select=normal&advanced=&termUse=ancestor&slimTypes=IPO%3D
+ * An except from a GAF file is below:
  * UniProtKB	Q4VCS5	AMOT		GO:0001570	GO_REF:0000107	IEA	UniProtKB:Q8VHG2|ensembl:ENSMUSP00000108455	P	Angiomotin	AMOT_HUMAN|AMOT|KIAA1071	protein	taxon:9606	20170107	Ensembl
  * UniProtKB	Q4VCS5	AMOT		GO:0001701	GO_REF:0000107	IEA	UniProtKB:Q8VHG2|ensembl:ENSMUSP00000108455	P	Angiomotin	AMOT_HUMAN|AMOT|KIAA1071	protein	taxon:9606	20170107	Ensembl
  * UniProtKB	Q4VCS5	AMOT		GO:0001702	GO_REF:0000107	IEA	UniProtKB:Q8VHG2|ensembl:ENSMUSP00000108455	P	Angiomotin	AMOT_HUMAN|AMOT|KIAA1071	protein	taxon:9606	20170107	Ensembl
@@ -53,11 +22,11 @@ import java.util.regex.Pattern;
  * UniProtKB	Q4VCS5	AMOT		GO:0005515	PMID:11257124	IPI	UniProtKB:P00747	F	Angiomotin	AMOT_HUMAN|AMOT|KIAA1071	protein	taxon:9606	20051212	HGNC
  * UniProtKB	Q4VCS5	AMOT		GO:0005515	PMID:16043488	IPI	UniProtKB:Q6RHR9-2	F	Angiomotin	AMOT_HUMAN|AMOT|KIAA1071	protein	taxon:9606	20051207	UniProt		UniProtKB:Q4VCS5-1
  * UniProtKB	Q4VCS5	AMOT		GO:0005515	PMID:19615732	IPI	UniProtKB:P35240	F	Angiomotin	AMOT_HUMAN|AMOT|KIAA1071	protein	taxon:9606	20170108	IntAct
- * UniProtKB	Q4VCS5	AMOT		GO:0005515	PMID:21187284	IPI	UniProtKB:P46937	F	Angiomotin	AMOT_HUMAN|AMOT|KIAA1071	protein	taxon:9606	20120124	UniProt		UniProtKB:Q4VCS5-1
- * UniProtKB	Q4VCS5	AMOT		GO:0005515	PMID:21481793	IPI	UniProtKB:P35240	F	Angiomotin	AMOT_HUMAN|AMOT|KIAA1071	protein	taxon:9606	20170108	IntAct		UniProtKB:Q4VCS5-1
- * UniProtKB	Q4VCS5	AMOT		GO:0005515	PMID:21481793	IPI	UniProtKB:P35240	F	Angiomotin	AMOT_HUMAN|AMOT|KIAA1071	protein	taxon:9606	20170108	IntAct		UniProtKB:Q4VCS5-2
- * UniProtKB	Q4VCS5	AMOT		GO:0005515	PMID:21481793	IPI	UniProtKB:P35240	F	Angiomotin	AMOT_HUMAN|AMOT|KIAA1071	protein	taxon:9606	20170108	IntAct
- * UniProtKB	Q4VCS5	AMOT		GO:0005515	PMID:21481793	IPI	UniProtKB:Q68EM7	F	Angiomotin	AMOT_HUMAN|AMOT|KIAA1071	protein	taxon:9606	20170108	IntAct
+ *
+ * @author Tony Wardell
+ * Date: 17/01/2017
+ * Time: 11:54
+ * Created with IntelliJ IDEA.
  */
 public class AnnotationToGAF extends AnnotationTo implements Function<Annotation, String>{
     static final String OUTPUT_DELIMITER = "\t";
