@@ -47,6 +47,7 @@ public class AnnotationToGAF extends AnnotationTo implements Function<Annotation
          * @param annotation instance
          * @return String TSV delimited representation of an annotation in GAF format.
          */
+        @Override
         public String apply(Annotation annotation) {
             String[] idElements = idToComponents(annotation);
             StringJoiner tsvJoiner = new StringJoiner(OUTPUT_DELIMITER);
