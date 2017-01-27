@@ -114,6 +114,6 @@ public class AnnotationDocMocker {
 
 
     public static String createGPId(int idNum) {
-        return String.format("UniProtKB:A0A%03d", idNum);
+        return String.format("UniProtKB:A0A%03d", idNum); // todo: check this doesn't affect other tests
     }
 }
