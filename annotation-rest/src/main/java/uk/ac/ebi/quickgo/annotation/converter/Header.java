@@ -7,10 +7,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
@@ -56,7 +55,6 @@ public class Header {
     static final String FILTERS_INTRO = "Filtering parameters selected to generate file:";
     static final String GAF_VERSION = "gaf-version: 2.1";
     static final String GPAD_VERSION = "gpa-version: 1.1";
-    private static final DateFormat YYYYMMDD_DATE_FORMAT = new SimpleDateFormat("yyyyMMdd");
     private static final String HEADER_LINE_PREFIX = "!";
     private final Path ontologyPath;
     private List<String> savedOntologyLines;
@@ -98,7 +96,7 @@ public class Header {
     }
 
     private String date() {
-        return DATE + YYYYMMDD_DATE_FORMAT.format(new Date());
+        return DATE + LocalDateTime.now().format(DateTimeFormatter.ISO_DATE);
     }
 
     private String request(HttpServletRequest request) {

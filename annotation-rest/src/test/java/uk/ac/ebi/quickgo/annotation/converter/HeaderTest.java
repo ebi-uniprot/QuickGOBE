@@ -3,9 +3,8 @@ package uk.ac.ebi.quickgo.annotation.converter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
@@ -34,7 +33,6 @@ import static org.mockito.Mockito.when;
 @SpringApplicationConfiguration(classes = HeaderTestConfig.class)
 public class HeaderTest {
 
-    private static final DateFormat YYYYMMDD_DATE_FORMAT = new SimpleDateFormat("yyyyMMdd");
     private static final String URI = "/QuickGO/services/annotation/search";
     private static final Map<String, String[]> mockParameterMap = new HashMap<>();
     private static final String todaysDate;
@@ -42,7 +40,7 @@ public class HeaderTest {
     static {
         mockParameterMap.put("assignedBy", new String[]{"foo", "bar"});
         mockParameterMap.put("evidence", new String[]{"ECO:12345"});
-        todaysDate = YYYYMMDD_DATE_FORMAT.format(new Date());
+        todaysDate = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE);
     }
 
     private @Mock ResponseBodyEmitter mockEmitter = mock(ResponseBodyEmitter.class);
