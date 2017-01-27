@@ -29,7 +29,7 @@ class HeaderTestConfig {
     }
 
     @Bean
-    public Header header() throws IOException {
-        return new Header(Paths.get(resource.getURI()));
+    public AnnotationDownloadFileHeader header() throws IOException {
+        return new AnnotationDownloadFileHeader(Paths.get(resource.getURI()));
     }
 }
