@@ -104,7 +104,7 @@ public class AnnotationDownloadFileHeader {
             case GPADHttpMessageConverter.SUB_TYPE:
                 return GPAD_VERSION;
         }
-        throw new IllegalArgumentException("Unknown Mime Type subtype requested: " + acceptHeader.getSubtype());
+        throw new IllegalArgumentException("Unknown Media subtype requested: " + acceptHeader.getSubtype());
     }
 
     private String date() {
@@ -126,7 +126,7 @@ public class AnnotationDownloadFileHeader {
 
     private List<String> ontology() {
         try {
-            FileTime lastModifiedTime = (FileTime)Files.getAttribute(ontologyPath, "lastModifiedTime");
+            FileTime lastModifiedTime = Files.getLastModifiedTime(ontologyPath);
 
             if (!lastModifiedTime.equals(previousTimeStamp)) {
                 previousTimeStamp = lastModifiedTime;
