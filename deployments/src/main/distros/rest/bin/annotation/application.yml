@@ -1,6 +1,18 @@
 ## ================= Search =================
 # the fields to return in search results from a solr query
 # ontology search: if you define a value, ensure ontologyType is also included
+annotation:
+  terms:
+    query:
+      compatible:
+        fields: ['assignedBy', 'evidenceCode', 'goEvidence', 'goId', 'dbSubset', 'geneProductType', 'qualifier',
+        'targetSet', 'taxonId', 'geneProductId']
+  validation:
+    validationResource: classpath:ONTOLOGY_IRI.dat.gz
+    chunk: 30
+    headerLines: 1
+    reference_dbs: ['pmid', 'doi', 'go_ref', 'reactome']
+
 search:
   external:
     filterConfigs:
@@ -33,13 +45,8 @@ model:
     transformations: {
       goId_join: goId
     }
+
 annotation:
-  validation:
-    validationResource: /nfs/public/rw/goa/quickgo_origin/full/DB_XREFS_ENTITIES.dat.gz
-    chunk: 30
-    headerLines: 1
-    reference_dbs:
-      - pmid
-      - doi
-      - go_ref
-      - reactome
+  download:
+    ontology:
+        source: classpath:ONTOLOGY_IRI.dat.gz
