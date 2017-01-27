@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
+import uk.ac.ebi.quickgo.annotation.converter.AnnotationDownloadFileHeader;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
 import uk.ac.ebi.quickgo.annotation.model.StatisticsGroup;
@@ -116,6 +117,7 @@ public class AnnotationController {
     private final ResultTransformerChain<QueryResult<Annotation>> resultTransformerChain;
     private final StatisticsService statsService;
     private final TaskExecutor taskExecutor;
+    private final AnnotationDownloadFileHeader annotationDownloadFileHeader;
 
     @Autowired
     public AnnotationController(SearchService<Annotation> annotationSearchService,
@@ -124,7 +126,8 @@ public class AnnotationController {
             FilterConverterFactory converterFactory,
             ResultTransformerChain<QueryResult<Annotation>> resultTransformerChain,
             StatisticsService statsService,
-            TaskExecutor taskExecutor) {
+            TaskExecutor taskExecutor,
+            AnnotationDownloadFileHeader annotationDownloadFileHeader) {
         checkArgument(annotationSearchService != null, "The SearchService<Annotation> instance passed " +
                 "to the constructor of AnnotationController should not be null.");
         checkArgument(annotationRetrievalConfig != null, "The SearchServiceConfig" +
@@ -135,6 +138,7 @@ public class AnnotationController {
                 "The ResultTransformerChain<QueryResult<Annotation>> cannot be null.");
         checkArgument(statsService != null, "Annotation stats service cannot be null.");
         checkArgument(taskExecutor != null, "TaskExecutor cannot be null.");
+        checkArgument(annotationDownloadFileHeader != null, "AnnotationDownloadFileHeader cannot be null.");
 
         this.annotationSearchService = annotationSearchService;
         this.validationHelper = validationHelper;
@@ -147,6 +151,7 @@ public class AnnotationController {
         this.downloadQueryTemplate = createDownloadSearchQueryTemplate(annotationRetrievalConfig);
 
         this.taskExecutor = taskExecutor;
+        this.annotationDownloadFileHeader = annotationDownloadFileHeader;
     }
 
     /**
@@ -218,6 +223,7 @@ public class AnnotationController {
                 .build();
 
         ResponseBodyEmitter emitter = new ResponseBodyEmitter();
+        annotationDownloadFileHeader.write(emitter, request, mediaTypeAcceptHeader);
         try {
             emitter.send((" ! " + servletRequest.getRequestURL().toString() +
                                   " : " + servletRequest.getRequestURI() + ":" + servletRequest.getQueryString()),

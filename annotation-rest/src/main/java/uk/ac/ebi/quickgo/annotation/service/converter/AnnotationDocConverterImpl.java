@@ -36,8 +36,8 @@ public class AnnotationDocConverterImpl implements AnnotationDocConverter {
         annotation.assignedBy = annotationDocument.assignedBy;
 
         annotation.targetSets = asUnmodifiableList(annotationDocument.targetSets);
-        annotation.withFrom = asXRefList(annotationDocument.withFrom, this::createSimpleXRef);
-        annotation.extensions = asXRefList(annotationDocument.extensions, this::createQualifiedXRef);
+        annotation.withFrom = asWithFromXRefList(annotationDocument.withFrom, this::createSimpleXRef);
+        annotation.extensions = asExtensionsXRefList(annotationDocument.extensions, this::createQualifiedXRef);
         annotation.date = annotationDocument.date;
 
         return annotation;
@@ -55,14 +55,27 @@ public class AnnotationDocConverterImpl implements AnnotationDocConverter {
         return unmodifiableList;
     }
 
-    private <T extends Annotation.AbstractXref> List<Annotation.ConnectedXRefs> asXRefList(
+    private List<Annotation.ConnectedXRefs<Annotation.SimpleXRef>> asWithFromXRefList(
             List<String> csvs,
-            Function<String, T> xrefCreator) {
+            Function<String, Annotation.SimpleXRef> xrefCreator) {
         if (csvs != null && !csvs.isEmpty()) {
 
             return csvs.stream()
                     .map(xrefs -> createConnectedXRefs(xrefCreator, xrefs))
                     .collect(Collectors.toList());
+        } else {
+            return null;
+        }
+    }
+
+    private List<Annotation.ConnectedXRefs<Annotation.QualifiedXref>> asExtensionsXRefList(
+            List<String> csvs,
+            Function<String, Annotation.QualifiedXref> xrefCreator) {
+        if (csvs != null && !csvs.isEmpty()) {
+
+            return csvs.stream()
+                       .map(xrefs -> createConnectedXRefs(xrefCreator, xrefs))
+                       .collect(Collectors.toList());
         } else {
             return null;
         }
