@@ -39,6 +39,9 @@ public class AnnotationDownloadFileHeaderTest {
     private static final String URI = "/QuickGO/services/annotation/search";
     private static final Map<String, String[]> mockParameterMap = new HashMap<>();
     private static final String todaysDate;
+    private static final String ECO_VERSION = "http://purl.obolibrary.org/obo/eco/releases/2017-01-06/eco.owl";
+    private static final String GO_VERSION = "http://purl.obolibrary.org/obo/go/releases/2017-01-12/go" +
+                                                               ".owl";
 
     static {
         mockParameterMap.put("assignedBy", new String[]{"foo", "bar"});
@@ -66,7 +69,7 @@ public class AnnotationDownloadFileHeaderTest {
         annotationDownloadFileHeader.write(mockEmitter, mockRequest, mockMediaType);
 
         //Test
-        verify(mockEmitter).send("!" + AnnotationDownloadFileHeader.GAF_VERSION, MediaType.TEXT_PLAIN);
+        verify(mockEmitter).send(prefixHeaderLine(AnnotationDownloadFileHeader.GAF_VERSION), MediaType.TEXT_PLAIN);
         testRestOfHeader();
     }
 
@@ -76,7 +79,7 @@ public class AnnotationDownloadFileHeaderTest {
         annotationDownloadFileHeader.write(mockEmitter, mockRequest, mockMediaType);
 
         //Test
-        verify(mockEmitter).send("!" + AnnotationDownloadFileHeader.GPAD_VERSION, MediaType.TEXT_PLAIN);
+        verify(mockEmitter).send(prefixHeaderLine(AnnotationDownloadFileHeader.GPAD_VERSION), MediaType.TEXT_PLAIN);
         testRestOfHeader();
     }
 
@@ -86,14 +89,11 @@ public class AnnotationDownloadFileHeaderTest {
         when(mockMediaType.getSubtype()).thenReturn(GAFHttpMessageConverter.SUB_TYPE);
         annotationDownloadFileHeader = new AnnotationDownloadFileHeader(ontologyPath);
         annotationDownloadFileHeader.write(mockEmitter, mockRequest, mockMediaType);
-        verify(mockEmitter, never()).send("!" + "http://purl.obolibrary.org/obo/eco/releases/2017-01-06/eco.owl",
-                                 MediaType.TEXT_PLAIN);
-        verify(mockEmitter, never()).send("!" + "http://purl.obolibrary.org/obo/go/releases/2017-01-12/go.owl",
-                                 MediaType.TEXT_PLAIN);
-        verify(mockEmitter, never()).send("!", MediaType.TEXT_PLAIN);
-        verify(mockEmitter, never()).send("!", MediaType.TEXT_PLAIN);
+        verify(mockEmitter, never()).send(prefixHeaderLine(ECO_VERSION), MediaType.TEXT_PLAIN);
+        verify(mockEmitter, never()).send(prefixHeaderLine(GO_VERSION), MediaType.TEXT_PLAIN);
+        verify(mockEmitter, never()).send(prefixHeaderLine(""), MediaType.TEXT_PLAIN);
+        verify(mockEmitter, never()).send(prefixHeaderLine(""), MediaType.TEXT_PLAIN);
     }
-
 
     @Test(expected = IllegalArgumentException.class)
     public void headerOutputThrowsExceptionWhenMediaTypeIsUnexpected() throws Exception {
@@ -107,15 +107,22 @@ public class AnnotationDownloadFileHeaderTest {
     }
 
     private void testRestOfHeader() throws IOException {
-        verify(mockEmitter).send("!" + AnnotationDownloadFileHeader.PROJECT_NAME, MediaType.TEXT_PLAIN);
-        verify(mockEmitter).send("!" + AnnotationDownloadFileHeader.URL, MediaType.TEXT_PLAIN);
-        verify(mockEmitter).send("!" + AnnotationDownloadFileHeader.EMAIL, MediaType.TEXT_PLAIN);
-        verify(mockEmitter).send("!" + AnnotationDownloadFileHeader.DATE + todaysDate, MediaType.TEXT_PLAIN);
-        verify(mockEmitter).send("!" + AnnotationDownloadFileHeader.FILTERS_INTRO, MediaType.TEXT_PLAIN);
-        verify(mockEmitter).send("!" + URI + "?assignedBy=foo,bar&evidence=ECO:12345", MediaType.TEXT_PLAIN);
-        verify(mockEmitter).send("!" + "http://purl.obolibrary.org/obo/eco/releases/2017-01-06/eco.owl",
+        verify(mockEmitter).send(prefixHeaderLine(AnnotationDownloadFileHeader.PROJECT_NAME), MediaType.TEXT_PLAIN);
+        verify(mockEmitter).send(prefixHeaderLine(AnnotationDownloadFileHeader.URL), MediaType.TEXT_PLAIN);
+        verify(mockEmitter).send(prefixHeaderLine(AnnotationDownloadFileHeader.EMAIL), MediaType.TEXT_PLAIN);
+        verify(mockEmitter).send(prefixHeaderLine(AnnotationDownloadFileHeader.DATE + todaysDate),
                                  MediaType.TEXT_PLAIN);
-        verify(mockEmitter).send("!" + "http://purl.obolibrary.org/obo/go/releases/2017-01-12/go.owl",
+        verify(mockEmitter).send(prefixHeaderLine(AnnotationDownloadFileHeader.FILTERS_INTRO), MediaType.TEXT_PLAIN);
+        verify(mockEmitter).send(prefixHeaderLine(URI + "?assignedBy=foo,bar&evidence=ECO:12345"),
+                                 MediaType.TEXT_PLAIN);
+        verify(mockEmitter).send(prefixHeaderLine(ECO_VERSION),
+                                 MediaType.TEXT_PLAIN);
+        verify(mockEmitter).send(prefixHeaderLine(GO_VERSION),
                                  MediaType.TEXT_PLAIN);
     }
+
+    private static String prefixHeaderLine(String content) {
+        return "!" + content;
+    }
+
 }
