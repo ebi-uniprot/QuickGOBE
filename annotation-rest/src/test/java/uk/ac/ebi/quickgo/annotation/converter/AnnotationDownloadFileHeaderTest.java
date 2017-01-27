@@ -31,7 +31,7 @@ import static org.mockito.Mockito.when;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = HeaderTestConfig.class)
-public class HeaderTest {
+public class AnnotationDownloadFileHeaderTest {
 
     private static final String URI = "/QuickGO/services/annotation/search";
     private static final Map<String, String[]> mockParameterMap = new HashMap<>();
@@ -48,7 +48,7 @@ public class HeaderTest {
     private @Mock MediaType mockMediaType = mock(MediaType.class);
 
     @Autowired
-    private Header header;
+    private AnnotationDownloadFileHeader annotationDownloadFileHeader;
 
 
     @Before
@@ -60,20 +60,20 @@ public class HeaderTest {
     @Test
     public void produceGAFHeader() throws Exception {
         when(mockMediaType.getSubtype()).thenReturn("GAF");
-        header.write(mockEmitter, mockRequest, mockMediaType);
+        annotationDownloadFileHeader.write(mockEmitter, mockRequest, mockMediaType);
 
         //Test
-        verify(mockEmitter).send("!" + Header.GAF_VERSION, MediaType.TEXT_PLAIN);
+        verify(mockEmitter).send("!" + AnnotationDownloadFileHeader.GAF_VERSION, MediaType.TEXT_PLAIN);
         testRestOfHeader();
     }
 
     @Test
     public void produceGPADHeader() throws Exception {
         when(mockMediaType.getSubtype()).thenReturn("GPAD");
-        header.write(mockEmitter, mockRequest, mockMediaType);
+        annotationDownloadFileHeader.write(mockEmitter, mockRequest, mockMediaType);
 
         //Test
-        verify(mockEmitter).send("!" + Header.GPAD_VERSION, MediaType.TEXT_PLAIN);
+        verify(mockEmitter).send("!" + AnnotationDownloadFileHeader.GPAD_VERSION, MediaType.TEXT_PLAIN);
         testRestOfHeader();
     }
 
@@ -81,8 +81,8 @@ public class HeaderTest {
     public void headerOutputDoesNotContainOntologyInformationWhenFileIsNotAvailable() throws Exception {
         Path ontologyPath = Paths.get("/nowhere/city");
         when(mockMediaType.getSubtype()).thenReturn("GAF");
-        header = new Header(ontologyPath);
-        header.write(mockEmitter, mockRequest, mockMediaType);
+        annotationDownloadFileHeader = new AnnotationDownloadFileHeader(ontologyPath);
+        annotationDownloadFileHeader.write(mockEmitter, mockRequest, mockMediaType);
         verify(mockEmitter, never()).send("!" + "http://purl.obolibrary.org/obo/eco/releases/2017-01-06/eco.owl",
                                  MediaType.TEXT_PLAIN);
         verify(mockEmitter, never()).send("!" + "http://purl.obolibrary.org/obo/go/releases/2017-01-12/go.owl",
@@ -95,20 +95,20 @@ public class HeaderTest {
     @Test(expected = IllegalArgumentException.class)
     public void headerOutputThrowsExceptionWhenMediaTypeIsUnexpected() throws Exception {
         when(mockMediaType.getSubtype()).thenReturn("FOOBAR");
-        header.write(mockEmitter, mockRequest, mockMediaType);
+        annotationDownloadFileHeader.write(mockEmitter, mockRequest, mockMediaType);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void pathToOntologyFileIsNull() throws Exception {
-      new Header(null);
+      new AnnotationDownloadFileHeader(null);
     }
 
     private void testRestOfHeader() throws IOException {
-        verify(mockEmitter).send("!" + Header.PROJECT_NAME, MediaType.TEXT_PLAIN);
-        verify(mockEmitter).send("!" + Header.URL, MediaType.TEXT_PLAIN);
-        verify(mockEmitter).send("!" + Header.EMAIL, MediaType.TEXT_PLAIN);
-        verify(mockEmitter).send("!" + Header.DATE + todaysDate, MediaType.TEXT_PLAIN);
-        verify(mockEmitter).send("!" + Header.FILTERS_INTRO, MediaType.TEXT_PLAIN);
+        verify(mockEmitter).send("!" + AnnotationDownloadFileHeader.PROJECT_NAME, MediaType.TEXT_PLAIN);
+        verify(mockEmitter).send("!" + AnnotationDownloadFileHeader.URL, MediaType.TEXT_PLAIN);
+        verify(mockEmitter).send("!" + AnnotationDownloadFileHeader.EMAIL, MediaType.TEXT_PLAIN);
+        verify(mockEmitter).send("!" + AnnotationDownloadFileHeader.DATE + todaysDate, MediaType.TEXT_PLAIN);
+        verify(mockEmitter).send("!" + AnnotationDownloadFileHeader.FILTERS_INTRO, MediaType.TEXT_PLAIN);
         verify(mockEmitter).send("!" + URI + "?assignedBy=foo,bar&evidence=ECO:12345", MediaType.TEXT_PLAIN);
         verify(mockEmitter).send("!" + "http://purl.obolibrary.org/obo/eco/releases/2017-01-06/eco.owl",
                                  MediaType.TEXT_PLAIN);

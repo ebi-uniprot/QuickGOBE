@@ -44,8 +44,8 @@ import static java.util.Arrays.stream;
  * GAnnotation?count=25&protein=A0A000&select=normal&advanced=&termUse=ancestor&slimTypes=IPO%3D
  */
 @Component
-public class Header {
-    Logger logger = LoggerFactory.getLogger(Header.class);
+public class AnnotationDownloadFileHeader {
+    Logger logger = LoggerFactory.getLogger(AnnotationDownloadFileHeader.class);
 
     static final String PROJECT_NAME = "Project_name: UniProt GO Annotation (UniProt-GOA)";
     static final String URL = "URL: http://www.ebi.ac.uk/GOA";
@@ -60,7 +60,7 @@ public class Header {
     private List<String> savedOntologyLines;
     private FileTime previousTimeStamp;
 
-    public Header(Path ontologyPath) {
+    public AnnotationDownloadFileHeader(Path ontologyPath) {
         Preconditions.checkArgument(ontologyPath != null, "The path to the ontology file must not be null");
         this.ontologyPath = ontologyPath;
     }

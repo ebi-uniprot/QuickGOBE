@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.service.search;
 
-import uk.ac.ebi.quickgo.annotation.converter.Header;
+import uk.ac.ebi.quickgo.annotation.converter.AnnotationDownloadFileHeader;
 
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -36,7 +36,7 @@ public class DownloadConfig {
     }
 
     @Bean
-    public Header header() throws IOException {
-        return new Header(Paths.get(resource.getURI()));
+    public AnnotationDownloadFileHeader header() throws IOException {
+        return new AnnotationDownloadFileHeader(Paths.get(resource.getURI()));
     }
 }
