@@ -66,8 +66,8 @@ public class AnnotationToGAF extends AnnotationTo implements Function<Annotation
                             .add(toYMD(annotation.date))
                             .add(annotation.assignedBy)
                             .add(extensionsAsString(annotation.extensions))
-                            .add((UNIPROT_KB.equals(idElements[0]) ? String.format("%s:%s", UNIPROT_KB,
-                                                                                   idElements[1]) : "")).toString();
+                            .add(UNIPROT_KB.equals(idElements[0]) ? String.format("%s:%s", UNIPROT_KB,
+                                                                                   idElements[1]) : "").toString();
         }
 
     /**
@@ -93,9 +93,7 @@ public class AnnotationToGAF extends AnnotationTo implements Function<Annotation
                                                          id));
     }
 
-
     private String toGeneProductType(String idElement) {
-        System.out.println(idElement);
         switch (idElement) {
             case "UniProtKB":
                 return "protein";
