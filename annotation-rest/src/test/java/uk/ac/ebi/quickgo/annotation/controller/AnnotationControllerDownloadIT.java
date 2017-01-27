@@ -52,7 +52,7 @@ public class AnnotationControllerDownloadIT {
     @ClassRule
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
 
-    private static final int NUMBER_OF_GENERIC_DOCS = 10;
+    private static final int NUMBER_OF_GENERIC_DOCS = 200;
     private static final String DOWNLOAD_SEARCH_URL = "/annotation/downloadSearch";
     private static final String DOWNLOAD_LIMIT_PARAM = "downloadLimit";
     private static final int MIN_DOWNLOAD_NUMBER = 1;
@@ -85,7 +85,7 @@ public class AnnotationControllerDownloadIT {
         ResultActions response = mockMvc.perform(
                 get(DOWNLOAD_SEARCH_URL)
                         .header(ACCEPT, GAF_MEDIA_TYPE)
-                        .param(DOWNLOAD_LIMIT_PARAM, "10"));
+                        .param(DOWNLOAD_LIMIT_PARAM, "100"));
 
         List<String> storedIds = getFieldValuesFromRepo(doc -> doc.geneProductId);
 

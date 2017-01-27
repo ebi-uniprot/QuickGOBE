@@ -31,7 +31,7 @@ import static org.slf4j.LoggerFactory.getLogger;
  */
 public class GPADHttpMessageConverter extends AbstractHttpMessageConverter<Object> {
     private static final String TYPE = "text";
-    private static final String SUB_TYPE = "gpad";
+    public static final String SUB_TYPE = "gpad";
     private static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
 
     public static final MediaType GPAD_MEDIA_TYPE = new MediaType(TYPE, SUB_TYPE, DEFAULT_CHARSET);

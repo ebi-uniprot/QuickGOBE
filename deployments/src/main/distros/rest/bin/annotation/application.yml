@@ -57,6 +57,5 @@ annotation:
           fields: ['assignedBy', 'evidenceCode', 'goEvidence', 'goId', 'dbSubset', 'geneProductType', 'qualifier',
           'targetSet', 'taxonId', 'geneProductId']
   download:
-      ontology:
-          source: classpath:ONTOLOGY_IRI.dat.gz
+      ontologySource: classpath:ONTOLOGY_IRI.dat.gz
 

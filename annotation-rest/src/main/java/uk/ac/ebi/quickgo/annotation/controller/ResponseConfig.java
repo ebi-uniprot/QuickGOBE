@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
-import uk.ac.ebi.quickgo.annotation.service.converter.GAFAnnotationConverter;
+import uk.ac.ebi.quickgo.annotation.converter.AnnotationToGAF;
 import uk.ac.ebi.quickgo.annotation.service.converter.GPADAnnotationConverter;
 import uk.ac.ebi.quickgo.annotation.service.http.GAFHttpMessageConverter;
 import uk.ac.ebi.quickgo.annotation.service.http.GPADHttpMessageConverter;
@@ -48,7 +48,7 @@ import org.springframework.context.annotation.Primary;
         return new GPADAnnotationConverter();
     }
 
-    private GAFAnnotationConverter gafAnnotationConverter() {
-        return new GAFAnnotationConverter();
+    private AnnotationToGAF gafAnnotationConverter() {
+        return new AnnotationToGAF();
     }
 }

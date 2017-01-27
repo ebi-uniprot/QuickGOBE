@@ -13,8 +13,7 @@ annotation:
     headerLines: 1
     reference_dbs: ['pmid', 'doi', 'go_ref', 'reactome']
   download:
-      ontology:
-          source: classpath:ONTOLOGY_IRI.dat.gz
+      ontologySource: classpath:ONTOLOGY_IRI.dat.gz
 
 search:
   external:

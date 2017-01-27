@@ -223,14 +223,7 @@ public class AnnotationController {
                 .build();
 
         ResponseBodyEmitter emitter = new ResponseBodyEmitter();
-        annotationDownloadFileHeader.write(emitter, request, mediaTypeAcceptHeader);
-        try {
-            emitter.send((" ! " + servletRequest.getRequestURL().toString() +
-                                  " : " + servletRequest.getRequestURI() + ":" + servletRequest.getQueryString()),
-                    MediaType.TEXT_PLAIN);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        annotationDownloadFileHeader.write(emitter, servletRequest, mediaTypeAcceptHeader);
 
         taskExecutor.execute(() -> emitStreamWithMediaType(
                 emitter,

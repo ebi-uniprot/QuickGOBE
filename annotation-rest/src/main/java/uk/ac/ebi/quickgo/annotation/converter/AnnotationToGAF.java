@@ -52,7 +52,7 @@ public class AnnotationToGAF extends AnnotationTo implements Function<Annotation
             String[] idElements = idToComponents(annotation);
             StringJoiner tsvJoiner = new StringJoiner(OUTPUT_DELIMITER);
             return tsvJoiner.add(idElements[0])
-                            .add(toCanonical(annotation.id))
+                            .add(toCanonical(annotation.geneProductId))
                             .add(annotation.symbol)
                             .add(annotation.qualifier)
                             .add(idOrSlimmedId(annotation))

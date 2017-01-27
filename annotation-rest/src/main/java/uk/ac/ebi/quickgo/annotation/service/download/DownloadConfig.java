@@ -1,5 +1,9 @@
 package uk.ac.ebi.quickgo.annotation.service.download;
 
+import uk.ac.ebi.quickgo.annotation.converter.AnnotationDownloadFileHeader;
+
+import java.io.IOException;
+import java.nio.file.Paths;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,9 +23,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 @ConfigurationProperties(prefix = "annotation.download")
 public class DownloadConfig {
     private static final int DEFAULT_DOWNLOAD_EMITTER_TIMEOUT_MILLIS = 5 * 60 * 1000;
+    private static final String DEFAULT_ONTOLOGY_SOURCE = "ONTOLOGY_IRI.dat.gz";
 
     private TaskExecutorProperties taskExecutor = new TaskExecutorProperties();
     private int defaultEmitterTimeout = DEFAULT_DOWNLOAD_EMITTER_TIMEOUT_MILLIS;
+    private String ontologySource = DEFAULT_ONTOLOGY_SOURCE;
 
     @Bean
     public WebMvcConfigurerAdapter asyncWebMvcConfigurerAdapter() {
@@ -48,6 +54,11 @@ public class DownloadConfig {
     @Bean
     public ThreadPoolTaskExecutor configurableTaskExecutor() {
         return new ThreadPoolTaskExecutor();
+    }
+
+    @Bean
+    public AnnotationDownloadFileHeader downloadFileHeader() throws IOException {
+        return new AnnotationDownloadFileHeader(Paths.get(ontologySource));
     }
 
     public void setTaskExecutor(TaskExecutorProperties taskExecutor) {

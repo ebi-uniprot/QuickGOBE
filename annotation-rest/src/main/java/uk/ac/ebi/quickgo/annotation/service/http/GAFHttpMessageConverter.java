@@ -1,14 +1,13 @@
 package uk.ac.ebi.quickgo.annotation.service.http;
 
+import uk.ac.ebi.quickgo.annotation.converter.AnnotationToGAF;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
-import uk.ac.ebi.quickgo.annotation.service.converter.GAFAnnotationConverter;
 import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -31,7 +30,7 @@ import static org.slf4j.LoggerFactory.getLogger;
  */
 public class GAFHttpMessageConverter extends AbstractHttpMessageConverter<Object> {
     private static final String TYPE = "text";
-    private static final String SUB_TYPE = "gaf";
+    public static final String SUB_TYPE = "gaf";
     private static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
 
     public static final MediaType GAF_MEDIA_TYPE = new MediaType(TYPE, SUB_TYPE, DEFAULT_CHARSET);
@@ -39,9 +38,9 @@ public class GAFHttpMessageConverter extends AbstractHttpMessageConverter<Object
 
     private static final Logger GAF_LOGGER = getLogger(GAFHttpMessageConverter.class);
     private static final int FLUSH_INTERVAL = 5000;
-    private final GAFAnnotationConverter converter;
+    private final AnnotationToGAF converter;
 
-    public GAFHttpMessageConverter(GAFAnnotationConverter converter) {
+    public GAFHttpMessageConverter(AnnotationToGAF converter) {
         super(GAF_MEDIA_TYPE);
         this.converter = converter;
     }
@@ -85,33 +84,17 @@ public class GAFHttpMessageConverter extends AbstractHttpMessageConverter<Object
     private void writeAnnotations(OutputStream out, Stream<QueryResult<Annotation>> annotationStream)
             throws IOException {
         AtomicInteger counter = new AtomicInteger(0);
-        annotationStream.forEach(annotationResult -> {
-            if (counter.get() == 0) {
-                writeHeaderLines(out, converter.getHeaderLines(annotationResult));
-            }
-            annotationResult.getResults().forEach(annotation -> {
-                try {
-                    out.write((converter.convert(annotation) + "\n").getBytes());
-                    counter.getAndIncrement();
-
-                    if (counter.get() % FLUSH_INTERVAL == 0) {
-                        out.flush();
-                    }
-                } catch (IOException e) {
-                    GAF_LOGGER.error("Could not write annotation in GAF format: " + annotation, e);
-                }
-            });
-        });
-        GAF_LOGGER.info("Written " + counter.get() + " GAF annotations");
-    }
-
-    private void writeHeaderLines(OutputStream out, List<String> headerLines) {
-        headerLines.forEach(headerLine -> {
+        annotationStream.forEach(annotationResult -> annotationResult.getResults().forEach(annotation -> {
             try {
-                out.write((headerLine + "\n").getBytes());
+                out.write((converter.apply(annotation) + "\n").getBytes());
+                counter.getAndIncrement();
+                if (counter.get() % FLUSH_INTERVAL == 0) {
+                    out.flush();
+                }
             } catch (IOException e) {
-                GAF_LOGGER.error("Could not write header line: " + headerLine, e);
+                GAF_LOGGER.error("Could not flush OutputStream whilst writing GAF annotation: " + annotation, e);
             }
-        });
+        }));
+        GAF_LOGGER.info("Written " + counter.get() + " GAF annotations");
     }
 }
