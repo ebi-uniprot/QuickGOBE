@@ -1,5 +1,12 @@
 package uk.ac.ebi.quickgo.annotation.service.http;
 
+import org.slf4j.Logger;
+import org.springframework.http.HttpInputMessage;
+import org.springframework.http.HttpOutputMessage;
+import org.springframework.http.MediaType;
+import org.springframework.http.converter.AbstractHttpMessageConverter;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.http.converter.HttpMessageNotWritableException;
 import uk.ac.ebi.quickgo.annotation.converter.AnnotationToGAF;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
@@ -11,13 +18,6 @@ import java.nio.charset.Charset;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.slf4j.Logger;
-import org.springframework.http.HttpInputMessage;
-import org.springframework.http.HttpOutputMessage;
-import org.springframework.http.MediaType;
-import org.springframework.http.converter.AbstractHttpMessageConverter;
-import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.http.converter.HttpMessageNotWritableException;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -51,7 +51,8 @@ public class GAFHttpMessageConverter extends AbstractHttpMessageConverter<Object
     }
 
     @Override
-    protected Object readInternal(Class<?> aClass,
+    protected Object readInternal(
+            Class<?> aClass,
             HttpInputMessage httpInputMessage)
             throws IOException, HttpMessageNotReadableException {
         return null;

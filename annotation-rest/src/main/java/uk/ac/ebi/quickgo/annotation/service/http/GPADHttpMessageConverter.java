@@ -1,17 +1,5 @@
 package uk.ac.ebi.quickgo.annotation.service.http;
 
-import uk.ac.ebi.quickgo.annotation.model.Annotation;
-import uk.ac.ebi.quickgo.annotation.service.converter.GPADAnnotationConverter;
-import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
-import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
-
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.charset.Charset;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
@@ -19,6 +7,17 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.AbstractHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
+import uk.ac.ebi.quickgo.annotation.converter.AnnotationToGPAD;
+import uk.ac.ebi.quickgo.annotation.model.Annotation;
+import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
+import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.charset.Charset;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -39,9 +38,9 @@ public class GPADHttpMessageConverter extends AbstractHttpMessageConverter<Objec
 
     private static final Logger GPAD_LOGGER = getLogger(GPADHttpMessageConverter.class);
     private static final int FLUSH_INTERVAL = 5000;
-    private final GPADAnnotationConverter converter;
+    private final AnnotationToGPAD converter;
 
-    public GPADHttpMessageConverter(GPADAnnotationConverter converter) {
+    public GPADHttpMessageConverter(AnnotationToGPAD converter) {
         super(GPAD_MEDIA_TYPE);
         this.converter = converter;
     }
@@ -84,33 +83,17 @@ public class GPADHttpMessageConverter extends AbstractHttpMessageConverter<Objec
 
     private void writeAnnotations(OutputStream out, Stream<QueryResult<Annotation>> annotationStream) {
         AtomicInteger counter = new AtomicInteger(0);
-        annotationStream.forEach(annotationResult -> {
-            if (counter.get() == 0) {
-                writeHeaderLines(out, converter.getHeaderLines(annotationResult));
-            }
-            annotationResult.getResults().forEach(annotation -> {
-                try {
-                    out.write((converter.convert(annotation) + "\n").getBytes());
-                    counter.getAndIncrement();
-
-                    if (counter.get() % FLUSH_INTERVAL == 0) {
-                        out.flush();
-                    }
-                } catch (IOException e) {
-                    GPAD_LOGGER.error("Could not write annotation in GPAD format: " + annotation, e);
-                }
-            });
-        });
-        GPAD_LOGGER.info("Written " + counter.get() + " GPAD annotations");
-    }
-
-    private void writeHeaderLines(OutputStream out, List<String> headerLines) {
-        headerLines.forEach(headerLine -> {
+        annotationStream.forEach(annotationResult -> annotationResult.getResults().forEach(annotation -> {
             try {
-                out.write((headerLine + "\n").getBytes());
+                out.write((converter.apply(annotation) + "\n").getBytes());
+                counter.getAndIncrement();
+                if (counter.get() % FLUSH_INTERVAL == 0) {
+                    out.flush();
+                }
             } catch (IOException e) {
-                GPAD_LOGGER.error("Could not write header line: " + headerLine, e);
+                GPAD_LOGGER.error("Could not flush OutputStream whilst writing GAF annotation: " + annotation, e);
             }
-        });
+        }));
+        GPAD_LOGGER.info("Written " + counter.get() + " GAF annotations");
     }
 }
