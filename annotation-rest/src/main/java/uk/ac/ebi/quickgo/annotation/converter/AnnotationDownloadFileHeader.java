@@ -1,10 +1,16 @@
 package uk.ac.ebi.quickgo.annotation.converter;
 
+import com.google.common.base.Preconditions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 import uk.ac.ebi.quickgo.annotation.service.http.GAFHttpMessageConverter;
 import uk.ac.ebi.quickgo.annotation.service.http.GPADHttpMessageConverter;
 import uk.ac.ebi.quickgo.common.loader.GZIPFiles;
 
-import com.google.common.base.Preconditions;
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,12 +20,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.servlet.http.HttpServletRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.MediaType;
-import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 
 import static java.util.Arrays.stream;
 
@@ -50,6 +50,7 @@ import static java.util.Arrays.stream;
  * Created with IntelliJ IDEA.
  */
 @Component
+// todo: move all classes in this package to uk/ac/ebi/quickgo/annotation/service/converter
 public class AnnotationDownloadFileHeader {
     Logger logger = LoggerFactory.getLogger(AnnotationDownloadFileHeader.class);
 
