@@ -7,6 +7,7 @@ import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -15,8 +16,9 @@ import static java.util.Arrays.asList;
 
 /**
  * Class to create stubbed {@link AnnotationDocument} instances.
- *
+ * <p>
  * Created 14/04/16
+ *
  * @author Edd
  */
 public class AnnotationDocMocker {
@@ -50,13 +52,14 @@ public class AnnotationDocMocker {
     public static final String EXTENSION_RELATIONSHIP3 = "indicative_of";
 
     public static final String EXTENSION_1 = asExtension(EXTENSION_RELATIONSHIP1, EXTENSION_DB1, EXTENSION_ID1);
-    public static final String EXTENSION_2 = asExtension(EXTENSION_RELATIONSHIP2 ,EXTENSION_DB2 ,EXTENSION_ID2);
-    public static final String EXTENSION_3 = asExtension(EXTENSION_RELATIONSHIP3 ,EXTENSION_DB3,EXTENSION_ID3);
+    public static final String EXTENSION_2 = asExtension(EXTENSION_RELATIONSHIP2, EXTENSION_DB2, EXTENSION_ID2);
+    public static final String EXTENSION_3 = asExtension(EXTENSION_RELATIONSHIP3, EXTENSION_DB3, EXTENSION_ID3);
     public static final List<String> EXTENSIONS = asList(String.format("%s,%s", EXTENSION_1, EXTENSION_2), EXTENSION_3);
 
     public static AtomicLong rowNumberGenerator = new AtomicLong();
 
-    private AnnotationDocMocker() {}
+    private AnnotationDocMocker() {
+    }
 
     public static AnnotationDocument createAnnotationDoc(String geneProductId) {
         AnnotationDocument doc = new AnnotationDocument();
@@ -88,32 +91,42 @@ public class AnnotationDocMocker {
         return doc;
     }
 
-    public static AnnotationDocument createAnnotationDoc(String geneProductId, String goId){
+    public static AnnotationDocument createAnnotationDoc(String geneProductId, String goId) {
         AnnotationDocument doc = createAnnotationDoc(geneProductId);
         doc.goId = goId;
         return doc;
     }
 
     public static String asExtension(String relationship, String db, String id) {
-        return String.format("%s(%s:%s)",relationship, db, id);
+        return String.format("%s(%s:%s)", relationship, db, id);
     }
 
     //----- Setup data ---------------------//
 
     public static List<AnnotationDocument> createGenericDocs(int n) {
         return IntStream.range(0, n)
-                        .mapToObj(i -> AnnotationDocMocker.createAnnotationDoc(createGPId(i))).collect
-                        (Collectors.toList());
+                .mapToObj(i -> AnnotationDocMocker.createAnnotationDoc(createGPId(i)))
+                .collect(Collectors.toList());
+    }
+
+    public static List<AnnotationDocument> createGenericDocs(int n, Function<Integer, String> idCreator) {
+        return IntStream.range(0, n)
+                .mapToObj(i -> AnnotationDocMocker.createAnnotationDoc(idCreator.apply(i)))
+                .collect(Collectors.toList());
     }
 
     public static List<AnnotationDocument> createGenericDocs(int n, Supplier<String> gpIdCreator) {
         return IntStream.range(0, n)
-                        .mapToObj(i -> AnnotationDocMocker.createAnnotationDoc(gpIdCreator.get())).collect
-                        (Collectors.toList());
+                .mapToObj(i -> AnnotationDocMocker.createAnnotationDoc(gpIdCreator.get()))
+                .collect(Collectors.toList());
     }
 
 
     public static String createGPId(int idNum) {
-        return String.format("UniProtKB:A0A%03d", idNum); // todo: check this doesn't affect other tests
+        return String.format("A0A%03d", idNum);
+    }
+
+    public static String createUniProtGPID(int idNum) {
+        return String.format("UniProtKB:A0A%03d", idNum);
     }
 }

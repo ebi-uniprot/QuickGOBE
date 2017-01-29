@@ -17,6 +17,7 @@ import uk.ac.ebi.quickgo.annotation.AnnotationParameters;
 import uk.ac.ebi.quickgo.annotation.AnnotationREST;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
+import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker;
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
 
 import java.util.ArrayList;
@@ -79,10 +80,14 @@ public class AnnotationControllerDownloadIT {
                 webAppContextSetup(webApplicationContext)
                 .build();
 
-        genericDocs = createGenericDocs(NUMBER_OF_GENERIC_DOCS);
+        genericDocs = createDocs(NUMBER_OF_GENERIC_DOCS);
         savedDocs = new ArrayList<>();
 
         saveToRepo(genericDocs);
+    }
+
+    private List<AnnotationDocument> createDocs(int number) {
+        return createGenericDocs(number, AnnotationDocMocker::createUniProtGPID);
     }
 
     private void saveToRepo(List<AnnotationDocument> docsToSave) {
@@ -119,7 +124,7 @@ public class AnnotationControllerDownloadIT {
         int moreThanExpectedDownloadCount = expectedDownloadCount + 5;
         int expectedTaxonId = 1066;
 
-        createGenericDocs(moreThanExpectedDownloadCount)
+        createDocs(moreThanExpectedDownloadCount)
                 .stream()
                 .map(doc -> {
                     doc.taxonId = expectedTaxonId;
@@ -155,7 +160,7 @@ public class AnnotationControllerDownloadIT {
         int actualAvailableDownloadCount = requestedDownloadCount - 5;
         int expectedTaxonId = 1066;
 
-        createGenericDocs(actualAvailableDownloadCount)
+        createDocs(actualAvailableDownloadCount)
                 .stream()
                 .map(doc -> {
                     doc.taxonId = expectedTaxonId;
@@ -213,7 +218,7 @@ public class AnnotationControllerDownloadIT {
         int moreThanExpectedDownloadCount = expectedDownloadCount + 5;
         int expectedTaxonId = 1066;
 
-        createGenericDocs(moreThanExpectedDownloadCount)
+        createDocs(moreThanExpectedDownloadCount)
                 .stream()
                 .map(doc -> {
                     doc.taxonId = expectedTaxonId;
@@ -249,7 +254,7 @@ public class AnnotationControllerDownloadIT {
         int actualAvailableDownloadCount = requestedDownloadCount - 5;
         int expectedTaxonId = 1066;
 
-        createGenericDocs(actualAvailableDownloadCount)
+        createDocs(actualAvailableDownloadCount)
                 .stream()
                 .map(doc -> {
                     doc.taxonId = expectedTaxonId;
