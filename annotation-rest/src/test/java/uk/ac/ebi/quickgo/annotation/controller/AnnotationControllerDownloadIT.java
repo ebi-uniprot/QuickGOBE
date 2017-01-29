@@ -100,6 +100,25 @@ public class AnnotationControllerDownloadIT {
     }
 
     @Test
+    public void canDownloadAnAnnotationAmountFewerThanPageSize() throws Exception {
+        int expectedDownloadCount = 1;
+        ResultActions response = mockMvc.perform(
+                get(DOWNLOAD_SEARCH_URL)
+                        .header(ACCEPT, GAF_MEDIA_TYPE)
+                        .param(DOWNLOAD_LIMIT_PARAM, Integer.toString(expectedDownloadCount)));
+
+        List<String> storedIds = getFieldValuesFromRepo(doc -> idFrom(doc.geneProductId), expectedDownloadCount);
+
+        response
+                .andExpect(request().asyncStarted())
+                .andDo(MvcResult::getAsyncResult)
+                .andDo(print())
+                .andExpect(header().string(CONTENT_DISPOSITION, endsWith(GAF_SUFFIX)))
+                .andExpect(content().contentType(GAF_MEDIA_TYPE))
+                .andExpect(content().string(stringContainsInOrder(storedIds)));
+    }
+
+    @Test
     public void canDownloadInGafFormat() throws Exception {
         int expectedDownloadCount = 97;
         ResultActions response = mockMvc.perform(
