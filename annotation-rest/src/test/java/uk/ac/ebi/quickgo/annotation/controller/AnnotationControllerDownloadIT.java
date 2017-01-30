@@ -39,6 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.createGenericDocs;
+import static uk.ac.ebi.quickgo.annotation.controller.DownloadResponseVerifier.nonNullMandatoryFieldsExist;
 import static uk.ac.ebi.quickgo.annotation.service.http.GAFHttpMessageConverter.GAF_MEDIA_TYPE;
 import static uk.ac.ebi.quickgo.annotation.service.http.GPADHttpMessageConverter.GPAD_MEDIA_TYPE;
 
@@ -98,13 +99,7 @@ public class AnnotationControllerDownloadIT {
 
         List<String> storedIds = getFieldValuesFromRepo(doc -> idFrom(doc.geneProductId), expectedDownloadCount);
 
-        response
-                .andExpect(request().asyncStarted())
-                .andDo(MvcResult::getAsyncResult)
-                .andDo(print())
-                .andExpect(header().string(CONTENT_DISPOSITION, endsWith(getFileNameEndingFor(GAF_MEDIA_TYPE))))
-                .andExpect(content().contentType(GAF_MEDIA_TYPE))
-                .andExpect(content().string(stringContainsInOrder(storedIds)));
+        checkResponse(GAF_MEDIA_TYPE, response, storedIds);
     }
 
     @Test
@@ -184,12 +179,17 @@ public class AnnotationControllerDownloadIT {
 
         List<String> storedIds = getFieldValuesFromRepo(doc -> idFrom(doc.geneProductId), expectedDownloadCount);
 
+        checkResponse(mediaType, response, storedIds);
+    }
+
+    private void checkResponse(MediaType mediaType, ResultActions response, List<String> storedIds) throws Exception {
         response
                 .andExpect(request().asyncStarted())
                 .andDo(MvcResult::getAsyncResult)
                 .andDo(print())
                 .andExpect(header().string(CONTENT_DISPOSITION, endsWith(getFileNameEndingFor(mediaType))))
                 .andExpect(content().contentType(mediaType))
+                .andExpect(nonNullMandatoryFieldsExist(mediaType))
                 .andExpect(content().string(stringContainsInOrder(storedIds)));
     }
 
@@ -219,13 +219,7 @@ public class AnnotationControllerDownloadIT {
                         .param(AnnotationParameters.TAXON_ID_PARAM.getName(), Integer.toString(expectedTaxonId))
                         .param(DOWNLOAD_LIMIT_PARAM, Integer.toString(expectedDownloadCount)));
 
-        response
-                .andExpect(request().asyncStarted())
-                .andDo(MvcResult::getAsyncResult)
-                .andDo(print())
-                .andExpect(header().string(CONTENT_DISPOSITION, endsWith(getFileNameEndingFor(mediaType))))
-                .andExpect(content().contentType(mediaType))
-                .andExpect(content().string(stringContainsInOrder(expectedIds)));
+        checkResponse(mediaType, response, expectedIds);
     }
 
     private String getFileNameEndingFor(MediaType mediaType) {
@@ -263,13 +257,7 @@ public class AnnotationControllerDownloadIT {
                         .param(AnnotationParameters.TAXON_ID_PARAM.getName(), Integer.toString(expectedTaxonId))
                         .param(DOWNLOAD_LIMIT_PARAM, Integer.toString(requestedDownloadCount)));
 
-        response
-                .andExpect(request().asyncStarted())
-                .andDo(MvcResult::getAsyncResult)
-                .andDo(print())
-                .andExpect(header().string(CONTENT_DISPOSITION, endsWith(getFileNameEndingFor(mediaType))))
-                .andExpect(content().contentType(mediaType))
-                .andExpect(content().string(stringContainsInOrder(expectedIds)));
+        checkResponse(mediaType, response, expectedIds);
     }
 
     private String idFrom(String geneProductId) {
