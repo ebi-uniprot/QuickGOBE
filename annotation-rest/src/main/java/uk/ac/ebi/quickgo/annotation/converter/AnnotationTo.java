@@ -6,6 +6,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -53,12 +54,13 @@ abstract class AnnotationTo {
                        .collect(Collectors.joining(COMMA));
     }
 
-    public String[] idToComponents(String id) {
+    String[] idToComponents(String id) {
         return id==null? new String[] {"",""}:id.split(ID_DELIMITER);
     }
 
-    public String toYMD(Date date) {
+    String toYMD(Date date) {
         return date==null?"":YYYYMMDD_DATE_FORMAT.format(date);
     }
 
+    final Function<String, String> nullToEmptyString = s -> s==null ? "": s;
 }
