@@ -2,10 +2,15 @@ package uk.ac.ebi.quickgo.annotation.converter;
 
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * Convert an {@link Annotation}  to a String representation.
@@ -28,7 +33,7 @@ import java.util.regex.Pattern;
  * Time: 11:54
  * Created with IntelliJ IDEA.
  */
-public class AnnotationToGAF extends AnnotationTo implements Function<Annotation, String>{
+public class AnnotationToGAF extends AnnotationTo implements Function<Annotation, List<String>>{
     static final String OUTPUT_DELIMITER = "\t";
     private static final String UNIPROT_KB = "UniProtKB";
     private static final int CANONICAL_GROUP_NUMBER = 2;
@@ -46,16 +51,27 @@ public class AnnotationToGAF extends AnnotationTo implements Function<Annotation
          * Convert an {@link Annotation} to a String representation.
          * @param annotation instance
          * @return String TSV delimited representation of an annotation in GAF format.
+         *
          */
         @Override
-        public String apply(Annotation annotation) {
+        public List<String> apply(Annotation annotation) {
+            if (Objects.isNull(annotation.slimmedIds) || annotation.slimmedIds.isEmpty()) {
+                return Collections.singletonList(toOutputRecord(annotation, annotation.goId));
+            } else {
+                return annotation.slimmedIds.stream()
+                                            .map(goId -> this.toOutputRecord(annotation, goId))
+                                            .collect(toList());
+            }
+        }
+
+        public String toOutputRecord(Annotation annotation, String goId) {
             String[] idElements = idToComponents(annotation);
             StringJoiner tsvJoiner = new StringJoiner(OUTPUT_DELIMITER);
             return tsvJoiner.add(idElements[0])
                             .add(toCanonical(annotation.geneProductId))
                             .add(annotation.symbol)
                             .add(annotation.qualifier)
-                            .add(idOrSlimmedId(annotation))
+                            .add(goId)
                             .add(annotation.reference)
                             .add(annotation.evidenceCode)
                             .add(withFromAsString(annotation.withFrom))
