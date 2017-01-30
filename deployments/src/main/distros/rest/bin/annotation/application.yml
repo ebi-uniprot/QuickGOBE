@@ -51,11 +51,11 @@ annotation:
       keepAliveSeconds: 7200
       allowCoreThreadTimeout: true
       waitForTasksToCompleteOnShutdown: false
+    ontologySource: classpath:ONTOLOGY_IRI.dat.gz
   terms:
       query:
         compatible:
           fields: ['assignedBy', 'evidenceCode', 'goEvidence', 'goId', 'dbSubset', 'geneProductType', 'qualifier',
           'targetSet', 'taxonId', 'geneProductId']
-  download:
-      ontologySource: classpath:ONTOLOGY_IRI.dat.gz
+
 
