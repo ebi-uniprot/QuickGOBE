@@ -42,7 +42,7 @@ public class AnnotationMocker {
     public static final String GO_EVIDENCE = "IPI";
     private static final String GO_ASPECT = "molecular_function";
     public static final int TAXON_ID = 12345;
-    public static final String INTERACTING_TAXON_ID = "54321";
+    public static final int INTERACTING_TAXON_ID = 54321;
     public static final String DB = "IntAct";
     public static final String ID = "EBI-10043081";
     public static final String GO_ID = "GO:0003824";
