@@ -92,7 +92,7 @@ public class AnnotationDownloadFileHeader {
 
     private void send(ResponseBodyEmitter emitter, String content) {
         try {
-            emitter.send(HEADER_LINE_PREFIX + content, MediaType.TEXT_PLAIN);
+            emitter.send(HEADER_LINE_PREFIX + content + "\n", MediaType.TEXT_PLAIN);
         } catch (IOException e) {
             throw new RuntimeException("Failed to send download header", e);
         }
