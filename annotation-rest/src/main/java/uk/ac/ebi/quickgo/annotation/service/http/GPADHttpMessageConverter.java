@@ -2,6 +2,8 @@ package uk.ac.ebi.quickgo.annotation.service.http;
 
 import uk.ac.ebi.quickgo.annotation.converter.AnnotationToGPAD;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
+import uk.ac.ebi.quickgo.annotation.service.converter.GPADAnnotationConverter;
+import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import java.io.IOException;
@@ -9,6 +11,7 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.springframework.http.HttpInputMessage;
@@ -27,14 +30,21 @@ import static org.slf4j.LoggerFactory.getLogger;
  * Created 19/01/17
  * @author Edd
  */
-public class GPADHttpMessageConverter extends AbstractHttpMessageConverter<Stream<QueryResult<Annotation>>> {
-    public static final String SUB_TYPE = "gpad";
-    private static final MediaType MEDIA_TYPE = new MediaType("text", SUB_TYPE, Charset.forName("utf-8"));
+public class GPADHttpMessageConverter extends AbstractHttpMessageConverter<Object> {
+    private static final String TYPE = "text";
+    private static final String SUB_TYPE = "gpad";
+    private static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
+
+    public static final MediaType GPAD_MEDIA_TYPE = new MediaType(TYPE, SUB_TYPE, DEFAULT_CHARSET);
+    public static final String GPAD_MEDIA_TYPE_STRING = TYPE + "/" + SUB_TYPE;
+
     private static final Logger GPAD_LOGGER = getLogger(GPADHttpMessageConverter.class);
+    private static final int FLUSH_INTERVAL = 5000;
     private final AnnotationToGPAD converter;
 
+
     public GPADHttpMessageConverter(AnnotationToGPAD converter) {
-        super(MEDIA_TYPE);
+        super(GPAD_MEDIA_TYPE);
         this.converter = converter;
     }
 
@@ -44,8 +54,8 @@ public class GPADHttpMessageConverter extends AbstractHttpMessageConverter<Strea
     }
 
     @Override
-    protected Stream<QueryResult<Annotation>> readInternal(
-            Class<? extends Stream<QueryResult<Annotation>>> aClass,
+    protected Object readInternal(
+            Class<?> aClass,
             HttpInputMessage httpInputMessage)
             throws IOException, HttpMessageNotReadableException {
         return null;
@@ -53,12 +63,25 @@ public class GPADHttpMessageConverter extends AbstractHttpMessageConverter<Strea
 
     @Override
     protected void writeInternal(
-            Stream<QueryResult<Annotation>> annotationStream,
+            Object annotationStream,
             HttpOutputMessage httpOutputMessage)
             throws IOException, HttpMessageNotWritableException {
         OutputStream out = httpOutputMessage.getBody();
 
-        writeAnnotations(out, annotationStream);
+        dispatchWriting(annotationStream, out);
+    }
+
+    @SuppressWarnings("unchecked") private void dispatchWriting(Object object, OutputStream out) throws IOException {
+        if (object instanceof ResponseExceptionHandler.ErrorInfo) {
+            writeError(out, (ResponseExceptionHandler.ErrorInfo) object);
+        } else {
+            writeAnnotations(out, (Stream<QueryResult<Annotation>>) object);
+        }
+    }
+
+    private void writeError(OutputStream out, ResponseExceptionHandler.ErrorInfo errorInfo) throws IOException {
+        out.write(("URL:\n\t" + errorInfo.getUrl()+"\n").getBytes());
+        out.write(("Messages:\n\t" + errorInfo.getMessages().stream().collect(Collectors.joining(",\n"))).getBytes());
     }
 
     private void writeAnnotations(OutputStream out, Stream<QueryResult<Annotation>> annotationStream) {
@@ -68,17 +91,12 @@ public class GPADHttpMessageConverter extends AbstractHttpMessageConverter<Strea
                 try {
                     out.write((converter.apply(annotation) + "\n").getBytes());
                     counter.getAndIncrement();
+
+                    if (counter.get() % FLUSH_INTERVAL == 0) {
+                        out.flush();
+                    }
                 } catch (IOException e) {
                     GPAD_LOGGER.error("Could not write annotation in GPAD format: " + annotation, e);
-                }
-                // flush occasionally
-                // todo: currently flushing every 20, to see effects. Future, flush every 10000 or so, or forget it?
-                if (counter.get() % 20 == 0) {
-                    try {
-                        out.flush();
-                    } catch (IOException e) {
-                        GPAD_LOGGER.error("Could not flush stream", e);
-                    }
                 }
             });
         });

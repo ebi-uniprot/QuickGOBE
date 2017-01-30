@@ -15,7 +15,13 @@ annotation:
   download:
       ontology:
           source: classpath:ONTOLOGY_IRI.dat.gz
-
+    taskExecutor:
+      corePoolSize: 4
+      maxPoolSize: 8
+      queueCapacity: 100
+      keepAliveSeconds: 7200
+      allowCoreThreadTimeout: true
+      waitForTasksToCompleteOnShutdown: false
 search:
   external:
     filterConfigs:

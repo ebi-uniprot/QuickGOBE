@@ -73,7 +73,7 @@ public class QueryResultTest {
     public void validFullQueryResult() throws Exception {
         long numberOfHits = 2;
         List<String> results = Arrays.asList("result1", "result2");
-        uk.ac.ebi.quickgo.rest.search.results.PageInfo pageInfo = new PageInfo.Builder()
+        PageInfo pageInfo = new PageInfo.Builder()
                 .withTotalPages(1)
                 .withCurrentPage(1)
                 .withResultsPerPage(5)

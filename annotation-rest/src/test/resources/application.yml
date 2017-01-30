@@ -49,3 +49,17 @@ model:
       goId_join: goId,
       goAspect: aspect
     }
+
+---
+## ==========
+spring:
+   profiles: download-task-executor-test
+annotation:
+  download:
+    taskExecutor:
+      corePoolSize: 10
+      maxPoolSize: 20
+      queueCapacity: 100
+      keepAliveSeconds: 600
+      allowCoreThreadTimeout: false
+      waitForTasksToCompleteOnShutdown: true

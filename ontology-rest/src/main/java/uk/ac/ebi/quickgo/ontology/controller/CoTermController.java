@@ -20,6 +20,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import static java.lang.String.format;
 import static uk.ac.ebi.quickgo.common.validator.OntologyIdPredicate.isValidGOTermId;
 
 /**
@@ -36,6 +37,8 @@ public class CoTermController {
     @Value("${coterm.default.limit:50}")
     private int defaultLimit;
     private CoTermRepository coTermRepository;
+    private static final String INVALID_CO_TERM_SOURCE = "The value for source should be one of %s. '%s' is not a " +
+            "valid value for source.";
 
     /**
      * Create the endpoint for Co Terms.
@@ -125,8 +128,8 @@ public class CoTermController {
     private CoTermSource toCoTermSource(String source) {
         final String asUpperCase = source.toUpperCase();
         if (!CoTermSource.isValidValue(asUpperCase)) {
-            throw new ParameterException("The value for source should be one of " + CoTermSource.valuesAsCSV() +
-                                                 " and not " + source + ".");
+            throw new ParameterException(format(INVALID_CO_TERM_SOURCE, CoTermSource.valuesAsCSV(), source));
+
         }
         return CoTermSource.valueOf(asUpperCase);
     }
