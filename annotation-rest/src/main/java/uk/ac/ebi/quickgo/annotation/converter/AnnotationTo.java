@@ -62,9 +62,4 @@ abstract class AnnotationTo {
         return YYYYMMDD_DATE_FORMAT.format(date);
     }
 
-
-    protected String idOrSlimmedId(Annotation annotation) {
-        return Objects.isNull(annotation.slimmedIds) || annotation.slimmedIds.isEmpty() ? annotation.goId : annotation
-                .slimmedIds.get(0);
-    }
 }
