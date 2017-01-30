@@ -5,6 +5,8 @@ import uk.ac.ebi.quickgo.annotation.AnnotationREST;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker;
+import uk.ac.ebi.quickgo.annotation.service.http.GAFHttpMessageConverter;
+import uk.ac.ebi.quickgo.annotation.service.http.GPADHttpMessageConverter;
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
 
 import java.util.ArrayList;
@@ -17,6 +19,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -55,15 +58,11 @@ public class AnnotationControllerDownloadIT {
     // temporary data store for solr's data, which is automatically cleaned on exit
     @ClassRule
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
-
     private static final int NUMBER_OF_GENERIC_DOCS = 200;
     private static final String DOWNLOAD_SEARCH_URL = "/annotation/downloadSearch";
     private static final String DOWNLOAD_LIMIT_PARAM = "downloadLimit";
     private static final int MIN_DOWNLOAD_NUMBER = 1;
     private static final int MAX_DOWNLOAD_NUMBER = 50000;
-    public static final String GAF_SUFFIX = ".gaf\"";
-    public static final String GPAD_SUFFIX = ".gpad\"";
-
     private MockMvc mockMvc;
 
     private List<AnnotationDocument> genericDocs;
@@ -89,19 +88,6 @@ public class AnnotationControllerDownloadIT {
         saveToRepo(genericDocs);
     }
 
-    private List<AnnotationDocument> createDocs(int number) {
-        return createGenericDocs(number, AnnotationDocMocker::createUniProtGPID);
-    }
-
-    private void saveToRepo(List<AnnotationDocument> docsToSave) {
-        docsToSave.forEach(this::saveToRepo);
-    }
-
-    private void saveToRepo(AnnotationDocument docToSave) {
-        repository.save(docToSave);
-        savedDocs.add(docToSave);
-    }
-
     @Test
     public void canDownloadAnAnnotationAmountFewerThanPageSize() throws Exception {
         int expectedDownloadCount = 1;
@@ -116,193 +102,39 @@ public class AnnotationControllerDownloadIT {
                 .andExpect(request().asyncStarted())
                 .andDo(MvcResult::getAsyncResult)
                 .andDo(print())
-                .andExpect(header().string(CONTENT_DISPOSITION, endsWith(GAF_SUFFIX)))
+                .andExpect(header().string(CONTENT_DISPOSITION, endsWith(getFileNameEndingFor(GAF_MEDIA_TYPE))))
                 .andExpect(content().contentType(GAF_MEDIA_TYPE))
                 .andExpect(content().string(stringContainsInOrder(storedIds)));
     }
 
     @Test
     public void canDownloadInGafFormat() throws Exception {
-        int expectedDownloadCount = 97;
-        ResultActions response = mockMvc.perform(
-                get(DOWNLOAD_SEARCH_URL)
-                        .header(ACCEPT, GAF_MEDIA_TYPE)
-                        .param(DOWNLOAD_LIMIT_PARAM, Integer.toString(expectedDownloadCount)));
-
-        List<String> storedIds = getFieldValuesFromRepo(doc -> idFrom(doc.geneProductId), expectedDownloadCount);
-
-        response
-                .andExpect(request().asyncStarted())
-                .andDo(MvcResult::getAsyncResult)
-                .andDo(print())
-                .andExpect(header().string(CONTENT_DISPOSITION, endsWith(GAF_SUFFIX)))
-                .andExpect(content().contentType(GAF_MEDIA_TYPE))
-                .andExpect(content().string(stringContainsInOrder(storedIds)));
+        canDownload(GAF_MEDIA_TYPE);
     }
 
     @Test
     public void canDownloadWithFilterInGafFormat() throws Exception {
-        int expectedDownloadCount = 31;
-        int moreThanExpectedDownloadCount = expectedDownloadCount + 5;
-        int expectedTaxonId = 1066;
-
-        createDocs(moreThanExpectedDownloadCount)
-                .stream()
-                .map(doc -> {
-                    doc.taxonId = expectedTaxonId;
-                    return doc;
-                })
-                .forEach(this::saveToRepo);
-
-        // we expect to receive fewer ids in the response than those we saved, because we will request fewer
-        List<String> expectedIds = savedDocs.stream()
-                .filter(doc -> doc.taxonId == expectedTaxonId)
-                .map(doc -> idFrom(doc.geneProductId))
-                .collect(Collectors.toList())
-                .subList(0, expectedDownloadCount);
-
-        ResultActions response = mockMvc.perform(
-                get(DOWNLOAD_SEARCH_URL)
-                        .header(ACCEPT, GAF_MEDIA_TYPE)
-                        .param(AnnotationParameters.TAXON_ID_PARAM.getName(), Integer.toString(expectedTaxonId))
-                        .param(DOWNLOAD_LIMIT_PARAM, Integer.toString(expectedDownloadCount)));
-
-        response
-                .andExpect(request().asyncStarted())
-                .andDo(MvcResult::getAsyncResult)
-                .andDo(print())
-                .andExpect(header().string(CONTENT_DISPOSITION, endsWith(GAF_SUFFIX)))
-                .andExpect(content().contentType(GAF_MEDIA_TYPE))
-                .andExpect(content().string(stringContainsInOrder(expectedIds)));
+        canDownloadWithFilter(GAF_MEDIA_TYPE);
     }
 
     @Test
     public void canDownloadWithFilterAllAvailableItemsInGafFormat() throws Exception {
-        int requestedDownloadCount = 31;
-        int actualAvailableDownloadCount = requestedDownloadCount - 5;
-        int expectedTaxonId = 1066;
-
-        createDocs(actualAvailableDownloadCount)
-                .stream()
-                .map(doc -> {
-                    doc.taxonId = expectedTaxonId;
-                    return doc;
-                })
-                .forEach(this::saveToRepo);
-
-        // we expect to receive fewer ids in the response than those we saved, because we will request fewer
-        List<String> expectedIds = savedDocs.stream()
-                .filter(doc -> doc.taxonId == expectedTaxonId)
-                .map(doc -> idFrom(doc.geneProductId))
-                .collect(Collectors.toList());
-
-        ResultActions response = mockMvc.perform(
-                get(DOWNLOAD_SEARCH_URL)
-                        .header(ACCEPT, GAF_MEDIA_TYPE)
-                        .param(AnnotationParameters.TAXON_ID_PARAM.getName(), Integer.toString(expectedTaxonId))
-                        .param(DOWNLOAD_LIMIT_PARAM, Integer.toString(requestedDownloadCount)));
-
-        response
-                .andExpect(request().asyncStarted())
-                .andDo(MvcResult::getAsyncResult)
-                .andDo(print())
-                .andExpect(header().string(CONTENT_DISPOSITION, endsWith(GAF_SUFFIX)))
-                .andExpect(content().contentType(GAF_MEDIA_TYPE))
-                .andExpect(content().string(stringContainsInOrder(expectedIds)));
-    }
-
-    private String idFrom(String geneProductId) {
-        return geneProductId.substring(10);
+        canDownloadWithFilterAllAvailableItems(GAF_MEDIA_TYPE);
     }
 
     @Test
     public void canDownloadInGpadFormat() throws Exception {
-        int desiredDownloadCount = 56;
-        ResultActions response = mockMvc.perform(
-                get(DOWNLOAD_SEARCH_URL)
-                        .header(ACCEPT, GPAD_MEDIA_TYPE)
-                        .param(DOWNLOAD_LIMIT_PARAM, Integer.toString(desiredDownloadCount)));
-
-        List<String> storedIds = getFieldValuesFromRepo(doc -> idFrom(doc.geneProductId), desiredDownloadCount);
-
-        response
-                .andExpect(request().asyncStarted())
-                .andDo(MvcResult::getAsyncResult)
-                .andDo(print())
-                .andExpect(header().string(CONTENT_DISPOSITION, endsWith(GPAD_SUFFIX)))
-                .andExpect(content().contentType(GPAD_MEDIA_TYPE))
-                .andExpect(content().string(stringContainsInOrder(storedIds)));
+        canDownload(GPAD_MEDIA_TYPE);
     }
 
     @Test
     public void canDownloadWithFilterInGpadFormat() throws Exception {
-        int expectedDownloadCount = 31;
-        int moreThanExpectedDownloadCount = expectedDownloadCount + 5;
-        int expectedTaxonId = 1066;
-
-        createDocs(moreThanExpectedDownloadCount)
-                .stream()
-                .map(doc -> {
-                    doc.taxonId = expectedTaxonId;
-                    return doc;
-                })
-                .forEach(this::saveToRepo);
-
-        // we expect to receive fewer ids in the response than those we saved, because we will request fewer
-        List<String> expectedIds = savedDocs.stream()
-                .filter(doc -> doc.taxonId == expectedTaxonId)
-                .map(doc -> idFrom(doc.geneProductId))
-                .collect(Collectors.toList())
-                .subList(0, expectedDownloadCount);
-
-        ResultActions response = mockMvc.perform(
-                get(DOWNLOAD_SEARCH_URL)
-                        .header(ACCEPT, GPAD_MEDIA_TYPE)
-                        .param(AnnotationParameters.TAXON_ID_PARAM.getName(), Integer.toString(expectedTaxonId))
-                        .param(DOWNLOAD_LIMIT_PARAM, Integer.toString(expectedDownloadCount)));
-
-        response
-                .andExpect(request().asyncStarted())
-                .andDo(MvcResult::getAsyncResult)
-                .andDo(print())
-                .andExpect(header().string(CONTENT_DISPOSITION, endsWith(GPAD_SUFFIX)))
-                .andExpect(content().contentType(GPAD_MEDIA_TYPE))
-                .andExpect(content().string(stringContainsInOrder(expectedIds)));
+        canDownloadWithFilter(GPAD_MEDIA_TYPE);
     }
 
     @Test
     public void canDownloadWithFilterAllAvailableItemsInGpadFormat() throws Exception {
-        int requestedDownloadCount = 31;
-        int actualAvailableDownloadCount = requestedDownloadCount - 5;
-        int expectedTaxonId = 1066;
-
-        createDocs(actualAvailableDownloadCount)
-                .stream()
-                .map(doc -> {
-                    doc.taxonId = expectedTaxonId;
-                    return doc;
-                })
-                .forEach(this::saveToRepo);
-
-        // we expect to receive fewer ids in the response than those we saved, because we will request fewer
-        List<String> expectedIds = savedDocs.stream()
-                .filter(doc -> doc.taxonId == expectedTaxonId)
-                .map(doc -> idFrom(doc.geneProductId))
-                .collect(Collectors.toList());
-
-        ResultActions response = mockMvc.perform(
-                get(DOWNLOAD_SEARCH_URL)
-                        .header(ACCEPT, GPAD_MEDIA_TYPE)
-                        .param(AnnotationParameters.TAXON_ID_PARAM.getName(), Integer.toString(expectedTaxonId))
-                        .param(DOWNLOAD_LIMIT_PARAM, Integer.toString(requestedDownloadCount)));
-
-        response
-                .andExpect(request().asyncStarted())
-                .andDo(MvcResult::getAsyncResult)
-                .andDo(print())
-                .andExpect(header().string(CONTENT_DISPOSITION, endsWith(GPAD_SUFFIX)))
-                .andExpect(content().contentType(GPAD_MEDIA_TYPE))
-                .andExpect(content().string(stringContainsInOrder(expectedIds)));
+        canDownloadWithFilterAllAvailableItems(GPAD_MEDIA_TYPE);
     }
 
     @Test
@@ -327,6 +159,121 @@ public class AnnotationControllerDownloadIT {
         response
                 .andDo(print())
                 .andExpect(status().isBadRequest());
+    }
+
+    private List<AnnotationDocument> createDocs(int number) {
+        return createGenericDocs(number, AnnotationDocMocker::createUniProtGPID);
+    }
+
+    private void saveToRepo(List<AnnotationDocument> docsToSave) {
+        repository.save(docsToSave);
+        savedDocs.addAll(docsToSave);
+    }
+
+    private void saveToRepo(AnnotationDocument docToSave) {
+        repository.save(docToSave);
+        savedDocs.add(docToSave);
+    }
+
+    private void canDownload(MediaType mediaType) throws Exception {
+        int expectedDownloadCount = 97;
+        ResultActions response = mockMvc.perform(
+                get(DOWNLOAD_SEARCH_URL)
+                        .header(ACCEPT, mediaType)
+                        .param(DOWNLOAD_LIMIT_PARAM, Integer.toString(expectedDownloadCount)));
+
+        List<String> storedIds = getFieldValuesFromRepo(doc -> idFrom(doc.geneProductId), expectedDownloadCount);
+
+        response
+                .andExpect(request().asyncStarted())
+                .andDo(MvcResult::getAsyncResult)
+                .andDo(print())
+                .andExpect(header().string(CONTENT_DISPOSITION, endsWith(getFileNameEndingFor(mediaType))))
+                .andExpect(content().contentType(mediaType))
+                .andExpect(content().string(stringContainsInOrder(storedIds)));
+    }
+
+    private void canDownloadWithFilter(MediaType mediaType) throws Exception {
+        int expectedDownloadCount = 31;
+        int moreThanExpectedDownloadCount = expectedDownloadCount + 5;
+        int expectedTaxonId = 1066;
+
+        createDocs(moreThanExpectedDownloadCount)
+                .stream()
+                .map(doc -> {
+                    doc.taxonId = expectedTaxonId;
+                    return doc;
+                })
+                .forEach(this::saveToRepo);
+
+        // we expect to receive fewer ids in the response than those we saved, because we will request fewer
+        List<String> expectedIds = savedDocs.stream()
+                .filter(doc -> doc.taxonId == expectedTaxonId)
+                .map(doc -> idFrom(doc.geneProductId))
+                .collect(Collectors.toList())
+                .subList(0, expectedDownloadCount);
+
+        ResultActions response = mockMvc.perform(
+                get(DOWNLOAD_SEARCH_URL)
+                        .header(ACCEPT, mediaType)
+                        .param(AnnotationParameters.TAXON_ID_PARAM.getName(), Integer.toString(expectedTaxonId))
+                        .param(DOWNLOAD_LIMIT_PARAM, Integer.toString(expectedDownloadCount)));
+
+        response
+                .andExpect(request().asyncStarted())
+                .andDo(MvcResult::getAsyncResult)
+                .andDo(print())
+                .andExpect(header().string(CONTENT_DISPOSITION, endsWith(getFileNameEndingFor(mediaType))))
+                .andExpect(content().contentType(mediaType))
+                .andExpect(content().string(stringContainsInOrder(expectedIds)));
+    }
+
+    private String getFileNameEndingFor(MediaType mediaType) {
+        switch (mediaType.getSubtype()) {
+            case GAFHttpMessageConverter.SUB_TYPE:
+            case GPADHttpMessageConverter.SUB_TYPE:
+                return "." + mediaType.getSubtype() + "\"";
+            default:
+                throw new IllegalArgumentException("Unknown media type: " + mediaType);
+        }
+    }
+
+    private void canDownloadWithFilterAllAvailableItems(MediaType mediaType) throws Exception {
+        int requestedDownloadCount = 31;
+        int actualAvailableDownloadCount = requestedDownloadCount - 5;
+        int expectedTaxonId = 1066;
+
+        createDocs(actualAvailableDownloadCount)
+                .stream()
+                .map(doc -> {
+                    doc.taxonId = expectedTaxonId;
+                    return doc;
+                })
+                .forEach(this::saveToRepo);
+
+        // we expect to receive fewer ids in the response than those we saved, because we will request fewer
+        List<String> expectedIds = savedDocs.stream()
+                .filter(doc -> doc.taxonId == expectedTaxonId)
+                .map(doc -> idFrom(doc.geneProductId))
+                .collect(Collectors.toList());
+
+        ResultActions response = mockMvc.perform(
+                get(DOWNLOAD_SEARCH_URL)
+                        .header(ACCEPT, mediaType)
+                        .param(AnnotationParameters.TAXON_ID_PARAM.getName(), Integer.toString(expectedTaxonId))
+                        .param(DOWNLOAD_LIMIT_PARAM, Integer.toString(requestedDownloadCount)));
+
+        response
+                .andExpect(request().asyncStarted())
+                .andDo(MvcResult::getAsyncResult)
+                .andDo(print())
+                .andExpect(header().string(CONTENT_DISPOSITION, endsWith(getFileNameEndingFor(mediaType))))
+                .andExpect(content().contentType(mediaType))
+                .andExpect(content().string(stringContainsInOrder(expectedIds)));
+    }
+
+    private String idFrom(String geneProductId) {
+        return geneProductId.substring(10);
     }
 
     private <O> List<O> getFieldValuesFromRepo(Function<AnnotationDocument, O> transformation, int subListSize) {
