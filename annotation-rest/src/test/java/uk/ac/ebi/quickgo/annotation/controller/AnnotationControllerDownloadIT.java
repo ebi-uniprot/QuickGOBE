@@ -1,5 +1,16 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
+import uk.ac.ebi.quickgo.annotation.AnnotationParameters;
+import uk.ac.ebi.quickgo.annotation.AnnotationREST;
+import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
+import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
+import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker;
+import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -13,17 +24,6 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import uk.ac.ebi.quickgo.annotation.AnnotationParameters;
-import uk.ac.ebi.quickgo.annotation.AnnotationREST;
-import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
-import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
-import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker;
-import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.stringContainsInOrder;
@@ -31,7 +31,10 @@ import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.createGenericDocs;
 import static uk.ac.ebi.quickgo.annotation.service.http.GAFHttpMessageConverter.GAF_MEDIA_TYPE;
 import static uk.ac.ebi.quickgo.annotation.service.http.GPADHttpMessageConverter.GPAD_MEDIA_TYPE;
@@ -91,7 +94,7 @@ public class AnnotationControllerDownloadIT {
     }
 
     private void saveToRepo(List<AnnotationDocument> docsToSave) {
-        docsToSave.stream().forEach(this::saveToRepo);
+        docsToSave.forEach(this::saveToRepo);
     }
 
     private void saveToRepo(AnnotationDocument docToSave) {
