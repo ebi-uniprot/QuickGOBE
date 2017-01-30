@@ -44,18 +44,18 @@ public class AnnotationToGPAD extends AnnotationTo implements Function<Annotatio
 
     private String toOutputRecord(Annotation annotation, String goId) {
         StringJoiner tsvJoiner = new StringJoiner(OUTPUT_DELIMITER);
-        String[] idElements = idToComponents(annotation);
+        String[] idElements = idToComponents(annotation.geneProductId);
         return tsvJoiner.add(idElements[0])
                         .add(idElements[1])
-                        .add(annotation.qualifier)
-                        .add(goId)
-                        .add(annotation.reference)
-                        .add(annotation.evidenceCode)
+                        .add(nullToEmptyString.apply(annotation.qualifier))
+                        .add(nullToEmptyString.apply(goId))
+                        .add(nullToEmptyString.apply(annotation.reference))
+                        .add(nullToEmptyString.apply(annotation.evidenceCode))
                         .add(withFromAsString(annotation.withFrom))
-                        .add(annotation.interactingTaxonId)
+                        .add(Integer.toString(annotation.interactingTaxonId))
                         .add(toYMD(annotation.date))
-                        .add(annotation.assignedBy)
+                        .add(nullToEmptyString.apply(annotation.assignedBy))
                         .add(extensionsAsString(annotation.extensions))
-                        .add("goEvidence=" + annotation.goEvidence).toString();
+                        .add("goEvidence=" + nullToEmptyString.apply(annotation.goEvidence)).toString();
     }
 }
