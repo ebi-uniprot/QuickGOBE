@@ -5,9 +5,9 @@ import uk.ac.ebi.quickgo.annotation.model.AnnotationMocker;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -40,7 +40,7 @@ public class AnnotationToGAFTest {
     private static final int COL_DATE = 13;
     private static final int COL_ASSIGNED_BY = 14;
     private static final int COL_ANNOTATION_EXTENSION = 15;
-    private static final int COL_GENE_PRODUCT = 16;
+    private static final int COL_GENE_PRODUCT_FORM_ID = 16;
 
     private Annotation annotation;
     private AnnotationToGAF annotationToGAF;
@@ -80,7 +80,7 @@ public class AnnotationToGAFTest {
         String db = "UniProtKB";
         String gpType = "protein";
         annotation.id = String.format("%s:%s",db,gpId);
-        annotation.geneProductId = gpId;
+        annotation.geneProductId = String.format("%s:%s",db,gpId);
         annotation.assignedBy = db;
         annotation.symbol = gpId;
         String[] elements = annotationToElements(annotation);
@@ -100,7 +100,7 @@ public class AnnotationToGAFTest {
         assertThat(elements[COL_DATE], equalTo(DATE_AS_STRING));
         assertThat(elements[COL_ASSIGNED_BY], equalTo(db));
         assertThat(elements[COL_ANNOTATION_EXTENSION], is(EXTENSIONS_AS_STRING));
-        assertThat(elements[COL_GENE_PRODUCT], is(annotation.id));
+        assertThat(elements[COL_GENE_PRODUCT_FORM_ID], is(annotation.id));
     }
 
     @Test
@@ -110,7 +110,7 @@ public class AnnotationToGAFTest {
         String db = "RNAcentral";
         String gpType = "miRNA";
         annotation.id = String.format("%s:%s",db,gpId);
-        annotation.geneProductId = gpId;
+        annotation.geneProductId = String.format("%s:%s",db,gpId);
         annotation.assignedBy = db;
         annotation.symbol = gpId;
         String[] elements = annotationToElements(annotation);
@@ -130,7 +130,7 @@ public class AnnotationToGAFTest {
         assertThat(elements[COL_DATE], equalTo(DATE_AS_STRING));
         assertThat(elements[COL_ASSIGNED_BY], equalTo(db));
         assertThat(elements[COL_ANNOTATION_EXTENSION], is(EXTENSIONS_AS_STRING));
-
+        assertThat(elements[COL_GENE_PRODUCT_FORM_ID], is(""));
     }
 
     @Test
@@ -157,6 +157,7 @@ public class AnnotationToGAFTest {
         assertThat(elements[COL_DATE], equalTo(DATE_AS_STRING));
         assertThat(elements[COL_ASSIGNED_BY], equalTo(DB));
         assertThat(elements[COL_ANNOTATION_EXTENSION], is(EXTENSIONS_AS_STRING));
+        assertThat(elements[COL_GENE_PRODUCT_FORM_ID], is(""));
     }
 
     @Test
@@ -172,43 +173,14 @@ public class AnnotationToGAFTest {
         annotation.goAspect = "cellular_component";
         String[] elements = annotationToElements(annotation);
         assertThat(elements[COL_ASPECT], is("C"));
-
     }
 
     @Test
     public void slimmedToGoIdReplacesGoIdIfItExists(){
         final String slimmedToGoId = "GO:0005524";
-        annotation.slimmedIds = Arrays.asList(slimmedToGoId);
+        annotation.slimmedIds = Collections.singletonList(slimmedToGoId);
         String[] elements = annotationToElements(annotation);
         assertThat(elements[COL_GO_ID], is(slimmedToGoId));
-    }
-
-    @Test
-    public void testForNullInWithFrom(){
-        annotation.withFrom = null;
-        String[] elements = annotationToElements(annotation);
-        assertThat(elements[COL_WITH], is(""));
-    }
-
-    @Test
-    public void testForEmptyWithFrom(){
-        annotation.withFrom = new ArrayList<>();
-        String[] elements = annotationToElements(annotation);
-        assertThat(elements[COL_WITH], is(""));
-    }
-
-    @Test
-    public void testForNullInExtensions(){
-        annotation.extensions = null;
-        String[] elements = annotationToElements(annotation);
-        assertThat(elements[COL_ANNOTATION_EXTENSION], is(""));
-    }
-
-    @Test
-    public void testForEmptyExtensions(){
-        annotation.extensions = new ArrayList<>();
-        String[] elements = annotationToElements(annotation);
-        assertThat(elements[COL_ANNOTATION_EXTENSION], is(""));
     }
 
     @Test
@@ -224,6 +196,118 @@ public class AnnotationToGAFTest {
         checkReturned(slimmedToGoId2, converted.get(2));
     }
 
+    @Test
+    public void nullGeneProductId(){
+        annotation.geneProductId = null;
+        String[] elements = annotationToElements(annotation);
+        assertThat(elements[COL_DB_OBJECT_ID], is(""));
+    }
+
+    @Test
+    public void emptyGeneProductId(){
+        annotation.geneProductId = "";
+        String[] elements = annotationToElements(annotation);
+        assertThat(elements[COL_DB_OBJECT_ID], is(""));
+    }
+
+    @Test
+    public void nullSymbol(){
+        annotation.symbol = null;
+        String[] elements = annotationToElements(annotation);
+        assertThat(elements[COL_DB_OBJECT_SYMBOL], is(""));
+    }
+
+    @Test
+    public void testForNullQualifier(){
+        annotation.qualifier = null;
+        String[] elements = annotationToElements(annotation);
+        assertThat(elements[COL_QUALIFIER], is(""));
+    }
+
+    @Test
+    public void nullGoId(){
+        annotation.goId = null;
+        String[] elements = annotationToElements(annotation);
+        assertThat(elements[COL_GO_ID], is(""));
+    }
+
+    @Test
+    public void nullReference(){
+        annotation.reference = null;
+        String[] elements = annotationToElements(annotation);
+        assertThat(elements[COL_REFERENCE], is(""));
+    }
+
+    @Test
+    public void nullEvidenceCode(){
+        annotation.evidenceCode = null;
+        String[] elements = annotationToElements(annotation);
+        assertThat(elements[COL_EVIDENCE], is(""));
+    }
+
+    @Test
+    public void nullInWithFrom(){
+        annotation.withFrom = null;
+        String[] elements = annotationToElements(annotation);
+        assertThat(elements[COL_WITH], is(""));
+    }
+
+    @Test
+    public void emptyWithFrom(){
+        annotation.withFrom = new ArrayList<>();
+        String[] elements = annotationToElements(annotation);
+        assertThat(elements[COL_WITH], is(""));
+    }
+
+    @Test
+    public void nullAspect(){
+        annotation.goAspect = null;
+        String[] elements = annotationToElements(annotation);
+        assertThat(elements[COL_ASPECT], is(""));
+    }
+
+    @Test
+    public void nullGeneProductType(){
+        annotation.geneProductId = null;
+        String[] elements = annotationToElements(annotation);
+        assertThat(elements[COL_DB_OBJECT_TYPE], is(""));
+    }
+
+    @Test
+    public void nullDate(){
+        annotation.date = null;
+        String[] elements = annotationToElements(annotation);
+        assertThat(elements[COL_DATE], is(""));
+    }
+
+    @Test
+    public void nullAssignedBy(){
+        annotation.assignedBy = null;
+        String[] elements = annotationToElements(annotation);
+        assertThat(elements[COL_ASSIGNED_BY], is(""));
+    }
+
+    @Test
+    public void nullInExtensions(){
+        annotation.extensions = null;
+        String[] elements = annotationToElements(annotation);
+        assertThat(elements[COL_ANNOTATION_EXTENSION], is(""));
+    }
+
+    @Test
+    public void emptyExtensions(){
+        annotation.extensions = new ArrayList<>();
+        String[] elements = annotationToElements(annotation);
+        assertThat(elements[COL_ANNOTATION_EXTENSION], is(""));
+    }
+
+    @Test
+    public void nullGeneProductIdCreatesEmptyGeneProductFormId(){
+        annotation.geneProductId = null;
+        String[] elements = annotationToElements(annotation);
+        assertThat(elements[COL_GENE_PRODUCT_FORM_ID], is(""));
+    }
+
     private void checkReturned(String slimmedToGoId, String converted) {
         String[] elements = converted.split(AnnotationToGAF.OUTPUT_DELIMITER, -1);
         assertThat(elements[COL_GO_ID], is(slimmedToGoId));
@@ -233,5 +317,4 @@ public class AnnotationToGAFTest {
         return annotationToGAF.apply(annotation).get(0)
                               .split(AnnotationToGAF.OUTPUT_DELIMITER, -1);
     }
-
 }
