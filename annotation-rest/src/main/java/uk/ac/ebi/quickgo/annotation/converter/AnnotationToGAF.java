@@ -39,7 +39,6 @@ public class AnnotationToGAF extends AnnotationTo implements Function<Annotation
     static final String OUTPUT_DELIMITER = "\t";
     private static final String UNIPROT_KB = "UniProtKB";
     private static final Logger LOGGER = LoggerFactory.getLogger(AnnotationToGAF.class);
-    private final Function<String, String> nullToEmptyString = s -> s==null ? "": s;
 
     private final Function<String,String> toCanonical = new Function<String, String>() {
         private static final int CANONICAL_GROUP_NUMBER = 2;
