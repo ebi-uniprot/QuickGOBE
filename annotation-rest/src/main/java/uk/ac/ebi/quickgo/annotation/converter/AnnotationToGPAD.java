@@ -34,7 +34,7 @@ public class AnnotationToGPAD extends AnnotationTo implements Function<Annotatio
     @Override
     public List<String> apply(Annotation annotation) {
         if (Objects.isNull(annotation.slimmedIds) || annotation.slimmedIds.isEmpty()) {
-            return Collections.singletonList(toOutputRecord(annotation, annotation.id));
+            return Collections.singletonList(toOutputRecord(annotation, annotation.goId));
         } else {
             return annotation.slimmedIds.stream()
                                         .map(goId -> this.toOutputRecord(annotation, goId))
@@ -42,13 +42,13 @@ public class AnnotationToGPAD extends AnnotationTo implements Function<Annotatio
         }
     }
 
-    private String toOutputRecord(Annotation annotation, String id) {
+    private String toOutputRecord(Annotation annotation, String goId) {
         StringJoiner tsvJoiner = new StringJoiner(OUTPUT_DELIMITER);
         String[] idElements = idToComponents(annotation);
         return tsvJoiner.add(idElements[0])
                         .add(idElements[1])
                         .add(annotation.qualifier)
-                        .add(id)
+                        .add(goId)
                         .add(annotation.reference)
                         .add(annotation.evidenceCode)
                         .add(withFromAsString(annotation.withFrom))
