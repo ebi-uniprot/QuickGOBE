@@ -12,6 +12,9 @@ annotation:
     chunk: 30
     headerLines: 1
     reference_dbs: ['pmid', 'doi', 'go_ref', 'reactome']
+  download:
+      ontology:
+          source: classpath:ONTOLOGY_IRI.dat.gz
 
 search:
   external:
@@ -46,8 +49,3 @@ model:
       goId_join: goId,
       goAspect: aspect
     }
-
-annotation:
-  download:
-    ontology:
-        source: classpath:ONTOLOGY_IRI.dat.gz

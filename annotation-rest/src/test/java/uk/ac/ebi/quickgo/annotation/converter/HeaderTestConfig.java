@@ -17,7 +17,7 @@ import org.springframework.core.io.Resource;
 @Configuration
 class HeaderTestConfig {
 
-    @Value("${download.ontology.source}")
+    @Value("${annotation.download.ontology.source}")
     private Resource resource;
 
     /**
