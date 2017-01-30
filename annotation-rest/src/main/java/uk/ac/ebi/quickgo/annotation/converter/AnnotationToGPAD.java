@@ -2,8 +2,13 @@ package uk.ac.ebi.quickgo.annotation.converter;
 
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.function.Function;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * Convert an Annotation to the GPAD format.
@@ -22,18 +27,28 @@ import java.util.function.Function;
  * Time: 11:24
  * Created with IntelliJ IDEA.
  */
-public class AnnotationToGPAD extends AnnotationTo implements Function<Annotation, String> {
+public class AnnotationToGPAD extends AnnotationTo implements Function<Annotation, List<String>> {
 
     static final String OUTPUT_DELIMITER = "\t";
 
     @Override
-    public String apply(Annotation annotation) {
+    public List<String> apply(Annotation annotation) {
+        if (Objects.isNull(annotation.slimmedIds) || annotation.slimmedIds.isEmpty()) {
+            return Collections.singletonList(toOutputRecord(annotation, annotation.id));
+        } else {
+            return annotation.slimmedIds.stream()
+                                        .map(goId -> this.toOutputRecord(annotation, goId))
+                                        .collect(toList());
+        }
+    }
+
+    private String toOutputRecord(Annotation annotation, String id) {
         StringJoiner tsvJoiner = new StringJoiner(OUTPUT_DELIMITER);
         String[] idElements = idToComponents(annotation);
         return tsvJoiner.add(idElements[0])
                         .add(idElements[1])
                         .add(annotation.qualifier)
-                        .add(idOrSlimmedId(annotation))
+                        .add(id)
                         .add(annotation.reference)
                         .add(annotation.evidenceCode)
                         .add(withFromAsString(annotation.withFrom))
@@ -42,6 +57,5 @@ public class AnnotationToGPAD extends AnnotationTo implements Function<Annotatio
                         .add(annotation.assignedBy)
                         .add(extensionsAsString(annotation.extensions))
                         .add("goEvidence=" + annotation.goEvidence).toString();
-
     }
 }
