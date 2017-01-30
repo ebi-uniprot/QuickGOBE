@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.annotation.service.http;
 
+import uk.ac.ebi.quickgo.annotation.converter.AnnotationToGPAD;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
-import uk.ac.ebi.quickgo.annotation.service.converter.GPADAnnotationConverter;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import java.io.IOException;
@@ -31,9 +31,9 @@ public class GPADHttpMessageConverter extends AbstractHttpMessageConverter<Strea
     public static final String SUB_TYPE = "gpad";
     private static final MediaType MEDIA_TYPE = new MediaType("text", SUB_TYPE, Charset.forName("utf-8"));
     private static final Logger GPAD_LOGGER = getLogger(GPADHttpMessageConverter.class);
-    private final GPADAnnotationConverter converter;
+    private final AnnotationToGPAD converter;
 
-    public GPADHttpMessageConverter(GPADAnnotationConverter converter) {
+    public GPADHttpMessageConverter(AnnotationToGPAD converter) {
         super(MEDIA_TYPE);
         this.converter = converter;
     }
@@ -64,12 +64,9 @@ public class GPADHttpMessageConverter extends AbstractHttpMessageConverter<Strea
     private void writeAnnotations(OutputStream out, Stream<QueryResult<Annotation>> annotationStream) {
         AtomicInteger counter = new AtomicInteger(0);
         annotationStream.forEach(annotationResult -> {
-            if (counter.get() == 0) {
-                writeHeaderLines(out, converter.getHeaderLines(annotationResult));
-            }
             annotationResult.getResults().forEach(annotation -> {
                 try {
-                    out.write((converter.convert(annotation) + "\n").getBytes());
+                    out.write((converter.apply(annotation) + "\n").getBytes());
                     counter.getAndIncrement();
                 } catch (IOException e) {
                     GPAD_LOGGER.error("Could not write annotation in GPAD format: " + annotation, e);
