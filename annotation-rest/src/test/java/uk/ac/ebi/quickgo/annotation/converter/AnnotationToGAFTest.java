@@ -5,6 +5,7 @@ import uk.ac.ebi.quickgo.annotation.model.AnnotationMocker;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -12,6 +13,7 @@ import org.junit.Test;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
 import static uk.ac.ebi.quickgo.annotation.model.AnnotationMocker.*;
 
 /**
@@ -209,8 +211,26 @@ public class AnnotationToGAFTest {
         assertThat(elements[COL_ANNOTATION_EXTENSION], is(""));
     }
 
+    @Test
+    public void multipleSlimmedToGoIdsCreatesEqualQuantityOfAnnotationRecords(){
+        final String slimmedToGoId0 = "GO:0005524";
+        final String slimmedToGoId1 = "GO:1005524";
+        final String slimmedToGoId2 = "GO:2005524";
+        annotation.slimmedIds = Arrays.asList(slimmedToGoId0,slimmedToGoId1,slimmedToGoId2);
+        List<String> converted = annotationToGAF.apply(annotation);
+        assertThat(converted, hasSize(annotation.slimmedIds.size()));
+        checkReturned(slimmedToGoId0, converted.get(0));
+        checkReturned(slimmedToGoId1, converted.get(1));
+        checkReturned(slimmedToGoId2, converted.get(2));
+    }
+
+    private void checkReturned(String slimmedToGoId, String converted) {
+        String[] elements = converted.split(AnnotationToGAF.OUTPUT_DELIMITER, -1);
+        assertThat(elements[COL_GO_ID], is(slimmedToGoId));
+    }
+
     private String[] annotationToElements(Annotation annotation) {
-        return annotationToGAF.apply(annotation)
+        return annotationToGAF.apply(annotation).get(0)
                               .split(AnnotationToGAF.OUTPUT_DELIMITER, -1);
     }
 

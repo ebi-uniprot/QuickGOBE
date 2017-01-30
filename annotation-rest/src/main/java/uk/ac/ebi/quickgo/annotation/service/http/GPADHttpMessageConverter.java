@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.service.http;
 
+import java.util.List;
 import org.slf4j.Logger;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
@@ -85,8 +86,18 @@ public class GPADHttpMessageConverter extends AbstractHttpMessageConverter<Objec
         AtomicInteger counter = new AtomicInteger(0);
         annotationStream.forEach(annotationResult -> annotationResult.getResults().forEach(annotation -> {
             try {
-                out.write((converter.apply(annotation) + "\n").getBytes());
-                counter.getAndIncrement();
+                converter.apply(annotation)
+                         .stream()
+                         .forEach(s -> {
+                             try {
+                                 out.write((s + "\n").getBytes());
+                             } catch (IOException e) {
+                                 GPAD_LOGGER.error("Could not write OutputStream whilst writing GAF annotation: " +
+                                                           annotation, e);
+                             }
+                             counter.getAndIncrement();
+                         });
+
                 if (counter.get() % FLUSH_INTERVAL == 0) {
                     out.flush();
                 }
