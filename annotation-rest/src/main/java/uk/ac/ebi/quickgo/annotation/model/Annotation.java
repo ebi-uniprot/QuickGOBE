@@ -52,7 +52,7 @@ public class Annotation {
     @JsonFormat(shape= JsonFormat.Shape.STRING, pattern = "yyyyMMdd")
     public Date date;
 
-    public String interactingTaxonId;
+    public int interactingTaxonId;
 
     @Override public String toString() {
         return "Annotation{" +

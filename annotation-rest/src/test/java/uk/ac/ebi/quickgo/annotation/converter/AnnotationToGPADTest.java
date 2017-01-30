@@ -4,13 +4,16 @@ import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationMocker;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
 import static uk.ac.ebi.quickgo.annotation.model.AnnotationMocker.*;
 
 /**
@@ -53,7 +56,7 @@ public class AnnotationToGPADTest {
         assertThat(elements[COL_REFERENCE], is(REFERENCE));
         assertThat(elements[COL_EVIDENCE], is(EVIDENCE_CODE));
         assertThat(elements[COL_WITH], equalTo(WITH_FROM_AS_STRING));
-        assertThat(elements[COL_INTERACTING_DB], is(INTERACTING_TAXON_ID));
+        assertThat(elements[COL_INTERACTING_DB], is(Integer.toString(INTERACTING_TAXON_ID)));
         assertThat(elements[COL_DATE], equalTo(DATE_AS_STRING));
         assertThat(elements[COL_ASSIGNED_BY], equalTo(DB));
         assertThat(elements[COL_ANNOTATION_EXTENSION], is(EXTENSIONS_AS_STRING));
@@ -69,32 +72,116 @@ public class AnnotationToGPADTest {
     }
 
     @Test
-    public void testForNullInWithFrom() {
+    public void nullGeneProductId() {
+        annotation.geneProductId = null;
+        String[] elements = annotationToElements(annotation);
+        assertThat(elements[COL_DB], is(""));
+        assertThat(elements[COL_DB_OBJECT_ID], is(""));
+    }
+
+    @Test
+    public void nullQualifier() {
+        annotation.qualifier = null;
+        String[] elements = annotationToElements(annotation);
+        assertThat(elements[COL_QUALIFIER], is(""));
+    }
+
+    @Test
+    public void nullGoId() {
+        annotation.goId = null;
+        String[] elements = annotationToElements(annotation);
+        assertThat(elements[COL_GO_ID], is(""));
+    }
+
+    @Test
+    public void nullReference() {
+        annotation.reference = null;
+        String[] elements = annotationToElements(annotation);
+        assertThat(elements[COL_REFERENCE], is(""));
+    }
+
+    @Test
+    public void nullEvidence() {
+        annotation.evidenceCode = null;
+        String[] elements = annotationToElements(annotation);
+        assertThat(elements[COL_EVIDENCE], is(""));
+    }
+
+    @Test
+    public void nullWithFrom() {
         annotation.withFrom = null;
         String[] elements = annotationToElements(annotation);
         assertThat(elements[COL_WITH], is(""));
     }
 
     @Test
-    public void testForEmptyWithFrom() {
+    public void emptyWithFrom() {
         annotation.withFrom = new ArrayList<>();
         String[] elements = annotationToElements(annotation);
         assertThat(elements[COL_WITH], is(""));
     }
 
     @Test
-    public void testForNullInExtensions() {
-        annotation.extensions = null;
+    public void emptyInteractingTaxonId() {
+        annotation.interactingTaxonId = 0;
+        String[] elements = annotationToElements(annotation);
+        assertThat(elements[COL_INTERACTING_DB], is("0"));
+    }
+
+    @Test
+    public void nullDate(){
+        annotation.date = null;
+        String[] elements = annotationToElements(annotation);
+        assertThat(elements[COL_DATE], is(""));
+    }
+
+    @Test
+    public void nullAssignedBy(){
+        annotation.assignedBy = null;
+        String[] elements = annotationToElements(annotation);
+        assertThat(elements[COL_ASSIGNED_BY], is(""));
+    }
+
+    @Test
+    public void nullGoEvidence(){
+        annotation.goEvidence = null;
+        String[] elements = annotationToElements(annotation);
+        assertThat(elements[COL_GO_EVIDENCE], is("goEvidence="));
+    }
+
+    @Test
+    public void emptyExtensions() {
+        annotation.extensions = new ArrayList<>();
         String[] elements = annotationToElements(annotation);
         assertThat(elements[COL_ANNOTATION_EXTENSION], is(""));
     }
 
     @Test
-    public void testForEmptyExtensions() {
-        annotation.extensions = new ArrayList<>();
+    public void nullInExtensions() {
+        annotation.extensions = null;
         String[] elements = annotationToElements(annotation);
         assertThat(elements[COL_ANNOTATION_EXTENSION], is(""));
     }
+
+
+    @Test
+    public void multipleSlimmedToGoIdsCreatesEqualQuantityOfAnnotationRecords(){
+        final String slimmedToGoId0 = "GO:0005524";
+        final String slimmedToGoId1 = "GO:1005524";
+        final String slimmedToGoId2 = "GO:2005524";
+        annotation.slimmedIds = Arrays.asList(slimmedToGoId0, slimmedToGoId1, slimmedToGoId2);
+        List<String> converted = annotationToGPAD.apply(annotation);
+        assertThat(converted, hasSize(annotation.slimmedIds.size()));
+        checkReturned(slimmedToGoId0, converted.get(0));
+        checkReturned(slimmedToGoId1, converted.get(1));
+        checkReturned(slimmedToGoId2, converted.get(2));
+    }
+
+    private void checkReturned(String slimmedToGoId, String converted) {
+        String[] elements = converted.split(AnnotationToGAF.OUTPUT_DELIMITER, -1);
+        assertThat(elements[COL_GO_ID], is(slimmedToGoId));
+    }
+
 
     private String[] annotationToElements(Annotation annotation) {
         return annotationToGPAD.apply(annotation)

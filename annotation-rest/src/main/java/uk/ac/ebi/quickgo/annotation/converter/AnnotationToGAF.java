@@ -2,10 +2,17 @@ package uk.ac.ebi.quickgo.annotation.converter;
 
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * Convert an {@link Annotation}  to a String representation.
@@ -28,70 +35,98 @@ import java.util.regex.Pattern;
  * Time: 11:54
  * Created with IntelliJ IDEA.
  */
-public class AnnotationToGAF extends AnnotationTo implements Function<Annotation, String>{
+public class AnnotationToGAF extends AnnotationTo implements Function<Annotation, List<String>>{
     static final String OUTPUT_DELIMITER = "\t";
     private static final String UNIPROT_KB = "UniProtKB";
-    private static final int CANONICAL_GROUP_NUMBER = 2;
-    private static final int INTACT_GROUP_NUMBER = 1;
+    private static final Logger LOGGER = LoggerFactory.getLogger(AnnotationToGAF.class);
 
-    private static final String UNIPROT_CANONICAL_REGEX = "^(?:UniProtKB:)?(([OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z]" +
-            "([0-9][A-Z][A-Z0-9]{2}){1,2}[0-9])((-[0-9]+)|:PRO_[0-9]{10}|:VAR_[0-9]{6}){0,1})$";
-    private static final Pattern UNIPROT_CANONICAL_PATTERN = Pattern.compile(UNIPROT_CANONICAL_REGEX);
-    private static final String RNA_CENTRAL_REGEX = "^(?:RNAcentral:)?((URS[0-9A-F]{10})(_[0-9]+){0,1})$";
-    private static final Pattern RNA_CENTRAL_CANONICAL_PATTERN = Pattern.compile(RNA_CENTRAL_REGEX);
-    private static final String INTACT_CANONICAL_REGEX = "^(?:IntAct:)(EBI-[0-9]+)$";
-    private static final Pattern INTACT_CANONICAL_PATTERN = Pattern.compile(INTACT_CANONICAL_REGEX);
+    private final Function<String,String> toCanonical = new Function<String, String>() {
+        private static final int CANONICAL_GROUP_NUMBER = 2;
+        private static final int INTACT_GROUP_NUMBER = 1;
+        private static final String UNIPROT_CANONICAL_REGEX = "^(?:UniProtKB:)?(([OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z]" +
+                "([0-9][A-Z][A-Z0-9]{2}){1,2}[0-9])((-[0-9]+)|:PRO_[0-9]{10}|:VAR_[0-9]{6}){0,1})$";
+        private final Pattern UNIPROT_CANONICAL_PATTERN = Pattern.compile(UNIPROT_CANONICAL_REGEX);
+        private static final String RNA_CENTRAL_REGEX = "^(?:RNAcentral:)?((URS[0-9A-F]{10})(_[0-9]+){0,1})$";
+        private final Pattern RNA_CENTRAL_CANONICAL_PATTERN = Pattern.compile(RNA_CENTRAL_REGEX);
+        private static final String INTACT_CANONICAL_REGEX = "^(?:IntAct:)(EBI-[0-9]+)$";
+        private final Pattern INTACT_CANONICAL_PATTERN = Pattern.compile(INTACT_CANONICAL_REGEX);
+
+        /**
+         * Extract the canonical version of the id, removing the variation or isoform suffix if it exists.
+         * @param id Annotation id, could had isoform or variant suffix.
+         * @return canonical form of the id with the soform or variant suffix removed.
+         */
+        @Override public String apply(String id) {
+            Matcher uniprotMatcher = UNIPROT_CANONICAL_PATTERN.matcher(id);
+            if (uniprotMatcher.matches()) {
+                return uniprotMatcher.group(CANONICAL_GROUP_NUMBER);
+            }
+            Matcher rnaMatcher = RNA_CENTRAL_CANONICAL_PATTERN.matcher(id);
+            if (rnaMatcher.matches()) {
+                return rnaMatcher.group(CANONICAL_GROUP_NUMBER);
+            }
+
+            Matcher intactMatcher = INTACT_CANONICAL_PATTERN.matcher(id);
+            if (intactMatcher.matches()) {
+                return intactMatcher.group(INTACT_GROUP_NUMBER);
+            }
+             LOGGER.error(String.format("Can not extract the canonical version of the id from %s", id));
+            return "";
+        }
+    };
+
+    private final Function<String,String> createCanonical = toCanonical.compose(nullToEmptyString);
 
         /**
          * Convert an {@link Annotation} to a String representation.
          * @param annotation instance
          * @return String TSV delimited representation of an annotation in GAF format.
+         *
          */
         @Override
-        public String apply(Annotation annotation) {
-            String[] idElements = idToComponents(annotation);
+        public List<String> apply(Annotation annotation) {
+            if (Objects.isNull(annotation.slimmedIds) || annotation.slimmedIds.isEmpty()) {
+                return Collections.singletonList(toOutputRecord(annotation, annotation.goId));
+            } else {
+                return annotation.slimmedIds.stream()
+                                            .map(goId -> this.toOutputRecord(annotation, goId))
+                                            .collect(toList());
+            }
+        }
+
+        private String toOutputRecord(Annotation annotation, String goId) {
+            String[] idElements = idToComponents(annotation.geneProductId);
             StringJoiner tsvJoiner = new StringJoiner(OUTPUT_DELIMITER);
+
             return tsvJoiner.add(idElements[0])
-                            .add(toCanonical(annotation.geneProductId))
-                            .add(annotation.symbol)
-                            .add(annotation.qualifier)
-                            .add(idOrSlimmedId(annotation))
-                            .add(annotation.reference)
-                            .add(annotation.evidenceCode)
+                            .add(createCanonical.apply(annotation.geneProductId))
+                            .add(nullToEmptyString.apply(annotation.symbol))
+                            .add(nullToEmptyString.apply(annotation.qualifier))
+                            .add(nullToEmptyString.apply(goId))
+                            .add(nullToEmptyString.apply(annotation.reference))
+                            .add(nullToEmptyString.apply(annotation.evidenceCode))
                             .add(withFromAsString(annotation.withFrom))
-                            .add(Aspect.fromScientificName(annotation.goAspect).character)
+                            .add(populateAspect(annotation.goAspect))
                             .add("")   // name - in GP core optional not used
                             .add("")   //synonym, - in GP core  e.g. 'Nit79A3_0905' optional not used
-                            .add(toGeneProductType(idElements[0]))
+                            .add(nullToEmptyString.apply(toGeneProductType(idElements[0])))
                             .add("taxon:" + annotation.taxonId)
                             .add(toYMD(annotation.date))
-                            .add(annotation.assignedBy)
+                            .add(nullToEmptyString.apply(annotation.assignedBy))
                             .add(extensionsAsString(annotation.extensions))
                             .add(UNIPROT_KB.equals(idElements[0]) ? String.format("%s:%s", UNIPROT_KB,
-                                                                                   idElements[1]) : "").toString();
+                                                                                  idElements[1]) : "").toString();
         }
 
-    /**
-     * Extract the canonical version of the id, removing the variation or isoform suffix if it exists.
-     * @param id Annotation id, could had isoform or variant suffix.
-     * @return canonical form of the id with the soform or variant suffix removed.
-     */
-    private String toCanonical(String id) {
-        Matcher uniprotMatcher = UNIPROT_CANONICAL_PATTERN.matcher(id);
-        if (uniprotMatcher.matches()) {
-            return uniprotMatcher.group(CANONICAL_GROUP_NUMBER);
+    private String populateAspect(String goAspect) {
+        String aspectCharacter;
+        try {
+            aspectCharacter = Aspect.fromScientificName(goAspect).character;
+        } catch (Exception e) {
+            LOGGER.error("Unrecognized Aspect scientificName: " + goAspect);
+            aspectCharacter = "";
         }
-        Matcher rnaMatcher = RNA_CENTRAL_CANONICAL_PATTERN.matcher(id);
-        if (rnaMatcher.matches()) {
-            return rnaMatcher.group(CANONICAL_GROUP_NUMBER);
-        }
-
-        Matcher intactMatcher = INTACT_CANONICAL_PATTERN.matcher(id);
-        if (intactMatcher.matches()) {
-            return intactMatcher.group(INTACT_GROUP_NUMBER);
-        }
-        throw new IllegalArgumentException(String.format("Can not extract the canonical version of the id from %s",
-                                                         id));
+        return aspectCharacter;
     }
 
     private String toGeneProductType(String idElement) {
@@ -103,7 +138,8 @@ public class AnnotationToGAF extends AnnotationTo implements Function<Annotation
             case "RNAcentral":
                 return "miRNA";
         }
-        throw new IllegalArgumentException("Cannot determine gene product type for based on DB of " + idElement);
+        LOGGER.error(("Cannot determine gene product type for based on DB of " + idElement));
+        return "";
     }
 
     public enum Aspect {
