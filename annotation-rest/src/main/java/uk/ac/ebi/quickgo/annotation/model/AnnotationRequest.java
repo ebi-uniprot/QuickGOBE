@@ -39,6 +39,9 @@ public class AnnotationRequest {
     static final int MAX_EVIDENCE_CODE = 100;
     static final int MAX_TAXON_IDS = 50;
     static final int MAX_REFERENCES = 50;
+    static final int MIN_DOWNLOAD_NUMBER = 1;
+    static final int MAX_DOWNLOAD_NUMBER = 50000;
+    static final int DEFAULT_DOWNLOAD_LIMIT = 10000;
 
     //Names of the parameters in readable format
     static final String ASSIGNED_BY_PARAM = "Assigned By";
@@ -105,7 +108,7 @@ public class AnnotationRequest {
     @ApiModelProperty(
             value = "Number of results per page.",
             allowableValues = "range[" + MIN_ENTRIES_PER_PAGE + "," + MAX_ENTRIES_PER_PAGE + "]")
-    private int limit = DEFAULT_ENTRIES_PER_PAGE;
+    protected int limit = DEFAULT_ENTRIES_PER_PAGE;
 
     @ApiModelProperty(
             value = "Page number of the result set to display.",
@@ -228,6 +231,12 @@ public class AnnotationRequest {
                     "results_in_formation_of(UBERON:0003070),occurs_in(CL:0000032),occurs_in(CL:0000008)," +
                     "results_in_formation_of(UBERON:0001675)")
     private String extension;
+
+    @ApiModelProperty(
+            value = "The number of annotations to download. Note, the page size parameter [limit] will be ignored " +
+                    "when downloading results.",
+            allowableValues = "range[" + MIN_DOWNLOAD_NUMBER + "," + MAX_DOWNLOAD_NUMBER + "]")
+    private int downloadLimit = DEFAULT_DOWNLOAD_LIMIT;
 
     private final Map<String, String[]> filterMap = new HashMap<>();
 
@@ -474,6 +483,18 @@ public class AnnotationRequest {
 
     public void setPage(int page) {
         this.page = page;
+    }
+
+    @Min(value = MIN_DOWNLOAD_NUMBER, message = "Number of entries to download cannot be less than {value} " +
+            "but found: ${validatedValue}")
+    @Max(value = MAX_DOWNLOAD_NUMBER, message = "Number of entries to download cannot be more than {value} " +
+            "but found: ${validatedValue}")
+    public int getDownloadLimit() {
+        return downloadLimit;
+    }
+
+    public void setDownloadLimit(int downloadLimit) {
+        this.downloadLimit = downloadLimit;
     }
 
     /**

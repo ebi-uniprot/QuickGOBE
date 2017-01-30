@@ -27,6 +27,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
 import static uk.ac.ebi.quickgo.annotation.IdGeneratorUtil.generateValues;
@@ -602,8 +603,8 @@ public class AnnotationRequestValidationIT {
 
         int numRefs = AnnotationRequest.MAX_REFERENCES + 1;
         List<String> refs = IntStream.range(0, numRefs)
-                                     .mapToObj(i -> "PMID:123456")
-                                     .collect(toList());
+                .mapToObj(i -> "PMID:123456")
+                .collect(toList());
         annotationRequest.setReference(refs.toArray(new String[0]));
         Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
 
@@ -613,18 +614,18 @@ public class AnnotationRequestValidationIT {
     }
 
     @Test
-    public void referenceIsValid(){
+    public void referenceIsValid() {
         setupDbXrefValidationData();
-        String[] refs = new String[] {"PMID:123456"};
+        String[] refs = new String[]{"PMID:123456"};
         annotationRequest.setReference(refs);
         Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
         assertThat(violations, hasSize(0));
     }
 
     @Test
-    public void referenceIsInvalid(){
+    public void referenceIsInvalid() {
         setupDbXrefValidationData();
-        String[] refs = new String[] {"PMID:ZZZZZZZZ"};
+        String[] refs = new String[]{"PMID:ZZZZZZZZ"};
         annotationRequest.setReference(refs);
         Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
         assertThat(violations, hasSize(1));
@@ -633,7 +634,7 @@ public class AnnotationRequestValidationIT {
     // QUALIFIER
     @Test
     public void qualifierWithUnderscoreNoSpacesOrNumbersIsValid() {
-        annotationRequest.setQualifier("foobar","foo_bar");
+        annotationRequest.setQualifier("foobar", "foo_bar");
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
@@ -668,11 +669,41 @@ public class AnnotationRequestValidationIT {
     }
 
     @Test
-    public void StringWithNumbersIsAnInvalidQualifier() {
+    public void stringWithNumbersIsAnInvalidQualifier() {
         annotationRequest.setQualifier("foo3bar");
         assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
     }
 
+    // DOWNLOAD LIMIT
+    @Test
+    public void negativeDownloadLimitIsInvalid() {
+        annotationRequest.setDownloadLimit(-1);
+        assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
+    }
+
+    @Test
+    public void zeroDownloadLimitIsInvalid() {
+        annotationRequest.setDownloadLimit(0);
+        assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
+    }
+
+    @Test
+    public void positiveDownloadLimitLessThanMaxIsValid() {
+        annotationRequest.setDownloadLimit(MAX_DOWNLOAD_NUMBER - 1);
+        assertThat(validator.validate(annotationRequest), is(empty()));
+    }
+
+    @Test
+    public void positiveDownloadLimitEqualToMaxIsValid() {
+        annotationRequest.setDownloadLimit(MAX_DOWNLOAD_NUMBER);
+        assertThat(validator.validate(annotationRequest), is(empty()));
+    }
+
+    @Test
+    public void positiveDownloadLimitGreaterThanMaxIsInvalid() {
+        annotationRequest.setDownloadLimit(MAX_DOWNLOAD_NUMBER + 1);
+        assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
+    }
 
     private String createRegexErrorMessage(String paramName, String... invalidItems) {
         String csvInvalidItems = Stream.of(invalidItems).collect(Collectors.joining(", "));
@@ -683,8 +714,8 @@ public class AnnotationRequestValidationIT {
         return "Number of items in '" + paramName + "' is larger than: " + maxSize;
     }
 
-    private void setupDbXrefValidationData(){
-        if(!HAS_RUN) {
+    private void setupDbXrefValidationData() {
+        if (!HAS_RUN) {
             JobExecution jobExecution = jobLauncherTestUtils.launchStep(LOAD_ANNOTATION_DBX_REF_ENTITIES_STEP_NAME);
             assertThat(jobExecution.getStatus(), is(BatchStatus.COMPLETED));
             HAS_RUN = true;

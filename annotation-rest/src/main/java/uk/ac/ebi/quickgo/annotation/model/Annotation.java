@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Annotation DTO used by the service layer.
@@ -34,14 +33,14 @@ public class Annotation {
 
     public String reference;
 
-    public List<ConnectedXRefs> withFrom;
+    public List<ConnectedXRefs<Annotation.SimpleXRef>> withFrom;
 
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     public int taxonId;
 
     public String assignedBy;
 
-    public List<ConnectedXRefs> extensions;
+    public List<ConnectedXRefs<Annotation.QualifiedXref>> extensions;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public List<String> slimmedIds;
@@ -52,6 +51,8 @@ public class Annotation {
 
     @JsonFormat(shape= JsonFormat.Shape.STRING, pattern = "yyyyMMdd")
     public Date date;
+
+    public String interactingTaxonId;
 
     @Override public String toString() {
         return "Annotation{" +
@@ -130,7 +131,6 @@ public class Annotation {
             return false;
         }
         return date != null ? date.equals(that.date) : that.date == null;
-
     }
 
     @Override public int hashCode() {
@@ -215,6 +215,10 @@ public class Annotation {
             return id;
         }
 
+        public String asXref() {
+            return String.format("%s:%s", db, id);
+        }
+
         @Override public boolean equals(Object o) {
             if (this == o) {
                 return true;
@@ -254,10 +258,6 @@ public class Annotation {
                     ", id='" + id + '\'' +
                     '}';
         }
-
-        public String asXref() {
-            return String.format("%s:%s", db, id);
-        }
     }
 
     /**
@@ -290,10 +290,9 @@ public class Annotation {
             QualifiedXref that = (QualifiedXref) o;
 
             return qualifier != null ? qualifier.equals(that.qualifier) : that.qualifier == null;
-
         }
 
-
+        @Override
         public String asXref() {
             return String.format("%s(%s:%s)", qualifier, db, id);
         }
@@ -311,6 +310,5 @@ public class Annotation {
                     ", qualifier='" + qualifier + '\'' +
                     '}';
         }
-
     }
 }
