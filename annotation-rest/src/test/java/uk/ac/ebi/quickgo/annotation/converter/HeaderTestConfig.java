@@ -17,7 +17,7 @@ import org.springframework.core.io.Resource;
 @Configuration
 class HeaderTestConfig {
 
-    @Value("${annotation.download.ontology.source}")
+    @Value("${annotation.download.ontologySource}")
     private Resource resource;
 
     /**
@@ -29,7 +29,7 @@ class HeaderTestConfig {
     }
 
     @Bean
-    public AnnotationDownloadFileHeader header() throws IOException {
+    public AnnotationDownloadFileHeader annotationDownloadFileHeader() throws IOException {
         return new AnnotationDownloadFileHeader(Paths.get(resource.getURI()));
     }
 }
