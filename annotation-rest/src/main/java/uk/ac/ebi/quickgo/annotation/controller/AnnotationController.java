@@ -218,14 +218,13 @@ public class AnnotationController {
         FilterQueryInfo filterQueryInfo = extractFilterQueryInfo(request);
         // -1 indicates no timeout
         ResponseBodyEmitter emitter = new ResponseBodyEmitter(-1L);
-        annotationDownloadFileHeader.write(emitter, request, acceptHeader);
+        annotationDownloadFileHeader.write(emitter, servletRequest, mediaTypeAcceptHeader);
 
         QueryRequest queryRequest = downloadQueryTemplate.newBuilder()
                 .setQuery(QuickGOQuery.createAllQuery())
                 .addFilters(filterQueryInfo.getFilterQueries())
                 .build();
 
-        ResponseBodyEmitter emitter = new ResponseBodyEmitter();
         try {
             emitter.send((" ! " + servletRequest.getRequestURL().toString() +
                                   " : " + servletRequest.getRequestURI() + ":" + servletRequest.getQueryString()),
