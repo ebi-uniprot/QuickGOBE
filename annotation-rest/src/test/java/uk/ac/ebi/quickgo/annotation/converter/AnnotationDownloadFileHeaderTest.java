@@ -25,6 +25,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.ac.ebi.quickgo.annotation.converter.AnnotationDownloadFileHeader.REQUEST_LINE_INDENTATION;
 
 /**
  * @author Tony Wardell
@@ -38,15 +39,15 @@ public class AnnotationDownloadFileHeaderTest {
 
     private static final String URI = "/QuickGO/services/annotation/search";
     private static final Map<String, String[]> mockParameterMap = new HashMap<>();
-    private static final String todaysDate;
+    private static final String TODAYS_DATE;
     private static final String ECO_VERSION = "http://purl.obolibrary.org/obo/eco/releases/2017-01-06/eco.owl";
     private static final String GO_VERSION = "http://purl.obolibrary.org/obo/go/releases/2017-01-12/go" +
-                                                               ".owl";
+            ".owl";
 
     static {
         mockParameterMap.put("assignedBy", new String[]{"foo", "bar"});
         mockParameterMap.put("evidence", new String[]{"ECO:12345"});
-        todaysDate = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE);
+        TODAYS_DATE = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE);
     }
 
     private @Mock ResponseBodyEmitter mockEmitter = mock(ResponseBodyEmitter.class);
@@ -102,22 +103,22 @@ public class AnnotationDownloadFileHeaderTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void pathToOntologyFileIsNull() throws Exception {
-      new AnnotationDownloadFileHeader(null);
+        new AnnotationDownloadFileHeader(null);
     }
 
     private void testRestOfHeader() throws IOException {
         verify(mockEmitter).send(decorateContent(AnnotationDownloadFileHeader.PROJECT_NAME), MediaType.TEXT_PLAIN);
         verify(mockEmitter).send(decorateContent(AnnotationDownloadFileHeader.URL), MediaType.TEXT_PLAIN);
         verify(mockEmitter).send(decorateContent(AnnotationDownloadFileHeader.EMAIL), MediaType.TEXT_PLAIN);
-        verify(mockEmitter).send(decorateContent(AnnotationDownloadFileHeader.DATE + todaysDate),
-                                 MediaType.TEXT_PLAIN);
+        verify(mockEmitter).send(decorateContent(AnnotationDownloadFileHeader.DATE + TODAYS_DATE),
+                MediaType.TEXT_PLAIN);
         verify(mockEmitter).send(decorateContent(AnnotationDownloadFileHeader.FILTERS_INTRO), MediaType.TEXT_PLAIN);
-        verify(mockEmitter).send(decorateContent(URI + "?assignedBy=foo,bar&evidence=ECO:12345"),
-                                 MediaType.TEXT_PLAIN);
+        verify(mockEmitter).send(decorateContent(REQUEST_LINE_INDENTATION + URI + "?assignedBy=foo,bar&evidence=ECO:12345"),
+                MediaType.TEXT_PLAIN);
         verify(mockEmitter).send(decorateContent(ECO_VERSION),
-                                 MediaType.TEXT_PLAIN);
+                MediaType.TEXT_PLAIN);
         verify(mockEmitter).send(decorateContent(GO_VERSION),
-                                 MediaType.TEXT_PLAIN);
+                MediaType.TEXT_PLAIN);
     }
 
     private static String decorateContent(String content) {
