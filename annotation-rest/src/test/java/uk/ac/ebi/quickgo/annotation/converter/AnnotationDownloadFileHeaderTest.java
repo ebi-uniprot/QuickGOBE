@@ -56,7 +56,6 @@ public class AnnotationDownloadFileHeaderTest {
     @Autowired
     private AnnotationDownloadFileHeader annotationDownloadFileHeader;
 
-
     @Before
     public void setup() throws IOException {
         when(mockRequest.getRequestURI()).thenReturn(URI);
@@ -69,7 +68,7 @@ public class AnnotationDownloadFileHeaderTest {
         annotationDownloadFileHeader.write(mockEmitter, mockRequest, mockMediaType);
 
         //Test
-        verify(mockEmitter).send(prefixHeaderLine(AnnotationDownloadFileHeader.GAF_VERSION), MediaType.TEXT_PLAIN);
+        verify(mockEmitter).send(decorateContent(AnnotationDownloadFileHeader.GAF_VERSION), MediaType.TEXT_PLAIN);
         testRestOfHeader();
     }
 
@@ -79,7 +78,7 @@ public class AnnotationDownloadFileHeaderTest {
         annotationDownloadFileHeader.write(mockEmitter, mockRequest, mockMediaType);
 
         //Test
-        verify(mockEmitter).send(prefixHeaderLine(AnnotationDownloadFileHeader.GPAD_VERSION), MediaType.TEXT_PLAIN);
+        verify(mockEmitter).send(decorateContent(AnnotationDownloadFileHeader.GPAD_VERSION), MediaType.TEXT_PLAIN);
         testRestOfHeader();
     }
 
@@ -89,10 +88,10 @@ public class AnnotationDownloadFileHeaderTest {
         when(mockMediaType.getSubtype()).thenReturn(GAFHttpMessageConverter.SUB_TYPE);
         annotationDownloadFileHeader = new AnnotationDownloadFileHeader(ontologyPath);
         annotationDownloadFileHeader.write(mockEmitter, mockRequest, mockMediaType);
-        verify(mockEmitter, never()).send(prefixHeaderLine(ECO_VERSION), MediaType.TEXT_PLAIN);
-        verify(mockEmitter, never()).send(prefixHeaderLine(GO_VERSION), MediaType.TEXT_PLAIN);
-        verify(mockEmitter, never()).send(prefixHeaderLine(""), MediaType.TEXT_PLAIN);
-        verify(mockEmitter, never()).send(prefixHeaderLine(""), MediaType.TEXT_PLAIN);
+        verify(mockEmitter, never()).send(decorateContent(ECO_VERSION), MediaType.TEXT_PLAIN);
+        verify(mockEmitter, never()).send(decorateContent(GO_VERSION), MediaType.TEXT_PLAIN);
+        verify(mockEmitter, never()).send(decorateContent(""), MediaType.TEXT_PLAIN);
+        verify(mockEmitter, never()).send(decorateContent(""), MediaType.TEXT_PLAIN);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -107,22 +106,22 @@ public class AnnotationDownloadFileHeaderTest {
     }
 
     private void testRestOfHeader() throws IOException {
-        verify(mockEmitter).send(prefixHeaderLine(AnnotationDownloadFileHeader.PROJECT_NAME), MediaType.TEXT_PLAIN);
-        verify(mockEmitter).send(prefixHeaderLine(AnnotationDownloadFileHeader.URL), MediaType.TEXT_PLAIN);
-        verify(mockEmitter).send(prefixHeaderLine(AnnotationDownloadFileHeader.EMAIL), MediaType.TEXT_PLAIN);
-        verify(mockEmitter).send(prefixHeaderLine(AnnotationDownloadFileHeader.DATE + todaysDate),
+        verify(mockEmitter).send(decorateContent(AnnotationDownloadFileHeader.PROJECT_NAME), MediaType.TEXT_PLAIN);
+        verify(mockEmitter).send(decorateContent(AnnotationDownloadFileHeader.URL), MediaType.TEXT_PLAIN);
+        verify(mockEmitter).send(decorateContent(AnnotationDownloadFileHeader.EMAIL), MediaType.TEXT_PLAIN);
+        verify(mockEmitter).send(decorateContent(AnnotationDownloadFileHeader.DATE + todaysDate),
                                  MediaType.TEXT_PLAIN);
-        verify(mockEmitter).send(prefixHeaderLine(AnnotationDownloadFileHeader.FILTERS_INTRO), MediaType.TEXT_PLAIN);
-        verify(mockEmitter).send(prefixHeaderLine(URI + "?assignedBy=foo,bar&evidence=ECO:12345"),
+        verify(mockEmitter).send(decorateContent(AnnotationDownloadFileHeader.FILTERS_INTRO), MediaType.TEXT_PLAIN);
+        verify(mockEmitter).send(decorateContent(URI + "?assignedBy=foo,bar&evidence=ECO:12345"),
                                  MediaType.TEXT_PLAIN);
-        verify(mockEmitter).send(prefixHeaderLine(ECO_VERSION),
+        verify(mockEmitter).send(decorateContent(ECO_VERSION),
                                  MediaType.TEXT_PLAIN);
-        verify(mockEmitter).send(prefixHeaderLine(GO_VERSION),
+        verify(mockEmitter).send(decorateContent(GO_VERSION),
                                  MediaType.TEXT_PLAIN);
     }
 
-    private static String prefixHeaderLine(String content) {
-        return "!" + content;
+    private static String decorateContent(String content) {
+        return "!" + content + "\n";
     }
 
 }

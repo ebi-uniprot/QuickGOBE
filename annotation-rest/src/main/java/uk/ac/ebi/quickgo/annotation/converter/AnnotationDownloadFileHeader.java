@@ -1,16 +1,10 @@
 package uk.ac.ebi.quickgo.annotation.converter;
 
-import com.google.common.base.Preconditions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.MediaType;
-import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 import uk.ac.ebi.quickgo.annotation.service.http.GAFHttpMessageConverter;
 import uk.ac.ebi.quickgo.annotation.service.http.GPADHttpMessageConverter;
 import uk.ac.ebi.quickgo.common.loader.GZIPFiles;
 
-import javax.servlet.http.HttpServletRequest;
+import com.google.common.base.Preconditions;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -20,6 +14,12 @@ import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 
 import static java.util.Arrays.stream;
 
@@ -87,12 +87,11 @@ public class AnnotationDownloadFileHeader {
         send(emitter, FILTERS_INTRO);
         send(emitter, request(request));
         ontology().forEach(s -> send(emitter, s));
-
     }
 
     private void send(ResponseBodyEmitter emitter, String content) {
         try {
-            emitter.send(HEADER_LINE_PREFIX + content, MediaType.TEXT_PLAIN);
+            emitter.send(HEADER_LINE_PREFIX + content + "\n", MediaType.TEXT_PLAIN);
         } catch (IOException e) {
             throw new RuntimeException("Failed to send download header", e);
         }
@@ -104,8 +103,9 @@ public class AnnotationDownloadFileHeader {
                 return GAF_VERSION;
             case GPADHttpMessageConverter.SUB_TYPE:
                 return GPAD_VERSION;
+            default:
+                throw new IllegalArgumentException("Unknown Media subtype requested: " + acceptHeader.getSubtype());
         }
-        throw new IllegalArgumentException("Unknown Media subtype requested: " + acceptHeader.getSubtype());
     }
 
     private String date() {
@@ -118,11 +118,11 @@ public class AnnotationDownloadFileHeader {
 
     private String parameterString(HttpServletRequest request) {
         return request.getParameterMap()
-                      .entrySet()
-                      .stream()
-                      .map(s -> String.format("%s=%s", s.getKey(), stream(s.getValue())
-                              .collect(Collectors.joining(","))))
-                      .collect(Collectors.joining("&"));
+                .entrySet()
+                .stream()
+                .map(s -> String.format("%s=%s", s.getKey(), stream(s.getValue())
+                        .collect(Collectors.joining(","))))
+                .collect(Collectors.joining("&"));
     }
 
     private List<String> ontology() {
@@ -132,9 +132,9 @@ public class AnnotationDownloadFileHeader {
             if (!lastModifiedTime.equals(previousTimeStamp)) {
                 previousTimeStamp = lastModifiedTime;
                 savedOntologyLines = GZIPFiles.lines(ontologyPath)
-                                              .skip(1)
-                                              .map(s -> s.substring(s.indexOf("http:")))
-                                              .collect(Collectors.toList());
+                        .skip(1)
+                        .map(s -> s.substring(s.indexOf("http:")))
+                        .collect(Collectors.toList());
 
             }
         } catch (Exception e) {
