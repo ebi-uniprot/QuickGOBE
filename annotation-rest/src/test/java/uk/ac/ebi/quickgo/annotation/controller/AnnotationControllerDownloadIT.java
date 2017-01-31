@@ -61,8 +61,8 @@ public class AnnotationControllerDownloadIT {
     private static final String DOWNLOAD_LIMIT_PARAM = "downloadLimit";
     private static final int MIN_DOWNLOAD_NUMBER = 1;
     private static final int MAX_DOWNLOAD_NUMBER = 50000;
-    public static final String GAF_SUFFIX = ".gaf\"";
-    public static final String GPAD_SUFFIX = ".gpad\"";
+    private static final String GAF_SUFFIX = ".gaf\"";
+    private static final String GPAD_SUFFIX = ".gpad\"";
 
     private MockMvc mockMvc;
 
