@@ -63,7 +63,7 @@ public class SearchServiceConfig {
             "id,geneProductId,qualifier,goId,goEvidence," +
                     "evidenceCode,reference,withFrom,taxonId,assignedBy,extensions,symbol";
     private static final String SOLR_ANNOTATION_QUERY_REQUEST_HANDLER = "/query";
-    private static final String DEFAULT_DOWNLOAD_SORT_FIELDS = "id,rowNumber";
+    private static final String DEFAULT_DOWNLOAD_SORT_FIELDS = "rowNumber,id";
     private static final int DEFAULT_DOWNLOAD_PAGE_SIZE = 5000;
 
     @Value("${geneproduct.db.xref.valid.regexes}")
