@@ -129,21 +129,21 @@ public class AnnotationToGPADTest {
     }
 
     @Test
-    public void nullDate(){
+    public void nullDate() {
         annotation.date = null;
         String[] elements = annotationToElements(annotation);
         assertThat(elements[COL_DATE], is(""));
     }
 
     @Test
-    public void nullAssignedBy(){
+    public void nullAssignedBy() {
         annotation.assignedBy = null;
         String[] elements = annotationToElements(annotation);
         assertThat(elements[COL_ASSIGNED_BY], is(""));
     }
 
     @Test
-    public void nullGoEvidence(){
+    public void nullGoEvidence() {
         annotation.goEvidence = null;
         String[] elements = annotationToElements(annotation);
         assertThat(elements[COL_GO_EVIDENCE], is("goEvidence="));
@@ -163,9 +163,8 @@ public class AnnotationToGPADTest {
         assertThat(elements[COL_ANNOTATION_EXTENSION], is(""));
     }
 
-
     @Test
-    public void multipleSlimmedToGoIdsCreatesEqualQuantityOfAnnotationRecords(){
+    public void multipleSlimmedToGoIdsCreatesEqualQuantityOfAnnotationRecords() {
         final String slimmedToGoId0 = "GO:0005524";
         final String slimmedToGoId1 = "GO:1005524";
         final String slimmedToGoId2 = "GO:2005524";
@@ -181,7 +180,6 @@ public class AnnotationToGPADTest {
         String[] elements = converted.split(AnnotationToGAF.OUTPUT_DELIMITER, -1);
         assertThat(elements[COL_GO_ID], is(slimmedToGoId));
     }
-
 
     private String[] annotationToElements(Annotation annotation) {
         return annotationToGPAD.apply(annotation)
