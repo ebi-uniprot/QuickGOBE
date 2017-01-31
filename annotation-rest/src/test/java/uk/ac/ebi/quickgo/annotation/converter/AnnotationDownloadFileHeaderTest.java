@@ -56,7 +56,6 @@ public class AnnotationDownloadFileHeaderTest {
     @Autowired
     private AnnotationDownloadFileHeader annotationDownloadFileHeader;
 
-
     @Before
     public void setup() throws IOException {
         when(mockRequest.getRequestURI()).thenReturn(URI);
