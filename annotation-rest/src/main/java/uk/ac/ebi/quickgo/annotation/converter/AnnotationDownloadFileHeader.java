@@ -52,14 +52,15 @@ import static java.util.Arrays.stream;
 @Component
 // todo: move all classes in this package to uk/ac/ebi/quickgo/annotation/service/converter
 public class AnnotationDownloadFileHeader {
-    Logger logger = LoggerFactory.getLogger(AnnotationDownloadFileHeader.class);
-
+    private Logger logger = LoggerFactory.getLogger(AnnotationDownloadFileHeader.class);
     static final String PROJECT_NAME = "Project_name: UniProt GO Annotation (UniProt-GOA)";
+
     static final String URL = "URL: http://www.ebi.ac.uk/GOA";
     static final String EMAIL = "Contact Email: goa@ebi.ac.uk";
-    static final String DATE = " * !Date downloaded from the QuickGO browser: ";
-
+    static final String DATE = "Date downloaded from QuickGO: ";
     static final String FILTERS_INTRO = "Filtering parameters selected to generate file:";
+    static final String REQUEST_LINE_INDENTATION = "   ";
+
     static final String GAF_VERSION = "gaf-version: 2.1";
     static final String GPAD_VERSION = "gpa-version: 1.1";
     private static final String HEADER_LINE_PREFIX = "!";
@@ -113,7 +114,7 @@ public class AnnotationDownloadFileHeader {
     }
 
     private String request(HttpServletRequest request) {
-        return request.getRequestURI() + "?" + parameterString(request);
+        return REQUEST_LINE_INDENTATION + request.getRequestURI() + "?" + parameterString(request);
     }
 
     private String parameterString(HttpServletRequest request) {
