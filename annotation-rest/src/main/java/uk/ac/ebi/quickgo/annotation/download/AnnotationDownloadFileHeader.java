@@ -1,7 +1,7 @@
-package uk.ac.ebi.quickgo.annotation.converter;
+package uk.ac.ebi.quickgo.annotation.download;
 
-import uk.ac.ebi.quickgo.annotation.service.http.GAFHttpMessageConverter;
-import uk.ac.ebi.quickgo.annotation.service.http.GPADHttpMessageConverter;
+import uk.ac.ebi.quickgo.annotation.download.http.GAFHttpMessageConverter;
+import uk.ac.ebi.quickgo.annotation.download.http.GPADHttpMessageConverter;
 import uk.ac.ebi.quickgo.common.loader.GZIPFiles;
 
 import com.google.common.base.Preconditions;
@@ -50,7 +50,6 @@ import static java.util.Arrays.stream;
  * Created with IntelliJ IDEA.
  */
 @Component
-// todo: move all classes in this package to uk/ac/ebi/quickgo/annotation/service/converter
 public class AnnotationDownloadFileHeader {
     private Logger logger = LoggerFactory.getLogger(AnnotationDownloadFileHeader.class);
     static final String PROJECT_NAME = "Project_name: UniProt GO Annotation (UniProt-GOA)";

@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
-import uk.ac.ebi.quickgo.annotation.service.http.GAFHttpMessageConverter;
-import uk.ac.ebi.quickgo.annotation.service.http.GPADHttpMessageConverter;
+import uk.ac.ebi.quickgo.annotation.download.http.GAFHttpMessageConverter;
+import uk.ac.ebi.quickgo.annotation.download.http.GPADHttpMessageConverter;
 
 import java.util.List;
 import org.hamcrest.Description;

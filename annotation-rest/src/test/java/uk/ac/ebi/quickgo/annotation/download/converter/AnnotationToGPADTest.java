@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.annotation.converter;
+package uk.ac.ebi.quickgo.annotation.download.converter;
 
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationMocker;

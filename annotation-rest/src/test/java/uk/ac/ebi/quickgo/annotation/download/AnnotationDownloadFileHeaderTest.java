@@ -1,7 +1,7 @@
-package uk.ac.ebi.quickgo.annotation.converter;
+package uk.ac.ebi.quickgo.annotation.download;
 
-import uk.ac.ebi.quickgo.annotation.service.http.GAFHttpMessageConverter;
-import uk.ac.ebi.quickgo.annotation.service.http.GPADHttpMessageConverter;
+import uk.ac.ebi.quickgo.annotation.download.http.GAFHttpMessageConverter;
+import uk.ac.ebi.quickgo.annotation.download.http.GPADHttpMessageConverter;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -25,7 +25,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.ac.ebi.quickgo.annotation.converter.AnnotationDownloadFileHeader.REQUEST_LINE_INDENTATION;
+import static uk.ac.ebi.quickgo.annotation.download.AnnotationDownloadFileHeader.REQUEST_LINE_INDENTATION;
 
 /**
  * @author Tony Wardell
@@ -34,7 +34,7 @@ import static uk.ac.ebi.quickgo.annotation.converter.AnnotationDownloadFileHeade
  * Created with IntelliJ IDEA.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = HeaderTestConfig.class)
+@SpringApplicationConfiguration(classes = AnnotationDownloadFileHeaderTestConfig.class)
 public class AnnotationDownloadFileHeaderTest {
 
     private static final String URI = "/QuickGO/services/annotation/search";

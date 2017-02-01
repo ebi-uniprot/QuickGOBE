@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.annotation.service.download;
+package uk.ac.ebi.quickgo.annotation.download;
 
 import org.springframework.core.task.TaskExecutor;
 

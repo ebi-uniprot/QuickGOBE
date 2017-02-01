@@ -1,4 +1,6 @@
-package uk.ac.ebi.quickgo.annotation.converter;
+package uk.ac.ebi.quickgo.annotation.download;
+
+import uk.ac.ebi.quickgo.annotation.download.AnnotationDownloadFileHeader;
 
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -15,7 +17,7 @@ import org.springframework.core.io.Resource;
  * Created with IntelliJ IDEA.
  */
 @Configuration
-class HeaderTestConfig {
+class AnnotationDownloadFileHeaderTestConfig {
 
     @Value("${annotation.download.ontologySource}")
     private Resource resource;

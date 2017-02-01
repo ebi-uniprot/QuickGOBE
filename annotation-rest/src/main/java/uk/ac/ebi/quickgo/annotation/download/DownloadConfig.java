@@ -1,6 +1,4 @@
-package uk.ac.ebi.quickgo.annotation.service.download;
-
-import uk.ac.ebi.quickgo.annotation.converter.AnnotationDownloadFileHeader;
+package uk.ac.ebi.quickgo.annotation.download;
 
 import java.io.IOException;
 import java.nio.file.Paths;

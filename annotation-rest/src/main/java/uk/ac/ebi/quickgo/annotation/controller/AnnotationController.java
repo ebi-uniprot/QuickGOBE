@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
-import uk.ac.ebi.quickgo.annotation.converter.AnnotationDownloadFileHeader;
+import uk.ac.ebi.quickgo.annotation.download.AnnotationDownloadFileHeader;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
 import uk.ac.ebi.quickgo.annotation.model.StatisticsGroup;
@@ -44,8 +44,8 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.http.HttpHeaders.ACCEPT;
-import static uk.ac.ebi.quickgo.annotation.service.http.GAFHttpMessageConverter.GAF_MEDIA_TYPE_STRING;
-import static uk.ac.ebi.quickgo.annotation.service.http.GPADHttpMessageConverter.GPAD_MEDIA_TYPE_STRING;
+import static uk.ac.ebi.quickgo.annotation.download.http.GAFHttpMessageConverter.GAF_MEDIA_TYPE_STRING;
+import static uk.ac.ebi.quickgo.annotation.download.http.GPADHttpMessageConverter.GPAD_MEDIA_TYPE_STRING;
 import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.searchAndTransform;
 import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.streamSearchResults;
 import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.createFirstCursorPage;

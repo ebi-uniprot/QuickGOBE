@@ -1,6 +1,6 @@
-package uk.ac.ebi.quickgo.annotation.service.http;
+package uk.ac.ebi.quickgo.annotation.download.http;
 
-import uk.ac.ebi.quickgo.annotation.converter.AnnotationToGAF;
+import uk.ac.ebi.quickgo.annotation.download.converter.AnnotationToGPAD;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
@@ -22,26 +22,26 @@ import org.springframework.http.converter.HttpMessageNotWritableException;
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
- * GAF message converter that writes a stream of {@link QueryResult} containing {@link Annotation} instances,
+ * GPAD message converter that writes a stream of {@link QueryResult} containing {@link Annotation} instances,
  * to a response's output stream.
  *
  * Created 19/01/17
  * @author Edd
  */
-public class GAFHttpMessageConverter extends AbstractHttpMessageConverter<Object> {
+public class GPADHttpMessageConverter extends AbstractHttpMessageConverter<Object> {
     private static final String TYPE = "text";
-    public static final String SUB_TYPE = "gaf";
+    public static final String SUB_TYPE = "gpad";
     private static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
 
-    public static final MediaType GAF_MEDIA_TYPE = new MediaType(TYPE, SUB_TYPE, DEFAULT_CHARSET);
-    public static final String GAF_MEDIA_TYPE_STRING = TYPE + "/" + SUB_TYPE;
+    public static final MediaType GPAD_MEDIA_TYPE = new MediaType(TYPE, SUB_TYPE, DEFAULT_CHARSET);
+    public static final String GPAD_MEDIA_TYPE_STRING = TYPE + "/" + SUB_TYPE;
 
-    private static final Logger GAF_LOGGER = getLogger(GAFHttpMessageConverter.class);
-    private static final int FLUSH_INTERVAL = 1000;
-    private final AnnotationToGAF converter;
+    private static final Logger GPAD_LOGGER = getLogger(GPADHttpMessageConverter.class);
+    private static final int FLUSH_INTERVAL = 5000;
+    private final AnnotationToGPAD converter;
 
-    public GAFHttpMessageConverter(AnnotationToGAF converter) {
-        super(GAF_MEDIA_TYPE);
+    public GPADHttpMessageConverter(AnnotationToGPAD converter) {
+        super(GPAD_MEDIA_TYPE);
         this.converter = converter;
     }
 
@@ -68,8 +68,7 @@ public class GAFHttpMessageConverter extends AbstractHttpMessageConverter<Object
         dispatchWriting(annotationStream, out);
     }
 
-    @SuppressWarnings("unchecked")
-    private void dispatchWriting(Object object, OutputStream out) throws IOException {
+    @SuppressWarnings("unchecked") private void dispatchWriting(Object object, OutputStream out) throws IOException {
         if (object instanceof ResponseExceptionHandler.ErrorInfo) {
             writeError(out, (ResponseExceptionHandler.ErrorInfo) object);
         } else {
@@ -88,22 +87,23 @@ public class GAFHttpMessageConverter extends AbstractHttpMessageConverter<Object
         try {
             annotationStream.forEach(annotationResult ->
                     annotationResult.getResults().forEach(annotation -> converter.apply(annotation)
-                    .forEach(s -> {
-                        try {
-                            out.write((s + "\n").getBytes());
+                            .forEach(s -> {
+                                try {
+                                    out.write((s + "\n").getBytes());
 
-                            updateCountersAndFlushStreamWhenRequired(out, counter, batchCount);
-                        } catch (IOException e) {
-                            throw new StopStreamException(
-                                    "Could not write OutputStream whilst writing GAF annotation: " + annotation,
-                                    e);
-                        }
-                    })));
+                                    updateCountersAndFlushStreamWhenRequired(out, counter, batchCount);
+                                } catch (IOException e) {
+                                    throw new StopStreamException(
+                                            "Could not write OutputStream whilst writing GPAD annotation: " +
+                                                    annotation,
+                                            e);
+                                }
+                            })));
         } catch (StopStreamException e) {
-            GAF_LOGGER.error("Client aborted streaming: closing stream.", e);
+            GPAD_LOGGER.error("Client aborted streaming: closing stream.", e);
             annotationStream.close();
         }
-        GAF_LOGGER.info("Written " + counter.get() + " GAF annotations");
+        GPAD_LOGGER.info("Written " + counter.get() + " GPAD annotations");
     }
 
     private void updateCountersAndFlushStreamWhenRequired(OutputStream out, AtomicInteger counter,
@@ -112,7 +112,7 @@ public class GAFHttpMessageConverter extends AbstractHttpMessageConverter<Object
         batchCount.getAndIncrement();
         if (batchCount.get() >= FLUSH_INTERVAL) {
             out.flush();
-            GAF_LOGGER.info("Flushed GAF http message converter output stream after: " +
+            GPAD_LOGGER.info("Flushed GAF http message converter output stream after: " +
                     counter.get() + " annotations.");
             batchCount.set(0);
         }

@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.annotation.service.http;
+package uk.ac.ebi.quickgo.annotation.download.http;
 
 import java.util.stream.Stream;
 

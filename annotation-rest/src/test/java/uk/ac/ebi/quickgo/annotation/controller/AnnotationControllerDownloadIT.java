@@ -5,8 +5,8 @@ import uk.ac.ebi.quickgo.annotation.AnnotationREST;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker;
-import uk.ac.ebi.quickgo.annotation.service.http.GAFHttpMessageConverter;
-import uk.ac.ebi.quickgo.annotation.service.http.GPADHttpMessageConverter;
+import uk.ac.ebi.quickgo.annotation.download.http.GAFHttpMessageConverter;
+import uk.ac.ebi.quickgo.annotation.download.http.GPADHttpMessageConverter;
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
 
 import java.util.ArrayList;
@@ -40,8 +40,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.createGenericDocs;
 import static uk.ac.ebi.quickgo.annotation.controller.DownloadResponseVerifier.nonNullMandatoryFieldsExist;
-import static uk.ac.ebi.quickgo.annotation.service.http.GAFHttpMessageConverter.GAF_MEDIA_TYPE;
-import static uk.ac.ebi.quickgo.annotation.service.http.GPADHttpMessageConverter.GPAD_MEDIA_TYPE;
+import static uk.ac.ebi.quickgo.annotation.download.http.GAFHttpMessageConverter.GAF_MEDIA_TYPE;
+import static uk.ac.ebi.quickgo.annotation.download.http.GPADHttpMessageConverter.GPAD_MEDIA_TYPE;
 
 /**
  * Tests whether the downloading functionality of the {@link AnnotationController} works as expected.
