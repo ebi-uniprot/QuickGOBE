@@ -66,4 +66,12 @@ public class DownloadConfig {
     public TaskExecutorProperties getTaskExecutor() {
         return taskExecutor;
     }
+
+    public void setDefaultEmitterTimeout(int defaultEmitterTimeout) {
+        this.defaultEmitterTimeout = defaultEmitterTimeout;
+    }
+
+    public void setOntologySource(String ontologySource) {
+        this.ontologySource = ontologySource;
+    }
 }
