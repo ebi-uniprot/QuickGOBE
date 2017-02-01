@@ -84,9 +84,9 @@ public class AnnotationDownloadFileHeader {
         send(emitter, URL);
         send(emitter, EMAIL);
         send(emitter, date());
+        ontology().forEach(s -> send(emitter, s));
         send(emitter, FILTERS_INTRO);
         send(emitter, request(request));
-        ontology().forEach(s -> send(emitter, s));
     }
 
     private void send(ResponseBodyEmitter emitter, String content) {
