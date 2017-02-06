@@ -101,8 +101,7 @@ public class AnnotationIndexingConfig {
                           .build();
     }
 
-    @Bean
-    public Step annotationIndexingStep() {
+    private Step annotationIndexingStep() {
         return stepBuilders.get(ANNOTATION_INDEXING_STEP_NAME)
                 .<Annotation, AnnotationDocument>chunk(chunkSize)
                 .faultTolerant()
@@ -118,8 +117,7 @@ public class AnnotationIndexingConfig {
                 .build();
     }
 
-    @Bean
-    ItemWriter<AnnotationDocument> compositeAnnotationWriter() {
+    private ItemWriter<AnnotationDocument> compositeAnnotationWriter() {
         CompositeItemWriter<AnnotationDocument> compositeItemWriter = new CompositeItemWriter<>();
         List<ItemWriter<? super AnnotationDocument>> writerList = new ArrayList<>();
         writerList.add(annotationSolrServerWriter);
@@ -129,8 +127,7 @@ public class AnnotationIndexingConfig {
         return compositeItemWriter;
     }
 
-    @Bean
-    ItemProcessor<Annotation, AnnotationDocument> annotationCompositeProcessor() {
+    private ItemProcessor<Annotation, AnnotationDocument> annotationCompositeProcessor() {
         List<ItemProcessor<?, ?>> processors = new ArrayList<>();
         processors.add(annotationValidator);
         processors.add(annotationDocConverter);
