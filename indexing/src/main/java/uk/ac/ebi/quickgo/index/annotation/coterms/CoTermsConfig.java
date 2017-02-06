@@ -30,7 +30,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 /**
@@ -79,11 +78,14 @@ public class CoTermsConfig {
 
     @Bean
     public Step coTermManualSummarizationStep() {
+        Preconditions.checkArgument(!allCoTermsPath.equals(manualCoTermsPath), "The output path for manual and all " +
+                "coterms files should not be the same, but they were both %s", manualCoTermsPath);
+
         return stepBuilders.get(CO_TERM_MANUAL_SUMMARIZATION_STEP)
                 .<String, List<CoTerm>>chunk(cotermsChunk)
                 .reader(coTermsManualReader(coTermsManualAggregationWriter()))
                 .processor(coTermsManualCalculator(coTermsManualAggregationWriter()))
-                .writer(coTermsManualStatsWriter(new OutputPath(manualCoTermsPath, allCoTermsPath)))
+                .writer(coTermsManualStatsWriter(new OutputPath(manualCoTermsPath)))
                 .listener(logStepListener())
                 .listener(logWriteRateListener(coTermLogInterval))
                 .listener(skipLogListener())
@@ -92,11 +94,14 @@ public class CoTermsConfig {
 
     @Bean
     public Step coTermAllSummarizationStep() {
+        Preconditions.checkArgument(!allCoTermsPath.equals(manualCoTermsPath), "The output path for manual and all " +
+                "coterms files should not be the same, but they were both %s", manualCoTermsPath);
+
         return stepBuilders.get(CO_TERM_ALL_SUMMARIZATION_STEP)
                 .<String, List<CoTerm>>chunk(cotermsChunk)
                 .reader(coTermsAllReader(coTermsAllAggregationWriter()))
                 .processor(coTermsAllCalculator(coTermsAllAggregationWriter()))
-                .writer(coTermsAllStatsWriter(new OutputPath(manualCoTermsPath, allCoTermsPath)))
+                .writer(coTermsAllStatsWriter(new OutputPath(allCoTermsPath)))
                 .listener(logStepListener())
                 .listener(logWriteRateListener(coTermLogInterval))
                 .listener(skipLogListener())
@@ -134,11 +139,11 @@ public class CoTermsConfig {
     }
 
     private ItemWriter<List<CoTerm>> coTermsManualStatsWriter(OutputPath outputPath) {
-        return listItemFlatFileWriter(outputPath.manualCoTermsResource);
+        return listItemFlatFileWriter(outputPath.resource);
     }
 
     private ItemWriter<List<CoTerm>> coTermsAllStatsWriter(OutputPath outputPath) {
-        return listItemFlatFileWriter(outputPath.allCoTermsResource);
+        return listItemFlatFileWriter(outputPath.resource);
     }
 
     private ListItemWriter<CoTerm> listItemFlatFileWriter(Resource outputFile) {
@@ -170,22 +175,6 @@ public class CoTermsConfig {
         return beanWrapperFieldExtractor;
     }
 
-    private class OutputPath {
-        final FileSystemResource manualCoTermsResource;
-        final FileSystemResource allCoTermsResource;
-        private OutputPath(String manualCoTermsPath, String allCoTermsPath) {
-            Preconditions.checkArgument(Objects.nonNull(manualCoTermsPath), "The output path for the 'manual' coterms" +
-                    " file cannot be null");
-            Preconditions.checkArgument(Objects.nonNull(allCoTermsPath), "The output path for the 'all' coterms" +
-                    " file cannot be null");
-            Preconditions.checkArgument(!allCoTermsPath.equals(manualCoTermsPath), "The output path for manual and all " +
-                    "coterms files should not be the same, but they were both %s", manualCoTermsPath);
-
-            manualCoTermsResource = new FileSystemResource(manualCoTermsPath);
-            allCoTermsResource =  new FileSystemResource(allCoTermsPath);
-
-        }
-    }
 
     private ItemWriteListener<QuickGODocument> logWriteRateListener(final int writeInterval) {
         return new ItemRateWriterListener<>(Instant.now(), writeInterval);
