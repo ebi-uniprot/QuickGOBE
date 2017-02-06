@@ -41,7 +41,7 @@ import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermsConfig.CO_TERM_M
 @ActiveProfiles(profiles = {"embeddedServer"})
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(
-        classes = {AnnotationConfig.class, JobTestRunnerConfig.class, CoTermTemporaryDataStore.Config.class},
+        classes = {AnnotationIndexingConfig.class, JobTestRunnerConfig.class, CoTermTemporaryDataStore.Config.class},
         loader = SpringApplicationContextLoader.class)
 public class AnnotationIndexingBatchIT {
 
