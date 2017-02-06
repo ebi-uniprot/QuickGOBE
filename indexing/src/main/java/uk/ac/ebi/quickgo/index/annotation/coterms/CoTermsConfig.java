@@ -1,14 +1,23 @@
 package uk.ac.ebi.quickgo.index.annotation.coterms;
 
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
+import uk.ac.ebi.quickgo.common.QuickGODocument;
+import uk.ac.ebi.quickgo.index.common.listener.ItemRateWriterListener;
+import uk.ac.ebi.quickgo.index.common.listener.LogStepListener;
+import uk.ac.ebi.quickgo.index.common.listener.SkipLoggerListener;
 import uk.ac.ebi.quickgo.index.common.writer.ListItemWriter;
 
 import com.google.common.base.Preconditions;
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.batch.core.ItemWriteListener;
+import org.springframework.batch.core.Step;
+import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileHeaderCallback;
@@ -17,6 +26,7 @@ import org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor;
 import org.springframework.batch.item.file.transform.DelimitedLineAggregator;
 import org.springframework.batch.item.file.transform.LineAggregator;
 import org.springframework.batch.item.file.transform.PassThroughLineAggregator;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -48,11 +58,49 @@ public class CoTermsConfig {
             "together", "compared"};
     private static final String DELIMITER = "\t";
 
+    @Value("${indexing.annotation.source}")
+    private Resource[] resources;
+    @Value("${indexing.coterms.chunk.size:1}")
+    private int cotermsChunk;
+    @Value("${indexing.annotation.header.lines:21}")
+    private int headerLines;
+    @Value("${indexing.annotation.skip.limit:100}")
+    private int skipLimit;
+    @Value("${indexing.coterm.loginterval:1000}")
+    private int coTermLogInterval;
+    @Value("${indexing.coterms.manual:#{systemProperties['user.dir']}/QuickGO/CoTermsManual}")
+    private String manualCoTermsPath;
+    @Value("${indexing.coterms.all:#{systemProperties['user.dir']}/QuickGO/CoTermsAll}")
+    private String allCoTermsPath;
+
+    @Autowired
+    private StepBuilderFactory stepBuilders;
+
+
     @Bean
-    public OutputPath outputPath(@Value("${indexing.coterms.manual:#{systemProperties['user" +
-            ".dir']}/QuickGO/CoTermsManual}") String manualCoTermsPath,
-            @Value("${indexing.coterms.all:#{systemProperties['user.dir']}/QuickGO/CoTermsAll}") String allCoTermsPath){
-            return new OutputPath(manualCoTermsPath, allCoTermsPath);
+    public Step coTermManualSummarizationStep() {
+        return stepBuilders.get(CO_TERM_MANUAL_SUMMARIZATION_STEP)
+                .<String, List<CoTerm>>chunk(cotermsChunk)
+                .reader(coTermsManualReader(coTermsManualAggregationWriter()))
+                .processor(coTermsManualCalculator(coTermsManualAggregationWriter()))
+                .writer(coTermsManualStatsWriter(new OutputPath(manualCoTermsPath, allCoTermsPath)))
+                .listener(logStepListener())
+                .listener(logWriteRateListener(coTermLogInterval))
+                .listener(skipLogListener())
+                .build();
+    }
+
+    @Bean
+    public Step coTermAllSummarizationStep() {
+        return stepBuilders.get(CO_TERM_ALL_SUMMARIZATION_STEP)
+                .<String, List<CoTerm>>chunk(cotermsChunk)
+                .reader(coTermsAllReader(coTermsAllAggregationWriter()))
+                .processor(coTermsAllCalculator(coTermsAllAggregationWriter()))
+                .writer(coTermsAllStatsWriter(new OutputPath(manualCoTermsPath, allCoTermsPath)))
+                .listener(logStepListener())
+                .listener(logWriteRateListener(coTermLogInterval))
+                .listener(skipLogListener())
+                .build();
     }
 
     @Bean
@@ -65,36 +113,31 @@ public class CoTermsConfig {
         return new CoTermsAggregationWriter(INCLUDE_ALL_ANNOTATIONS);
     }
 
-    @Bean
-    public CoTermsProcessor coTermsManualCalculator(CoTermsAggregationWriter coTermsManualAggregationWriter) {
+
+    private CoTermsProcessor coTermsManualCalculator(CoTermsAggregationWriter coTermsManualAggregationWriter) {
         return new CoTermsProcessor(coTermsManualAggregationWriter);
     }
 
-    @Bean
-    public CoTermsProcessor coTermsAllCalculator(
+    private CoTermsProcessor coTermsAllCalculator(
             CoTermsAggregationWriter coTermsAllAggregationWriter) {
         return new CoTermsProcessor(coTermsAllAggregationWriter);
     }
 
-    @Bean
-    public ItemReader<String> coTermsManualReader(
+    private ItemReader<String> coTermsManualReader(
             CoTermsAggregationWriter coTermsManualAggregationWriter) {
         return new CoTermItemReader(coTermsManualAggregationWriter);
     }
 
-    @Bean
-    public ItemReader<String> coTermsAllReader(
+    private ItemReader<String> coTermsAllReader(
             CoTermsAggregationWriter coTermsAllAggregationWriter) {
         return new CoTermItemReader(coTermsAllAggregationWriter);
     }
 
-    @Bean
-    ItemWriter<List<CoTerm>> coTermsManualStatsWriter(OutputPath outputPath) {
+    private ItemWriter<List<CoTerm>> coTermsManualStatsWriter(OutputPath outputPath) {
         return listItemFlatFileWriter(outputPath.manualCoTermsResource);
     }
 
-    @Bean
-    ItemWriter<List<CoTerm>> coTermsAllStatsWriter(OutputPath outputPath) {
+    private ItemWriter<List<CoTerm>> coTermsAllStatsWriter(OutputPath outputPath) {
         return listItemFlatFileWriter(outputPath.allCoTermsResource);
     }
 
@@ -127,10 +170,10 @@ public class CoTermsConfig {
         return beanWrapperFieldExtractor;
     }
 
-    public class OutputPath {
-        FileSystemResource manualCoTermsResource;
-        FileSystemResource allCoTermsResource;
-        public OutputPath(String manualCoTermsPath, String allCoTermsPath) {
+    private class OutputPath {
+        final FileSystemResource manualCoTermsResource;
+        final FileSystemResource allCoTermsResource;
+        private OutputPath(String manualCoTermsPath, String allCoTermsPath) {
             Preconditions.checkArgument(Objects.nonNull(manualCoTermsPath), "The output path for the 'manual' coterms" +
                     " file cannot be null");
             Preconditions.checkArgument(Objects.nonNull(allCoTermsPath), "The output path for the 'all' coterms" +
@@ -143,4 +186,18 @@ public class CoTermsConfig {
 
         }
     }
+
+    private ItemWriteListener<QuickGODocument> logWriteRateListener(final int writeInterval) {
+        return new ItemRateWriterListener<>(Instant.now(), writeInterval);
+    }
+
+    private StepExecutionListener logStepListener() {
+        return new LogStepListener();
+    }
+
+    //todo is this signature correct?
+    private SkipLoggerListener<AnnotationDocument, AnnotationDocument> skipLogListener() {
+        return new SkipLoggerListener<>();
+    }
+
 }
