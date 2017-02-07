@@ -10,13 +10,13 @@ import uk.ac.ebi.quickgo.index.common.writer.ListItemWriter;
 import com.google.common.base.Preconditions;
 import java.time.Instant;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.ItemWriteListener;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
@@ -30,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.io.Resource;
 
 /**
@@ -42,6 +43,7 @@ import org.springframework.core.io.Resource;
  * Created with IntelliJ IDEA.
  */
 @Configuration
+@EnableBatchProcessing
 public class CoTermsConfig {
 
     private static final String ELECTRONIC = "IEA";
@@ -57,28 +59,26 @@ public class CoTermsConfig {
             "together", "compared"};
     private static final String DELIMITER = "\t";
 
-    @Value("${indexing.annotation.source}")
-    private Resource[] resources;
     @Value("${indexing.coterms.chunk.size:1}")
     private int cotermsChunk;
-    @Value("${indexing.annotation.header.lines:21}")
-    private int headerLines;
-    @Value("${indexing.annotation.skip.limit:100}")
-    private int skipLimit;
     @Value("${indexing.coterm.loginterval:1000}")
     private int coTermLogInterval;
     @Value("${indexing.coterms.manual:#{systemProperties['user.dir']}/QuickGO/CoTermsManual}")
-    private String manualCoTermsPath;
+    String manualCoTermsPath;
     @Value("${indexing.coterms.all:#{systemProperties['user.dir']}/QuickGO/CoTermsAll}")
-    private String allCoTermsPath;
+    String allCoTermsPath;
 
     @Autowired
-    private StepBuilderFactory stepBuilders;
+    public StepBuilderFactory stepBuilders;
 
+    @Bean
+    public static PropertySourcesPlaceholderConfigurer propertyConfigIn() {
+        return new PropertySourcesPlaceholderConfigurer();
+    }
 
     @Bean
     public Step coTermManualSummarizationStep() {
-        Preconditions.checkArgument(!allCoTermsPath.equals(manualCoTermsPath), "The output path for manual and all " +
+        Preconditions.checkState(!allCoTermsPath.equals(manualCoTermsPath), "The output path for manual and all " +
                 "coterms files should not be the same, but they were both %s", manualCoTermsPath);
 
         return stepBuilders.get(CO_TERM_MANUAL_SUMMARIZATION_STEP)
@@ -94,7 +94,7 @@ public class CoTermsConfig {
 
     @Bean
     public Step coTermAllSummarizationStep() {
-        Preconditions.checkArgument(!allCoTermsPath.equals(manualCoTermsPath), "The output path for manual and all " +
+        Preconditions.checkState(!allCoTermsPath.equals(manualCoTermsPath), "The output path for manual and all " +
                 "coterms files should not be the same, but they were both %s", manualCoTermsPath);
 
         return stepBuilders.get(CO_TERM_ALL_SUMMARIZATION_STEP)
@@ -118,12 +118,13 @@ public class CoTermsConfig {
         return new CoTermsAggregationWriter(INCLUDE_ALL_ANNOTATIONS);
     }
 
-
-    private CoTermsProcessor coTermsManualCalculator(CoTermsAggregationWriter coTermsManualAggregationWriter) {
+    @Bean
+    public CoTermsProcessor coTermsManualCalculator(CoTermsAggregationWriter coTermsManualAggregationWriter) {
         return new CoTermsProcessor(coTermsManualAggregationWriter);
     }
 
-    private CoTermsProcessor coTermsAllCalculator(
+    @Bean
+    public CoTermsProcessor coTermsAllCalculator(
             CoTermsAggregationWriter coTermsAllAggregationWriter) {
         return new CoTermsProcessor(coTermsAllAggregationWriter);
     }
