@@ -45,19 +45,8 @@ public class CoTermIndexingBatchIT {
     @ClassRule
     public static final CoTermTemporaryDataStore coTermsDataStore = new CoTermTemporaryDataStore();
 
-    @ClassRule
-    public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
-
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
-
-    @Autowired
-    private AnnotationRepository annotationRepository;
-
-    @Before
-    public void setUp() {
-        annotationRepository.deleteAll();
-    }
 
     @Test
     public void successfulCoTermsOnlyJob() throws Exception {
