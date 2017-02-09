@@ -10,6 +10,7 @@ import uk.ac.ebi.quickgo.index.common.writer.ListItemWriter;
 import com.google.common.base.Preconditions;
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,9 +65,9 @@ public class CoTermsConfig {
     @Value("${indexing.coterm.loginterval:1000}")
     private int coTermLogInterval;
     @Value("${indexing.coterms.manual:#{systemProperties['user.dir']}/QuickGO/CoTermsManual}")
-    String manualCoTermsPath;
+    Resource manualCoTermsPath;
     @Value("${indexing.coterms.all:#{systemProperties['user.dir']}/QuickGO/CoTermsAll}")
-    String allCoTermsPath;
+    Resource allCoTermsPath;
 
     @Autowired
     public StepBuilderFactory stepBuilders;
@@ -85,7 +86,7 @@ public class CoTermsConfig {
                 .<String, List<CoTerm>>chunk(cotermsChunk)
                 .reader(coTermsManualReader(coTermsManualAggregationWriter()))
                 .processor(coTermsManualCalculator(coTermsManualAggregationWriter()))
-                .writer(coTermsManualStatsWriter(new OutputPath(manualCoTermsPath)))
+                .writer(coTermsManualStatsWriter(manualCoTermsPath))
                 .listener(logStepListener())
                 .listener(logWriteRateListener(coTermLogInterval))
                 .listener(skipLogListener())
@@ -101,7 +102,7 @@ public class CoTermsConfig {
                 .<String, List<CoTerm>>chunk(cotermsChunk)
                 .reader(coTermsAllReader(coTermsAllAggregationWriter()))
                 .processor(coTermsAllCalculator(coTermsAllAggregationWriter()))
-                .writer(coTermsAllStatsWriter(new OutputPath(allCoTermsPath)))
+                .writer(coTermsAllStatsWriter(allCoTermsPath))
                 .listener(logStepListener())
                 .listener(logWriteRateListener(coTermLogInterval))
                 .listener(skipLogListener())
@@ -139,12 +140,16 @@ public class CoTermsConfig {
         return new CoTermItemReader(coTermsAllAggregationWriter);
     }
 
-    private ItemWriter<List<CoTerm>> coTermsManualStatsWriter(OutputPath outputPath) {
-        return listItemFlatFileWriter(outputPath.resource);
+    private ItemWriter<List<CoTerm>> coTermsManualStatsWriter(Resource outputPath) {
+        Preconditions.checkArgument(Objects.nonNull(outputPath), "The output path for the 'manual' coterms" +
+                " file cannot be null");
+        return listItemFlatFileWriter(outputPath);
     }
 
-    private ItemWriter<List<CoTerm>> coTermsAllStatsWriter(OutputPath outputPath) {
-        return listItemFlatFileWriter(outputPath.resource);
+    private ItemWriter<List<CoTerm>> coTermsAllStatsWriter(Resource outputPath) {
+        Preconditions.checkArgument(Objects.nonNull(outputPath), "The output path for the 'all' coterms" +
+                " file cannot be null");
+        return listItemFlatFileWriter(outputPath);
     }
 
     private ListItemWriter<CoTerm> listItemFlatFileWriter(Resource outputFile) {
