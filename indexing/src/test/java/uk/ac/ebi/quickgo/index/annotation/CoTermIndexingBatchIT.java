@@ -1,13 +1,10 @@
 package uk.ac.ebi.quickgo.index.annotation;
 
-import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
-import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
 import uk.ac.ebi.quickgo.index.annotation.coterms.CoTermTemporaryDataStore;
 import uk.ac.ebi.quickgo.index.common.JobTestRunnerConfig;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
