@@ -52,7 +52,7 @@ public class CoTermsConfig {
             EXCLUDE_ANNOTATIONS_PRODUCED_BY_ELECTRONIC_MEANS =
             annotationDocument -> !ELECTRONIC.equals(annotationDocument.goEvidence);
     private static final Predicate<AnnotationDocument> INCLUDE_ALL_ANNOTATIONS = annotationDocument -> true;
-    private final Logger LOGGER = LoggerFactory.getLogger(CoTermsConfig.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CoTermsConfig.class);
 
     public static final String CO_TERM_MANUAL_SUMMARIZATION_STEP = "coTermManualSummarizationStep";
     public static final String CO_TERM_ALL_SUMMARIZATION_STEP = "coTermAllSummarizationStep";
@@ -190,8 +190,7 @@ public class CoTermsConfig {
         return new LogStepListener();
     }
 
-    //todo is this signature correct?
-    private SkipLoggerListener<AnnotationDocument, AnnotationDocument> skipLogListener() {
+    private SkipLoggerListener<String, List<CoTerm>> skipLogListener() {
         return new SkipLoggerListener<>();
     }
 
