@@ -30,7 +30,7 @@ import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermsConfig.CO_TERM_A
 import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermsConfig.CO_TERM_MANUAL_SUMMARIZATION_STEP;
 
 /**
- * Tests whether Spring Batch is correctly wired up to run the annotation indexing.
+ * Tests whether Spring Batch is correctly wired up to run the indexing for CoTerms only.
  *
  * Created 22/04/16
  * @author Edd
@@ -59,7 +59,6 @@ public class CoTermIndexingBatchIT {
         annotationRepository.deleteAll();
     }
 
-
     @Test
     public void successfulCoTermsOnlyJob() throws Exception {
         JobExecution jobExecution = jobLauncherTestUtils.launchJob();
@@ -67,7 +66,8 @@ public class CoTermIndexingBatchIT {
 
         List<StepExecution> jobsSingleStepAsList = jobExecution.getStepExecutions()
                                                                .stream()
-                                                               .filter(step -> step.getStepName().equals(ANNOTATION_READING_STEP_NAME))
+                                                               .filter(step -> step.getStepName()
+                                                                                   .equals(ANNOTATION_READING_STEP_NAME))
                                                                .collect(Collectors.toList());
         assertThat(jobsSingleStepAsList, hasSize(1));
 
@@ -81,7 +81,8 @@ public class CoTermIndexingBatchIT {
         //Manual
         List<StepExecution> summarizeCoTermManualSteps = jobExecution.getStepExecutions()
                                                                      .stream()
-                                                                     .filter(step -> step.getStepName().equals(CO_TERM_MANUAL_SUMMARIZATION_STEP))
+                                                                     .filter(step -> step.getStepName()
+                                                                                         .equals(CO_TERM_MANUAL_SUMMARIZATION_STEP))
                                                                      .collect(Collectors.toList());
         assertThat(summarizeCoTermManualSteps, hasSize(1));
         StepExecution coTermsManualStep = summarizeCoTermManualSteps.get(0);
@@ -92,7 +93,8 @@ public class CoTermIndexingBatchIT {
 
         List<StepExecution> summarizeCoTermAllSteps = jobExecution.getStepExecutions()
                                                                   .stream()
-                                                                  .filter(step -> step.getStepName().equals(CO_TERM_ALL_SUMMARIZATION_STEP))
+                                                                  .filter(step -> step.getStepName()
+                                                                                      .equals(CO_TERM_ALL_SUMMARIZATION_STEP))
                                                                   .collect(Collectors.toList());
         assertThat(summarizeCoTermAllSteps, hasSize(1));
         StepExecution coTermsAllStep = summarizeCoTermAllSteps.get(0);
