@@ -36,7 +36,7 @@ import org.springframework.data.solr.core.SolrTemplate;
  * Sets up batch jobs for annotation indexing.
  *
  * Created 20/04/16
- * @author Edd
+ * @author Tony Wardell
  */
 @Configuration
 @EnableBatchProcessing
@@ -150,4 +150,4 @@ public class CoTermIndexingConfig {
     private SkipLoggerListener<Annotation, AnnotationDocument> skipLogListener() {
         return new SkipLoggerListener<>();
     }
-    }
+}
