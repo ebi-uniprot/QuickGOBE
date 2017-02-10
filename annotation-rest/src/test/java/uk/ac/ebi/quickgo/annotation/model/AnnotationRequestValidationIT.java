@@ -330,6 +330,14 @@ public class AnnotationRequestValidationIT {
     }
 
     @Test
+    public void requestingMaximumNumberOfGOIdentifiersIsValid() {
+        String[] goIds = generateValues(IdGeneratorUtil::createGoId, AnnotationRequest.MAX_GO_IDS);
+        annotationRequest.setGoId(goIds);
+        Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+        assertThat(violations, hasSize(0));
+    }
+
+    @Test
     public void exceedingMaximumNumberOfGOIdentifiersSendsError() {
         int numIds = AnnotationRequest.MAX_GO_IDS + 1;
 
