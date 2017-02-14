@@ -3,8 +3,13 @@ package uk.ac.ebi.quickgo.index.annotation;
 import uk.ac.ebi.quickgo.index.annotation.coterms.CoTermTemporaryDataStore;
 import uk.ac.ebi.quickgo.index.common.JobTestRunnerConfig;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,8 +18,8 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationContextLoader;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -32,18 +37,36 @@ import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermsConfig.CO_TERM_M
  * Created 22/04/16
  * @author Edd
  */
-@ActiveProfiles(profiles = {"embeddedServer"})
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(
         classes = {CoTermIndexingConfig.class, JobTestRunnerConfig.class, CoTermTemporaryDataStore.Config.class},
         loader = SpringApplicationContextLoader.class)
+//@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class CoTermIndexingBatchIT {
+
+    @Value("${indexing.coterms.manual:#{systemProperties['user.dir']}/QuickGO/CoTermsManual}")
+    String manualCoTermsPath;
+    @Value("${indexing.coterms.all:#{systemProperties['user.dir']}/QuickGO/CoTermsAll}")
+    String allCoTermsPath;
+
 
     @ClassRule
     public static final CoTermTemporaryDataStore coTermsDataStore = new CoTermTemporaryDataStore();
 
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
+
+    @Before
+    public void setUp() throws IOException {
+        Files.deleteIfExists(Paths.get(manualCoTermsPath));
+        Files.deleteIfExists(Paths.get(allCoTermsPath));
+    }
+
+    @After
+    public void tearDown() throws IOException {
+        Files.deleteIfExists(Paths.get(manualCoTermsPath));
+        Files.deleteIfExists(Paths.get(allCoTermsPath));
+    }
 
     @Test
     public void successfulCoTermsOnlyJob() throws Exception {
