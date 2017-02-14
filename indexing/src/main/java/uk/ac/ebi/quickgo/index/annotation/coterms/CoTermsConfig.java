@@ -32,6 +32,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 /**
@@ -65,9 +66,9 @@ public class CoTermsConfig {
     @Value("${indexing.coterm.loginterval:1000}")
     private int coTermLogInterval;
     @Value("${indexing.coterms.manual:#{systemProperties['user.dir']}/QuickGO/CoTermsManual}")
-    Resource manualCoTermsPath;
+    String manualCoTermsPath;
     @Value("${indexing.coterms.all:#{systemProperties['user.dir']}/QuickGO/CoTermsAll}")
-    Resource allCoTermsPath;
+    String allCoTermsPath;
 
     @Autowired
     public StepBuilderFactory stepBuilders;
@@ -86,7 +87,7 @@ public class CoTermsConfig {
                 .<String, List<CoTerm>>chunk(cotermsChunk)
                 .reader(coTermsManualReader(coTermsManualAggregationWriter()))
                 .processor(coTermsManualCalculator(coTermsManualAggregationWriter()))
-                .writer(coTermsManualStatsWriter(manualCoTermsPath))
+                .writer(coTermsManualStatsWriter(new FileSystemResource(manualCoTermsPath)))
                 .listener(logStepListener())
                 .listener(logWriteRateListener(coTermLogInterval))
                 .listener(skipLogListener())
@@ -102,7 +103,7 @@ public class CoTermsConfig {
                 .<String, List<CoTerm>>chunk(cotermsChunk)
                 .reader(coTermsAllReader(coTermsAllAggregationWriter()))
                 .processor(coTermsAllCalculator(coTermsAllAggregationWriter()))
-                .writer(coTermsAllStatsWriter(allCoTermsPath))
+                .writer(coTermsAllStatsWriter(new FileSystemResource(allCoTermsPath)))
                 .listener(logStepListener())
                 .listener(logWriteRateListener(coTermLogInterval))
                 .listener(skipLogListener())
