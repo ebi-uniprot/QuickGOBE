@@ -4,9 +4,6 @@ import java.io.IOException;
 import org.junit.ClassRule;
 import org.junit.rules.ExternalResource;
 import org.junit.rules.TemporaryFolder;
-import org.springframework.context.annotation.Bean;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
 
 /**
  * Provide a temporary location for files to be output during co-occurring terms calculation.
@@ -29,16 +26,5 @@ public class CoTermTemporaryDataStore extends ExternalResource {
     }
 
     public static class Config {
-        @Bean
-        public Resource manualCoTermsResource() throws IOException {
-            String manualCoTermsPath = temporaryFolder.newFile().getAbsolutePath();
-            return new FileSystemResource(manualCoTermsPath);
-        }
-
-        @Bean
-        public Resource allCoTermsResource() throws IOException {
-            String allCoTermsLocation = temporaryFolder.newFile().getAbsolutePath();
-            return new FileSystemResource(allCoTermsLocation);
-        }
     }
 }
