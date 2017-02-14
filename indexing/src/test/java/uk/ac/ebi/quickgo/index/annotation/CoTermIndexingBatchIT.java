@@ -1,6 +1,5 @@
 package uk.ac.ebi.quickgo.index.annotation;
 
-import uk.ac.ebi.quickgo.index.annotation.coterms.CoTermTemporaryDataStore;
 import uk.ac.ebi.quickgo.index.common.JobTestRunnerConfig;
 
 import java.io.IOException;
@@ -10,7 +9,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.BatchStatus;
@@ -39,7 +37,7 @@ import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermsConfig.CO_TERM_M
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(
-        classes = {CoTermIndexingConfig.class, JobTestRunnerConfig.class, CoTermTemporaryDataStore.Config.class},
+        classes = {CoTermIndexingConfig.class, JobTestRunnerConfig.class},
         loader = SpringApplicationContextLoader.class)
 //@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class CoTermIndexingBatchIT {
@@ -48,10 +46,6 @@ public class CoTermIndexingBatchIT {
     String manualCoTermsPath;
     @Value("${indexing.coterms.all:#{systemProperties['user.dir']}/QuickGO/CoTermsAll}")
     String allCoTermsPath;
-
-
-    @ClassRule
-    public static final CoTermTemporaryDataStore coTermsDataStore = new CoTermTemporaryDataStore();
 
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
