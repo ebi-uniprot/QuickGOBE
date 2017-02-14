@@ -14,17 +14,11 @@ import static org.mockito.Mockito.mock;
  * Time: 11:00
  * Created with IntelliJ IDEA.
  */
-@RunWith(MockitoJUnitRunner.class)
+//@RunWith(MockitoJUnitRunner.class)
 public class CoTermConfigTest {
 
-    Resource manualPath;
-    Resource allPath;
-
-    @Before
-    public void setup(){
-        manualPath = mock(Resource.class);
-        allPath = mock(Resource.class);
-    }
+    String manualPath = "foo";
+    String allPath = "bar";
 
     @Test(expected = NullPointerException.class)
     public void manualAndAllOutputPathsWhenDifferentWillNotCauseAIllegalStateException(){
