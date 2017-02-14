@@ -71,7 +71,7 @@ public class CoTermsConfig {
     String allCoTermsPath;
 
     @Autowired
-    public StepBuilderFactory stepBuilders;
+    private StepBuilderFactory stepBuilders;
 
     @Bean
     public static PropertySourcesPlaceholderConfigurer propertyConfigIn() {
