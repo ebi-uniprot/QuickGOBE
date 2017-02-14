@@ -1,12 +1,6 @@
 package uk.ac.ebi.quickgo.index.annotation.coterms;
 
-import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.core.io.Resource;
-
-import static org.mockito.Mockito.mock;
 
 /**
  * @author Tony Wardell
@@ -14,17 +8,16 @@ import static org.mockito.Mockito.mock;
  * Time: 11:00
  * Created with IntelliJ IDEA.
  */
-//@RunWith(MockitoJUnitRunner.class)
 public class CoTermConfigTest {
 
-    String manualPath = "foo";
-    String allPath = "bar";
+    private static final String MANUAL_PATH = "foo";
+    private static final String ALL_PATH = "bar";
 
     @Test(expected = NullPointerException.class)
     public void manualAndAllOutputPathsWhenDifferentWillNotCauseAIllegalStateException(){
         CoTermsConfig coTermsConfig = new CoTermsConfig();
-        coTermsConfig.manualCoTermsPath = manualPath;
-        coTermsConfig.allCoTermsPath = allPath;
+        coTermsConfig.manualCoTermsPath = MANUAL_PATH;
+        coTermsConfig.allCoTermsPath = ALL_PATH;
         coTermsConfig.coTermAllSummarizationStep();
         coTermsConfig.coTermManualSummarizationStep();
     }
@@ -32,17 +25,16 @@ public class CoTermConfigTest {
     @Test(expected = IllegalStateException.class)
     public void cannotHaveBothManualAndAllOutputPathsTheSameForCoTermsWhenCallingCoTermAllSummarizationStep(){
         CoTermsConfig coTermsConfig = new CoTermsConfig();
-        coTermsConfig.manualCoTermsPath = manualPath;
-        coTermsConfig.allCoTermsPath = manualPath;
+        coTermsConfig.manualCoTermsPath = MANUAL_PATH;
+        coTermsConfig.allCoTermsPath = MANUAL_PATH;
         coTermsConfig.coTermAllSummarizationStep();
     }
 
     @Test(expected = IllegalStateException.class)
     public void cannotHaveBothManualAndAllOutputPathsTheSameForCoTermsCoTermManualSummarizationStep(){
         CoTermsConfig coTermsConfig = new CoTermsConfig();
-        coTermsConfig.manualCoTermsPath = manualPath;
-        coTermsConfig.allCoTermsPath = manualPath;
+        coTermsConfig.manualCoTermsPath = MANUAL_PATH;
+        coTermsConfig.allCoTermsPath = MANUAL_PATH;
         coTermsConfig.coTermManualSummarizationStep();
     }
-
 }
