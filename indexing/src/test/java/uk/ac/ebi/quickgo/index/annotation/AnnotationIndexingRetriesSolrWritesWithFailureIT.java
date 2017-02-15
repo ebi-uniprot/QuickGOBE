@@ -2,7 +2,6 @@ package uk.ac.ebi.quickgo.index.annotation;
 
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
-import uk.ac.ebi.quickgo.index.annotation.coterms.CoTermTemporaryDataStore;
 import uk.ac.ebi.quickgo.index.common.JobTestRunnerConfig;
 
 import java.util.List;
@@ -50,13 +49,10 @@ import static uk.ac.ebi.quickgo.index.annotation.AnnotationConfig.ANNOTATION_IND
 @ActiveProfiles(profiles = {"embeddedServer", "tooManySolrRemoteHostErrors"})
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(
-        classes = {AnnotationConfig.class, JobTestRunnerConfig.class, CoTermTemporaryDataStore.Config.class,
+        classes = {AnnotationIndexingConfig.class, JobTestRunnerConfig.class,
                 AnnotationIndexingRetriesSolrWritesWithFailureIT.RetryConfig.class},
         loader = SpringApplicationContextLoader.class)
 public class AnnotationIndexingRetriesSolrWritesWithFailureIT {
-
-    @ClassRule
-    public static final CoTermTemporaryDataStore coTermsDataStore = new CoTermTemporaryDataStore();
 
     @ClassRule
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
