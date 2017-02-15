@@ -34,7 +34,7 @@ import static uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern.Flag.CASE_I
  * Created with IntelliJ IDEA.
  */
 public class AnnotationRequest {
-    static final int MAX_GO_IDS = 500;
+    static final int MAX_GO_IDS = 600;
     static final int MAX_GENE_PRODUCT_IDS = 500;
     static final int MAX_EVIDENCE_CODE = 100;
     static final int MAX_TAXON_IDS = 50;
