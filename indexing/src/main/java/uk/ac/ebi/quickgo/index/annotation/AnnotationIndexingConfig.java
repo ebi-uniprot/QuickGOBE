@@ -13,6 +13,7 @@ import uk.ac.ebi.quickgo.index.common.listener.SkipLoggerListener;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -31,6 +32,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.Resource;
 import org.springframework.data.solr.core.SolrTemplate;
+import org.springframework.retry.backoff.BackOffPolicy;
+import org.springframework.retry.backoff.ExponentialBackOffPolicy;
 
 /**
  * Sets up batch jobs for annotation indexing.
@@ -57,6 +60,12 @@ public class AnnotationIndexingConfig {
     private int skipLimit;
     @Value("${indexing.coterm.loginterval:1000}")
     private int coTermLogInterval;
+    @Value("${indexing.annotation.retries.initialInterval:5000}")
+    private int initialBackOffInterval;
+    @Value("${indexing.annotation.retries.maxInterval:20000}")
+    private int maxBackOffInterval;
+    @Value("${indexing.annotation.retries.retryLimit:20}")
+    private int retryLimit;
 
     @Autowired
     private SolrTemplate annotationTemplate;
@@ -108,6 +117,9 @@ public class AnnotationIndexingConfig {
                 .skipLimit(skipLimit)
                 .skip(FlatFileParseException.class)
                 .skip(ValidationException.class)
+                .retry(HttpSolrClient.RemoteSolrException.class)
+                .retryLimit(retryLimit)
+                .backOffPolicy(backOffPolicy())
                 .<Annotation>reader(annotationMultiFileReader)
                 .processor(annotationCompositeProcessor())
                 .<AnnotationDocument>writer(compositeAnnotationWriter())
@@ -115,6 +127,13 @@ public class AnnotationIndexingConfig {
                 .listener(logStepListener())
                 .listener(skipLogListener())
                 .build();
+    }
+
+    private BackOffPolicy backOffPolicy() {
+        ExponentialBackOffPolicy backOffPolicy = new ExponentialBackOffPolicy();
+        backOffPolicy.setInitialInterval(initialBackOffInterval);
+        backOffPolicy.setMaxInterval(maxBackOffInterval);
+        return backOffPolicy;
     }
 
     private ItemWriter<AnnotationDocument> compositeAnnotationWriter() {

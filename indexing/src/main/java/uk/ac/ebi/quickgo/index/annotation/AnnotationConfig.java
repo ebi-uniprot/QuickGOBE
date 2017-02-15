@@ -5,8 +5,6 @@ import uk.ac.ebi.quickgo.annotation.common.AnnotationRepoConfig;
 import uk.ac.ebi.quickgo.index.common.SolrServerWriter;
 
 import java.util.function.Function;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
-import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
@@ -26,8 +24,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.Resource;
 import org.springframework.data.solr.core.SolrTemplate;
-import org.springframework.retry.backoff.BackOffPolicy;
-import org.springframework.retry.backoff.ExponentialBackOffPolicy;
 
 import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.TAB;
 
@@ -46,22 +42,8 @@ public class AnnotationConfig {
 
     @Value("${indexing.annotation.source}")
     private Resource[] resources;
-    @Value("${indexing.annotation.chunk.size:500}")
-    private int chunkSize;
-    @Value("${indexing.annotation.retries.initialInterval:5000}")
-    private int initialBackOffInterval;
-    @Value("${indexing.annotation.retries.maxInterval:20000}")
-    private int maxBackOffInterval;
-    @Value("${indexing.annotation.retries.retryLimit:20}")
-    private int retryLimit;
-    @Value("${indexing.coterms.chunk.size:1}")
-    private int cotermsChunk;
     @Value("${indexing.annotation.header.lines:21}")
     private int headerLines;
-    @Value("${indexing.annotation.skip.limit:100}")
-    private int skipLimit;
-    @Value("${indexing.coterm.loginterval:1000}")
-    private int coTermLogInterval;
 
     @Autowired
     private SolrTemplate annotationTemplate;
