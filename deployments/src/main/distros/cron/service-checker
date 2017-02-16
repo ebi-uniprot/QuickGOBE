@@ -1,0 +1,68 @@
+#! /bin/bash
+
+##=======================================================================================
+# Checks the liveness of services, and if down, then restarts them.
+# This script is designed to be installed as a cron job.
+##=======================================================================================
+
+set -eo pipefail
+
+IFS=$'\n\t'
+
+# find the dir in which the current script is running
+my_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+# this file specifies the list of services to consider during status checking.
+# format is: service_base_directory|service_status_check command|service_stop_command|service_start_command
+services_definition_file=$my_dir/services.txt
+
+# a log of all the service status checks that have taken place
+log_file=$my_dir/log.txt
+
+function log {
+    echo $1 | tee -a $log_file
+}
+
+function check_service {
+   local base_dir="$1"
+   local status_check_command="$2"
+   local stop_command="$3"
+   local start_command="$4"
+   local service_name="$(basename $base_dir)"
+
+   log "checking service:"
+   log "   base_dir=$base_dir"
+   log "   status_check_command=$status_check_command"
+   log "   stop_command=$stop_command"
+   log "   start_command=$start_command"
+
+   local current_dir="$(pwd)"
+   cd $base_dir
+   
+   
+   if eval "$status_check_command > /dev/null"; then
+      log "   STATUS: $service_name service is ALIVE"
+   else
+      log "   STATUS: $service_name service is DOWN; restarting ..."
+      log "-------- Stopping $service_name --------"
+      eval "$stop_command" | tee -a $log_file || log "Failed to stop $service_name"
+      log "-------- Starting $service_name --------"
+      eval "$start_command" | tee -a $log_file || log "Failed to start $service_name"
+      log "-------- Completed stopping/starting $service_name --------"
+   fi
+   cd $current_dir
+}
+
+log "%%%%%%%%%%%%%%%%%%%% STARTING current checking cycle: $(date) %%%%%%%%%%%%%%%%%%%%"
+for line in $(cat $services_definition_file); do
+    # ignore lines starting with #
+    if [[ $line =~ ^\#.*$ ]] || [[ ${#line} == 0 ]] ; then
+        continue;
+    fi
+
+    log "service line: $line"
+    IFS='|' read -ra ARR <<<"$line"
+    # run it in a sub-shell
+    (check_service "${ARR[0]}" "${ARR[1]}" "${ARR[2]}" "${ARR[3]}")
+done
+log "%%%%%%%%%%%%%%%%%%%% FINISHED checking cycle: $(date) %%%%%%%%%%%%%%%%%%%%"
