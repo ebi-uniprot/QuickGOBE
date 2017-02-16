@@ -76,8 +76,10 @@ for vm in $VMS; do
     
   if [[ "$vm_status" == *"UP"* ]]; then
        echo "$vm is UP"
+       exit 0
     else
        echo "$vm is DOWN"
+       exit 1
     fi
   fi
 done
