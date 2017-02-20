@@ -83,6 +83,8 @@ public class CoTermsConfig {
         Preconditions.checkState(!allCoTermsPath.equals(manualCoTermsPath), "The output path for manual and all " +
                 "coterms files should not be the same, but they were both %s", manualCoTermsPath);
 
+        LOGGER.info("Created coTermManualSummarizationStep. Will write CoTerms to " + manualCoTermsPath);
+
         return stepBuilders.get(CO_TERM_MANUAL_SUMMARIZATION_STEP)
                 .<String, List<CoTerm>>chunk(cotermsChunk)
                 .reader(coTermsManualReader(coTermsManualAggregationWriter()))
@@ -98,6 +100,8 @@ public class CoTermsConfig {
     public Step coTermAllSummarizationStep() {
         Preconditions.checkState(!allCoTermsPath.equals(manualCoTermsPath), "The output path for manual and all " +
                 "coterms files should not be the same, but they were both %s", manualCoTermsPath);
+
+        LOGGER.info("Created coTermAllSummarizationStep. Will write CoTerms to " + allCoTermsPath);
 
         return stepBuilders.get(CO_TERM_ALL_SUMMARIZATION_STEP)
                 .<String, List<CoTerm>>chunk(cotermsChunk)
