@@ -1,5 +1,12 @@
 #!/bin/bash
-
+#----------------------------------------------------------------------------
+# Run indexing only to produce coterms, therefore this script is only to be used
+# from the annotation core.
+# It is the same as the index-create script but with the Solr procedures removed.
+# Before running this script make sure the annotation/index.variables file
+# has the property jobName=coTermIndexingJob
+#
+#---------------------------------------------------------------------------
 #fail on error
 set -eo pipefail
 
