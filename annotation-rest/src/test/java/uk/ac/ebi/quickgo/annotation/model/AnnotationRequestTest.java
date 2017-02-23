@@ -3,6 +3,8 @@ package uk.ac.ebi.quickgo.annotation.model;
 import uk.ac.ebi.quickgo.rest.ParameterException;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 import org.junit.Before;
 import org.junit.Rule;
@@ -12,11 +14,13 @@ import org.junit.rules.ExpectedException;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayContaining;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.EVIDENCE_CODE_PARAM;
 import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.GO_ID_PARAM;
 import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.EVIDENCE_CODE_USAGE_RELATIONSHIPS;
+import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.GO_USAGE_ID;
 import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.GO_USAGE_RELATIONSHIPS;
 
 /**
@@ -195,7 +199,6 @@ public class AnnotationRequestTest {
         annotationRequest.createFilterRequests();
     }
 
-    //-----------------
     @Test
     public void setAndGetEvidenceCodeUsage() {
         String usage = "descendants";
@@ -268,7 +271,6 @@ public class AnnotationRequestTest {
 
         annotationRequest.createFilterRequests();
     }
-    //-----------------
 
     @Test
     public void setAndGetQualifier() {
@@ -296,5 +298,21 @@ public class AnnotationRequestTest {
         int limit = 12345;
         annotationRequest.setDownloadLimit(limit);
         assertThat(annotationRequest.getDownloadLimit(), is(limit));
+    }
+
+    @Test
+    public void defaultsAreSetForUsageAndRelationshipsIfGoIdsAreRequested() {
+        annotationRequest.setGoId("GO:0000001");
+        List<FilterRequest> requests = annotationRequest.createFilterRequests();
+        assertThat(requests, hasSize(1));
+        FilterRequest request = requests.get(0);
+        Map<String, List<String>> properties = request.getProperties();
+        assertThat(properties.entrySet(), hasSize(3));
+        assertThat(properties.get(GO_USAGE_RELATIONSHIPS), hasSize(0));
+        assertThat(properties.get(GO_USAGE_ID), hasSize(1));
+        assertThat(properties.get("descendants"), hasSize(0));
+
+
+
     }
 }
