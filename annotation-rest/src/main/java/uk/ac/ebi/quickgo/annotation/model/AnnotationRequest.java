@@ -524,7 +524,7 @@ public class AnnotationRequest {
      */
     public List<FilterRequest> createFilterRequests() {
         List<FilterRequest> filterRequests = new ArrayList<>();
-        createDefaultUsageAndRelationshipsIfGoIdRequested();
+        createDefaultUsageIfGoIdRequested();
 
         Stream.of(FILTER_REQUEST_FIELDS)
                 .map(this::createSimpleFilter)
@@ -538,7 +538,7 @@ public class AnnotationRequest {
         return filterRequests;
     }
 
-    private void createDefaultUsageAndRelationshipsIfGoIdRequested() {
+    private void createDefaultUsageIfGoIdRequested() {
         final String[] goIds = filterMap.get(Searchable.GO_ID);
         if(goIds!=null && goIds.length > 0){
             final String[] goUsageField = filterMap.get(GO_USAGE_FIELD);
@@ -546,10 +546,6 @@ public class AnnotationRequest {
             if(goUsageField == null || goUsageField.length == 0){
                 filterMap.put(GO_USAGE_FIELD, DEFAULT_GO_USAGE);
             }
-//            final String[] goUsageRelationships = filterMap.get(GO_USAGE_RELATIONSHIPS);
-//            if( goUsageRelationships ==null || goUsageRelationships.length == 0){
-//                filterMap.put(GO_USAGE_RELATIONSHIPS, DEFAULT_GO_USAGE_RELATIONSHIPS);
-//            }
         }
     }
 
