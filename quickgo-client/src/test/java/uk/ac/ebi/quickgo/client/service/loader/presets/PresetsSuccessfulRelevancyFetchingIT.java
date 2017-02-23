@@ -175,7 +175,7 @@ public class PresetsSuccessfulRelevancyFetchingIT {
     }
 
     @Test
-    public void loadTaxonPresetsAfterSuccessfulRESTInfoFetching() throws Exception {
+    public void loadTaxonPresets() throws Exception {
         assertThat(presets.getTaxons(), hasSize(0));
 
         JobExecution jobExecution =
