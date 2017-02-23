@@ -16,6 +16,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -43,6 +44,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.Resource;
 import org.springframework.data.solr.core.SolrTemplate;
+import org.springframework.retry.backoff.BackOffPolicy;
+import org.springframework.retry.backoff.ExponentialBackOffPolicy;
 
 import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermsConfig.CO_TERM_ALL_SUMMARIZATION_STEP;
 import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermsConfig.CO_TERM_MANUAL_SUMMARIZATION_STEP;
@@ -65,6 +68,12 @@ public class AnnotationConfig {
     private Resource[] resources;
     @Value("${indexing.annotation.chunk.size:500}")
     private int chunkSize;
+    @Value("${indexing.annotation.retries.initialInterval:5000}")
+    private int initialBackOffInterval;
+    @Value("${indexing.annotation.retries.maxInterval:20000}")
+    private int maxBackOffInterval;
+    @Value("${indexing.annotation.retries.retryLimit:20}")
+    private int retryLimit;
     @Value("${indexing.coterms.chunk.size:1}")
     private int cotermsChunk;
     @Value("${indexing.annotation.header.lines:21}")
@@ -123,6 +132,9 @@ public class AnnotationConfig {
                 .skipLimit(skipLimit)
                 .skip(FlatFileParseException.class)
                 .skip(ValidationException.class)
+                .retry(HttpSolrClient.RemoteSolrException.class)
+                .retryLimit(retryLimit)
+                .backOffPolicy(backOffPolicy())
                 .<Annotation>reader(annotationMultiFileReader())
                 .processor(annotationCompositeProcessor())
                 .<AnnotationDocument>writer(compositeAnnotationWriter())
@@ -130,6 +142,13 @@ public class AnnotationConfig {
                 .listener(logStepListener())
                 .listener(skipLogListener())
                 .build();
+    }
+
+    private BackOffPolicy backOffPolicy() {
+        ExponentialBackOffPolicy backOffPolicy = new ExponentialBackOffPolicy();
+        backOffPolicy.setInitialInterval(initialBackOffInterval);
+        backOffPolicy.setMaxInterval(maxBackOffInterval);
+        return backOffPolicy;
     }
 
     @Bean
