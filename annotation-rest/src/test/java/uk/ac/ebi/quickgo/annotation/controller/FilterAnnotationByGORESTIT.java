@@ -274,6 +274,71 @@ public class FilterAnnotationByGORESTIT extends AbstractFilterAnnotationByOntolo
     }
 
     @Test
+    public void searchForTermWithOneDescendantId() throws Exception {
+        annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(1), ontologyId(1)));
+        annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(2), ontologyId(2)));
+
+        expectRestCallHasDescendants(
+                singletonList(ontologyId(1)),
+                emptyList(),
+                asList(asList(ontologyId(1), ontologyId(2))));
+
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE)
+                        .param(idParam, ontologyId(1)));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(pageInfoExists())
+                .andExpect(totalNumOfResults(2))
+                .andExpect(fieldsInAllResultsExist(2));
+    }
+
+
+    @Test
+    public void successfullyLookupAnnotationsByGoIdCaseInsensitive() throws Exception {
+        annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(1), ontologyId(1)));
+        annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(2), ontologyId(2)));
+
+        expectRestCallHasDescendants(
+                singletonList(ontologyId(1)),
+                emptyList(),    //todo should this be the full 3 list?
+                asList(asList(ontologyId(1), ontologyId(2).toLowerCase())));
+
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE)
+                        .param(idParam, ontologyId(1)));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(pageInfoExists())
+                .andExpect(totalNumOfResults(2))
+                .andExpect(fieldsInAllResultsExist(2));
+    }
+
+    @Test
+    public void failToFindAnnotationsWhenGoIdDoesntExist() throws Exception {
+
+        annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(1), ontologyId(1)));
+        annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(2), ontologyId(2)));
+
+        expectRestCallHasDescendants(singletonList(ontologyId(1)), emptyList(), singletonList((emptyList())));
+
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE)
+                        .param(idParam, ontologyId(1)));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(pageInfoExists())
+                .andExpect(totalNumOfResults(0));
+    }
+
+
+    @Test
     public void wrongResourcePathForSlimCausesErrorMessage() throws Exception {
         annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(1), ontologyId(1)));
         annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(2), ontologyId(2)));
