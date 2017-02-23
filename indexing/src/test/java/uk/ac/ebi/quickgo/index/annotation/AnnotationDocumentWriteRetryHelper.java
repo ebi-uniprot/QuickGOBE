@@ -85,6 +85,7 @@ public class AnnotationDocumentWriteRetryHelper {
                     docsToRetryWriting = docsToWrite;
                     break;
                 default:
+                    throw new IllegalStateException("Unknown SolrResponse");
             }
         }
     }
