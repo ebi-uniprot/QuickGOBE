@@ -63,6 +63,8 @@ public class MockPresetDataConfig {
     static final PresetItem PRESET_GO_SLIM_POMBE;
     static final PresetItem PRESET_GO_SLIM_SYNAPSE;
     static final String TAXON_HUMAN = "9606";
+    static final String TAXON_ARABIDOPSIS = "3702";
+    static final String TAXON_DROSOPHILA = "7227";
     static final String TAXON_BACTERIA = "2";
     static final String QUALIFIER_ENABLES = "enables";
     static final String QUALIFIER_INVOLVED_IN = "involved_in";
