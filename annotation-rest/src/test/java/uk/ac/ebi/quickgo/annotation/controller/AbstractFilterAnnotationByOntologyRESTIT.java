@@ -433,8 +433,10 @@ public abstract class AbstractFilterAnnotationByOntologyRESTIT {
                 buildResource(
                         resourceFormat,
                         termIdsCSV,
-                        relationsCSV),
-                constructResponseObject(termIds, descendants));
+                        relationsCSV
+                ),
+                constructResponseObject(termIds, descendants)
+        );
     }
 
     String buildResource(String format, String... arguments) {
