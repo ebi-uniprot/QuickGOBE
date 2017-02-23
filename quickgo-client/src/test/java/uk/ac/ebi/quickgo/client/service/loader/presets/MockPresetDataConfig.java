@@ -62,9 +62,9 @@ public class MockPresetDataConfig {
     static final PresetItem PRESET_GO_SLIM_METAGENOMICS;
     static final PresetItem PRESET_GO_SLIM_POMBE;
     static final PresetItem PRESET_GO_SLIM_SYNAPSE;
+    static final PresetItem PRESET_TAXON_ARABIDOPSIS;
+    static final PresetItem PRESET_TAXON_DROSOPHILA;
     static final String TAXON_HUMAN = "9606";
-    static final String TAXON_ARABIDOPSIS = "3702";
-    static final String TAXON_DROSOPHILA = "7227";
     static final String TAXON_BACTERIA = "2";
     static final String QUALIFIER_ENABLES = "enables";
     static final String QUALIFIER_INVOLVED_IN = "involved_in";
@@ -152,6 +152,19 @@ public class MockPresetDataConfig {
                         createPresetItem("GO:0004444", "obsolete inositol-1,4,5-trisphosphate 1-phosphatase",
                                 "cellular_component")))
                 .build();
+
+        PRESET_TAXON_ARABIDOPSIS = PresetItem
+                .createWithName("Arabidopsis thaliana")
+                .withProperty(PresetItem.Property.ID, "3702")
+                .withRelevancy(1)
+                .build();
+
+        PRESET_TAXON_DROSOPHILA = PresetItem
+                .createWithName("Drosophila melanogaster")
+                .withProperty(PresetItem.Property.ID, "7227")
+                .withRelevancy(2)
+                .build();
+
     }
 
     private static PresetItem createPresetItem(String id, String name, String aspect) {
