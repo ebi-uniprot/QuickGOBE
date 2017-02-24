@@ -62,20 +62,6 @@ public class PresetsFailedRelevancyFetchingIT {
     }
 
     @Test
-    public void loadDefaultTaxonPresetsAfterFailedRESTInfoFetching() throws Exception {
-        assertThat(presets.getTaxons(), hasSize(0));
-
-        JobExecution jobExecution =
-                jobLauncherTestUtils.launchStep(TaxonPresetsConfig.TAXON_LOADING_STEP_NAME);
-        BatchStatus status = jobExecution.getStatus();
-
-        assertThat(status, is(BatchStatus.COMPLETED));
-        assertThat(
-                extractPresetValues(presets.getTaxons(), p -> p.getProperty(PresetItem.Property.NAME.getKey())),
-                is(empty()));
-    }
-
-    @Test
     public void loadDefaultQualifierPresetsAfterFailedRESTInfoFetching() throws Exception {
         assertThat(presets.getQualifiers(), hasSize(0));
 

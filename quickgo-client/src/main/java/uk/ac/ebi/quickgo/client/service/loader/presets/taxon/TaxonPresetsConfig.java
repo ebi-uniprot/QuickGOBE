@@ -6,17 +6,28 @@ import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
 import uk.ac.ebi.quickgo.client.service.loader.presets.LogStepListener;
 import uk.ac.ebi.quickgo.client.service.loader.presets.PresetsCommonConfig;
 import uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPreset;
-import uk.ac.ebi.quickgo.rest.search.request.converter.RESTFilterConverterFactory;
+import uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPresetValidator;
+import uk.ac.ebi.quickgo.client.service.loader.presets.ff.SourceColumnsFactory;
+import uk.ac.ebi.quickgo.client.service.loader.presets.ff.StringToRawNamedPresetMapper;
 
+import java.util.concurrent.atomic.AtomicInteger;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.file.FlatFileItemReader;
+import org.springframework.batch.item.file.mapping.FieldSetMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.io.Resource;
 
 import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfig.SKIP_LIMIT;
-import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelper.topItemsFromRESTReader;
+import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelper.compositeItemProcessor;
+import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelper.fileReader;
+import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelper.rawPresetMultiFileReader;
+import static uk.ac.ebi.quickgo.client.service.loader.presets.ff.SourceColumnsFactory.Source.TAXON_COLUMNS;
 
 /**
  * Exposes the {@link Step} bean that is used to read and populate information relating to the taxonomy preset data.
@@ -30,19 +41,29 @@ import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelpe
 public class TaxonPresetsConfig {
     public static final String TAXON_LOADING_STEP_NAME = "TaxonReadingStep";
     public static final String TAXON_ID = "taxonId";
+    private static final AtomicInteger INSERT_ORDER = new AtomicInteger(0);
+
+    @Value("#{'${taxon.preset.source:}'.split(',')}")
+    private Resource[] taxonResources;
+    @Value("${taxon.preset.header.lines:1}")
+    private int taxonHeaderLines;
 
     @Bean
     public Step taxonStep(
             StepBuilderFactory stepBuilderFactory,
             Integer chunkSize,
-            CompositePresetImpl presets,
-            RESTFilterConverterFactory converterFactory) {
+            CompositePresetImpl presets) {
+
+        FlatFileItemReader<RawNamedPreset> itemReader = fileReader(fieldSetMapper(TAXON_COLUMNS));
+        itemReader.setLinesToSkip(taxonHeaderLines);
 
         return stepBuilderFactory.get(TAXON_LOADING_STEP_NAME)
                 .<RawNamedPreset, RawNamedPreset>chunk(chunkSize)
                 .faultTolerant()
                 .skipLimit(SKIP_LIMIT)
-                .reader(topItemsFromRESTReader(converterFactory, TAXON_ID))
+                .<RawNamedPreset>reader(rawPresetMultiFileReader(taxonResources, itemReader))
+                .processor(compositeItemProcessor(
+                        rawPresetValidator()))
                 .writer(rawPresetWriter(presets))
                 .listener(new LogStepListener())
                 .build();
@@ -59,9 +80,18 @@ public class TaxonPresetsConfig {
                 presets.addPreset(PresetType.TAXONS,
                         PresetItem
                                 .createWithName(rawItem.name)
-                                .withRelevancy(rawItem.relevancy)
+                                .withProperty(PresetItem.Property.ID.getKey(), rawItem.id)
+                                .withRelevancy(INSERT_ORDER.incrementAndGet())
                                 .build());
             });
         };
+    }
+
+    private FieldSetMapper<RawNamedPreset> fieldSetMapper(SourceColumnsFactory.Source source) {
+        return new StringToRawNamedPresetMapper(SourceColumnsFactory.createFor(source));
+    }
+
+    private ItemProcessor<RawNamedPreset, RawNamedPreset> rawPresetValidator() {
+        return new RawNamedPresetValidator();
     }
 }
