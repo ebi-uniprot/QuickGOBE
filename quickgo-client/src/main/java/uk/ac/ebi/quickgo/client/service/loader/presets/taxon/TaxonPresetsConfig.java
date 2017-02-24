@@ -41,7 +41,7 @@ import static uk.ac.ebi.quickgo.client.service.loader.presets.ff.SourceColumnsFa
 public class TaxonPresetsConfig {
     public static final String TAXON_LOADING_STEP_NAME = "TaxonReadingStep";
     public static final String TAXON_ID = "taxonId";
-    private static final AtomicInteger insertOrder = new AtomicInteger(0);
+    private static final AtomicInteger INSERT_ORDER = new AtomicInteger(0);
 
     @Value("#{'${taxon.preset.source:}'.split(',')}")
     private Resource[] taxonResources;
@@ -81,7 +81,7 @@ public class TaxonPresetsConfig {
                         PresetItem
                                 .createWithName(rawItem.name)
                                 .withProperty(PresetItem.Property.ID.getKey(), rawItem.id)
-                                .withRelevancy(insertOrder.incrementAndGet())
+                                .withRelevancy(INSERT_ORDER.incrementAndGet())
                                 .build());
             });
         };
