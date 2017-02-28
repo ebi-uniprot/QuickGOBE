@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.index.annotation;
 
+import org.junit.Before;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
 import uk.ac.ebi.quickgo.index.common.JobTestRunnerConfig;
@@ -10,6 +11,9 @@ import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.MockitoAnnotations;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
@@ -23,17 +27,25 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
+import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
+import uk.ac.ebi.quickgo.index.annotation.AnnotationDocumentWriteRetryHelper.SolrResponse;
+import uk.ac.ebi.quickgo.index.annotation.coterms.CoTermTemporaryDataStore;
+import uk.ac.ebi.quickgo.index.common.JobTestRunnerConfig;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.util.MatcherAssertionErrors.assertThat;
 import static uk.ac.ebi.quickgo.index.annotation.AnnotationConfig.ANNOTATION_INDEXING_JOB_NAME;
 import static uk.ac.ebi.quickgo.index.annotation.AnnotationConfig.ANNOTATION_INDEXING_STEP_NAME;
+import static uk.ac.ebi.quickgo.index.annotation.AnnotationDocumentWriteRetryHelper.stubSolrWriteResponses;
+import static uk.ac.ebi.quickgo.index.annotation.AnnotationDocumentWriteRetryHelper.validateWriteAttempts;
 
 /**
  * <p>Tests whether Spring Batch's retry + backoff policy works as expected. This class simulates annotation indexing
@@ -63,6 +75,23 @@ public class AnnotationIndexingRetriesSolrWritesWithFailureIT {
     @Autowired
     private ItemWriter<AnnotationDocument> annotationSolrServerWriter;
 
+    @Captor
+    private ArgumentCaptor<List<AnnotationDocument>> argumentCaptor;
+
+    private static final List<AnnotationDocumentWriteRetryHelper.SolrResponse> SOLR_RESPONSES = asList(
+            SolrResponse.OK,                // simulate writing first chunk (size 2: both valid)
+            SolrResponse.REMOTE_EXCEPTION,  // error
+            SolrResponse.OK,                // simulate writing second chunk (size 2: both valid)
+            SolrResponse.OK,                // simulate writing second chunk (size 1: only 1 valid document in chunk)
+            SolrResponse.REMOTE_EXCEPTION,  // error
+            SolrResponse.REMOTE_EXCEPTION,  // too many errors -- indexing fails
+            SolrResponse.OK);               // never called
+
+    @Before
+    public void setup() {
+        MockitoAnnotations.initMocks(this);
+    }
+
     @Test
     public void tooManyRetriesAndFailedIndexingJob() throws Exception {
         JobExecution jobExecution = jobLauncherTestUtils.launchJob();
@@ -79,7 +108,12 @@ public class AnnotationIndexingRetriesSolrWritesWithFailureIT {
         assertThat(indexingStep.getReadCount(), is(8));
         assertThat(indexingStep.getReadSkipCount(), is(0));
         assertThat(indexingStep.getProcessSkipCount(), is(2));
-        verify(annotationSolrServerWriter, times(6)).write(any());
+        assertThat(indexingStep.getWriteSkipCount(), is(0));
+        assertThat(indexingStep.getWriteCount(), is(5));
+
+        verify(annotationSolrServerWriter, times(6)).write(argumentCaptor.capture());
+        List<List<AnnotationDocument>> docsSentToBeWritten = argumentCaptor.getAllValues();
+        validateWriteAttempts(SOLR_RESPONSES, docsSentToBeWritten);
 
         BatchStatus status = jobExecution.getStatus();
         assertThat(status, is(BatchStatus.FAILED));
@@ -92,19 +126,13 @@ public class AnnotationIndexingRetriesSolrWritesWithFailureIT {
         private static final String MESSAGE = "Looks like the host is not reachable?!";
         private static final int CODE = 1;
 
-        @Bean @Primary
+        @Bean
+        @Primary
         @SuppressWarnings(value = "unchecked")
         ItemWriter<AnnotationDocument> annotationSolrServerWriter() throws Exception {
             ItemWriter<AnnotationDocument> mockItemWriter = mock(ItemWriter.class);
 
-            doNothing()             // simulate writing first chunk
-                    .doThrow(new HttpSolrClient.RemoteSolrException(HOST, CODE, "bad", null))    // error
-                    .doNothing()    // simulate writing second chunk
-                    .doNothing()    // simulate writing third chunk
-                    .doThrow(new HttpSolrClient.RemoteSolrException(HOST, CODE, MESSAGE, null))    // error
-                    .doThrow(new HttpSolrClient.RemoteSolrException(HOST, CODE, MESSAGE, null))    // too many errors
-                    .doNothing()    // never called
-                    .doNothing()    // never called
+            stubSolrWriteResponses(SOLR_RESPONSES)
                     .when(mockItemWriter).write(any());
 
             return mockItemWriter;

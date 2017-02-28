@@ -1,0 +1,12 @@
+# Defines services to be checked and restarted if required, which are to be run in a cron.
+# Lines beginning with a '#' are comments and are ignored
+# Each non-comment line defines a service to be checked.
+# Each non-comment line is of the format:
+#   service_base_directory|service_status_check command|service_stop_command|service_start_command
+
+# restful DEV services
+# e.g., PATH_TO/.restful/bin/ontology|../status-check dev|../stop dev|../start dev
+
+# restful BETA services
+# restful service fallback
+# restful service production

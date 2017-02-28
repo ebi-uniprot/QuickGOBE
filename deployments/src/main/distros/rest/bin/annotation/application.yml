@@ -51,7 +51,7 @@ annotation:
       keepAliveSeconds: 7200
       allowCoreThreadTimeout: true
       waitForTasksToCompleteOnShutdown: false
-    ontologySource:
+    ontologySource: ONTOLOGY_IRI.dat.gz
   terms:
       query:
         compatible:

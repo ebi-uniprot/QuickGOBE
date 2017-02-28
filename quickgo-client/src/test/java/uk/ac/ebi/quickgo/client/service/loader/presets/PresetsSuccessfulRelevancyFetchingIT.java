@@ -175,7 +175,7 @@ public class PresetsSuccessfulRelevancyFetchingIT {
     }
 
     @Test
-    public void loadTaxonPresetsAfterSuccessfulRESTInfoFetching() throws Exception {
+    public void loadTaxonPresets() throws Exception {
         assertThat(presets.getTaxons(), hasSize(0));
 
         JobExecution jobExecution =
@@ -183,10 +183,9 @@ public class PresetsSuccessfulRelevancyFetchingIT {
         BatchStatus status = jobExecution.getStatus();
 
         assertThat(status, is(BatchStatus.COMPLETED));
-        assertThat(
-                extractPresetValues(presets.getTaxons(), p -> p.getProperty(NAME)),
-                IsIterableContainingInOrder
-                        .contains(MockPresetDataConfig.TAXON_HUMAN, MockPresetDataConfig.TAXON_BACTERIA));
+        final List<PresetItem> presetItems = extractPresets(presets.getTaxons());
+        assertThat(presetItems.get(0), is(equalTo(MockPresetDataConfig.PRESET_TAXON_ARABIDOPSIS)));
+        assertThat(presetItems.get(1), is(equalTo(MockPresetDataConfig.PRESET_TAXON_DROSOPHILA)));
     }
 
     @Test
