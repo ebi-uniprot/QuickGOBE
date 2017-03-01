@@ -34,6 +34,7 @@ public class AnnotationDocMocker {
     public static final String SYMBOL = "moeA5";
     public static final String OBJECT_TYPE = "protein";
     public static final int TAXON_ID = 12345;
+    public static final List<Integer> TAXON_ANCESTRY = asList(12345, 1234, 123, 12, 1);
 
     public static final List<String> TARGET_SET = asList("KRUK", "BHF-UCL", "Exosome");
     public static final String GP_SUBSET = "TrEMBL";
@@ -83,6 +84,7 @@ public class AnnotationDocMocker {
         doc.symbol = SYMBOL;
         doc.geneProductType = OBJECT_TYPE;
         doc.taxonId = TAXON_ID;
+        doc.taxonAncestry = TAXON_ANCESTRY;
         doc.targetSets = TARGET_SET;
         doc.geneProductSubset = GP_SUBSET;
         doc.goAspect = GO_ASPECT;

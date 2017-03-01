@@ -87,6 +87,7 @@
     <field name="reference" type="string" indexed="true" stored="true" multiValued="false" docValues="true"/>
     <field name="targetSet" type="string" indexed="true" stored="true" multiValued="true"/>
     <field name="taxonId" type="int" indexed="true" stored="true" multiValued="false" docValues="true"/>
+    <field name="taxonAncestry" type="int" indexed="true" stored="false" multiValued="true" docValues="false"/>
     <field name="withFrom" type="string" indexed="true" stored="true" multiValued="true"/>
 
     <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
@@ -130,6 +131,9 @@
 
     <field name="taxonId_unsorted" type="int" indexed="true" stored="false" multiValued="false"/>
     <copyField source="taxonId" dest="taxonId_unsorted"/>
+
+    <field name="taxonAncestry_unsorted" type="int" indexed="true" stored="false" multiValued="false"/>
+    <copyField source="taxonAncestry" dest="taxonAncestry_unsorted"/>
 
     <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
     <!-- Fields that are used specifically for search -->
