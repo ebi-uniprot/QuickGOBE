@@ -132,7 +132,7 @@
     <field name="taxonId_unsorted" type="int" indexed="true" stored="false" multiValued="false"/>
     <copyField source="taxonId" dest="taxonId_unsorted"/>
 
-    <field name="taxonAncestry_unsorted" type="int" indexed="true" stored="false" multiValued="false"/>
+    <field name="taxonAncestry_unsorted" type="int" indexed="true" stored="false" multiValued="true"/>
     <copyField source="taxonAncestry" dest="taxonAncestry_unsorted"/>
 
     <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
