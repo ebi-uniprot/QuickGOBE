@@ -65,6 +65,9 @@ public class AnnotationRequest {
     static final String EVIDENCE_CODE_USAGE_FIELD = "evidenceCodeUsage";
     static final String EVIDENCE_CODE_USAGE_RELATIONSHIPS = "evidenceCodeUsageRelationships";
 
+    static final String[] DEFAULT_GO_USAGE = new String[]{"descendants"};
+    static final String[] DEFAULT_GO_USAGE_RELATIONSHIPS = new String[]{"is_a", "part_of", "occurs_in"};
+
     /**
      * indicates which fields should be looked at when creating filters
      */
@@ -521,6 +524,7 @@ public class AnnotationRequest {
      */
     public List<FilterRequest> createFilterRequests() {
         List<FilterRequest> filterRequests = new ArrayList<>();
+        createDefaultUsageIfGoIdRequested();
 
         Stream.of(FILTER_REQUEST_FIELDS)
                 .map(this::createSimpleFilter)
@@ -532,6 +536,17 @@ public class AnnotationRequest {
         createEvidenceCodeUsageFilter().ifPresent(filterRequests::add);
 
         return filterRequests;
+    }
+
+    private void createDefaultUsageIfGoIdRequested() {
+        final String[] goIds = filterMap.get(Searchable.GO_ID);
+        if(goIds!=null && goIds.length > 0){
+            final String[] goUsageField = filterMap.get(GO_USAGE_FIELD);
+
+            if(goUsageField == null || goUsageField.length == 0){
+                filterMap.put(GO_USAGE_FIELD, DEFAULT_GO_USAGE);
+            }
+        }
     }
 
     private Optional<FilterRequest> createSimpleFilter(String key) {
@@ -559,14 +574,13 @@ public class AnnotationRequest {
     private Optional<FilterRequest> createUsageFilter(String usageParam, String idParam, String idField,
             String relationshipsParam) {
         Optional<FilterRequest> request;
-        FilterRequest.Builder filterBuilder = FilterRequest.newBuilder();
 
         if (filterMap.containsKey(usageParam)) {
             if (filterMap.containsKey(idField)) {
                 assert filterMap.get(usageParam).length == 1 : usageParam + ": can only have one value";
 
                 String usageValue = filterMap.get(usageParam)[0];
-
+                FilterRequest.Builder filterBuilder = FilterRequest.newBuilder();
                 filterBuilder
                         .addProperty(usageValue)
                         .addProperty(idParam, filterMap.get(idField));

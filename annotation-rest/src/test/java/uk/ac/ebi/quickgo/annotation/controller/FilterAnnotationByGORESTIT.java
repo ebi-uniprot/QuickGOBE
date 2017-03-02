@@ -4,6 +4,7 @@ import uk.ac.ebi.quickgo.annotation.IdGeneratorUtil;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.ResultActions;
 
 import static java.util.Arrays.asList;
@@ -35,13 +36,16 @@ public class FilterAnnotationByGORESTIT extends AbstractFilterAnnotationByOntolo
         usageRelations = GO_USAGE_RELATIONS_PARAM.getName();
     }
 
+    @Autowired
+    private RestTestSupport goRestTestSupport;
+
     // slimming tests (which is GO specific)
     @Test
     public void slimFilterWhenThereAreNoDescendantsMeansFilterEverything() throws Exception {
         annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(1), ontologyId(1)));
         annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(2), ontologyId(2)));
 
-        expectRestCallHasDescendants(singletonList(ontologyId(1)), emptyList(), singletonList((emptyList())));
+        goRestTestSupport.expectRestCallHasDescendants(singletonList(ontologyId(1)), emptyList(), singletonList((emptyList())));
 
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
@@ -61,7 +65,7 @@ public class FilterAnnotationByGORESTIT extends AbstractFilterAnnotationByOntolo
         annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(2), ontologyId(2)));
         annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(3), ontologyId(3)));
 
-        expectRestCallHasDescendants(singletonList(ontologyId(1)), emptyList(), singletonList(singletonList(ontologyId(3))));
+        goRestTestSupport.expectRestCallHasDescendants(singletonList(ontologyId(1)), emptyList(), singletonList(singletonList(ontologyId(3))));
 
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
@@ -84,7 +88,7 @@ public class FilterAnnotationByGORESTIT extends AbstractFilterAnnotationByOntolo
         annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(2), ontologyId(2)));
         annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(3), ontologyId(3)));
 
-        expectRestCallHasDescendants(
+        goRestTestSupport.expectRestCallHasDescendants(
                 singletonList(ontologyId(1)),
                 singletonList(IS_A),
                 singletonList(asList(ontologyId(2), ontologyId(3))));
@@ -114,7 +118,7 @@ public class FilterAnnotationByGORESTIT extends AbstractFilterAnnotationByOntolo
         annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(2), ontologyId(2)));
         annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(3), ontologyId(3)));
 
-        expectRestCallHasDescendants(asList(ontologyId(1), ontologyId(2)), singletonList(IS_A), asList(emptyList(), emptyList()));
+        goRestTestSupport.expectRestCallHasDescendants(asList(ontologyId(1), ontologyId(2)), singletonList(IS_A), asList(emptyList(), emptyList()));
 
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
@@ -135,7 +139,7 @@ public class FilterAnnotationByGORESTIT extends AbstractFilterAnnotationByOntolo
         annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(2), ontologyId(2)));
         annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(3), ontologyId(3)));
 
-        expectRestCallHasDescendants(
+        goRestTestSupport.expectRestCallHasDescendants(
                 asList(ontologyId(1), ontologyId(2)),
                 emptyList(),
                 asList(
@@ -164,7 +168,7 @@ public class FilterAnnotationByGORESTIT extends AbstractFilterAnnotationByOntolo
         annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(3), ontologyId(3)));
         annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(4), ontologyId(4)));
 
-        expectRestCallHasDescendants(
+        goRestTestSupport.expectRestCallHasDescendants(
                 asList(ontologyId(1), ontologyId(2)),
                 emptyList(),
                 asList(
@@ -191,7 +195,7 @@ public class FilterAnnotationByGORESTIT extends AbstractFilterAnnotationByOntolo
 
     @Test
     public void slimForTermWithNullDescendantsProducesErrorMessage() throws Exception {
-        expectRestCallHasDescendants(singletonList(ontologyId(1)), emptyList(), singletonList(null));
+        goRestTestSupport.expectRestCallHasDescendants(singletonList(ontologyId(1)), emptyList(), singletonList(null));
 
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
@@ -206,7 +210,7 @@ public class FilterAnnotationByGORESTIT extends AbstractFilterAnnotationByOntolo
 
     @Test
     public void slimForTermWithOneNullDescendantsListAndOneValidDescendantsProducesError() throws Exception {
-        expectRestCallHasDescendants(
+        goRestTestSupport.expectRestCallHasDescendants(
                 asList(ontologyId(1), ontologyId(2)),
                 emptyList(),
                 asList(
@@ -226,7 +230,7 @@ public class FilterAnnotationByGORESTIT extends AbstractFilterAnnotationByOntolo
 
     @Test
     public void slimForTermWithTwoNullDescendantsListAndOneValidDescendantsProducesErrorShowingBothIds() throws Exception {
-        expectRestCallHasDescendants(
+        goRestTestSupport.expectRestCallHasDescendants(
                 asList(ontologyId(1), ontologyId(2), ontologyId(3)),
                 emptyList(),
                 asList(
@@ -250,7 +254,7 @@ public class FilterAnnotationByGORESTIT extends AbstractFilterAnnotationByOntolo
     public void slimForTermWithOneDescendantIdThatIsNullAndOneNonNullSucceeds() throws Exception {
         annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(2), ontologyId(2)));
 
-        expectRestCallHasDescendants(
+        goRestTestSupport.expectRestCallHasDescendants(
                 singletonList(ontologyId(1)),
                 emptyList(),
                 singletonList(
@@ -274,6 +278,71 @@ public class FilterAnnotationByGORESTIT extends AbstractFilterAnnotationByOntolo
     }
 
     @Test
+    public void searchForTermWithOneDescendantId() throws Exception {
+        annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(1), ontologyId(1)));
+        annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(2), ontologyId(2)));
+
+        goRestTestSupport.expectRestCallHasDescendants(
+                singletonList(ontologyId(1)),
+                emptyList(),
+                singletonList(asList(ontologyId(1), ontologyId(2))));
+
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE)
+                        .param(idParam, ontologyId(1)));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(pageInfoExists())
+                .andExpect(totalNumOfResults(2))
+                .andExpect(fieldsInAllResultsExist(2));
+    }
+
+
+    @Test
+    public void successfullyLookupAnnotationsByGoIdCaseInsensitive() throws Exception {
+        annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(1), ontologyId(1)));
+        annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(2), ontologyId(2)));
+
+        goRestTestSupport.expectRestCallHasDescendants(
+                singletonList(ontologyId(1)),
+                emptyList(),    //todo should this be the full 3 list?
+                singletonList(asList(ontologyId(1), ontologyId(2).toLowerCase())));
+
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE)
+                        .param(idParam, ontologyId(1)));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(pageInfoExists())
+                .andExpect(totalNumOfResults(2))
+                .andExpect(fieldsInAllResultsExist(2));
+    }
+
+    @Test
+    public void failToFindAnnotationsWhenGoIdDoesNotExist() throws Exception {
+
+        annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(1), ontologyId(1)));
+        annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(2), ontologyId(2)));
+
+        goRestTestSupport.expectRestCallHasDescendants(singletonList(ontologyId(1)), emptyList(), singletonList((emptyList())));
+
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE)
+                        .param(idParam, ontologyId(1)));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(pageInfoExists())
+                .andExpect(totalNumOfResults(0));
+    }
+
+
+    @Test
     public void wrongResourcePathForSlimCausesErrorMessage() throws Exception {
         annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(1), ontologyId(1)));
         annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(2), ontologyId(2)));
@@ -294,7 +363,7 @@ public class FilterAnnotationByGORESTIT extends AbstractFilterAnnotationByOntolo
         annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(1), ontologyId(1)));
         annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(2), ontologyId(2)));
 
-        expectRestCallResponse(GET, buildResource(resourceFormat, ontologyId(1)), withTimeout());
+        goRestTestSupport.expectRestCallResponse(GET, goRestTestSupport.buildResource(resourceFormat, ontologyId(1)), withTimeout());
 
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
@@ -312,7 +381,7 @@ public class FilterAnnotationByGORESTIT extends AbstractFilterAnnotationByOntolo
         annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(1), ontologyId(1)));
         annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(2), ontologyId(2)));
 
-        expectRestCallResponse(GET, buildResource(resourceFormat, ontologyId(1)), withServerError());
+        goRestTestSupport.expectRestCallResponse(GET, goRestTestSupport.buildResource(resourceFormat, ontologyId(1)), withServerError());
 
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
@@ -330,7 +399,7 @@ public class FilterAnnotationByGORESTIT extends AbstractFilterAnnotationByOntolo
         annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(1), ontologyId(1)));
         annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(2), ontologyId(2)));
 
-        expectRestCallResponse(GET, buildResource(resourceFormat, ontologyId(1)), withBadRequest());
+        goRestTestSupport.expectRestCallResponse(GET, goRestTestSupport.buildResource(resourceFormat, ontologyId(1)), withBadRequest());
 
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
@@ -353,5 +422,9 @@ public class FilterAnnotationByGORESTIT extends AbstractFilterAnnotationByOntolo
 
     @Override protected String ontologyId(int id) {
         return IdGeneratorUtil.createGoId(id);
+    }
+
+    @Override RestTestSupport restTestSupport() {
+        return goRestTestSupport;
     }
 }

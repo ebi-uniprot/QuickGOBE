@@ -7,10 +7,7 @@ import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker;
 import uk.ac.ebi.quickgo.common.QuickGODocument;
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -28,6 +25,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -73,6 +72,9 @@ public class AnnotationControllerStatisticsIT {
 
     @Autowired
     private AnnotationRepository repository;
+
+    @Autowired
+    private RestTestSupport goRestTestSupport;
 
     @Before
     public void setup() {
@@ -174,6 +176,11 @@ public class AnnotationControllerStatisticsIT {
 
         List<String> relevantTaxonIds = asList(String.valueOf(extraDoc1.taxonId), String.valueOf(extraDoc2.taxonId));
 
+        goRestTestSupport.expectRestCallHasDescendants(
+                singletonList(filteringGoId),
+                emptyList(),
+                singletonList(singletonList(filteringGoId)));
+
         ResultActions response = mockMvc.perform(
                 get(STATS_ENDPOINT)
                         .param(GO_ID_PARAM.getName(), filteringGoId)
@@ -215,6 +222,11 @@ public class AnnotationControllerStatisticsIT {
         repository.save(extraDoc2);
 
         List<String> relevantReferenceIds = asList(extraDoc1.reference, extraDoc2.reference);
+
+        goRestTestSupport.expectRestCallHasDescendants(
+                singletonList(filteringGoId),
+                emptyList(),
+                singletonList(singletonList(filteringGoId)));
 
         ResultActions response = mockMvc.perform(
                 get(STATS_ENDPOINT)
@@ -259,6 +271,11 @@ public class AnnotationControllerStatisticsIT {
 
         List<String> relevantEvidenceCodes = asList(extraDoc1.evidenceCode, extraDoc2.evidenceCode);
 
+        goRestTestSupport.expectRestCallHasDescendants(
+                singletonList(filteringGoId),
+                emptyList(),
+                singletonList(singletonList(filteringGoId)));
+
         ResultActions response = mockMvc.perform(
                 get(STATS_ENDPOINT)
                         .param(GO_ID_PARAM.getName(), filteringGoId)
@@ -300,6 +317,11 @@ public class AnnotationControllerStatisticsIT {
         repository.save(extraDoc2);
 
         List<String> relevantAssignedBy = asList(extraDoc1.assignedBy, extraDoc2.assignedBy);
+
+        goRestTestSupport.expectRestCallHasDescendants(
+                singletonList(filteringGoId),
+                emptyList(),
+                singletonList(singletonList(filteringGoId)));
 
         ResultActions response = mockMvc.perform(
                 get(STATS_ENDPOINT)
@@ -373,6 +395,11 @@ public class AnnotationControllerStatisticsIT {
         repository.save(extraDoc2);
 
         List<String> relevantAspect = asList(extraDoc1.goAspect, extraDoc2.goAspect);
+
+        goRestTestSupport.expectRestCallHasDescendants(
+                singletonList(filteringGoId),
+                emptyList(),
+                singletonList(singletonList(filteringGoId)));
 
         ResultActions response = mockMvc.perform(
                 get(STATS_ENDPOINT)

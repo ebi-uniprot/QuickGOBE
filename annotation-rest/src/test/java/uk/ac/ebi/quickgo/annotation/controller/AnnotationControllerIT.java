@@ -586,45 +586,9 @@ public class AnnotationControllerIT {
     }
 
     //---------- Gene Ontology Id
-
-    @Test
-    public void successfullyLookupAnnotationsByGoId() throws Exception {
-
-        ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(GO_ID_PARAM.getName(), AnnotationDocMocker.GO_ID));
-
-        response.andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
-                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS))
-                .andExpect(itemExistsExpectedTimes(GO_ID_FIELD, AnnotationDocMocker.GO_ID, NUMBER_OF_GENERIC_DOCS));
-    }
-
-    @Test
-    public void successfullyLookupAnnotationsByGoIdCaseInsensitive() throws Exception {
-        ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(GO_ID_PARAM.getName(), AnnotationDocMocker.GO_ID.toLowerCase()));
-
-        response.andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
-                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS))
-                .andExpect(itemExistsExpectedTimes(GO_ID_FIELD, AnnotationDocMocker.GO_ID, NUMBER_OF_GENERIC_DOCS));
-    }
-
-    @Test
-    public void failToFindAnnotationsWhenGoIdDoesntExist() throws Exception {
-
-        ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(GO_ID_PARAM.getName(), MISSING_GO_ID));
-
-        response.andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(0));
-    }
+    //Successfully test a search using GO ids needs to be conducted together with a the test GO ids in a graph (or not)
+    //to reflect the defaults used for GO id searches i.e. the search will by default use goUsage=descendants and
+    //goUsageRelationships=part_of,is_a,occurs_in
 
     @Test
     public void incorrectFormattedGoIdCausesError() throws Exception {
