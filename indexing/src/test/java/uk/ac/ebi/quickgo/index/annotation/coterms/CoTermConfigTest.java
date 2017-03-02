@@ -16,25 +16,37 @@ public class CoTermConfigTest {
     @Test(expected = NullPointerException.class)
     public void manualAndAllOutputPathsWhenDifferentWillNotCauseAIllegalStateException(){
         CoTermsConfig coTermsConfig = new CoTermsConfig();
-        coTermsConfig.manualCoTermsPath = MANUAL_PATH;
-        coTermsConfig.allCoTermsPath = ALL_PATH;
-        coTermsConfig.coTermAllSummarizationStep();
-        coTermsConfig.coTermManualSummarizationStep();
+        CoTermsConfigProperties properties = new CoTermsConfigProperties.Builder()
+                .withManualCoTermsPath(MANUAL_PATH)
+                .withAllCoTermsPath(ALL_PATH)
+                .withCoTermLogInterval(1)
+                .withCotermsChunk(1)
+                .build();
+        coTermsConfig.coTermAllSummarizationStep(properties);
+        coTermsConfig.coTermManualSummarizationStep(properties);
     }
 
     @Test(expected = IllegalStateException.class)
     public void cannotHaveBothManualAndAllOutputPathsTheSameForCoTermsWhenCallingCoTermAllSummarizationStep(){
         CoTermsConfig coTermsConfig = new CoTermsConfig();
-        coTermsConfig.manualCoTermsPath = MANUAL_PATH;
-        coTermsConfig.allCoTermsPath = MANUAL_PATH;
-        coTermsConfig.coTermAllSummarizationStep();
+        CoTermsConfigProperties properties = new CoTermsConfigProperties.Builder()
+                .withManualCoTermsPath(MANUAL_PATH)
+                .withAllCoTermsPath(MANUAL_PATH)
+                .withCoTermLogInterval(1)
+                .withCotermsChunk(1)
+                .build();
+        coTermsConfig.coTermAllSummarizationStep(properties);
     }
 
     @Test(expected = IllegalStateException.class)
     public void cannotHaveBothManualAndAllOutputPathsTheSameForCoTermsCoTermManualSummarizationStep(){
         CoTermsConfig coTermsConfig = new CoTermsConfig();
-        coTermsConfig.manualCoTermsPath = MANUAL_PATH;
-        coTermsConfig.allCoTermsPath = MANUAL_PATH;
-        coTermsConfig.coTermManualSummarizationStep();
+        CoTermsConfigProperties properties = new CoTermsConfigProperties.Builder()
+                .withManualCoTermsPath(MANUAL_PATH)
+                .withAllCoTermsPath(MANUAL_PATH)
+                .withCoTermLogInterval(1)
+                .withCotermsChunk(1)
+                .build();
+        coTermsConfig.coTermAllSummarizationStep(properties);
     }
 }

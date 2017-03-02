@@ -7,7 +7,7 @@ import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker;
 import uk.ac.ebi.quickgo.annotation.download.http.GAFHttpMessageConverter;
 import uk.ac.ebi.quickgo.annotation.download.http.GPADHttpMessageConverter;
-import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
+import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 
 import java.util.ArrayList;
 import java.util.List;

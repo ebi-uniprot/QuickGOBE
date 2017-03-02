@@ -1,14 +1,12 @@
 package uk.ac.ebi.quickgo.index.annotation;
 
+import uk.ac.ebi.quickgo.common.store.BasicTemporaryFolder;
+import uk.ac.ebi.quickgo.index.annotation.coterms.CoTermsConfigProperties;
 import uk.ac.ebi.quickgo.index.common.JobTestRunnerConfig;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.BatchStatus;
@@ -16,8 +14,10 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationContextLoader;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -37,30 +37,15 @@ import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermsConfig.CO_TERM_M
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(
-        classes = {CoTermIndexingConfig.class, JobTestRunnerConfig.class},
+        classes = {CoTermIndexingBatchIT.TestConfig.class, CoTermIndexingConfig.class, JobTestRunnerConfig.class},
         loader = SpringApplicationContextLoader.class)
-//@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class CoTermIndexingBatchIT {
 
-    @Value("${indexing.coterms.manual:#{systemProperties['user.dir']}/QuickGO/CoTermsManual}")
-    String manualCoTermsPath;
-    @Value("${indexing.coterms.all:#{systemProperties['user.dir']}/QuickGO/CoTermsAll}")
-    String allCoTermsPath;
+    @ClassRule
+    public static BasicTemporaryFolder basicTemporaryFolder = new BasicTemporaryFolder();
 
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
-
-    @Before
-    public void setUp() throws IOException {
-        Files.deleteIfExists(Paths.get(manualCoTermsPath));
-        Files.deleteIfExists(Paths.get(allCoTermsPath));
-    }
-
-    @After
-    public void tearDown() throws IOException {
-        Files.deleteIfExists(Paths.get(manualCoTermsPath));
-        Files.deleteIfExists(Paths.get(allCoTermsPath));
-    }
 
     @Test
     public void successfulCoTermsOnlyJob() throws Exception {
@@ -68,10 +53,10 @@ public class CoTermIndexingBatchIT {
         assertThat(jobExecution.getJobInstance().getJobName(), is(COTERM_INDEXING_JOB_NAME));
 
         List<StepExecution> jobsSingleStepAsList = jobExecution.getStepExecutions()
-                                                               .stream()
-                                                               .filter(step -> step.getStepName()
-                                                                                   .equals(ANNOTATION_READING_STEP_NAME))
-                                                               .collect(Collectors.toList());
+                .stream()
+                .filter(step -> step.getStepName()
+                        .equals(ANNOTATION_READING_STEP_NAME))
+                .collect(Collectors.toList());
         assertThat(jobsSingleStepAsList, hasSize(1));
 
         StepExecution readingStep = jobsSingleStepAsList.get(0);
@@ -83,10 +68,10 @@ public class CoTermIndexingBatchIT {
 
         //Manual
         List<StepExecution> summarizeCoTermManualSteps = jobExecution.getStepExecutions()
-                                                                     .stream()
-                                                                     .filter(step -> step.getStepName()
-                                                                                         .equals(CO_TERM_MANUAL_SUMMARIZATION_STEP))
-                                                                     .collect(Collectors.toList());
+                .stream()
+                .filter(step -> step.getStepName()
+                        .equals(CO_TERM_MANUAL_SUMMARIZATION_STEP))
+                .collect(Collectors.toList());
         assertThat(summarizeCoTermManualSteps, hasSize(1));
         StepExecution coTermsManualStep = summarizeCoTermManualSteps.get(0);
         assertThat(coTermsManualStep.getReadCount(), is(4));
@@ -95,10 +80,10 @@ public class CoTermIndexingBatchIT {
         assertThat(coTermsManualStep.getWriteCount(), is(4));
 
         List<StepExecution> summarizeCoTermAllSteps = jobExecution.getStepExecutions()
-                                                                  .stream()
-                                                                  .filter(step -> step.getStepName()
-                                                                                      .equals(CO_TERM_ALL_SUMMARIZATION_STEP))
-                                                                  .collect(Collectors.toList());
+                .stream()
+                .filter(step -> step.getStepName()
+                        .equals(CO_TERM_ALL_SUMMARIZATION_STEP))
+                .collect(Collectors.toList());
         assertThat(summarizeCoTermAllSteps, hasSize(1));
         StepExecution coTermsAllStep = summarizeCoTermAllSteps.get(0);
         assertThat(coTermsAllStep.getReadCount(), is(5));
@@ -111,5 +96,22 @@ public class CoTermIndexingBatchIT {
         BatchStatus status = jobExecution.getStatus();
         assertThat(status, is(BatchStatus.COMPLETED));
 
+    }
+
+    /**
+     * Configure properties used by co-term generation, using test values.
+     */
+    @Configuration
+    public static class TestConfig {
+        @Primary
+        @Bean
+        public CoTermsConfigProperties primaryCoTermsConfigProperties() {
+            return new CoTermsConfigProperties.Builder()
+                    .withCotermsChunk(1)
+                    .withCoTermLogInterval(1000)
+                    .withManualCoTermsPath(basicTemporaryFolder.getRoot().getAbsolutePath() + "/CoTermsManual")
+                    .withAllCoTermsPath(basicTemporaryFolder.getRoot().getAbsolutePath() + "/CoTermsAll")
+                    .build();
+        }
     }
 }
