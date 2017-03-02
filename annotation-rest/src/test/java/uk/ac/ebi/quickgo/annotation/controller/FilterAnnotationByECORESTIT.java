@@ -3,6 +3,7 @@ package uk.ac.ebi.quickgo.annotation.controller;
 import uk.ac.ebi.quickgo.annotation.IdGeneratorUtil;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.EVIDENCE_CODE_PARAM;
 import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.EVIDENCE_CODE_USAGE_PARAM;
 import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.EVIDENCE_CODE_USAGE_RELATIONS_PARAM;
@@ -22,6 +23,9 @@ public class FilterAnnotationByECORESTIT extends AbstractFilterAnnotationByOntol
         usageRelations = EVIDENCE_CODE_USAGE_RELATIONS_PARAM.getName();
     }
 
+    @Autowired
+    private RestTestSupport ecoRestTestSupport;
+
     @Override protected AnnotationDocument createAnnotationDocWithId(String geneProductId, String ecoId) {
         AnnotationDocument doc = createAnnotationDoc(geneProductId);
         doc.evidenceCode = ecoId;
@@ -31,5 +35,9 @@ public class FilterAnnotationByECORESTIT extends AbstractFilterAnnotationByOntol
 
     @Override protected String ontologyId(int id) {
         return IdGeneratorUtil.createEvidenceCode(id);
+    }
+
+    @Override RestTestSupport restTestSupport() {
+        return ecoRestTestSupport;
     }
 }

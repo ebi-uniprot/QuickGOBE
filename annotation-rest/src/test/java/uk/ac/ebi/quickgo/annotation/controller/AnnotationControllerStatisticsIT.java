@@ -4,12 +4,9 @@ import uk.ac.ebi.quickgo.annotation.AnnotationREST;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker;
-import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.ConvertedOntologyFilter;
 import uk.ac.ebi.quickgo.common.QuickGODocument;
 import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -20,26 +17,16 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.client.RestOperations;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -87,14 +74,7 @@ public class AnnotationControllerStatisticsIT {
     private AnnotationRepository repository;
 
     @Autowired
-    private RestOperations restOperations;
-    private MockRestServiceServer mockRestServiceServer;
-    private ObjectMapper dtoMapper;
-
-    private static final String GO_DESCENDANTS_RESOURCE_FORMAT = "/ontology/go/terms/%s/descendants?relations=%s";
-    private String resourceFormat = GO_DESCENDANTS_RESOURCE_FORMAT;
-    private static final String BASE_URL = "http://localhost";
-    private static final String COMMA = ",";
+    private RestTestSupport goRestTestSupport;
 
     @Before
     public void setup() {
@@ -106,9 +86,6 @@ public class AnnotationControllerStatisticsIT {
 
         savedDocs = createGenericDocs(NUMBER_OF_GENERIC_DOCS);
         repository.save(savedDocs);
-
-        mockRestServiceServer = MockRestServiceServer.createServer((RestTemplate) restOperations);
-        dtoMapper = new ObjectMapper();
     }
 
     @Test
@@ -199,7 +176,7 @@ public class AnnotationControllerStatisticsIT {
 
         List<String> relevantTaxonIds = asList(String.valueOf(extraDoc1.taxonId), String.valueOf(extraDoc2.taxonId));
 
-        expectRestCallHasDescendants(
+        goRestTestSupport.expectRestCallHasDescendants(
                 singletonList(filteringGoId),
                 emptyList(),
                 singletonList(singletonList(filteringGoId)));
@@ -246,7 +223,7 @@ public class AnnotationControllerStatisticsIT {
 
         List<String> relevantReferenceIds = asList(extraDoc1.reference, extraDoc2.reference);
 
-        expectRestCallHasDescendants(
+        goRestTestSupport.expectRestCallHasDescendants(
                 singletonList(filteringGoId),
                 emptyList(),
                 singletonList(singletonList(filteringGoId)));
@@ -294,7 +271,7 @@ public class AnnotationControllerStatisticsIT {
 
         List<String> relevantEvidenceCodes = asList(extraDoc1.evidenceCode, extraDoc2.evidenceCode);
 
-        expectRestCallHasDescendants(
+        goRestTestSupport.expectRestCallHasDescendants(
                 singletonList(filteringGoId),
                 emptyList(),
                 singletonList(singletonList(filteringGoId)));
@@ -341,7 +318,7 @@ public class AnnotationControllerStatisticsIT {
 
         List<String> relevantAssignedBy = asList(extraDoc1.assignedBy, extraDoc2.assignedBy);
 
-        expectRestCallHasDescendants(
+        goRestTestSupport.expectRestCallHasDescendants(
                 singletonList(filteringGoId),
                 emptyList(),
                 singletonList(singletonList(filteringGoId)));
@@ -419,7 +396,7 @@ public class AnnotationControllerStatisticsIT {
 
         List<String> relevantAspect = asList(extraDoc1.goAspect, extraDoc2.goAspect);
 
-        expectRestCallHasDescendants(
+        goRestTestSupport.expectRestCallHasDescendants(
                 singletonList(filteringGoId),
                 emptyList(),
                 singletonList(singletonList(filteringGoId)));
@@ -450,68 +427,5 @@ public class AnnotationControllerStatisticsIT {
 
     private String createId(int idNum) {
         return String.format("A0A%03d", idNum);
-    }
-
-    private String buildResource(String format, String... arguments) {
-        int requiredArgsCount = format.length() - format.replace("%", "").length();
-        List<String> args = new ArrayList<>();
-        for (int i = 0; i < requiredArgsCount; i++) {
-            if (i < arguments.length) {
-                args.add(arguments[i]);
-            } else {
-                args.add("");
-            }
-        }
-        return String.format(format, args.toArray());
-    }
-
-    private void expectRestCallHasDescendants(
-            List<String> termIds,
-            List<String> usageRelations,
-            List<List<String>> descendants) {
-        String termIdsCSV = termIds.stream().collect(Collectors.joining(COMMA));
-        String relationsCSV = usageRelations.stream().collect(Collectors.joining(COMMA));
-
-        expectRestCallSuccess(
-                GET,
-                buildResource(
-                        resourceFormat,
-                        termIdsCSV,
-                        relationsCSV
-                ),
-                constructResponseObject(termIds, descendants)
-        );
-    }
-
-    private String constructResponseObject(List<String> termIds, List<List<String>> descendants) {
-        checkArgument(termIds != null, "termIds cannot be null");
-        checkArgument(descendants != null, "descendants cannot be null");
-        checkArgument(termIds.size() == descendants.size(), "Term ID list and the (list of lists) of their " +
-                "descendants should be the same size");
-
-        ConvertedOntologyFilter response = new ConvertedOntologyFilter();
-        List<ConvertedOntologyFilter.Result> results = new ArrayList<>();
-
-        Iterator<List<String>> descendantListsIterator = descendants.iterator();
-        termIds.forEach(t -> {
-            ConvertedOntologyFilter.Result result = new ConvertedOntologyFilter.Result();
-            result.setId(t);
-            result.setDescendants(descendantListsIterator.next());
-            results.add(result);
-        });
-
-        response.setResults(results);
-        try {
-            return dtoMapper.writeValueAsString(response);
-        } catch (JsonProcessingException e) {
-            throw new IllegalStateException("Problem constructing mocked REST response:", e);
-        }
-    }
-
-    private void expectRestCallSuccess(HttpMethod method, String url, String response) {
-        mockRestServiceServer.expect(
-                requestTo(BASE_URL + url))
-                             .andExpect(method(method))
-                             .andRespond(withSuccess(response, MediaType.APPLICATION_JSON));
     }
 }
