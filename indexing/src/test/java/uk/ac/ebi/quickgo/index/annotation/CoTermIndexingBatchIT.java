@@ -95,7 +95,6 @@ public class CoTermIndexingBatchIT {
         //Has finished
         BatchStatus status = jobExecution.getStatus();
         assertThat(status, is(BatchStatus.COMPLETED));
-
     }
 
     /**
@@ -106,12 +105,12 @@ public class CoTermIndexingBatchIT {
         @Primary
         @Bean
         public CoTermsConfigProperties primaryCoTermsConfigProperties() {
-            return new CoTermsConfigProperties.Builder()
-                    .withCotermsChunk(1)
-                    .withCoTermLogInterval(1000)
-                    .withManualCoTermsPath(basicTemporaryFolder.getRoot().getAbsolutePath() + "/CoTermsManual")
-                    .withAllCoTermsPath(basicTemporaryFolder.getRoot().getAbsolutePath() + "/CoTermsAll")
-                    .build();
+            CoTermsConfigProperties properties = new CoTermsConfigProperties();
+            properties.setChunkSize(1);
+            properties.setLoginterval(1000);
+            properties.setManual(basicTemporaryFolder.getRoot().getAbsolutePath() + "/CoTermsManual");
+            properties.setAll(basicTemporaryFolder.getRoot().getAbsolutePath() + "/CoTermsAll");
+            return properties;
         }
     }
 }

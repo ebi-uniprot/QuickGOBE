@@ -1,67 +1,53 @@
 package uk.ac.ebi.quickgo.index.annotation.coterms;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 /**
  * Encapsulates configurable properties used during the generation of co-occurring term data.
+ * This class' variables are populated using Spring's {@code @ConfigurationProperties} annotation in
+ * {@link CoTermsConfig}.
  *
  * Created 02/03/17
  * @author Edd
  */
 public class CoTermsConfigProperties {
-    private int cotermsChunk;
-    private int coTermLogInterval;
-    private String manualCoTermsPath;
-    private String allCoTermsPath;
+    private static final int DEFAULT_CHUNK_SIZE = 1;
+    private static final int DEFAULT_LOG_INTERVAL = 1000;
+    private static final String DEFAULT_MANUAL_PATH = System.getProperty("user.home") + "/QuickGO/CoTermsManual";
+    private static final String DEFAULT_ALL_PATH = System.getProperty("user.home") + "/QuickGO/CoTermsAll";
 
-    private CoTermsConfigProperties(Builder builder) {
-        this.cotermsChunk = checkValidValue(builder.cotermsChunk);
-        this.coTermLogInterval = checkValidValue(builder.coTermLogInterval);
-        this.manualCoTermsPath = checkValidValue(builder.manualCoTermsPath);
-        this.allCoTermsPath = checkValidValue(builder.allCoTermsPath);
+    private int chunkSize = DEFAULT_CHUNK_SIZE;
+    private int loginterval = DEFAULT_LOG_INTERVAL;
+    private String manual = DEFAULT_MANUAL_PATH;
+    private String all = DEFAULT_ALL_PATH;
+
+    public int getChunkSize() {
+        return chunkSize;
     }
 
-    private <T> T checkValidValue(T value) {
-        checkArgument(value != null, "Value cannot be null");
-        return value;
+    public void setChunkSize(int chunkSize) {
+        this.chunkSize = chunkSize;
     }
 
-    int getCoTermsChunk() {return cotermsChunk;}
+    public int getLoginterval() {
+        return loginterval;
+    }
 
-    int getCoTermLogInterval() {return coTermLogInterval;}
+    public void setLoginterval(int loginterval) {
+        this.loginterval = loginterval;
+    }
 
-    String getManualCoTermsPath() {return manualCoTermsPath;}
+    public String getManual() {
+        return manual;
+    }
 
-    String getAllCoTermsPath() {return allCoTermsPath;}
+    public void setManual(String manual) {
+        this.manual = manual;
+    }
 
-    public static class Builder {
-        private int cotermsChunk;
-        private int coTermLogInterval;
-        private String manualCoTermsPath;
-        private String allCoTermsPath;
+    public String getAll() {
+        return all;
+    }
 
-        public Builder withCotermsChunk(int cotermsChunk) {
-            this.cotermsChunk = cotermsChunk;
-            return this;
-        }
-
-        public Builder withCoTermLogInterval(int coTermLogInterval) {
-            this.coTermLogInterval = coTermLogInterval;
-            return this;
-        }
-
-        public Builder withManualCoTermsPath(String manualCoTermsPath) {
-            this.manualCoTermsPath = manualCoTermsPath;
-            return this;
-        }
-
-        public Builder withAllCoTermsPath(String allCoTermsPath) {
-            this.allCoTermsPath = allCoTermsPath;
-            return this;
-        }
-
-        public CoTermsConfigProperties build() {
-            return new CoTermsConfigProperties(this);
-        }
+    public void setAll(String all) {
+        this.all = all;
     }
 }

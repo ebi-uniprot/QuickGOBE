@@ -28,7 +28,8 @@ import org.springframework.batch.item.file.transform.DelimitedLineAggregator;
 import org.springframework.batch.item.file.transform.LineAggregator;
 import org.springframework.batch.item.file.transform.PassThroughLineAggregator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
@@ -47,6 +48,7 @@ import static com.google.common.base.Preconditions.checkArgument;
  * Created with IntelliJ IDEA.
  */
 @Configuration
+@EnableConfigurationProperties
 @EnableBatchProcessing
 public class CoTermsConfig {
 
@@ -63,17 +65,14 @@ public class CoTermsConfig {
             "together", "compared"};
     private static final String DELIMITER = "\t";
 
-    @Value("${indexing.coterms.chunk.size:1}")
-    private int cotermsChunk;
-    @Value("${indexing.coterm.loginterval:1000}")
-    private int coTermLogInterval;
-    @Value("${indexing.coterms.manual:#{systemProperties['user.dir']}/QuickGO/CoTermsManual}")
-    String manualCoTermsPath;
-    @Value("${indexing.coterms.all:#{systemProperties['user.dir']}/QuickGO/CoTermsAll}")
-    String allCoTermsPath;
-
     @Autowired
     private StepBuilderFactory stepBuilders;
+
+    @Bean
+    @ConfigurationProperties(prefix = "indexing.coterms")
+    public CoTermsConfigProperties coTermsConfigProperties() {
+        return new CoTermsConfigProperties();
+    }
 
     @Bean
     public static PropertySourcesPlaceholderConfigurer propertyConfigIn() {
@@ -81,35 +80,25 @@ public class CoTermsConfig {
     }
 
     @Bean
-    public CoTermsConfigProperties coTermsConfigProperties() {
-        return new CoTermsConfigProperties.Builder()
-                .withManualCoTermsPath(manualCoTermsPath)
-                .withAllCoTermsPath(allCoTermsPath)
-                .withCoTermLogInterval(coTermLogInterval)
-                .withCotermsChunk(cotermsChunk)
-                .build();
-    }
-
-    @Bean
     public Step coTermManualSummarizationStep(CoTermsConfigProperties coTermsConfigProperties) {
         Preconditions.checkState(
-                !coTermsConfigProperties.getAllCoTermsPath().equals(coTermsConfigProperties.getManualCoTermsPath()),
+                !coTermsConfigProperties.getAll().equals(coTermsConfigProperties.getManual()),
                 "The output path for " +
                         "manual and all " +
                         "coterms files should not be the same, but they were both %s",
-                coTermsConfigProperties.getManualCoTermsPath());
+                coTermsConfigProperties.getManual());
 
         LOGGER.info("Created coTermManualSummarizationStep. Will write CoTerms to " + coTermsConfigProperties
-                .getManualCoTermsPath());
+                .getManual());
 
         return stepBuilders.get(CO_TERM_MANUAL_SUMMARIZATION_STEP)
-                .<String, List<CoTerm>>chunk(coTermsConfigProperties.getCoTermsChunk())
+                .<String, List<CoTerm>>chunk(coTermsConfigProperties.getChunkSize())
                 .reader(coTermsManualReader(coTermsManualAggregationWriter()))
                 .processor(coTermsManualCalculator(coTermsManualAggregationWriter()))
                 .writer(coTermsManualStatsWriter(
-                        new FileSystemResource(coTermsConfigProperties.getManualCoTermsPath())))
+                        new FileSystemResource(coTermsConfigProperties.getManual())))
                 .listener(logStepListener())
-                .listener(logWriteRateListener(coTermsConfigProperties.getCoTermLogInterval()))
+                .listener(logWriteRateListener(coTermsConfigProperties.getLoginterval()))
                 .listener(skipLogListener())
                 .build();
     }
@@ -117,23 +106,23 @@ public class CoTermsConfig {
     @Bean
     public Step coTermAllSummarizationStep(CoTermsConfigProperties coTermsConfigProperties) {
         Preconditions.checkState(
-                !coTermsConfigProperties.getAllCoTermsPath().equals(coTermsConfigProperties.getManualCoTermsPath()),
+                !coTermsConfigProperties.getAll().equals(coTermsConfigProperties.getManual()),
                 "The output path for " +
                         "manual and all " +
                         "coterms files should not be the same, but they were both %s",
-                coTermsConfigProperties.getManualCoTermsPath());
+                coTermsConfigProperties.getManual());
 
         LOGGER.info(
                 "Created coTermAllSummarizationStep. Will write CoTerms to " +
-                        coTermsConfigProperties.getAllCoTermsPath());
+                        coTermsConfigProperties.getAll());
 
         return stepBuilders.get(CO_TERM_ALL_SUMMARIZATION_STEP)
-                .<String, List<CoTerm>>chunk(coTermsConfigProperties.getCoTermsChunk())
+                .<String, List<CoTerm>>chunk(coTermsConfigProperties.getChunkSize())
                 .reader(coTermsAllReader(coTermsAllAggregationWriter()))
                 .processor(coTermsAllCalculator(coTermsAllAggregationWriter()))
-                .writer(coTermsAllStatsWriter(new FileSystemResource(coTermsConfigProperties.getAllCoTermsPath())))
+                .writer(coTermsAllStatsWriter(new FileSystemResource(coTermsConfigProperties.getAll())))
                 .listener(logStepListener())
-                .listener(logWriteRateListener(coTermsConfigProperties.getCoTermLogInterval()))
+                .listener(logWriteRateListener(coTermsConfigProperties.getLoginterval()))
                 .listener(skipLogListener())
                 .build();
     }

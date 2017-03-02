@@ -16,12 +16,9 @@ public class CoTermConfigTest {
     @Test(expected = NullPointerException.class)
     public void manualAndAllOutputPathsWhenDifferentWillNotCauseAIllegalStateException(){
         CoTermsConfig coTermsConfig = new CoTermsConfig();
-        CoTermsConfigProperties properties = new CoTermsConfigProperties.Builder()
-                .withManualCoTermsPath(MANUAL_PATH)
-                .withAllCoTermsPath(ALL_PATH)
-                .withCoTermLogInterval(1)
-                .withCotermsChunk(1)
-                .build();
+        CoTermsConfigProperties properties = new CoTermsConfigProperties();
+        properties.setAll(ALL_PATH);
+        properties.setManual(MANUAL_PATH);
         coTermsConfig.coTermAllSummarizationStep(properties);
         coTermsConfig.coTermManualSummarizationStep(properties);
     }
@@ -29,24 +26,18 @@ public class CoTermConfigTest {
     @Test(expected = IllegalStateException.class)
     public void cannotHaveBothManualAndAllOutputPathsTheSameForCoTermsWhenCallingCoTermAllSummarizationStep(){
         CoTermsConfig coTermsConfig = new CoTermsConfig();
-        CoTermsConfigProperties properties = new CoTermsConfigProperties.Builder()
-                .withManualCoTermsPath(MANUAL_PATH)
-                .withAllCoTermsPath(MANUAL_PATH)
-                .withCoTermLogInterval(1)
-                .withCotermsChunk(1)
-                .build();
+        CoTermsConfigProperties properties = new CoTermsConfigProperties();
+        properties.setAll(MANUAL_PATH);
+        properties.setManual(MANUAL_PATH);
         coTermsConfig.coTermAllSummarizationStep(properties);
     }
 
     @Test(expected = IllegalStateException.class)
     public void cannotHaveBothManualAndAllOutputPathsTheSameForCoTermsCoTermManualSummarizationStep(){
         CoTermsConfig coTermsConfig = new CoTermsConfig();
-        CoTermsConfigProperties properties = new CoTermsConfigProperties.Builder()
-                .withManualCoTermsPath(MANUAL_PATH)
-                .withAllCoTermsPath(MANUAL_PATH)
-                .withCoTermLogInterval(1)
-                .withCotermsChunk(1)
-                .build();
+        CoTermsConfigProperties properties = new CoTermsConfigProperties();
+        properties.setAll(ALL_PATH);
+        properties.setManual(ALL_PATH);
         coTermsConfig.coTermAllSummarizationStep(properties);
     }
 }
