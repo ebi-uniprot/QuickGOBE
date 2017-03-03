@@ -37,10 +37,8 @@ public class CoTermsProcessingAndCalculationIT {
     private CoTermsAggregationWriter coTermsManualAggregationWriter;
     @Autowired
     private ItemProcessor<String, List<CoTerm>> coTermsManualCalculator;
-
     @Autowired
     private ItemProcessor<String, List<CoTerm>> coTermsAllCalculator;
-
     @Autowired
     private CoTermsAggregationWriter coTermsAllAggregationWriter;
 
