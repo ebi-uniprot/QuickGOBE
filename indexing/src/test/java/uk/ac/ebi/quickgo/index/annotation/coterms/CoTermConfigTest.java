@@ -16,25 +16,28 @@ public class CoTermConfigTest {
     @Test(expected = NullPointerException.class)
     public void manualAndAllOutputPathsWhenDifferentWillNotCauseAIllegalStateException(){
         CoTermsConfig coTermsConfig = new CoTermsConfig();
-        coTermsConfig.manualCoTermsPath = MANUAL_PATH;
-        coTermsConfig.allCoTermsPath = ALL_PATH;
-        coTermsConfig.coTermAllSummarizationStep();
-        coTermsConfig.coTermManualSummarizationStep();
+        CoTermsConfigProperties properties = new CoTermsConfigProperties();
+        properties.setAll(ALL_PATH);
+        properties.setManual(MANUAL_PATH);
+        coTermsConfig.coTermAllSummarizationStep(properties);
+        coTermsConfig.coTermManualSummarizationStep(properties);
     }
 
     @Test(expected = IllegalStateException.class)
     public void cannotHaveBothManualAndAllOutputPathsTheSameForCoTermsWhenCallingCoTermAllSummarizationStep(){
         CoTermsConfig coTermsConfig = new CoTermsConfig();
-        coTermsConfig.manualCoTermsPath = MANUAL_PATH;
-        coTermsConfig.allCoTermsPath = MANUAL_PATH;
-        coTermsConfig.coTermAllSummarizationStep();
+        CoTermsConfigProperties properties = new CoTermsConfigProperties();
+        properties.setAll(MANUAL_PATH);
+        properties.setManual(MANUAL_PATH);
+        coTermsConfig.coTermAllSummarizationStep(properties);
     }
 
     @Test(expected = IllegalStateException.class)
     public void cannotHaveBothManualAndAllOutputPathsTheSameForCoTermsCoTermManualSummarizationStep(){
         CoTermsConfig coTermsConfig = new CoTermsConfig();
-        coTermsConfig.manualCoTermsPath = MANUAL_PATH;
-        coTermsConfig.allCoTermsPath = MANUAL_PATH;
-        coTermsConfig.coTermManualSummarizationStep();
+        CoTermsConfigProperties properties = new CoTermsConfigProperties();
+        properties.setAll(ALL_PATH);
+        properties.setManual(ALL_PATH);
+        coTermsConfig.coTermAllSummarizationStep(properties);
     }
 }

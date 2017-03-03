@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.common;
 
-import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
+import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 
 import org.junit.Before;
 import org.junit.ClassRule;

@@ -2,16 +2,15 @@ package uk.ac.ebi.quickgo.index.annotation;
 
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
-import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
+import uk.ac.ebi.quickgo.common.store.BasicTemporaryFolder;
+import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
+import uk.ac.ebi.quickgo.index.annotation.coterms.CoTermsConfigProperties;
 import uk.ac.ebi.quickgo.index.common.JobTestRunnerConfig;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -21,8 +20,10 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationContextLoader;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -45,17 +46,16 @@ import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermsConfig.CO_TERM_M
 @ActiveProfiles(profiles = {"embeddedServer"})
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(
-        classes = {AnnotationIndexingConfig.class, JobTestRunnerConfig.class},
+        classes = {AnnotationIndexingBatchIT.TestConfig.class,
+                AnnotationIndexingConfig.class, JobTestRunnerConfig.class},
         loader = SpringApplicationContextLoader.class)
 public class AnnotationIndexingBatchIT {
 
-    @Value("${indexing.coterms.manual:#{systemProperties['user.dir']}/QuickGO/CoTermsManual}")
-    String manualCoTermsPath;
-    @Value("${indexing.coterms.all:#{systemProperties['user.dir']}/QuickGO/CoTermsAll}")
-    String allCoTermsPath;
-
     @ClassRule
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
+
+    @ClassRule
+    public static BasicTemporaryFolder basicTemporaryFolder = new BasicTemporaryFolder();
 
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
@@ -66,14 +66,6 @@ public class AnnotationIndexingBatchIT {
     @Before
     public void setUp() throws IOException {
         annotationRepository.deleteAll();
-        Files.deleteIfExists(Paths.get(manualCoTermsPath));
-        Files.deleteIfExists(Paths.get(allCoTermsPath));
-    }
-
-    @After
-    public void tearDown() throws IOException {
-        Files.deleteIfExists(Paths.get(manualCoTermsPath));
-        Files.deleteIfExists(Paths.get(allCoTermsPath));
     }
 
     @Test
@@ -133,11 +125,27 @@ public class AnnotationIndexingBatchIT {
         //Has finished
         BatchStatus status = jobExecution.getStatus();
         assertThat(status, is(BatchStatus.COMPLETED));
-
     }
 
     private List<String> getGeneProductIdsFromAnnotationDocuments(Iterable<AnnotationDocument> repoDocsWritten) {
         return StreamSupport.stream(repoDocsWritten.spliterator(), false).map(i -> i.geneProductId).collect(Collectors
                 .toList());
+    }
+
+    /**
+     * Configure properties used by co-term generation, using test values.
+     */
+    @Configuration
+    public static class TestConfig {
+        @Primary
+        @Bean
+        public CoTermsConfigProperties primaryCoTermsConfigProperties() {
+            CoTermsConfigProperties properties = new CoTermsConfigProperties();
+            properties.setChunkSize(1);
+            properties.setLoginterval(100);
+            properties.setManual(basicTemporaryFolder.getRoot().getAbsolutePath() + "/CoTermsManual");
+            properties.setAll(basicTemporaryFolder.getRoot().getAbsolutePath() + "/CoTermsAll");
+            return properties;
+        }
     }
 }

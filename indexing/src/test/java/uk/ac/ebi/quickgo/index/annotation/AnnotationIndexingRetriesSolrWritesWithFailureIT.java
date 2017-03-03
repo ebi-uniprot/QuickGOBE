@@ -2,12 +2,11 @@ package uk.ac.ebi.quickgo.index.annotation;
 
 import org.junit.Before;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
-import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
+import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 import uk.ac.ebi.quickgo.index.common.JobTestRunnerConfig;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;

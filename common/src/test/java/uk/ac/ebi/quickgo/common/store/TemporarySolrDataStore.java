@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.common.solr;
+package uk.ac.ebi.quickgo.common.store;
 
 import java.io.File;
 import java.io.IOException;
