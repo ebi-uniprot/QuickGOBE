@@ -1,5 +1,7 @@
 package uk.ac.ebi.quickgo.index.annotation.coterms;
 
+import com.google.common.base.Preconditions;
+
 /**
  * Encapsulates configurable properties used during the generation of co-occurring term data.
  * This class' variables are populated using Spring's {@code @ConfigurationProperties} annotation in
@@ -36,6 +38,12 @@ public class CoTermsConfigProperties {
     }
 
     public String getManual() {
+        Preconditions.checkState(
+                !all.equals(manual),
+                "The output path for manual and all coterms files should not be the same, " +
+                        "but they were both %s",
+                manual);
+
         return manual;
     }
 
@@ -44,6 +52,12 @@ public class CoTermsConfigProperties {
     }
 
     public String getAll() {
+        Preconditions.checkState(
+                !all.equals(manual),
+                "The output path for manual and all coterms files should not be the same, " +
+                        "but they were both %s",
+                manual);
+
         return all;
     }
 

@@ -7,7 +7,6 @@ import uk.ac.ebi.quickgo.index.common.listener.LogStepListener;
 import uk.ac.ebi.quickgo.index.common.listener.SkipLoggerListener;
 import uk.ac.ebi.quickgo.index.common.writer.ListItemWriter;
 
-import com.google.common.base.Preconditions;
 import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
@@ -81,14 +80,7 @@ public class CoTermsConfig {
 
     @Bean
     public Step coTermManualSummarizationStep(CoTermsConfigProperties coTermsConfigProperties) {
-        Preconditions.checkState(
-                !coTermsConfigProperties.getAll().equals(coTermsConfigProperties.getManual()),
-                "The output path for " +
-                        "manual and all " +
-                        "coterms files should not be the same, but they were both %s",
-                coTermsConfigProperties.getManual());
-
-        LOGGER.info("Created coTermManualSummarizationStep. Will write CoTerms to " + coTermsConfigProperties
+       LOGGER.info("Created coTermManualSummarizationStep. Will write CoTerms to " + coTermsConfigProperties
                 .getManual());
 
         return stepBuilders.get(CO_TERM_MANUAL_SUMMARIZATION_STEP)
@@ -105,13 +97,6 @@ public class CoTermsConfig {
 
     @Bean
     public Step coTermAllSummarizationStep(CoTermsConfigProperties coTermsConfigProperties) {
-        Preconditions.checkState(
-                !coTermsConfigProperties.getAll().equals(coTermsConfigProperties.getManual()),
-                "The output path for " +
-                        "manual and all " +
-                        "coterms files should not be the same, but they were both %s",
-                coTermsConfigProperties.getManual());
-
         LOGGER.info(
                 "Created coTermAllSummarizationStep. Will write CoTerms to " +
                         coTermsConfigProperties.getAll());
