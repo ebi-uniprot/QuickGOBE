@@ -1,5 +1,7 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
+import com.google.common.base.Preconditions;
+import io.swagger.annotations.ApiModelProperty;
 import uk.ac.ebi.quickgo.annotation.validation.service.ReferenceValidator;
 import uk.ac.ebi.quickgo.annotation.validation.service.WithFromValidator;
 import uk.ac.ebi.quickgo.common.validator.GeneProductIDList;
@@ -8,14 +10,12 @@ import uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern;
 import uk.ac.ebi.quickgo.rest.search.AggregateFunction;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 
-import com.google.common.base.Preconditions;
-import io.swagger.annotations.ApiModelProperty;
-import java.util.*;
-import java.util.stream.Stream;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
+import java.util.*;
+import java.util.stream.Stream;
 
 import static uk.ac.ebi.quickgo.annotation.common.AnnotationFields.Facetable;
 import static uk.ac.ebi.quickgo.annotation.common.AnnotationFields.Searchable;
@@ -24,14 +24,14 @@ import static uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern.Flag.CASE_I
 
 /**
  * A data structure for the annotation filtering parameters passed in from the client.
- *
+ * <p>
  * Once the comma separated values have been set, then turn then into an object (SimpleFilter) that
  * encapsulates the list and solr field name to use for that argument.
  *
  * @author Tony Wardell
- * Date: 25/04/2016
- * Time: 11:23
- * Created with IntelliJ IDEA.
+ *         Date: 25/04/2016
+ *         Time: 11:23
+ *         Created with IntelliJ IDEA.
  */
 public class AnnotationRequest {
     static final int MAX_GO_IDS = 600;
@@ -42,6 +42,7 @@ public class AnnotationRequest {
     static final int MIN_DOWNLOAD_NUMBER = 1;
     static final int MAX_DOWNLOAD_NUMBER = 50000;
     static final int DEFAULT_DOWNLOAD_LIMIT = 10000;
+    static final String DEFAULT_TAXON_USAGE = "exact";
 
     //Names of the parameters in readable format
     static final String ASSIGNED_BY_PARAM = "Assigned By";
@@ -56,6 +57,9 @@ public class AnnotationRequest {
     static final String GENE_PRODUCT_PARAM = "Gene Product ID";
     static final String REFERENCE_PARAM = "Reference";
     static final String QUALIFIER_PARAM = "Qualifer";
+
+    static final String TAXON_USAGE_ID = "taxonId";
+    static final String TAXON_USAGE_FIELD = "taxonUsage";
 
     static final String GO_USAGE_ID = "goId";
     static final String GO_USAGE_FIELD = "goUsage";
@@ -77,16 +81,18 @@ public class AnnotationRequest {
             Searchable.GO_EVIDENCE,
             Searchable.QUALIFIER,
             Searchable.REFERENCE,
-            Searchable.TAXON_ID,
             Searchable.TARGET_SET,
             Searchable.WITH_FROM,
             Searchable.EXTENSION
     };
 
+    private static final String EXACT_USAGE = "exact";
+    private static final String DESCENDANTS_USAGE = "descendants";
+
     /**
      * At the moment the definition of the list is hardcoded because we only have need to display annotation and
      * gene product statistics on a subset of types.
-     *
+     * <p>
      * Note: We can in the future change this from a hard coded implementation, to something that is decided by the
      * client.
      */
@@ -169,6 +175,12 @@ public class AnnotationRequest {
     private String taxonId;
 
     @ApiModelProperty(
+            value = "Indicates how the taxonomic identifier within the annotations should be used.",
+            allowableValues = "descendants,exact",
+            example = "exact")
+    private String taxonUsage;
+
+    @ApiModelProperty(
             value = "Indicates how the GO terms within the annotations should be used. Is used in conjunction with " +
                     "'goUsageRelationships'.",
             allowableValues = "descendants,slim",
@@ -241,8 +253,8 @@ public class AnnotationRequest {
     private final Map<String, String[]> filterMap = new HashMap<>();
 
     /**
-     *  E.g. ASPGD,Agbase,..
-     *  In the format assignedBy=ASPGD,Agbase
+     * E.g. ASPGD,Agbase,..
+     * In the format assignedBy=ASPGD,Agbase
      */
     public void setAssignedBy(String... assignedBy) {
         if (assignedBy != null) {
@@ -302,6 +314,7 @@ public class AnnotationRequest {
      * The older evidence codes
      * E.g. IEA, IBA, IBD etc. See <a href="http://geneontology.org/page/guide-go-evidence-codes">Guide QuickGO
      * evidence codes</a>
+     *
      * @param evidence the evidence code
      */
     public void setGoIdEvidence(String... evidence) {
@@ -329,6 +342,7 @@ public class AnnotationRequest {
      * A list of with/from values, separated by commas
      * In the format withFrom=PomBase:SPBP23A10.14c,RGD:621207 etc
      * Users can supply just the id (e.g. PomBase) or id SPBP23A10.14c
+     *
      * @param withFrom comma separated with/from values
      */
     public void setWithFrom(String... withFrom) {
@@ -337,6 +351,7 @@ public class AnnotationRequest {
 
     /**
      * Return a list of with/from values, separated by commas
+     *
      * @return String containing comma separated list of with/From values.
      */
     @WithFromValidator
@@ -345,15 +360,25 @@ public class AnnotationRequest {
     }
 
     public void setTaxonId(String... taxId) {
-        filterMap.put(Searchable.TAXON_ID, taxId);
+        filterMap.put(TAXON_USAGE_ID, taxId);
     }
 
     @ArrayPattern(regexp = "^[0-9]+$", paramName = TAXON_ID_PARAM)
     @Size(max = MAX_TAXON_IDS,
             message = "Number of items in '" + TAXON_ID_PARAM + "' is larger than: {max}")
-
     public String[] getTaxonId() {
-        return filterMap.get(Searchable.TAXON_ID);
+        return filterMap.get(TAXON_USAGE_ID);
+    }
+
+    public void setTaxonUsage(String usage) {
+        if (usage != null) {
+            filterMap.put(TAXON_USAGE_FIELD, new String[]{usage.toLowerCase()});
+        }
+    }
+
+    @Pattern(regexp = "^exact|descendants$", message = "Invalid taxonUsage: ${validatedValue}")
+    public String getTaxonUsage() {
+        return filterMap.get(TAXON_USAGE_FIELD) == null ? DEFAULT_TAXON_USAGE : filterMap.get(TAXON_USAGE_FIELD)[0];
     }
 
     /**
@@ -508,6 +533,7 @@ public class AnnotationRequest {
 
     /**
      * Return a list of annotation extension values, separated by commas
+     *
      * @return String array containing comma separated list of extension values.
      */
     public String[] getExtension() {
@@ -530,6 +556,7 @@ public class AnnotationRequest {
 
         createGoUsageFilter().ifPresent(filterRequests::add);
         createEvidenceCodeUsageFilter().ifPresent(filterRequests::add);
+        createTaxonFilter().ifPresent(filterRequests::add);
 
         return filterRequests;
     }
@@ -547,6 +574,38 @@ public class AnnotationRequest {
         return request;
     }
 
+    private Optional<FilterRequest> createTaxonFilter() {
+        if (filterMap.containsKey(TAXON_USAGE_FIELD)) {
+            if (filterMap.containsKey(TAXON_USAGE_ID)) {
+                String field;
+                switch (getTaxonUsage()) {
+                    case EXACT_USAGE:
+                        field = Searchable.TAXON_ID;
+                        break;
+                    case DESCENDANTS_USAGE:
+                        field = Searchable.TAXON_ANCESTRY;
+                        break;
+                    default:
+                        field = Searchable.TAXON_ID;
+                        break;
+                }
+                return Optional.of(FilterRequest.newBuilder()
+                        .addProperty(field, filterMap.get(TAXON_USAGE_ID))
+                        .build());
+            } else {
+                throwUsageWithoutIdException(TAXON_ID_PARAM, TAXON_USAGE_FIELD);
+                // unreachable, but Java compiler doesn't know this
+                return Optional.empty();
+            }
+        }
+
+        return Optional.empty();
+    }
+
+    private void throwUsageWithoutIdException(String idParam, String usageParam) {
+        throw new ParameterException("Annotation " + usageParam + " requires '" + idParam + "' to be set.");
+    }
+
     private Optional<FilterRequest> createGoUsageFilter() {
         return createUsageFilter(GO_USAGE_FIELD, GO_USAGE_ID, Searchable.GO_ID, GO_USAGE_RELATIONSHIPS);
     }
@@ -557,7 +616,7 @@ public class AnnotationRequest {
     }
 
     private Optional<FilterRequest> createUsageFilter(String usageParam, String idParam, String idField,
-            String relationshipsParam) {
+                                                      String relationshipsParam) {
         Optional<FilterRequest> request;
         FilterRequest.Builder filterBuilder = FilterRequest.newBuilder();
 
@@ -572,9 +631,11 @@ public class AnnotationRequest {
                         .addProperty(idParam, filterMap.get(idField));
 
                 filterBuilder.addProperty(relationshipsParam, filterMap.get(relationshipsParam));
+                // unreachable, but Java compiler doesn't know this
                 request = Optional.of(filterBuilder.build());
             } else {
-                throw new ParameterException("Annotation " + usageParam + " requires '" + idParam + "' to be set.");
+                throwUsageWithoutIdException(idParam, usageParam);
+                request = Optional.empty();
             }
         } else {
             request = createSimpleFilter(idField);

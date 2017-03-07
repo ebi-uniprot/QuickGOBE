@@ -1,5 +1,18 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
+import org.apache.commons.lang.StringUtils;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 import uk.ac.ebi.quickgo.annotation.AnnotationREST;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
@@ -15,19 +28,6 @@ import java.util.StringJoiner;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import org.apache.commons.lang.StringUtils;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
 import static java.util.Arrays.asList;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -38,9 +38,7 @@ import static uk.ac.ebi.quickgo.annotation.IdGeneratorUtil.createGPId;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.*;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.*;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.ResponseItem.responseItem;
-import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.DEFAULT_ENTRIES_PER_PAGE;
-import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.MAX_PAGE_NUMBER;
-import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.MAX_PAGE_RESULTS;
+import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.*;
 
 /**
  * RESTful end point for Annotations
@@ -236,6 +234,7 @@ public class AnnotationControllerIT {
     }
 
     // TAXON ID
+    // todo: add exact param for each existing taxon test
     @Test
     public void lookupAnnotationFilterByTaxonIdSuccessfully() throws Exception {
         String geneProductId = "P99999";
@@ -302,6 +301,9 @@ public class AnnotationControllerIT {
                 .andExpect(fieldDoesNotExist(TAXON_ID_FIELD))
                 .andExpect(valuesOccurInField(GENEPRODUCT_ID_FIELD, geneProductId));
     }
+
+    // todo: test taxon ancestry 200 (x1 -- include itself and descs, x2+, x0 => zero results), 400 (invalid id)
+    // todo: test taxon invalid usage => 400
 
     @Test
     public void invalidTaxIdThrowsError() throws Exception {
