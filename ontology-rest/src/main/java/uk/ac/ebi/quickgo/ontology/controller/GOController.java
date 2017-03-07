@@ -51,23 +51,14 @@ public class GOController extends OBOController<GOTerm> {
         this.metaDataProvider = metaDataProvider;
     }
 
-
     /**
-     * Get core information about a list of terms in comma-separated-value (CSV) format
+     * Get meta data information about the Ontology service
      *
-     * @param ids ontology identifiers in CSV format
-     * @return
-     * <ul>
-     *     <li>all ids are valid: response consists of a 200 with the chosen information about the ontology terms</li>
-     *     <li>any id is not found: response returns 200 with an empty result set.</li>
-     *     <li>any id is of the an invalid format: response returns 400</li>
-     * </ul>
+     * @return response with metadata information.
      */
-    @ApiOperation(value = "Get core information about a (CSV) list of terms based on their ids",
-            notes = "If possible, response fields include: id, isObsolete, name, definition, ancestors, synonyms, " +
-                    "aspect and usage.")
-    @RequestMapping(value = "/about", method = RequestMethod.GET,
-            produces = {MediaType.APPLICATION_JSON_VALUE})
+    @ApiOperation(value = "Get meta data information about the Ontology service",
+            notes = "Ontology version number and creation date.")
+    @RequestMapping(value = "/about", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<MetaData> provideMetaData() {
         return getAboutResponse(this.metaDataProvider.lookupMetaData());
     }
@@ -78,12 +69,10 @@ public class GOController extends OBOController<GOTerm> {
      * @param metaData result
      * @return a {@link ResponseEntity} containing a {@link MetaData}
      */
-    <ResponseType> ResponseEntity<MetaData> getAboutResponse(MetaData metaData) {
-
+    ResponseEntity<MetaData> getAboutResponse(MetaData metaData) {
         if (metaData == null) {
           return new ResponseEntity<>(metaData, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
         return new ResponseEntity<>(metaData, HttpStatus.OK);
     }
 }
