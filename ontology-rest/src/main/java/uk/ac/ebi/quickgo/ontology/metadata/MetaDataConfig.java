@@ -10,6 +10,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 
 /**
+ * Configure the provision of metadata for the Ontology service.
+ *
  * @author Tony Wardell
  * Date: 07/03/2017
  * Time: 10:55
