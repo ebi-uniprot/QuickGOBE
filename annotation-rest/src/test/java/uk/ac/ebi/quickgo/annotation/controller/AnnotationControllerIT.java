@@ -8,13 +8,12 @@ import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.StringJoiner;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -69,6 +68,7 @@ public class AnnotationControllerIT {
     //Configuration
     private static final int NUMBER_OF_GENERIC_DOCS = 3;
     public static final String EXACT = "exact";
+    public static final String DESCENDANTS = "descendants";
     private MockMvc mockMvc;
     private List<AnnotationDocument> genericDocs;
     @Autowired
@@ -308,20 +308,102 @@ public class AnnotationControllerIT {
                 .andExpect(valuesOccurInField(GENEPRODUCT_ID_FIELD, geneProductId));
     }
 
-    // todo: test taxon ancestry 200 (x1 -- include itself and descs, x2+, x0 => zero results), 400 (invalid id)
-    // todo: test taxon invalid usage => 400
-
     @Test
     public void invalidTaxIdThrowsError() throws Exception {
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(TAXON_ID_PARAM.getName(), "-2"));
+                get(RESOURCE_URL + "/search")
+                        .param(TAXON_ID_PARAM.getName(), "-2")
+                        .param(TAXON_USAGE_PARAM.getName(), EXACT));
+
+        response.andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    // -- taxon descendant filtering
+    @Test
+    public void filterByTaxonAncestorSuccessfully() throws Exception {
+        int taxonId = 3;
+        int parentTaxonId = 4;
+        int grandParentTaxonId = 5;
+
+        List<AnnotationDocument> documents =
+                createDocsWithTaxonAncestors(asList(taxonId, parentTaxonId, grandParentTaxonId));
+        repository.save(documents);
+
+        List<String> gpIdList = transformDocs(documents, d -> d.geneProductId);
+        String[] expectedGPIds = gpIdList.toArray(new String[gpIdList.size()]);
+
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search")
+                        .param(TAXON_ID_PARAM.getName(), Integer.toString(grandParentTaxonId))
+                        .param(TAXON_USAGE_PARAM.getName(), DESCENDANTS));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(3))
+                .andExpect(fieldsInAllResultsExist(3))
+                .andExpect(valuesOccursInField(TAXON_ID_FIELD, taxonId, parentTaxonId, grandParentTaxonId))
+                .andExpect(valuesOccurInField(GENEPRODUCT_ID_FIELD, expectedGPIds));
+    }
+
+    @Test
+    public void filterByTaxonAncestorsSuccessfully() throws Exception {
+        int taxonId1 = 3;
+        int parentTaxonId1 = 4;
+        int grandParentTaxonId1 = 5;
+
+        int taxonId2 = 8;
+        int parentTaxonId2 = 9;
+        int grandParentTaxonId2 = 10;
+
+        List<AnnotationDocument> documents =
+                createDocsWithTaxonAncestors(asList(taxonId1, parentTaxonId1, grandParentTaxonId1));
+        documents.addAll(createDocsWithTaxonAncestors(asList(taxonId2, parentTaxonId2, grandParentTaxonId2)));
+        repository.save(documents);
+
+        Integer[] expectedTaxonIds = {taxonId1,
+                parentTaxonId1,
+                grandParentTaxonId1,
+                taxonId2,
+                parentTaxonId2};
+        List<String> gpIdList =
+                transformDocs(documents.stream()
+                                .filter(doc -> Stream
+                                        .of(expectedTaxonIds)
+                                        .anyMatch(e -> e == doc.taxonId))
+                                .collect(Collectors.toList()),
+                        doc -> doc.geneProductId);
+        String[] expectedGPIds = gpIdList.toArray(new String[gpIdList.size()]);
+
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search")
+                        .param(TAXON_ID_PARAM.getName(),
+                                Integer.toString(grandParentTaxonId1),
+                                Integer.toString(parentTaxonId2))
+                        .param(TAXON_USAGE_PARAM.getName(), DESCENDANTS));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(5))
+                .andExpect(fieldsInAllResultsExist(5))
+                .andExpect(valuesOccursInField(TAXON_ID_FIELD, expectedTaxonIds))
+                .andExpect(valuesOccurInField(GENEPRODUCT_ID_FIELD, expectedGPIds));
+    }
+
+    @Test
+    public void invalidTaxIdWithDescendantsThrowsError() throws Exception {
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search")
+                        .param(TAXON_ID_PARAM.getName(), "-2")
+                        .param(TAXON_USAGE_PARAM.getName(), DESCENDANTS));
 
         response.andDo(print())
                 .andExpect(status().isBadRequest());
     }
 
     //---------- GoEvidence related tests.
-
     @Test
     public void filterAnnotationsByGoEvidenceCodeSuccessfully() throws Exception {
         String goEvidenceCode = "IEA";
@@ -1548,6 +1630,10 @@ public class AnnotationControllerIT {
     }
 
     // ------------------------------- Helpers -------------------------------
+    private <T> List<T> transformDocs(List<AnnotationDocument> docs, Function<AnnotationDocument, T> transformation) {
+        return docs.stream().map(transformation).collect(Collectors.toList());
+    }
+
     private AnnotationDocument createDocWithAssignedBy(String geneProductId, String assignedBy) {
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc(geneProductId);
         doc.assignedBy = assignedBy;
@@ -1562,12 +1648,32 @@ public class AnnotationControllerIT {
         return doc;
     }
 
+    private List<AnnotationDocument> createDocsWithTaxonAncestors(List<Integer> lineage) {
+        List<AnnotationDocument> documents = new ArrayList<>();
+
+        for (int i = 0; i < lineage.size(); i++) {
+            documents.add(createDocWithTaxonAncestors(createGPId(i), lineage.subList(i, lineage.size())));
+        }
+
+        return documents;
+    }
+
+    private AnnotationDocument createDocWithTaxonAncestors(
+            String geneProductId,
+            List<Integer> lineage) {
+
+        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc(geneProductId);
+        doc.taxonId = lineage.get(0);
+        doc.taxonAncestry = lineage;
+
+        return doc;
+    }
+
     private String getRequiredDateString(int year, int month, int date) {
         return String.format(DATE_STRING_FORMAT, year, month, date);
     }
 
     //----- Setup data ---------------------//
-
     private List<AnnotationDocument> createGenericDocs(int n) {
         return IntStream.range(0, n)
                 .mapToObj(i -> AnnotationDocMocker.createAnnotationDoc(createGPId(i))).collect

@@ -87,7 +87,7 @@
     <field name="reference" type="string" indexed="true" stored="true" multiValued="false" docValues="true"/>
     <field name="targetSet" type="string" indexed="true" stored="true" multiValued="true"/>
     <field name="taxonId" type="int" indexed="true" stored="true" multiValued="false" docValues="true"/>
-    <field name="taxonAncestry" type="int" indexed="true" stored="false" multiValued="true" docValues="false"/>
+    <field name="taxonAncestry" type="int" indexed="true" stored="false" multiValued="true" docValues="true"/>
     <field name="withFrom" type="string" indexed="true" stored="true" multiValued="true"/>
 
     <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
