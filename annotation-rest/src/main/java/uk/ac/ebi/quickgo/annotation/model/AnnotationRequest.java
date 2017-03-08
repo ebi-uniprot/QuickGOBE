@@ -1,7 +1,5 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
-import com.google.common.base.Preconditions;
-import io.swagger.annotations.ApiModelProperty;
 import uk.ac.ebi.quickgo.annotation.validation.service.ReferenceValidator;
 import uk.ac.ebi.quickgo.annotation.validation.service.WithFromValidator;
 import uk.ac.ebi.quickgo.common.validator.GeneProductIDList;
@@ -10,12 +8,14 @@ import uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern;
 import uk.ac.ebi.quickgo.rest.search.AggregateFunction;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 
+import com.google.common.base.Preconditions;
+import io.swagger.annotations.ApiModelProperty;
+import java.util.*;
+import java.util.stream.Stream;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
-import java.util.*;
-import java.util.stream.Stream;
 
 import static uk.ac.ebi.quickgo.annotation.common.AnnotationFields.Facetable;
 import static uk.ac.ebi.quickgo.annotation.common.AnnotationFields.Searchable;
@@ -575,31 +575,33 @@ public class AnnotationRequest {
     }
 
     private Optional<FilterRequest> createTaxonFilter() {
+        Optional<String> field;
         if (filterMap.containsKey(TAXON_USAGE_FIELD)) {
             if (filterMap.containsKey(TAXON_USAGE_ID)) {
-                String field;
                 switch (getTaxonUsage()) {
-                    case EXACT_USAGE:
-                        field = Searchable.TAXON_ID;
-                        break;
                     case DESCENDANTS_USAGE:
-                        field = Searchable.TAXON_ANCESTRY;
+                        field = Optional.of(Searchable.TAXON_ANCESTRY);
                         break;
+                    case EXACT_USAGE:
                     default:
-                        field = Searchable.TAXON_ID;
+                        field = Optional.of(Searchable.TAXON_ID);
                         break;
                 }
-                return Optional.of(FilterRequest.newBuilder()
-                        .addProperty(field, filterMap.get(TAXON_USAGE_ID))
-                        .build());
             } else {
                 throwUsageWithoutIdException(TAXON_ID_PARAM, TAXON_USAGE_FIELD);
                 // unreachable, but Java compiler doesn't know this
                 return Optional.empty();
             }
+        } else if (filterMap.containsKey(TAXON_USAGE_ID)) {
+            field = Optional.of(Searchable.TAXON_ID);
+        } else {
+            field = Optional.empty();
         }
 
-        return Optional.empty();
+        return field.map(f -> FilterRequest
+                .newBuilder()
+                .addProperty(f, filterMap.get(TAXON_USAGE_ID))
+                .build());
     }
 
     private void throwUsageWithoutIdException(String idParam, String usageParam) {
