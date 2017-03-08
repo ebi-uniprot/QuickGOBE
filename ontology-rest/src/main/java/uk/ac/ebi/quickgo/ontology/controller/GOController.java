@@ -13,6 +13,7 @@ import uk.ac.ebi.quickgo.ontology.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.rest.metadata.MetaData;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
 
+import com.google.common.base.Preconditions;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -48,6 +49,7 @@ public class GOController extends OBOController<GOTerm> {
             MetaDataProvider metaDataProvider) {
         super(goOntologyService, ontologySearchService, searchableField, ontologyRetrievalConfig, graphImageService,
               goValidationHelper, ontologyPagingConfig, OntologyType.GO);
+        Preconditions.checkArgument(metaDataProvider != null, "Metadata provider cannot be null.");
         this.metaDataProvider = metaDataProvider;
     }
 
@@ -60,19 +62,6 @@ public class GOController extends OBOController<GOTerm> {
             notes = "Ontology version number and creation date.")
     @RequestMapping(value = "/about", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<MetaData> provideMetaData() {
-        return getAboutResponse(this.metaDataProvider.lookupMetaData());
-    }
-
-    /**
-     * Creates a {@link ResponseEntity} containing a {@link MetaData} for an about request.
-     *
-     * @param metaData result
-     * @return a {@link ResponseEntity} containing a {@link MetaData}
-     */
-    ResponseEntity<MetaData> getAboutResponse(MetaData metaData) {
-        if (metaData == null) {
-          return new ResponseEntity<>(metaData, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        return new ResponseEntity<>(metaData, HttpStatus.OK);
+        return new ResponseEntity<>(this.metaDataProvider.lookupMetaData(), HttpStatus.OK);
     }
 }
