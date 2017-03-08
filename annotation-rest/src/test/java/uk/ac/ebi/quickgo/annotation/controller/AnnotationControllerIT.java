@@ -1,18 +1,5 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
-import org.apache.commons.lang.StringUtils;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 import uk.ac.ebi.quickgo.annotation.AnnotationREST;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
@@ -28,6 +15,19 @@ import java.util.StringJoiner;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import org.apache.commons.lang.StringUtils;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import static java.util.Arrays.asList;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -38,7 +38,9 @@ import static uk.ac.ebi.quickgo.annotation.IdGeneratorUtil.createGPId;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.*;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.*;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.ResponseItem.responseItem;
-import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.*;
+import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.DEFAULT_ENTRIES_PER_PAGE;
+import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.MAX_PAGE_NUMBER;
+import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.MAX_PAGE_RESULTS;
 
 /**
  * RESTful end point for Annotations
@@ -66,6 +68,7 @@ public class AnnotationControllerIT {
     private static final String WITH_FROM_PATH = "withFrom.*.connectedXrefs";
     //Configuration
     private static final int NUMBER_OF_GENERIC_DOCS = 3;
+    public static final String EXACT = "exact";
     private MockMvc mockMvc;
     private List<AnnotationDocument> genericDocs;
     @Autowired
@@ -234,7 +237,6 @@ public class AnnotationControllerIT {
     }
 
     // TAXON ID
-    // todo: add exact param for each existing taxon test
     @Test
     public void lookupAnnotationFilterByTaxonIdSuccessfully() throws Exception {
         String geneProductId = "P99999";
@@ -244,7 +246,9 @@ public class AnnotationControllerIT {
         repository.save(document);
 
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(TAXON_ID_PARAM.getName(), Integer.toString(taxonId)));
+                get(RESOURCE_URL + "/search")
+                        .param(TAXON_ID_PARAM.getName(), Integer.toString(taxonId))
+                        .param(TAXON_USAGE_PARAM.getName(), EXACT));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -272,7 +276,8 @@ public class AnnotationControllerIT {
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search")
                         .param(TAXON_ID_PARAM.getName(), Integer.toString(taxonId1))
-                        .param(TAXON_ID_PARAM.getName(), Integer.toString(taxonId2)));
+                        .param(TAXON_ID_PARAM.getName(), Integer.toString(taxonId2))
+                        .param(TAXON_USAGE_PARAM.getName(), EXACT));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -292,7 +297,8 @@ public class AnnotationControllerIT {
         repository.save(document);
 
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(GENE_PRODUCT_ID_PARAM.getName(), geneProductId));
+                get(RESOURCE_URL + "/search")
+                        .param(GENE_PRODUCT_ID_PARAM.getName(), geneProductId));
 
         response.andDo(print())
                 .andExpect(status().isOk())

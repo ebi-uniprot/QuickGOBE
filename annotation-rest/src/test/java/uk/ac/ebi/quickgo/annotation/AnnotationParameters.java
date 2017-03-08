@@ -14,6 +14,7 @@ public enum AnnotationParameters {
     PAGE_PARAM("page"),
     LIMIT_PARAM("limit"),
     TAXON_ID_PARAM("taxonId"),
+    TAXON_USAGE_PARAM("taxonUsage"),
     GO_ID_PARAM("goId"),
     GO_USAGE_RELATIONS_PARAM("goUsageRelationships"),
     GO_USAGE_PARAM("goUsage"),
