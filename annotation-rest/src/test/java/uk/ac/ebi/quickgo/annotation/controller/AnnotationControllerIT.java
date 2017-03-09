@@ -1670,6 +1670,11 @@ public class AnnotationControllerIT {
                 .andExpect(valuesOccurInField(DATE_FIELD, expectedResponseDate));
     }
 
+    // ------------------------------- Helpers -------------------------------
+    private <T> List<T> transformDocs(List<AnnotationDocument> docs, Function<AnnotationDocument, T> transformation) {
+        return docs.stream().map(transformation).collect(Collectors.toList());
+    }
+
     private <T> List<AnnotationDocument> filterDocuments(
             List<AnnotationDocument> documents,
             T[] expectedValues,
@@ -1683,11 +1688,6 @@ public class AnnotationControllerIT {
 
     private String[] asArray(List<String> list) {
         return list.toArray(new String[list.size()]);
-    }
-
-    // ------------------------------- Helpers -------------------------------
-    private <T> List<T> transformDocs(List<AnnotationDocument> docs, Function<AnnotationDocument, T> transformation) {
-        return docs.stream().map(transformation).collect(Collectors.toList());
     }
 
     private AnnotationDocument createDocWithAssignedBy(String geneProductId, String assignedBy) {
