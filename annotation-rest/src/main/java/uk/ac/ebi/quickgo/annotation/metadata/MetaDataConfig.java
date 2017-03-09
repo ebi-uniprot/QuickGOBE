@@ -10,6 +10,8 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,19 +29,34 @@ import static java.util.stream.Collectors.toList;
  */
 @Configuration
 public class MetaDataConfig {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MetaDataConfig.class);
     private static final String SERVICE = "Annotation";
     private static final Path DEFAULT_METADATA_PATH = Paths.get("goa_uniprot.gpa-version");
-    private static final Function<Stream<String>, List<MetaData>> META_DATA_MAPPER = (Stream<String> str) -> str
-        .map(s -> new MetaData(null, s.substring(s.indexOf("2"))))
-        .collect(toList());
+    private static final Function<Path, List<MetaData>> PATH_TO_METADATA_MAPPER = (Path p) -> {
+        try {
+            Stream<String> stream =  Files.lines(p);
+            return stream.map(s -> new MetaData(null, s.substring(s.indexOf("2"))))
+            .collect(toList());
+        } catch (IOException e) {
+            throw new java.io.UncheckedIOException(e);
+        }
+    };
+
     private static final int NUMBER_OF_METADATA_LINES = 1;
 
     @Value("${annotation.metadata.source}")
     private Resource source;
 
     @Bean
-    MetaDataProvider metaDataProvider() throws IOException {
-        Path metaDataPath = source != null ? Paths.get(source.getURI()) : DEFAULT_METADATA_PATH;
-        return new MetaDataProvider(SERVICE, META_DATA_MAPPER, Files.lines(metaDataPath), NUMBER_OF_METADATA_LINES);
+    MetaDataProvider metaDataProvider()  {
+        Path metaDataPath = DEFAULT_METADATA_PATH;
+       if (source != null ) {
+           try {
+               metaDataPath = Paths.get(source.getURI());
+           } catch (IOException e) {
+               LOGGER.error("Failed to get the URI of the metadata source " + source,e);
+           }
+       }
+        return new MetaDataProvider(SERVICE, PATH_TO_METADATA_MAPPER, metaDataPath, NUMBER_OF_METADATA_LINES);
     }
 }
