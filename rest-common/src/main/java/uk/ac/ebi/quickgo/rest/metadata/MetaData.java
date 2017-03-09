@@ -11,10 +11,10 @@ package uk.ac.ebi.quickgo.rest.metadata;
 public class MetaData {
 
     public String version;
-    public String date;
+    public String timestamp;
 
-    public MetaData(String version, String date) {
+    public MetaData(String version, String timestamp) {
         this.version = version;
-        this.date = date;
+        this.timestamp = timestamp;
     }
 }
