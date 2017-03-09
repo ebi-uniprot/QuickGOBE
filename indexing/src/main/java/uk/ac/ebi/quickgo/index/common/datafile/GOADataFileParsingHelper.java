@@ -1,9 +1,10 @@
 package uk.ac.ebi.quickgo.index.common.datafile;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static java.util.Collections.emptyList;
 
 /**
  * This class provides stateless methods to help process the contents of gene ontology annotation data files.
@@ -65,5 +66,20 @@ public class GOADataFileParsingHelper {
                 .filter(v -> !v.isEmpty())
                 .map(v -> v.split(delimiter))
                 .orElse(new String[0]);
+    }
+
+    /**
+     * Splits a {@link String} value on occurrences of a {@link String} delimiter, into a list of {@link Integer}s.
+     * @param value the value to split
+     * @param delimiter the delimiter on which splitting takes place
+     * @return a list of {@link Integer} values
+     */
+    public static List<Integer> splitValueToIntegerList(String value, String delimiter) {
+        assert delimiter != null : "Delimiter cannot be null";
+
+        return Optional.ofNullable(value)
+                .filter(v -> !v.isEmpty())
+                .map(v -> Stream.of(v.split(delimiter)).map(Integer::new).collect(Collectors.toList()))
+                .orElse(emptyList());
     }
 }

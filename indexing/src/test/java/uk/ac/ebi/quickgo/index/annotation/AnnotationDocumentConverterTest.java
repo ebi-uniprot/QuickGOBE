@@ -287,6 +287,58 @@ public class AnnotationDocumentConverterTest {
         assertThat(doc.goAspect, is(value));
     }
 
+    // annotation properties: taxon ancestry
+    @Test
+    public void convertsNullAnnotationPropertiesToDefaultTaxonAncestryList() throws Exception {
+        annotation.annotationProperties = null;
+
+        AnnotationDocument doc = converter.process(annotation);
+
+        assertThat(doc.taxonAncestry, contains(DEFAULT_TAXON));
+    }
+
+    @Test
+    public void convertsNullTaxonAncestryAnnotationPropertiesToDefaultTaxonAncestryList() throws Exception {
+        String value = null;
+        annotation.annotationProperties = buildKeyValuesPair(TAXON_ANCESTRY, value);
+
+        AnnotationDocument doc = converter.process(annotation);
+
+        assertThat(doc.taxonAncestry, contains(DEFAULT_TAXON));
+    }
+
+    @Test
+    public void convertsInvalidTaxonAncestryAnnotationPropertiesToDefaultTaxonAncestryList() throws Exception {
+        String value = "1234d";
+        annotation.annotationProperties = buildKeyValuesPair(TAXON_ANCESTRY, value);
+
+        AnnotationDocument doc = converter.process(annotation);
+
+        assertThat(doc.taxonAncestry, contains(DEFAULT_TAXON));
+    }
+
+    @Test
+    public void convertsSingleTaxonAncestryAnnotationProperties() throws Exception {
+        String value = "1234";
+        annotation.annotationProperties = buildKeyValuesPair(TAXON_ANCESTRY, value);
+
+        AnnotationDocument doc = converter.process(annotation);
+
+        assertThat(doc.taxonAncestry, contains(Integer.valueOf(value)));
+    }
+
+    @Test
+    public void convertsMultipleTaxonAncestryAnnotationProperties() throws Exception {
+        String taxon1 = "1234";
+        String taxon2 = "55";
+        String value = taxon1 + "," + taxon2;
+        annotation.annotationProperties = buildKeyValuesPair(TAXON_ANCESTRY, value);
+
+        AnnotationDocument doc = converter.process(annotation);
+
+        assertThat(doc.taxonAncestry, contains(Integer.valueOf(taxon1), Integer.valueOf(taxon2)));
+    }
+
     // date
     @Test
     public void convertsValidDateSuccessfully() throws Exception {
