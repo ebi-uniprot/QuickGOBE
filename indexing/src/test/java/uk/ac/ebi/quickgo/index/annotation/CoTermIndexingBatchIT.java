@@ -1,17 +1,11 @@
 package uk.ac.ebi.quickgo.index.annotation;
 
-import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
-import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
 import uk.ac.ebi.quickgo.common.store.BasicTemporaryFolder;
-import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 import uk.ac.ebi.quickgo.index.annotation.coterms.CoTermsConfigProperties;
 import uk.ac.ebi.quickgo.index.common.JobTestRunnerConfig;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,35 +18,28 @@ import org.springframework.boot.test.SpringApplicationContextLoader;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.util.MatcherAssertionErrors.assertThat;
-import static uk.ac.ebi.quickgo.index.annotation.AnnotationConfig.ANNOTATION_INDEXING_JOB_NAME;
-import static uk.ac.ebi.quickgo.index.annotation.AnnotationConfig.ANNOTATION_INDEXING_STEP_NAME;
+import static uk.ac.ebi.quickgo.index.annotation.CoTermIndexingConfig.ANNOTATION_READING_STEP_NAME;
+import static uk.ac.ebi.quickgo.index.annotation.CoTermIndexingConfig.COTERM_INDEXING_JOB_NAME;
 import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermsConfig.CO_TERM_ALL_SUMMARIZATION_STEP;
 import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermsConfig.CO_TERM_MANUAL_SUMMARIZATION_STEP;
 
 /**
- * Tests whether Spring Batch is correctly wired up to run the annotation indexing.
+ * Tests whether Spring Batch is correctly wired up to run the indexing for CoTerms only.
  *
  * Created 22/04/16
  * @author Edd
  */
-@ActiveProfiles(profiles = {"embeddedServer"})
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(
-        classes = {AnnotationIndexingBatchIT.TestConfig.class,
-                AnnotationIndexingConfig.class, JobTestRunnerConfig.class},
+        classes = {CoTermIndexingBatchIT.TestConfig.class, CoTermIndexingConfig.class, JobTestRunnerConfig.class},
         loader = SpringApplicationContextLoader.class)
-public class AnnotationIndexingBatchIT {
-
-    @ClassRule
-    public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
+public class CoTermIndexingBatchIT {
 
     @ClassRule
     public static BasicTemporaryFolder basicTemporaryFolder = new BasicTemporaryFolder();
@@ -60,48 +47,30 @@ public class AnnotationIndexingBatchIT {
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
 
-    @Autowired
-    private AnnotationRepository annotationRepository;
-
-    @Before
-    public void setUp() throws IOException {
-        annotationRepository.deleteAll();
-    }
-
     @Test
-    public void successfulIndexingJob() throws Exception {
+    public void successfulCoTermsOnlyJob() throws Exception {
         JobExecution jobExecution = jobLauncherTestUtils.launchJob();
-        assertThat(jobExecution.getJobInstance().getJobName(), is(ANNOTATION_INDEXING_JOB_NAME));
+        assertThat(jobExecution.getJobInstance().getJobName(), is(COTERM_INDEXING_JOB_NAME));
 
         List<StepExecution> jobsSingleStepAsList = jobExecution.getStepExecutions()
                 .stream()
-                .filter(step -> step.getStepName().equals(ANNOTATION_INDEXING_STEP_NAME))
+                .filter(step -> step.getStepName()
+                        .equals(ANNOTATION_READING_STEP_NAME))
                 .collect(Collectors.toList());
         assertThat(jobsSingleStepAsList, hasSize(1));
 
-        StepExecution indexingStep = jobsSingleStepAsList.get(0);
+        StepExecution readingStep = jobsSingleStepAsList.get(0);
 
-        assertThat(indexingStep.getReadCount(), is(8));
-        assertThat(indexingStep.getReadSkipCount(), is(0));
-        assertThat(indexingStep.getProcessSkipCount(), is(2));
-        assertThat(indexingStep.getWriteCount(), is(6));
-
-        List<String> writtenAnnotationDocGeneProductIds =
-                getGeneProductIdsFromAnnotationDocuments(annotationRepository.findAll());
-
-        assertThat(writtenAnnotationDocGeneProductIds, containsInAnyOrder(
-                "IntAct:EBI-10043081",
-                "IntAct:EBI-10043081",
-                "IntAct:EBI-10043081",
-                "IntAct:EBI-10205244",
-                "IntAct:EBI-8801830",
-                "IntAct:EBI-10043089"
-        ));
+        assertThat(readingStep.getReadCount(), is(8));
+        assertThat(readingStep.getReadSkipCount(), is(0));
+        assertThat(readingStep.getProcessSkipCount(), is(2));
+        assertThat(readingStep.getWriteCount(), is(6));
 
         //Manual
         List<StepExecution> summarizeCoTermManualSteps = jobExecution.getStepExecutions()
                 .stream()
-                .filter(step -> step.getStepName().equals(CO_TERM_MANUAL_SUMMARIZATION_STEP))
+                .filter(step -> step.getStepName()
+                        .equals(CO_TERM_MANUAL_SUMMARIZATION_STEP))
                 .collect(Collectors.toList());
         assertThat(summarizeCoTermManualSteps, hasSize(1));
         StepExecution coTermsManualStep = summarizeCoTermManualSteps.get(0);
@@ -112,7 +81,8 @@ public class AnnotationIndexingBatchIT {
 
         List<StepExecution> summarizeCoTermAllSteps = jobExecution.getStepExecutions()
                 .stream()
-                .filter(step -> step.getStepName().equals(CO_TERM_ALL_SUMMARIZATION_STEP))
+                .filter(step -> step.getStepName()
+                        .equals(CO_TERM_ALL_SUMMARIZATION_STEP))
                 .collect(Collectors.toList());
         assertThat(summarizeCoTermAllSteps, hasSize(1));
         StepExecution coTermsAllStep = summarizeCoTermAllSteps.get(0);
@@ -127,11 +97,6 @@ public class AnnotationIndexingBatchIT {
         assertThat(status, is(BatchStatus.COMPLETED));
     }
 
-    private List<String> getGeneProductIdsFromAnnotationDocuments(Iterable<AnnotationDocument> repoDocsWritten) {
-        return StreamSupport.stream(repoDocsWritten.spliterator(), false).map(i -> i.geneProductId).collect(Collectors
-                .toList());
-    }
-
     /**
      * Configure properties used by co-term generation, using test values.
      */
@@ -142,7 +107,7 @@ public class AnnotationIndexingBatchIT {
         public CoTermsConfigProperties primaryCoTermsConfigProperties() {
             CoTermsConfigProperties properties = new CoTermsConfigProperties();
             properties.setChunkSize(1);
-            properties.setLoginterval(100);
+            properties.setLoginterval(1000);
             properties.setManual(basicTemporaryFolder.getRoot().getAbsolutePath() + "/CoTermsManual");
             properties.setAll(basicTemporaryFolder.getRoot().getAbsolutePath() + "/CoTermsAll");
             return properties;
