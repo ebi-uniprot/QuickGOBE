@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.ontology.controller;
 
-import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
+import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 import uk.ac.ebi.quickgo.graphics.model.GraphImageLayout;
 import uk.ac.ebi.quickgo.graphics.ontology.GraphImage;
 import uk.ac.ebi.quickgo.graphics.ontology.GraphImageResult;

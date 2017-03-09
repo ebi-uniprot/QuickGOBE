@@ -1,10 +1,12 @@
 package uk.ac.ebi.quickgo.annotation.download;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.Resource;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.servlet.config.annotation.AsyncSupportConfigurer;
@@ -21,11 +23,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 @ConfigurationProperties(prefix = "annotation.download")
 public class DownloadConfig {
     private static final int DEFAULT_DOWNLOAD_EMITTER_TIMEOUT_MILLIS = 5 * 60 * 1000;
-    private static final String DEFAULT_ONTOLOGY_SOURCE = "ONTOLOGY_IRI.dat.gz";
+    private static final Path DEFAULT_ONTOLOGY_PATH = Paths.get("ONTOLOGY_IRI.dat.gz");
 
     private TaskExecutorProperties taskExecutor = new TaskExecutorProperties();
     private int defaultEmitterTimeout = DEFAULT_DOWNLOAD_EMITTER_TIMEOUT_MILLIS;
-    private String ontologySource = DEFAULT_ONTOLOGY_SOURCE;
+    private Resource ontologySource;
 
     @Bean
     public WebMvcConfigurerAdapter asyncWebMvcConfigurerAdapter() {
@@ -56,22 +58,23 @@ public class DownloadConfig {
 
     @Bean
     public AnnotationDownloadFileHeader downloadFileHeader() throws IOException {
-        return new AnnotationDownloadFileHeader(Paths.get(ontologySource));
-    }
-
-    public void setTaskExecutor(TaskExecutorProperties taskExecutor) {
-        this.taskExecutor = taskExecutor;
+        Path osPath = ontologySource != null ? Paths.get(ontologySource.getURI()) : DEFAULT_ONTOLOGY_PATH;
+        return new AnnotationDownloadFileHeader(osPath);
     }
 
     public TaskExecutorProperties getTaskExecutor() {
         return taskExecutor;
     }
 
+    public void setTaskExecutor(TaskExecutorProperties taskExecutor) {
+        this.taskExecutor = taskExecutor;
+    }
+
     public void setDefaultEmitterTimeout(int defaultEmitterTimeout) {
         this.defaultEmitterTimeout = defaultEmitterTimeout;
     }
 
-    public void setOntologySource(String ontologySource) {
+    public void setOntologySource(Resource ontologySource) {
         this.ontologySource = ontologySource;
     }
 }

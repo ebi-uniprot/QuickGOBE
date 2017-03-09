@@ -29,7 +29,7 @@ public class CoTermsProcessorTest {
 
     private static final String GO_TERM = "GO:0003824";
     @Mock
-    CoTermsForSelectedTerm coTermsForSelectedTerm;
+    private CoTermsForSelectedTerm coTermsForSelectedTerm;
     @Mock
     private CoTermsAggregationWriter aggregator;
 
