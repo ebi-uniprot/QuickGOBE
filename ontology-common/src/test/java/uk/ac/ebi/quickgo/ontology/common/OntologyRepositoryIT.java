@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.ontology.common;
 
 import uk.ac.ebi.quickgo.common.QueryUtils;
-import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
+import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocMocker;
 
 import java.io.IOException;

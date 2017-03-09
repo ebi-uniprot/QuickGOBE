@@ -1,14 +1,23 @@
 package uk.ac.ebi.quickgo.index.annotation.coterms;
 
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
+import uk.ac.ebi.quickgo.common.QuickGODocument;
+import uk.ac.ebi.quickgo.index.common.listener.ItemRateWriterListener;
+import uk.ac.ebi.quickgo.index.common.listener.LogStepListener;
+import uk.ac.ebi.quickgo.index.common.listener.SkipLoggerListener;
 import uk.ac.ebi.quickgo.index.common.writer.ListItemWriter;
 
-import com.google.common.base.Preconditions;
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.batch.core.ItemWriteListener;
+import org.springframework.batch.core.Step;
+import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
+import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileHeaderCallback;
@@ -17,11 +26,16 @@ import org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor;
 import org.springframework.batch.item.file.transform.DelimitedLineAggregator;
 import org.springframework.batch.item.file.transform.LineAggregator;
 import org.springframework.batch.item.file.transform.PassThroughLineAggregator;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+
+import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  *
@@ -33,6 +47,8 @@ import org.springframework.core.io.Resource;
  * Created with IntelliJ IDEA.
  */
 @Configuration
+@EnableConfigurationProperties
+@EnableBatchProcessing
 public class CoTermsConfig {
 
     private static final String ELECTRONIC = "IEA";
@@ -40,7 +56,7 @@ public class CoTermsConfig {
             EXCLUDE_ANNOTATIONS_PRODUCED_BY_ELECTRONIC_MEANS =
             annotationDocument -> !ELECTRONIC.equals(annotationDocument.goEvidence);
     private static final Predicate<AnnotationDocument> INCLUDE_ALL_ANNOTATIONS = annotationDocument -> true;
-    private final Logger LOGGER = LoggerFactory.getLogger(CoTermsConfig.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CoTermsConfig.class);
 
     public static final String CO_TERM_MANUAL_SUMMARIZATION_STEP = "coTermManualSummarizationStep";
     public static final String CO_TERM_ALL_SUMMARIZATION_STEP = "coTermAllSummarizationStep";
@@ -48,11 +64,52 @@ public class CoTermsConfig {
             "together", "compared"};
     private static final String DELIMITER = "\t";
 
+    @Autowired
+    private StepBuilderFactory stepBuilders;
+
     @Bean
-    public OutputPath outputPath(@Value("${indexing.coterms.manual:#{systemProperties['user" +
-            ".dir']}/QuickGO/CoTermsManual}") String manualCoTermsPath,
-            @Value("${indexing.coterms.all:#{systemProperties['user.dir']}/QuickGO/CoTermsAll}") String allCoTermsPath){
-            return new OutputPath(manualCoTermsPath, allCoTermsPath);
+    @ConfigurationProperties(prefix = "indexing.coterms")
+    public CoTermsConfigProperties coTermsConfigProperties() {
+        return new CoTermsConfigProperties();
+    }
+
+    @Bean
+    public static PropertySourcesPlaceholderConfigurer propertyConfigIn() {
+        return new PropertySourcesPlaceholderConfigurer();
+    }
+
+    @Bean
+    public Step coTermManualSummarizationStep(CoTermsConfigProperties coTermsConfigProperties) {
+       LOGGER.info("Created coTermManualSummarizationStep. Will write CoTerms to " + coTermsConfigProperties
+                .getManual());
+
+        return stepBuilders.get(CO_TERM_MANUAL_SUMMARIZATION_STEP)
+                .<String, List<CoTerm>>chunk(coTermsConfigProperties.getChunkSize())
+                .reader(coTermsManualReader(coTermsManualAggregationWriter()))
+                .processor(coTermsManualCalculator(coTermsManualAggregationWriter()))
+                .writer(coTermsManualStatsWriter(
+                        new FileSystemResource(coTermsConfigProperties.getManual())))
+                .listener(logStepListener())
+                .listener(logWriteRateListener(coTermsConfigProperties.getLoginterval()))
+                .listener(skipLogListener())
+                .build();
+    }
+
+    @Bean
+    public Step coTermAllSummarizationStep(CoTermsConfigProperties coTermsConfigProperties) {
+        LOGGER.info(
+                "Created coTermAllSummarizationStep. Will write CoTerms to " +
+                        coTermsConfigProperties.getAll());
+
+        return stepBuilders.get(CO_TERM_ALL_SUMMARIZATION_STEP)
+                .<String, List<CoTerm>>chunk(coTermsConfigProperties.getChunkSize())
+                .reader(coTermsAllReader(coTermsAllAggregationWriter()))
+                .processor(coTermsAllCalculator(coTermsAllAggregationWriter()))
+                .writer(coTermsAllStatsWriter(new FileSystemResource(coTermsConfigProperties.getAll())))
+                .listener(logStepListener())
+                .listener(logWriteRateListener(coTermsConfigProperties.getLoginterval()))
+                .listener(skipLogListener())
+                .build();
     }
 
     @Bean
@@ -76,26 +133,26 @@ public class CoTermsConfig {
         return new CoTermsProcessor(coTermsAllAggregationWriter);
     }
 
-    @Bean
-    public ItemReader<String> coTermsManualReader(
+    private ItemReader<String> coTermsManualReader(
             CoTermsAggregationWriter coTermsManualAggregationWriter) {
         return new CoTermItemReader(coTermsManualAggregationWriter);
     }
 
-    @Bean
-    public ItemReader<String> coTermsAllReader(
+    private ItemReader<String> coTermsAllReader(
             CoTermsAggregationWriter coTermsAllAggregationWriter) {
         return new CoTermItemReader(coTermsAllAggregationWriter);
     }
 
-    @Bean
-    ItemWriter<List<CoTerm>> coTermsManualStatsWriter(OutputPath outputPath) {
-        return listItemFlatFileWriter(outputPath.manualCoTermsResource);
+    private ItemWriter<List<CoTerm>> coTermsManualStatsWriter(Resource outputPath) {
+        checkArgument(Objects.nonNull(outputPath), "The output path for the 'manual' coterms" +
+                " file cannot be null");
+        return listItemFlatFileWriter(outputPath);
     }
 
-    @Bean
-    ItemWriter<List<CoTerm>> coTermsAllStatsWriter(OutputPath outputPath) {
-        return listItemFlatFileWriter(outputPath.allCoTermsResource);
+    private ItemWriter<List<CoTerm>> coTermsAllStatsWriter(Resource outputPath) {
+        checkArgument(Objects.nonNull(outputPath), "The output path for the 'all' coterms" +
+                " file cannot be null");
+        return listItemFlatFileWriter(outputPath);
     }
 
     private ListItemWriter<CoTerm> listItemFlatFileWriter(Resource outputFile) {
@@ -127,20 +184,16 @@ public class CoTermsConfig {
         return beanWrapperFieldExtractor;
     }
 
-    public class OutputPath {
-        FileSystemResource manualCoTermsResource;
-        FileSystemResource allCoTermsResource;
-        public OutputPath(String manualCoTermsPath, String allCoTermsPath) {
-            Preconditions.checkArgument(Objects.nonNull(manualCoTermsPath), "The output path for the 'manual' coterms" +
-                    " file cannot be null");
-            Preconditions.checkArgument(Objects.nonNull(allCoTermsPath), "The output path for the 'all' coterms" +
-                    " file cannot be null");
-            Preconditions.checkArgument(!allCoTermsPath.equals(manualCoTermsPath), "The output path for manual and all " +
-                    "coterms files should not be the same, but they were both %s", manualCoTermsPath);
-
-            manualCoTermsResource = new FileSystemResource(manualCoTermsPath);
-            allCoTermsResource =  new FileSystemResource(allCoTermsPath);
-
-        }
+    private ItemWriteListener<QuickGODocument> logWriteRateListener(final int writeInterval) {
+        return new ItemRateWriterListener<>(Instant.now(), writeInterval);
     }
+
+    private StepExecutionListener logStepListener() {
+        return new LogStepListener();
+    }
+
+    private SkipLoggerListener<String, List<CoTerm>> skipLogListener() {
+        return new SkipLoggerListener<>();
+    }
+
 }
