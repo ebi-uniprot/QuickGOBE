@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
 import uk.ac.ebi.quickgo.annotation.download.AnnotationDownloadFileHeader;
+import uk.ac.ebi.quickgo.rest.metadata.MetaDataProvider;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
 import uk.ac.ebi.quickgo.annotation.model.StatisticsGroup;
@@ -10,6 +11,7 @@ import uk.ac.ebi.quickgo.rest.ParameterBindingException;
 import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
 import uk.ac.ebi.quickgo.rest.comm.FilterContext;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
+import uk.ac.ebi.quickgo.rest.metadata.MetaData;
 import uk.ac.ebi.quickgo.rest.search.DefaultSearchQueryTemplate;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
@@ -107,6 +109,8 @@ public class AnnotationController {
             DateTimeFormatter.ofPattern("-N-yyyyMMdd");
     public static final String DOWNLOAD_FILE_NAME_PREFIX = "QuickGO-annotations";
 
+    private final MetaDataProvider metaDataProvider;
+
     private final ControllerValidationHelper validationHelper;
 
     private final SearchService<Annotation> annotationSearchService;
@@ -127,7 +131,8 @@ public class AnnotationController {
             ResultTransformerChain<QueryResult<Annotation>> resultTransformerChain,
             StatisticsService statsService,
             TaskExecutor taskExecutor,
-            AnnotationDownloadFileHeader annotationDownloadFileHeader) {
+            AnnotationDownloadFileHeader annotationDownloadFileHeader,
+            MetaDataProvider metaDataProvider) {
         checkArgument(annotationSearchService != null, "The SearchService<Annotation> instance passed " +
                 "to the constructor of AnnotationController should not be null.");
         checkArgument(annotationRetrievalConfig != null, "The SearchServiceConfig" +
@@ -139,6 +144,8 @@ public class AnnotationController {
         checkArgument(statsService != null, "Annotation stats service cannot be null.");
         checkArgument(taskExecutor != null, "TaskExecutor cannot be null.");
         checkArgument(annotationDownloadFileHeader != null, "AnnotationDownloadFileHeader cannot be null.");
+        checkArgument(metaDataProvider != null, "Metadata provider cannot be null.");
+
 
         this.annotationSearchService = annotationSearchService;
         this.validationHelper = validationHelper;
@@ -152,6 +159,8 @@ public class AnnotationController {
 
         this.taskExecutor = taskExecutor;
         this.annotationDownloadFileHeader = annotationDownloadFileHeader;
+
+        this.metaDataProvider = metaDataProvider;
     }
 
     /**
@@ -235,6 +244,18 @@ public class AnnotationController {
                 .ok()
                 .headers(createHttpDownloadHeader(mediaTypeAcceptHeader))
                 .body(emitter);
+    }
+
+    /**
+     * Get meta data information about the Annotation service
+     *
+     * @return response with metadata information.
+     */
+    @ApiOperation(value = "Get meta data information about the Annotation service",
+            notes = "Annotations creation date.")
+    @RequestMapping(value = "/about", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<MetaData> provideMetaData() {
+        return new ResponseEntity<>(metaDataProvider.lookupMetaData().get(0), HttpStatus.OK);
     }
 
     private DefaultSearchQueryTemplate createSearchQueryTemplate(
