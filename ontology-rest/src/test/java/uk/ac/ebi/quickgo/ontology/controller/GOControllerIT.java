@@ -74,7 +74,7 @@ public class GOControllerIT extends OBOControllerIT {
 
         response.andDo(print())
                 .andExpect(jsonPath("$.version").value("http://purl.obolibrary.org/obo/go/releases/2017-01-12/go.owl"))
-                .andExpect(jsonPath(".date").value("2017-01-13 02:19"));
+                .andExpect(jsonPath(".timestamp").value("2017-01-13 02:19"));
     }
 
     /*
