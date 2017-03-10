@@ -1,15 +1,15 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationFields;
 import uk.ac.ebi.quickgo.rest.ParameterException;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 
 import java.util.List;
 import java.util.stream.Stream;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayContaining;
@@ -231,7 +231,7 @@ public class AnnotationRequestTest {
         annotationRequest.setTaxonUsage("descendants");
 
         FilterRequest request = FilterRequest.newBuilder()
-                .addProperty(AnnotationFields.Searchable.TAXON_ANCESTRY, "1", "2")
+                .addProperty(AnnotationFields.Searchable.TAXON_ANCESTORS, "1", "2")
                 .build();
         List<FilterRequest> filterRequests = annotationRequest.createFilterRequests();
 
@@ -365,7 +365,7 @@ public class AnnotationRequestTest {
         String field;
         switch (AnnotationRequest.DEFAULT_TAXON_USAGE) {
             case "descendants":
-                field = AnnotationFields.Searchable.TAXON_ANCESTRY;
+                field = AnnotationFields.Searchable.TAXON_ANCESTORS;
                 break;
             case "exact":
             default:

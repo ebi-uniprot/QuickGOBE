@@ -35,8 +35,8 @@ public class AnnotationDocument implements QuickGODocument {
     @Field(AnnotationFields.TAXON_ID)
     public int taxonId;
 
-    @Field(AnnotationFields.TAXON_ANCESTRY)
-    public List<Integer> taxonAncestry;
+    @Field(AnnotationFields.TAXON_ANCESTORS)
+    public List<Integer> taxonAncestors;
 
     @Field(AnnotationFields.GO_ID)
     public String goId;

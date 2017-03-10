@@ -1,5 +1,7 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
+import com.google.common.base.Preconditions;
+import io.swagger.annotations.ApiModelProperty;
 import uk.ac.ebi.quickgo.annotation.validation.service.ReferenceValidator;
 import uk.ac.ebi.quickgo.annotation.validation.service.WithFromValidator;
 import uk.ac.ebi.quickgo.common.validator.GeneProductIDList;
@@ -8,14 +10,12 @@ import uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern;
 import uk.ac.ebi.quickgo.rest.search.AggregateFunction;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 
-import com.google.common.base.Preconditions;
-import io.swagger.annotations.ApiModelProperty;
-import java.util.*;
-import java.util.stream.Stream;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
+import java.util.*;
+import java.util.stream.Stream;
 
 import static uk.ac.ebi.quickgo.annotation.common.AnnotationFields.Facetable;
 import static uk.ac.ebi.quickgo.annotation.common.AnnotationFields.Searchable;
@@ -580,7 +580,7 @@ public class AnnotationRequest {
             if (filterMap.containsKey(TAXON_USAGE_ID)) {
                 switch (getTaxonUsage()) {
                     case DESCENDANTS_USAGE:
-                        field = Optional.of(Searchable.TAXON_ANCESTRY);
+                        field = Optional.of(Searchable.TAXON_ANCESTORS);
                         break;
                     case EXACT_USAGE:
                     default:
