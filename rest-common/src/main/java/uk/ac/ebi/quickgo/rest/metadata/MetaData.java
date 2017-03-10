@@ -1,5 +1,9 @@
 package uk.ac.ebi.quickgo.rest.metadata;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Simple data structure for a service's meta data.
  *
@@ -10,11 +14,17 @@ package uk.ac.ebi.quickgo.rest.metadata;
  */
 public class MetaData {
 
-    public String version;
-    public String timestamp;
+    //A list of common, but not exclusive keys with which to populate the properties map
+    public static final String VERSION = "version";
+    public static final String TIMESTAMP = "timestamp";
 
-    public MetaData(String version, String timestamp) {
-        this.version = version;
-        this.timestamp = timestamp;
+    private Map<String, MetaDataMarker> properties = new HashMap<>();
+    public void add(String key, MetaDataMarker value) {
+        properties.put(key, value);
+    }
+
+    @JsonAnyGetter
+    public Map<String, MetaDataMarker> getProperties() {
+        return properties;
     }
 }
