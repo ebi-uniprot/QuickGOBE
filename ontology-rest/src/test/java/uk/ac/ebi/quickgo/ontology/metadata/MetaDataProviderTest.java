@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.ontology.metadata;
 
+import uk.ac.ebi.quickgo.rest.metadata.MetaData;
 import uk.ac.ebi.quickgo.rest.service.ServiceConfigException;
 
 import java.io.IOException;
@@ -34,7 +35,8 @@ public class MetaDataProviderTest {
     public void fileExistsButDoesNotContainExpectedContent() throws IOException {
         Resource resource = new ClassPathResource("ONTOLOGY_IRI_BROKEN.dat.gz");
         MetaDataProvider metaDataProvider = new MetaDataProvider( Paths.get(resource.getURI()));
-        metaDataProvider.lookupMetaData();
+        MetaData metaData  = metaDataProvider.lookupMetaData();
+
     }
 
 }
