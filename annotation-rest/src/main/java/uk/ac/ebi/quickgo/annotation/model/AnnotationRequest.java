@@ -575,29 +575,22 @@ public class AnnotationRequest {
     }
 
     private Optional<FilterRequest> createTaxonFilter() {
-        Optional<String> field;
-        if (filterMap.containsKey(TAXON_USAGE_FIELD)) {
-            if (filterMap.containsKey(TAXON_USAGE_ID)) {
-                switch (getTaxonUsage()) {
-                    case DESCENDANTS_USAGE:
-                        field = Optional.of(Searchable.TAXON_ANCESTORS);
-                        break;
-                    case EXACT_USAGE:
-                    default:
-                        field = Optional.of(Searchable.TAXON_ID);
-                        break;
-                }
-            } else {
-                throwUsageWithoutIdException(TAXON_ID_PARAM, TAXON_USAGE_FIELD);
-                // unreachable, but Java compiler doesn't know this
-                return Optional.empty();
+        Optional<String> field = Optional.empty();
+        if (filterMap.containsKey(TAXON_USAGE_ID)) {
+            switch (getTaxonUsage()) {
+                case DESCENDANTS_USAGE:
+                    field = Optional.of(Searchable.TAXON_ANCESTORS);
+                    break;
+                case EXACT_USAGE:
+                default:
+                    field = Optional.of(Searchable.TAXON_ID);
+                    break;
             }
-        } else if (filterMap.containsKey(TAXON_USAGE_ID)) {
-            field = Optional.of(Searchable.TAXON_ID);
         } else {
-            field = Optional.empty();
+            if (filterMap.containsKey(TAXON_USAGE_FIELD)) {
+                throwUsageWithoutIdException(TAXON_ID_PARAM, TAXON_USAGE_FIELD);
+            }
         }
-
         return field.map(f -> FilterRequest
                 .newBuilder()
                 .addProperty(f, filterMap.get(TAXON_USAGE_ID))
