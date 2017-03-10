@@ -1,19 +1,18 @@
 package uk.ac.ebi.quickgo.index.common.datafile;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.collection.IsMapContaining.hasKey;
 import static org.hamcrest.core.Is.is;
-import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.convertLinePropertiesToMap;
-import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.splitValue;
-import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.splitValueToIntegerList;
+import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.*;
 import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingUtil.concatProperty;
 import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingUtil.concatStrings;
 
@@ -110,12 +109,12 @@ public class GOADataFileParsingHelperTest {
         assertThat(propsMap, hasEntry(propKey2, propValue2));
     }
 
-    @Test(expected = AssertionError.class)
+    @Test(expected = IllegalArgumentException.class)
     public void splittingOnNullDelimiterCausesException() {
         splitValue("some value", null);
     }
 
-    @Test(expected = AssertionError.class)
+    @Test(expected = IllegalArgumentException.class)
     public void splittingIntegerListOnNullDelimiterCausesException() {
         splitValueToIntegerList("1,3", null);
     }

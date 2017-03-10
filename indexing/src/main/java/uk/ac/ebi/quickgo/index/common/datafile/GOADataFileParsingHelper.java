@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Collections.emptyList;
 
 /**
@@ -60,7 +61,7 @@ public class GOADataFileParsingHelper {
      * @return an array of {@link String} values
      */
     public static String[] splitValue(String value, String delimiter) {
-        assert delimiter != null : "Delimiter cannot be null";
+        checkArgument(delimiter != null, "Delimiter cannot be null");
 
         return Optional.ofNullable(value)
                 .filter(v -> !v.isEmpty())
@@ -75,7 +76,7 @@ public class GOADataFileParsingHelper {
      * @return a list of {@link Integer} values
      */
     public static List<Integer> splitValueToIntegerList(String value, String delimiter) {
-        assert delimiter != null : "Delimiter cannot be null";
+        checkArgument(delimiter != null, "Delimiter cannot be null");
 
         return Optional.ofNullable(value)
                 .filter(v -> !v.isEmpty())
