@@ -255,7 +255,7 @@ public class AnnotationController {
             notes = "Annotations creation date.")
     @RequestMapping(value = "/about", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<MetaData> provideMetaData() {
-        return new ResponseEntity<>(metaDataProvider.lookupMetaData().get(0), HttpStatus.OK);
+        return new ResponseEntity<>(metaDataProvider.lookupMetaData(), HttpStatus.OK);
     }
 
     private DefaultSearchQueryTemplate createSearchQueryTemplate(
