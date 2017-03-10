@@ -127,6 +127,12 @@ public class GOADataFileParsingHelperTest {
     }
 
     @Test
+    public void splittingEmptyValueReturnsEmptyStringArray() {
+        String[] splitValues = splitValue("", "whatever");
+        assertThat(splitValues.length, is(0));
+    }
+
+    @Test
     public void splittingUnsplittableValueReturnsStringArrayOfSizeOne() {
         String value = "thisCannotBeSplit";
         String[] splitValues = splitValue(value, "whatever");
@@ -149,6 +155,13 @@ public class GOADataFileParsingHelperTest {
         assertThat(splitValues, is(notNullValue()));
         assertThat(splitValues, is(empty()));
     }
+
+    @Test
+    public void splittingEmptyValueReturnsEmptyIntegerList() {
+        List<Integer> splitValues = splitValueToIntegerList("", "whatever");
+        assertThat(splitValues, is(empty()));
+    }
+
 
     @Test
     public void splittingUnsplittableValueReturnsIntegerListOfSizeOne() {
