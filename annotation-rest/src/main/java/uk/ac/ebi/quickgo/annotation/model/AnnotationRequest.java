@@ -376,7 +376,7 @@ public class AnnotationRequest {
         }
     }
 
-    @Pattern(regexp = "^exact|descendants$", message = "Invalid taxonUsage: ${validatedValue}")
+    @Pattern(regexp = "^exact|descendants$", message = "Invalid taxonUsage: ${validatedValue}", flags = {Pattern.Flag.CASE_INSENSITIVE})
     public String getTaxonUsage() {
         return filterMap.get(TAXON_USAGE_FIELD) == null ? DEFAULT_TAXON_USAGE : filterMap.get(TAXON_USAGE_FIELD)[0];
     }
