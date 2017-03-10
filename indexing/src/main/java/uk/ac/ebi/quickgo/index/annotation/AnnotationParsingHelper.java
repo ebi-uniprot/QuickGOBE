@@ -2,9 +2,7 @@ package uk.ac.ebi.quickgo.index.annotation;
 
 import java.util.regex.Pattern;
 
-import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.KEY_EQUALS_VALUE_FORMAT;
-import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.PIPE_SEPARATED_CSVs_FORMAT;
-import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.WORD_LBRACE_WORD_RBRACE_FORMAT;
+import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.*;
 
 /**
  * This class defines common constants used during annotation indexing, when parsing the input files.
@@ -29,11 +27,12 @@ class AnnotationParsingHelper {
     private static final String QUALIFIERS_FORMAT =
             "^(NOT\\|)?(involved_in|enables|part_of|contributes_to|colocalizes_with)$";
     private static final String RAW_TAXON_FORMAT = "([0-9]+)";
-    private static final String RAW_TAXON_ANCESTRY_FORMAT = "^([0-9]+)(,[0-9]+)*$";
+    private static final String RAW_TAXON_ANCESTRY_FORMAT = "([0-9]+)(,[0-9]+)*";
     private static final String INTERACTING_TAXON_FORMAT = "taxon:" + RAW_TAXON_FORMAT;
     static final String DATE_FORMAT = "[0-9]{8}";
 
     static final Pattern PROPS_TAXON_REGEX = Pattern.compile(TAXON_ID + "=");
+    static final Pattern PROPS_TAXON_ANCESTORS_REGEX = Pattern.compile(TAXON_ANCESTRY + "=" + RAW_TAXON_ANCESTRY_FORMAT);
     static final Pattern PROPS_DB_OBJECT_TYPE_REGEX = Pattern.compile(DB_OBJECT_TYPE + "=");
     static final Pattern PROPS_GO_EVIDENCE_REGEX = Pattern.compile(GO_EVIDENCE + "=");
 
