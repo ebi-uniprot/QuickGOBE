@@ -1,8 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.metadata;
 
-import uk.ac.ebi.quickgo.rest.metadata.MetaData;
-import uk.ac.ebi.quickgo.rest.metadata.MetaDataConfigProperties;
-import uk.ac.ebi.quickgo.rest.metadata.MetaDataProvider;
+import uk.ac.ebi.quickgo.rest.metadata.*;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -33,17 +31,21 @@ public class MetaDataConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger(MetaDataConfig.class);
     private static final String SERVICE = "Annotation";
     private static final Path DEFAULT_METADATA_PATH = Paths.get("goa_uniprot.gpa-version");
-    private static final Function<Path, List<MetaData>> PATH_TO_METADATA_MAPPER = (Path p) -> {
-        try {
-            Stream<String> stream = Files.lines(p);
-            return stream.map(s -> new MetaData(null, s.substring(s.indexOf("2"))))
-                         .collect(toList());
+    private static final Function<Path, MetaData> MAPPER = (Path p) -> {
+        try (Stream<String> stream = Files.lines(p)){
+            MetaDataStringOnly metaDataStringOnly = new MetaDataStringOnly();
+            stream.forEach(s -> metaDataStringOnly.add(MetaData.TIMESTAMP, extractTimestamp(s)));
+            MetaData metaData  = new MetaData();
+            metaData.add(SERVICE, metaDataStringOnly);
+            return metaData;
         } catch (IOException e) {
             throw new java.io.UncheckedIOException(e);
         }
     };
 
-    private static final int NUMBER_OF_METADATA_LINES = 1;
+    private static String extractTimestamp(String s) {
+        return s.substring(s.indexOf('2'));
+    }
 
     @Bean
     @ConfigurationProperties(prefix = "annotation.metadata")
@@ -62,6 +64,6 @@ public class MetaDataConfig {
                 LOGGER.error("Failed to get the URI of the metadata source " + source, e);
             }
         }
-        return new MetaDataProvider(SERVICE, PATH_TO_METADATA_MAPPER, metaDataPath, NUMBER_OF_METADATA_LINES);
+        return new MetaDataProvider(MAPPER, metaDataPath);
     }
 }
