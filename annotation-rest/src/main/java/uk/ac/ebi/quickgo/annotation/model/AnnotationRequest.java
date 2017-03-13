@@ -8,7 +8,6 @@ import uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern;
 import uk.ac.ebi.quickgo.rest.search.AggregateFunction;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 
-import com.google.common.base.Preconditions;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.*;
 import java.util.stream.Stream;
@@ -17,6 +16,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static uk.ac.ebi.quickgo.annotation.common.AnnotationFields.Facetable;
 import static uk.ac.ebi.quickgo.annotation.common.AnnotationFields.Searchable;
 import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.*;
@@ -65,6 +65,9 @@ public class AnnotationRequest {
     static final String EVIDENCE_CODE_USAGE_FIELD = "evidenceCodeUsage";
     static final String EVIDENCE_CODE_USAGE_RELATIONSHIPS = "evidenceCodeUsageRelationships";
 
+    static final String DESCENDANTS_USAGE = "descendants";
+    static final String EXACT_USAGE = "exact";
+
     /**
      * indicates which fields should be looked at when creating filters
      */
@@ -82,6 +85,9 @@ public class AnnotationRequest {
             Searchable.WITH_FROM,
             Searchable.EXTENSION
     };
+
+    private static final String DEFAULT_EVIDENCE_CODE_USAGE = DESCENDANTS_USAGE;
+    private static final String DEFAULT_GO_USAGE = DESCENDANTS_USAGE;
 
     /**
      * At the moment the definition of the list is hardcoded because we only have need to display annotation and
@@ -171,7 +177,7 @@ public class AnnotationRequest {
     @ApiModelProperty(
             value = "Indicates how the GO terms within the annotations should be used. Is used in conjunction with " +
                     "'goUsageRelationships'.",
-            allowableValues = "descendants,slim",
+            allowableValues = "descendants,exact,slim",
             example = "descendants")
     private String goUsage;
 
@@ -186,7 +192,7 @@ public class AnnotationRequest {
     @ApiModelProperty(
             value = "Indicates how the evidence code terms within the annotations should be used. Is used in " +
                     "conjunction with 'evidenceCodeUsageRelationships'.",
-            allowableValues = "descendants",
+            allowableValues = "descendants,exact",
             example = "descendants")
     private String evidenceCodeUsage;
 
@@ -223,7 +229,8 @@ public class AnnotationRequest {
     private String goIdEvidence;
 
     @ApiModelProperty(value = "An annotation extension is used to extend " +
-            "(i.e., add more specificity to) the GO term used in an annotation; the combination of the GO term plus the" +
+            "(i.e., add more specificity to) the GO term used in an annotation; the combination of the GO term plus " +
+            "the" +
             " extension is equivalent to a more specific GO term. " +
             "An annotation extension is stored in the database, and transmitted in annotation files, as a single " +
             "string, structured as a pipe-separated list of comma-separated lists of components.",
@@ -376,10 +383,12 @@ public class AnnotationRequest {
         }
     }
 
-    @Pattern(regexp = "^descendants$", flags = Pattern.Flag.CASE_INSENSITIVE,
+    @Pattern(regexp = "^descendants|exact$", flags = Pattern.Flag.CASE_INSENSITIVE,
             message = "Invalid evidenceCodeUsage: ${validatedValue}")
     public String getEvidenceCodeUsage() {
-        return filterMap.get(EVIDENCE_CODE_USAGE_FIELD) == null ? null : filterMap.get(EVIDENCE_CODE_USAGE_FIELD)[0];
+        // todo test: ensure can use it; ensure filter req doesn't have goUsage in sig--is just a simple request
+        return filterMap.get(EVIDENCE_CODE_USAGE_FIELD) == null ?
+                DEFAULT_EVIDENCE_CODE_USAGE : filterMap.get(EVIDENCE_CODE_USAGE_FIELD)[0];
     }
 
     @ArrayPattern(regexp = "^is_a|part_of|occurs_in|regulates$", flags = CASE_INSENSITIVE,
@@ -415,10 +424,11 @@ public class AnnotationRequest {
         }
     }
 
-    @Pattern(regexp = "^slim|descendants$", flags = Pattern.Flag.CASE_INSENSITIVE,
+    @Pattern(regexp = "^slim|descendants|exact$", flags = Pattern.Flag.CASE_INSENSITIVE,
             message = "Invalid goUsage: ${validatedValue}")
     public String getGoUsage() {
-        return filterMap.get(GO_USAGE_FIELD) == null ? null : filterMap.get(GO_USAGE_FIELD)[0];
+        // todo test: ensure can use it; ensure filter req doesn't have goUsage in sig--is just a simple request
+        return filterMap.get(GO_USAGE_FIELD) == null ? DEFAULT_GO_USAGE : filterMap.get(GO_USAGE_FIELD)[0];
     }
 
     @ArrayPattern(regexp = "^is_a|part_of|occurs_in|regulates$", flags = CASE_INSENSITIVE,
@@ -548,36 +558,42 @@ public class AnnotationRequest {
     }
 
     private Optional<FilterRequest> createGoUsageFilter() {
-        return createUsageFilter(GO_USAGE_FIELD, GO_USAGE_ID, Searchable.GO_ID, GO_USAGE_RELATIONSHIPS);
+        return createUsageFilter(GO_USAGE_FIELD, getGoUsage(), GO_USAGE_ID, Searchable.GO_ID, GO_USAGE_RELATIONSHIPS);
     }
 
     private Optional<FilterRequest> createEvidenceCodeUsageFilter() {
-        return createUsageFilter(EVIDENCE_CODE_USAGE_FIELD, EVIDENCE_CODE_USAGE_ID,
+        return createUsageFilter(EVIDENCE_CODE_USAGE_FIELD, getEvidenceCodeUsage(), EVIDENCE_CODE_USAGE_ID,
                 Searchable.EVIDENCE_CODE, EVIDENCE_CODE_USAGE_RELATIONSHIPS);
     }
 
-    private Optional<FilterRequest> createUsageFilter(String usageParam, String idParam, String idField,
+    private Optional<FilterRequest> createUsageFilter(String usageParam, String usageValue, String idParam, String
+            idField,
             String relationshipsParam) {
         Optional<FilterRequest> request;
         FilterRequest.Builder filterBuilder = FilterRequest.newBuilder();
 
-        if (filterMap.containsKey(usageParam)) {
-            if (filterMap.containsKey(idField)) {
-                assert filterMap.get(usageParam).length == 1 : usageParam + ": can only have one value";
-
-                String usageValue = filterMap.get(usageParam)[0];
-
-                filterBuilder
-                        .addProperty(usageValue)
-                        .addProperty(idParam, filterMap.get(idField));
-
-                filterBuilder.addProperty(relationshipsParam, filterMap.get(relationshipsParam));
-                request = Optional.of(filterBuilder.build());
-            } else {
-                throw new ParameterException("Annotation " + usageParam + " requires '" + idParam + "' to be set.");
+        if (filterMap.containsKey(idField)) {
+            // term id provided
+            switch (usageValue) {
+                case DESCENDANTS_USAGE:
+                    request = Optional.of(filterBuilder.addProperty(usageValue)
+                            .addProperty(idField, filterMap.get(idField))
+                            .addProperty(relationshipsParam, filterMap.get(relationshipsParam))
+                            .build());
+                    break;
+                case EXACT_USAGE:
+                default:
+                    request = Optional.of(filterBuilder.addProperty(idField, filterMap.get(idField))
+                            .addProperty(relationshipsParam, filterMap.get(relationshipsParam))
+                            .build());
+                    break;
             }
         } else {
-            request = createSimpleFilter(idField);
+            // no term id
+            if (filterMap.containsKey(usageParam)) {
+                throw new ParameterException("Annotation " + usageParam + " requires '" + idParam + "' to be set.");
+            }
+            request = Optional.empty();
         }
 
         return request;
@@ -603,13 +619,12 @@ public class AnnotationRequest {
         private final List<String> types;
 
         public StatsRequest(String groupName, String groupField, String aggregateFunction, List<String> types) {
-            Preconditions.checkArgument(groupName != null && !groupName.trim().isEmpty(),
+            checkArgument(groupName != null && !groupName.trim().isEmpty(),
                     "Statistics group name cannot be null or empty");
-            Preconditions.checkArgument(groupField != null && !groupName.trim().isEmpty(),
+            checkArgument(groupField != null && !groupName.trim().isEmpty(),
                     "Statistics group field cannot be null or empty");
-            Preconditions
-                    .checkArgument(aggregateFunction != null && !aggregateFunction.trim().isEmpty(), "Statistics " +
-                            "aggregate function cannot be null or empty");
+            checkArgument(aggregateFunction != null && !aggregateFunction.trim().isEmpty(), "Statistics " +
+                    "aggregate function cannot be null or empty");
 
             this.groupName = groupName;
             this.groupField = groupField;
