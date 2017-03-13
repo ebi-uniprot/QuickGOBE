@@ -1,7 +1,5 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
-import com.google.common.base.Preconditions;
-import io.swagger.annotations.ApiModelProperty;
 import uk.ac.ebi.quickgo.annotation.validation.service.ReferenceValidator;
 import uk.ac.ebi.quickgo.annotation.validation.service.WithFromValidator;
 import uk.ac.ebi.quickgo.common.validator.GeneProductIDList;
@@ -10,12 +8,14 @@ import uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern;
 import uk.ac.ebi.quickgo.rest.search.AggregateFunction;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 
+import com.google.common.base.Preconditions;
+import io.swagger.annotations.ApiModelProperty;
+import java.util.*;
+import java.util.stream.Stream;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
-import java.util.*;
-import java.util.stream.Stream;
 
 import static uk.ac.ebi.quickgo.annotation.common.AnnotationFields.Facetable;
 import static uk.ac.ebi.quickgo.annotation.common.AnnotationFields.Searchable;
@@ -42,7 +42,7 @@ public class AnnotationRequest {
     static final int MIN_DOWNLOAD_NUMBER = 1;
     static final int MAX_DOWNLOAD_NUMBER = 50000;
     static final int DEFAULT_DOWNLOAD_LIMIT = 10000;
-    static final String DEFAULT_TAXON_USAGE = "exact";
+    static final String DEFAULT_TAXON_USAGE = "descendants";
 
     //Names of the parameters in readable format
     static final String ASSIGNED_BY_PARAM = "Assigned By";

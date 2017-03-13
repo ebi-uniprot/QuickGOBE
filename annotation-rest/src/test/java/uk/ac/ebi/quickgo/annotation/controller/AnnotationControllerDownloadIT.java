@@ -64,6 +64,7 @@ public class AnnotationControllerDownloadIT {
     private static final String DOWNLOAD_LIMIT_PARAM = "downloadLimit";
     private static final int MIN_DOWNLOAD_NUMBER = 1;
     private static final int MAX_DOWNLOAD_NUMBER = 50000;
+    private static final String EXACT = "exact";
     private MockMvc mockMvc;
 
     private List<AnnotationDocument> genericDocs;
@@ -217,6 +218,7 @@ public class AnnotationControllerDownloadIT {
                 get(DOWNLOAD_SEARCH_URL)
                         .header(ACCEPT, mediaType)
                         .param(AnnotationParameters.TAXON_ID_PARAM.getName(), Integer.toString(expectedTaxonId))
+                        .param(AnnotationParameters.TAXON_USAGE_PARAM.getName(), EXACT)
                         .param(DOWNLOAD_LIMIT_PARAM, Integer.toString(expectedDownloadCount)));
 
         checkResponse(mediaType, response, expectedIds);
@@ -255,6 +257,7 @@ public class AnnotationControllerDownloadIT {
                 get(DOWNLOAD_SEARCH_URL)
                         .header(ACCEPT, mediaType)
                         .param(AnnotationParameters.TAXON_ID_PARAM.getName(), Integer.toString(expectedTaxonId))
+                        .param(AnnotationParameters.TAXON_USAGE_PARAM.getName(), EXACT)
                         .param(DOWNLOAD_LIMIT_PARAM, Integer.toString(requestedDownloadCount)));
 
         checkResponse(mediaType, response, expectedIds);
