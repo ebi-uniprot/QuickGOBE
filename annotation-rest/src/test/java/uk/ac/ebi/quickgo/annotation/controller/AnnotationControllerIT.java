@@ -68,6 +68,7 @@ public class AnnotationControllerIT {
     private static final String WITH_FROM_PATH = "withFrom.*.connectedXrefs";
     //Configuration
     private static final int NUMBER_OF_GENERIC_DOCS = 3;
+    public static final String EXACT_USAGE = "exact";
     private MockMvc mockMvc;
     private List<AnnotationDocument> genericDocs;
     @Autowired
@@ -591,7 +592,9 @@ public class AnnotationControllerIT {
     public void successfullyLookupAnnotationsByGoId() throws Exception {
 
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(GO_ID_PARAM.getName(), AnnotationDocMocker.GO_ID));
+                get(RESOURCE_URL + "/search")
+                        .param(GO_ID_PARAM.getName(), AnnotationDocMocker.GO_ID)
+                        .param(GO_USAGE_PARAM.getName(), EXACT_USAGE));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -604,7 +607,9 @@ public class AnnotationControllerIT {
     @Test
     public void successfullyLookupAnnotationsByGoIdCaseInsensitive() throws Exception {
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(GO_ID_PARAM.getName(), AnnotationDocMocker.GO_ID.toLowerCase()));
+                get(RESOURCE_URL + "/search")
+                        .param(GO_ID_PARAM.getName(), AnnotationDocMocker.GO_ID.toLowerCase())
+                        .param(GO_USAGE_PARAM.getName(), EXACT_USAGE));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -616,9 +621,10 @@ public class AnnotationControllerIT {
 
     @Test
     public void failToFindAnnotationsWhenGoIdDoesntExist() throws Exception {
-
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(GO_ID_PARAM.getName(), MISSING_GO_ID));
+                get(RESOURCE_URL + "/search")
+                        .param(GO_ID_PARAM.getName(), MISSING_GO_ID)
+                        .param(GO_USAGE_PARAM.getName(), EXACT_USAGE));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -640,7 +646,9 @@ public class AnnotationControllerIT {
     @Test
     public void filterAnnotationsUsingSingleEvidenceCodeReturnsResults() throws Exception {
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(EVIDENCE_CODE_PARAM.getName(), AnnotationDocMocker.ECO_ID));
+                get(RESOURCE_URL + "/search")
+                        .param(EVIDENCE_CODE_PARAM.getName(), AnnotationDocMocker.ECO_ID)
+                        .param(EVIDENCE_CODE_USAGE_PARAM.getName(), EXACT_USAGE));
 
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
@@ -657,8 +665,10 @@ public class AnnotationControllerIT {
         repository.save(doc);
 
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(EVIDENCE_CODE_PARAM.getName(), AnnotationDocMocker.ECO_ID + ","
-                        + doc.evidenceCode + "," + MISSING_ECO_ID));
+                get(RESOURCE_URL + "/search")
+                        .param(EVIDENCE_CODE_PARAM.getName(),
+                                AnnotationDocMocker.ECO_ID + "," + doc.evidenceCode + "," + MISSING_ECO_ID)
+                        .param(EVIDENCE_CODE_USAGE_PARAM.getName(), EXACT_USAGE));
 
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
@@ -681,7 +691,8 @@ public class AnnotationControllerIT {
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(EVIDENCE_CODE_PARAM.getName(), AnnotationDocMocker.ECO_ID)
                         .param(EVIDENCE_CODE_PARAM.getName(), doc.evidenceCode)
-                        .param(EVIDENCE_CODE_PARAM.getName(), MISSING_ECO_ID));
+                        .param(EVIDENCE_CODE_PARAM.getName(), MISSING_ECO_ID)
+                        .param(EVIDENCE_CODE_USAGE_PARAM.getName(), EXACT_USAGE));
 
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
@@ -696,7 +707,9 @@ public class AnnotationControllerIT {
     @Test
     public void filterByNonExistentEvidenceCodeReturnsZeroResults() throws Exception {
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(EVIDENCE_CODE_PARAM.getName(), MISSING_ECO_ID));
+                get(RESOURCE_URL + "/search")
+                        .param(EVIDENCE_CODE_PARAM.getName(), MISSING_ECO_ID)
+                        .param(EVIDENCE_CODE_USAGE_PARAM.getName(), EXACT_USAGE));
 
         response.andDo(print())
                 .andExpect(status().isOk())

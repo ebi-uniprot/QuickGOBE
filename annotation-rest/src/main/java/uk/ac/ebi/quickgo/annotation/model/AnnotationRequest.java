@@ -67,6 +67,7 @@ public class AnnotationRequest {
 
     static final String DESCENDANTS_USAGE = "descendants";
     static final String EXACT_USAGE = "exact";
+    static final String SLIM_USAGE = "slim";
 
     /**
      * indicates which fields should be looked at when creating filters
@@ -575,16 +576,16 @@ public class AnnotationRequest {
         if (filterMap.containsKey(idField)) {
             // term id provided
             switch (usageValue) {
+                case SLIM_USAGE:
                 case DESCENDANTS_USAGE:
                     request = Optional.of(filterBuilder.addProperty(usageValue)
-                            .addProperty(idField, filterMap.get(idField))
+                            .addProperty(idParam, filterMap.get(idField))
                             .addProperty(relationshipsParam, filterMap.get(relationshipsParam))
                             .build());
                     break;
                 case EXACT_USAGE:
                 default:
                     request = Optional.of(filterBuilder.addProperty(idField, filterMap.get(idField))
-                            .addProperty(relationshipsParam, filterMap.get(relationshipsParam))
                             .build());
                     break;
             }

@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
+import uk.ac.ebi.quickgo.annotation.AnnotationParameters;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationFields;
 import uk.ac.ebi.quickgo.rest.ParameterException;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
@@ -17,6 +18,7 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.EVIDENCE_CODE_USAGE_RELATIONS_PARAM;
+import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.GO_ID_PARAM;
 import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.GO_USAGE_RELATIONS_PARAM;
 import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.DESCENDANTS_USAGE;
 import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.EXACT_USAGE;
@@ -164,7 +166,7 @@ public class AnnotationRequestTest {
 
         FilterRequest request = FilterRequest.newBuilder()
                 .addProperty(DESCENDANTS_USAGE)
-                .addProperty(AnnotationFields.Searchable.GO_ID, goId.toUpperCase())
+                .addProperty(AnnotationParameters.GO_ID_PARAM.getName(), goId.toUpperCase())
                 .addProperty(GO_USAGE_RELATIONS_PARAM.getName())
                 .build();
         List<FilterRequest> filterRequests = annotationRequest.createFilterRequests();
@@ -181,7 +183,7 @@ public class AnnotationRequestTest {
 
         FilterRequest request = FilterRequest.newBuilder()
                 .addProperty(DESCENDANTS_USAGE)
-                .addProperty(AnnotationFields.Searchable.GO_ID, goId.toUpperCase())
+                .addProperty(GO_ID_PARAM.getName(), goId.toUpperCase())
                 .addProperty(GO_USAGE_RELATIONS_PARAM.getName(), relationships.toLowerCase())
                 .build();
         List<FilterRequest> filterRequests = annotationRequest.createFilterRequests();
@@ -198,14 +200,13 @@ public class AnnotationRequestTest {
 
         FilterRequest request = FilterRequest.newBuilder()
                 .addProperty(AnnotationFields.Searchable.GO_ID, goId.toUpperCase())
-                .addProperty(GO_USAGE_RELATIONS_PARAM.getName())
                 .build();
         List<FilterRequest> filterRequests = annotationRequest.createFilterRequests();
         assertThat(filterRequests, contains(request));
     }
 
     @Test
-    public void canCreateExactFilterWithGoIdsAndGoUsageRelationships() {
+    public void canCreateExactFilterWithGoIdsAndUnusedGoUsageRelationships() {
         String goId = "GO:0000001";
         String usage = EXACT_USAGE;
         String relationships = "is_A";
@@ -216,7 +217,6 @@ public class AnnotationRequestTest {
 
         FilterRequest request = FilterRequest.newBuilder()
                 .addProperty(AnnotationFields.Searchable.GO_ID, goId.toUpperCase())
-                .addProperty(GO_USAGE_RELATIONS_PARAM.getName(), relationships.toLowerCase())
                 .build();
         List<FilterRequest> filterRequests = annotationRequest.createFilterRequests();
         assertThat(filterRequests, contains(request));
@@ -232,7 +232,7 @@ public class AnnotationRequestTest {
 
         FilterRequest request = FilterRequest.newBuilder()
                 .addProperty(usage.toLowerCase())
-                .addProperty(AnnotationFields.Searchable.GO_ID, goId.toUpperCase())
+                .addProperty(AnnotationParameters.GO_ID_PARAM.getName(), goId.toUpperCase())
                 .addProperty(GO_USAGE_RELATIONSHIPS)
                 .build();
         assertThat(annotationRequest.createFilterRequests(),
@@ -252,7 +252,7 @@ public class AnnotationRequestTest {
         List<FilterRequest> filterRequests = annotationRequest.createFilterRequests();
         FilterRequest request = FilterRequest.newBuilder()
                 .addProperty(usage.toLowerCase())
-                .addProperty(AnnotationFields.Searchable.GO_ID, goId.toUpperCase())
+                .addProperty(AnnotationParameters.GO_ID_PARAM.getName(), goId.toUpperCase())
                 .addProperty(GO_USAGE_RELATIONSHIPS, relationships.toLowerCase())
                 .build();
         assertThat(filterRequests, contains(request));
@@ -305,7 +305,7 @@ public class AnnotationRequestTest {
 
         FilterRequest request = FilterRequest.newBuilder()
                 .addProperty(DESCENDANTS_USAGE)
-                .addProperty(AnnotationFields.Searchable.EVIDENCE_CODE, ecoId.toUpperCase())
+                .addProperty(AnnotationParameters.EVIDENCE_CODE_PARAM.getName(), ecoId.toUpperCase())
                 .addProperty(EVIDENCE_CODE_USAGE_RELATIONS_PARAM.getName())
                 .build();
         List<FilterRequest> filterRequests = annotationRequest.createFilterRequests();
@@ -322,7 +322,7 @@ public class AnnotationRequestTest {
 
         FilterRequest request = FilterRequest.newBuilder()
                 .addProperty(DESCENDANTS_USAGE)
-                .addProperty(AnnotationFields.Searchable.EVIDENCE_CODE, ecoId.toUpperCase())
+                .addProperty(AnnotationParameters.EVIDENCE_CODE_PARAM.getName(), ecoId.toUpperCase())
                 .addProperty(EVIDENCE_CODE_USAGE_RELATIONS_PARAM.getName(), relationships.toLowerCase())
                 .build();
         List<FilterRequest> filterRequests = annotationRequest.createFilterRequests();
@@ -339,14 +339,13 @@ public class AnnotationRequestTest {
 
         FilterRequest request = FilterRequest.newBuilder()
                 .addProperty(AnnotationFields.Searchable.EVIDENCE_CODE, ecoId.toUpperCase())
-                .addProperty(EVIDENCE_CODE_USAGE_RELATIONS_PARAM.getName())
                 .build();
         List<FilterRequest> filterRequests = annotationRequest.createFilterRequests();
         assertThat(filterRequests, contains(request));
     }
 
     @Test
-    public void canCreateExactFilterWithECOIdsAndECOUsageRelationships() {
+    public void canCreateExactFilterWithECOIdsAndUnusedECOUsageRelationships() {
         String ecoId = "ECO:0000001";
         String usage = EXACT_USAGE;
         String relationships = "is_A";
@@ -357,7 +356,6 @@ public class AnnotationRequestTest {
 
         FilterRequest request = FilterRequest.newBuilder()
                 .addProperty(AnnotationFields.Searchable.EVIDENCE_CODE, ecoId.toUpperCase())
-                .addProperty(EVIDENCE_CODE_USAGE_RELATIONS_PARAM.getName(), relationships.toLowerCase())
                 .build();
         List<FilterRequest> filterRequests = annotationRequest.createFilterRequests();
         assertThat(filterRequests, contains(request));
@@ -373,7 +371,7 @@ public class AnnotationRequestTest {
 
         FilterRequest request = FilterRequest.newBuilder()
                 .addProperty(usage.toLowerCase())
-                .addProperty(AnnotationFields.Searchable.EVIDENCE_CODE, id.toUpperCase())
+                .addProperty(AnnotationParameters.EVIDENCE_CODE_PARAM.getName(), id.toUpperCase())
                 .addProperty(EVIDENCE_CODE_USAGE_RELATIONS_PARAM.getName())
                 .build();
         assertThat(annotationRequest.createFilterRequests(),
@@ -393,7 +391,7 @@ public class AnnotationRequestTest {
         assertThat(annotationRequest.createFilterRequests(),
                 contains(FilterRequest.newBuilder()
                         .addProperty(usage.toLowerCase())
-                        .addProperty(AnnotationFields.Searchable.EVIDENCE_CODE, id.toUpperCase())
+                        .addProperty(AnnotationParameters.EVIDENCE_CODE_PARAM.getName(), id.toUpperCase())
                         .addProperty(EVIDENCE_CODE_USAGE_RELATIONS_PARAM.getName(), relationships.toLowerCase())
                         .build()));
     }
