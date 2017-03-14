@@ -602,6 +602,13 @@ public class AnnotationRequestValidationIT {
     }
 
     @Test
+    public void slimEcoUsageIsInvalid() {
+        annotationRequest.setEvidenceCodeUsage("slim");
+
+        assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
+    }
+
+    @Test
     public void ecoUsageValueIsInvalid() {
         annotationRequest.setEvidenceCodeUsage("thisDoesNotExistAsAValidUsage");
 
