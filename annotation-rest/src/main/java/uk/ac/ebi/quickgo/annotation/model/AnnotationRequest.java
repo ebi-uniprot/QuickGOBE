@@ -69,6 +69,9 @@ public class AnnotationRequest {
     static final String EXACT_USAGE = "exact";
     static final String SLIM_USAGE = "slim";
 
+    static final String DEFAULT_EVIDENCE_CODE_USAGE = DESCENDANTS_USAGE;
+    static final String DEFAULT_GO_USAGE = DESCENDANTS_USAGE;
+
     /**
      * indicates which fields should be looked at when creating filters
      */
@@ -86,9 +89,6 @@ public class AnnotationRequest {
             Searchable.WITH_FROM,
             Searchable.EXTENSION
     };
-
-    private static final String DEFAULT_EVIDENCE_CODE_USAGE = DESCENDANTS_USAGE;
-    private static final String DEFAULT_GO_USAGE = DESCENDANTS_USAGE;
 
     /**
      * At the moment the definition of the list is hardcoded because we only have need to display annotation and
@@ -387,7 +387,6 @@ public class AnnotationRequest {
     @Pattern(regexp = "^descendants|exact$", flags = Pattern.Flag.CASE_INSENSITIVE,
             message = "Invalid evidenceCodeUsage: ${validatedValue}")
     public String getEvidenceCodeUsage() {
-        // todo test: ensure can use it; ensure filter req doesn't have goUsage in sig--is just a simple request
         return filterMap.get(EVIDENCE_CODE_USAGE_FIELD) == null ?
                 DEFAULT_EVIDENCE_CODE_USAGE : filterMap.get(EVIDENCE_CODE_USAGE_FIELD)[0];
     }
@@ -428,7 +427,6 @@ public class AnnotationRequest {
     @Pattern(regexp = "^slim|descendants|exact$", flags = Pattern.Flag.CASE_INSENSITIVE,
             message = "Invalid goUsage: ${validatedValue}")
     public String getGoUsage() {
-        // todo test: ensure can use it; ensure filter req doesn't have goUsage in sig--is just a simple request
         return filterMap.get(GO_USAGE_FIELD) == null ? DEFAULT_GO_USAGE : filterMap.get(GO_USAGE_FIELD)[0];
     }
 
