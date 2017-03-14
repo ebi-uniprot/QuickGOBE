@@ -20,6 +20,8 @@ import static org.hamcrest.core.IsEqual.equalTo;
 import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.EVIDENCE_CODE_USAGE_RELATIONS_PARAM;
 import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.GO_ID_PARAM;
 import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.GO_USAGE_RELATIONS_PARAM;
+import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.DEFAULT_EVIDENCE_CODE_USAGE;
+import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.DEFAULT_GO_USAGE;
 import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.DESCENDANTS_USAGE;
 import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.EXACT_USAGE;
 import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.GO_USAGE_RELATIONSHIPS;
@@ -129,11 +131,16 @@ public class AnnotationRequestTest {
 
     @Test
     public void setAndGetGoUsage() {
-        String usage = "exact";
+        String usage = EXACT_USAGE;
 
         annotationRequest.setGoUsage(usage);
 
         assertThat(annotationRequest.getGoUsage(), is(usage));
+    }
+
+    @Test
+    public void getDefaultGoUsage() {
+        assertThat(annotationRequest.getGoUsage(), is(DEFAULT_GO_USAGE));
     }
 
     @Test
@@ -273,6 +280,11 @@ public class AnnotationRequestTest {
         annotationRequest.setEvidenceCodeUsage(usage);
 
         assertThat(annotationRequest.getEvidenceCodeUsage(), is(usage));
+    }
+
+    @Test
+    public void getDefaultEvidenceCodeUsage() {
+        assertThat(annotationRequest.getEvidenceCodeUsage(), is(DEFAULT_EVIDENCE_CODE_USAGE));
     }
 
     @Test
