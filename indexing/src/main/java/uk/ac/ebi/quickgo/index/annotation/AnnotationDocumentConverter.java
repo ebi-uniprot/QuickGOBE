@@ -67,7 +67,7 @@ class AnnotationDocumentConverter implements ItemProcessor<Annotation, Annotatio
         doc.targetSets = constructTargetSets(propertiesMap.get(TARGET_SET));
         doc.goAspect = propertiesMap.get(GO_ASPECT);
         doc.date = createDateFromString(annotation);
-        doc.taxonAncestry = constructTaxonAncestry(propertiesMap.get(TAXON_ANCESTRY));
+        doc.taxonAncestors = constructTaxonAncestors(propertiesMap.get(TAXON_ANCESTORS));
 
         return doc;
     }
@@ -116,11 +116,11 @@ class AnnotationDocumentConverter implements ItemProcessor<Annotation, Annotatio
         return DEFAULT_TAXON;
     }
 
-    private List<Integer> constructTaxonAncestry(String rawAncestry) {
-        if (!Strings.isNullOrEmpty(rawAncestry)) {
-            Matcher matcher = RAW_TAXON_ANCESTRY_REGEX.matcher(rawAncestry);
+    private List<Integer> constructTaxonAncestors(String rawAncestors) {
+        if (!Strings.isNullOrEmpty(rawAncestors)) {
+            Matcher matcher = RAW_TAXON_ANCESTORS_REGEX.matcher(rawAncestors);
             if (matcher.matches()) {
-                return createNullableIntegerListFromDelimitedValues(rawAncestry, COMMA);
+                return createNullableIntegerListFromDelimitedValues(rawAncestors, COMMA);
             }
         }
         return singletonList(DEFAULT_TAXON);

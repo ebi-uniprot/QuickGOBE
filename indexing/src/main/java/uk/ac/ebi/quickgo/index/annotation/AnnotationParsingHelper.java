@@ -20,19 +20,20 @@ class AnnotationParsingHelper {
     static final String DB_OBJECT_TYPE = "db_object_type";
     static final String TARGET_SET = "target_set";
     static final String GO_ASPECT = "go_aspect";
-    static final String TAXON_ANCESTRY = "taxon_lineage";
+    static final String TAXON_ANCESTORS = "taxon_lineage";
 
     // string regex representations
     private static final String DB_COLON_REF_FORMAT = "[A-Za-z0-9_\\.-]+(:[A-Za-z0-9_\\.-]+){1,}";
     private static final String QUALIFIERS_FORMAT =
             "^(NOT\\|)?(involved_in|enables|part_of|contributes_to|colocalizes_with)$";
     private static final String RAW_TAXON_FORMAT = "([1-9]+[0-9]*)";
-    private static final String RAW_TAXON_ANCESTRY_FORMAT = "([1-9]+[0-9]*)(,[1-9]+[0-9]*)*";
+    private static final String RAW_TAXON_ANCESTORS_FORMAT = "([1-9]+[0-9]*)(,[1-9]+[0-9]*)*";
     private static final String INTERACTING_TAXON_FORMAT = "taxon:" + RAW_TAXON_FORMAT;
     static final String DATE_FORMAT = "[0-9]{8}";
 
     static final Pattern PROPS_TAXON_REGEX = Pattern.compile(TAXON_ID + "=" + RAW_TAXON_FORMAT);
-    static final Pattern PROPS_TAXON_ANCESTORS_REGEX = Pattern.compile(TAXON_ANCESTRY + "=" + RAW_TAXON_ANCESTRY_FORMAT);
+    static final Pattern PROPS_TAXON_ANCESTORS_REGEX = Pattern.compile(TAXON_ANCESTORS + "=" +
+            RAW_TAXON_ANCESTORS_FORMAT);
     static final Pattern PROPS_DB_OBJECT_TYPE_REGEX = Pattern.compile(DB_OBJECT_TYPE + "=");
     static final Pattern PROPS_GO_EVIDENCE_REGEX = Pattern.compile(GO_EVIDENCE + "=");
 
@@ -50,6 +51,6 @@ class AnnotationParsingHelper {
             KEY_EQUALS_VALUE_FORMAT, KEY_EQUALS_VALUE_FORMAT, KEY_EQUALS_VALUE_FORMAT, KEY_EQUALS_VALUE_FORMAT));
     static final Pattern INTERACTING_TAXON_REGEX = Pattern.compile(INTERACTING_TAXON_FORMAT);
     static final Pattern RAW_TAXON_REGEX = Pattern.compile(RAW_TAXON_FORMAT);
-    static final Pattern RAW_TAXON_ANCESTRY_REGEX = Pattern.compile(RAW_TAXON_ANCESTRY_FORMAT);
+    static final Pattern RAW_TAXON_ANCESTORS_REGEX = Pattern.compile(RAW_TAXON_ANCESTORS_FORMAT);
     static final Pattern DATE_REGEX = Pattern.compile(DATE_FORMAT);
 }
