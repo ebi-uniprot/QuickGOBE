@@ -32,6 +32,7 @@ import org.springframework.web.context.WebApplicationContext;
 import static java.util.Arrays.asList;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.*;
 import static uk.ac.ebi.quickgo.annotation.IdGeneratorUtil.createGPId;
@@ -1537,6 +1538,16 @@ public class AnnotationControllerIT {
                 .andExpect(fieldsInAllResultsExist(1))
                 .andExpect(valuesOccurInField(GENEPRODUCT_ID_FIELD, geneProductId))
                 .andExpect(valuesOccurInField(DATE_FIELD, expectedResponseDate));
+    }
+
+    // ------------------------------- Check about information -------------------------------
+
+    @Test
+    public void about() throws Exception {
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/about"));
+
+        response.andDo(print())
+                .andExpect(jsonPath("$.annotation.timestamp").value("2017-03-01 18:00"));
     }
 
     // ------------------------------- Helpers -------------------------------
