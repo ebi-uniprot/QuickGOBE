@@ -1,9 +1,10 @@
 package uk.ac.ebi.quickgo.index.annotation;
 
+import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.item.validator.ValidationException;
-import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
 
 import static uk.ac.ebi.quickgo.index.annotation.AnnotationMocker.createValidAnnotation;
 
@@ -273,6 +274,14 @@ public class AnnotationValidatorTest {
     @Test(expected = ValidationException.class)
     public void invalidSingleTermedComponentAnnotationProperty() {
         annotation.annotationProperties = "go_evidence:IPI";
+        validator.validate(annotation);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void invalidAnnotationPropertyDueToTaxonBeing0() {
+        annotation.annotationProperties =
+                "go_evidence=IEA|taxon_id=35758|db_subset=TrEMBL|db_object_symbol=moeA5|db_object_type=protein" +
+                        "|taxon_lineage=0,10,200";
         validator.validate(annotation);
     }
 

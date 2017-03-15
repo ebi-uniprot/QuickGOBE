@@ -27,7 +27,7 @@ class AnnotationParsingHelper {
     private static final String QUALIFIERS_FORMAT =
             "^(NOT\\|)?(involved_in|enables|part_of|contributes_to|colocalizes_with)$";
     private static final String RAW_TAXON_FORMAT = "([0-9]+)";
-    private static final String RAW_TAXON_ANCESTRY_FORMAT = "([0-9]+)(,[0-9]+)*";
+    private static final String RAW_TAXON_ANCESTRY_FORMAT = "([1-9]+[0-9]*)(,[1-9]+[0-9]*)*";
     private static final String INTERACTING_TAXON_FORMAT = "taxon:" + RAW_TAXON_FORMAT;
     static final String DATE_FORMAT = "[0-9]{8}";
 
