@@ -27,11 +27,10 @@ import org.springframework.core.io.Resource;
  * Created with IntelliJ IDEA.
  */
 @Configuration
-@ConfigurationProperties(prefix = "metadata.ontology")
 public class MetaDataConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger(MetaDataConfig.class);
     private static final Path DEFAULT_METADATA_PATH = Paths.get("ONTOLOGY_IRI.dat.gz");
-    private static final String SERVICE = "GO";
+    private static final String SERVICE = "go";
     private static final Function<Path, MetaData> MAPPER = (Path p) -> {
         try (Stream<String> stream = GZIPFiles.lines(p)) {
             MetaDataStringOnly metaDataStringOnly = new MetaDataStringOnly();
