@@ -1547,7 +1547,7 @@ public class AnnotationControllerIT {
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/about"));
 
         response.andDo(print())
-                .andExpect(jsonPath("$.Annotation.timestamp").value("2017-03-01 18:00"));
+                .andExpect(jsonPath("$.annotation.timestamp").value("2017-03-01 18:00"));
     }
 
     // ------------------------------- Helpers -------------------------------
