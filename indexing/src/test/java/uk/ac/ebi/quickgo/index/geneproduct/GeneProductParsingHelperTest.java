@@ -5,9 +5,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.arrayContaining;
-import static org.hamcrest.Matchers.arrayWithSize;
-import static org.hamcrest.Matchers.emptyArray;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
 import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.splitValue;
 import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingUtil.concatProperty;
@@ -29,7 +27,7 @@ public class GeneProductParsingHelperTest {
     public void nullDelimiterThrowsException() throws Exception {
         String value = "";
 
-        thrown.expect(AssertionError.class);
+        thrown.expect(IllegalArgumentException.class);
 
         splitValue(value, null);
     }

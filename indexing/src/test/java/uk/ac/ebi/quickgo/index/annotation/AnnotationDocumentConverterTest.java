@@ -1,5 +1,8 @@
 package uk.ac.ebi.quickgo.index.annotation;
 
+import org.hamcrest.CoreMatchers;
+import org.junit.Before;
+import org.junit.Test;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
 import uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper;
@@ -9,15 +12,10 @@ import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.stream.Collectors;
-import org.hamcrest.CoreMatchers;
-import org.junit.Before;
-import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 import static uk.ac.ebi.quickgo.index.annotation.AnnotationDocumentConverter.DEFAULT_TAXON;
 import static uk.ac.ebi.quickgo.index.annotation.AnnotationMocker.createValidAnnotation;
 import static uk.ac.ebi.quickgo.index.annotation.AnnotationParsingHelper.*;
@@ -285,6 +283,68 @@ public class AnnotationDocumentConverterTest {
         AnnotationDocument doc = converter.process(annotation);
 
         assertThat(doc.goAspect, is(value));
+    }
+
+    // annotation properties: taxon ancestry
+    @Test
+    public void convertsNullAnnotationPropertiesToDefaultTaxonAncestryList() throws Exception {
+        annotation.annotationProperties = null;
+
+        AnnotationDocument doc = converter.process(annotation);
+
+        assertThat(doc.taxonAncestry, contains(DEFAULT_TAXON));
+    }
+
+    @Test
+    public void convertsNullTaxonAncestryAnnotationPropertiesToDefaultTaxonAncestryList() throws Exception {
+        String value = null;
+        annotation.annotationProperties = buildKeyValuesPair(TAXON_ANCESTRY, value);
+
+        AnnotationDocument doc = converter.process(annotation);
+
+        assertThat(doc.taxonAncestry, contains(DEFAULT_TAXON));
+    }
+
+    @Test
+    public void convertsEmptyTaxonAncestryAnnotationPropertiesToDefaultTaxonAncestryList() throws Exception {
+        String value = "";
+        annotation.annotationProperties = buildKeyValuesPair(TAXON_ANCESTRY, value);
+
+        AnnotationDocument doc = converter.process(annotation);
+
+        assertThat(doc.taxonAncestry, contains(DEFAULT_TAXON));
+    }
+
+    @Test
+    public void convertsInvalidTaxonAncestryAnnotationPropertiesToDefaultTaxonAncestryList() throws Exception {
+        String value = "1234d";
+        annotation.annotationProperties = buildKeyValuesPair(TAXON_ANCESTRY, value);
+
+        AnnotationDocument doc = converter.process(annotation);
+
+        assertThat(doc.taxonAncestry, contains(DEFAULT_TAXON));
+    }
+
+    @Test
+    public void convertsSingleTaxonAncestryAnnotationProperties() throws Exception {
+        String value = "1234";
+        annotation.annotationProperties = buildKeyValuesPair(TAXON_ANCESTRY, value);
+
+        AnnotationDocument doc = converter.process(annotation);
+
+        assertThat(doc.taxonAncestry, contains(Integer.valueOf(value)));
+    }
+
+    @Test
+    public void convertsMultipleTaxonAncestryAnnotationProperties() throws Exception {
+        String taxon1 = "1234";
+        String taxon2 = "55";
+        String value = taxon1 + "," + taxon2;
+        annotation.annotationProperties = buildKeyValuesPair(TAXON_ANCESTRY, value);
+
+        AnnotationDocument doc = converter.process(annotation);
+
+        assertThat(doc.taxonAncestry, contains(Integer.valueOf(taxon1), Integer.valueOf(taxon2)));
     }
 
     // date
