@@ -74,8 +74,8 @@ public class GOControllerIT extends OBOControllerIT {
         final String expectedVersion = "http://purl.obolibrary.org/obo/go/releases/2017-01-12/go.owl";
         final String expectedTimestamp = "2017-01-13 02:19";
         response.andDo(print())
-                .andExpect(jsonPath("$.GO.version").value(expectedVersion))
-                .andExpect(jsonPath("$.GO.timestamp").value(expectedTimestamp));
+                .andExpect(jsonPath("$.go.version").value(expectedVersion))
+                .andExpect(jsonPath("$.go.timestamp").value(expectedTimestamp));
     }
 
     /*
