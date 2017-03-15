@@ -1,0 +1,115 @@
+#! /bin/bash
+
+##=========================================================================================
+# Copies files used by the QuickGO Backend application to a location that is profile
+# specific. Also backups up the previous version of the files used.
+##=========================================================================================
+
+set -euo pipefail
+IFS=$'\n\t '
+
+#THIS_DIR="$(dirname $0)"
+#cd "$THIS_DIR"
+
+source "../common/common"
+
+# ======= read the variables used by the control scripts ================================
+source "environment.variables" || {
+    echo "Please create a file called, environment.variables, containing the necessary environment variables."
+    exit 1
+}
+
+readonly PROFILE="$1"
+
+# ====== check which environment will be copied ========================================
+if ! check_profile $PROFILE; then
+   echo "Input profile: $PROFILE, not recognized. Allowable values: $(print_valid_profiles VALID_PROFILES)"
+   exit 1
+fi
+
+# ======= CONSTANTS =======================================
+readonly PERMITTED_USER=("uni_qgo")
+readonly SERVICE_CONF_PATH="$(pwd -P)"
+readonly SERVICE_NAME="$(basename $SERVICE_CONF_PATH)"
+readonly BASE_PATH="$(readlink -f $SERVICE_CONF_PATH/../../)"
+readonly REST_DATA_DIR="$BASE_PATH/data/$PROFILE/$SERVICE_NAME"
+readonly BACKUP_DATA_DIR="$REST_DATA_DIR/.backup"
+readonly COPY_FILE_LIST="$SERVICE_CONF_PATH/copylist"
+readonly SRC_DIR="/nfs/public/rw/goa/quickgo_origin/full"
+
+# ======= check the right user runs this script =======================================
+if ! user_can_execute_script $USER PERMITTED_USER; then
+    echo "This service can only be run as user(s), '${PERMITTED_USER[@]}'"
+    exit 1
+fi
+
+# ======= check if script is run on the right VM =====================================
+if ! [[ $(hostname) =~ ^ebi.* ]]; then
+    echo "This script can only be run from an EBI cluster machine"
+    exit 1
+fi
+
+# ======= FUNCTIONS ======================================================================
+function show_help {
+    cat<<EOF
+  Usage: [profile]
+
+  Argument description:
+    profile      => Indicates the profile of the services to update, possible values [dev|test|prod]
+
+  Example: dev -- copies files required to run the a service for the specified profile
+
+  WARNING: Please be aware of who is using the machine before starting/stopping them.
+EOF
+}
+
+
+# ======= take a string and add a time-stamp to it =======================================
+function addTimeStamp() {
+    local dirname="$(dirname $1)"
+    local fname=$(basename "$1")
+    local fext=""
+
+    if echo "$fname" | grep '\.'; then
+        fext=".${fname##*.}"
+    fi
+
+    local fname="${fname%.*}"
+    echo "$dirname/$fname-$(date '+%s.%N')$fext"
+
+}
+
+readonly TIMESTAMPED_BACKUP_DIR="$(addTimeStamp $BACKUP_DATA_DIR/version)"
+
+# Create the data directory if it doesn't already exist
+mkdir "$REST_DATA_DIR" || true
+mkdir "$BACKUP_DATA_DIR"  || true
+# ======= keep only last 5 backups =======================================
+pushd . > /dev/null
+cd "$BACKUP_DATA_DIR"
+
+# double check we're actually in the backup directory, before deleting anything!
+if [ "$(basename $(pwd))" = "$(basename $BACKUP_DATA_DIR)" ]; then
+    echo "Deleting oldest backups, but keeping newest 5";
+    (ls -t|head -n 5;ls)|sort|uniq -u|xargs rm -rf;
+fi
+popd > /dev/null
+
+
+# copy current data to backup dir, only if there are files in the backup direcotry
+files=("$REST_DATA_DIR")
+if [ ${#files[@]} -gt 0 ]; then
+
+    # Create the backup dir
+    mkdir $TIMESTAMPED_BACKUP_DIR
+
+    # Move all files in data directory to backup directory
+    find $REST_DATA_DIR -maxdepth 1 -type f -exec mv {} "$TIMESTAMPED_BACKUP_DIR" \;
+
+fi
+
+# ======= copy the latest files into the profile data directory  ==================
+while read line
+do
+    cp -v "$SRC_DIR/$line" "$REST_DATA_DIR"
+done < "$COPY_FILE_LIST"
