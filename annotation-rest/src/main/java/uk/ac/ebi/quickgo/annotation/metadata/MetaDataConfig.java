@@ -29,7 +29,7 @@ import static java.util.stream.Collectors.toList;
 @Configuration
 public class MetaDataConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger(MetaDataConfig.class);
-    private static final String SERVICE = "Annotation";
+    private static final String SERVICE = "annotation";
     private static final Path DEFAULT_METADATA_PATH = Paths.get("goa_uniprot.gpa-version");
     private static final Function<Path, MetaData> MAPPER = (Path p) -> {
         try (Stream<String> stream = Files.lines(p)){
