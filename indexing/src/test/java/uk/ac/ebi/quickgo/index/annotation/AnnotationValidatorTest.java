@@ -278,17 +278,17 @@ public class AnnotationValidatorTest {
     }
 
     @Test(expected = ValidationException.class)
-    public void invalidAnnotationPropertyDueToTaxonBeing0() {
+    public void invalidAnnotationPropertyDueToMissingGOEvidence() {
         annotation.annotationProperties =
-                "go_evidence=IEA|taxon_id=35758|db_subset=TrEMBL|db_object_symbol=moeA5|db_object_type=protein" +
-                        "|taxon_lineage=0,10,200";
+                "taxon_id=35758|db_subset=TrEMBL|db_object_symbol=moeA5|db_object_type=protein|taxon_lineage=1,2";
         validator.validate(annotation);
     }
 
     @Test(expected = ValidationException.class)
-    public void invalidAnnotationPropertyDueToMissingGOEvidence() {
+    public void invalidAnnotationPropertyDueToTaxonIdBeing0() {
         annotation.annotationProperties =
-                "taxon_id=35758|db_subset=TrEMBL|db_object_symbol=moeA5|db_object_type=protein|taxon_lineage=1,2";
+                "go_evidence=IEA|taxon_id=0|db_subset=TrEMBL|db_object_symbol=moeA5|db_object_type=protein" +
+                        "|taxon_lineage=10,200";
         validator.validate(annotation);
     }
 
@@ -302,6 +302,14 @@ public class AnnotationValidatorTest {
     @Test(expected = ValidationException.class)
     public void invalidAnnotationPropertyDueToMissingDbObjectType() {
         annotation.annotationProperties = "go_evidence=IEA|taxon_id=35758|db_subset=TrEMBL|db_object_symbol=moeA5|taxon_lineage=1,2";
+        validator.validate(annotation);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void invalidAnnotationPropertyDueToTaxonLineageBeing0() {
+        annotation.annotationProperties =
+                "go_evidence=IEA|taxon_id=35758|db_subset=TrEMBL|db_object_symbol=moeA5|db_object_type=protein" +
+                        "|taxon_lineage=0,10,200";
         validator.validate(annotation);
     }
 
@@ -400,8 +408,14 @@ public class AnnotationValidatorTest {
 
     // bad taxon field
     @Test(expected = ValidationException.class)
-    public void invalidInteractingTaxon() {
+    public void invalidInteractingTaxonWhenIncludingLetter() {
         annotation.interactingTaxonId = "taxon:652611a";
+        validator.validate(annotation);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void invalidInteractingTaxonWhenZero() {
+        annotation.interactingTaxonId = "taxon:0";
         validator.validate(annotation);
     }
 
