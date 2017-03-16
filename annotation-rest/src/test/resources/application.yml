@@ -15,6 +15,8 @@ annotation:
   download:
     ontologySource: ONTOLOGY_IRI.dat.gz
     pageSize: 6
+  metadata:
+    source: classpath:/goa_uniprot.gpa-version
 
 search:
   external:
