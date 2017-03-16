@@ -1,6 +1,6 @@
-package uk.ac.ebi.quickgo.ontology.controller;
+package uk.ac.ebi.quickgo.annotation.controller;
 
-import uk.ac.ebi.quickgo.ontology.OntologyREST;
+import uk.ac.ebi.quickgo.annotation.AnnotationREST;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -28,12 +28,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Created with IntelliJ IDEA.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = {OntologyREST.class})
+@SpringApplicationConfiguration(classes = {AnnotationREST.class})
 @WebAppConfiguration
 @TestPropertySource(properties = {"coterm.source.manual=fu", "coterm.source.all=bar"})
 public class CoTermControllerFailedLoadIT {
 
-    private static final String RESOURCE_URL = "/ontology/go/coterms";
+    private static final String RESOURCE_URL = "/annotation/coterms";
     private static final String VALID_GO_TERM = "GO:7777771";
 
     @Autowired

@@ -1,8 +1,8 @@
-package uk.ac.ebi.quickgo.ontology.controller;
+package uk.ac.ebi.quickgo.annotation.controller;
 
-import uk.ac.ebi.quickgo.ontology.common.coterms.CoTerm;
-import uk.ac.ebi.quickgo.ontology.common.coterms.CoTermRepository;
-import uk.ac.ebi.quickgo.ontology.common.coterms.CoTermSource;
+import uk.ac.ebi.quickgo.annotation.common.coterms.CoTerm;
+import uk.ac.ebi.quickgo.annotation.common.coterms.CoTermRepository;
+import uk.ac.ebi.quickgo.annotation.common.coterms.CoTermSource;
 import uk.ac.ebi.quickgo.rest.ParameterException;
 import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
@@ -30,7 +30,7 @@ import static uk.ac.ebi.quickgo.common.validator.OntologyIdPredicate.isValidGOTe
  * @author Tony Wardell
  */
 @RestController
-@RequestMapping(value = "/ontology/go/coterms")
+@RequestMapping(value = "/annotation/coterms")
 public class CoTermController {
 
     public static final String LIMIT_ALL = "ALL";

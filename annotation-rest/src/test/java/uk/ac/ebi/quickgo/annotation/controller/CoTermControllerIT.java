@@ -1,7 +1,7 @@
-package uk.ac.ebi.quickgo.ontology.controller;
+package uk.ac.ebi.quickgo.annotation.controller;
 
-import uk.ac.ebi.quickgo.ontology.OntologyREST;
-import uk.ac.ebi.quickgo.ontology.common.coterms.CoTermSource;
+import uk.ac.ebi.quickgo.annotation.AnnotationREST;
+import uk.ac.ebi.quickgo.annotation.common.coterms.CoTermSource;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -13,6 +13,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -25,6 +26,8 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD;
+import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -38,11 +41,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Created with IntelliJ IDEA.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = {OntologyREST.class})
+@SpringApplicationConfiguration(classes = {AnnotationREST.class})
 @WebAppConfiguration
 public class CoTermControllerIT {
 
-    private static final String RESOURCE_URL = "/ontology/go/coterms";
+    private static final String RESOURCE_URL = "/annotation/coterms";
     private static final int NUMBER_OF_ALL_CO_TERM_RECORDS = 12;
     private static final String GO_0000001 = "GO:0000001";
     private static final String GO_9000001 = "GO:9000001";

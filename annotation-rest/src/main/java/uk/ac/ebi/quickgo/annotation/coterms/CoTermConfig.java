@@ -1,7 +1,7 @@
-package uk.ac.ebi.quickgo.ontology.coterms;
+package uk.ac.ebi.quickgo.annotation.coterms;
 
-import uk.ac.ebi.quickgo.ontology.common.coterms.CoTermRepository;
-import uk.ac.ebi.quickgo.ontology.common.coterms.CoTermRepositorySimpleMap;
+import uk.ac.ebi.quickgo.annotation.common.coterms.CoTermRepository;
+import uk.ac.ebi.quickgo.annotation.common.coterms.CoTermRepositorySimpleMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 
-import static uk.ac.ebi.quickgo.ontology.common.coterms.CoTermRepositorySimpleMap.createEmptyRepository;
+import static uk.ac.ebi.quickgo.annotation.common.coterms.CoTermRepositorySimpleMap.createEmptyRepository;
 
 /**
  * @author Tony Wardell

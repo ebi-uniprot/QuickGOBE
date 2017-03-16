@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.ontology.common.coterms;
+package uk.ac.ebi.quickgo.annotation.common.coterms;
 
 import java.io.IOException;
 import org.springframework.beans.factory.annotation.Value;
@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.io.Resource;
 
-import static uk.ac.ebi.quickgo.ontology.common.coterms.CoTermRepositorySimpleMap.*;
+import static uk.ac.ebi.quickgo.annotation.common.coterms.CoTermRepositorySimpleMap.*;
 
 /**
  * Configuration class related to loading and using co-occurring terms information.
