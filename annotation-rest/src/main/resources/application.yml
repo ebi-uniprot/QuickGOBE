@@ -7,13 +7,3 @@ search:
       - signature: goIds,goUsage,relations
         execution: REST_COMM
         properties: {ip: 123.456.789, resourceFormat: endpoint, localField: goId}
-
-## ========== Co-occurring Terms ==========
-coterm:
-  source:
-    manual:
-    all:
-    header:
-      lines: 1
-    default:
-      limit: 30

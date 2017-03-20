@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.annotation.common.coterms;
+package uk.ac.ebi.quickgo.annotation.coterms;
 
 import java.util.List;
 

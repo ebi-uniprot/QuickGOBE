@@ -1,8 +1,8 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
-import uk.ac.ebi.quickgo.annotation.common.coterms.CoTerm;
-import uk.ac.ebi.quickgo.annotation.common.coterms.CoTermRepository;
-import uk.ac.ebi.quickgo.annotation.common.coterms.CoTermSource;
+import uk.ac.ebi.quickgo.annotation.coterms.CoTerm;
+import uk.ac.ebi.quickgo.annotation.coterms.CoTermRepository;
+import uk.ac.ebi.quickgo.annotation.coterms.CoTermSource;
 import uk.ac.ebi.quickgo.rest.ParameterException;
 import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;

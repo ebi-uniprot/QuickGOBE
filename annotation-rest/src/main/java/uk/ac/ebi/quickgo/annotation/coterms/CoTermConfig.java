@@ -1,16 +1,13 @@
 package uk.ac.ebi.quickgo.annotation.coterms;
 
-import uk.ac.ebi.quickgo.annotation.common.coterms.CoTermRepository;
-import uk.ac.ebi.quickgo.annotation.common.coterms.CoTermRepositorySimpleMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.Resource;
 
-import static uk.ac.ebi.quickgo.annotation.common.coterms.CoTermRepositorySimpleMap.createEmptyRepository;
+import static uk.ac.ebi.quickgo.annotation.coterms.CoTermRepositorySimpleMap.createEmptyRepository;
 
 /**
  * @author Tony Wardell
@@ -19,21 +16,12 @@ import static uk.ac.ebi.quickgo.annotation.common.coterms.CoTermRepositorySimple
  * Created with IntelliJ IDEA.
  */
 @Configuration
+@ConfigurationProperties(prefix = "annotation.download")
 public class CoTermConfig {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CoTermConfig.class);
+    private CoTermProperties coTermProperties = new CoTermProperties();
 
-    @Value("${coterm.default.limit:50}")
-    private int defaultLimit;
-
-    @Value("${coterm.source.manual}")
-    private Resource manualResource;
-
-    @Value("${coterm.source.all}")
-    private Resource allResource;
-
-    @Value("${coterm.source.headerLines:1}")
-    private int headerLines;
 
     /**
      * If we have been unable to load the CoTermRepository, do not propagate the exception as this will stop all
@@ -44,18 +32,25 @@ public class CoTermConfig {
     @Bean
     public CoTermRepository coTermRepository() {
         CoTermRepositorySimpleMap coTermRepository;
+        LOGGER.debug("Contents of coterm properties" + coTermProperties);
         try {
-            coTermRepository = CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(manualResource, allResource,
-                                                                                         headerLines);
+            coTermRepository = CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(coTermProperties.manual,
+                                                                                         coTermProperties.all,
+                                                                                         coTermProperties.headerLines);
         } catch (Exception e) {
             final String errorMessage = "Failed to load co-occurring terms from 'MANUAL' source " +
-                    (manualResource == null ? "unknown" : manualResource.getDescription()) +
+                    (coTermProperties
+                             .getManual() == null ? "unknown" : coTermProperties
+                            .getManual().getDescription()) +
                     " or from 'ALL' source " +
-                    (allResource == null ? "unknown" : allResource.getDescription());
+                    (coTermProperties.getAll() == null ? "unknown" : coTermProperties.getAll().getDescription());
             LOGGER.error(errorMessage);
             coTermRepository = createEmptyRepository();
         }
         return coTermRepository;
     }
 
+    public void setCoTermProperties(CoTermProperties coTermProperties) {
+        this.coTermProperties = coTermProperties;
+    }
 }

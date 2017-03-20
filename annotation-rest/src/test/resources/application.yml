@@ -68,10 +68,7 @@ annotation:
 
 ## ========== Co-occurring Terms ==========
 coterm:
-  source:
-    manual: classpath:/coterms/CoTermsManual
-    all: classpath:/coterms/CoTermsAll
-    header:
-      lines: 1
-  default:
-    limit: 30
+   manual: classpath:/coterms/CoTermsManual
+   all: classpath:/coterms/CoTermsAll
+   headerLines: 1
+   limit: 30

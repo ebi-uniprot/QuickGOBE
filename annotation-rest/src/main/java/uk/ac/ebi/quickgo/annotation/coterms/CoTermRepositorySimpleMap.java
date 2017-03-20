@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.annotation.common.coterms;
+package uk.ac.ebi.quickgo.annotation.coterms;
 
 import com.google.common.base.Preconditions;
 import java.io.IOException;
