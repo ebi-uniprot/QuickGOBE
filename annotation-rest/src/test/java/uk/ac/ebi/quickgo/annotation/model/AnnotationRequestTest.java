@@ -1,15 +1,16 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import uk.ac.ebi.quickgo.annotation.AnnotationParameters;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationFields;
 import uk.ac.ebi.quickgo.rest.ParameterException;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 
 import java.util.List;
 import java.util.stream.Stream;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayContaining;
@@ -19,11 +20,7 @@ import static org.hamcrest.core.IsEqual.equalTo;
 import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.EVIDENCE_CODE_USAGE_RELATIONS_PARAM;
 import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.GO_ID_PARAM;
 import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.GO_USAGE_RELATIONS_PARAM;
-import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.DEFAULT_EVIDENCE_CODE_USAGE;
-import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.DEFAULT_GO_USAGE;
-import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.DESCENDANTS_USAGE;
-import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.EXACT_USAGE;
-import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.GO_USAGE_RELATIONSHIPS;
+import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.*;
 
 /**
  *
