@@ -89,6 +89,12 @@ public class FilterRequest {
 
     }
 
+    @Override public String toString() {
+        return "FilterRequest{" +
+                "properties=" + properties +
+                '}';
+    }
+
     public static class Builder {
         private Map<String, List<String>> properties;
 

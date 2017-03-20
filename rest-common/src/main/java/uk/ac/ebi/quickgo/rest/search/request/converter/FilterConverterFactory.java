@@ -50,7 +50,6 @@ public class FilterConverterFactory {
                             "RequestConfig execution has not been handled " +
                                     "for signature (" + request.getSignature() + ") in " + filterConfigRetrieval);
             }
-
         } else {
             throw new IllegalStateException(
                     "Could not find signature (" + request.getSignature() + ") in " + filterConfigRetrieval);

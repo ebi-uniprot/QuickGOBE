@@ -569,44 +569,44 @@ public class AnnotationRequestValidationIT {
         assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
     }
 
-    //USAGE PARAMETERS
+    //GO USAGE PARAMETERS
     @Test
-    public void descendantsUsageIsValid() {
+    public void descendantsGoUsageIsValid() {
         annotationRequest.setGoUsage("descendants");
 
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
-    public void slimUsageIsValid() {
+    public void slimGoUsageIsValid() {
         annotationRequest.setGoUsage("slim");
 
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
-    public void exactUsageIsInvalid() {
+    public void exactGoUsageIsValid() {
         annotationRequest.setGoUsage("exact");
 
-        assertThat(validator.validate(annotationRequest), hasSize(1));
+        assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
-    public void usageValueIsInvalid() {
+    public void goUsageValueIsInvalid() {
         annotationRequest.setGoUsage("thisDoesNotExistAsAValidUsage");
 
         assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
     }
 
     @Test
-    public void usageRelationshipIsValid() {
+    public void goUsageRelationshipIsValid() {
         annotationRequest.setGoUsageRelationships("is_a");
 
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
-    public void usageRelationshipIsInvalid() {
+    public void goUsageRelationshipIsInvalid() {
         String invalidRel = "invalid_relationship";
 
         annotationRequest.setGoUsageRelationships(invalidRel);
@@ -619,11 +619,70 @@ public class AnnotationRequestValidationIT {
     }
 
     @Test(expected = ParameterException.class)
-    public void cannotCreateFilterWithUsageAndNoUsageIds() {
+    public void cannotCreateFilterWithGoUsageAndNoUsageIds() {
         annotationRequest.setGoUsage("descendants");
 
         annotationRequest.createFilterRequests();
     }
+
+    //---------------------------------------
+    //ECO USAGE PARAMETERS
+    @Test
+    public void descendantsEcoUsageIsValid() {
+        annotationRequest.setEvidenceCodeUsage("descendants");
+
+        assertThat(validator.validate(annotationRequest), hasSize(0));
+    }
+
+    @Test
+    public void exactEcoUsageIsValid() {
+        annotationRequest.setEvidenceCodeUsage("exact");
+
+        assertThat(validator.validate(annotationRequest), hasSize(0));
+    }
+
+    @Test
+    public void slimEcoUsageIsInvalid() {
+        annotationRequest.setEvidenceCodeUsage("slim");
+
+        assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
+    }
+
+    @Test
+    public void ecoUsageValueIsInvalid() {
+        annotationRequest.setEvidenceCodeUsage("thisDoesNotExistAsAValidUsage");
+
+        assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
+    }
+
+    @Test
+    public void ecoUsageRelationshipIsValid() {
+        annotationRequest.setEvidenceCodeUsageRelationships("is_a");
+
+        assertThat(validator.validate(annotationRequest), hasSize(0));
+    }
+
+    @Test
+    public void ecoUsageRelationshipIsInvalid() {
+        String invalidRel = "invalid_relationship";
+
+        annotationRequest.setEvidenceCodeUsageRelationships(invalidRel);
+
+        Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+
+        assertThat(violations, hasSize(1));
+        assertThat(violations.iterator().next().getMessage(),
+                is(createRegexErrorMessage(USAGE_RELATIONSHIP_PARAM, invalidRel)));
+    }
+
+    @Test(expected = ParameterException.class)
+    public void cannotCreateFilterWithEcoUsageAndNoUsageIds() {
+        annotationRequest.setEvidenceCodeUsage("descendants");
+
+        annotationRequest.createFilterRequests();
+    }
+    //---------------------------------------
+
 
     //WITH/FROM PARAMETER
     @Test
