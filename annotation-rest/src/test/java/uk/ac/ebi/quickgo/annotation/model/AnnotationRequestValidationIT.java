@@ -1,18 +1,5 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
-import uk.ac.ebi.quickgo.annotation.IdGeneratorUtil;
-import uk.ac.ebi.quickgo.annotation.validation.loader.ValidationConfig;
-import uk.ac.ebi.quickgo.annotation.validation.service.JobTestRunnerConfig;
-import uk.ac.ebi.quickgo.rest.ParameterException;
-import uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern;
-
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,20 +10,28 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.ConfigFileApplicationContextInitializer;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import uk.ac.ebi.quickgo.annotation.IdGeneratorUtil;
+import uk.ac.ebi.quickgo.annotation.validation.loader.ValidationConfig;
+import uk.ac.ebi.quickgo.annotation.validation.service.JobTestRunnerConfig;
+import uk.ac.ebi.quickgo.rest.ParameterException;
+import uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.*;
 import static uk.ac.ebi.quickgo.annotation.IdGeneratorUtil.generateValues;
 import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.*;
-import static uk.ac.ebi.quickgo.annotation.validation.loader.ValidationConfig
-        .LOAD_ANNOTATION_DBX_REF_ENTITIES_STEP_NAME;
-import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.MAX_ENTRIES_PER_PAGE;
-import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.MIN_ENTRIES_PER_PAGE;
-import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.MIN_PAGE_NUMBER;
+import static uk.ac.ebi.quickgo.annotation.validation.loader.ValidationConfig.LOAD_ANNOTATION_DBX_REF_ENTITIES_STEP_NAME;
+import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.*;
 
 /**
  * Tests that the validation added to the {@link AnnotationRequest} class is correct.
@@ -170,7 +165,7 @@ public class AnnotationRequestValidationIT {
         assertThat(violations, hasSize(0));
     }
 
-    //TAXONOMY ID PARAMETER
+    //TAXONOMY ID PARAMETER (applicable to all taxonUsage values)
     @Test
     public void negativeTaxonIdIsInvalid() {
         String invalidTaxonId = "-1";
@@ -244,6 +239,51 @@ public class AnnotationRequestValidationIT {
         assertThat(violations, hasSize(1));
         assertThat(violations.iterator().next().getMessage(),
                 is(createMaxSizeErrorMessage(TAXON_ID_PARAM, MAX_TAXON_IDS)));
+    }
+
+    //TAXON USAGE
+    @Test
+    public void exactTaxonUsageIsValid() {
+        String usage = "exact";
+
+        annotationRequest.setTaxonUsage(usage);
+
+        assertThat(validator.validate(annotationRequest), hasSize(0));
+    }
+
+    @Test
+    public void descendantsTaxonUsageIsValid() {
+        String usage = "descendants";
+
+        annotationRequest.setTaxonUsage(usage);
+
+        assertThat(validator.validate(annotationRequest), hasSize(0));
+    }
+
+    @Test
+    public void multipleTaxonUsageIsInvalid() {
+        String usage = "descendants,exact";
+
+        annotationRequest.setTaxonUsage(usage);
+
+        Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+
+        assertThat(violations, hasSize(is(1)));
+        assertThat(violations.iterator().next().getMessage(),
+                containsString("Invalid " + TAXON_USAGE_FIELD + ": " + usage + ""));
+    }
+
+    @Test
+    public void taxonUsageIsInvalid() {
+        String usage = "thisisnotokay";
+
+        annotationRequest.setTaxonUsage(usage);
+
+        Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+
+        assertThat(violations, hasSize(is(1)));
+        assertThat(violations.iterator().next().getMessage(),
+                containsString("Invalid " + TAXON_USAGE_FIELD + ": " + usage + ""));
     }
 
     //GENE PRODUCT ID

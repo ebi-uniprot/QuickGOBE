@@ -33,6 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.GO_ID_PARAM;
 import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.TAXON_ID_PARAM;
+import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.TAXON_USAGE_PARAM;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.contentTypeToBeJson;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.totalNumOfResults;
 import static uk.ac.ebi.quickgo.annotation.controller.StatsResponseVerifier.keysInTypeWithinGroup;
@@ -63,6 +64,7 @@ public class AnnotationControllerStatisticsIT {
     private static final String REFERENCE_STATS_FIELD = "reference";
     private static final String TAXON_ID_STATS_FIELD = "taxonId";
     private static final String GO_ASPECT_STATS_FIELD = "aspect";
+    private static final String EXACT = "exact";
 
     private MockMvc mockMvc;
 
@@ -133,6 +135,7 @@ public class AnnotationControllerStatisticsIT {
         ResultActions response = mockMvc.perform(
                 get(STATS_ENDPOINT)
                         .param(TAXON_ID_PARAM.getName(), "42")
+                        .param(TAXON_USAGE_PARAM.getName(), EXACT)
         );
 
         assertStatsResponse(response, GO_ID_STATS_FIELD, 2, relevantGOIds);

@@ -1,13 +1,15 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
-import uk.ac.ebi.quickgo.rest.ParameterException;
-import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
-
-import java.util.stream.Stream;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import uk.ac.ebi.quickgo.annotation.common.AnnotationFields;
+import uk.ac.ebi.quickgo.rest.ParameterException;
+import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
+
+import java.util.List;
+import java.util.stream.Stream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayContaining;
@@ -114,15 +116,6 @@ public class AnnotationRequestTest {
     }
 
     @Test
-    public void setAndGetTaxon() {
-        String taxonId = "1";
-
-        annotationRequest.setTaxonId(taxonId);
-
-        assertThat(annotationRequest.getTaxonId(), arrayContaining(taxonId));
-    }
-
-    @Test
     public void setAndGetGoUsage() {
         String usage = "exact";
 
@@ -191,6 +184,76 @@ public class AnnotationRequestTest {
     @Test(expected = ParameterException.class)
     public void cannotCreateFilterWithUsageAndNoGoUsageIds() {
         annotationRequest.setGoUsage("descendants");
+
+        annotationRequest.createFilterRequests();
+    }
+
+    //-----------------
+    @Test
+    public void setAndGetTaxon() {
+        String taxonId = "1";
+
+        annotationRequest.setTaxonId(taxonId);
+
+        assertThat(annotationRequest.getTaxonId(), arrayContaining(taxonId));
+    }
+
+    @Test
+    public void setAndGetTaxonUsage() {
+        String taxonUsage = "exact";
+        annotationRequest.setTaxonUsage(taxonUsage);
+
+        assertThat(annotationRequest.getTaxonUsage(), is(taxonUsage));
+    }
+
+    @Test
+    public void useCorrectDefaultTaxonUsage() {
+        annotationRequest.createFilterRequests();
+
+        assertThat(annotationRequest.getTaxonUsage(), is(AnnotationRequest.DEFAULT_TAXON_USAGE));
+    }
+
+    @Test
+    public void canCreateDefaultTaxonFilterWithTaxonIds() {
+        annotationRequest.setTaxonId("1", "2");
+
+        FilterRequest request = FilterRequest.newBuilder()
+                .addProperty(getDefaultTaxonSearchField(), "1", "2")
+                .build();
+        List<FilterRequest> filterRequests = annotationRequest.createFilterRequests();
+
+        assertThat(filterRequests, contains(request));
+    }
+
+    @Test
+    public void canCreateTaxonDescendantsFilterWithTaxonUsageAndTaxonIds() {
+        annotationRequest.setTaxonId("1", "2");
+        annotationRequest.setTaxonUsage("descendants");
+
+        FilterRequest request = FilterRequest.newBuilder()
+                .addProperty(AnnotationFields.Searchable.TAXON_ANCESTORS, "1", "2")
+                .build();
+        List<FilterRequest> filterRequests = annotationRequest.createFilterRequests();
+
+        assertThat(filterRequests, contains(request));
+    }
+
+    @Test
+    public void canCreateTaxonExactFilterWithTaxonUsageAndTaxonIds() {
+        annotationRequest.setTaxonId("1", "2");
+        annotationRequest.setTaxonUsage("exact");
+
+        FilterRequest request = FilterRequest.newBuilder()
+                .addProperty(AnnotationFields.Searchable.TAXON_ID, "1", "2")
+                .build();
+        List<FilterRequest> filterRequests = annotationRequest.createFilterRequests();
+
+        assertThat(filterRequests, contains(request));
+    }
+
+    @Test(expected = ParameterException.class)
+    public void cannotCreateFilterWithTaxonUsageAndNoTaxonIds() {
+        annotationRequest.setTaxonUsage("descendants");
 
         annotationRequest.createFilterRequests();
     }
@@ -268,7 +331,6 @@ public class AnnotationRequestTest {
 
         annotationRequest.createFilterRequests();
     }
-    //-----------------
 
     @Test
     public void setAndGetQualifier() {
@@ -276,6 +338,7 @@ public class AnnotationRequestTest {
         annotationRequest.setQualifier(qualifier);
         assertThat(annotationRequest.getQualifier(), arrayContaining(qualifier));
     }
+    //-----------------
 
     @Test
     public void setAndGetReference() {
@@ -296,5 +359,19 @@ public class AnnotationRequestTest {
         int limit = 12345;
         annotationRequest.setDownloadLimit(limit);
         assertThat(annotationRequest.getDownloadLimit(), is(limit));
+    }
+
+    private String getDefaultTaxonSearchField() {
+        String field;
+        switch (AnnotationRequest.DEFAULT_TAXON_USAGE) {
+            case "descendants":
+                field = AnnotationFields.Searchable.TAXON_ANCESTORS;
+                break;
+            case "exact":
+            default:
+                field = AnnotationFields.Searchable.TAXON_ID;
+                break;
+        }
+        return field;
     }
 }

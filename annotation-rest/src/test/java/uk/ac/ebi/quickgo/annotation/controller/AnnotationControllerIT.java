@@ -1,20 +1,5 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
-import uk.ac.ebi.quickgo.annotation.AnnotationREST;
-import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
-import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
-import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker;
-import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
-
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.StringJoiner;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -28,6 +13,20 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import uk.ac.ebi.quickgo.annotation.AnnotationREST;
+import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
+import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
+import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker;
+import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
+
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static java.util.Arrays.asList;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -39,9 +38,7 @@ import static uk.ac.ebi.quickgo.annotation.IdGeneratorUtil.createGPId;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.*;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.*;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.ResponseItem.responseItem;
-import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.DEFAULT_ENTRIES_PER_PAGE;
-import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.MAX_PAGE_NUMBER;
-import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.MAX_PAGE_RESULTS;
+import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.*;
 
 /**
  * RESTful end point for Annotations
@@ -59,6 +56,8 @@ public class AnnotationControllerIT {
     @ClassRule
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
     public static final String DATE_STRING_FORMAT = "%04d%02d%02d";
+    public static final String EXACT = "exact";
+    public static final String DESCENDANTS = "descendants";
     //Test Data
     private static final String MISSING_ASSIGNED_BY = "ZZZZZ";
     private static final String RESOURCE_URL = "/annotation";
@@ -246,7 +245,9 @@ public class AnnotationControllerIT {
         repository.save(document);
 
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(TAXON_ID_PARAM.getName(), Integer.toString(taxonId)));
+                get(RESOURCE_URL + "/search")
+                        .param(TAXON_ID_PARAM.getName(), Integer.toString(taxonId))
+                        .param(TAXON_USAGE_PARAM.getName(), EXACT));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -274,7 +275,8 @@ public class AnnotationControllerIT {
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search")
                         .param(TAXON_ID_PARAM.getName(), Integer.toString(taxonId1))
-                        .param(TAXON_ID_PARAM.getName(), Integer.toString(taxonId2)));
+                        .param(TAXON_ID_PARAM.getName(), Integer.toString(taxonId2))
+                        .param(TAXON_USAGE_PARAM.getName(), EXACT));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -294,7 +296,8 @@ public class AnnotationControllerIT {
         repository.save(document);
 
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(GENE_PRODUCT_ID_PARAM.getName(), geneProductId));
+                get(RESOURCE_URL + "/search")
+                        .param(GENE_PRODUCT_ID_PARAM.getName(), geneProductId));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -305,16 +308,142 @@ public class AnnotationControllerIT {
     }
 
     @Test
+    public void filterByMissingTaxonIdFindsNothingSuccessfully() throws Exception {
+        int desiredTaxonId = 999999;
+
+        String geneProductId = "P99999";
+        int taxonId = 2;
+        AnnotationDocument document = createDocWithTaxonId(geneProductId, taxonId);
+        repository.save(document);
+
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search")
+                        .param(TAXON_ID_PARAM.getName(), Integer.toString(desiredTaxonId))
+                        .param(TAXON_USAGE_PARAM.getName(), EXACT));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(0));
+    }
+
+    @Test
     public void invalidTaxIdThrowsError() throws Exception {
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(TAXON_ID_PARAM.getName(), "-2"));
+                get(RESOURCE_URL + "/search")
+                        .param(TAXON_ID_PARAM.getName(), "-2")
+                        .param(TAXON_USAGE_PARAM.getName(), EXACT));
+
+        response.andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    // -- taxon descendant filtering
+    @Test
+    public void filterByTaxonAncestorSuccessfully() throws Exception {
+        int taxonId = 3;
+        int parentTaxonId = 4;
+        int grandParentTaxonId = 5;
+
+        List<AnnotationDocument> documents =
+                createDocsWithTaxonAncestors(asList(taxonId, parentTaxonId, grandParentTaxonId));
+        repository.save(documents);
+
+        String[] expectedGPIds = asArray(transformDocs(documents, d -> d.geneProductId));
+
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search")
+                        .param(TAXON_ID_PARAM.getName(), Integer.toString(grandParentTaxonId))
+                        .param(TAXON_USAGE_PARAM.getName(), DESCENDANTS));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(3))
+                .andExpect(fieldsInAllResultsExist(3))
+                .andExpect(valuesOccursInField(TAXON_ID_FIELD, taxonId, parentTaxonId, grandParentTaxonId))
+                .andExpect(valuesOccurInField(GENEPRODUCT_ID_FIELD, expectedGPIds));
+    }
+
+    @Test
+    public void filterByTaxonAncestorsSuccessfully() throws Exception {
+        int taxonId1 = 3;
+        int parentTaxonId1 = 4;
+        int grandParentTaxonId1 = 5;
+
+        int taxonId2 = 8;
+        int parentTaxonId2 = 9;
+        int grandParentTaxonId2 = 10;
+
+        List<AnnotationDocument> documents =
+                createDocsWithTaxonAncestors(asList(taxonId1, parentTaxonId1, grandParentTaxonId1));
+        documents.addAll(createDocsWithTaxonAncestors(asList(taxonId2, parentTaxonId2, grandParentTaxonId2)));
+        repository.save(documents);
+
+        Integer[] expectedTaxonIds = {taxonId1,
+                parentTaxonId1,
+                grandParentTaxonId1,
+                taxonId2,
+                parentTaxonId2};
+
+        String[] expectedGPIds = asArray(
+                transformDocs(
+                        filterDocuments(
+                                documents,
+                                expectedTaxonIds,
+                                doc -> doc.taxonId),
+                        doc -> doc.geneProductId));
+
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search")
+                        .param(TAXON_ID_PARAM.getName(),
+                                Integer.toString(grandParentTaxonId1),
+                                Integer.toString(parentTaxonId2))
+                        .param(TAXON_USAGE_PARAM.getName(), DESCENDANTS));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(5))
+                .andExpect(fieldsInAllResultsExist(5))
+                .andExpect(valuesOccursInField(TAXON_ID_FIELD, expectedTaxonIds))
+                .andExpect(valuesOccurInField(GENEPRODUCT_ID_FIELD, expectedGPIds));
+    }
+
+    @Test
+    public void filterByMissingTaxonAncestorFindsNothingSuccessfully() throws Exception {
+        int desiredTaxonId = 99999999;
+        int taxonId = 3;
+        int parentTaxonId = 4;
+        int grandParentTaxonId = 5;
+
+        List<AnnotationDocument> documents =
+                createDocsWithTaxonAncestors(asList(taxonId, parentTaxonId, grandParentTaxonId));
+        repository.save(documents);
+
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search")
+                        .param(TAXON_ID_PARAM.getName(), Integer.toString(desiredTaxonId))
+                        .param(TAXON_USAGE_PARAM.getName(), DESCENDANTS));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(0));
+    }
+
+    @Test
+    public void invalidTaxIdWithDescendantsThrowsError() throws Exception {
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search")
+                        .param(TAXON_ID_PARAM.getName(), "-2")
+                        .param(TAXON_USAGE_PARAM.getName(), DESCENDANTS));
 
         response.andDo(print())
                 .andExpect(status().isBadRequest());
     }
 
     //---------- GoEvidence related tests.
-
     @Test
     public void filterAnnotationsByGoEvidenceCodeSuccessfully() throws Exception {
         String goEvidenceCode = "IEA";
@@ -387,8 +516,6 @@ public class AnnotationControllerIT {
 
     }
 
-    //---------- Qualifier related tests.
-
     @Test
     public void successfullyLookupAnnotationsByQualifier() throws Exception {
         String qualifier = "enables";
@@ -423,6 +550,8 @@ public class AnnotationControllerIT {
 
     }
 
+    //---------- Qualifier related tests.
+
     @Test
     public void failToFindAnnotationsWhenQualifierDoesntExist() throws Exception {
         ResultActions response = mockMvc.perform(
@@ -434,8 +563,6 @@ public class AnnotationControllerIT {
                 .andExpect(totalNumOfResults(0));
 
     }
-
-    //---------- Search by Gene Product ID tests.
 
     @Test
     public void filterByGeneProductIDSuccessfully() throws Exception {
@@ -471,6 +598,8 @@ public class AnnotationControllerIT {
                 .andExpect(fieldsInAllResultsExist(1))
                 .andExpect(itemExistsExpectedTimes(GENEPRODUCT_ID_FIELD, geneProductId, 1));
     }
+
+    //---------- Search by Gene Product ID tests.
 
     @Test
     public void filterByUniProtKBAndIntactAndRNACentralGeneProductIDSuccessfully() throws Exception {
@@ -586,8 +715,6 @@ public class AnnotationControllerIT {
                 .andExpect(totalNumOfResults(0));
     }
 
-    //---------- Gene Ontology Id
-
     @Test
     public void successfullyLookupAnnotationsByGoId() throws Exception {
 
@@ -615,6 +742,8 @@ public class AnnotationControllerIT {
                 .andExpect(itemExistsExpectedTimes(GO_ID_FIELD, AnnotationDocMocker.GO_ID, NUMBER_OF_GENERIC_DOCS));
     }
 
+    //---------- Gene Ontology Id
+
     @Test
     public void failToFindAnnotationsWhenGoIdDoesntExist() throws Exception {
 
@@ -635,8 +764,6 @@ public class AnnotationControllerIT {
         response.andExpect(status().isBadRequest())
                 .andExpect(contentTypeToBeJson());
     }
-
-    //---------- EVIDENCE CODE
 
     @Test
     public void filterAnnotationsUsingSingleEvidenceCodeReturnsResults() throws Exception {
@@ -671,6 +798,8 @@ public class AnnotationControllerIT {
                 .andExpect(itemExistsExpectedTimes(EVIDENCE_CODE_PARAM.getName(), MISSING_ECO_ID, 0));
     }
 
+    //---------- EVIDENCE CODE
+
     @Test
     public void filterAnnotationsUsingMultipleEvidenceCodesAsIndependentParametersProducesMixedResults()
             throws Exception {
@@ -704,8 +833,6 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(0));
     }
-
-    //---------- Page related tests.
 
     @Test
     public void retrievesSecondPageOfAllEntriesRequest() throws Exception {
@@ -745,6 +872,8 @@ public class AnnotationControllerIT {
                                 DEFAULT_ENTRIES_PER_PAGE)
                 );
     }
+
+    //---------- Page related tests.
 
     @Test
     public void pageRequestOfZeroAndResultsAvailableReturns400() throws Exception {
@@ -879,8 +1008,6 @@ public class AnnotationControllerIT {
                         .withAttribute("id", "IPR015421").build()));
     }
 
-    //---------- Limit related tests.
-
     @Test
     public void limitForPageExceedsMaximumAllowed() throws Exception {
         ResultActions response = mockMvc.perform(
@@ -901,6 +1028,8 @@ public class AnnotationControllerIT {
                 .andExpect(pageInfoMatches(1, 1, 100));
     }
 
+    //---------- Limit related tests.
+
     @Test
     public void limitForPageThrowsErrorWhenNegative() throws Exception {
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
@@ -909,8 +1038,6 @@ public class AnnotationControllerIT {
         response.andDo(print())
                 .andExpect(status().isBadRequest());
     }
-
-    //----- Tests for reference ---------------------//
 
     @Test
     public void filterBySingleReferenceReturnsDocumentsThatContainTheReference() throws Exception {
@@ -943,6 +1070,8 @@ public class AnnotationControllerIT {
                 .andExpect(fieldsInAllResultsExist(1))
                 .andExpect(itemExistsExpectedTimes(REFERENCE_FIELD, doc.reference, 1));
     }
+
+    //----- Tests for reference ---------------------//
 
     @Test
     public void filterByThreeReferencesReturnsDocumentsThatContainThoseReferences() throws Exception {
@@ -1064,8 +1193,6 @@ public class AnnotationControllerIT {
                 .andExpect(totalNumOfResults(0));
     }
 
-    //----- Tests for GeneProductType ---------------------//
-
     @Test
     public void filterByGeneProductTypeReturnsMatchingDocuments() throws Exception {
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(GENE_PRODUCT_TYPE_PARAM.getName(),
@@ -1093,6 +1220,8 @@ public class AnnotationControllerIT {
                 .andExpect(totalNumOfResults(1))
                 .andExpect(fieldsInAllResultsExist(1));
     }
+
+    //----- Tests for GeneProductType ---------------------//
 
     @Test
     public void filterAnnotationsByTwoGeneProductTypesAsOneParameterReturnsMatchingDocuments() throws Exception {
@@ -1141,8 +1270,6 @@ public class AnnotationControllerIT {
                 .andExpect(totalNumOfResults(0));
     }
 
-    //----- Target Sets
-
     @Test
     public void filterByTargetSetReturnsMatchingDocuments() throws Exception {
         ResultActions response =
@@ -1166,6 +1293,8 @@ public class AnnotationControllerIT {
                 .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
                 .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS));
     }
+
+    //----- Target Sets
 
     @Test
     public void filterByNewTargetSetValueReturnsMatchingDocuments() throws Exception {
@@ -1210,8 +1339,6 @@ public class AnnotationControllerIT {
                 .andExpect(totalNumOfResults(0));
     }
 
-    //---------- GO Aspect related tests.
-
     @Test
     public void filterAnnotationsByGoAspectSuccessfully() throws Exception {
         String goAspect = AnnotationDocMocker.GO_ASPECT;
@@ -1236,6 +1363,8 @@ public class AnnotationControllerIT {
                 .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
                 .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS));
     }
+
+    //---------- GO Aspect related tests.
 
     @Test
     public void filterAnnotationsByInvalidGoAspectReturnsError() throws Exception {
@@ -1286,8 +1415,6 @@ public class AnnotationControllerIT {
                 .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS));
     }
 
-    //----- Tests for Annotation Extension ---------------------//
-
     @Test
     public void filterById() throws Exception {
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
@@ -1311,6 +1438,8 @@ public class AnnotationControllerIT {
                 .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
                 .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS));
     }
+
+    //----- Tests for Annotation Extension ---------------------//
 
     @Test
     public void filterByExtensionTarget2() throws Exception {
@@ -1551,6 +1680,25 @@ public class AnnotationControllerIT {
     }
 
     // ------------------------------- Helpers -------------------------------
+    private <T> List<T> transformDocs(List<AnnotationDocument> docs, Function<AnnotationDocument, T> transformation) {
+        return docs.stream().map(transformation).collect(Collectors.toList());
+    }
+
+    private <T> List<AnnotationDocument> filterDocuments(
+            List<AnnotationDocument> documents,
+            T[] expectedValues,
+            Function<AnnotationDocument, T> docTransformer) {
+        return documents.stream()
+                .filter(doc -> Stream
+                        .of(expectedValues)
+                        .anyMatch(e -> e == docTransformer.apply(doc)))
+                .collect(Collectors.toList());
+    }
+
+    private String[] asArray(List<String> list) {
+        return list.toArray(new String[list.size()]);
+    }
+
     private AnnotationDocument createDocWithAssignedBy(String geneProductId, String assignedBy) {
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc(geneProductId);
         doc.assignedBy = assignedBy;
@@ -1565,12 +1713,32 @@ public class AnnotationControllerIT {
         return doc;
     }
 
+    private List<AnnotationDocument> createDocsWithTaxonAncestors(List<Integer> lineage) {
+        List<AnnotationDocument> documents = new ArrayList<>();
+
+        for (int i = 0; i < lineage.size(); i++) {
+            documents.add(createDocWithTaxonAncestors(createGPId(i), lineage.subList(i, lineage.size())));
+        }
+
+        return documents;
+    }
+
+    private AnnotationDocument createDocWithTaxonAncestors(
+            String geneProductId,
+            List<Integer> lineage) {
+
+        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc(geneProductId);
+        doc.taxonId = lineage.get(0);
+        doc.taxonAncestors = lineage;
+
+        return doc;
+    }
+
     private String getRequiredDateString(int year, int month, int date) {
         return String.format(DATE_STRING_FORMAT, year, month, date);
     }
 
     //----- Setup data ---------------------//
-
     private List<AnnotationDocument> createGenericDocs(int n) {
         return IntStream.range(0, n)
                 .mapToObj(i -> AnnotationDocMocker.createAnnotationDoc(createGPId(i))).collect
