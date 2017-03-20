@@ -56,7 +56,7 @@ public class OntologyRequest {
         setters
      */
     @ApiModelProperty(value = "Further filters the results of the main query based on values chosen from " +
-            "the aspect field", example = "biological_process")
+            "the aspect field", allowableValues = "Component,Function,Process", example = "Process")
     private String[] aspect;
 
     @ApiModelProperty(value = "Further filters the results of the main query based on a value chosen from " +
@@ -113,7 +113,7 @@ public class OntologyRequest {
         this.facet = facet;
     }
 
-    @ArrayPattern(regexp = "biological_process|molecular_function|cellular_component",
+    @ArrayPattern(regexp = "Process|Function|Component",
             paramName = "aspect",
             flags = Flag.CASE_INSENSITIVE)
     public String[] getAspect() {
