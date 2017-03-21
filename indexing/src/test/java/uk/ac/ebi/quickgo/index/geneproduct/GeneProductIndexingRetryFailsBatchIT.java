@@ -2,7 +2,6 @@ package uk.ac.ebi.quickgo.index.geneproduct;
 
 import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductDocument;
-import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepository;
 import uk.ac.ebi.quickgo.index.common.JobTestRunnerConfig;
 
 import com.google.common.collect.Lists;
@@ -38,8 +37,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.util.MatcherAssertionErrors.assertThat;
-import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductWriteRetryHelper.stubSolrWriteResponses;
-import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductWriteRetryHelper.validateWriteAttempts;
+import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductDocumentWriteRetryHelper.stubSolrWriteResponses;
+import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductDocumentWriteRetryHelper.validateWriteAttempts;
 
 /**
  * Tests whether Spring Batch is correctly wired up to run the Gene product indexing.
@@ -64,11 +63,11 @@ public class GeneProductIndexingRetryFailsBatchIT {
     @Captor
     private ArgumentCaptor<List<GeneProductDocument>> argumentCaptor;
 
-    private static final List<GeneProductWriteRetryHelper.SolrResponse> SOLR_RESPONSES = asList(
-            GeneProductWriteRetryHelper.SolrResponse.REMOTE_EXCEPTION,// error
-            GeneProductWriteRetryHelper.SolrResponse.REMOTE_EXCEPTION,// error
-            GeneProductWriteRetryHelper.SolrResponse.REMOTE_EXCEPTION,// too many errors -- indexing fails
-            GeneProductWriteRetryHelper.SolrResponse.OK);               // never called
+    private static final List<GeneProductDocumentWriteRetryHelper.SolrResponse> SOLR_RESPONSES = asList(
+            GeneProductDocumentWriteRetryHelper.SolrResponse.REMOTE_EXCEPTION,// error
+            GeneProductDocumentWriteRetryHelper.SolrResponse.REMOTE_EXCEPTION,// error
+            GeneProductDocumentWriteRetryHelper.SolrResponse.REMOTE_EXCEPTION,// too many errors -- indexing fails
+            GeneProductDocumentWriteRetryHelper.SolrResponse.OK);               // never called
 
     @Before
     public void setup() {

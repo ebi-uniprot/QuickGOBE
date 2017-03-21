@@ -4,11 +4,7 @@ import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductDocument;
 import uk.ac.ebi.quickgo.index.common.JobTestRunnerConfig;
 
-import com.google.common.collect.Lists;
-import java.util.Collection;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -37,13 +33,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.util.MatcherAssertionErrors.assertThat;
-import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductWriteRetryHelper.stubSolrWriteResponses;
-import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductWriteRetryHelper.validateWriteAttempts;
+import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductDocumentWriteRetryHelper.stubSolrWriteResponses;
+import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductDocumentWriteRetryHelper.validateWriteAttempts;
 
 /**
  * Tests whether Spring Batch is correctly wired up to run the Gene product indexing.
  */
-@ActiveProfiles(profiles = {"embeddedServer", "tooManySolrRemoteHostErrors"})
+@ActiveProfiles(profiles = {"embeddedServer", "twoSolrRemoteHostErrors "})
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(
         classes = {GeneProductConfig.class, JobTestRunnerConfig.class, GeneProductIndexingRetrySucceedsBatchIT
@@ -56,21 +52,20 @@ public class GeneProductIndexingRetrySucceedsBatchIT {
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
 
-
     @Autowired
-    ItemWriter<GeneProductDocument> geneProductRepositoryWriter;
+    private ItemWriter<GeneProductDocument> geneProductRepositoryWriter;
 
     @Captor
     private ArgumentCaptor<List<GeneProductDocument>> argumentCaptor;
 
-    private static final List<GeneProductWriteRetryHelper.SolrResponse> SOLR_RESPONSES = asList(
-            GeneProductWriteRetryHelper.SolrResponse.OK,// error
-            GeneProductWriteRetryHelper.SolrResponse.REMOTE_EXCEPTION,// error
-            GeneProductWriteRetryHelper.SolrResponse.OK,// too many errors -- indexing fails
-            GeneProductWriteRetryHelper.SolrResponse.REMOTE_EXCEPTION,
-            GeneProductWriteRetryHelper.SolrResponse.OK,
-            GeneProductWriteRetryHelper.SolrResponse.OK,
-            GeneProductWriteRetryHelper.SolrResponse.REMOTE_EXCEPTION // never called
+    private static final List<GeneProductDocumentWriteRetryHelper.SolrResponse> SOLR_RESPONSES = asList(
+            GeneProductDocumentWriteRetryHelper.SolrResponse.OK,// error
+            GeneProductDocumentWriteRetryHelper.SolrResponse.REMOTE_EXCEPTION,// error
+            GeneProductDocumentWriteRetryHelper.SolrResponse.OK,// too many errors -- indexing fails
+            GeneProductDocumentWriteRetryHelper.SolrResponse.REMOTE_EXCEPTION,
+            GeneProductDocumentWriteRetryHelper.SolrResponse.OK,
+            GeneProductDocumentWriteRetryHelper.SolrResponse.OK,
+            GeneProductDocumentWriteRetryHelper.SolrResponse.REMOTE_EXCEPTION // never called
             );
 
     @Before
@@ -106,8 +101,7 @@ public class GeneProductIndexingRetrySucceedsBatchIT {
         throw new IllegalArgumentException("Step name not recognized: " + stepName);
     }
 
-
-    @Profile("tooManySolrRemoteHostErrors")
+    @Profile("twoSolrRemoteHostErrors ")
     public static class RetryConfig {
 
         private static final String HOST = "http://www.myhost.com";
@@ -125,15 +119,5 @@ public class GeneProductIndexingRetrySucceedsBatchIT {
 
             return mockItemWriter;
         }
-    }
-
-    private Collection<GeneProductDocument> convertToCollection(Iterable<GeneProductDocument> docs) {
-        return Lists.newArrayList(docs);
-    }
-
-    private Set<String> extractIdsFromGPDocs(Collection<GeneProductDocument> gpDocs) {
-        return gpDocs.stream()
-                .map(gpDoc -> gpDoc.id)
-                .collect(Collectors.toSet());
     }
 }

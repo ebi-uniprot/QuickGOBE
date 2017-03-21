@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.index.geneproduct;
 
-import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
+import uk.ac.ebi.quickgo.geneproduct.common.GeneProductDocument;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -18,7 +18,7 @@ import static org.springframework.test.util.MatcherAssertionErrors.assertThat;
 
 /**
  * Utility methods to help the testing of the retry logic associated with writing
- * annotation documents to an index, in the presence of an possibly busy
+ * gene product documents to an index, in the presence of an possibly busy
  * Solr instance, which may occasionally not be responsive due to other tasks, e.g.,
  * dedicated to Zookeeper.
  *
@@ -62,10 +62,10 @@ public class GeneProductDocumentWriteRetryHelper {
      * @param docsSentToBeWritten a list of document lists, each of which was sent as an
      *                            argument to an {@link ItemWriter}, for writing to Solr.
      */
-    static void validateWriteAttempts(List<SolrResponse> responses, List<List<AnnotationDocument>> docsSentToBeWritten) {
+    static void validateWriteAttempts(List<SolrResponse> responses, List<List<GeneProductDocument>> docsSentToBeWritten) {
         int counter = 0;
-        List<AnnotationDocument> docsToWrite;
-        List<AnnotationDocument> docsToRetryWriting = Collections.emptyList();
+        List<GeneProductDocument> docsToWrite;
+        List<GeneProductDocument> docsToRetryWriting = Collections.emptyList();
 
         Iterator<SolrResponse> responsesIt = responses.iterator();
         for(int i = 0; i < docsSentToBeWritten.size() && responsesIt.hasNext(); i++) {
@@ -76,8 +76,8 @@ public class GeneProductDocumentWriteRetryHelper {
                 case OK:
                     // documents could not be written last time, but can this time
                     if (!docsToRetryWriting.isEmpty()) {
-                        assertThat(extractDocAttribute(docsToWrite, d -> d.geneProductId),
-                                is(extractDocAttribute(docsToRetryWriting, d -> d.geneProductId)));
+                        assertThat(extractDocAttribute(docsToWrite, d -> d.id),
+                                is(extractDocAttribute(docsToRetryWriting, d -> d.id)));
                         docsToRetryWriting = Collections.emptyList();
                     }
                     break;
@@ -91,8 +91,8 @@ public class GeneProductDocumentWriteRetryHelper {
     }
 
     private static <T> List<T> extractDocAttribute(
-            List<AnnotationDocument> docs,
-            Function<AnnotationDocument, T> transformation) {
+            List<GeneProductDocument> docs,
+            Function<GeneProductDocument, T> transformation) {
         return docs.stream().map(transformation).collect(Collectors.toList());
     }
 
