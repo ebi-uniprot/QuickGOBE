@@ -15,5 +15,6 @@ public enum PresetType {
     TAXONS,
     QUALIFIERS,
     ASPECTS,
-    EXT_RELATIONS
+    EXT_RELATIONS,
+    EXT_DATABASES
 }

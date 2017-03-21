@@ -130,6 +130,16 @@ public class PresetsRetrievalIT {
                 .andExpect(jsonPath("$.extRelations.*", hasSize(greaterThan(0))));
     }
 
+
+    @Test
+    public void canRetrieveAnnotationExtensionDatabasesPresets() throws Exception {
+        mockMvc.perform(get(RESOURCE_URL))
+               .andDo(print())
+               .andExpect(status().isOk())
+               .andExpect(jsonPath("$.extDatabases.*", hasSize(greaterThan(0))));
+    }
+
+
     @Test
     public void canRetrieveSingleDesiredPreset() throws Exception {
         mockMvc.perform(get(RESOURCE_URL).param(FIELDS_PARAM, "goSlimSets"))

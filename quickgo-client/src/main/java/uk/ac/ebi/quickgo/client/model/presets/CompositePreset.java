@@ -33,4 +33,6 @@ public interface CompositePreset {
     List<PresetItem> getGeneProductTypes();
 
     List<PresetItem> getExtRelations();
+
+    List<PresetItem> getExtDatabases();
 }
