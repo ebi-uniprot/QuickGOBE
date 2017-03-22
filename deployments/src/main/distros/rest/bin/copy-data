@@ -8,9 +8,6 @@
 set -euo pipefail
 IFS=$'\n\t '
 
-#THIS_DIR="$(dirname $0)"
-#cd "$THIS_DIR"
-
 source "../common/common"
 
 # ======= read the variables used by the control scripts ================================
@@ -19,7 +16,7 @@ source "environment.variables" || {
     exit 1
 }
 
-readonly PROFILE="$1"
+readonly PROFILE=${1:-\'\'}
 
 # ====== check which environment will be copied ========================================
 if ! check_profile $PROFILE; then
