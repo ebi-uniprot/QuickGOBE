@@ -18,7 +18,7 @@ import static uk.ac.ebi.quickgo.annotation.coterms.CoTermRepositorySimpleMap.cre
  */
 @Configuration
 public class CoTermRepoTestConfig {
-    public static final String FAILED_RETRIEVAL = "failedRetrieval";
+    static final String FAILED_RETRIEVAL = "failedRetrieval";
     static final String SUCCESSFUL_RETRIEVAL = "successfulRetrieval";
 
     private CoTermProperties coTermProperties = new CoTermProperties();
