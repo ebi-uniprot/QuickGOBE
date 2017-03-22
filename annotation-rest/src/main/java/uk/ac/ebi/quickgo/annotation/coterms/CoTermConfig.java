@@ -1,6 +1,5 @@
 package uk.ac.ebi.quickgo.annotation.coterms;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -21,7 +20,6 @@ public class CoTermConfig {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CoTermConfig.class);
     private CoTermProperties coTermProperties = new CoTermProperties();
-
 
     /**
      * If we have been unable to load the CoTermRepository, do not propagate the exception as this will stop all
