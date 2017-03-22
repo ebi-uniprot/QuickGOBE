@@ -107,7 +107,7 @@ public class AnnotationIndexingRetriesSolrWritesWithFailureIT {
 
         verify(annotationSolrServerWriter, times(6)).write(argumentCaptor.capture());
         List<List<AnnotationDocument>> docsSentToBeWritten = argumentCaptor.getAllValues();
-        validateWriteAttempts(SOLR_RESPONSES, docsSentToBeWritten, d -> d.id);
+        validateWriteAttempts(SOLR_RESPONSES, docsSentToBeWritten, d -> d.geneProductId);
 
         BatchStatus status = jobExecution.getStatus();
         assertThat(status, is(BatchStatus.FAILED));
