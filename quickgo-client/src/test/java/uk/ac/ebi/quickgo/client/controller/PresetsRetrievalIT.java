@@ -130,7 +130,6 @@ public class PresetsRetrievalIT {
                 .andExpect(jsonPath("$.extRelations.*", hasSize(greaterThan(0))));
     }
 
-
     @Test
     public void canRetrieveAnnotationExtensionDatabasesPresets() throws Exception {
         mockMvc.perform(get(RESOURCE_URL))
@@ -138,7 +137,6 @@ public class PresetsRetrievalIT {
                .andExpect(status().isOk())
                .andExpect(jsonPath("$.extDatabases.*", hasSize(greaterThan(0))));
     }
-
 
     @Test
     public void canRetrieveSingleDesiredPreset() throws Exception {
