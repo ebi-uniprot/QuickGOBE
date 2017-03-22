@@ -3,6 +3,7 @@ package uk.ac.ebi.quickgo.index.annotation;
 import org.junit.Before;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
+import uk.ac.ebi.quickgo.index.DocumentWriteRetryHelper;
 import uk.ac.ebi.quickgo.index.common.JobTestRunnerConfig;
 
 import java.util.List;
@@ -26,7 +27,6 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import uk.ac.ebi.quickgo.index.annotation.AnnotationDocumentWriteRetryHelper.SolrResponse;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
@@ -34,10 +34,12 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.util.MatcherAssertionErrors.assertThat;
+import static uk.ac.ebi.quickgo.index.DocumentWriteRetryHelper.stubSolrWriteResponses;
+import static uk.ac.ebi.quickgo.index.DocumentWriteRetryHelper.validateWriteAttempts;
 import static uk.ac.ebi.quickgo.index.annotation.AnnotationConfig.ANNOTATION_INDEXING_JOB_NAME;
 import static uk.ac.ebi.quickgo.index.annotation.AnnotationConfig.ANNOTATION_INDEXING_STEP_NAME;
-import static uk.ac.ebi.quickgo.index.annotation.AnnotationDocumentWriteRetryHelper.stubSolrWriteResponses;
-import static uk.ac.ebi.quickgo.index.annotation.AnnotationDocumentWriteRetryHelper.validateWriteAttempts;
+import static uk.ac.ebi.quickgo.index.DocumentWriteRetryHelper.SolrResponse;
+
 
 /**
  * <p>Tests whether Spring Batch's retry + backoff policy works as expected. This class simulates annotation indexing
@@ -70,7 +72,7 @@ public class AnnotationIndexingRetriesSolrWritesWithFailureIT {
     @Captor
     private ArgumentCaptor<List<AnnotationDocument>> argumentCaptor;
 
-    private static final List<AnnotationDocumentWriteRetryHelper.SolrResponse> SOLR_RESPONSES = asList(
+    private static final List<SolrResponse> SOLR_RESPONSES = asList(
             SolrResponse.OK,                // simulate writing first chunk (size 2: both valid)
             SolrResponse.REMOTE_EXCEPTION,  // error
             SolrResponse.OK,                // simulate writing second chunk (size 2: both valid)
@@ -105,7 +107,7 @@ public class AnnotationIndexingRetriesSolrWritesWithFailureIT {
 
         verify(annotationSolrServerWriter, times(6)).write(argumentCaptor.capture());
         List<List<AnnotationDocument>> docsSentToBeWritten = argumentCaptor.getAllValues();
-        validateWriteAttempts(SOLR_RESPONSES, docsSentToBeWritten);
+        validateWriteAttempts(SOLR_RESPONSES, docsSentToBeWritten, d -> d.id);
 
         BatchStatus status = jobExecution.getStatus();
         assertThat(status, is(BatchStatus.FAILED));

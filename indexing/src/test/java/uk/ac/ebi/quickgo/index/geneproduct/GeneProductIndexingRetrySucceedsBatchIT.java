@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.index.geneproduct;
 
-import uk.ac.ebi.quickgo.common.QuickGODocument;
 import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
+import uk.ac.ebi.quickgo.geneproduct.common.GeneProductDocument;
 import uk.ac.ebi.quickgo.index.DocumentWriteRetryHelper;
 import uk.ac.ebi.quickgo.index.common.JobTestRunnerConfig;
 
@@ -54,10 +54,10 @@ public class GeneProductIndexingRetrySucceedsBatchIT {
     private JobLauncherTestUtils jobLauncherTestUtils;
 
     @Autowired
-    private ItemWriter<QuickGODocument> geneProductRepositoryWriter;
+    private ItemWriter<GeneProductDocument> geneProductRepositoryWriter;
 
     @Captor
-    private ArgumentCaptor<List<? extends QuickGODocument>> argumentCaptor;
+    private ArgumentCaptor<List<GeneProductDocument>> argumentCaptor;
 
     private static final List<DocumentWriteRetryHelper.SolrResponse> SOLR_RESPONSES = asList(
             DocumentWriteRetryHelper.SolrResponse.OK,// error
@@ -85,8 +85,8 @@ public class GeneProductIndexingRetrySucceedsBatchIT {
         assertThat(indexingStep.getWriteCount(), is(6));
 
         verify(geneProductRepositoryWriter, times(6)).write(argumentCaptor.capture());
-        List<List<? extends QuickGODocument>> docsSentToBeWritten = argumentCaptor.getAllValues();
-        validateWriteAttempts(SOLR_RESPONSES, docsSentToBeWritten);
+        List<List<GeneProductDocument>> docsSentToBeWritten = argumentCaptor.getAllValues();
+        validateWriteAttempts(SOLR_RESPONSES, docsSentToBeWritten, d -> d.id);
 
         BatchStatus status = jobExecution.getStatus();
         assertThat(status, is(BatchStatus.COMPLETED));
@@ -112,8 +112,8 @@ public class GeneProductIndexingRetrySucceedsBatchIT {
         @Bean
         @Primary
         @SuppressWarnings(value = "unchecked")
-        ItemWriter<QuickGODocument> geneProductRepositoryWriter() throws Exception {
-            ItemWriter<QuickGODocument> mockItemWriter = mock(ItemWriter.class);
+        ItemWriter<GeneProductDocument> geneProductRepositoryWriter() throws Exception {
+            ItemWriter<GeneProductDocument> mockItemWriter = mock(ItemWriter.class);
 
             stubSolrWriteResponses(SOLR_RESPONSES)
                     .when(mockItemWriter).write(any());

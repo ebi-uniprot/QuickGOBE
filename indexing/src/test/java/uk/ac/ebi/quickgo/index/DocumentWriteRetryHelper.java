@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.mockito.stubbing.Stubber;
@@ -62,11 +63,11 @@ public class DocumentWriteRetryHelper {
      * @param docsSentToBeWritten a list of document lists, each of which was sent as an
      *                            argument to an {@link ItemWriter}, for writing to Solr.
      */
-    public static void validateWriteAttempts(List<SolrResponse> responses, List<List<? extends QuickGODocument>>
-            docsSentToBeWritten) {
+    public static <T,I> void validateWriteAttempts(List<SolrResponse> responses, List<List<T>>
+            docsSentToBeWritten, Function<T, I> transformation) {
         int counter = 0;
-        List<? extends QuickGODocument> docsToWrite;
-        List<? extends QuickGODocument> docsToRetryWriting = Collections.emptyList();
+        List<T> docsToWrite;
+        List<T> docsToRetryWriting = Collections.emptyList();
 
         Iterator<SolrResponse> responsesIt = responses.iterator();
         for(int i = 0; i < docsSentToBeWritten.size() && responsesIt.hasNext(); i++) {
@@ -77,8 +78,8 @@ public class DocumentWriteRetryHelper {
                 case OK:
                     // documents could not be written last time, but can this time
                     if (!docsToRetryWriting.isEmpty()) {
-                        assertThat(extractDocAttribute(docsToWrite, d -> d.getUniqueName()),
-                                is(extractDocAttribute(docsToRetryWriting, d -> d.getUniqueName())));
+                        assertThat(extractDocAttribute(docsToWrite, transformation),
+                                is(extractDocAttribute(docsToRetryWriting, transformation)));
                         docsToRetryWriting = Collections.emptyList();
                     }
                     break;
@@ -91,8 +92,7 @@ public class DocumentWriteRetryHelper {
         }
     }
 
-    private static <T> List<T> extractDocAttribute( List<? extends QuickGODocument> docs,
-                                         Function<QuickGODocument, T> transformation) {
+    private static <T,I> List<I> extractDocAttribute( List<T> docs,Function<T, I> transformation) {
         return docs.stream().map(transformation).collect(Collectors.toList());
     }
 
