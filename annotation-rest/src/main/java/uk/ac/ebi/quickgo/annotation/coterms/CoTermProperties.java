@@ -6,6 +6,8 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 /**
+ * Contains the configuration data for the endpoint that provides data about co-occurring terms (GO terms that appear
+ * in multiple GO Term annotations).
  * @author Tony Wardell
  * Date: 17/03/2017
  * Time: 15:09
