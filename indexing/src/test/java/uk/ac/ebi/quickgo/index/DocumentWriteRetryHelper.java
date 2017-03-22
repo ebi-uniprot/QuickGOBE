@@ -1,6 +1,6 @@
-package uk.ac.ebi.quickgo.index.geneproduct;
+package uk.ac.ebi.quickgo.index;
 
-import uk.ac.ebi.quickgo.geneproduct.common.GeneProductDocument;
+import uk.ac.ebi.quickgo.common.QuickGODocument;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -24,7 +24,7 @@ import static org.springframework.test.util.MatcherAssertionErrors.assertThat;
  *
  * Created by edd on 23/02/2017.
  */
-public class GeneProductWriteRetryHelper {
+public class DocumentWriteRetryHelper {
     private static final String HOST = "http://www.myhost.com";
     private static final String MESSAGE = "Looks like the host is not reachable?!";
     private static final int CODE = 1;
@@ -38,7 +38,7 @@ public class GeneProductWriteRetryHelper {
      * @param responses represents a list of behavioural responses from Solr
      * @return a {@link Stubber} which can be associated with a method call
      */
-    static Stubber stubSolrWriteResponses(List<SolrResponse> responses) {
+    public static Stubber stubSolrWriteResponses(List<SolrResponse> responses) {
         Stubber stubber = null;
         for (SolrResponse response : responses) {
             switch (response) {
@@ -62,10 +62,11 @@ public class GeneProductWriteRetryHelper {
      * @param docsSentToBeWritten a list of document lists, each of which was sent as an
      *                            argument to an {@link ItemWriter}, for writing to Solr.
      */
-    static void validateWriteAttempts(List<SolrResponse> responses, List<List<GeneProductDocument>> docsSentToBeWritten) {
+    public static void validateWriteAttempts(List<SolrResponse> responses, List<List<? extends QuickGODocument>>
+            docsSentToBeWritten) {
         int counter = 0;
-        List<GeneProductDocument> docsToWrite;
-        List<GeneProductDocument> docsToRetryWriting = Collections.emptyList();
+        List<? extends QuickGODocument> docsToWrite;
+        List<? extends QuickGODocument> docsToRetryWriting = Collections.emptyList();
 
         Iterator<SolrResponse> responsesIt = responses.iterator();
         for(int i = 0; i < docsSentToBeWritten.size() && responsesIt.hasNext(); i++) {
@@ -76,8 +77,8 @@ public class GeneProductWriteRetryHelper {
                 case OK:
                     // documents could not be written last time, but can this time
                     if (!docsToRetryWriting.isEmpty()) {
-                        assertThat(extractDocAttribute(docsToWrite, d -> d.id),
-                                is(extractDocAttribute(docsToRetryWriting, d -> d.id)));
+                        assertThat(extractDocAttribute(docsToWrite, d -> d.getUniqueName()),
+                                is(extractDocAttribute(docsToRetryWriting, d -> d.getUniqueName())));
                         docsToRetryWriting = Collections.emptyList();
                     }
                     break;
@@ -90,9 +91,8 @@ public class GeneProductWriteRetryHelper {
         }
     }
 
-    private static <T> List<T> extractDocAttribute(
-            List<GeneProductDocument> docs,
-            Function<GeneProductDocument, T> transformation) {
+    private static <T> List<T> extractDocAttribute( List<? extends QuickGODocument> docs,
+                                         Function<QuickGODocument, T> transformation) {
         return docs.stream().map(transformation).collect(Collectors.toList());
     }
 

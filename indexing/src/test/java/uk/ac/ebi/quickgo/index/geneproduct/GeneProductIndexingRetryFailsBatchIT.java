@@ -1,14 +1,12 @@
 package uk.ac.ebi.quickgo.index.geneproduct;
 
+import uk.ac.ebi.quickgo.common.QuickGODocument;
 import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
-import uk.ac.ebi.quickgo.geneproduct.common.GeneProductDocument;
+import uk.ac.ebi.quickgo.index.DocumentWriteRetryHelper;
 import uk.ac.ebi.quickgo.index.common.JobTestRunnerConfig;
 
-import com.google.common.collect.Lists;
-import java.util.Collection;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -37,8 +35,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.util.MatcherAssertionErrors.assertThat;
-import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductDocumentWriteRetryHelper.stubSolrWriteResponses;
-import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductDocumentWriteRetryHelper.validateWriteAttempts;
+import static uk.ac.ebi.quickgo.index.DocumentWriteRetryHelper.stubSolrWriteResponses;
+import static uk.ac.ebi.quickgo.index.DocumentWriteRetryHelper.validateWriteAttempts;
 
 /**
  * Tests whether Spring Batch is correctly wired up to run the Gene product indexing.
@@ -56,18 +54,17 @@ public class GeneProductIndexingRetryFailsBatchIT {
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
 
-
     @Autowired
-    ItemWriter<GeneProductDocument> geneProductRepositoryWriter;
+    private ItemWriter<QuickGODocument> geneProductRepositoryWriter;
 
     @Captor
-    private ArgumentCaptor<List<GeneProductDocument>> argumentCaptor;
+    private ArgumentCaptor<List<? extends QuickGODocument>> argumentCaptor;
 
-    private static final List<GeneProductDocumentWriteRetryHelper.SolrResponse> SOLR_RESPONSES = asList(
-            GeneProductDocumentWriteRetryHelper.SolrResponse.REMOTE_EXCEPTION,// error
-            GeneProductDocumentWriteRetryHelper.SolrResponse.REMOTE_EXCEPTION,// error
-            GeneProductDocumentWriteRetryHelper.SolrResponse.REMOTE_EXCEPTION,// too many errors -- indexing fails
-            GeneProductDocumentWriteRetryHelper.SolrResponse.OK);               // never called
+    private static final List<DocumentWriteRetryHelper.SolrResponse> SOLR_RESPONSES = asList(
+            DocumentWriteRetryHelper.SolrResponse.REMOTE_EXCEPTION,// error
+            DocumentWriteRetryHelper.SolrResponse.REMOTE_EXCEPTION,// error
+            DocumentWriteRetryHelper.SolrResponse.REMOTE_EXCEPTION,// too many errors -- indexing fails
+            DocumentWriteRetryHelper.SolrResponse.OK);               // never called
 
     @Before
     public void setup() {
@@ -85,7 +82,7 @@ public class GeneProductIndexingRetryFailsBatchIT {
         assertThat(indexingStep.getWriteCount(), is(0));
 
         verify(geneProductRepositoryWriter, times(2)).write(argumentCaptor.capture());
-        List<List<GeneProductDocument>> docsSentToBeWritten = argumentCaptor.getAllValues();
+        List<List<? extends QuickGODocument>> docsSentToBeWritten = argumentCaptor.getAllValues();
         validateWriteAttempts(SOLR_RESPONSES, docsSentToBeWritten);
 
         BatchStatus status = jobExecution.getStatus();
@@ -113,8 +110,8 @@ public class GeneProductIndexingRetryFailsBatchIT {
         @Bean
         @Primary
         @SuppressWarnings(value = "unchecked")
-        ItemWriter<GeneProductDocument> geneProductRepositoryWriter() throws Exception {
-            ItemWriter<GeneProductDocument> mockItemWriter = mock(ItemWriter.class);
+        ItemWriter<QuickGODocument> geneProductRepositoryWriter() throws Exception {
+            ItemWriter<QuickGODocument> mockItemWriter = mock(ItemWriter.class);
 
             stubSolrWriteResponses(SOLR_RESPONSES)
                     .when(mockItemWriter).write(any());
@@ -123,13 +120,4 @@ public class GeneProductIndexingRetryFailsBatchIT {
         }
     }
 
-    private Collection<GeneProductDocument> convertToCollection(Iterable<GeneProductDocument> docs) {
-        return Lists.newArrayList(docs);
-    }
-
-    private Set<String> extractIdsFromGPDocs(Collection<GeneProductDocument> gpDocs) {
-        return gpDocs.stream()
-                .map(gpDoc -> gpDoc.id)
-                .collect(Collectors.toSet());
-    }
 }

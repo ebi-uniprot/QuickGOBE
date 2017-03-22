@@ -1,7 +1,8 @@
 package uk.ac.ebi.quickgo.index.geneproduct;
 
+import uk.ac.ebi.quickgo.common.QuickGODocument;
 import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
-import uk.ac.ebi.quickgo.geneproduct.common.GeneProductDocument;
+import uk.ac.ebi.quickgo.index.DocumentWriteRetryHelper;
 import uk.ac.ebi.quickgo.index.common.JobTestRunnerConfig;
 
 import java.util.List;
@@ -33,13 +34,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.util.MatcherAssertionErrors.assertThat;
-import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductDocumentWriteRetryHelper.stubSolrWriteResponses;
-import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductDocumentWriteRetryHelper.validateWriteAttempts;
+import static uk.ac.ebi.quickgo.index.DocumentWriteRetryHelper.stubSolrWriteResponses;
+import static uk.ac.ebi.quickgo.index.DocumentWriteRetryHelper.validateWriteAttempts;
 
 /**
  * Tests whether Spring Batch is correctly wired up to run the Gene product indexing.
  */
-@ActiveProfiles(profiles = {"embeddedServer", "twoSolrRemoteHostErrors "})
+@ActiveProfiles(profiles = {"embeddedServer", "twoSolrRemoteHostErrors"})
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(
         classes = {GeneProductConfig.class, JobTestRunnerConfig.class, GeneProductIndexingRetrySucceedsBatchIT
@@ -53,19 +54,19 @@ public class GeneProductIndexingRetrySucceedsBatchIT {
     private JobLauncherTestUtils jobLauncherTestUtils;
 
     @Autowired
-    private ItemWriter<GeneProductDocument> geneProductRepositoryWriter;
+    private ItemWriter<QuickGODocument> geneProductRepositoryWriter;
 
     @Captor
-    private ArgumentCaptor<List<GeneProductDocument>> argumentCaptor;
+    private ArgumentCaptor<List<? extends QuickGODocument>> argumentCaptor;
 
-    private static final List<GeneProductDocumentWriteRetryHelper.SolrResponse> SOLR_RESPONSES = asList(
-            GeneProductDocumentWriteRetryHelper.SolrResponse.OK,// error
-            GeneProductDocumentWriteRetryHelper.SolrResponse.REMOTE_EXCEPTION,// error
-            GeneProductDocumentWriteRetryHelper.SolrResponse.OK,// too many errors -- indexing fails
-            GeneProductDocumentWriteRetryHelper.SolrResponse.REMOTE_EXCEPTION,
-            GeneProductDocumentWriteRetryHelper.SolrResponse.OK,
-            GeneProductDocumentWriteRetryHelper.SolrResponse.OK,
-            GeneProductDocumentWriteRetryHelper.SolrResponse.REMOTE_EXCEPTION // never called
+    private static final List<DocumentWriteRetryHelper.SolrResponse> SOLR_RESPONSES = asList(
+            DocumentWriteRetryHelper.SolrResponse.OK,// error
+            DocumentWriteRetryHelper.SolrResponse.REMOTE_EXCEPTION,// error
+            DocumentWriteRetryHelper.SolrResponse.OK,// too many errors -- indexing fails
+            DocumentWriteRetryHelper.SolrResponse.REMOTE_EXCEPTION,
+            DocumentWriteRetryHelper.SolrResponse.OK,
+            DocumentWriteRetryHelper.SolrResponse.OK,
+            DocumentWriteRetryHelper.SolrResponse.REMOTE_EXCEPTION // never called
             );
 
     @Before
@@ -84,7 +85,7 @@ public class GeneProductIndexingRetrySucceedsBatchIT {
         assertThat(indexingStep.getWriteCount(), is(6));
 
         verify(geneProductRepositoryWriter, times(6)).write(argumentCaptor.capture());
-        List<List<GeneProductDocument>> docsSentToBeWritten = argumentCaptor.getAllValues();
+        List<List<? extends QuickGODocument>> docsSentToBeWritten = argumentCaptor.getAllValues();
         validateWriteAttempts(SOLR_RESPONSES, docsSentToBeWritten);
 
         BatchStatus status = jobExecution.getStatus();
@@ -101,7 +102,7 @@ public class GeneProductIndexingRetrySucceedsBatchIT {
         throw new IllegalArgumentException("Step name not recognized: " + stepName);
     }
 
-    @Profile("twoSolrRemoteHostErrors ")
+    @Profile("twoSolrRemoteHostErrors")
     public static class RetryConfig {
 
         private static final String HOST = "http://www.myhost.com";
@@ -111,8 +112,8 @@ public class GeneProductIndexingRetrySucceedsBatchIT {
         @Bean
         @Primary
         @SuppressWarnings(value = "unchecked")
-        ItemWriter<GeneProductDocument> geneProductRepositoryWriter() throws Exception {
-            ItemWriter<GeneProductDocument> mockItemWriter = mock(ItemWriter.class);
+        ItemWriter<QuickGODocument> geneProductRepositoryWriter() throws Exception {
+            ItemWriter<QuickGODocument> mockItemWriter = mock(ItemWriter.class);
 
             stubSolrWriteResponses(SOLR_RESPONSES)
                     .when(mockItemWriter).write(any());
