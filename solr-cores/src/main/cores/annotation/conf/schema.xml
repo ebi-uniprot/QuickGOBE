@@ -215,11 +215,16 @@
         </analyzer>
     </fieldType>
 
-    <!-- Be able to search for database references in the form database:id, by database, id or combined -->
+    <!--
+        Search for database references in the form:
+            database:id:additional_info
+        where one can obtain a hit by database/id/additional_info or the entire combination
+     -->
     <fieldType name="database_ignorecase" class="solr.TextField" positionIncrementGap="100">
         <analyzer type="index">
             <tokenizer class="solr.KeywordTokenizerFactory"/>
-            <filter class="solr.PatternCaptureGroupFilterFactory" pattern="(.+):(.+)"
+            <!--<filter class="solr.PatternCaptureGroupFilterFactory" pattern="(.+):(.+)"-->
+            <filter class="solr.PatternCaptureGroupFilterFactory" pattern="([^:.]+)"
                     preserve_original="true"/>
             <filter class="solr.LowerCaseFilterFactory"/>
         </analyzer>
