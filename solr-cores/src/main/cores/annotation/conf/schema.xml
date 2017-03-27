@@ -221,15 +221,30 @@
         where one can obtain a hit by database/id/additional_info or the entire combination
      -->
     <fieldType name="database_ignorecase" class="solr.TextField" positionIncrementGap="100">
-        <analyzer type="index">
+        <!--<analyzer type="index">-->
+            <!--<tokenizer class="solr.KeywordTokenizerFactory"/>-->
+            <!--&lt;!&ndash;<filter class="solr.PatternCaptureGroupFilterFactory" pattern="(.+):(.+)"&ndash;&gt;-->
+            <!--&lt;!&ndash;<filter class="solr.PatternCaptureGroupFilterFactory" pattern="([^:.]+)"&ndash;&gt;-->
+            <!--&lt;!&ndash;<filter class="solr.PatternCaptureGroupFilterFactory"-->
+            <!--pattern="([^:]+):((([^:-]+)(?:[^:]+)?)(?::?)(.+)?)"&ndash;&gt;-->
+                    <!--&lt;!&ndash;preserve_original="true"/>&ndash;&gt;-->
+            <!--<filter class="solr.PatternCaptureGroupFilterFactory"-->
+                    <!--pattern="([^:]+)(?::)([^:-]+)([^:]+)?(?::)?(.+)?"-->
+                    <!--preserve_original="true"/>-->
+            <!--<filter class="solr.LowerCaseFilterFactory"/>-->
+        <!--</analyzer>-->
+        <!--<analyzer type="query">-->
+            <!--<tokenizer class="solr.KeywordTokenizerFactory"/>-->
+            <!--<filter class="solr.PatternCaptureGroupFilterFactory"-->
+                    <!--pattern="([^:]+)(?::)([^:-]+)([^:]+)?(?::)?(.+)?"-->
+                    <!--preserve_original="true"/>-->
+            <!--<filter class="solr.LowerCaseFilterFactory"/>-->
+        <!--</analyzer>-->
+        <analyzer>
             <tokenizer class="solr.KeywordTokenizerFactory"/>
-            <!--<filter class="solr.PatternCaptureGroupFilterFactory" pattern="(.+):(.+)"-->
-            <filter class="solr.PatternCaptureGroupFilterFactory" pattern="([^:.]+)"
+            <filter class="solr.PatternCaptureGroupFilterFactory"
+                    pattern="([^:-]+)"
                     preserve_original="true"/>
-            <filter class="solr.LowerCaseFilterFactory"/>
-        </analyzer>
-        <analyzer type="query">
-            <tokenizer class="solr.KeywordTokenizerFactory"/>
             <filter class="solr.LowerCaseFilterFactory"/>
         </analyzer>
     </fieldType>
