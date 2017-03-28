@@ -221,30 +221,45 @@
         where one can obtain a hit by database/id/additional_info or the entire combination
      -->
     <fieldType name="database_ignorecase" class="solr.TextField" positionIncrementGap="100">
-        <!--<analyzer type="index">-->
-            <!--<tokenizer class="solr.KeywordTokenizerFactory"/>-->
-            <!--&lt;!&ndash;<filter class="solr.PatternCaptureGroupFilterFactory" pattern="(.+):(.+)"&ndash;&gt;-->
-            <!--&lt;!&ndash;<filter class="solr.PatternCaptureGroupFilterFactory" pattern="([^:.]+)"&ndash;&gt;-->
-            <!--&lt;!&ndash;<filter class="solr.PatternCaptureGroupFilterFactory"-->
-            <!--pattern="([^:]+):((([^:-]+)(?:[^:]+)?)(?::?)(.+)?)"&ndash;&gt;-->
-                    <!--&lt;!&ndash;preserve_original="true"/>&ndash;&gt;-->
-            <!--<filter class="solr.PatternCaptureGroupFilterFactory"-->
-                    <!--pattern="([^:]+)(?::)([^:-]+)([^:]+)?(?::)?(.+)?"-->
-                    <!--preserve_original="true"/>-->
-            <!--<filter class="solr.LowerCaseFilterFactory"/>-->
-        <!--</analyzer>-->
-        <!--<analyzer type="query">-->
-            <!--<tokenizer class="solr.KeywordTokenizerFactory"/>-->
-            <!--<filter class="solr.PatternCaptureGroupFilterFactory"-->
-                    <!--pattern="([^:]+)(?::)([^:-]+)([^:]+)?(?::)?(.+)?"-->
-                    <!--preserve_original="true"/>-->
-            <!--<filter class="solr.LowerCaseFilterFactory"/>-->
-        <!--</analyzer>-->
-        <analyzer>
+        <analyzer type="index">
             <tokenizer class="solr.KeywordTokenizerFactory"/>
+            <!--
+                source: UniProtKB:P12345-1
+                tokens: UniProtKB:P12345-1, UniProtKB, UniProtKB:P12345-1, P12345-1
+
+                source: UniProtKB:P12345:Pro_x
+                tokens: UniProtKB:P12345:Pro_x, UniProtKB, UniProtKB:P12345
+
+                source: ANYTHING
+                tokens: ANYTHING (possibly plus other tokens, depending on ANYTHING)
+                -->
             <filter class="solr.PatternCaptureGroupFilterFactory"
-                    pattern="([^:-]+)"
+                    pattern="(([^:]+)(?::)([^:]+)).*|(.*)"
                     preserve_original="true"/>
+
+            <!--
+                source: UniProtKB:P12345-1
+                tokens: UniProtKB:P12345, UniProtKB:P12345, P12345
+
+                source: UniProtKB:P12345:Pro_x
+                tokens: UniProtKB:P12345, P12345
+                -->
+            <filter class="solr.PatternCaptureGroupFilterFactory"
+                    pattern="((?:[^:]+)(?::)([^:-]+)).*"
+                    preserve_original="true"/>
+
+            <!--
+                source: UniProtKB:P12345:Pro_x
+                tokens: P12345:Pro_x
+                -->
+            <filter class="solr.PatternCaptureGroupFilterFactory"
+                    pattern="(?:[^:]+)(?::)([^:]+.*)"
+                    preserve_original="true"/>
+            <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
+            <filter class="solr.LowerCaseFilterFactory"/>
+        </analyzer>
+        <analyzer type="query">
+            <tokenizer class="solr.KeywordTokenizerFactory"/>
             <filter class="solr.LowerCaseFilterFactory"/>
         </analyzer>
     </fieldType>
@@ -291,10 +306,10 @@
 
             <!-- Left-pad numbers with zeroes -->
             <filter class="solr.PatternReplaceFilterFactory"
-                    pattern="(\d+)" replacement="00000000000$1" replace="all" />
+                    pattern="(\d+)" replacement="00000000000$1" replace="all"/>
             <!-- Left-trim zeroes to produce 6 digit numbers -->
             <filter class="solr.PatternReplaceFilterFactory"
-                    pattern="0*([0-9]{13,})" replacement="$1" replace="all" />
+                    pattern="0*([0-9]{13,})" replacement="$1" replace="all"/>
         </analyzer>
         <analyzer type="query">
             <tokenizer class="solr.StandardTokenizerFactory"/>
@@ -302,7 +317,7 @@
         </analyzer>
     </fieldType>
 
-   <!-- Create a unique id -->
+    <!-- Create a unique id -->
     <!--<fieldType name="uuid" class="solr.UUIDField" indexed="true" />-->
 
     <!-- field type definitions. The "name" attribute is

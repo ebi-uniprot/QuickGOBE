@@ -13,6 +13,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+
 import uk.ac.ebi.quickgo.annotation.AnnotationREST;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
@@ -619,7 +620,7 @@ public class AnnotationControllerIT {
                 .andExpect(itemExistsExpectedTimes(GENEPRODUCT_ID_FIELD, geneProductId, 1));
     }
 
-    // -- specific behavioural tests
+    // -- filter gene product ids of the form UniProtKB:P12345:VAR_12345 or UniProtKB:P12345:PRO_12345, etc
     @Test
     public void findGeneProductVarById() throws Exception {
         String db = "UniProtKB";
@@ -641,17 +642,57 @@ public class AnnotationControllerIT {
     }
 
     @Test
+    public void findGeneProductVarByDbAndId() throws Exception {
+        String db = "UniProtKB";
+        String id = "P05067";
+        String var = "VAR_000023";
+        String geneProductId = db + ":" + id + ":" + var;
+        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc(geneProductId);
+        repository.save(doc);
+
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search").param(GENE_PRODUCT_ID_PARAM.getName(), db + ":" + id));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(1))
+                .andExpect(fieldsInAllResultsExist(1))
+                .andExpect(itemExistsExpectedTimes(GENEPRODUCT_ID_FIELD, geneProductId, 1));
+    }
+
+    @Test
+    public void findGeneProductVarByDbIdAndVar() throws Exception {
+        String db = "UniProtKB";
+        String id = "P05068";
+        String var = "VAR_000023";
+        String geneProductId = db + ":" + id + ":" + var;
+        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc(geneProductId);
+        repository.save(doc);
+
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search").param(GENE_PRODUCT_ID_PARAM.getName(), geneProductId));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(1))
+                .andExpect(fieldsInAllResultsExist(1))
+                .andExpect(itemExistsExpectedTimes(GENEPRODUCT_ID_FIELD, geneProductId, 1));
+    }
+
+    @Test
     public void findGeneProductVarByIdAndVar() throws Exception {
         String db = "UniProtKB";
         String id = "P05067";
         String var = "VAR_000023";
-        String fullId = id + ":" + var;
-        String geneProductId = db + ":" + fullId;
+        String idWithVar = id + ":" + var;
+        String geneProductId = db + ":" + idWithVar;
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc(geneProductId);
         repository.save(doc);
 
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(GENE_PRODUCT_ID_PARAM.getName(), fullId));
+                get(RESOURCE_URL + "/search").param(GENE_PRODUCT_ID_PARAM.getName(), idWithVar));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -661,47 +702,7 @@ public class AnnotationControllerIT {
                 .andExpect(itemExistsExpectedTimes(GENEPRODUCT_ID_FIELD, geneProductId, 1));
     }
 
-    @Test
-    public void findGeneProductProById() throws Exception {
-        String db = "UniProtKB";
-        String id = "O14625";
-        String pro = "PRO_0000005106";
-        String geneProductId = db + ":" + id + ":" + pro;
-        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc(geneProductId);
-        repository.save(doc);
-
-        ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(GENE_PRODUCT_ID_PARAM.getName(), id));
-
-        response.andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(1))
-                .andExpect(fieldsInAllResultsExist(1))
-                .andExpect(itemExistsExpectedTimes(GENEPRODUCT_ID_FIELD, geneProductId, 1));
-    }
-
-    @Test
-    public void findGeneProductProByIdAndPro() throws Exception {
-        String db = "UniProtKB";
-        String id = "O14625";
-        String pro = "PRO_0000005106";
-        String fullId = id + ":" + pro;
-        String geneProductId = db + ":" + fullId;
-        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc(geneProductId);
-        repository.save(doc);
-
-        ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(GENE_PRODUCT_ID_PARAM.getName(), fullId));
-
-        response.andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(1))
-                .andExpect(fieldsInAllResultsExist(1))
-                .andExpect(itemExistsExpectedTimes(GENEPRODUCT_ID_FIELD, geneProductId, 1));
-    }
-
+    // -- filter gene product ids of the form UniProtKB:P12345-2
     @Test
     public void findGeneProductIsoformById() throws Exception {
         String db = "UniProtKB";
@@ -723,17 +724,17 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void findGeneProductIsoformByIdAndIso() throws Exception {
+    public void findGeneProductIsoformByDbAndId() throws Exception {
         String db = "UniProtKB";
         String id = "P05067";
         String iso = "-2";
-        String fullId = id + iso;
-        String geneProductId = db + ":" + fullId;
+        String dbWithId = db + ":" + id;
+        String geneProductId = db + ":" + id + iso;
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc(geneProductId);
         repository.save(doc);
 
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(GENE_PRODUCT_ID_PARAM.getName(), fullId));
+                get(RESOURCE_URL + "/search").param(GENE_PRODUCT_ID_PARAM.getName(), dbWithId));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -744,11 +745,55 @@ public class AnnotationControllerIT {
     }
 
     @Test
+    public void findGeneProductIsoformByIdAndIsoform() throws Exception {
+        String db = "UniProtKB";
+        String id = "P05067";
+        String iso = "-2";
+        String idWithIso = id + iso;
+        String geneProductIdWithIsoform = db + ":" + idWithIso;
+        AnnotationDocument docWithIsoform = AnnotationDocMocker.createAnnotationDoc(geneProductIdWithIsoform);
+        AnnotationDocument docWithoutIsoform = AnnotationDocMocker.createAnnotationDoc(db + ":" + id);
+        repository.save(docWithIsoform);
+        repository.save(docWithoutIsoform);
+
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search").param(GENE_PRODUCT_ID_PARAM.getName(), idWithIso));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(1))
+                .andExpect(fieldsInAllResultsExist(1))
+                .andExpect(itemExistsExpectedTimes(GENEPRODUCT_ID_FIELD, geneProductIdWithIsoform, 1));
+    }
+
+    @Test
+    public void findGeneProductIsoformByDbIdAndIsoform() throws Exception {
+        String db = "UniProtKB";
+        String id = "P05068";
+        String iso = "-2";
+        String geneProductId = db + ":" + id + iso;
+        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc(geneProductId);
+        repository.save(doc);
+
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search").param(GENE_PRODUCT_ID_PARAM.getName(), geneProductId));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(1))
+                .andExpect(fieldsInAllResultsExist(1))
+                .andExpect(itemExistsExpectedTimes(GENEPRODUCT_ID_FIELD, geneProductId, 1));
+    }
+
+    // -- filter gene product ids of the form UniProtKB:P12345-2:VAR_12345
+    @Test
     public void findGeneProductIsoformVarById() throws Exception {
         String db = "UniProtKB";
         String id = "P05067";
         String iso = "-2";
-        String var = "VAR_12345";
+        String var = "VAR_000023";
         String geneProductId = db + ":" + id + iso + ":" + var;
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc(geneProductId);
         repository.save(doc);
@@ -765,11 +810,32 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void findGeneProductIsoformVarByIdIsoAndform() throws Exception {
+    public void findGeneProductIsoformVarByDbAndId() throws Exception {
         String db = "UniProtKB";
         String id = "P05067";
         String iso = "-2";
-        String var = "VAR_12345";
+        String var = "VAR_000023";
+        String geneProductId = db + ":" + id + iso + ":" + var;
+        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc(geneProductId);
+        repository.save(doc);
+
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search").param(GENE_PRODUCT_ID_PARAM.getName(), db + ":" + id));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(1))
+                .andExpect(fieldsInAllResultsExist(1))
+                .andExpect(itemExistsExpectedTimes(GENEPRODUCT_ID_FIELD, geneProductId, 1));
+    }
+
+    @Test
+    public void findGeneProductIsoformVarByIdAndIsoform() throws Exception {
+        String db = "UniProtKB";
+        String id = "P05067";
+        String iso = "-2";
+        String var = "VAR_000023";
         String geneProductId = db + ":" + id + iso + ":" + var;
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc(geneProductId);
         repository.save(doc);
@@ -786,6 +852,40 @@ public class AnnotationControllerIT {
     }
 
     @Test
+    public void findGeneProductIsoformVarByDbIdAndIsoform() throws Exception {
+        String db = "UniProtKB";
+        String id = "P05068";
+        String iso = "-2";
+        String var = "VAR_000023";
+        String geneProductId = db + ":" + id + iso + ":" + var;
+        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc(geneProductId);
+        repository.save(doc);
+
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search").param(GENE_PRODUCT_ID_PARAM.getName(), db + ":" + id + iso));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(1))
+                .andExpect(fieldsInAllResultsExist(1))
+                .andExpect(itemExistsExpectedTimes(GENEPRODUCT_ID_FIELD, geneProductId, 1));
+    }
+
+    @Test
+    public void badRequestWhenFindingByGeneProductDbIdIsoformAndVar() throws Exception {
+        String geneProductId = "UniProtKB:P05068-2:VAR_000023";
+        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc(geneProductId);
+        repository.save(doc);
+
+        ResultActions response = mockMvc.perform(
+                get(RESOURCE_URL + "/search").param(GENE_PRODUCT_ID_PARAM.getName(), geneProductId));
+
+        response.andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     public void findIsoformEntryAndNonIsoformEntryById() throws Exception {
         String db = "UniProtKB";
         String id = "P05067";
@@ -799,7 +899,7 @@ public class AnnotationControllerIT {
         repository.save(doc2);
 
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(GENE_PRODUCT_ID_PARAM.getName(), db + ":" + id));
+                get(RESOURCE_URL + "/search").param(GENE_PRODUCT_ID_PARAM.getName(), id));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -807,11 +907,8 @@ public class AnnotationControllerIT {
                 .andExpect(totalNumOfResults(2))
                 .andExpect(fieldsInAllResultsExist(2))
                 .andExpect(itemExistsExpectedTimes(GENEPRODUCT_ID_FIELD, geneProductIdWithIso, 1))
-                .andExpect(itemExistsExpectedTimes(GENEPRODUCT_ID_FIELD, geneProductIdWithoutIso, 1)
-                );
+                .andExpect(itemExistsExpectedTimes(GENEPRODUCT_ID_FIELD, geneProductIdWithoutIso, 1));
     }
-
-    // -- specific behavioural tests end
 
     @Test
     public void filterByUniProtKBAndIntactAndRNACentralGeneProductIDSuccessfully() throws Exception {
@@ -1844,7 +1941,7 @@ public class AnnotationControllerIT {
 
         //Create an Annotation with a mixture of new and existing extensions.
         String newExtension = "results_in_development_of(UBERON:8888888)";
-        final String newGeneProduct = "A0A123";
+        final String newGeneProduct = "UniProtKB:A0A123";
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc(newGeneProduct);
         doc.extensions = asList(newExtension, EXTENSION_3);
         repository.save(doc);
@@ -1856,7 +1953,7 @@ public class AnnotationControllerIT {
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
                 .param(EXTENSION_PARAM.getName(), filter));
 
-        String expected = "A0A000";
+        String expected = "UniProtKB:A0A000";
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -1963,7 +2060,7 @@ public class AnnotationControllerIT {
     //----- Setup data ---------------------//
     private List<AnnotationDocument> createGenericDocs(int n) {
         return IntStream.range(0, n)
-                .mapToObj(i -> AnnotationDocMocker.createAnnotationDoc(createGPId(i))).collect
+                .mapToObj(i -> AnnotationDocMocker.createAnnotationDoc("UniProtKB:"+ createGPId(i))).collect
                         (Collectors.toList());
     }
 
