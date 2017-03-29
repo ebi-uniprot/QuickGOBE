@@ -15,7 +15,7 @@ import static uk.ac.ebi.quickgo.annotation.coterms.CoTermRepositorySimpleMap.cre
  * Created with IntelliJ IDEA.
  */
 @Configuration
-@ConfigurationProperties(prefix = "annotation.download")
+@ConfigurationProperties(prefix = "coterm")
 public class CoTermConfig {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CoTermConfig.class);
