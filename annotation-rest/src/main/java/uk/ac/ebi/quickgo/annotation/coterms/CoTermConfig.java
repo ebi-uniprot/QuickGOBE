@@ -2,7 +2,8 @@ package uk.ac.ebi.quickgo.annotation.coterms;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -15,11 +16,11 @@ import static uk.ac.ebi.quickgo.annotation.coterms.CoTermRepositorySimpleMap.cre
  * Created with IntelliJ IDEA.
  */
 @Configuration
-@ConfigurationProperties(prefix = "coterm")
+@EnableConfigurationProperties(CoTermProperties.class)
 public class CoTermConfig {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CoTermConfig.class);
-    private CoTermProperties coTermProperties = new CoTermProperties();
+    private CoTermProperties coTermProperties;
 
     /**
      * If we have been unable to load the CoTermRepository, do not propagate the exception as this will stop all
@@ -48,6 +49,7 @@ public class CoTermConfig {
         return coTermRepository;
     }
 
+    @Autowired
     public void setCoTermProperties(CoTermProperties coTermProperties) {
         LOGGER.debug("Setting contents of coterm properties" + coTermProperties);
         this.coTermProperties = coTermProperties;
