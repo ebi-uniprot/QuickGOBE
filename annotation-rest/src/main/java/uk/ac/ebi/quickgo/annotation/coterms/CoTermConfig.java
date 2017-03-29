@@ -49,6 +49,7 @@ public class CoTermConfig {
     }
 
     public void setCoTermProperties(CoTermProperties coTermProperties) {
+        LOGGER.debug("Setting contents of coterm properties" + coTermProperties);
         this.coTermProperties = coTermProperties;
     }
 }
