@@ -13,8 +13,8 @@ import org.springframework.stereotype.Component;
  * Time: 15:09
  * Created with IntelliJ IDEA.
  */
-@ConfigurationProperties("coterm")
 @Component
+@ConfigurationProperties(prefix="coterm")
 public class CoTermProperties {
 
     private static final int DEFAULT_LIMIT = 50;
