@@ -95,8 +95,8 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
      */
     private List<CoTerm> findCoTermsFromMap(Map<String, List<CoTerm>> map, String id) {
         if(!Objects.nonNull(map)){
-            LOGGER.error( String.format("The coterm maps are used, sources used were %s for manual coterms and %s for" +
-                                                " all coterms", coTermLoader.manualSource, coTermLoader.allSource));
+//            LOGGER.error( String.format("The coterm maps are used, sources used were %s for manual coterms and %s for" +
+//                                                " all coterms", coTermLoader.manualSource, coTermLoader.allSource));
             throw new IllegalStateException("No co-occurring data is available.");
         }
         Preconditions.checkState(map.size() > 0, "The co-occurring repository is empty.");
