@@ -9,6 +9,7 @@ import uk.ac.ebi.quickgo.index.common.listener.SkipLoggerListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.SkipListener;
@@ -36,6 +37,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.Resource;
+import org.springframework.retry.backoff.BackOffPolicy;
+import org.springframework.retry.backoff.ExponentialBackOffPolicy;
 
 /**
  * Sets up batch jobs for gene product indexing.
@@ -70,6 +73,15 @@ public class GeneProductConfig {
     @Value("${indexing.geneproduct.skip.limit:100}")
     private int skipLimit;
 
+    @Value("${indexing.geneproduct.retries.initialInterval:5000}")
+    private int initialBackOffInterval;
+
+    @Value("${indexing.geneproduct.retries.maxInterval:20000}")
+    private int maxBackOffInterval;
+
+    @Value("${indexing.geneproduct.retries.retryLimit:20}")
+    private int retryLimit;
+
     @Autowired
     private GeneProductRepository geneProductRepository;
 
@@ -90,6 +102,9 @@ public class GeneProductConfig {
                 .skip(FlatFileParseException.class)
                 .skip(ValidationException.class)
                 .listener(skipLogListener())
+                .retry(HttpSolrClient.RemoteSolrException.class)
+                .retryLimit(retryLimit)
+                .backOffPolicy(backOffPolicy())
                 .<GeneProduct>reader(geneProductMultiFileReader())
                 .processor(geneProductCompositeProcessor())
                 .writer(geneProductRepositoryWriter())
@@ -178,5 +193,12 @@ public class GeneProductConfig {
 
     private SkipListener<GeneProduct, GeneProductDocument> skipLogListener() {
         return new SkipLoggerListener<>();
+    }
+
+    private BackOffPolicy backOffPolicy() {
+        ExponentialBackOffPolicy backOffPolicy = new ExponentialBackOffPolicy();
+        backOffPolicy.setInitialInterval(initialBackOffInterval);
+        backOffPolicy.setMaxInterval(maxBackOffInterval);
+        return backOffPolicy;
     }
 }

@@ -27,7 +27,6 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import uk.ac.ebi.quickgo.index.annotation.AnnotationDocumentWriteRetryHelper.SolrResponse;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
@@ -37,8 +36,10 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.util.MatcherAssertionErrors.assertThat;
 import static uk.ac.ebi.quickgo.index.annotation.AnnotationConfig.ANNOTATION_INDEXING_JOB_NAME;
 import static uk.ac.ebi.quickgo.index.annotation.AnnotationConfig.ANNOTATION_INDEXING_STEP_NAME;
-import static uk.ac.ebi.quickgo.index.annotation.AnnotationDocumentWriteRetryHelper.stubSolrWriteResponses;
-import static uk.ac.ebi.quickgo.index.annotation.AnnotationDocumentWriteRetryHelper.validateWriteAttempts;
+import static uk.ac.ebi.quickgo.index.DocumentWriteRetryHelper.stubSolrWriteResponses;
+import static uk.ac.ebi.quickgo.index.DocumentWriteRetryHelper.validateWriteAttempts;
+import static uk.ac.ebi.quickgo.index.DocumentWriteRetryHelper.SolrResponse;
+
 
 /**
  * <p>Tests whether Spring Batch's retry + backoff policy works as expected. This class simulates annotation indexing
@@ -108,7 +109,7 @@ public class AnnotationIndexingRetriesSolrWritesWithSuccessIT {
 
         verify(annotationSolrServerWriter, times(6)).write(argumentCaptor.capture());
         List<List<AnnotationDocument>> docsSentToBeWritten = argumentCaptor.getAllValues();
-        validateWriteAttempts(SOLR_RESPONSES, docsSentToBeWritten);
+        validateWriteAttempts(SOLR_RESPONSES, docsSentToBeWritten, d -> d.geneProductId);
 
         BatchStatus status = jobExecution.getStatus();
         assertThat(status, is(BatchStatus.COMPLETED));

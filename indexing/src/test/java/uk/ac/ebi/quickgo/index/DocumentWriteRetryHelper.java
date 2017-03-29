@@ -1,15 +1,16 @@
-package uk.ac.ebi.quickgo.index.annotation;
+package uk.ac.ebi.quickgo.index;
 
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
-import org.mockito.stubbing.Stubber;
-import org.springframework.batch.item.ItemWriter;
-import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
+import uk.ac.ebi.quickgo.common.QuickGODocument;
 
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.mockito.stubbing.Stubber;
+import org.springframework.batch.item.ItemWriter;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.Mockito.doNothing;
@@ -18,13 +19,13 @@ import static org.springframework.test.util.MatcherAssertionErrors.assertThat;
 
 /**
  * Utility methods to help the testing of the retry logic associated with writing
- * annotation documents to an index, in the presence of an possibly busy
+ * gene product documents to an index, in the presence of an possibly busy
  * Solr instance, which may occasionally not be responsive due to other tasks, e.g.,
  * dedicated to Zookeeper.
  *
  * Created by edd on 23/02/2017.
  */
-public class AnnotationDocumentWriteRetryHelper {
+public class DocumentWriteRetryHelper {
     private static final String HOST = "http://www.myhost.com";
     private static final String MESSAGE = "Looks like the host is not reachable?!";
     private static final int CODE = 1;
@@ -38,7 +39,7 @@ public class AnnotationDocumentWriteRetryHelper {
      * @param responses represents a list of behavioural responses from Solr
      * @return a {@link Stubber} which can be associated with a method call
      */
-    static Stubber stubSolrWriteResponses(List<SolrResponse> responses) {
+    public static Stubber stubSolrWriteResponses(List<SolrResponse> responses) {
         Stubber stubber = null;
         for (SolrResponse response : responses) {
             switch (response) {
@@ -62,10 +63,11 @@ public class AnnotationDocumentWriteRetryHelper {
      * @param docsSentToBeWritten a list of document lists, each of which was sent as an
      *                            argument to an {@link ItemWriter}, for writing to Solr.
      */
-    static void validateWriteAttempts(List<SolrResponse> responses, List<List<AnnotationDocument>> docsSentToBeWritten) {
+    public static <T,I> void validateWriteAttempts(List<SolrResponse> responses, List<List<T>>
+            docsSentToBeWritten, Function<T, I> transformation) {
         int counter = 0;
-        List<AnnotationDocument> docsToWrite;
-        List<AnnotationDocument> docsToRetryWriting = Collections.emptyList();
+        List<T> docsToWrite;
+        List<T> docsToRetryWriting = Collections.emptyList();
 
         Iterator<SolrResponse> responsesIt = responses.iterator();
         for(int i = 0; i < docsSentToBeWritten.size() && responsesIt.hasNext(); i++) {
@@ -76,8 +78,8 @@ public class AnnotationDocumentWriteRetryHelper {
                 case OK:
                     // documents could not be written last time, but can this time
                     if (!docsToRetryWriting.isEmpty()) {
-                        assertThat(extractDocAttribute(docsToWrite, d -> d.geneProductId),
-                                is(extractDocAttribute(docsToRetryWriting, d -> d.geneProductId)));
+                        assertThat(extractDocAttribute(docsToWrite, transformation),
+                                is(extractDocAttribute(docsToRetryWriting, transformation)));
                         docsToRetryWriting = Collections.emptyList();
                     }
                     break;
@@ -90,9 +92,7 @@ public class AnnotationDocumentWriteRetryHelper {
         }
     }
 
-    private static <T> List<T> extractDocAttribute(
-            List<AnnotationDocument> docs,
-            Function<AnnotationDocument, T> transformation) {
+    private static <T,I> List<I> extractDocAttribute( List<T> docs,Function<T, I> transformation) {
         return docs.stream().map(transformation).collect(Collectors.toList());
     }
 
