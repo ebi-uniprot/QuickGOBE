@@ -225,7 +225,7 @@
             <tokenizer class="solr.KeywordTokenizerFactory"/>
             <!--
                 source: UniProtKB:P12345-1
-                tokens: UniProtKB:P12345-1, UniProtKB, UniProtKB:P12345-1, P12345-1
+                tokens: UniProtKB:P12345-1, UniProtKB, P12345-1
 
                 source: UniProtKB:P12345:Pro_x
                 tokens: UniProtKB:P12345:Pro_x, UniProtKB, UniProtKB:P12345
@@ -239,7 +239,7 @@
 
             <!--
                 source: UniProtKB:P12345-1
-                tokens: UniProtKB:P12345, UniProtKB:P12345, P12345
+                tokens: UniProtKB:P12345, P12345
 
                 source: UniProtKB:P12345:Pro_x
                 tokens: UniProtKB:P12345, P12345
