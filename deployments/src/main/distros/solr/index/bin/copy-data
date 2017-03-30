@@ -8,45 +8,46 @@
 set -euo pipefail
 IFS=$'\n\t '
 
-source "../common/common"
+readonly valid_users=("uni_qgo")
+readonly release_version_prefix="v";
 
-# ======= read the variables used by the control scripts ================================
-source "environment.variables" || {
-    echo "Please create a file called, environment.variables, containing the necessary environment variables."
-    exit 1
-}
+## ------------------------ SOURCE NECESSARY FILES ------------------------
+if ! source "$QUICKGO_SCRIPTS_DIR/common/common" || ! source "$QUICKGO_SCRIPTS_DIR/common/common.variables" || !source "index.variables" || ! source "../common/lsf.command.variables" || ! source "$admin_scripts_dir/common/solr.variables"; then
+    prettyEcho "<error>Required properties files were not found. Please make sure you're in the right directory</error>";
+    exit 1;
+fi
 
-readonly PROFILE=${1:-\'\'}
+readonly requested_profile=${1:-\'\'}
 
-# ====== check which environment will be copied ========================================
-if ! check_profile $PROFILE; then
-   echo "Input profile: $PROFILE, not recognized. Allowable values: $(print_valid_profiles VALID_PROFILES)"
+# ------------------------ check profile specified is correct ------------------------
+if ! check_profile $requested_profile; then
+   echo "Input profile: $requested_profile, not recognized. Allowable values: $(print_valid_profiles VALID_PROFILES)"
    exit 1
 fi
 
-# ======= CONSTANTS =======================================
+# ------------------------  CONSTANTS ------------------------
 readonly PERMITTED_USER=("uni_qgo")
 readonly SERVICE_CONF_PATH="$(pwd -P)"
 readonly SERVICE_NAME="$(basename $SERVICE_CONF_PATH)"
 readonly BASE_PATH="$(readlink -f $SERVICE_CONF_PATH/../../)"
-readonly REST_DATA_DIR="$BASE_PATH/data/$PROFILE/$SERVICE_NAME"
+readonly REST_DATA_DIR="/nfs/public/rw/goa/.restful/data/$requested_profile/$SERVICE_NAME"
 readonly BACKUP_DATA_DIR="$REST_DATA_DIR/.backup"
 readonly COPY_FILE_LIST="$SERVICE_CONF_PATH/copylist"
 readonly SRC_DIR="/nfs/public/rw/goa/quickgo_origin/full"
 
-# ======= check the right user runs this script =======================================
+# ------------------------check the right user runs this script ------------------------
 if ! user_can_execute_script $USER PERMITTED_USER; then
     echo "This service can only be run as user(s), '${PERMITTED_USER[@]}'"
     exit 1
 fi
 
-# ======= check if script is run on the right VM =====================================
+# ------------------------ check if script is run on the right VM ------------------------
 if ! [[ $(hostname) =~ ^ebi.* ]]; then
     echo "This script can only be run from an EBI cluster machine"
     exit 1
 fi
 
-# ======= FUNCTIONS ======================================================================
+# ------------------------ FUNCTIONS ------------------------
 function show_help {
     cat<<EOF
   Usage: [profile]
@@ -61,7 +62,7 @@ EOF
 }
 
 
-# ======= take a string and add a time-stamp to it =======================================
+# ------------------------ take a string and add a time-stamp to it ------------------------
 function addTimeStamp() {
     local dirname="$(dirname $1)"
     local fname=$(basename "$1")
@@ -81,7 +82,8 @@ readonly TIMESTAMPED_BACKUP_DIR="$(addTimeStamp $BACKUP_DATA_DIR/version)"
 # Create the data directory if it doesn't already exist
 mkdir "$REST_DATA_DIR" || true
 mkdir "$BACKUP_DATA_DIR"  || true
-# ======= keep only last 5 backups =======================================
+
+# ------------------------ keep only last 5 backups  ------------------------
 pushd . > /dev/null
 cd "$BACKUP_DATA_DIR"
 
@@ -105,7 +107,7 @@ if [ ${#files[@]} -gt 0 ]; then
 
 fi
 
-# ======= copy the latest files into the profile data directory  ==================
+# ------------------------ copy the latest files into the profile data directory   ----------------
 while read line
 do
     cp -v "$SRC_DIR/$line" "$REST_DATA_DIR"
