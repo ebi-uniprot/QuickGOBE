@@ -30,10 +30,9 @@ readonly PERMITTED_USER=("uni_qgo")
 readonly SERVICE_CONF_PATH="$(pwd -P)"
 readonly SERVICE_NAME="$(basename $SERVICE_CONF_PATH)"
 readonly BASE_PATH="$(readlink -f $SERVICE_CONF_PATH/../../)"
-readonly REST_DATA_DIR="/nfs/public/rw/goa/.restful/data/$requested_profile/$SERVICE_NAME"
+readonly REST_DATA_DIR="$DATA_DIR/$requested_profile/$SERVICE_NAME"
 readonly BACKUP_DATA_DIR="$REST_DATA_DIR/.backup"
 readonly COPY_FILE_LIST="$SERVICE_CONF_PATH/copylist"
-readonly SRC_DIR="/nfs/public/rw/goa/quickgo_origin/full"
 
 # ------------------------check the right user runs this script ------------------------
 if ! user_can_execute_script $USER PERMITTED_USER; then
