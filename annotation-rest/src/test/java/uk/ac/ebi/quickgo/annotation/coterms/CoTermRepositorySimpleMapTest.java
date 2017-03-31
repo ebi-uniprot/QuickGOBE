@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.ontology.common.coterms;
+package uk.ac.ebi.quickgo.annotation.coterms;
 
 import java.io.IOException;
 import org.junit.Rule;

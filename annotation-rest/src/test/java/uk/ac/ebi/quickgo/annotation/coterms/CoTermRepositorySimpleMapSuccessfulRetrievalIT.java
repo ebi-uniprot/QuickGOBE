@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.ontology.common.coterms;
+package uk.ac.ebi.quickgo.annotation.coterms;
 
 import java.util.List;
 import org.junit.Rule;
@@ -12,7 +12,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static uk.ac.ebi.quickgo.ontology.common.coterms.CoTermRepoTestConfig.SUCCESSFUL_RETRIEVAL;
 
 /**
  * @author Tony Wardell
@@ -22,7 +21,7 @@ import static uk.ac.ebi.quickgo.ontology.common.coterms.CoTermRepoTestConfig.SUC
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = {CoTermRepoTestConfig.class})
-@ActiveProfiles(profiles = SUCCESSFUL_RETRIEVAL)
+@ActiveProfiles(profiles = CoTermRepoTestConfig.SUCCESSFUL_RETRIEVAL)
 public class CoTermRepositorySimpleMapSuccessfulRetrievalIT {
 
     @Rule

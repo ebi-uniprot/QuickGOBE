@@ -65,3 +65,10 @@ annotation:
       keepAliveSeconds: 600
       allowCoreThreadTimeout: false
       waitForTasksToCompleteOnShutdown: true
+
+## ========== Co-occurring Terms ==========
+coterm:
+   manual: classpath:/coterms/CoTermsManual
+   all: classpath:/coterms/CoTermsAll
+   headerLines: 1
+   limit: 30

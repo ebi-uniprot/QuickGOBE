@@ -40,10 +40,7 @@ class SimpleFilterConverter implements FilterConverter<FilterRequest, QuickGOQue
         Preconditions.checkArgument(request.getValues().size() == 1,
                 "FilterRequest should contain only 1 property for application to a SimpleRequestConverter, " +
                         "instead it contained " + request.getValues().size());
-
-        Stream<String> values = request.getValues().stream().flatMap(Collection::stream);
-
-        return new ConvertedFilter<>(getQuickGOQuery(request, values));
+        return new ConvertedFilter<>(getQuickGOQuery(request));
     }
 
     /**
@@ -56,11 +53,9 @@ class SimpleFilterConverter implements FilterConverter<FilterRequest, QuickGOQue
      * </ul>
      *
      * @param request the filter request
-     * @param values the values, whose combination with the filter details, enable creation of a
-     *        corresponding {@link QuickGOQuery}
      * @return the corresponding {@link QuickGOQuery}
      */
-    private QuickGOQuery getQuickGOQuery(FilterRequest request, Stream<String> values) {
+    private QuickGOQuery getQuickGOQuery(FilterRequest request) {
         Set<QuickGOQuery> queries = request.getValues().stream()
                 .flatMap(Collection::stream)
                 .map(value -> QuickGOQuery

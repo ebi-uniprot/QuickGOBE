@@ -1,7 +1,7 @@
-package uk.ac.ebi.quickgo.ontology.controller;
+package uk.ac.ebi.quickgo.annotation.controller;
 
-import uk.ac.ebi.quickgo.ontology.OntologyREST;
-import uk.ac.ebi.quickgo.ontology.common.coterms.CoTermSource;
+import uk.ac.ebi.quickgo.annotation.AnnotationREST;
+import uk.ac.ebi.quickgo.annotation.coterms.CoTermSource;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -38,11 +38,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Created with IntelliJ IDEA.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = {OntologyREST.class})
+@SpringApplicationConfiguration(classes = {AnnotationREST.class})
 @WebAppConfiguration
 public class CoTermControllerIT {
 
-    private static final String RESOURCE_URL = "/ontology/go/coterms";
+    private static final String RESOURCE_URL = "/annotation/coterms";
     private static final int NUMBER_OF_ALL_CO_TERM_RECORDS = 12;
     private static final String GO_0000001 = "GO:0000001";
     private static final String GO_9000001 = "GO:9000001";

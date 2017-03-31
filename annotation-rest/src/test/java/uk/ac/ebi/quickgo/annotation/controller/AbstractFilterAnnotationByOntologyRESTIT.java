@@ -121,6 +121,29 @@ public abstract class AbstractFilterAnnotationByOntologyRESTIT {
     }
 
     @Test
+    public void defaultFilterFor1TermBy1ValidDescendant() throws Exception {
+        annotationRepository.save(createAnnotationDocWithId(createGPId(1), ontologyId(1)));
+        annotationRepository.save(createAnnotationDocWithId(createGPId(2), ontologyId(2)));
+        annotationRepository.save(createAnnotationDocWithId(createGPId(3), ontologyId(3)));
+
+        expectRestCallHasDescendants(singletonList(ontologyId(1)), emptyList(),
+                singletonList(singletonList(ontologyId(3))));
+
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE)
+                        .param(idParam, ontologyId(1)));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(pageInfoExists())
+                .andExpect(totalNumOfResults(1))
+                .andExpect(fieldsInAllResultsExist(1))
+                .andExpect(fieldDoesNotExist(SLIMMED_ID_FIELD))
+                .andExpect(valuesOccurInField(idParam, ontologyId(3)));
+    }
+
+    @Test
     public void filterFor1TermBy1ValidDescendant() throws Exception {
         annotationRepository.save(createAnnotationDocWithId(createGPId(1), ontologyId(1)));
         annotationRepository.save(createAnnotationDocWithId(createGPId(2), ontologyId(2)));
