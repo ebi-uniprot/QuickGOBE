@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import uk.ac.ebi.quickgo.common.SearchableField;
 import uk.ac.ebi.quickgo.graphics.service.GraphImageService;
 import uk.ac.ebi.quickgo.ontology.OntologyRestConfig;
-import uk.ac.ebi.quickgo.ontology.OntologyRestProperties;
 import uk.ac.ebi.quickgo.ontology.common.OntologyType;
 import uk.ac.ebi.quickgo.ontology.controller.validation.OBOControllerValidationHelper;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
@@ -18,15 +17,14 @@ import uk.ac.ebi.quickgo.ontology.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
-import java.time.Duration;
 import java.time.LocalTime;
 import java.util.Collections;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.when;
 
 /**
  * Unit tests available components of the {@link OBOController} class.
@@ -41,6 +39,7 @@ public class OBOControllerTest {
     private static final int DEFAULT_PAGE_SIZE = 25;
     private static final LocalTime START_TIME = LocalTime.of(18, 0);
     private static final LocalTime END_TIME = LocalTime.of(17, 0);
+    private static Function<LocalTime, Long> remainingCacheCalculator = (t) -> 1L;
     @Mock
     private SearchServiceConfig.OntologyCompositeRetrievalConfig retrievalConfig;
     @Mock
@@ -55,8 +54,6 @@ public class OBOControllerTest {
     private SearchableField searchableField;
     @Mock
     private GraphImageService graphImageService;
-    @Mock
-    private OntologyRestProperties restProperties;
     private OBOController<FakeOBOTerm> controller;
 
     private static OBOController<FakeOBOTerm> createOBOController(
@@ -66,7 +63,7 @@ public class OBOControllerTest {
             final GraphImageService graphImageService,
             OBOControllerValidationHelper oboControllerValidationHelper,
             OntologyRestConfig.OntologyPagingConfig ontologyPagingConfig,
-            OntologyType ontologyType, OntologyRestProperties restProperties) {
+            OntologyType ontologyType) {
         return new OBOController<FakeOBOTerm>(ontologyService,
                                               searchService,
                                               searchableField,
@@ -75,16 +72,16 @@ public class OBOControllerTest {
                                               oboControllerValidationHelper,
                                               ontologyPagingConfig,
                 ontologyType,
-                restProperties) {
+                remainingCacheCalculator) {
         };
     }
 
     @Before
     public void setUp() {
 
-        when(restProperties.getStartTime()).thenReturn(START_TIME);
-        when(restProperties.getEndTime()).thenReturn(END_TIME);
-        when(restProperties.startOfDayToEndCacheSeconds()).thenReturn(Duration.between(LocalTime.MIDNIGHT, END_TIME).getSeconds());
+//        when(restProperties.getStartTime()).thenReturn(START_TIME);
+//        when(restProperties.getEndTime()).thenReturn(END_TIME);
+//        when(restProperties.startOfDayToEndCacheSeconds()).thenReturn(Duration.between(LocalTime.MIDNIGHT, END_TIME).getSeconds());
 
         this.controller = createOBOController(ontologyService,
                                               searchService,
@@ -93,8 +90,7 @@ public class OBOControllerTest {
                                               graphImageService,
                                               oboControllerValidationHelper,
                                               ontologyPagingConfig,
-                OntologyType.GO,
-                restProperties);
+                OntologyType.GO);
     }
 
     @Test
@@ -130,8 +126,7 @@ public class OBOControllerTest {
                 graphImageService,
                 oboControllerValidationHelper,
                 ontologyPagingConfig,
-                OntologyType.GO,
-                restProperties);
+                OntologyType.GO);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -143,8 +138,7 @@ public class OBOControllerTest {
                             graphImageService,
                             oboControllerValidationHelper,
                             ontologyPagingConfig,
-                OntologyType.GO,
-                restProperties);
+                OntologyType.GO);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -156,8 +150,7 @@ public class OBOControllerTest {
                             graphImageService,
                             oboControllerValidationHelper,
                             ontologyPagingConfig,
-                OntologyType.GO,
-                restProperties);
+                OntologyType.GO);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -169,8 +162,7 @@ public class OBOControllerTest {
                             graphImageService,
                             oboControllerValidationHelper,
                             ontologyPagingConfig,
-                OntologyType.GO,
-                restProperties);
+                OntologyType.GO);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -182,29 +174,25 @@ public class OBOControllerTest {
                             null,
                             oboControllerValidationHelper,
                             ontologyPagingConfig,
-                OntologyType.GO,
-                restProperties);
+                OntologyType.GO);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void controllerInstantiationFailsOnNullValidationHelper() {
         createOBOController(ontologyService, searchService, searchableField, retrievalConfig, graphImageService, null,
-                ontologyPagingConfig, OntologyType.GO,
-                restProperties);
+                ontologyPagingConfig, OntologyType.GO);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void controllerInstantiationFailsOnNullPagingConfig() {
         createOBOController(ontologyService, searchService, searchableField, retrievalConfig, graphImageService,
-                oboControllerValidationHelper, null, OntologyType.GO,
-                restProperties);
+                oboControllerValidationHelper, null, OntologyType.GO);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void controllerInstantiationFailsOnNullOntologyType() {
         createOBOController(ontologyService, searchService, searchableField, retrievalConfig, graphImageService,
-                oboControllerValidationHelper, ontologyPagingConfig, null,
-                restProperties);
+                oboControllerValidationHelper, ontologyPagingConfig, null);
     }
 
     private static class FakeOBOTerm extends OBOTerm {}
