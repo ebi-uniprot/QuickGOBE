@@ -3,6 +3,7 @@ package uk.ac.ebi.quickgo.ontology;
 import uk.ac.ebi.quickgo.ontology.controller.validation.OBOControllerValidationHelper;
 import uk.ac.ebi.quickgo.ontology.controller.validation.OBOControllerValidationHelperImpl;
 
+import java.time.LocalTime;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,6 +24,8 @@ import static uk.ac.ebi.quickgo.common.validator.OntologyIdPredicate.isValidGOTe
 @Configuration
 public class OntologyRestConfig {
 
+    private static final int MINUTES = 0;
+
     @Bean
     public OntologyPagingConfig ontologyPagingConfig(
             @Value("${ontology.default_page_size:25}") int defaultPageSize) {
@@ -41,5 +44,15 @@ public class OntologyRestConfig {
 
     public interface OntologyPagingConfig {
         int defaultPageSize();
+    }
+
+    @Bean
+    public LocalTime ontologyCacheStartTime(@Value("${ontology.cache.control.start.time:18}") int cacheStartHour){
+        return LocalTime.of(cacheStartHour, MINUTES );
+    }
+
+    @Bean
+    public LocalTime ontologyCacheEndTime(@Value("${ontology.cache.control.end.time:17}") int cacheEndHour){
+        return LocalTime.of(cacheEndHour, MINUTES );
     }
 }
