@@ -49,6 +49,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.ac.ebi.quickgo.common.converter.HelpfulConverter.toCSV;
@@ -860,6 +861,17 @@ public abstract class OBOControllerIT {
                 get(buildTermsURLWithSubResource(invalidId(), CHART_COORDINATES_SUB_RESOURCE)));
 
         expectInvalidIdError(response, invalidId());
+    }
+
+
+    //-----------------------  Check Http Header for Cache-Control content ------------------------------------------
+
+    @Test
+    public void httpHeaderContainsCacheControlContent() throws Exception {
+        ResultActions response = mockMvc.perform(get(buildTermsURL(validId)));
+
+        expectCoreFieldsInResults(response, singletonList(validId))
+                .andExpect(header().string("cache-control", "max-age=7200"));
     }
 
     private void requestToChartServiceReturnsValidImage() {
