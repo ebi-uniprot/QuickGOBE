@@ -20,7 +20,7 @@ public class OntologyRestProperties {
     private static final int DEFAULT_END_HOURS = 17;
     private LocalTime startTime = LocalTime.of(DEFAULT_START_HOURS, MINUTES);
     private LocalTime endTime = LocalTime.of(DEFAULT_END_HOURS, MINUTES);
-    private long midnightToEndCacheTime;
+    private long startOfDayToEndCacheSeconds;
 
     public void setStart(int hours) {
         startTime = LocalTime.of(hours, MINUTES);
@@ -28,7 +28,7 @@ public class OntologyRestProperties {
 
     public void setEnd(int hours) {
         endTime = LocalTime.of(hours, MINUTES);
-        this.midnightToEndCacheTime = Duration.between(LocalTime.MIN, endTime).getSeconds();
+        this.startOfDayToEndCacheSeconds = Duration.between(LocalTime.MIN, endTime).getSeconds();
     }
 
     public LocalTime getStartTime() {
@@ -39,7 +39,7 @@ public class OntologyRestProperties {
         return endTime;
     }
 
-    public long midnightToEndCacheTime() {
-        return midnightToEndCacheTime;
+    public long startOfDayToEndCacheSeconds() {
+        return startOfDayToEndCacheSeconds;
     }
 }
