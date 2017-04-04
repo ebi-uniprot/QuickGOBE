@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.ac.ebi.quickgo.common.SearchableField;
 import uk.ac.ebi.quickgo.graphics.service.GraphImageService;
 import uk.ac.ebi.quickgo.ontology.OntologyRestConfig;
-import uk.ac.ebi.quickgo.ontology.OntologyRestProperties;
 import uk.ac.ebi.quickgo.ontology.common.OntologyType;
 import uk.ac.ebi.quickgo.ontology.controller.validation.OBOControllerValidationHelper;
 import uk.ac.ebi.quickgo.ontology.model.ECOTerm;
@@ -14,6 +13,9 @@ import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;
 import uk.ac.ebi.quickgo.ontology.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
+
+import java.time.LocalTime;
+import java.util.function.Function;
 
 /**
  * REST controller for accessing ECO related information.
@@ -35,9 +37,9 @@ public class ECOController extends OBOController<ECOTerm> {
                          GraphImageService graphImageService,
                          OBOControllerValidationHelper ecoValidationHelper,
                          OntologyRestConfig.OntologyPagingConfig ontologyPagingConfig,
-                         OntologyRestProperties restProperties
+                         Function<LocalTime, Long> remainingCacheCalculator
    ) {
         super(ecoOntologyService, ontologySearchService, searchableField, ontologyRetrievalConfig, graphImageService,
-                ecoValidationHelper, ontologyPagingConfig, OntologyType.ECO, restProperties);
+                ecoValidationHelper, ontologyPagingConfig, OntologyType.ECO, remainingCacheCalculator);
     }
 }

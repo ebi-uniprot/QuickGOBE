@@ -24,6 +24,9 @@ import uk.ac.ebi.quickgo.rest.metadata.MetaData;
 import uk.ac.ebi.quickgo.rest.metadata.MetaDataProvider;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
 
+import java.time.LocalTime;
+import java.util.function.Function;
+
 /**
  * REST controller for accessing GO related information.
  *
@@ -49,9 +52,9 @@ public class GOController extends OBOController<GOTerm> {
                         OBOControllerValidationHelper goValidationHelper,
                         OntologyRestConfig.OntologyPagingConfig ontologyPagingConfig,
                         MetaDataProvider metaDataProvider,
-                        OntologyRestProperties restProperties) {
+                        Function<LocalTime, Long> remainingCacheTime) {
         super(goOntologyService, ontologySearchService, searchableField, ontologyRetrievalConfig, graphImageService,
-                goValidationHelper, ontologyPagingConfig, OntologyType.GO, restProperties);
+                goValidationHelper, ontologyPagingConfig, OntologyType.GO, remainingCacheTime);
         Preconditions.checkArgument(metaDataProvider != null, "Metadata provider cannot be null.");
         this.metaDataProvider = metaDataProvider;
     }
