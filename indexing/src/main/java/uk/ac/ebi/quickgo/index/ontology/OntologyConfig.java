@@ -9,12 +9,15 @@ import uk.ac.ebi.quickgo.ontology.common.OntologyRepoConfig;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.support.CompositeItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -27,7 +30,7 @@ import org.springframework.context.annotation.Import;
  */
 @Configuration
 @EnableBatchProcessing
-@Import({OntologyRepoConfig.class})
+@Import({OntologyRepoConfig.class, OntologySiteMapConfig.class})
 public class OntologyConfig {
     static final String ONTOLOGY_INDEXING_JOB_NAME = "ontologyIndexingJob";
     static final String ONTOLOGY_INDEXING_STEP_NAME = "ontologyIndexStep";
@@ -40,6 +43,12 @@ public class OntologyConfig {
 
     @Autowired
     private OntologyRepository ontologyRepository;
+
+    @Autowired
+    private SiteMapItemWriter siteMapOntologyWriter;
+
+    @Autowired
+    private SiteMapStepListener siteMapStepListener;
 
     @Value("${indexing.ontology.chunk.size:500}")
     private int chunkSize;
@@ -68,19 +77,25 @@ public class OntologyConfig {
                 .faultTolerant()
                 .skip(DocumentReaderException.class)
                 .skipLimit(skipLimit)
-                .writer(ontologyWriter())
+                .writer(compositeOntologyWriter())
                 .listener(logStepListener())
+                .listener(siteMapStepListener)
                 .build();
-    }
-
-    @Bean
-    ItemWriter<OntologyDocument> ontologyWriter() {
-        return new SolrCrudRepoWriter<>(ontologyRepository);
     }
 
     @Bean
     OntologyReader ontologyReader() {
         return new OntologyReader(new File(sourceFile));
+    }
+
+    private ItemWriter<OntologyDocument> compositeOntologyWriter() {
+        List<ItemWriter<? super OntologyDocument>> writers = new ArrayList<>();
+        writers.add(new SolrCrudRepoWriter<>(ontologyRepository));
+        writers.add(siteMapOntologyWriter);
+
+        CompositeItemWriter<OntologyDocument> compositeItemWriter = new CompositeItemWriter<>();
+        compositeItemWriter.setDelegates(writers);
+        return compositeItemWriter;
     }
 
     private LogJobListener logJobListener() {
