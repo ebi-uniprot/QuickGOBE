@@ -541,10 +541,12 @@ public abstract class OBOController<T extends OBOTerm> {
         long maxAge;
         final LocalTime now = LocalTime.now();
         if (now.isAfter(restProperties.getStartTime())) {
-            maxAge = Duration.between(now, LocalTime.MIDNIGHT).getSeconds() + restProperties.midnightToEndCacheTime();
+            maxAge = Duration.between(now, LocalTime.MAX).getSeconds() + restProperties.midnightToEndCacheTime();
         } else {
             maxAge = Duration.between(now, restProperties.getEndTime()).getSeconds();
         }
+        assert maxAge > 0;
+
         return maxAge;
     }
 }
