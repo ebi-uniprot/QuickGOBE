@@ -84,7 +84,7 @@ public class OBOControllerTest {
 
         when(restProperties.getStartTime()).thenReturn(START_TIME);
         when(restProperties.getEndTime()).thenReturn(END_TIME);
-        when(restProperties.midnightToEndCacheTime()).thenReturn(Duration.between(LocalTime.MIDNIGHT, END_TIME).getSeconds());
+        when(restProperties.startOfDayToEndCacheSeconds()).thenReturn(Duration.between(LocalTime.MIDNIGHT, END_TIME).getSeconds());
 
         this.controller = createOBOController(ontologyService,
                                               searchService,
