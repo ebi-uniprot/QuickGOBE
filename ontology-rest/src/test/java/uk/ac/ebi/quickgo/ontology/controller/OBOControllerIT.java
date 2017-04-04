@@ -1,5 +1,21 @@
 package uk.ac.ebi.quickgo.ontology.controller;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 import uk.ac.ebi.quickgo.graphics.model.GraphImageLayout;
 import uk.ac.ebi.quickgo.graphics.ontology.GraphImage;
@@ -17,41 +33,17 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.*;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static uk.ac.ebi.quickgo.common.converter.HelpfulConverter.toCSV;
 import static uk.ac.ebi.quickgo.ontology.controller.OBOController.*;
 
@@ -84,12 +76,9 @@ public abstract class OBOControllerIT {
 
     @Autowired
     protected OntologyGraph ontologyGraph;
-
+    protected MockMvc mockMvc;
     @Autowired
     private GraphImageService graphImageService;
-
-    protected MockMvc mockMvc;
-
     private String resourceUrl;
     private String validId;
     private String validIdsShortCSV;
@@ -873,11 +862,27 @@ public abstract class OBOControllerIT {
     //-----------------------  Check Http Header for Cache-Control content ------------------------------------------
 
     @Test
-    public void httpHeaderContainsCacheControlContent() throws Exception {
-        ResultActions response = mockMvc.perform(get(buildTermsURL(validId)));
+    public void cacheControlMaxAgeReducesOnSubsequentRequests() throws Exception {
+        MvcResult mvcResult = mockMvc.perform(get(buildTermsURL(validId))).andReturn();
 
-        expectCoreFieldsInResults(response, singletonList(validId))
-                .andExpect(header().string("cache-control", "max-age=7200"));
+        String ccHeader = mvcResult.getResponse().getHeader("Cache-Control");
+        String[] keyValEarlier = ccHeader.split("=");
+
+        assertThat(keyValEarlier[0], is("max-age"));
+        long secsBeforeExpiringEarlier = Long.parseLong(keyValEarlier[1]);
+        assertThat(secsBeforeExpiringEarlier, is(greaterThan(0L)));
+
+        Thread.sleep(5000);
+
+        mvcResult = mockMvc.perform(get(buildTermsURL(validId))).andReturn();
+
+        ccHeader = mvcResult.getResponse().getHeader("Cache-Control");
+        String[] keyValLater = ccHeader.split("=");
+
+        assertThat(keyValLater[0], is("max-age"));
+        long secsBeforeExpiringLater = Long.parseLong(keyValLater[1]);
+        assertThat(secsBeforeExpiringLater, is(greaterThan(0L)));
+        assertThat(secsBeforeExpiringEarlier, is(greaterThan(secsBeforeExpiringLater)));
     }
 
     private void requestToChartServiceReturnsValidImage() {
