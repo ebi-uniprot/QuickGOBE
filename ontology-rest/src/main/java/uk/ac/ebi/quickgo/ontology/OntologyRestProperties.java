@@ -16,8 +16,10 @@ import java.time.LocalTime;
 public class OntologyRestProperties {
 
     private static final int MINUTES = 0;
-    private LocalTime startTime;
-    private LocalTime endTime;
+    private static final int DEFAULT_START_HOURS = 18;
+    private static final int DEFAULT_END_HOURS = 17;
+    private LocalTime startTime = LocalTime.of(DEFAULT_START_HOURS, MINUTES);
+    private LocalTime endTime = LocalTime.of(DEFAULT_END_HOURS, MINUTES);
     private long midnightToEndCacheTime;
 
     public void setStart(int hours) {
