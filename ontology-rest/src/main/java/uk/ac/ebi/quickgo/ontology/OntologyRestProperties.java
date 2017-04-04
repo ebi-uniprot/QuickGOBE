@@ -28,7 +28,7 @@ public class OntologyRestProperties {
 
     public void setEnd(int hours) {
         endTime = LocalTime.of(hours, MINUTES);
-        this.midnightToEndCacheTime = Duration.between(LocalTime.MIDNIGHT, endTime).getSeconds();
+        this.midnightToEndCacheTime = Duration.between(LocalTime.MIN, endTime).getSeconds();
     }
 
     public LocalTime getStartTime() {
