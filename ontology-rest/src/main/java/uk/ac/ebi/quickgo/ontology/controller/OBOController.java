@@ -18,7 +18,6 @@ import uk.ac.ebi.quickgo.graphics.model.GraphImageLayout;
 import uk.ac.ebi.quickgo.graphics.ontology.RenderingGraphException;
 import uk.ac.ebi.quickgo.graphics.service.GraphImageService;
 import uk.ac.ebi.quickgo.ontology.OntologyRestConfig;
-import uk.ac.ebi.quickgo.ontology.OntologyRestProperties;
 import uk.ac.ebi.quickgo.ontology.common.OntologyFields;
 import uk.ac.ebi.quickgo.ontology.common.OntologyType;
 import uk.ac.ebi.quickgo.ontology.controller.validation.OBOControllerValidationHelper;
@@ -43,9 +42,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.time.Duration;
 import java.time.LocalTime;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -89,7 +88,7 @@ public abstract class OBOController<T extends OBOTerm> {
     private final GraphImageService graphImageService;
     private final OntologyRestConfig.OntologyPagingConfig ontologyPagingConfig;
     private final OntologyType ontologyType;
-    private final OntologyRestProperties restProperties;
+    private final Function<LocalTime, Long> remainingCacheTime;
 
     public OBOController(OntologyService<T> ontologyService,
                          SearchService<OBOTerm> ontologySearchService,
@@ -99,7 +98,7 @@ public abstract class OBOController<T extends OBOTerm> {
                          OBOControllerValidationHelper oboControllerValidationHelper,
                          OntologyRestConfig.OntologyPagingConfig ontologyPagingConfig,
                          OntologyType ontologyType,
-                         OntologyRestProperties restProperties) {
+                         Function<LocalTime, Long> remainingCacheTime) {
         checkArgument(ontologyService != null, "Ontology service cannot be null");
         checkArgument(ontologySearchService != null, "Ontology search service cannot be null");
         checkArgument(searchableField != null, "Ontology searchable field cannot be null");
@@ -108,7 +107,7 @@ public abstract class OBOController<T extends OBOTerm> {
         checkArgument(oboControllerValidationHelper != null, "OBO validation helper cannot be null");
         checkArgument(ontologyPagingConfig != null, "Paging config cannot be null");
         checkArgument(ontologyType != null, "Ontology type config cannot be null");
-        checkArgument(restProperties != null, "Rest properties cannot be null");
+        checkArgument(remainingCacheTime != null, "RemainingCacheTime cannot be null");
 
         this.ontologyService = ontologyService;
         this.ontologySearchService = ontologySearchService;
@@ -118,7 +117,7 @@ public abstract class OBOController<T extends OBOTerm> {
         this.graphImageService = graphImageService;
         this.ontologyPagingConfig = ontologyPagingConfig;
         this.ontologyType = ontologyType;
-        this.restProperties = restProperties;
+        this.remainingCacheTime = remainingCacheTime;
 
     }
 
@@ -533,24 +532,8 @@ public abstract class OBOController<T extends OBOTerm> {
 
     private MultiValueMap<String, String>  httpHeaders(){
         MultiValueMap<String, String> headers = new HttpHeaders();
-        headers.add(HttpHeaders.CACHE_CONTROL,  String.format(MAX_AGE_HTTP_HEADER, maxAge()));
+        headers.add(HttpHeaders.CACHE_CONTROL, String.format(MAX_AGE_HTTP_HEADER, remainingCacheTime.apply(LocalTime.now())));
         return headers;
     }
 
-    private long maxAge(){
-        long maxAge;
-        final LocalTime now = LocalTime.now();
-        if (now.isAfter(restProperties.getStartTime())) {
-            maxAge = Duration.between(now, LocalTime.MAX).getSeconds() + restProperties.startOfDayToEndCacheSeconds();
-        } else {
-            if (now.isBefore(restProperties.getEndTime())) {
-                maxAge = Duration.between(now, restProperties.getEndTime()).getSeconds();
-            } else {
-                maxAge = 0;
-            }
-        }
-        assert maxAge >= 0;
-
-        return maxAge;
-    }
 }
