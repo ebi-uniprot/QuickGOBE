@@ -106,6 +106,12 @@ public abstract class OBOControllerIT {
     @Value("${ontology.max_page_size:30}")
     private int maxPageSize;
 
+    @Value("${ontology.cache.control.start.time:18}")
+    private int cacheControlStartTime;
+
+    @Value("${ontology.cache.control.end.time:18}")
+    private int cacheControlEndTime;
+
     @Before
     public void setup() {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
