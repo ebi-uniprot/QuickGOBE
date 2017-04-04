@@ -29,6 +29,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.Duration;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
@@ -86,6 +88,9 @@ public abstract class OBOController<T extends OBOTerm> {
     private final GraphImageService graphImageService;
     private final OntologyRestConfig.OntologyPagingConfig ontologyPagingConfig;
     private final OntologyType ontologyType;
+    private final LocalTime cacheStartTime;
+    private final LocalTime cacheEndTime = LocalTime.of(17,0);
+    private final long midnightToEndCacheTime;
 
     public OBOController(OntologyService<T> ontologyService,
             SearchService<OBOTerm> ontologySearchService,
@@ -94,7 +99,9 @@ public abstract class OBOController<T extends OBOTerm> {
             GraphImageService graphImageService,
             OBOControllerValidationHelper oboControllerValidationHelper,
             OntologyRestConfig.OntologyPagingConfig ontologyPagingConfig,
-            OntologyType ontologyType) {
+            OntologyType ontologyType,
+            LocalTime cacheStartTime,
+            LocalTime cacheEndTime) {
         checkArgument(ontologyService != null, "Ontology service cannot be null");
         checkArgument(ontologySearchService != null, "Ontology search service cannot be null");
         checkArgument(searchableField != null, "Ontology searchable field cannot be null");
@@ -103,7 +110,8 @@ public abstract class OBOController<T extends OBOTerm> {
         checkArgument(oboControllerValidationHelper != null, "OBO validation helper cannot be null");
         checkArgument(ontologyPagingConfig != null, "Paging config cannot be null");
         checkArgument(ontologyType != null, "Ontology type config cannot be null");
-
+        checkArgument(cacheStartTime != null, "Cache start time cannot be null");
+        checkArgument(cacheEndTime != null, "Cache end time cannot be null");
 
         this.ontologyService = ontologyService;
         this.ontologySearchService = ontologySearchService;
@@ -113,6 +121,8 @@ public abstract class OBOController<T extends OBOTerm> {
         this.graphImageService = graphImageService;
         this.ontologyPagingConfig = ontologyPagingConfig;
         this.ontologyType = ontologyType;
+        this.cacheStartTime = cacheStartTime;
+        this.midnightToEndCacheTime = Duration.between(LocalTime.MIDNIGHT, cacheEndTime).getSeconds();
     }
 
     /**
@@ -522,9 +532,20 @@ public abstract class OBOController<T extends OBOTerm> {
                         OntologyFields.Searchable.ONTOLOGY_TYPE + COLON + ontologyType.name()));
     }
 
-    private static MultiValueMap<String, String>  httpHeaders(){
+    private MultiValueMap<String, String>  httpHeaders(){
         MultiValueMap<String, String> headers = new HttpHeaders();
-        headers.add(HttpHeaders.CACHE_CONTROL,  String.format(MAX_AGE_HTTP_HEADER, "7200"));
+        headers.add(HttpHeaders.CACHE_CONTROL,  String.format(MAX_AGE_HTTP_HEADER, maxAge()));
         return headers;
+    }
+
+    private long maxAge(){
+        long maxAge;
+        final LocalTime now = LocalTime.now();
+        if(now.isAfter(cacheStartTime)){
+            maxAge = Duration.between(now, LocalTime.MIDNIGHT).getSeconds() + midnightToEndCacheTime;
+        }else{
+            maxAge = Duration.between(now, cacheEndTime).getSeconds();
+        }
+        return maxAge;
     }
 }
