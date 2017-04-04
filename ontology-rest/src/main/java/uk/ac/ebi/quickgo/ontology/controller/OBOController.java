@@ -139,14 +139,10 @@ public abstract class OBOController<T extends OBOTerm> {
     public ResponseEntity<QueryResult<T>> baseUrl(
             @RequestParam(value = "page", defaultValue = DEFAULT_PAGE_NUMBER) int page) {
 
-        MultiValueMap<String, String> headers = new HttpHeaders();
-        headers.add(HttpHeaders.CACHE_CONTROL,  String.format(MAX_AGE_HTTP_HEADER, "7200"));
-
-        ResponseEntity<QueryResult<T>> responseEntity = new ResponseEntity<>(ontologyService.findAllByOntologyType
+        return new ResponseEntity<>(ontologyService.findAllByOntologyType
                 (this.ontologyType,
-                new RegularPage(page, ontologyPagingConfig.defaultPageSize())), headers, HttpStatus.OK);
+                new RegularPage(page, ontologyPagingConfig.defaultPageSize())), httpHeaders(), HttpStatus.OK);
 
-        return responseEntity;
     }
 
     /**
@@ -166,8 +162,7 @@ public abstract class OBOController<T extends OBOTerm> {
     @RequestMapping(value = TERMS_RESOURCE + "/{ids}", method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsCoreAttr(@PathVariable(value = "ids") String ids) {
-        return getResultsResponse(ontologyService.findCoreInfoByOntologyId(validationHelper.validateCSVIds
-                (ids)));
+        return getResultsResponse(ontologyService.findCoreInfoByOntologyId(validationHelper.validateCSVIds(ids)));
     }
 
     /**
@@ -187,7 +182,7 @@ public abstract class OBOController<T extends OBOTerm> {
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsComplete(@PathVariable(value = "ids") String ids) {
         return getResultsResponse(
-                ontologyService.findCompleteInfoByOntologyId(validationHelper.validateCSVIds(ids)));
+        ontologyService.findCompleteInfoByOntologyId(validationHelper.validateCSVIds(ids)));
     }
 
     /**
@@ -206,6 +201,7 @@ public abstract class OBOController<T extends OBOTerm> {
     @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + HISTORY_SUB_RESOURCE, method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsHistory(@PathVariable(value = "ids") String ids) {
+
         return getResultsResponse(
                 ontologyService.findHistoryInfoByOntologyId(validationHelper.validateCSVIds(ids)));
     }
@@ -454,7 +450,7 @@ public abstract class OBOController<T extends OBOTerm> {
         }
 
         QueryResult<ResponseType> queryResult = new QueryResult.Builder<>(resultsToShow.size(), resultsToShow).build();
-        return new ResponseEntity<>(queryResult, HttpStatus.OK);
+        return new ResponseEntity<>(queryResult, httpHeaders(), HttpStatus.OK);
     }
 
     private RetrievalException createChartGraphicsException(Throwable throwable) {
@@ -524,5 +520,11 @@ public abstract class OBOController<T extends OBOTerm> {
         return and(query,
                 ontologyQueryConverter.convert(
                         OntologyFields.Searchable.ONTOLOGY_TYPE + COLON + ontologyType.name()));
+    }
+
+    private static MultiValueMap<String, String>  httpHeaders(){
+        MultiValueMap<String, String> headers = new HttpHeaders();
+        headers.add(HttpHeaders.CACHE_CONTROL,  String.format(MAX_AGE_HTTP_HEADER, "7200"));
+        return headers;
     }
 }
