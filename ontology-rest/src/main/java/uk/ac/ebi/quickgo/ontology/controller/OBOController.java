@@ -35,9 +35,11 @@ import javax.imageio.ImageIO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -74,6 +76,7 @@ public abstract class OBOController<T extends OBOTerm> {
     private static final String COLON = ":";
     private static final String DEFAULT_ENTRIES_PER_PAGE = "25";
     private static final String DEFAULT_PAGE_NUMBER = "1";
+    private static final String MAX_AGE_HTTP_HEADER = "max-age=%s";
 
     private final OntologyService<T> ontologyService;
     private final SearchService<OBOTerm> ontologySearchService;
@@ -136,8 +139,14 @@ public abstract class OBOController<T extends OBOTerm> {
     public ResponseEntity<QueryResult<T>> baseUrl(
             @RequestParam(value = "page", defaultValue = DEFAULT_PAGE_NUMBER) int page) {
 
-        return new ResponseEntity<>(ontologyService.findAllByOntologyType(this.ontologyType,
-                new RegularPage(page, ontologyPagingConfig.defaultPageSize())), HttpStatus.OK);
+        MultiValueMap<String, String> headers = new HttpHeaders();
+        headers.add(HttpHeaders.CACHE_CONTROL,  String.format(MAX_AGE_HTTP_HEADER, "7200"));
+
+        ResponseEntity<QueryResult<T>> responseEntity = new ResponseEntity<>(ontologyService.findAllByOntologyType
+                (this.ontologyType,
+                new RegularPage(page, ontologyPagingConfig.defaultPageSize())), headers, HttpStatus.OK);
+
+        return responseEntity;
     }
 
     /**
