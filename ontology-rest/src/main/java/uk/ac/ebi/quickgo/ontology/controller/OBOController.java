@@ -1,10 +1,24 @@
 package uk.ac.ebi.quickgo.ontology.controller;
 
+import io.swagger.annotations.ApiOperation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import uk.ac.ebi.quickgo.common.SearchableField;
 import uk.ac.ebi.quickgo.graphics.model.GraphImageLayout;
 import uk.ac.ebi.quickgo.graphics.ontology.RenderingGraphException;
 import uk.ac.ebi.quickgo.graphics.service.GraphImageService;
 import uk.ac.ebi.quickgo.ontology.OntologyRestConfig;
+import uk.ac.ebi.quickgo.ontology.OntologyRestProperties;
 import uk.ac.ebi.quickgo.ontology.common.OntologyFields;
 import uk.ac.ebi.quickgo.ontology.common.OntologyType;
 import uk.ac.ebi.quickgo.ontology.controller.validation.OBOControllerValidationHelper;
@@ -23,7 +37,7 @@ import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.query.RegularPage;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
-import io.swagger.annotations.ApiOperation;
+import javax.imageio.ImageIO;
 import java.awt.image.RenderedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -33,19 +47,6 @@ import java.time.Duration;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
-import javax.imageio.ImageIO;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.DEFAULT_TRAVERSAL_TYPES_CSV;
@@ -88,20 +89,17 @@ public abstract class OBOController<T extends OBOTerm> {
     private final GraphImageService graphImageService;
     private final OntologyRestConfig.OntologyPagingConfig ontologyPagingConfig;
     private final OntologyType ontologyType;
-    private final LocalTime cacheStartTime;
-    private final LocalTime cacheEndTime = LocalTime.of(17,0);
-    private final long midnightToEndCacheTime;
+    private final OntologyRestProperties restProperties;
 
     public OBOController(OntologyService<T> ontologyService,
-            SearchService<OBOTerm> ontologySearchService,
-            SearchableField searchableField,
-            SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig,
-            GraphImageService graphImageService,
-            OBOControllerValidationHelper oboControllerValidationHelper,
-            OntologyRestConfig.OntologyPagingConfig ontologyPagingConfig,
-            OntologyType ontologyType,
-            LocalTime cacheStartTime,
-            LocalTime cacheEndTime) {
+                         SearchService<OBOTerm> ontologySearchService,
+                         SearchableField searchableField,
+                         SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig,
+                         GraphImageService graphImageService,
+                         OBOControllerValidationHelper oboControllerValidationHelper,
+                         OntologyRestConfig.OntologyPagingConfig ontologyPagingConfig,
+                         OntologyType ontologyType,
+                         OntologyRestProperties restProperties) {
         checkArgument(ontologyService != null, "Ontology service cannot be null");
         checkArgument(ontologySearchService != null, "Ontology search service cannot be null");
         checkArgument(searchableField != null, "Ontology searchable field cannot be null");
@@ -110,8 +108,7 @@ public abstract class OBOController<T extends OBOTerm> {
         checkArgument(oboControllerValidationHelper != null, "OBO validation helper cannot be null");
         checkArgument(ontologyPagingConfig != null, "Paging config cannot be null");
         checkArgument(ontologyType != null, "Ontology type config cannot be null");
-        checkArgument(cacheStartTime != null, "Cache start time cannot be null");
-        checkArgument(cacheEndTime != null, "Cache end time cannot be null");
+        checkArgument(restProperties != null, "Rest properties cannot be null");
 
         this.ontologyService = ontologyService;
         this.ontologySearchService = ontologySearchService;
@@ -121,8 +118,30 @@ public abstract class OBOController<T extends OBOTerm> {
         this.graphImageService = graphImageService;
         this.ontologyPagingConfig = ontologyPagingConfig;
         this.ontologyType = ontologyType;
-        this.cacheStartTime = cacheStartTime;
-        this.midnightToEndCacheTime = Duration.between(LocalTime.MIDNIGHT, cacheEndTime).getSeconds();
+        this.restProperties = restProperties;
+
+    }
+
+    /**
+     * Wrap a collection as a {@link Set}
+     *
+     * @param items      the items to wrap as a {@link Set}
+     * @param <ItemType> the type of the {@link Collection}, i.e., this method works for any type
+     * @return a {@link Set} wrapping the items in a {@link Collection}
+     */
+    private static <ItemType> Set<ItemType> asSet(Collection<ItemType> items) {
+        return items.stream().collect(Collectors.toSet());
+    }
+
+    /**
+     * Converts a {@link Collection} of {@link OntologyRelationType}s to a corresponding array of
+     * {@link OntologyRelationType}s
+     *
+     * @param relations the {@link OntologyRelationType}s
+     * @return an array of {@link OntologyRelationType}s
+     */
+    private static OntologyRelationType[] asOntologyRelationTypeArray(Collection<OntologyRelationType> relations) {
+        return relations.stream().toArray(OntologyRelationType[]::new);
     }
 
     /**
@@ -426,26 +445,6 @@ public abstract class OBOController<T extends OBOTerm> {
     }
 
     /**
-     * Wrap a collection as a {@link Set}
-     * @param items the items to wrap as a {@link Set}
-     * @param <ItemType> the type of the {@link Collection}, i.e., this method works for any type
-     * @return a {@link Set} wrapping the items in a {@link Collection}
-     */
-    private static <ItemType> Set<ItemType> asSet(Collection<ItemType> items) {
-        return items.stream().collect(Collectors.toSet());
-    }
-
-    /**
-     * Converts a {@link Collection} of {@link OntologyRelationType}s to a corresponding array of
-     * {@link OntologyRelationType}s
-     * @param relations the {@link OntologyRelationType}s
-     * @return an array of {@link OntologyRelationType}s
-     */
-    private static OntologyRelationType[] asOntologyRelationTypeArray(Collection<OntologyRelationType> relations) {
-        return relations.stream().toArray(OntologyRelationType[]::new);
-    }
-
-    /**
      * Creates a {@link ResponseEntity} containing a {@link QueryResult} for a list of results.
      *
      * @param results a list of results
@@ -541,10 +540,10 @@ public abstract class OBOController<T extends OBOTerm> {
     private long maxAge(){
         long maxAge;
         final LocalTime now = LocalTime.now();
-        if(now.isAfter(cacheStartTime)){
-            maxAge = Duration.between(now, LocalTime.MIDNIGHT).getSeconds() + midnightToEndCacheTime;
-        }else{
-            maxAge = Duration.between(now, cacheEndTime).getSeconds();
+        if (now.isAfter(restProperties.getStartTime())) {
+            maxAge = Duration.between(now, LocalTime.MIDNIGHT).getSeconds() + restProperties.midnightToEndCacheTime();
+        } else {
+            maxAge = Duration.between(now, restProperties.getEndTime()).getSeconds();
         }
         return maxAge;
     }
