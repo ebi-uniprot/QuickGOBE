@@ -23,10 +23,18 @@ public class HttpHeader {
         this.headerFunction = headerFunction;
     }
 
+    /**
+     * A HTTP header name e.g. cache-control
+     * @return
+     */
     String getHeaderName() {
         return headerName;
     }
 
+    /**
+     * An argument for a HTTP header e.g. max-age=3600
+     * @return
+     */
     String getHeaderArgument() {
         return  (headerKey + "=" + headerFunction.get());
     }
