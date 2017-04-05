@@ -4,11 +4,9 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -27,6 +25,7 @@ import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;
 import uk.ac.ebi.quickgo.ontology.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
+import uk.ac.ebi.quickgo.rest.headers.HttpHeadersProvider;
 import uk.ac.ebi.quickgo.rest.search.RetrievalException;
 import uk.ac.ebi.quickgo.rest.search.SearchDispatcher;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
@@ -42,9 +41,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.time.LocalTime;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -88,7 +85,7 @@ public abstract class OBOController<T extends OBOTerm> {
     private final GraphImageService graphImageService;
     private final OntologyRestConfig.OntologyPagingConfig ontologyPagingConfig;
     private final OntologyType ontologyType;
-    private final Function<LocalTime, Long> remainingCacheTime;
+    private final HttpHeadersProvider httpHeadersProvider;
 
     public OBOController(OntologyService<T> ontologyService,
                          SearchService<OBOTerm> ontologySearchService,
@@ -98,7 +95,7 @@ public abstract class OBOController<T extends OBOTerm> {
                          OBOControllerValidationHelper oboControllerValidationHelper,
                          OntologyRestConfig.OntologyPagingConfig ontologyPagingConfig,
                          OntologyType ontologyType,
-                         Function<LocalTime, Long> remainingCacheTime) {
+            HttpHeadersProvider httpHeadersProvider) {
         checkArgument(ontologyService != null, "Ontology service cannot be null");
         checkArgument(ontologySearchService != null, "Ontology search service cannot be null");
         checkArgument(searchableField != null, "Ontology searchable field cannot be null");
@@ -107,7 +104,7 @@ public abstract class OBOController<T extends OBOTerm> {
         checkArgument(oboControllerValidationHelper != null, "OBO validation helper cannot be null");
         checkArgument(ontologyPagingConfig != null, "Paging config cannot be null");
         checkArgument(ontologyType != null, "Ontology type config cannot be null");
-        checkArgument(remainingCacheTime != null, "RemainingCacheTime cannot be null");
+        checkArgument(httpHeadersProvider != null, "Http Headers Provider cannot be null");
 
         this.ontologyService = ontologyService;
         this.ontologySearchService = ontologySearchService;
@@ -117,7 +114,7 @@ public abstract class OBOController<T extends OBOTerm> {
         this.graphImageService = graphImageService;
         this.ontologyPagingConfig = ontologyPagingConfig;
         this.ontologyType = ontologyType;
-        this.remainingCacheTime = remainingCacheTime;
+        this.httpHeadersProvider = httpHeadersProvider;
 
     }
 
@@ -169,7 +166,7 @@ public abstract class OBOController<T extends OBOTerm> {
 
         return new ResponseEntity<>(ontologyService.findAllByOntologyType
                 (this.ontologyType,
-                new RegularPage(page, ontologyPagingConfig.defaultPageSize())), httpHeaders(), HttpStatus.OK);
+                new RegularPage(page, ontologyPagingConfig.defaultPageSize())), httpHeadersProvider.provide(), HttpStatus.OK);
 
     }
 
@@ -458,7 +455,7 @@ public abstract class OBOController<T extends OBOTerm> {
         }
 
         QueryResult<ResponseType> queryResult = new QueryResult.Builder<>(resultsToShow.size(), resultsToShow).build();
-        return new ResponseEntity<>(queryResult, httpHeaders(), HttpStatus.OK);
+        return new ResponseEntity<>(queryResult, httpHeadersProvider.provide(), HttpStatus.OK);
     }
 
     private RetrievalException createChartGraphicsException(Throwable throwable) {
@@ -529,11 +526,4 @@ public abstract class OBOController<T extends OBOTerm> {
                 ontologyQueryConverter.convert(
                         OntologyFields.Searchable.ONTOLOGY_TYPE + COLON + ontologyType.name()));
     }
-
-    private MultiValueMap<String, String>  httpHeaders(){
-        MultiValueMap<String, String> headers = new HttpHeaders();
-        headers.add(HttpHeaders.CACHE_CONTROL, String.format(MAX_AGE_HTTP_HEADER, remainingCacheTime.apply(LocalTime.now())));
-        return headers;
-    }
-
 }
