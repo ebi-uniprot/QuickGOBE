@@ -12,6 +12,7 @@ import uk.ac.ebi.quickgo.ontology.model.ECOTerm;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;
 import uk.ac.ebi.quickgo.ontology.service.search.SearchServiceConfig;
+import uk.ac.ebi.quickgo.rest.headers.HttpHeadersProvider;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
 
 import java.time.LocalTime;
@@ -37,9 +38,9 @@ public class ECOController extends OBOController<ECOTerm> {
                          GraphImageService graphImageService,
                          OBOControllerValidationHelper ecoValidationHelper,
                          OntologyRestConfig.OntologyPagingConfig ontologyPagingConfig,
-                         Function<LocalTime, Long> remainingCacheCalculator
+           HttpHeadersProvider httpHeadersProvider
    ) {
         super(ecoOntologyService, ontologySearchService, searchableField, ontologyRetrievalConfig, graphImageService,
-                ecoValidationHelper, ontologyPagingConfig, OntologyType.ECO, remainingCacheCalculator);
+                ecoValidationHelper, ontologyPagingConfig, OntologyType.ECO, httpHeadersProvider);
     }
 }

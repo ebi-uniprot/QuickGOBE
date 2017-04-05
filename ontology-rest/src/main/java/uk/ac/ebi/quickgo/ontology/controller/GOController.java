@@ -20,6 +20,7 @@ import uk.ac.ebi.quickgo.ontology.model.GOTerm;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;
 import uk.ac.ebi.quickgo.ontology.service.search.SearchServiceConfig;
+import uk.ac.ebi.quickgo.rest.headers.HttpHeadersProvider;
 import uk.ac.ebi.quickgo.rest.metadata.MetaData;
 import uk.ac.ebi.quickgo.rest.metadata.MetaDataProvider;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
@@ -52,9 +53,9 @@ public class GOController extends OBOController<GOTerm> {
                         OBOControllerValidationHelper goValidationHelper,
                         OntologyRestConfig.OntologyPagingConfig ontologyPagingConfig,
                         MetaDataProvider metaDataProvider,
-                        Function<LocalTime, Long> remainingCacheTime) {
+            HttpHeadersProvider httpHeadersProvider) {
         super(goOntologyService, ontologySearchService, searchableField, ontologyRetrievalConfig, graphImageService,
-                goValidationHelper, ontologyPagingConfig, OntologyType.GO, remainingCacheTime);
+                goValidationHelper, ontologyPagingConfig, OntologyType.GO, httpHeadersProvider);
         Preconditions.checkArgument(metaDataProvider != null, "Metadata provider cannot be null.");
         this.metaDataProvider = metaDataProvider;
     }
