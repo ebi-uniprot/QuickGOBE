@@ -63,8 +63,7 @@ import static uk.ac.ebi.quickgo.ontology.common.document.OntologyDocMocker.creat
 @ActiveProfiles(profiles = {"embeddedServer"})
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(
-        classes = {JobTestRunnerConfig.class, OntologyConfig.class, OntologyIndexingTestConfig.class,
-                OntologyIndexingBatchIT.TestConfig.class},
+        classes = {JobTestRunnerConfig.class, OntologyConfig.class, OntologyIndexingBatchIT.TestConfig.class},
         loader = SpringApplicationContextLoader.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class OntologyIndexingBatchIT {
