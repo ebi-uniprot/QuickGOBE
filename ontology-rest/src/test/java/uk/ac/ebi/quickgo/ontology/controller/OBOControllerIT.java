@@ -870,8 +870,9 @@ public abstract class OBOControllerIT {
 
         assertThat(keyValEarlier[0], is("max-age"));
         long secsBeforeExpiringEarlier = Long.parseLong(keyValEarlier[1]);
-        assertThat(secsBeforeExpiringEarlier, is(greaterThan(0L)));
+        assertThat(secsBeforeExpiringEarlier, is(greaterThanOrEqualTo(0L)));
 
+        //Now wait to see if cache expiry time changes.
         Thread.sleep(5000);
 
         mvcResult = mockMvc.perform(get(buildTermsURL(validId))).andReturn();
@@ -881,8 +882,10 @@ public abstract class OBOControllerIT {
 
         assertThat(keyValLater[0], is("max-age"));
         long secsBeforeExpiringLater = Long.parseLong(keyValLater[1]);
-        assertThat(secsBeforeExpiringLater, is(greaterThan(0L)));
-        assertThat(secsBeforeExpiringEarlier, is(greaterThan(secsBeforeExpiringLater)));
+
+        //Compare earlier to later
+        assertThat(secsBeforeExpiringLater, is(greaterThanOrEqualTo(0L)));
+        assertThat(secsBeforeExpiringEarlier, is(greaterThanOrEqualTo(secsBeforeExpiringLater)));
     }
 
     private void requestToChartServiceReturnsValidImage() {
