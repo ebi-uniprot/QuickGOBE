@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.ontology.common.coterms;
+package uk.ac.ebi.quickgo.annotation.coterms;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -6,8 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import static uk.ac.ebi.quickgo.ontology.common.coterms.CoTermRepoTestConfig.FAILED_RETRIEVAL;
 
 /**
  * @author Tony Wardell
@@ -17,23 +15,23 @@ import static uk.ac.ebi.quickgo.ontology.common.coterms.CoTermRepoTestConfig.FAI
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = {CoTermRepoTestConfig.class})
-@ActiveProfiles(profiles = FAILED_RETRIEVAL)
+@ActiveProfiles(profiles = CoTermRepoTestConfig.FAILED_RETRIEVAL)
 public class CoTermRepositorySimpleMapFailedRetrievalIT {
 
     private static final String GO_TERM = "GO:7777771";
 
     @Autowired
-    private CoTermRepository coTermRepository;
+    private CoTermRepository failedCoTermLoading;
 
     @Test(expected = IllegalStateException.class)
     public void cannotLoadAllFromCoTermRepositoryAsFileIsEmpty() {
-        coTermRepository.findCoTerms(GO_TERM, CoTermSource.ALL);
+        failedCoTermLoading.findCoTerms(GO_TERM, CoTermSource.ALL);
 
     }
 
     @Test(expected = IllegalStateException.class)
     public void cannotLoadManualFromCoTermRepositoryAsFileIsEmpty() {
-        coTermRepository.findCoTerms(GO_TERM, CoTermSource.MANUAL);
+        failedCoTermLoading.findCoTerms(GO_TERM, CoTermSource.MANUAL);
 
     }
 }

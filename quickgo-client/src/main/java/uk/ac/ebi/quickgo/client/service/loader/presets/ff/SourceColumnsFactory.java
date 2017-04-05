@@ -46,6 +46,10 @@ public class SourceColumnsFactory {
                 return RawNamedPresetColumnsBuilder.createWithNamePosition(1)
                                                    .withIdPosition(0)
                                                    .build();
+            case EXT_DATABASE_COLUMNS:
+                return RawNamedPresetColumnsBuilder
+                        .createWithNamePosition(0)
+                        .build();
             default:
                 throw new IllegalStateException("Source type: " + source + " is not handled.");
         }
@@ -58,6 +62,7 @@ public class SourceColumnsFactory {
         GO_SLIM_SET_COLUMNS,
         REF_COLUMNS,
         EXT_RELATION_COLUMNS,
-        TAXON_COLUMNS
+        TAXON_COLUMNS,
+        EXT_DATABASE_COLUMNS
     }
 }

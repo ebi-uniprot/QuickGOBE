@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.ontology.common.coterms;
+package uk.ac.ebi.quickgo.annotation.coterms;
 
 import com.google.common.base.Preconditions;
 import java.io.IOException;
@@ -26,9 +26,12 @@ import static java.util.stream.Collectors.groupingBy;
 
 public class CoTermRepositorySimpleMap implements CoTermRepository {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(CoTermRepositorySimpleMap.class);
+
     private int headerLines = 0;
     private Map<String, List<CoTerm>> coTermsAll;
     private Map<String, List<CoTerm>> coTermsManual;
+    private static CoTermRepositorySimpleMap.CoTermLoader coTermLoader;
 
     private CoTermRepositorySimpleMap() {}
 
@@ -52,8 +55,7 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
         Preconditions.checkArgument(headerLines > -1, "The number of header lines is less than zero.");
 
         CoTermRepositorySimpleMap coTermRepository = new CoTermRepositorySimpleMap(headerLines);
-        CoTermRepositorySimpleMap.CoTermLoader coTermLoader =
-                coTermRepository.new CoTermLoader(manualCoTermsSource, allCoTermSource);
+        coTermLoader = coTermRepository.new CoTermLoader(manualCoTermsSource, allCoTermSource);
         coTermLoader.load();
         return coTermRepository;
     }
@@ -92,7 +94,11 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
      * @throws IllegalStateException if the target map is empty.
      */
     private List<CoTerm> findCoTermsFromMap(Map<String, List<CoTerm>> map, String id) {
-        Preconditions.checkState(Objects.nonNull(map), "No co-occurring data is available.");
+        if(!Objects.nonNull(map)){
+//            LOGGER.error( String.format("The coterm maps are used, sources used were %s for manual coterms and %s for" +
+//                                                " all coterms", coTermLoader.manualSource, coTermLoader.allSource));
+            throw new IllegalStateException("No co-occurring data is available.");
+        }
         Preconditions.checkState(map.size() > 0, "The co-occurring repository is empty.");
         List<CoTerm> results = map.get(id);
         if (results == null) {

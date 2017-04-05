@@ -1,20 +1,18 @@
 package uk.ac.ebi.quickgo.index.common.datafile;
 
-import java.util.Arrays;
-import java.util.Map;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
-import static org.hamcrest.Matchers.hasEntry;
-import static org.hamcrest.Matchers.isEmptyString;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.collection.IsMapContaining.hasKey;
 import static org.hamcrest.core.Is.is;
-import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.convertLinePropertiesToMap;
-import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.splitValue;
+import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.*;
 import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingUtil.concatProperty;
 import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingUtil.concatStrings;
 
@@ -111,15 +109,26 @@ public class GOADataFileParsingHelperTest {
         assertThat(propsMap, hasEntry(propKey2, propValue2));
     }
 
-    @Test(expected = AssertionError.class)
+    @Test(expected = IllegalArgumentException.class)
     public void splittingOnNullDelimiterCausesException() {
         splitValue("some value", null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void splittingIntegerListOnNullDelimiterCausesException() {
+        splitValueToIntegerList("1,3", null);
     }
 
     @Test
     public void splittingNullValueReturnsEmptyStringArray() {
         String[] splitValues = splitValue(null, "whatever");
         assertThat(splitValues, is(notNullValue()));
+        assertThat(splitValues.length, is(0));
+    }
+
+    @Test
+    public void splittingEmptyValueReturnsEmptyStringArray() {
+        String[] splitValues = splitValue("", "whatever");
         assertThat(splitValues.length, is(0));
     }
 
@@ -138,5 +147,36 @@ public class GOADataFileParsingHelperTest {
         assertThat(splitValues, is(notNullValue()));
         assertThat(splitValues.length, is(3));
         assertThat(splitValues, arrayContainingInAnyOrder("a", "b", "c"));
+    }
+
+    @Test
+    public void splittingNullValueReturnsEmptyIntegerList() {
+        List<Integer> splitValues = splitValueToIntegerList(null, "whatever");
+        assertThat(splitValues, is(notNullValue()));
+        assertThat(splitValues, is(empty()));
+    }
+
+    @Test
+    public void splittingEmptyValueReturnsEmptyIntegerList() {
+        List<Integer> splitValues = splitValueToIntegerList("", "whatever");
+        assertThat(splitValues, is(empty()));
+    }
+
+
+    @Test
+    public void splittingUnsplittableValueReturnsIntegerListOfSizeOne() {
+        String value = "12345";
+        List<Integer> splitValues = splitValueToIntegerList(value, "whatever");
+        assertThat(splitValues, is(notNullValue()));
+        assertThat(splitValues.size(), is(1));
+        assertThat(splitValues.get(0), is(Integer.valueOf(value)));
+    }
+
+    @Test
+    public void splittingSplittableValueReturnsCorrectlySplitIntegerList() {
+        List<Integer> splitValues = splitValueToIntegerList("1234-5678-9", "-");
+        assertThat(splitValues, is(notNullValue()));
+        assertThat(splitValues.size(), is(3));
+        assertThat(splitValues, contains(1234, 5678, 9));
     }
 }

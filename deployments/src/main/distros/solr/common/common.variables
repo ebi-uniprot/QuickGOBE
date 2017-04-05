@@ -43,3 +43,7 @@ solr_config_dir="${QUICKGO_BASE_DIR}/solr-conf"
 dist_dir="${QUICKGO_BASE_DIR}/libs"
 
 quickgo_service_jar="${solr_config_dir}/PROFILE_PLACEHOLDER/lib/quickgo/*"
+
+# ---------------------- COPY RESTFUL FILES ----------------------------------
+DATA_DIR="/nfs/public/rw/goa/.restful/data/"
+SRC_DIR="/nfs/public/rw/goa/quickgo_origin/full"
