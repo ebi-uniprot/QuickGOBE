@@ -32,7 +32,6 @@ import static uk.ac.ebi.quickgo.common.validator.OntologyIdPredicate.isValidGOTe
 @EnableConfigurationProperties(OntologyRestProperties.class)
 public class OntologyRestConfig {
 
-
     @Bean
     public OntologyPagingConfig ontologyPagingConfig(
             @Value("${ontology.default_page_size:25}") int defaultPageSize) {
@@ -66,5 +65,4 @@ public class OntologyRestConfig {
         headerSources.add(headerSource);
         return new HttpHeadersProvider(headerSources);
     }
-
 }
