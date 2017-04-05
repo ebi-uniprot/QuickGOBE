@@ -41,15 +41,16 @@ public class CacheStrategy {
     public static Supplier<String> maxAgeTimeLeft(LocalTime start, LocalTime end) {
 
         Preconditions.checkArgument(start.isAfter(end));
+        final long secondsFromStartOfDayTillEndTime = secondsFromStartOfDayTillEndTime(end);
 
         return () -> {
             long maxAge;
             final LocalTime now = LocalTime.now();
             if (now.isAfter(start)) {
-                maxAge = Duration.between(now, LocalTime.MAX).getSeconds() + Duration.between(LocalTime.MIN, end).getSeconds();
+                maxAge = secondsFromNowToEndOfDay(now) + secondsFromStartOfDayTillEndTime;
             } else {
                 if (now.isBefore(end)) {
-                    maxAge = Duration.between(now, end).getSeconds();
+                    maxAge = secondsTodayFromNowToEndTime(now, end);
                 } else {
                     maxAge = 0;
                 }
@@ -57,5 +58,17 @@ public class CacheStrategy {
             assert maxAge >= 0;
             return Long.toString(maxAge);
         };
+    }
+
+    private static long secondsTodayFromNowToEndTime(LocalTime now, LocalTime end) {
+        return Duration.between(now, end).getSeconds();
+    }
+
+    private static long secondsFromStartOfDayTillEndTime(LocalTime end) {
+        return Duration.between(LocalTime.MIN, end).getSeconds();
+    }
+
+    private static long secondsFromNowToEndOfDay(LocalTime now) {
+        return Duration.between(now, LocalTime.MAX).getSeconds();
     }
 }
