@@ -21,8 +21,8 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class OntologySiteMapConfig {
     private static final Logger LOGGER = getLogger(OntologySiteMapConfig.class);
     
-    private static final String DEFAULT_QUICKGO_FRONTEND_URL = "http://www.ebi.ac.uk/QuickGO";
-    private static final String DEFAULT_QUICKGO_FRONTEND_TERM_URL = DEFAULT_QUICKGO_FRONTEND_URL + "/term";
+    static final String DEFAULT_QUICKGO_FRONTEND_URL = "http://www.ebi.ac.uk/QuickGO";
+    static final String DEFAULT_QUICKGO_FRONTEND_TERM_URL = DEFAULT_QUICKGO_FRONTEND_URL + "/term";
 
     @Value("${frontend.urlPrefix:" + DEFAULT_QUICKGO_FRONTEND_URL + "}")
     private String frontEndUrl;
