@@ -1,5 +1,8 @@
 package uk.ac.ebi.quickgo.ontology;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Supplier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -7,9 +10,10 @@ import org.springframework.context.annotation.Configuration;
 import uk.ac.ebi.quickgo.ontology.controller.validation.OBOControllerValidationHelper;
 import uk.ac.ebi.quickgo.ontology.controller.validation.OBOControllerValidationHelperImpl;
 import uk.ac.ebi.quickgo.rest.cache.CacheStrategy;
+import uk.ac.ebi.quickgo.rest.headers.HttpHeader;
+import uk.ac.ebi.quickgo.rest.headers.HttpHeadersProvider;
 
-import java.time.LocalTime;
-import java.util.function.Function;
+import org.springframework.http.HttpHeaders;
 
 import static uk.ac.ebi.quickgo.common.validator.OntologyIdPredicate.isValidECOTermId;
 import static uk.ac.ebi.quickgo.common.validator.OntologyIdPredicate.isValidGOTermId;
@@ -45,14 +49,22 @@ public class OntologyRestConfig {
         return new OBOControllerValidationHelperImpl(maxPageSize, isValidECOTermId());
     }
 
-    @Bean
-    Function<LocalTime, Long> remainingCacheTime(OntologyRestProperties restProperties) {
-        CacheStrategy cacheStrategy = new CacheStrategy();
-        return cacheStrategy.maxAgeCountDown(restProperties.getStartTime(), restProperties.getEndTime());
-    }
-
     public interface OntologyPagingConfig {
         int defaultPageSize();
+    }
+
+    /**
+     * Configure a HttpHeadersProvider instance to write required response HTTP headers.
+     * @param restProperties holds properties to configure header sources.
+     * @return HttpHeadersProvider instance
+     */
+    @Bean
+    public HttpHeadersProvider httpHeadersProvider(OntologyRestProperties restProperties){
+        final Supplier<String> secsSupplier = CacheStrategy.maxAgeTimeLeft(restProperties.getStartTime(), restProperties.getEndTime());
+        HttpHeader headerSource = new HttpHeader(HttpHeaders.CACHE_CONTROL, "max-age", secsSupplier);
+        List<HttpHeader> headerSources = new ArrayList<>();
+        headerSources.add(headerSource);
+        return new HttpHeadersProvider(headerSources);
     }
 
 }
