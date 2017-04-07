@@ -1,0 +1,61 @@
+package uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer;
+
+import uk.ac.ebi.quickgo.annotation.model.Annotation;
+import uk.ac.ebi.quickgo.annotation.service.comm.rest.common.transformer.ResponseValueInjector;
+import uk.ac.ebi.quickgo.rest.comm.FilterContext;
+import uk.ac.ebi.quickgo.rest.search.request.converter.RESTFilterConverterFactory;
+import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
+import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformer;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static com.google.common.base.Preconditions.checkArgument;
+
+/**
+ * The purpose of this class is to insert ontology related information, available externally via RESTful services,
+ * into a {@link QueryResult} of {@link Annotation}s.
+ *
+ * Created 06/04/17
+ * @author Edd
+ */
+public class OntologyResultsTransformer implements ResultTransformer<QueryResult<Annotation>> {
+
+    private static final OptionalFieldRequests EMPTY_FIELD_REQUESTS = new OptionalFieldRequests();
+    private final RESTFilterConverterFactory restFilterConverterFactory;
+    private final List<ResponseValueInjector> fieldInjectors;
+    private final List<String> fieldsToAdd;
+
+    public OntologyResultsTransformer(RESTFilterConverterFactory restFilterConverterFactory,
+            List<ResponseValueInjector> fieldInjectors) {
+        checkArgument(restFilterConverterFactory != null,
+                "RESTFilterConverterFactory cannot be null");
+        checkArgument(fieldInjectors != null, "Supplied list of OntologyFieldInjectors cannot be null");
+
+        this.restFilterConverterFactory = restFilterConverterFactory;
+        this.fieldInjectors = fieldInjectors;
+        this.fieldsToAdd = fieldInjectors.stream().map(ResponseValueInjector::getSignature).collect(Collectors.toList());
+    }
+
+    @Override public QueryResult<Annotation> transform(QueryResult<Annotation> result, FilterContext filterContext) {
+        OptionalFieldRequests optionalFieldRequests =
+                filterContext
+                        .get(OptionalFieldRequests.class)
+                        .orElse(EMPTY_FIELD_REQUESTS);
+
+        Set<String> allFieldRequests = optionalFieldRequests.getFieldRequests();
+        Set<String> requiredFieldRequests = new HashSet<>(allFieldRequests);
+        requiredFieldRequests.retainAll(fieldsToAdd);
+
+        if (!requiredFieldRequests.isEmpty()) {
+            result.getResults().forEach(annotation ->
+                    fieldInjectors.forEach(valueInjector ->
+                            valueInjector.inject(restFilterConverterFactory, annotation))
+            );
+        }
+
+        return result;
+    }
+}
