@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.descendants;
 
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.DescendantsFilterConverter;
-import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.ConvertedOntologyFilter;
+import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.OntologyDescendants;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
 
@@ -20,13 +20,13 @@ import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.or;
  * Created by edd on 02/11/2016.
  */
 public abstract class AbstractDescendantsFilterConverterTest {
-    private ConvertedOntologyFilter response;
+    private OntologyDescendants response;
     private DescendantsFilterConverter converter;
     String field;
 
     @Before
     public void setUp() {
-        response = new ConvertedOntologyFilter();
+        response = new OntologyDescendants();
         response.setResults(new ArrayList<>());
         converter = new DescendantsFilterConverter();
     }
@@ -97,14 +97,14 @@ public abstract class AbstractDescendantsFilterConverterTest {
     }
 
     private void addResponseDescendant(String termId, String descendantId) {
-        for (ConvertedOntologyFilter.Result result : response.getResults()) {
+        for (OntologyDescendants.Result result : response.getResults()) {
             if (result.getId().equals(termId)) {
                 result.getDescendants().add(descendantId);
                 return;
             }
         }
 
-        ConvertedOntologyFilter.Result newResult = new ConvertedOntologyFilter.Result();
+        OntologyDescendants.Result newResult = new OntologyDescendants.Result();
         newResult.setId(termId);
         List<String> descList = new ArrayList<>();
         descList.add(descendantId);
