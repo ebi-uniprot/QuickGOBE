@@ -138,6 +138,7 @@ class RESTFilterConverter<T> implements FilterConverter<FilterRequest, T> {
         Class<?> converterClass = Class.forName(converterClassName);
 
         Constructor<?> declaredConstructor = converterClass.getDeclaredConstructor();
+        // todo: could cache converterClassName |-> declaredConstructor, for performance
         return (FilterConverter<ResponseType, T>) declaredConstructor.newInstance();
     }
 

@@ -545,6 +545,8 @@ public class AnnotationRequest {
         return filterMap.get(Searchable.EXTENSION);
     }
 
+    
+
     /**
      * Produces a set of {@link FilterRequest} objects given the filter attributes provided by the user.
      *
@@ -614,6 +616,11 @@ public class AnnotationRequest {
         return createUsageFilter(EVIDENCE_CODE_USAGE_FIELD, getEvidenceCodeUsage(), EVIDENCE_CODE_USAGE_ID,
                 Searchable.EVIDENCE_CODE, EVIDENCE_CODE_USAGE_RELATIONSHIPS);
     }
+
+    //todo: add optionalFields req param, and use this to create, e.g., ResultTransformationRequest
+    // the list of RTRs can be accessed via a getter
+    // the annotation controller could insert these into the filtercontext
+    // 
 
     private Optional<FilterRequest> createUsageFilter(String usageParam, String usageValue, String idParam, String
             idField,

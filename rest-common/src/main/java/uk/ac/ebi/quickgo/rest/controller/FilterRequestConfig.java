@@ -15,6 +15,8 @@ import org.springframework.web.client.RestTemplate;
 public class FilterRequestConfig {
     @Bean
     public RestOperations restOperations() {
+        // todo: use connection pooling? http://stackoverflow.com/questions/31869193/using-spring-rest-template-either-creating-too-many-connections-or-slow
+        // ... to prevent exceeding local port range when performing numerous requests
         return new RestTemplate();
     }
 }
