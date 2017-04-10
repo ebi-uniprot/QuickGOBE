@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.ontology.controller;
 
+import org.apache.http.HttpHeaders;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -45,6 +46,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static uk.ac.ebi.quickgo.common.converter.HelpfulConverter.toCSV;
+import static uk.ac.ebi.quickgo.ontology.OntologyRestConfig.*;
 import static uk.ac.ebi.quickgo.ontology.controller.OBOController.*;
 
 /**
@@ -865,27 +867,27 @@ public abstract class OBOControllerIT {
     public void cacheControlMaxAgeReducesOnSubsequentRequests() throws Exception {
         MvcResult mvcResult = mockMvc.perform(get(buildTermsURL(validId))).andReturn();
 
-        String ccHeader = mvcResult.getResponse().getHeader("Cache-Control");
+        String ccHeader = mvcResult.getResponse().getHeader(HttpHeaders.CACHE_CONTROL);
         String[] keyValEarlier = ccHeader.split("=");
 
-        assertThat(keyValEarlier[0], is("max-age"));
-        long secsBeforeExpiringEarlier = Long.parseLong(keyValEarlier[1]);
-        assertThat(secsBeforeExpiringEarlier, is(greaterThanOrEqualTo(0L)));
+        assertThat(keyValEarlier[0], is(MAX_AGE));
+        long maxAgeInFirstCall = Long.parseLong(keyValEarlier[1]);
+        assertThat(maxAgeInFirstCall, is(greaterThanOrEqualTo(0L)));
 
         //Now wait to see if cache expiry time changes.
         Thread.sleep(5000);
 
         mvcResult = mockMvc.perform(get(buildTermsURL(validId))).andReturn();
 
-        ccHeader = mvcResult.getResponse().getHeader("Cache-Control");
+        ccHeader = mvcResult.getResponse().getHeader(HttpHeaders.CACHE_CONTROL);
         String[] keyValLater = ccHeader.split("=");
 
-        assertThat(keyValLater[0], is("max-age"));
-        long secsBeforeExpiringLater = Long.parseLong(keyValLater[1]);
+        assertThat(keyValLater[0], is(MAX_AGE));
+        long maxAgeInSecondCall = Long.parseLong(keyValLater[1]);
 
         //Compare earlier to later
-        assertThat(secsBeforeExpiringLater, is(greaterThanOrEqualTo(0L)));
-        assertThat(secsBeforeExpiringEarlier, is(greaterThanOrEqualTo(secsBeforeExpiringLater)));
+        assertThat(maxAgeInSecondCall, is(greaterThanOrEqualTo(0L)));
+        assertThat(maxAgeInFirstCall, is(greaterThanOrEqualTo(maxAgeInSecondCall)));
     }
 
     private void requestToChartServiceReturnsValidImage() {
