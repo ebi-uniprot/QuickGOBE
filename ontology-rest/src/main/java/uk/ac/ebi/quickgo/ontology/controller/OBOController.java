@@ -1,16 +1,5 @@
 package uk.ac.ebi.quickgo.ontology.controller;
 
-import io.swagger.annotations.ApiOperation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import uk.ac.ebi.quickgo.common.SearchableField;
 import uk.ac.ebi.quickgo.graphics.model.GraphImageLayout;
 import uk.ac.ebi.quickgo.graphics.ontology.RenderingGraphException;
@@ -35,13 +24,24 @@ import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.query.RegularPage;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
-import javax.imageio.ImageIO;
+import io.swagger.annotations.ApiOperation;
 import java.awt.image.RenderedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import javax.imageio.ImageIO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.DEFAULT_TRAVERSAL_TYPES_CSV;
@@ -86,13 +86,13 @@ public abstract class OBOController<T extends OBOTerm> {
     private final HttpHeadersProvider httpHeadersProvider;
 
     public OBOController(OntologyService<T> ontologyService,
-                         SearchService<OBOTerm> ontologySearchService,
-                         SearchableField searchableField,
-                         SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig,
-                         GraphImageService graphImageService,
-                         OBOControllerValidationHelper oboControllerValidationHelper,
-                         OntologyRestConfig.OntologyPagingConfig ontologyPagingConfig,
-                         OntologyType ontologyType,
+            SearchService<OBOTerm> ontologySearchService,
+            SearchableField searchableField,
+            SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig,
+            GraphImageService graphImageService,
+            OBOControllerValidationHelper oboControllerValidationHelper,
+            OntologyRestConfig.OntologyPagingConfig ontologyPagingConfig,
+            OntologyType ontologyType,
             HttpHeadersProvider httpHeadersProvider) {
         checkArgument(ontologyService != null, "Ontology service cannot be null");
         checkArgument(ontologySearchService != null, "Ontology search service cannot be null");
@@ -164,7 +164,9 @@ public abstract class OBOController<T extends OBOTerm> {
 
         return new ResponseEntity<>(ontologyService.findAllByOntologyType
                 (this.ontologyType,
-                new RegularPage(page, ontologyPagingConfig.defaultPageSize())), httpHeadersProvider.provide(), HttpStatus.OK);
+                 new RegularPage(page, ontologyPagingConfig.defaultPageSize())),
+                                    httpHeadersProvider.provide(),
+                                    HttpStatus.OK);
 
     }
 
@@ -205,7 +207,7 @@ public abstract class OBOController<T extends OBOTerm> {
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsComplete(@PathVariable(value = "ids") String ids) {
         return getResultsResponse(
-        ontologyService.findCompleteInfoByOntologyId(validationHelper.validateCSVIds(ids)));
+                ontologyService.findCompleteInfoByOntologyId(validationHelper.validateCSVIds(ids)));
     }
 
     /**
@@ -306,7 +308,8 @@ public abstract class OBOController<T extends OBOTerm> {
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsAnnotationGuideLines(@PathVariable(value = "ids") String ids) {
         return getResultsResponse(ontologyService
-                .findAnnotationGuideLinesInfoByOntologyId(validationHelper.validateCSVIds(ids)));
+                                          .findAnnotationGuideLinesInfoByOntologyId(validationHelper.validateCSVIds
+                                                  (ids)));
     }
 
     /**
@@ -422,14 +425,12 @@ public abstract class OBOController<T extends OBOTerm> {
     @ApiOperation(value = "Retrieves coordinate information about terms within the PNG chart from the " +
             CHART_SUB_RESOURCE + " sub-resource")
     @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + CHART_COORDINATES_SUB_RESOURCE,
-            method =
-            RequestMethod.GET,
+            method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<GraphImageLayout> getChartCoordinates(@PathVariable(value = "ids") String ids) {
         try {
             GraphImageLayout layout = graphImageService
                     .createChart(validationHelper.validateCSVIds(ids), ontologyType.name()).getLayout();
-
             return ResponseEntity
                     .ok()
                     .body(layout);
@@ -487,7 +488,7 @@ public abstract class OBOController<T extends OBOTerm> {
                 .ok()
                 .contentLength(os.size())
                 .contentType(MediaType.IMAGE_PNG)
-                .header("Content-Encoding","base64")
+                .header("Content-Encoding", "base64")
                 .body(new InputStreamResource(is));
     }
 
@@ -505,7 +506,7 @@ public abstract class OBOController<T extends OBOTerm> {
 
         if (!ontologyRetrievalConfig.getSearchReturnedFields().isEmpty()) {
             ontologyRetrievalConfig.getSearchReturnedFields()
-                    .forEach(builder::addProjectedField);
+                                   .forEach(builder::addProjectedField);
         }
 
         return builder.build();
@@ -521,7 +522,7 @@ public abstract class OBOController<T extends OBOTerm> {
      */
     private QuickGOQuery restrictQueryToOTypeResults(QuickGOQuery query) {
         return and(query,
-                ontologyQueryConverter.convert(
-                        OntologyFields.Searchable.ONTOLOGY_TYPE + COLON + ontologyType.name()));
+                   ontologyQueryConverter.convert(
+                           OntologyFields.Searchable.ONTOLOGY_TYPE + COLON + ontologyType.name()));
     }
 }
