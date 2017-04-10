@@ -42,7 +42,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.DEFAULT_TRAVERSAL_TYPES_CSV;
@@ -75,7 +74,6 @@ public abstract class OBOController<T extends OBOTerm> {
     private static final String COLON = ":";
     private static final String DEFAULT_ENTRIES_PER_PAGE = "25";
     private static final String DEFAULT_PAGE_NUMBER = "1";
-    private static final String MAX_AGE_HTTP_HEADER = "max-age=%s";
 
     private final OntologyService<T> ontologyService;
     private final SearchService<OBOTerm> ontologySearchService;
@@ -126,7 +124,7 @@ public abstract class OBOController<T extends OBOTerm> {
      * @return a {@link Set} wrapping the items in a {@link Collection}
      */
     private static <ItemType> Set<ItemType> asSet(Collection<ItemType> items) {
-        return items.stream().collect(Collectors.toSet());
+        return new HashSet<>(items);
     }
 
     /**
