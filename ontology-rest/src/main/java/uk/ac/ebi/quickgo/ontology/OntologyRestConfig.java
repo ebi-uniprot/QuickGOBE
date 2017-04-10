@@ -32,6 +32,8 @@ import static uk.ac.ebi.quickgo.common.validator.OntologyIdPredicate.isValidGOTe
 @EnableConfigurationProperties(OntologyRestProperties.class)
 public class OntologyRestConfig {
 
+    public static final String MAX_AGE = "max-age";
+
     @Bean
     public OntologyPagingConfig ontologyPagingConfig(
             @Value("${ontology.default_page_size:25}") int defaultPageSize) {
@@ -60,7 +62,7 @@ public class OntologyRestConfig {
     @Bean
     public HttpHeadersProvider httpHeadersProvider(OntologyRestProperties restProperties){
         final Supplier<String> secsSupplier = CacheStrategy.maxAgeTimeLeft(restProperties.getStartTime(), restProperties.getEndTime());
-        HttpHeader headerSource = new HttpHeader(HttpHeaders.CACHE_CONTROL, "max-age", secsSupplier);
+        HttpHeader headerSource = new HttpHeader(HttpHeaders.CACHE_CONTROL, MAX_AGE, secsSupplier);
         List<HttpHeader> headerSources = new ArrayList<>();
         headerSources.add(headerSource);
         return new HttpHeadersProvider(headerSources);
