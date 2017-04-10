@@ -45,6 +45,14 @@ search:
           responseClass: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.OntologyDescendants",
           responseConverter: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.SlimmingFilterConverter"
         }
+      - signature: goId,goName
+        execution: REST_COMM
+        properties: {
+          ip: localhost,
+          resourceFormat: "/ontology/go/terms/{goId}",
+          responseClass: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.BasicOntology",
+          responseConverter: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.BasicOntologyIdentityFilterConverter"
+        }
 model:
   repo2domainFieldNameTransformations:
     transformations: {

@@ -1,5 +1,7 @@
 package uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model;
 
+import uk.ac.ebi.quickgo.rest.comm.ResponseType;
+
 import java.util.List;
 
 /**
@@ -14,7 +16,7 @@ import java.util.List;
  * Created 07/04/17
  * @author Edd
  */
-public class BasicOntology {
+public class BasicOntology implements ResponseType {
     private List<Result> results;
 
     public BasicOntology() {}

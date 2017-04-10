@@ -12,12 +12,12 @@ import uk.ac.ebi.quickgo.rest.search.request.converter.RESTFilterConverterFactor
  */
 public interface ResponseValueInjector {
     /**
-     * A signature that identifies the value that is to be
+     * An identifier for the value that is to be
      * injected into the {@link Annotation}. For example, a field name.
      *
-     * @return the signature of the value to inject
+     * @return the identifier of the value to inject
      */
-    String getSignature();
+    String getId();
 
     /**
      * Injects the necessary value into the {@link Annotation}, through the use of
