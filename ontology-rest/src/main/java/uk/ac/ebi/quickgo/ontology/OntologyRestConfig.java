@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.ontology;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
@@ -9,7 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import uk.ac.ebi.quickgo.ontology.controller.validation.OBOControllerValidationHelper;
 import uk.ac.ebi.quickgo.ontology.controller.validation.OBOControllerValidationHelperImpl;
-import uk.ac.ebi.quickgo.rest.cache.CacheStrategy;
+import uk.ac.ebi.quickgo.rest.cache.MaxAgeWhenStartTimeAfterEndTime;
 import uk.ac.ebi.quickgo.rest.headers.HttpHeader;
 import uk.ac.ebi.quickgo.rest.headers.HttpHeadersProvider;
 
@@ -61,10 +62,20 @@ public class OntologyRestConfig {
      */
     @Bean
     public HttpHeadersProvider httpHeadersProvider(OntologyRestProperties restProperties){
-        final Supplier<String> secsSupplier = CacheStrategy.maxAgeTimeLeft(restProperties.getStartTime(), restProperties.getEndTime());
-        HttpHeader headerSource = new HttpHeader(HttpHeaders.CACHE_CONTROL, MAX_AGE, secsSupplier);
+
         List<HttpHeader> headerSources = new ArrayList<>();
+        //We are assuming we are going to be doing daily indexing.
+        Supplier<Duration> maxAge;
+        if(restProperties.getStartTime().isAfter(restProperties.getEndTime())) {
+            maxAge = new MaxAgeWhenStartTimeAfterEndTime(restProperties.getStartTime(), restProperties.getEndTime());
+        }else {
+            maxAge = new MaxAgeWhenStartTimeAfterEndTime(restProperties.getStartTime(), restProperties.getEndTime());
+        }
+        HttpHeader headerSource = new HttpHeader(HttpHeaders.CACHE_CONTROL, MAX_AGE,
+                                                 ()-> Long.toString(maxAge.get().getSeconds()));
         headerSources.add(headerSource);
+
+
         return new HttpHeadersProvider(headerSources);
     }
 }
