@@ -28,20 +28,19 @@ public class OntologyNameInjector implements ResponseValueInjector {
     private static final String GO_ID = "goId";
     private static final Logger LOGGER = getLogger(OntologyNameInjector.class);
 
-    @Override public String getId() {
+    @Override
+    public String getId() {
         return GO_NAME;
     }
 
-    @Override public void inject(RESTFilterConverterFactory restFetcher, Annotation annotation) {
+    @Override
+    public void inject(RESTFilterConverterFactory restFetcher, Annotation annotation) {
         FilterRequest request =
                 FilterRequest.newBuilder()
                         .addProperty(getId())
                         .addProperty(GO_ID, annotation.goId)
                         .build();
 
-        // todo: handle 404 and 500 responses differently
-        // 404 => leave empty
-        // 500 => throw error back up
         try {
             ConvertedFilter<BasicOntology> convertedRequest = restFetcher.convert(request);
 
