@@ -22,10 +22,12 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.test.web.client.ResponseCreator;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -43,6 +45,8 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withBadRequest;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -101,9 +105,7 @@ public class AnnotationTransformerControllerIT {
     }
 
     @Test
-    public void
-    requestOmittingGoNameProducesResultWhereGoNameIsNull()
-            throws Exception {
+    public void requestOmittingGoNameProducesResultWhereGoNameIsNull() throws Exception {
         annotationRepository.save(createAnnotationDoc(createGPId(1), goId(1)));
 
         expectGoTermsHaveGoNamesViaRest(singletonList(goId(1)), singletonList(goName(1)));
@@ -159,6 +161,107 @@ public class AnnotationTransformerControllerIT {
                 .andExpect(totalNumOfResults(2));
     }
 
+    @Test
+    public void doNotPopulateGoNameWhenExternalServiceProduces404() throws Exception {
+        annotationRepository.save(createAnnotationDoc(createGPId(0), goId(0)));
+        annotationRepository.save(createAnnotationDoc(createGPId(1), goId(1)));
+        
+        expectRestCallResponse(GET, buildResource(GO_TERM_RESOURCE_FORMAT, goId(0)), withStatus(HttpStatus.NOT_FOUND));
+        expectGoTermsHaveGoNamesViaRest(singletonList(goId(1)), singletonList(goName(1)));
+
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE)
+                        .param(INCLUDE_FIELD_PARAM.getName(), INCLUDE_FIELD));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(pageInfoExists())
+                .andExpect(jsonPath("$.results[0].goId", is(goId(0))))
+                .andExpect(jsonPath("$.results[0].goName", is(nullValue())))
+                .andExpect(jsonPath("$.results[1].goId", is(goId(1))))
+                .andExpect(jsonPath("$.results[1].goName", is(goName(1))))
+                .andExpect(totalNumOfResults(2));
+    }
+
+    @Test
+    public void injectingGoNameProducesErrorWhenExternalServiceProducesError500() throws Exception {
+        annotationRepository.save(createAnnotationDoc(createGPId(0), goId(0)));
+        annotationRepository.save(createAnnotationDoc(createGPId(1), goId(1)));
+
+        expectRestCallResponse(GET, buildResource(GO_TERM_RESOURCE_FORMAT, goId(0)), withStatus(HttpStatus.INTERNAL_SERVER_ERROR));
+        expectGoTermsHaveGoNamesViaRest(singletonList(goId(1)), singletonList(goName(1)));
+
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE)
+                        .param(INCLUDE_FIELD_PARAM.getName(), INCLUDE_FIELD));
+
+        response.andDo(print())
+                .andExpect(status().is5xxServerError());
+    }
+
+    @Test
+    public void invalidIncludeFieldCausesBadRequest() throws Exception {
+        annotationRepository.save(createAnnotationDoc(createGPId(0), goId(0)));
+
+        expectGoTermsHaveGoNamesViaRest(singletonList(goId(0)), singletonList(goName(0)));
+
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE)
+                        .param(INCLUDE_FIELD_PARAM.getName(), "XXXXXX"));
+
+        response.andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void injectingGoNameProducesErrorWhenExternalServiceProducesTimeoutError() throws Exception {
+        annotationRepository.save(createAnnotationDoc(createGPId(0), goId(0)));
+        annotationRepository.save(createAnnotationDoc(createGPId(1), goId(1)));
+
+        expectRestCallResponse(GET, buildResource(GO_TERM_RESOURCE_FORMAT, goId(0)), withStatus(HttpStatus.REQUEST_TIMEOUT));
+        expectGoTermsHaveGoNamesViaRest(singletonList(goId(1)), singletonList(goName(1)));
+
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE)
+                        .param(INCLUDE_FIELD_PARAM.getName(), INCLUDE_FIELD));
+
+        response.andDo(print())
+                .andExpect(status().is5xxServerError());
+    }
+
+    @Test
+    public void injectingGoNameProducesErrorWhenExternalServiceProducesBadGatewayError() throws Exception {
+        annotationRepository.save(createAnnotationDoc(createGPId(0), goId(0)));
+        annotationRepository.save(createAnnotationDoc(createGPId(1), goId(1)));
+
+        expectRestCallResponse(GET, buildResource(GO_TERM_RESOURCE_FORMAT, goId(0)), withStatus(HttpStatus.BAD_GATEWAY));
+        expectGoTermsHaveGoNamesViaRest(singletonList(goId(1)), singletonList(goName(1)));
+
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE)
+                        .param(INCLUDE_FIELD_PARAM.getName(), INCLUDE_FIELD));
+
+        response.andDo(print())
+                .andExpect(status().is5xxServerError());
+    }
+
+    @Test
+    public void injectingGoNameProducesErrorWhenExternalServiceProducesBadRequestError() throws Exception {
+        annotationRepository.save(createAnnotationDoc(createGPId(0), goId(0)));
+        annotationRepository.save(createAnnotationDoc(createGPId(1), goId(1)));
+
+        expectRestCallResponse(GET, buildResource(GO_TERM_RESOURCE_FORMAT, goId(0)), withStatus(HttpStatus.BAD_REQUEST));
+        expectGoTermsHaveGoNamesViaRest(singletonList(goId(1)), singletonList(goName(1)));
+
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE)
+                        .param(INCLUDE_FIELD_PARAM.getName(), INCLUDE_FIELD));
+
+        response.andDo(print())
+                .andExpect(status().is5xxServerError());
+    }
+
     private void expectGoTermsHaveGoNamesViaRest(
             List<String> termIds,
             List<String> termNames) {
@@ -205,6 +308,13 @@ public class AnnotationTransformerControllerIT {
         } catch (JsonProcessingException e) {
             throw new IllegalStateException("Problem constructing mocked GO term REST response:", e);
         }
+    }
+
+    private void expectRestCallResponse(HttpMethod method, String url, ResponseCreator response) {
+        mockRestServiceServer.expect(
+                requestTo(BASE_URL + url))
+                .andExpect(method(method))
+                .andRespond(response);
     }
 
     private void expectRestCallSuccess(HttpMethod method, String url, String response) {
