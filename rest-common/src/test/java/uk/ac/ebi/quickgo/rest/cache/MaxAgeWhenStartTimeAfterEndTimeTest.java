@@ -12,14 +12,14 @@ import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.core.Is.is;
 
 /**
- * Test methods in the CacheStrategy class.
+ * Test calculation of duration when start time is after the end time - i.e the duration wraps across midnight.
  *
  * @author Tony Wardell
  * Date: 05/04/2017
  * Time: 13:26
  * Created with IntelliJ IDEA.
  */
-public class CacheStrategyTest {
+public class MaxAgeWhenStartTimeAfterEndTimeTest {
 
     @Test
     public void secondsLeftWhenNowBetweenStartOfDayAndEndTime(){
@@ -32,16 +32,16 @@ public class CacheStrategyTest {
             //we've running this test at midnight, the time has wrapped and we need to bail out
             return;
         }
-        Long timeLeftToday = Duration.between(now, endTime).getSeconds();
-        Long totalTimeLeft = timeLeftToday;
+        Duration totalTimeLeft =  Duration.between(now, endTime);
         //Provide a little wiggle room for test
-        Long rangeLowPoint = totalTimeLeft - 3;
-        Long rangeHighPoint = totalTimeLeft + 3;
+        Duration rangeLowPoint = totalTimeLeft.minusSeconds(3);
+        Duration rangeHighPoint = totalTimeLeft.plusSeconds(3);
 
-        Supplier<String> timeProvider = CacheStrategy.maxAgeTimeLeft(startTime, endTime);
-        Long timeLeft = Long.parseLong(timeProvider.get());
+        Supplier<Duration> maxAge = new MaxAgeWhenStartTimeAfterEndTime(startTime, endTime);
+        Duration timeLeft = maxAge.get();
 
-        assertThat(timeLeft, is(both(greaterThan(rangeLowPoint)).and(lessThan(rangeHighPoint))));
+        assertThat(timeLeft.getSeconds(), is(both(greaterThan(rangeLowPoint.getSeconds())).and(lessThan
+                                                                                                       (rangeHighPoint.getSeconds()))));
     }
 
     @Test
@@ -54,17 +54,16 @@ public class CacheStrategyTest {
             //we've running this test at midnight, the time has wrapped and we need to bail out
             return;
         }
-        Long midnightTillEndTime = Duration.between(LocalTime.MIN, endTime).getSeconds();
-        Long timeLeftToday = Duration.between(now, LocalTime.MAX).getSeconds();
-        Long totalTimeLeft = timeLeftToday + midnightTillEndTime;
-        Long rangeLowPoint = totalTimeLeft - 3;
-        Long rangeHighPoint = totalTimeLeft + 3;
+        Duration midnightTillEndTime = Duration.between(LocalTime.MIN, endTime);
+        Duration timeLeftToday = Duration.between(now, LocalTime.MAX);
+        Duration totalTimeLeft = timeLeftToday.plus(midnightTillEndTime);
+        Duration rangeLowPoint = totalTimeLeft.minusSeconds(3);
+        Duration rangeHighPoint = totalTimeLeft.plusSeconds(3);
 
-        Supplier<String> timeProvider = CacheStrategy.maxAgeTimeLeft(startTime, endTime);
-        Long timeLeft = Long.parseLong(timeProvider.get());
+        Supplier<Duration> maxAge = new MaxAgeWhenStartTimeAfterEndTime(startTime, endTime);
 
-        assertThat(timeLeft, is(both(greaterThan(rangeLowPoint)).and(lessThan(rangeHighPoint))));
-
+        assertThat(maxAge.get().getSeconds(), is(both(greaterThan(rangeLowPoint.getSeconds())).and(lessThan(rangeHighPoint.getSeconds
+                ()))));
     }
 
     @Test
@@ -74,8 +73,7 @@ public class CacheStrategyTest {
         LocalTime endTime = now.minusHours(1);
         LocalTime startTime = now.plusHours(1);
 
-        Supplier<String> timeProvider = CacheStrategy.maxAgeTimeLeft(startTime, endTime);
-
-        assertThat(timeProvider.get(), is("0"));
+        Supplier<Duration> maxAge = new MaxAgeWhenStartTimeAfterEndTime(startTime, endTime);
+        assertThat(maxAge.get(), is(Duration.ZERO));
     }
 }
