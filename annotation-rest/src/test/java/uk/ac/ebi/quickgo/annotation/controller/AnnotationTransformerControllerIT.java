@@ -77,8 +77,7 @@ public class AnnotationTransformerControllerIT {
     private static final String BASE_URL = "http://localhost";
     private static final String INCLUDE_FIELD = "goName";
     private static final String GO_TERM_RESOURCE_FORMAT = "/ontology/go/terms/%s";
-    private static final String COMMA = ",";
-
+    
     @Autowired
     private AnnotationRepository annotationRepository;
     @Autowired
