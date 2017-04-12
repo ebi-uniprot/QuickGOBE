@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import uk.ac.ebi.quickgo.ontology.controller.validation.OBOControllerValidationHelper;
 import uk.ac.ebi.quickgo.ontology.controller.validation.OBOControllerValidationHelperImpl;
+import uk.ac.ebi.quickgo.rest.cache.MaxAgeWhenStartBeforeEndTime;
 import uk.ac.ebi.quickgo.rest.cache.MaxAgeWhenStartTimeAfterEndTime;
 import uk.ac.ebi.quickgo.rest.headers.HttpHeader;
 import uk.ac.ebi.quickgo.rest.headers.HttpHeadersProvider;
@@ -69,7 +70,7 @@ public class OntologyRestConfig {
         if(restProperties.getStartTime().isAfter(restProperties.getEndTime())) {
             maxAge = new MaxAgeWhenStartTimeAfterEndTime(restProperties.getStartTime(), restProperties.getEndTime());
         }else {
-            maxAge = new MaxAgeWhenStartTimeAfterEndTime(restProperties.getStartTime(), restProperties.getEndTime());
+            maxAge = new MaxAgeWhenStartBeforeEndTime(restProperties.getStartTime(), restProperties.getEndTime());
         }
         HttpHeader headerSource = new HttpHeader(HttpHeaders.CACHE_CONTROL, MAX_AGE,
                                                  ()-> Long.toString(maxAge.get().getSeconds()));
