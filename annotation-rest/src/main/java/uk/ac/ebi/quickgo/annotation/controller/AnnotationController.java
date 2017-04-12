@@ -1,7 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
 import uk.ac.ebi.quickgo.annotation.download.AnnotationDownloadFileHeader;
-import uk.ac.ebi.quickgo.rest.metadata.MetaDataProvider;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
 import uk.ac.ebi.quickgo.annotation.model.StatisticsGroup;
@@ -12,6 +11,7 @@ import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
 import uk.ac.ebi.quickgo.rest.comm.FilterContext;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
 import uk.ac.ebi.quickgo.rest.metadata.MetaData;
+import uk.ac.ebi.quickgo.rest.metadata.MetaDataProvider;
 import uk.ac.ebi.quickgo.rest.search.DefaultSearchQueryTemplate;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
@@ -19,6 +19,7 @@ import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.query.RegularPage;
 import uk.ac.ebi.quickgo.rest.search.request.converter.FilterConverterFactory;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
+import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformationRequests;
 import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformerChain;
 
 import io.swagger.annotations.ApiOperation;
@@ -287,6 +288,13 @@ public class AnnotationController {
                     filterQueries.add(convertedFilter.getConvertedValue());
                     convertedFilter.getFilterContext().ifPresent(filterContexts::add);
                 });
+
+        ResultTransformationRequests transformationRequests = request.createResultTransformationRequests();
+        if (!transformationRequests.getRequests().isEmpty()) {
+            FilterContext transformationContext = new FilterContext();
+            transformationContext.save(ResultTransformationRequests.class, transformationRequests);
+            filterContexts.add(transformationContext);
+        }
 
         return new FilterQueryInfo() {
             @Override public Set<QuickGOQuery> getFilterQueries() {

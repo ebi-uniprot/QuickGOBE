@@ -26,7 +26,7 @@ search:
         properties: {
           ip: localhost,
           resourceFormat: "/ontology/eco/terms/{evidenceCode}/descendants?relations={evidenceCodeUsageRelationships}",
-          responseClass: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.ConvertedOntologyFilter",
+          responseClass: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.OntologyDescendants",
           responseConverter: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.DescendantsFilterConverter"
         }
       - signature: descendants,goId,goUsageRelationships
@@ -34,7 +34,7 @@ search:
         properties: {
           ip: localhost,
           resourceFormat: "/ontology/go/terms/{goId}/descendants?relations={goUsageRelationships}",
-          responseClass: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.ConvertedOntologyFilter",
+          responseClass: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.OntologyDescendants",
           responseConverter: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.DescendantsFilterConverter"
         }
       - signature: goId,goUsageRelationships,slim
@@ -42,8 +42,24 @@ search:
         properties: {
           ip: localhost,
           resourceFormat: "/ontology/go/terms/{goId}/descendants?relations={goUsageRelationships}",
-          responseClass: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.ConvertedOntologyFilter",
+          responseClass: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.OntologyDescendants",
           responseConverter: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.SlimmingFilterConverter"
+        }
+      - signature: goId,goName
+        execution: REST_COMM
+        properties: {
+          ip: localhost,
+          resourceFormat: "/ontology/go/terms/{goId}",
+          responseClass: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.BasicOntology",
+          responseConverter: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.BasicOntologyIdentityFilterConverter"
+        }
+      - signature: taxonId,taxonName
+        execution: REST_COMM
+        properties: {
+          ip: localhost,
+          resourceFormat: "/proteins/api/taxonomy/id/{taxonId}/node",
+          responseClass: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.BasicTaxonomyNode",
+          responseConverter: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.BasicTaxonomyNodeIdentityFilterConverter"
         }
 model:
   repo2domainFieldNameTransformations:
