@@ -27,6 +27,7 @@ public class BasicOntologyIdentityFilterConverterTest {
     @Test
     public void inputIsValueInConvertedFilter() {
         BasicOntology ontology = createBasicOntology();
+
         ConvertedFilter<BasicOntology> convertedFilter = converter.transform(ontology);
 
         assertThat(convertedFilter.getConvertedValue(), is(ontology));

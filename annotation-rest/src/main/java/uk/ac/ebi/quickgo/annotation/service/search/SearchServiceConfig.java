@@ -5,8 +5,9 @@ import uk.ac.ebi.quickgo.annotation.common.AnnotationRepoConfig;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.common.transformer.ResponseValueInjector;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.OntologyNameInjector;
-import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.OntologyResultsTransformer;
+import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.ExternalServiceResultsTransformer;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.SlimResultsTransformer;
+import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.TaxonomyNameInjector;
 import uk.ac.ebi.quickgo.annotation.service.converter.AnnotationDocConverterImpl;
 import uk.ac.ebi.quickgo.common.SearchableField;
 import uk.ac.ebi.quickgo.common.loader.DbXRefLoader;
@@ -40,7 +41,6 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.data.solr.core.SolrTemplate;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
 
 /**
  * Spring Configuration facilitating Annotation search functionality.
@@ -181,7 +181,7 @@ public class SearchServiceConfig {
 
     @Bean
     public ResultTransformerChain<QueryResult<Annotation>> resultTransformerChain(
-            OntologyResultsTransformer ontologyResultsTransformer) {
+            ExternalServiceResultsTransformer ontologyResultsTransformer) {
         ResultTransformerChain<QueryResult<Annotation>> transformerChain = new ResultTransformerChain<>();
         transformerChain.addTransformer(new SlimResultsTransformer());
         transformerChain.addTransformer(ontologyResultsTransformer);
@@ -189,9 +189,11 @@ public class SearchServiceConfig {
     }
 
     @Bean
-    public OntologyResultsTransformer ontologyResultsTransformer(RESTFilterConverterFactory restFilterConverterFactory) {
-        List<ResponseValueInjector> responseValueInjectors = singletonList(new OntologyNameInjector());
-        return new OntologyResultsTransformer(restFilterConverterFactory, responseValueInjectors);
+    public ExternalServiceResultsTransformer ontologyResultsTransformer(RESTFilterConverterFactory restFilterConverterFactory) {
+        List<ResponseValueInjector> responseValueInjectors = asList(
+                new OntologyNameInjector(),
+                new TaxonomyNameInjector());
+        return new ExternalServiceResultsTransformer(restFilterConverterFactory, responseValueInjectors);
     }
 
     @Bean

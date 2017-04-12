@@ -23,14 +23,14 @@ import static com.google.common.base.Preconditions.checkArgument;
  * Created 06/04/17
  * @author Edd
  */
-public class OntologyResultsTransformer implements ResultTransformer<QueryResult<Annotation>> {
+public class ExternalServiceResultsTransformer implements ResultTransformer<QueryResult<Annotation>> {
 
     private static final ResultTransformationRequests EMPTY_TRANSFORMATION_REQUESTS = new ResultTransformationRequests();
     private final RESTFilterConverterFactory restFilterConverterFactory;
     private final List<ResponseValueInjector> fieldInjectors;
     private final List<String> fieldsToAdd;
 
-    public OntologyResultsTransformer(RESTFilterConverterFactory restFilterConverterFactory,
+    public ExternalServiceResultsTransformer(RESTFilterConverterFactory restFilterConverterFactory,
             List<ResponseValueInjector> fieldInjectors) {
         checkArgument(restFilterConverterFactory != null,
                 "RESTFilterConverterFactory cannot be null");
@@ -53,8 +53,13 @@ public class OntologyResultsTransformer implements ResultTransformer<QueryResult
         requiredRequests.retainAll(fieldsToAdd);
 
         if (!requiredRequests.isEmpty()) {
+            List<ResponseValueInjector> requiredInjectors =
+                    fieldInjectors.stream()
+                            .filter(injector -> requiredRequests.contains(injector.getId()))
+                            .collect(Collectors.toList());
+
             result.getResults().forEach(annotation ->
-                    fieldInjectors.forEach(valueInjector ->
+                    requiredInjectors.forEach(valueInjector ->
                             valueInjector.inject(restFilterConverterFactory, annotation))
             );
         }

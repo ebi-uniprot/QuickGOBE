@@ -533,8 +533,8 @@ public class AnnotationRequestTest {
     @Test
     public void twoIncludedFieldResultsInTwoResultTransformationRequests() {
         String goName = "goName";
-        String taxName = "taxName";
-        String[] fields = {goName, taxName};
+        String taxonName = "taxonName";
+        String[] fields = {goName, taxonName};
         annotationRequest.setIncludeFields(fields);
 
         Set<ResultTransformationRequest> requests =
@@ -543,7 +543,7 @@ public class AnnotationRequestTest {
 
         List<String> requestIds =
                 requests.stream().map(ResultTransformationRequest::getId).collect(Collectors.toList());
-        assertThat(requestIds, containsInAnyOrder(goName, taxName));
+        assertThat(requestIds, containsInAnyOrder(goName, taxonName));
     }
 
     //----------------- helpers

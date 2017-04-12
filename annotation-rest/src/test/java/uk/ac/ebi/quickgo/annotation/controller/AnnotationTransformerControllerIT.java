@@ -2,18 +2,17 @@ package uk.ac.ebi.quickgo.annotation.controller;
 
 import uk.ac.ebi.quickgo.annotation.AnnotationREST;
 import uk.ac.ebi.quickgo.annotation.IdGeneratorUtil;
+import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.BasicOntology;
-import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.OntologyDescendants;
+import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.BasicTaxonomyNode;
 import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepoConfig;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -37,15 +36,12 @@ import org.springframework.web.context.WebApplicationContext;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
-import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withBadRequest;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -75,9 +71,11 @@ public class AnnotationTransformerControllerIT {
 
     private static final String SEARCH_RESOURCE = "/annotation/search";
     private static final String BASE_URL = "http://localhost";
-    private static final String INCLUDE_FIELD = "goName";
+    private static final String GO_NAME_FIELD = "goName";
+    private static final String TAXON_NAME_FIELD = "taxonName";
     private static final String GO_TERM_RESOURCE_FORMAT = "/ontology/go/terms/%s";
-    
+    private static final String TAXONOMY_ID_NODE_RESOURCE_FORMAT = "/proteins/api/taxonomy/id/%s/node";
+
     @Autowired
     private AnnotationRepository annotationRepository;
     @Autowired
@@ -103,6 +101,7 @@ public class AnnotationTransformerControllerIT {
         annotationRepository.deleteAll();
     }
 
+    // ----------------- gene ontology name values -----------------
     @Test
     public void requestOmittingGoNameProducesResultWhereGoNameIsNull() throws Exception {
         annotationRepository.save(createAnnotationDoc(createGPId(1), goId(1)));
@@ -127,7 +126,7 @@ public class AnnotationTransformerControllerIT {
 
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
-                        .param(INCLUDE_FIELD_PARAM.getName(), INCLUDE_FIELD));
+                        .param(INCLUDE_FIELD_PARAM.getName(), GO_NAME_FIELD));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -147,7 +146,7 @@ public class AnnotationTransformerControllerIT {
 
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
-                        .param(INCLUDE_FIELD_PARAM.getName(), INCLUDE_FIELD));
+                        .param(INCLUDE_FIELD_PARAM.getName(), GO_NAME_FIELD));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -160,17 +159,106 @@ public class AnnotationTransformerControllerIT {
                 .andExpect(totalNumOfResults(2));
     }
 
+    // ----------------- taxonomy name values -----------------
     @Test
-    public void doNotPopulateGoNameWhenExternalServiceProduces404() throws Exception {
+    public void requestOmittingTaxonNameProducesResultWhereTaxonNameIsNull() throws Exception {
+        annotationRepository.save(annotationDocWithTaxon(goId(1), taxonId(1)));
+
+        expectTaxonIdHasGivenTaxonNameViaRest(taxonId(1), taxonName(1));
+
+        ResultActions response = mockMvc.perform(get(SEARCH_RESOURCE));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(pageInfoExists())
+                .andExpect(jsonPath("$.results[0].taxonName", is(nullValue())))
+                .andExpect(totalNumOfResults(1));
+    }
+
+    @Test
+    public void includeTaxonNameForOneTermFetchesNameFromExternalServiceSuccessfully() throws Exception {
+        annotationRepository.save(annotationDocWithTaxon(goId(1), taxonId(1)));
+
+        expectTaxonIdHasGivenTaxonNameViaRest(taxonId(1), taxonName(1));
+
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE)
+                        .param(INCLUDE_FIELD_PARAM.getName(), TAXON_NAME_FIELD));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(pageInfoExists())
+                .andExpect(jsonPath("$.results[0].goId", is(goId(1))))
+                .andExpect(jsonPath("$.results[0].taxonId", is(taxonId(1))))
+                .andExpect(jsonPath("$.results[0].taxonName", is(taxonName(1))))
+                .andExpect(totalNumOfResults(1));
+    }
+
+    @Test
+    public void includeTaxonNameForMultipleTermsFetchesNameFromExternalServiceSuccessfully() throws Exception {
+        annotationRepository.save(annotationDocWithTaxon(goId(1), taxonId(1)));
+        annotationRepository.save(annotationDocWithTaxon(goId(2), taxonId(2)));
+
+        expectTaxonIdHasGivenTaxonNameViaRest(taxonId(1), taxonName(1));
+        expectTaxonIdHasGivenTaxonNameViaRest(taxonId(2), taxonName(2));
+
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE)
+                        .param(INCLUDE_FIELD_PARAM.getName(), TAXON_NAME_FIELD));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(pageInfoExists())
+                .andExpect(jsonPath("$.results[0].goId", is(goId(1))))
+                .andExpect(jsonPath("$.results[0].taxonId", is(taxonId(1))))
+                .andExpect(jsonPath("$.results[0].taxonName", is(taxonName(1))))
+                .andExpect(jsonPath("$.results[1].goId", is(goId(2))))
+                .andExpect(jsonPath("$.results[1].taxonId", is(taxonId(2))))
+                .andExpect(jsonPath("$.results[1].taxonName", is(taxonName(2))))
+                .andExpect(totalNumOfResults(2));
+    }
+
+    @Test
+    public void includeGoAndTaxonNameFetchesNamesFromTwoExternalServicesSuccessfully() throws Exception {
+        AnnotationDocument doc = createAnnotationDoc(createGPId(1), goId(1));
+        doc.taxonId = taxonId(1);
+        annotationRepository.save(doc);
+
+        expectGoTermsHaveGoNamesViaRest(singletonList(goId(1)), singletonList(goName(1)));
+        expectTaxonIdHasGivenTaxonNameViaRest(taxonId(1), taxonName(1));
+
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE)
+                        .param(INCLUDE_FIELD_PARAM.getName(), GO_NAME_FIELD + "," + TAXON_NAME_FIELD));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(pageInfoExists())
+                .andExpect(jsonPath("$.results[0].goId", is(goId(1))))
+                .andExpect(jsonPath("$.results[0].goName", is(goName(1))))
+                .andExpect(jsonPath("$.results[0].taxonId", is(taxonId(1))))
+                .andExpect(jsonPath("$.results[0].taxonName", is(taxonName(1))))
+                .andExpect(totalNumOfResults(1));
+    }
+
+    // ----------------- external service error handling -----------------
+    // the follow tests are relevant for all instances of ResponseValueInjector, and
+    // not only OntologyNameInjector -- which is used to show the behaviour the results transformer
+    @Test
+    public void doNotPopulateValueWhenExternalServiceProduces404() throws Exception {
         annotationRepository.save(createAnnotationDoc(createGPId(0), goId(0)));
         annotationRepository.save(createAnnotationDoc(createGPId(1), goId(1)));
-        
+
         expectRestCallResponse(GET, buildResource(GO_TERM_RESOURCE_FORMAT, goId(0)), withStatus(HttpStatus.NOT_FOUND));
         expectGoTermsHaveGoNamesViaRest(singletonList(goId(1)), singletonList(goName(1)));
 
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
-                        .param(INCLUDE_FIELD_PARAM.getName(), INCLUDE_FIELD));
+                        .param(INCLUDE_FIELD_PARAM.getName(), GO_NAME_FIELD));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -184,16 +272,68 @@ public class AnnotationTransformerControllerIT {
     }
 
     @Test
-    public void injectingGoNameProducesErrorWhenExternalServiceProducesError500() throws Exception {
+    public void injectingValueProducesErrorWhenExternalServiceProducesTimeoutError() throws Exception {
         annotationRepository.save(createAnnotationDoc(createGPId(0), goId(0)));
         annotationRepository.save(createAnnotationDoc(createGPId(1), goId(1)));
 
-        expectRestCallResponse(GET, buildResource(GO_TERM_RESOURCE_FORMAT, goId(0)), withStatus(HttpStatus.INTERNAL_SERVER_ERROR));
+        expectRestCallResponse(GET, buildResource(GO_TERM_RESOURCE_FORMAT, goId(0)),
+                withStatus(HttpStatus.REQUEST_TIMEOUT));
         expectGoTermsHaveGoNamesViaRest(singletonList(goId(1)), singletonList(goName(1)));
 
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
-                        .param(INCLUDE_FIELD_PARAM.getName(), INCLUDE_FIELD));
+                        .param(INCLUDE_FIELD_PARAM.getName(), GO_NAME_FIELD));
+
+        response.andDo(print())
+                .andExpect(status().is5xxServerError());
+    }
+
+    @Test
+    public void injectingValueProducesErrorWhenExternalServiceProducesBadGatewayError() throws Exception {
+        annotationRepository.save(createAnnotationDoc(createGPId(0), goId(0)));
+        annotationRepository.save(createAnnotationDoc(createGPId(1), goId(1)));
+
+        expectRestCallResponse(GET, buildResource(GO_TERM_RESOURCE_FORMAT, goId(0)),
+                withStatus(HttpStatus.BAD_GATEWAY));
+        expectGoTermsHaveGoNamesViaRest(singletonList(goId(1)), singletonList(goName(1)));
+
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE)
+                        .param(INCLUDE_FIELD_PARAM.getName(), GO_NAME_FIELD));
+
+        response.andDo(print())
+                .andExpect(status().is5xxServerError());
+    }
+
+    @Test
+    public void injectingValueProducesErrorWhenExternalServiceProducesBadRequestError() throws Exception {
+        annotationRepository.save(createAnnotationDoc(createGPId(0), goId(0)));
+        annotationRepository.save(createAnnotationDoc(createGPId(1), goId(1)));
+
+        expectRestCallResponse(GET, buildResource(GO_TERM_RESOURCE_FORMAT, goId(0)),
+                withStatus(HttpStatus.BAD_REQUEST));
+        expectGoTermsHaveGoNamesViaRest(singletonList(goId(1)), singletonList(goName(1)));
+
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE)
+                        .param(INCLUDE_FIELD_PARAM.getName(), GO_NAME_FIELD));
+
+        response.andDo(print())
+                .andExpect(status().is5xxServerError());
+    }
+
+    @Test
+    public void injectingValueProducesErrorWhenExternalServiceProducesError500() throws Exception {
+        annotationRepository.save(createAnnotationDoc(createGPId(0), goId(0)));
+        annotationRepository.save(createAnnotationDoc(createGPId(1), goId(1)));
+
+        expectRestCallResponse(GET, buildResource(GO_TERM_RESOURCE_FORMAT, goId(0)),
+                withStatus(HttpStatus.INTERNAL_SERVER_ERROR));
+        expectGoTermsHaveGoNamesViaRest(singletonList(goId(1)), singletonList(goName(1)));
+
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE)
+                        .param(INCLUDE_FIELD_PARAM.getName(), GO_NAME_FIELD));
 
         response.andDo(print())
                 .andExpect(status().is5xxServerError());
@@ -213,52 +353,26 @@ public class AnnotationTransformerControllerIT {
                 .andExpect(status().isBadRequest());
     }
 
-    @Test
-    public void injectingGoNameProducesErrorWhenExternalServiceProducesTimeoutError() throws Exception {
-        annotationRepository.save(createAnnotationDoc(createGPId(0), goId(0)));
-        annotationRepository.save(createAnnotationDoc(createGPId(1), goId(1)));
-
-        expectRestCallResponse(GET, buildResource(GO_TERM_RESOURCE_FORMAT, goId(0)), withStatus(HttpStatus.REQUEST_TIMEOUT));
-        expectGoTermsHaveGoNamesViaRest(singletonList(goId(1)), singletonList(goName(1)));
-
-        ResultActions response = mockMvc.perform(
-                get(SEARCH_RESOURCE)
-                        .param(INCLUDE_FIELD_PARAM.getName(), INCLUDE_FIELD));
-
-        response.andDo(print())
-                .andExpect(status().is5xxServerError());
+    // ----------------- helpers -----------------
+    private AnnotationDocument annotationDocWithTaxon(String goId, int taxonId) {
+        AnnotationDocument annotationDocument = createAnnotationDoc(createGPId(taxonId), goId);
+        annotationDocument.taxonId = taxonId;
+        return annotationDocument;
     }
 
-    @Test
-    public void injectingGoNameProducesErrorWhenExternalServiceProducesBadGatewayError() throws Exception {
-        annotationRepository.save(createAnnotationDoc(createGPId(0), goId(0)));
-        annotationRepository.save(createAnnotationDoc(createGPId(1), goId(1)));
+    private void expectTaxonIdHasGivenTaxonNameViaRest(int taxonId, String taxonName) {
+        checkArgument(taxonName != null && !taxonName.isEmpty(), "taxonName cannot be null or empty");
 
-        expectRestCallResponse(GET, buildResource(GO_TERM_RESOURCE_FORMAT, goId(0)), withStatus(HttpStatus.BAD_GATEWAY));
-        expectGoTermsHaveGoNamesViaRest(singletonList(goId(1)), singletonList(goName(1)));
+        BasicTaxonomyNode expectedResponse = new BasicTaxonomyNode();
+        expectedResponse.setScientificName(taxonName);
+        String responseAsString = getResponseAsString(expectedResponse);
 
-        ResultActions response = mockMvc.perform(
-                get(SEARCH_RESOURCE)
-                        .param(INCLUDE_FIELD_PARAM.getName(), INCLUDE_FIELD));
-
-        response.andDo(print())
-                .andExpect(status().is5xxServerError());
-    }
-
-    @Test
-    public void injectingGoNameProducesErrorWhenExternalServiceProducesBadRequestError() throws Exception {
-        annotationRepository.save(createAnnotationDoc(createGPId(0), goId(0)));
-        annotationRepository.save(createAnnotationDoc(createGPId(1), goId(1)));
-
-        expectRestCallResponse(GET, buildResource(GO_TERM_RESOURCE_FORMAT, goId(0)), withStatus(HttpStatus.BAD_REQUEST));
-        expectGoTermsHaveGoNamesViaRest(singletonList(goId(1)), singletonList(goName(1)));
-
-        ResultActions response = mockMvc.perform(
-                get(SEARCH_RESOURCE)
-                        .param(INCLUDE_FIELD_PARAM.getName(), INCLUDE_FIELD));
-
-        response.andDo(print())
-                .andExpect(status().is5xxServerError());
+        expectRestCallSuccess(
+                GET,
+                buildResource(
+                        TAXONOMY_ID_NODE_RESOURCE_FORMAT,
+                        String.valueOf(taxonId)),
+                responseAsString);
     }
 
     private void expectGoTermsHaveGoNamesViaRest(
@@ -269,7 +383,7 @@ public class AnnotationTransformerControllerIT {
         checkArgument(termIds.size() == termNames.size(),
                 "termIds and termNames lists must be the same size");
 
-        for(int i = 0; i < termIds.size(); i++) {
+        for (int i = 0; i < termIds.size(); i++) {
             String termId = termIds.get(i);
             String termName = termNames.get(i);
             expectRestCallSuccess(
@@ -290,18 +404,18 @@ public class AnnotationTransformerControllerIT {
         BasicOntology response = new BasicOntology();
         List<BasicOntology.Result> results = new ArrayList<>();
 
-        for(int i = 0; i < termIds.size(); i++) {
+        for (int i = 0; i < termIds.size(); i++) {
             BasicOntology.Result result = new BasicOntology.Result();
             result.setId(termIds.get(i));
             result.setName(termNames.get(i));
             results.add(result);
         }
-        
+
         response.setResults(results);
         return getResponseAsString(response);
     }
 
-    private String getResponseAsString(BasicOntology response) {
+    private <T> String getResponseAsString(T response) {
         try {
             return dtoMapper.writeValueAsString(response);
         } catch (JsonProcessingException e) {
@@ -342,5 +456,13 @@ public class AnnotationTransformerControllerIT {
 
     private String goName(int id) {
         return IdGeneratorUtil.createGoId(id) + " name";
+    }
+
+    private int taxonId(int id) {
+        return id;
+    }
+
+    private String taxonName(int id) {
+        return "taxon name: " + id;
     }
 }

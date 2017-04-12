@@ -40,6 +40,8 @@ public class Annotation {
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     public int taxonId;
 
+    public String taxonName;
+
     public String assignedBy;
 
     public List<ConnectedXRefs<Annotation.QualifiedXref>> extensions;
@@ -69,6 +71,7 @@ public class Annotation {
                 ", reference='" + reference + '\'' +
                 ", withFrom=" + withFrom +
                 ", taxonId=" + taxonId +
+                ", taxonName='" + taxonName + '\'' +
                 ", assignedBy='" + assignedBy + '\'' +
                 ", extensions=" + extensions +
                 ", slimmedIds=" + slimmedIds +
@@ -125,6 +128,9 @@ public class Annotation {
         if (withFrom != null ? !withFrom.equals(that.withFrom) : that.withFrom != null) {
             return false;
         }
+        if (taxonName != null ? !taxonName.equals(that.taxonName) : that.taxonName != null) {
+            return false;
+        }
         if (assignedBy != null ? !assignedBy.equals(that.assignedBy) : that.assignedBy != null) {
             return false;
         }
@@ -155,6 +161,7 @@ public class Annotation {
         result = 31 * result + (reference != null ? reference.hashCode() : 0);
         result = 31 * result + (withFrom != null ? withFrom.hashCode() : 0);
         result = 31 * result + taxonId;
+        result = 31 * result + (taxonName != null ? taxonName.hashCode() : 0);
         result = 31 * result + (assignedBy != null ? assignedBy.hashCode() : 0);
         result = 31 * result + (extensions != null ? extensions.hashCode() : 0);
         result = 31 * result + (slimmedIds != null ? slimmedIds.hashCode() : 0);
