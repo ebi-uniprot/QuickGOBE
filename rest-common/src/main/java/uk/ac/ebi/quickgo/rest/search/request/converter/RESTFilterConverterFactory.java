@@ -48,7 +48,6 @@ public class RESTFilterConverterFactory {
             FilterConfig filterConfig = configOpt.get();
             switch (filterConfig.getExecution()) {
                 case REST_COMM:
-                    // todo: possible cache of (filterConfig, restOperations) |-> RESTFilterConverter
                     return new RESTFilterConverter<T>(filterConfig, restOperations).transform(request);
                 default:
                     throw new IllegalStateException(
