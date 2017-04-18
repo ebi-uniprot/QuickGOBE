@@ -21,10 +21,10 @@ class DayTime {
 
     /**
      * Create an instance of DayTime from {@link DayOfWeek} and {@link LocalTime} instance.
-     * @param dayOfWeek
-     * @param time
+     * @param dayOfWeek this class represents.
+     * @param time this class represents.
      */
-    public DayTime(DayOfWeek dayOfWeek, LocalTime time) {
+    DayTime(DayOfWeek dayOfWeek, LocalTime time) {
         Preconditions.checkArgument(Objects.nonNull(dayOfWeek), "Invalid Daytime DayOfWeek parameter passed to " +
                 "constructor. Parameter is null, it should be a valid DayOfWeek instance.");
         Preconditions.checkArgument(Objects.nonNull(time), "Invalid DayTime time parameter passed to constructor. " +
