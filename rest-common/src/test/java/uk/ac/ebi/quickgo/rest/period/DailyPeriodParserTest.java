@@ -32,7 +32,7 @@ public class DailyPeriodParserTest {
 
         Period result = dailyPeriodParser.parse(validInput);
         assertThat(result, notNullValue());
-        assertThat(result, instanceOf(ReducingDailyPeriod.class));
+        assertThat(result, instanceOf(RemainingTimePeriod.class));
     }
 
     @Test
