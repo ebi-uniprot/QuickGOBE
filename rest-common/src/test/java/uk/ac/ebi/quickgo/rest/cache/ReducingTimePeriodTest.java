@@ -21,7 +21,7 @@ import static org.hamcrest.core.Is.is;
  * Created with IntelliJ IDEA.
  */
 @RunWith(MockitoJUnitRunner.class)
-public class CachingAllowedPeriodTest {
+public class ReducingTimePeriodTest {
 
     @Test
     public void secondsLeftWhenNowBetweenStartTimeAndEndTime(){
@@ -32,10 +32,10 @@ public class CachingAllowedPeriodTest {
         DayTime startDayTime = new DayTime(start.getDayOfWeek(), start.toLocalTime());
         DayTime endDayTime = new DayTime(end.getDayOfWeek(), end.toLocalTime());
 
-        CachingAllowedPeriod cachingAllowedPeriod = new CachingAllowedPeriod(startDayTime, endDayTime);
+        ReducingTimePeriod reducingTimePeriod = new ReducingTimePeriod(startDayTime, endDayTime);
 
         //Provide a little wriggle room for test
-        long timeLeft = cachingAllowedPeriod.remainingTime(now).getSeconds();
+        long timeLeft = reducingTimePeriod.remainingTime(now).getSeconds();
         Long rangeLowPoint = timeLeft - 3;
         Long rangeHighPoint = timeLeft + 3;
         assertThat(timeLeft, is(both(greaterThan(rangeLowPoint)).and(lessThan(rangeHighPoint))));
@@ -50,10 +50,10 @@ public class CachingAllowedPeriodTest {
         DayTime startDayTime = new DayTime(start.getDayOfWeek(), start.toLocalTime());
         DayTime endDayTime = new DayTime(end.getDayOfWeek(), end.toLocalTime());
 
-        CachingAllowedPeriod cachingAllowedPeriod = new CachingAllowedPeriod(startDayTime, endDayTime);
+        ReducingTimePeriod reducingTimePeriod = new ReducingTimePeriod(startDayTime, endDayTime);
 
         //Provide a little wriggle room for test
-        long timeLeft = cachingAllowedPeriod.remainingTime(now).getSeconds();
+        long timeLeft = reducingTimePeriod.remainingTime(now).getSeconds();
         assertThat(timeLeft, is(both(greaterThan(57L)).and(lessThan(63L))));
     }
 
@@ -67,9 +67,9 @@ public class CachingAllowedPeriodTest {
         DayTime startDayTime = new DayTime(start.getDayOfWeek(), start.toLocalTime());
         DayTime endDayTime = new DayTime(end.getDayOfWeek(), end.toLocalTime());
 
-        CachingAllowedPeriod cachingAllowedPeriod = new CachingAllowedPeriod(startDayTime, endDayTime);
+        ReducingTimePeriod reducingTimePeriod = new ReducingTimePeriod(startDayTime, endDayTime);
 
-        assertThat(cachingAllowedPeriod.remainingTime(now), is(Duration.ZERO));
+        assertThat(reducingTimePeriod.remainingTime(now), is(Duration.ZERO));
     }
 
     @Test
@@ -81,9 +81,9 @@ public class CachingAllowedPeriodTest {
         DayTime startDayTime = new DayTime(start.getDayOfWeek(), start.toLocalTime());
         DayTime endDayTime = new DayTime(end.getDayOfWeek(), end.toLocalTime());
 
-        CachingAllowedPeriod cachingAllowedPeriod = new CachingAllowedPeriod(startDayTime, endDayTime);
+        ReducingTimePeriod reducingTimePeriod = new ReducingTimePeriod(startDayTime, endDayTime);
 
-        assertThat(cachingAllowedPeriod.remainingTime(now), is(Duration.ZERO));
+        assertThat(reducingTimePeriod.remainingTime(now), is(Duration.ZERO));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -93,7 +93,7 @@ public class CachingAllowedPeriodTest {
         LocalDateTime end = now.plusMinutes(1);
         DayTime endDayTime = new DayTime(end.getDayOfWeek(), end.toLocalTime());
 
-        new CachingAllowedPeriod(null, endDayTime);
+        new ReducingTimePeriod(null, endDayTime);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -103,11 +103,11 @@ public class CachingAllowedPeriodTest {
         LocalDateTime start = now.plusMinutes(2);
         DayTime startDayTime = new DayTime(start.getDayOfWeek(), start.toLocalTime());
 
-        new CachingAllowedPeriod(startDayTime, null);
+        new ReducingTimePeriod(startDayTime, null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void exceptionIfStartAndEndIsNull(){
-        new CachingAllowedPeriod(null, null);
+        new ReducingTimePeriod(null, null);
     }
 }
