@@ -36,7 +36,7 @@ public class PeriodParser {
      * Parse a string that contains a day of week and time in the format DAY(HH:MM)-DAY(HH:MM), to produce an
      * instance of CachingPeriodAllowed.
      * @param input String
-     * @return instance of ReducingTimePeriod that defines a time period.
+     * @return instance of ReducingDailyPeriod that defines a time period.
      */
     public Period parse(String input) {
         if (!Objects.nonNull(input) || input.isEmpty()) {
@@ -55,7 +55,7 @@ public class PeriodParser {
                                          "instances parsed from the input string is invalid, we require %s, but found" +
                                          " %s from %s.",
                                  REQUIRED_DAYTIME_INSTANCES, dayTimeList.size(), input);
-        return new ReducingTimePeriod(dayTimeList.get(0), dayTimeList.get(1));
+        return new ReducingDailyPeriod(dayTimeList.get(0), dayTimeList.get(1));
     }
 
     private DayTime toDayTime(String dayTime) {

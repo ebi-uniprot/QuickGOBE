@@ -21,7 +21,7 @@ import static org.hamcrest.core.Is.is;
  * Created with IntelliJ IDEA.
  */
 @RunWith(MockitoJUnitRunner.class)
-public class ReducingTimePeriodTest {
+public class ReducingDailyPeriodTest {
 
     @Test
     public void secondsLeftWhenNowBetweenStartTimeAndEndTime(){
@@ -32,10 +32,10 @@ public class ReducingTimePeriodTest {
         DayTime startDayTime = new DayTime(start.getDayOfWeek(), start.toLocalTime());
         DayTime endDayTime = new DayTime(end.getDayOfWeek(), end.toLocalTime());
 
-        ReducingTimePeriod reducingTimePeriod = new ReducingTimePeriod(startDayTime, endDayTime);
+        ReducingDailyPeriod reducingDailyPeriod = new ReducingDailyPeriod(startDayTime, endDayTime);
 
         //Provide a little wriggle room for test
-        long timeLeft = reducingTimePeriod.remainingTime(now).getSeconds();
+        long timeLeft = reducingDailyPeriod.remainingTime(now).getSeconds();
         Long rangeLowPoint = timeLeft - 3;
         Long rangeHighPoint = timeLeft + 3;
         assertThat(timeLeft, is(both(greaterThan(rangeLowPoint)).and(lessThan(rangeHighPoint))));
@@ -50,10 +50,10 @@ public class ReducingTimePeriodTest {
         DayTime startDayTime = new DayTime(start.getDayOfWeek(), start.toLocalTime());
         DayTime endDayTime = new DayTime(end.getDayOfWeek(), end.toLocalTime());
 
-        ReducingTimePeriod reducingTimePeriod = new ReducingTimePeriod(startDayTime, endDayTime);
+        ReducingDailyPeriod reducingDailyPeriod = new ReducingDailyPeriod(startDayTime, endDayTime);
 
         //Provide a little wriggle room for test
-        long timeLeft = reducingTimePeriod.remainingTime(now).getSeconds();
+        long timeLeft = reducingDailyPeriod.remainingTime(now).getSeconds();
         assertThat(timeLeft, is(both(greaterThan(57L)).and(lessThan(63L))));
     }
 
@@ -67,9 +67,9 @@ public class ReducingTimePeriodTest {
         DayTime startDayTime = new DayTime(start.getDayOfWeek(), start.toLocalTime());
         DayTime endDayTime = new DayTime(end.getDayOfWeek(), end.toLocalTime());
 
-        ReducingTimePeriod reducingTimePeriod = new ReducingTimePeriod(startDayTime, endDayTime);
+        ReducingDailyPeriod reducingDailyPeriod = new ReducingDailyPeriod(startDayTime, endDayTime);
 
-        assertThat(reducingTimePeriod.remainingTime(now), is(Duration.ZERO));
+        assertThat(reducingDailyPeriod.remainingTime(now), is(Duration.ZERO));
     }
 
     @Test
@@ -81,9 +81,9 @@ public class ReducingTimePeriodTest {
         DayTime startDayTime = new DayTime(start.getDayOfWeek(), start.toLocalTime());
         DayTime endDayTime = new DayTime(end.getDayOfWeek(), end.toLocalTime());
 
-        ReducingTimePeriod reducingTimePeriod = new ReducingTimePeriod(startDayTime, endDayTime);
+        ReducingDailyPeriod reducingDailyPeriod = new ReducingDailyPeriod(startDayTime, endDayTime);
 
-        assertThat(reducingTimePeriod.remainingTime(now), is(Duration.ZERO));
+        assertThat(reducingDailyPeriod.remainingTime(now), is(Duration.ZERO));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -93,7 +93,7 @@ public class ReducingTimePeriodTest {
         LocalDateTime end = now.plusMinutes(1);
         DayTime endDayTime = new DayTime(end.getDayOfWeek(), end.toLocalTime());
 
-        new ReducingTimePeriod(null, endDayTime);
+        new ReducingDailyPeriod(null, endDayTime);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -103,11 +103,11 @@ public class ReducingTimePeriodTest {
         LocalDateTime start = now.plusMinutes(2);
         DayTime startDayTime = new DayTime(start.getDayOfWeek(), start.toLocalTime());
 
-        new ReducingTimePeriod(startDayTime, null);
+        new ReducingDailyPeriod(startDayTime, null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void exceptionIfStartAndEndIsNull(){
-        new ReducingTimePeriod(null, null);
+        new ReducingDailyPeriod(null, null);
     }
 }
