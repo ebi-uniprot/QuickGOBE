@@ -15,14 +15,14 @@ import javax.validation.constraints.NotNull;
  * Time: 12:46
  * Created with IntelliJ IDEA.
  */
-public class CachingAllowedPeriod implements Period {
+public class ReducingTimePeriod implements Period {
 
     @NotNull
     private final DayTime start;
     @NotNull
     private final DayTime end;
 
-    CachingAllowedPeriod(DayTime start, DayTime end) {
+    ReducingTimePeriod(DayTime start, DayTime end) {
         Preconditions.checkArgument(Objects.nonNull(start), "The CachingAllowedPeriod constructor start parameter " +
                 "must not be null.");
         Preconditions.checkArgument(Objects.nonNull(end),"The CachingAllowedPeriod constructor end parameter " +
