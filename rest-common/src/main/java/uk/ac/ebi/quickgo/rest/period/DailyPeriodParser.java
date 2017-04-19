@@ -21,7 +21,6 @@ import static java.util.stream.Collectors.toList;
  * Created with IntelliJ IDEA.
  */
 public class DailyPeriodParser {
-    public static final String PERIOD_DELIMITER = ",";
     private static final String DAY_TIME_REGEX = "^(MONDAY|TUESDAY|WEDNESDAY|THURSDAY|FRIDAY|SATURDAY|SUNDAY)\\(" +
             "([0-9]{2}):([0-9]{2})\\)";
     private static final Pattern DAY_TIME_PATTERN = Pattern.compile(DAY_TIME_REGEX);
@@ -35,7 +34,7 @@ public class DailyPeriodParser {
      * Parse a string that contains a day of week and time in the format DAY(HH:MM)-DAY(HH:MM), to produce an
      * instance of CachingPeriodAllowed.
      * @param input String
-     * @return instance of ReducingDailyPeriod that defines a time period.
+     * @return instance of Period or null if no valid period could be parsed.
      */
     public Period parse(String input) {
         if (!Objects.nonNull(input) || input.isEmpty()) {
@@ -56,11 +55,11 @@ public class DailyPeriodParser {
     }
 
     private DayTime toDayTime(String dayTime) {
-        Matcher dayTimeMatcher = DAY_TIME_PATTERN.matcher(dayTime);
-        if(dayTimeMatcher.matches() && dayTimeMatcher.groupCount() == EXPECTED_GROUP_COUNT) {
-            final int hours = Integer.parseInt(dayTimeMatcher.group(HOUR_GROUP));
-            final int minutes = Integer.parseInt(dayTimeMatcher.group(MINUTE_GROUP));
-            return new DayTime(DayOfWeek.valueOf(dayTimeMatcher.group(DAY_GROUP)), LocalTime.of(hours, minutes));
+        Matcher periodMatcher = DAY_TIME_PATTERN.matcher(dayTime);
+        if(periodMatcher.matches() && periodMatcher.groupCount() == EXPECTED_GROUP_COUNT) {
+            final int hours = Integer.parseInt(periodMatcher.group(HOUR_GROUP));
+            final int minutes = Integer.parseInt(periodMatcher.group(MINUTE_GROUP));
+            return new DayTime(DayOfWeek.valueOf(periodMatcher.group(DAY_GROUP)), LocalTime.of(hours, minutes));
         }
         return null;
     }
