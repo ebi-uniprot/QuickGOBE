@@ -1,7 +1,6 @@
 package uk.ac.ebi.quickgo.rest.period;
 
 import java.time.DateTimeException;
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.instanceOf;
@@ -19,12 +18,7 @@ import static org.junit.Assert.assertThat;
  */
 public class DailyPeriodParserTest {
 
-    private DailyPeriodParser dailyPeriodParser = new DailyPeriodParser();
-
-    @Before
-    public void setup(){
-        dailyPeriodParser = new DailyPeriodParser();
-    }
+    private final DailyPeriodParser dailyPeriodParser = new DailyPeriodParser();
 
     @Test
     public void validInputString(){
