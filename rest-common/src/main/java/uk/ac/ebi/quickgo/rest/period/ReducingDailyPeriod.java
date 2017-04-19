@@ -23,9 +23,9 @@ public class ReducingDailyPeriod implements Period {
     private final DayTime end;
 
     ReducingDailyPeriod(DayTime start, DayTime end) {
-        Preconditions.checkArgument(Objects.nonNull(start), "The CachingAllowedPeriod constructor start parameter " +
+        Preconditions.checkArgument(Objects.nonNull(start), "The ReducingDailyPeriod constructor start parameter " +
                 "must not be null.");
-        Preconditions.checkArgument(Objects.nonNull(end),"The CachingAllowedPeriod constructor end parameter " +
+        Preconditions.checkArgument(Objects.nonNull(end),"The ReducingDailyPeriod constructor end parameter " +
                 "must not be null.");
         this.start = start;
         this.end = end;
