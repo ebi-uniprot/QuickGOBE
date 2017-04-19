@@ -32,8 +32,8 @@ public class ReducingDailyPeriod implements Period {
     }
 
     public Duration remainingTime(LocalDateTime target) {
-        LocalDateTime startDateTime = build(target, start);
-        LocalDateTime endDateTime = build(target, end);
+        LocalDateTime startDateTime = start.toInstant(target);
+        LocalDateTime endDateTime = end.toInstant(target);
         Duration remaining;
         if (target.isAfter(startDateTime) && target.isBefore(endDateTime)){
             remaining = Duration.between(target, endDateTime);
@@ -42,10 +42,4 @@ public class ReducingDailyPeriod implements Period {
         }
         return remaining;
     }
-
-    private LocalDateTime build(LocalDateTime target, DayTime compared) {
-        LocalDateTime comparedDate = target.with(compared.dayOfWeek);
-        return comparedDate.with(compared.time);
-    }
-
 }

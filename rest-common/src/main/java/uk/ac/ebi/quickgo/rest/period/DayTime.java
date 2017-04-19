@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.rest.period;
 
 import com.google.common.base.Preconditions;
 import java.time.DayOfWeek;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Objects;
 import javax.validation.constraints.NotNull;
@@ -31,5 +32,10 @@ class DayTime {
                 "Parameter was null, it should be a valid LocalTime instance.");
         this.dayOfWeek = dayOfWeek;
         this.time = time;
+    }
+
+    LocalDateTime toInstant(LocalDateTime target) {
+        LocalDateTime comparedDate = target.with(this.dayOfWeek);
+        return comparedDate.with(this.time);
     }
 }
