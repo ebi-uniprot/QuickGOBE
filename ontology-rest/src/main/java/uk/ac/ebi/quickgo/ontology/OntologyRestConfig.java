@@ -20,7 +20,6 @@ import org.springframework.http.HttpHeaders;
 import static java.util.stream.Collectors.toList;
 import static uk.ac.ebi.quickgo.common.validator.OntologyIdPredicate.isValidECOTermId;
 import static uk.ac.ebi.quickgo.common.validator.OntologyIdPredicate.isValidGOTermId;
-import static uk.ac.ebi.quickgo.rest.period.DailyPeriodParser.PERIOD_DELIMITER;
 
 /**
  * Configure the beans related to the operation of the restful service - id validation helpers and configuration
@@ -38,6 +37,7 @@ public class OntologyRestConfig {
 
     Logger LOGGER = LoggerFactory.getLogger(OntologyRestConfig.class);
     public static final String MAX_AGE = "max-age";
+    private static final String PERIOD_DELIMITER = ",";
 
     @Bean
     public OntologyPagingConfig ontologyPagingConfig(
