@@ -1,6 +1,5 @@
 package uk.ac.ebi.quickgo.rest.period;
 
-import com.google.common.base.Preconditions;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.Arrays;
@@ -44,27 +43,26 @@ public class PeriodParser {
         }
 
         String[] dayTimes = input.split("-");
-        Preconditions.checkArgument(dayTimes.length == REQUIRED_DAYTIME_INSTANCES,
-                                    "The input value for Period is invalid - should be DAY" +
-                                            "(HH:MM)-DAY(HH:MM) but was %s", input);
-
-        List<DayTime> dayTimeList = Arrays.stream(dayTimes)
-                                          .map(this::toDayTime)
-                                          .collect(toList());
-        Preconditions.checkArgument(dayTimeList.size() == REQUIRED_DAYTIME_INSTANCES, "The number of DayTime " +
-                                         "instances parsed from the input string is invalid, we require %s, but found" +
-                                         " %s from %s.",
-                                 REQUIRED_DAYTIME_INSTANCES, dayTimeList.size(), input);
-        return new ReducingDailyPeriod(dayTimeList.get(0), dayTimeList.get(1));
+        if(dayTimes.length == REQUIRED_DAYTIME_INSTANCES) {
+            List<DayTime> dayTimeList = Arrays.stream(dayTimes)
+                                              .map(this::toDayTime)
+                                              .filter(Objects::nonNull)
+                                              .collect(toList());
+            if (dayTimeList.size() == REQUIRED_DAYTIME_INSTANCES) {
+                return new ReducingDailyPeriod(dayTimeList.get(0), dayTimeList.get(1));
+            }
+        }
+        return null;
     }
 
     private DayTime toDayTime(String dayTime) {
         Matcher dayTimeMatcher = DAY_TIME_PATTERN.matcher(dayTime);
-        Preconditions.checkArgument(dayTimeMatcher.matches() && dayTimeMatcher.groupCount() == EXPECTED_GROUP_COUNT,
-                                 "Unable to convert %s to a DayTime instance", dayTime);
-        final int hours = Integer.parseInt(dayTimeMatcher.group(HOUR_GROUP));
-        final int minutes = Integer.parseInt(dayTimeMatcher.group(MINUTE_GROUP));
-        return new DayTime(DayOfWeek.valueOf(dayTimeMatcher.group(DAY_GROUP)), LocalTime.of(hours, minutes));
+        if(dayTimeMatcher.matches() && dayTimeMatcher.groupCount() == EXPECTED_GROUP_COUNT) {
+            final int hours = Integer.parseInt(dayTimeMatcher.group(HOUR_GROUP));
+            final int minutes = Integer.parseInt(dayTimeMatcher.group(MINUTE_GROUP));
+            return new DayTime(DayOfWeek.valueOf(dayTimeMatcher.group(DAY_GROUP)), LocalTime.of(hours, minutes));
+        }
+        return null;
     }
 
 }

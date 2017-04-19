@@ -5,6 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 
@@ -48,25 +49,31 @@ public class PeriodParserTest {
         assertThat(result, instanceOf(ZeroDurationPeriod.class));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void toLittleData(){
         String invalidInput="MONDAY(21:30)-";
 
-        periodParser.parse(invalidInput);
+        Period result = periodParser.parse(invalidInput);
+
+        assertThat(result, nullValue());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void tooMuchData(){
         String invalidInput="MONDAY(21:30)-TUESDAY(21:30)-WEDNESDAY(21:30)";
 
-        periodParser.parse(invalidInput);
+        Period result = periodParser.parse(invalidInput);
+
+        assertThat(result, nullValue());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void wontMatchRegularExpression(){
         String invalidInput="MONDAY(21:30)-FEBRUARY(21:30)";
 
-        periodParser.parse(invalidInput);
+        Period result = periodParser.parse(invalidInput);
+
+        assertThat(result, nullValue());
     }
 
     @Test(expected = DateTimeException.class)
