@@ -8,7 +8,8 @@ import java.util.Objects;
 import javax.validation.constraints.NotNull;
 
 /**
- * Data structure holds day of week and time. Used to declare events that have a daily occurrence at a set time.
+ * Data structure holds union of day of week and time. Used to declare events that have a daily occurrence at a set
+ * time.
  *
  * @author Tony Wardell
  * Date: 11/04/2017
@@ -17,8 +18,8 @@ import javax.validation.constraints.NotNull;
  */
 class DayTime implements DateModifying {
 
-    @NotNull DayOfWeek dayOfWeek;
-    @NotNull LocalTime time;
+    @NotNull private final DayOfWeek dayOfWeek;
+    @NotNull private final LocalTime time;
 
     /**
      * Create an instance of DayTime from {@link DayOfWeek} and {@link LocalTime} instance.
@@ -26,15 +27,21 @@ class DayTime implements DateModifying {
      * @param time this class represents.
      */
     DayTime(DayOfWeek dayOfWeek, LocalTime time) {
-        Preconditions.checkArgument(Objects.nonNull(dayOfWeek), "Invalid Daytime DayOfWeek parameter passed to " +
-                "constructor. Parameter is null, it should be a valid DayOfWeek instance.");
-        Preconditions.checkArgument(Objects.nonNull(time), "Invalid DayTime time parameter passed to constructor. " +
+        Preconditions.checkArgument(Objects.nonNull(dayOfWeek), "Invalid DayOfWeek parameter passed to " +
+                "DayTime constructor. Parameter is null, it should be a valid DayOfWeek instance.");
+        Preconditions.checkArgument(Objects.nonNull(time), "Invalid time parameter passed to DayTime constructor. " +
                 "Parameter was null, it should be a valid LocalTime instance.");
         this.dayOfWeek = dayOfWeek;
         this.time = time;
     }
 
+    /**
+     * Modify the targetTime to be an instant defined by the values held in this instance.
+     * @param target to modify.
+     * @return a particular instant in time.
+     */
     public LocalDateTime toInstant(LocalDateTime target) {
+        Preconditions.checkArgument(Objects.nonNull(target), "A target LocalDateTime cannot be null");
         LocalDateTime comparedDate = target.with(this.dayOfWeek);
         return comparedDate.with(this.time);
     }
