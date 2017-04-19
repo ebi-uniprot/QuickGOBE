@@ -2,9 +2,9 @@ package uk.ac.ebi.quickgo.ontology;
 
 import uk.ac.ebi.quickgo.ontology.controller.validation.OBOControllerValidationHelper;
 import uk.ac.ebi.quickgo.ontology.controller.validation.OBOControllerValidationHelperImpl;
-import uk.ac.ebi.quickgo.rest.cache.Period;
-import uk.ac.ebi.quickgo.rest.cache.RemainingTimeSupplier;
-import uk.ac.ebi.quickgo.rest.cache.PeriodParser;
+import uk.ac.ebi.quickgo.rest.period.Period;
+import uk.ac.ebi.quickgo.rest.period.RemainingTimeSupplier;
+import uk.ac.ebi.quickgo.rest.period.PeriodParser;
 import uk.ac.ebi.quickgo.rest.headers.HttpHeader;
 import uk.ac.ebi.quickgo.rest.headers.HttpHeadersProvider;
 
@@ -20,7 +20,7 @@ import org.springframework.http.HttpHeaders;
 import static java.util.stream.Collectors.toList;
 import static uk.ac.ebi.quickgo.common.validator.OntologyIdPredicate.isValidECOTermId;
 import static uk.ac.ebi.quickgo.common.validator.OntologyIdPredicate.isValidGOTermId;
-import static uk.ac.ebi.quickgo.rest.cache.PeriodParser.PERIOD_DELIMITER;
+import static uk.ac.ebi.quickgo.rest.period.PeriodParser.PERIOD_DELIMITER;
 
 /**
  * Configure the beans related to the operation of the restful service - id validation helpers and configuration

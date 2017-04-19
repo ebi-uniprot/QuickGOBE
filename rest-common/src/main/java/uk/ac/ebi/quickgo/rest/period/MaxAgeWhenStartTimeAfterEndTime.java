@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.rest.cache;
+package uk.ac.ebi.quickgo.rest.period;
 
 import java.time.Duration;
 import java.time.LocalTime;
