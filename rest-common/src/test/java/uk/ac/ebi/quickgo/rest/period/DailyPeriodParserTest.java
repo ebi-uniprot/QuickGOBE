@@ -17,34 +17,34 @@ import static org.junit.Assert.assertThat;
  * Time: 15:27
  * Created with IntelliJ IDEA.
  */
-public class PeriodParserTest {
+public class DailyPeriodParserTest {
 
-    private PeriodParser periodParser = new PeriodParser();
+    private DailyPeriodParser dailyPeriodParser = new DailyPeriodParser();
 
     @Before
     public void setup(){
-        periodParser = new PeriodParser();
+        dailyPeriodParser = new DailyPeriodParser();
     }
 
     @Test
     public void validInputString(){
         String validInput="MONDAY(21:30)-TUESDAY(21:30)";
 
-        Period result = periodParser.parse(validInput);
+        Period result = dailyPeriodParser.parse(validInput);
         assertThat(result, notNullValue());
         assertThat(result, instanceOf(ReducingDailyPeriod.class));
     }
 
     @Test
     public void nullInput(){
-        Period result = periodParser.parse(null);
+        Period result = dailyPeriodParser.parse(null);
 
         assertThat(result, instanceOf(ZeroDurationPeriod.class));
     }
 
     @Test
     public void emptyInput(){
-        Period result = periodParser.parse("");
+        Period result = dailyPeriodParser.parse("");
 
         assertThat(result, instanceOf(ZeroDurationPeriod.class));
     }
@@ -53,7 +53,7 @@ public class PeriodParserTest {
     public void toLittleData(){
         String invalidInput="MONDAY(21:30)-";
 
-        Period result = periodParser.parse(invalidInput);
+        Period result = dailyPeriodParser.parse(invalidInput);
 
         assertThat(result, nullValue());
     }
@@ -62,7 +62,7 @@ public class PeriodParserTest {
     public void tooMuchData(){
         String invalidInput="MONDAY(21:30)-TUESDAY(21:30)-WEDNESDAY(21:30)";
 
-        Period result = periodParser.parse(invalidInput);
+        Period result = dailyPeriodParser.parse(invalidInput);
 
         assertThat(result, nullValue());
     }
@@ -71,7 +71,7 @@ public class PeriodParserTest {
     public void wontMatchRegularExpression(){
         String invalidInput="MONDAY(21:30)-FEBRUARY(21:30)";
 
-        Period result = periodParser.parse(invalidInput);
+        Period result = dailyPeriodParser.parse(invalidInput);
 
         assertThat(result, nullValue());
     }
@@ -80,6 +80,6 @@ public class PeriodParserTest {
     public void matchesRegularExpressionButNotAValidTime(){
         String invalidInput="MONDAY(21:30)-TUESDAY(33:30)";
 
-        periodParser.parse(invalidInput);
+        dailyPeriodParser.parse(invalidInput);
     }
 }

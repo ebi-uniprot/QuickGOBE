@@ -20,7 +20,7 @@ import static java.util.stream.Collectors.toList;
  * Time: 15:26
  * Created with IntelliJ IDEA.
  */
-public class PeriodParser {
+public class DailyPeriodParser {
     public static final String PERIOD_DELIMITER = ",";
     private static final String DAY_TIME_REGEX = "^(MONDAY|TUESDAY|WEDNESDAY|THURSDAY|FRIDAY|SATURDAY|SUNDAY)\\(" +
             "([0-9]{2}):([0-9]{2})\\)";

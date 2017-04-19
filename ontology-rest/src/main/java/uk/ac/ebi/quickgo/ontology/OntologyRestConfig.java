@@ -4,7 +4,7 @@ import uk.ac.ebi.quickgo.ontology.controller.validation.OBOControllerValidationH
 import uk.ac.ebi.quickgo.ontology.controller.validation.OBOControllerValidationHelperImpl;
 import uk.ac.ebi.quickgo.rest.period.Period;
 import uk.ac.ebi.quickgo.rest.period.RemainingTimeSupplier;
-import uk.ac.ebi.quickgo.rest.period.PeriodParser;
+import uk.ac.ebi.quickgo.rest.period.DailyPeriodParser;
 import uk.ac.ebi.quickgo.rest.headers.HttpHeader;
 import uk.ac.ebi.quickgo.rest.headers.HttpHeadersProvider;
 
@@ -20,7 +20,7 @@ import org.springframework.http.HttpHeaders;
 import static java.util.stream.Collectors.toList;
 import static uk.ac.ebi.quickgo.common.validator.OntologyIdPredicate.isValidECOTermId;
 import static uk.ac.ebi.quickgo.common.validator.OntologyIdPredicate.isValidGOTermId;
-import static uk.ac.ebi.quickgo.rest.period.PeriodParser.PERIOD_DELIMITER;
+import static uk.ac.ebi.quickgo.rest.period.DailyPeriodParser.PERIOD_DELIMITER;
 
 /**
  * Configure the beans related to the operation of the restful service - id validation helpers and configuration
@@ -70,13 +70,13 @@ public class OntologyRestConfig {
 
     @Bean
     RemainingTimeSupplier maxAgeProvider(@Value("${ontology.caching.allowed.period}") String cachingAllowedPeriodValue,
-            PeriodParser periodParser) {
+            DailyPeriodParser dailyPeriodParser) {
         Collection<Period> cachingAllowedPeriods = null;
         if (Objects.nonNull(cachingAllowedPeriodValue)) {
             String[] periods = cachingAllowedPeriodValue.split(PERIOD_DELIMITER);
             try {
                 cachingAllowedPeriods = Arrays.stream(periods)
-                                              .map(s -> periodParser.parse(s))
+                                              .map(s -> dailyPeriodParser.parse(s))
                                               .collect(toList());
             } catch (Exception e) {
                 LOGGER.error("Failed to load caching allowed periods for ontology", e);
@@ -89,8 +89,8 @@ public class OntologyRestConfig {
     }
 
     @Bean
-    PeriodParser periodParser() {
-        return new PeriodParser();
+    DailyPeriodParser periodParser() {
+        return new DailyPeriodParser();
     }
 
     public interface OntologyPagingConfig {
