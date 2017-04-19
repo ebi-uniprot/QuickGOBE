@@ -48,7 +48,7 @@ public class DailyPeriodParser {
                                               .filter(Objects::nonNull)
                                               .collect(toList());
             if (dayTimeList.size() == REQUIRED_DAYTIME_INSTANCES) {
-                return new ReducingDailyPeriod(dayTimeList.get(0), dayTimeList.get(1));
+                return new RemainingTimePeriod(dayTimeList.get(0), dayTimeList.get(1));
             }
         }
         return null;

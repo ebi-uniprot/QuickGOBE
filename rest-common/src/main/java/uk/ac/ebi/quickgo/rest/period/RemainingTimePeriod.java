@@ -15,14 +15,14 @@ import javax.validation.constraints.NotNull;
  * Time: 12:46
  * Created with IntelliJ IDEA.
  */
-public class ReducingDailyPeriod implements Period {
+public class RemainingTimePeriod implements Period {
 
     @NotNull
     private final DateModifying start;
     @NotNull
     private final DateModifying end;
 
-    ReducingDailyPeriod(DateModifying start, DateModifying end) {
+    RemainingTimePeriod(DateModifying start, DateModifying end) {
         Preconditions.checkArgument(Objects.nonNull(start), "The ReducingDailyPeriod constructor start parameter " +
                 "must not be null.");
         Preconditions.checkArgument(Objects.nonNull(end),"The ReducingDailyPeriod constructor end parameter " +
