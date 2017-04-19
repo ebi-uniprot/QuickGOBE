@@ -31,7 +31,7 @@ public class PeriodParserTest {
 
         Period result = periodParser.parse(validInput);
         assertThat(result, notNullValue());
-        assertThat(result, instanceOf(CachingAllowedPeriod.class));
+        assertThat(result, instanceOf(ReducingTimePeriod.class));
     }
 
     @Test
