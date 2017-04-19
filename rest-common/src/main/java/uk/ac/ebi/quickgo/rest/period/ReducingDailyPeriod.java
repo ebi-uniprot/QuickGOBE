@@ -18,11 +18,11 @@ import javax.validation.constraints.NotNull;
 public class ReducingDailyPeriod implements Period {
 
     @NotNull
-    private final DayTime start;
+    private final DateModifying start;
     @NotNull
-    private final DayTime end;
+    private final DateModifying end;
 
-    ReducingDailyPeriod(DayTime start, DayTime end) {
+    ReducingDailyPeriod(DateModifying start, DateModifying end) {
         Preconditions.checkArgument(Objects.nonNull(start), "The ReducingDailyPeriod constructor start parameter " +
                 "must not be null.");
         Preconditions.checkArgument(Objects.nonNull(end),"The ReducingDailyPeriod constructor end parameter " +
