@@ -26,6 +26,7 @@ import java.util.function.Supplier;
  * Time: 15:47
  * Created with IntelliJ IDEA.
  */
+@Deprecated
 public class MaxAgeWhenStartBeforeEndTime implements Supplier<Duration>{
 
     private LocalTime start, end;
