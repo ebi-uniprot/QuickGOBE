@@ -15,7 +15,7 @@ import javax.validation.constraints.NotNull;
  * Time: 16:15
  * Created with IntelliJ IDEA.
  */
-class DayTime {
+class DayTime implements DateModifying {
 
     @NotNull DayOfWeek dayOfWeek;
     @NotNull LocalTime time;
@@ -34,7 +34,7 @@ class DayTime {
         this.time = time;
     }
 
-    LocalDateTime toInstant(LocalDateTime target) {
+    public LocalDateTime toInstant(LocalDateTime target) {
         LocalDateTime comparedDate = target.with(this.dayOfWeek);
         return comparedDate.with(this.time);
     }
