@@ -22,7 +22,7 @@ import static java.util.stream.Collectors.toList;
  * Created with IntelliJ IDEA.
  */
 public class PeriodParser {
-    public static final String CACHING_PERIOD_DELIMITER = ",";
+    public static final String PERIOD_DELIMITER = ",";
     private static final String DAY_TIME_REGEX = "^(MONDAY|TUESDAY|WEDNESDAY|THURSDAY|FRIDAY|SATURDAY|SUNDAY)\\(" +
             "([0-9]{2}):([0-9]{2})\\)";
     private static final Pattern DAY_TIME_PATTERN = Pattern.compile(DAY_TIME_REGEX);
@@ -36,7 +36,7 @@ public class PeriodParser {
      * Parse a string that contains a day of week and time in the format DAY(HH:MM)-DAY(HH:MM), to produce an
      * instance of CachingPeriodAllowed.
      * @param input String
-     * @return instance of CachingAllowedPeriod that defines a time period when clients can cache responses.
+     * @return instance of ReducingTimePeriod that defines a time period.
      */
     public Period parse(String input) {
         if (!Objects.nonNull(input) || input.isEmpty()) {
@@ -55,7 +55,7 @@ public class PeriodParser {
                                          "instances parsed from the input string is invalid, we require %s, but found" +
                                          " %s from %s.",
                                  REQUIRED_DAYTIME_INSTANCES, dayTimeList.size(), input);
-        return new CachingAllowedPeriod(dayTimeList.get(0), dayTimeList.get(1));
+        return new ReducingTimePeriod(dayTimeList.get(0), dayTimeList.get(1));
     }
 
     private DayTime toDayTime(String dayTime) {
