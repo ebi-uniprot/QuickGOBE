@@ -868,9 +868,10 @@ public abstract class OBOControllerIT {
         MvcResult mvcResult = mockMvc.perform(get(buildTermsURL(validId))).andReturn();
 
         String ccHeader = mvcResult.getResponse().getHeader(HttpHeaders.CACHE_CONTROL);
+        assertThat(ccHeader, org.hamcrest.Matchers.startsWith(CACHE_CONTROL_HEADER));
         String[] keyValEarlier = ccHeader.split("=");
 
-        assertThat(keyValEarlier[0], is(MAX_AGE));
+        assertThat(keyValEarlier[0], is(CACHE_CONTROL_HEADER));
         long maxAgeInFirstCall = Long.parseLong(keyValEarlier[1]);
         assertThat(maxAgeInFirstCall, is(greaterThanOrEqualTo(0L)));
 
@@ -882,7 +883,7 @@ public abstract class OBOControllerIT {
         ccHeader = mvcResult.getResponse().getHeader(HttpHeaders.CACHE_CONTROL);
         String[] keyValLater = ccHeader.split("=");
 
-        assertThat(keyValLater[0], is(MAX_AGE));
+        assertThat(keyValLater[0], is(CACHE_CONTROL_HEADER));
         long maxAgeInSecondCall = Long.parseLong(keyValLater[1]);
 
         //Compare earlier to later
