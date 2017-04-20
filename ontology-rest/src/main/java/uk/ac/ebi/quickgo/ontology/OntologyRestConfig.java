@@ -36,7 +36,7 @@ import static uk.ac.ebi.quickgo.common.validator.OntologyIdPredicate.isValidGOTe
 public class OntologyRestConfig {
 
     Logger LOGGER = LoggerFactory.getLogger(OntologyRestConfig.class);
-    public static final String MAX_AGE = "max-age";
+    public static final String MAX_AGE = "public, max-age";
     private static final String PERIOD_DELIMITER = ",";
 
     @Bean
