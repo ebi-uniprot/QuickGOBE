@@ -36,7 +36,7 @@ import static uk.ac.ebi.quickgo.common.validator.OntologyIdPredicate.isValidGOTe
 public class OntologyRestConfig {
 
     Logger LOGGER = LoggerFactory.getLogger(OntologyRestConfig.class);
-    public static final String MAX_AGE = "public, max-age";
+    public static final String CACHE_CONTROL_HEADER = "public, max-age";
     private static final String PERIOD_DELIMITER = ",";
 
     @Bean
@@ -62,7 +62,7 @@ public class OntologyRestConfig {
     @Bean
     public HttpHeadersProvider httpHeadersProvider(RemainingTimeSupplier maxAgeProvider) {
         List<HttpHeader> headerSources = new ArrayList<>();
-        HttpHeader headerSource = new HttpHeader(HttpHeaders.CACHE_CONTROL, MAX_AGE,
+        HttpHeader headerSource = new HttpHeader(HttpHeaders.CACHE_CONTROL, CACHE_CONTROL_HEADER,
                                                  () -> Long.toString(maxAgeProvider.get().getSeconds()));
         headerSources.add(headerSource);
         return new HttpHeadersProvider(headerSources);
