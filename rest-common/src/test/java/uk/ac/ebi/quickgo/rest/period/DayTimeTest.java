@@ -37,7 +37,7 @@ public class DayTimeTest {
     }
 
     @Test
-    public void modify(){
+    public void modifySuccessfully(){
         DayTime dayTime = new DayTime(DayOfWeek.FRIDAY, LocalTime.of(12, 37));
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime compared = now.with(DayOfWeek.FRIDAY);
@@ -47,5 +47,12 @@ public class DayTimeTest {
         LocalDateTime modified = dayTime.modify(now);
 
         assertThat(modified, equalTo(compared));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void modifyNullThrowsException(){
+        DayTime dayTime = new DayTime(DayOfWeek.FRIDAY, LocalTime.of(12, 37));
+
+        dayTime.modify(null);
     }
 }
