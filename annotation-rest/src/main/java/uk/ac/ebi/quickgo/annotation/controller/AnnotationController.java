@@ -17,6 +17,7 @@ import uk.ac.ebi.quickgo.rest.search.SearchService;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.query.RegularPage;
+import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 import uk.ac.ebi.quickgo.rest.search.request.converter.FilterConverterFactory;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformationRequests;
@@ -282,19 +283,8 @@ public class AnnotationController {
         Set<QuickGOQuery> filterQueries = new HashSet<>();
         Set<FilterContext> filterContexts = new HashSet<>();
 
-        request.createFilterRequests().stream()
-                .map(converterFactory::convert)
-                .forEach(convertedFilter -> {
-                    filterQueries.add(convertedFilter.getConvertedValue());
-                    convertedFilter.getFilterContext().ifPresent(filterContexts::add);
-                });
-
-        ResultTransformationRequests transformationRequests = request.createResultTransformationRequests();
-        if (!transformationRequests.getRequests().isEmpty()) {
-            FilterContext transformationContext = new FilterContext();
-            transformationContext.save(ResultTransformationRequests.class, transformationRequests);
-            filterContexts.add(transformationContext);
-        }
+        convertFilterRequests(request, filterQueries, filterContexts);
+        convertResultTransformationRequests(request, filterContexts);
 
         return new FilterQueryInfo() {
             @Override public Set<QuickGOQuery> getFilterQueries() {
@@ -305,6 +295,43 @@ public class AnnotationController {
                 return filterContexts.stream().reduce(new FilterContext(), FilterContext::merge);
             }
         };
+    }
+
+    /**
+     * Processes the list of {@link FilterRequest}s from the {@link AnnotationRequest} and
+     * adds corresponding {@link QuickGOQuery}s to the {@code filterQueries}, and {@link FilterContext}s
+     * to the {@code filterContext}s.
+     * @param request the annotation request
+     * @param filterQueries the {@link QuickGOQuery} list to append to
+     * @param filterContexts the {@link FilterContext} list to append to
+     */
+    private void convertFilterRequests(
+            AnnotationRequest request,
+            Set<QuickGOQuery> filterQueries,
+            Set<FilterContext> filterContexts) {
+        request.createFilterRequests().stream()
+                .map(converterFactory::convert)
+                .forEach(convertedFilter -> {
+                    filterQueries.add(convertedFilter.getConvertedValue());
+                    convertedFilter.getFilterContext().ifPresent(filterContexts::add);
+                });
+    }
+
+    /**
+     * Processes the {@link ResultTransformationRequests} instance from the {@link AnnotationRequest} and
+     * adds corresponding {@link FilterContext}s to the {@code filterContext}s.
+     * @param request the annotation request
+     * @param filterContexts the {@link FilterContext} list to append to
+     */
+    private void convertResultTransformationRequests(
+            AnnotationRequest request,
+            Set<FilterContext> filterContexts) {
+        ResultTransformationRequests transformationRequests = request.createResultTransformationRequests();
+        if (!transformationRequests.getRequests().isEmpty()) {
+            FilterContext transformationContext = new FilterContext();
+            transformationContext.save(ResultTransformationRequests.class, transformationRequests);
+            filterContexts.add(transformationContext);
+        }
     }
 
     private void checkBindingErrors(BindingResult bindingResult) {
