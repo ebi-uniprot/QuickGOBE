@@ -12,5 +12,12 @@ import java.time.LocalDateTime;
  */
 public interface DateModifier {
 
+    /**
+     * Create a new instance of LocalDateTime based on a combination of the argument and the values/logic held by
+     * implementing classes. The argument represents a specific instant in time, but a subclass could modify just the
+     * time to a set value (for whatever purpose).
+     * @param target
+     * @return
+     */
     LocalDateTime modify(LocalDateTime target);
 }
