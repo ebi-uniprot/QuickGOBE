@@ -42,4 +42,33 @@ public class MonthTime implements DateModifier {
         LocalDateTime comparedDate = target.with(this.monthDay);
         return comparedDate.with(this.time);
     }
+
+    @Override public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        MonthTime monthTime = (MonthTime) o;
+
+        if (monthDay != null ? !monthDay.equals(monthTime.monthDay) : monthTime.monthDay != null) {
+            return false;
+        }
+        return time != null ? time.equals(monthTime.time) : monthTime.time == null;
+    }
+
+    @Override public int hashCode() {
+        int result = monthDay != null ? monthDay.hashCode() : 0;
+        result = 31 * result + (time != null ? time.hashCode() : 0);
+        return result;
+    }
+
+    @Override public String toString() {
+        return "MonthTime{" +
+                "monthDay=" + monthDay +
+                ", time=" + time +
+                '}';
+    }
 }

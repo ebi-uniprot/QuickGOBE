@@ -40,4 +40,33 @@ public class RemainingTimePeriod implements Period {
         }
         return remaining;
     }
+
+    @Override public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        RemainingTimePeriod that = (RemainingTimePeriod) o;
+
+        if (start != null ? !start.equals(that.start) : that.start != null) {
+            return false;
+        }
+        return end != null ? end.equals(that.end) : that.end == null;
+    }
+
+    @Override public int hashCode() {
+        int result = start != null ? start.hashCode() : 0;
+        result = 31 * result + (end != null ? end.hashCode() : 0);
+        return result;
+    }
+
+    @Override public String toString() {
+        return "RemainingTimePeriod{" +
+                "start=" + start +
+                ", end=" + end +
+                '}';
+    }
 }
