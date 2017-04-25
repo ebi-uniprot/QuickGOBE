@@ -72,7 +72,7 @@ public class AbstractValueInjectorTest {
     }
 
     @Test(expected = RetrievalException.class)
-    public void restResponse5XXCausesException() {
+    public void fatalRestResponseCausesExeption() {
         ExecutionException executionException =
                 new ExecutionException(new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
         doThrow(new RetrievalException(executionException)).when(mockRestFetcher).convert(any());
