@@ -3,16 +3,12 @@ package uk.ac.ebi.quickgo.rest.period;
 import java.time.LocalTime;
 import java.time.Month;
 import java.time.MonthDay;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static java.util.stream.Collectors.toList;
 
 /**
  * Turn a string containing a definition for month, date And time into Period instance. Strings are required to be in
@@ -26,7 +22,7 @@ import static java.util.stream.Collectors.toList;
  * Time: 15:26
  * Created with IntelliJ IDEA.
  */
-public class MonthlyPeriodParser implements PeriodParser{
+public class MonthlyPeriodParser extends PeriodParser{
     private Logger LOGGER = LoggerFactory.getLogger(MonthlyPeriodParser.class);
 
     private static final String MONTH_DATE_TIME_REGEX = "^" +
@@ -38,7 +34,6 @@ public class MonthlyPeriodParser implements PeriodParser{
     private static final int HOUR_GROUP = 3;
     private static final int MINUTE_GROUP = 4;
     private static final int EXPECTED_GROUP_COUNT = 4;
-    private static final int REQUIRED_MONTH_TIME_INSTANCES = 2;
 
     /**
      * Parse a string that contains month, day of month and time in the format MONTH(date)(HH:MM)-MONTH(date)(HH:MM),
@@ -53,22 +48,7 @@ public class MonthlyPeriodParser implements PeriodParser{
         return Optional.empty();
     }
 
-    private Optional<Period> getPeriod(String input) {
-        String[] monthTimes = input.split("-");
-        if (monthTimes.length == REQUIRED_MONTH_TIME_INSTANCES) {
-            List<MonthTime> monthTimeList = Arrays.stream(monthTimes)
-                                                  .map(this::toMonthTime)
-                                                  .filter(Optional::isPresent)      //replace these two lines with
-                                                  .map(Optional::get)               //.map(Optional::stream) in Java 9
-                                                  .collect(toList());
-            if (monthTimeList.size() == REQUIRED_MONTH_TIME_INSTANCES) {
-                return Optional.of(new RemainingTimePeriod(monthTimeList.get(0), monthTimeList.get(1)));
-            }
-        }
-        return Optional.empty();
-    }
-
-    private Optional<MonthTime> toMonthTime(String input) {
+    protected Optional<DateModifying> toDateModifier(String input) {
         try {
             Matcher periodMatcher = MONTH_DATE_TIME_PATTERN.matcher(input);
             if(periodMatcher.matches() && periodMatcher.groupCount() == EXPECTED_GROUP_COUNT) {

@@ -2,8 +2,6 @@ package uk.ac.ebi.quickgo.rest.period;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -11,7 +9,6 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static java.util.stream.Collectors.toList;
 
 /**
  * Turn a string containing a definition for Day And Time into DayTime instance. Strings are required to be in the
@@ -23,7 +20,7 @@ import static java.util.stream.Collectors.toList;
  * Time: 15:26
  * Created with IntelliJ IDEA.
  */
-public class DailyPeriodParser implements PeriodParser{
+public class DailyPeriodParser extends PeriodParser{
     private static final Logger LOGGER = LoggerFactory.getLogger(DailyPeriodParser.class);
     private static final String DAY_TIME_REGEX = "^(MONDAY|TUESDAY|WEDNESDAY|THURSDAY|FRIDAY|SATURDAY|SUNDAY)\\(" +
             "([0-9]{2}):([0-9]{2})\\)";
@@ -32,8 +29,6 @@ public class DailyPeriodParser implements PeriodParser{
     private static final int HOUR_GROUP = 2;
     private static final int MINUTE_GROUP = 3;
     private static final int EXPECTED_GROUP_COUNT = 3;
-    private static final int REQUIRED_DAYTIME_INSTANCES = 2;
-    private static final String TOO_SYMBOL = "-";
 
     /**
      * Parse a string that contains a day of week and time in the format DAY(HH:MM)-DAY(HH:MM), to produce a Period
@@ -48,22 +43,7 @@ public class DailyPeriodParser implements PeriodParser{
         return Optional.empty();
     }
 
-    private Optional<Period> getPeriod(String input) {
-        String[] dayTimes = input.split(TOO_SYMBOL);
-        if (dayTimes.length == REQUIRED_DAYTIME_INSTANCES) {
-            List<DayTime> dayTimeList = Arrays.stream(dayTimes)
-                                              .map(this::toDayTime)
-                                              .filter(Optional::isPresent)
-                                              .map(Optional::get)
-                                              .collect(toList());
-            if (dayTimeList.size() == REQUIRED_DAYTIME_INSTANCES) {
-                return Optional.of(new RemainingTimePeriod(dayTimeList.get(0), dayTimeList.get(1)));
-            }
-        }
-        return Optional.empty();
-    }
-
-    private Optional<DayTime> toDayTime(String input) {
+    protected Optional<DateModifying> toDateModifier(String input) {
         try {
             Matcher periodMatcher = DAY_TIME_PATTERN.matcher(input);
             if(periodMatcher.matches() && periodMatcher.groupCount() == EXPECTED_GROUP_COUNT) {
