@@ -6,6 +6,7 @@ import java.time.MonthDay;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.slf4j.Logger;
@@ -25,8 +26,8 @@ import static java.util.stream.Collectors.toList;
  * Time: 15:26
  * Created with IntelliJ IDEA.
  */
-public class MonthlyPeriodParser {
-    Logger LOGGER = LoggerFactory.getLogger(MonthlyPeriodParser.class);
+public class MonthlyPeriodParser implements PeriodParser{
+    private Logger LOGGER = LoggerFactory.getLogger(MonthlyPeriodParser.class);
 
     private static final String MONTH_DATE_TIME_REGEX = "^" +
             "(JANUARY|FEBRUARY|MARCH|APRIL|MAY|JUNE|JULY|AUGUST|SEPTEMBER|OCTOBER|NOVEMBER|DECEMBER)\\(([0-9]{1,2})" +
@@ -41,29 +42,33 @@ public class MonthlyPeriodParser {
 
     /**
      * Parse a string that contains month, day of month and time in the format MONTH(date)(HH:MM)-MONTH(date)(HH:MM),
-     * to produce an instance of Period.
+     * to produce a Period instance.
      * @param input String
-     * @return instance of Period or null if no valid period could be parsed.
+     * @return instance an Optional of Period or an empty Optional if no valid period could be parsed.
      */
-    public Period parse(String input) {
-        if (!Objects.nonNull(input) || input.isEmpty()) {
-            return new ZeroDurationPeriod();
+    public Optional<Period> parse(String input) {
+        if (Objects.nonNull(input) && !input.isEmpty()) {
+            return getPeriod(input);
         }
-
-        String[] monthTimes = input.split("-");
-        if(monthTimes.length == REQUIRED_MONTH_TIME_INSTANCES) {
-            List<MonthTime> monthTimeList = Arrays.stream(monthTimes)
-                                              .map(this::toMonthTime)
-                                              .filter(Objects::nonNull)
-                                              .collect(toList());
-            if (monthTimeList.size() == REQUIRED_MONTH_TIME_INSTANCES) {
-                return new RemainingTimePeriod(monthTimeList.get(0), monthTimeList.get(1));
-            }
-        }
-        return null;
+        return Optional.empty();
     }
 
-    private MonthTime toMonthTime(String input) {
+    private Optional<Period> getPeriod(String input) {
+        String[] monthTimes = input.split("-");
+        if (monthTimes.length == REQUIRED_MONTH_TIME_INSTANCES) {
+            List<MonthTime> monthTimeList = Arrays.stream(monthTimes)
+                                                  .map(this::toMonthTime)
+                                                  .filter(Optional::isPresent)      //replace these two lines with
+                                                  .map(Optional::get)               //.map(Optional::stream) in Java 9
+                                                  .collect(toList());
+            if (monthTimeList.size() == REQUIRED_MONTH_TIME_INSTANCES) {
+                return Optional.of(new RemainingTimePeriod(monthTimeList.get(0), monthTimeList.get(1)));
+            }
+        }
+        return Optional.empty();
+    }
+
+    private Optional<MonthTime> toMonthTime(String input) {
         try {
             Matcher periodMatcher = MONTH_DATE_TIME_PATTERN.matcher(input);
             if(periodMatcher.matches() && periodMatcher.groupCount() == EXPECTED_GROUP_COUNT) {
@@ -72,11 +77,11 @@ public class MonthlyPeriodParser {
                 final int hours = Integer.parseInt(periodMatcher.group(HOUR_GROUP));
                 final int minutes = Integer.parseInt(periodMatcher.group(MINUTE_GROUP));
                 final MonthDay monthDay = MonthDay.of(month, dayOfMonth);
-                return new MonthTime(monthDay, LocalTime.of(hours, minutes));
+                return Optional.of(new MonthTime(monthDay, LocalTime.of(hours, minutes)));
             }
         } catch (Exception e) {
-            LOGGER.error("Failed to create valid MonthTime instance from " + input, e);
+            LOGGER.info("MonthlyPeriodParser parsed " + input + " but encountered an exception.", e);
         }
-        return null;
+        return Optional.empty();
     }
 }
