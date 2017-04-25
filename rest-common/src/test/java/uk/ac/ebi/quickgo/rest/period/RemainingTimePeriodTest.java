@@ -55,7 +55,6 @@ public class RemainingTimePeriodTest {
         assertThat(timeLeft, is(both(greaterThan(57L)).and(lessThan(63L))));
     }
 
-
     @Test
     public void durationZeroWhenNowAfterEndTime(){
         LocalDateTime now = LocalDateTime.now();
