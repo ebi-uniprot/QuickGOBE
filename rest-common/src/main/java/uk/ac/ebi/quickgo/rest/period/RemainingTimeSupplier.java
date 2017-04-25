@@ -18,7 +18,7 @@ import static java.util.Objects.nonNull;
  * Time: 12:45
  * Created with IntelliJ IDEA.
  */
-public class RemainingTimeSupplier implements Supplier<Duration> {
+public class RemainingTimeSupplier {
 
     private Collection<Period> periodCollection;
 
@@ -33,7 +33,7 @@ public class RemainingTimeSupplier implements Supplier<Duration> {
      * this instance. Return first non-zero Duration, or a Duration of Zero.
      * @return Duration left of any active periods, if they exist.
      */
-    public Duration get() {
+    public Duration getDuration() {
         LocalDateTime now = LocalDateTime.now();
         Optional<Duration> remainingTime = periodCollection.stream()
                                                            .map(p -> p.remainingTime(now))
