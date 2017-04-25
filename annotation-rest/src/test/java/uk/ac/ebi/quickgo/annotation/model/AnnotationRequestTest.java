@@ -515,7 +515,7 @@ public class AnnotationRequestTest {
     }
 
     @Test
-    public void zeroIncludedFieldResultsInOneResultTransformationRequest() {
+    public void zeroIncludedFieldResultsInZeroResultTransformationRequest() {
         assertThat(annotationRequest.createResultTransformationRequests().getRequests(), hasSize(0));
     }
 
