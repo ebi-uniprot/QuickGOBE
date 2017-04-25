@@ -60,7 +60,14 @@ public abstract class AbstractValueInjector<T> implements ResponseValueInjector 
         }
     }
 
-    private static boolean exceptionIsFatal(RetrievalException e) {
+    /**
+     * Defines whether a {@link RetrievalException} constitutes a fatal error, e.g., by
+     * analysing the stack trace.
+     *
+     * @param e the {@link RetrievalException}
+     * @return true if the supplied exception is fatal, else false
+     */
+    protected boolean exceptionIsFatal(RetrievalException e) {
         boolean isFatal = true;
         Throwable cause = e.getCause();
         if (cause != null) {
