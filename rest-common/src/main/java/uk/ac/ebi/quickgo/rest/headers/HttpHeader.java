@@ -25,7 +25,7 @@ public class HttpHeader {
 
     /**
      * A HTTP header name e.g. cache-control
-     * @return
+     * @return HTTP header name
      */
     String getHeaderName() {
         return headerName;
@@ -33,7 +33,7 @@ public class HttpHeader {
 
     /**
      * An argument for a HTTP header e.g. max-age=3600
-     * @return
+     * @return HTTP header argument
      */
     String getHeaderArgument() {
         return  (headerKey + "=" + headerFunction.get());
