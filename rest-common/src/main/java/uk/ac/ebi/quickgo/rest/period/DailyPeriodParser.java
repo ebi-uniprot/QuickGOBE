@@ -43,7 +43,7 @@ public class DailyPeriodParser extends PeriodParser{
         return Optional.empty();
     }
 
-    protected Optional<DateModifying> toDateModifier(String input) {
+    protected Optional<DateModifier> toDateModifier(String input) {
         try {
             Matcher periodMatcher = DAY_TIME_PATTERN.matcher(input);
             if(periodMatcher.matches() && periodMatcher.groupCount() == EXPECTED_GROUP_COUNT) {

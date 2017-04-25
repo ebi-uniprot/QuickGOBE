@@ -17,7 +17,7 @@ import javax.validation.constraints.NotNull;
  * Time: 11:19
  * Created with IntelliJ IDEA.
  */
-public class MonthTime implements DateModifying {
+public class MonthTime implements DateModifier {
 
     @NotNull private MonthDay monthDay;
     @NotNull private LocalTime time;

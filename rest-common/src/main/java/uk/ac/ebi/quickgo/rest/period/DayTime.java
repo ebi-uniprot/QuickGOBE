@@ -16,7 +16,7 @@ import javax.validation.constraints.NotNull;
  * Time: 16:15
  * Created with IntelliJ IDEA.
  */
-class DayTime implements DateModifying {
+class DayTime implements DateModifier {
 
     @NotNull private final DayOfWeek dayOfWeek;
     @NotNull private final LocalTime time;

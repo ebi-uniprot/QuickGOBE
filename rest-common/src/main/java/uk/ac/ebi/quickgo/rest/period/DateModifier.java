@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
  * Time: 12:00
  * Created with IntelliJ IDEA.
  */
-public interface DateModifying {
+public interface DateModifier {
 
     LocalDateTime toInstant(LocalDateTime target);
 }

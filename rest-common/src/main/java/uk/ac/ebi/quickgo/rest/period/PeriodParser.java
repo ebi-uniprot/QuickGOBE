@@ -30,7 +30,7 @@ public abstract class PeriodParser {
      * @param input a string that contains a duration definition.
      * @return DateModifying instance.
      */
-    protected abstract Optional<DateModifying> toDateModifier(String input);
+    protected abstract Optional<DateModifier> toDateModifier(String input);
 
     /**
      * Create a period instance from a String that defines a from and to duration.
@@ -40,11 +40,11 @@ public abstract class PeriodParser {
     protected Optional<Period> getPeriod(String input) {
         String[] fromTo = input.split(TOO_SYMBOL);
         if (fromTo.length == REQUIRED_DATE_MODIFYING_INSTANCES) {
-            List<DateModifying> durationList = Arrays.stream(fromTo)
-                                                     .map(this::toDateModifier)
-                                                     .filter(Optional::isPresent)   //replace these two lines with
-                                                     .map(Optional::get)            //.map(Optional::stream) in Java 9
-                                                     .collect(toList());
+            List<DateModifier> durationList = Arrays.stream(fromTo)
+                                                    .map(this::toDateModifier)
+                                                    .filter(Optional::isPresent)   //replace these two lines with
+                                                    .map(Optional::get)            //.map(Optional::stream) in Java 9
+                                                    .collect(toList());
             if (durationList.size() == REQUIRED_DATE_MODIFYING_INSTANCES) {
                 return Optional.of(new RemainingTimePeriod(durationList.get(0), durationList.get(1)));
             }
