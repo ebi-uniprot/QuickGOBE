@@ -41,6 +41,7 @@ public class MonthlyPeriodParser extends PeriodParser{
      * @param input String
      * @return instance an Optional of Period or an empty Optional if no valid period could be parsed.
      */
+    @Override
     public Optional<Period> parse(String input) {
         if (Objects.nonNull(input) && !input.isEmpty()) {
             return getPeriod(input);
@@ -48,6 +49,7 @@ public class MonthlyPeriodParser extends PeriodParser{
         return Optional.empty();
     }
 
+    @Override
     protected Optional<DateModifier> toDateModifier(String input) {
         try {
             Matcher periodMatcher = MONTH_DATE_TIME_PATTERN.matcher(input);

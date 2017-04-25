@@ -36,6 +36,7 @@ public class DailyPeriodParser extends PeriodParser{
      * @param input String
      * @return instance of Optional of Period which is empty if the period could be parsed.
      */
+    @Override
     public Optional<Period> parse(String input) {
         if (Objects.nonNull(input) && !input.isEmpty()) {
             return getPeriod(input);
@@ -43,6 +44,7 @@ public class DailyPeriodParser extends PeriodParser{
         return Optional.empty();
     }
 
+    @Override
     protected Optional<DateModifier> toDateModifier(String input) {
         try {
             Matcher periodMatcher = DAY_TIME_PATTERN.matcher(input);
