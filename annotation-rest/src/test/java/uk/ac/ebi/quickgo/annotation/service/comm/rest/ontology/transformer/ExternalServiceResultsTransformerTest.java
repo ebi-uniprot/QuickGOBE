@@ -33,7 +33,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * This class checks 
+ * This class checks the behaviour of {@link ExternalServiceResultsTransformer} instances and their interaction with
+ * {@link ResponseValueInjector} and {@link RESTFilterConverterFactory} instances.
  *
  * Created 06/04/17
  * @author Edd
@@ -75,7 +76,7 @@ public class ExternalServiceResultsTransformerTest {
     }
 
     @Test
-    public void transformingFilterContextWithGoNameRequestInCallToCorrectInjector() {
+    public void transformingFilterContextWithGoNameRequestResultsInCallToCorrectInjector() {
         FilterContext filterContext = createFilterContext(GO_NAME_REQUEST);
 
         List<Annotation> annotations = createMockedAnnotationList(2);
