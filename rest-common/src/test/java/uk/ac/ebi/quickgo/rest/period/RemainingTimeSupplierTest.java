@@ -26,13 +26,13 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class RemainingTimeSupplierTest {
 
-    @Mock private
-    Period allowedPeriod;
+    @Mock
+    private Period allowedPeriod;
     private static final Duration ONE_HOUR = Duration.ofHours(1);
+    private static final Duration TWO_HOUR = Duration.ofHours(2);
 
     @Test
     public void durationReturnedFromSinglePeriod() {
-        final Duration ONE_HOUR = Duration.ofHours(1);
         when(allowedPeriod.remainingTime(any(LocalDateTime.class))).thenReturn(ONE_HOUR);
 
         RemainingTimeSupplier remainingTimeSupplier =
@@ -42,10 +42,11 @@ public class RemainingTimeSupplierTest {
     }
 
     @Test
-    public void durationReturnedFromThirdPeriod() {
-        when(allowedPeriod.remainingTime(any(LocalDateTime.class))).thenReturn(Duration.ZERO);
-        when(allowedPeriod.remainingTime(any(LocalDateTime.class))).thenReturn(Duration.ZERO);
-        when(allowedPeriod.remainingTime(any(LocalDateTime.class))).thenReturn(ONE_HOUR);
+    public void durationReturnedFromFirstNonZeroPeriod() {
+        when(allowedPeriod.remainingTime(any(LocalDateTime.class))).thenReturn(Duration.ZERO)
+                                                                   .thenReturn(Duration.ZERO)
+                                                                   .thenReturn(ONE_HOUR)
+                                                                   .thenReturn(TWO_HOUR);
 
         RemainingTimeSupplier remainingTimeSupplier = new RemainingTimeSupplier(Arrays.asList(allowedPeriod,
                                                                                               allowedPeriod,
@@ -56,9 +57,9 @@ public class RemainingTimeSupplierTest {
 
     @Test
     public void noActivePeriodSoDurationIsZero() {
-        when(allowedPeriod.remainingTime(any(LocalDateTime.class))).thenReturn(Duration.ZERO);
-        when(allowedPeriod.remainingTime(any(LocalDateTime.class))).thenReturn(Duration.ZERO);
-        when(allowedPeriod.remainingTime(any(LocalDateTime.class))).thenReturn(Duration.ZERO);
+        when(allowedPeriod.remainingTime(any(LocalDateTime.class))).thenReturn(Duration.ZERO)
+                                                                   .thenReturn(Duration.ZERO)
+                                                                   .thenReturn(Duration.ZERO);
 
         RemainingTimeSupplier remainingTimeSupplier = new RemainingTimeSupplier(Arrays.asList(allowedPeriod,
                                                                                               allowedPeriod,
