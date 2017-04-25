@@ -69,6 +69,7 @@ public abstract class OBOControllerIT {
     private static final String RELATIONS_PARAM = "relations";
 
     private static final int RELATIONSHIP_CHAIN_LENGTH = 10;
+    public static final int WAIT_PERIOD = 10;
 
     @Autowired
     protected WebApplicationContext webApplicationContext;
@@ -876,7 +877,7 @@ public abstract class OBOControllerIT {
         assertThat(maxAgeInFirstCall, is(greaterThanOrEqualTo(0L)));
 
         //Now wait to see if cache expiry time changes.
-        Thread.sleep(5000);
+        Thread.sleep(WAIT_PERIOD);
 
         mvcResult = mockMvc.perform(get(buildTermsURL(validId))).andReturn();
 
