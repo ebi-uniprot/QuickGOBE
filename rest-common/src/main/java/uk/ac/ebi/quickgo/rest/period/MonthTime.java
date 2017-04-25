@@ -36,7 +36,7 @@ public class MonthTime implements DateModifier {
      * @param target to modify.
      * @return a particular instant in time.
      */
-    public LocalDateTime toInstant(LocalDateTime target) {
+    public LocalDateTime modify(LocalDateTime target) {
         Preconditions.checkArgument(Objects.nonNull(target), "A target LocalDateTime cannot be null");
         LocalDateTime comparedDate = target.with(this.monthDay);
         return comparedDate.with(this.time);

@@ -12,5 +12,5 @@ import java.time.LocalDateTime;
  */
 public interface DateModifier {
 
-    LocalDateTime toInstant(LocalDateTime target);
+    LocalDateTime modify(LocalDateTime target);
 }

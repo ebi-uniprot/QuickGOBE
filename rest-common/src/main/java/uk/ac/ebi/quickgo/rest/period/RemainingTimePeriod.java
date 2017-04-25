@@ -32,8 +32,8 @@ public class RemainingTimePeriod implements Period {
     }
 
     public Duration remainingTime(LocalDateTime target) {
-        LocalDateTime startDateTime = start.toInstant(target);
-        LocalDateTime endDateTime = end.toInstant(target);
+        LocalDateTime startDateTime = start.modify(target);
+        LocalDateTime endDateTime = end.modify(target);
         Duration remaining;
         if (target.isAfter(startDateTime) && target.isBefore(endDateTime)){
             remaining = Duration.between(target, endDateTime);

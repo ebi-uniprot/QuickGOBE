@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.Month;
 import java.time.MonthDay;
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -44,7 +43,7 @@ public class MonthTimeTest {
         MonthTime monthTime = new MonthTime(MONTH_DAY, TEA_TIME);
         LocalDateTime now = LocalDateTime.now();
 
-        LocalDateTime modifiedDateTime = monthTime.toInstant(now);
+        LocalDateTime modifiedDateTime = monthTime.modify(now);
 
         assertThat(modifiedDateTime.getYear(), is(now.getYear()));
         assertThat(modifiedDateTime.getMonth(), is(Month.APRIL));
