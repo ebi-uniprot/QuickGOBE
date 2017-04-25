@@ -1,13 +1,8 @@
-package uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer;
+package uk.ac.ebi.quickgo.rest.search.results.transformer;
 
-import uk.ac.ebi.quickgo.annotation.model.Annotation;
-import uk.ac.ebi.quickgo.annotation.service.comm.rest.common.transformer.ResponseValueInjector;
 import uk.ac.ebi.quickgo.rest.comm.FilterContext;
 import uk.ac.ebi.quickgo.rest.search.request.converter.RESTFilterConverterFactory;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
-import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformationRequest;
-import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformationRequests;
-import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformer;
 
 import java.util.List;
 import java.util.Set;
@@ -16,31 +11,32 @@ import java.util.stream.Collectors;
 import static com.google.common.base.Preconditions.checkArgument;
 
 /**
- * The purpose of this class is to insert ontology related information, available externally via RESTful services,
- * into a {@link QueryResult} of {@link Annotation}s.
+ * The purpose of this class is to insert information available externally via
+ * RESTful services, into a {@link QueryResult} of where the results have type, {@link R}.
  *
  * Created 06/04/17
  * @author Edd
  */
-public class ExternalServiceResultsTransformer implements ResultTransformer<QueryResult<Annotation>> {
+public class ExternalServiceResultsTransformer<R> implements ResultTransformer<QueryResult<R>> {
 
-    private static final ResultTransformationRequests EMPTY_TRANSFORMATION_REQUESTS = new ResultTransformationRequests();
+    private static final ResultTransformationRequests EMPTY_TRANSFORMATION_REQUESTS =
+            new ResultTransformationRequests();
     private final RESTFilterConverterFactory restFilterConverterFactory;
-    private final List<ResponseValueInjector> fieldInjectors;
+    private final List<ResponseValueInjector<R>> fieldInjectors;
     private final List<String> fieldsToAdd;
 
     public ExternalServiceResultsTransformer(RESTFilterConverterFactory restFilterConverterFactory,
-            List<ResponseValueInjector> fieldInjectors) {
+            List<ResponseValueInjector<R>> fieldInjectors) {
         checkArgument(restFilterConverterFactory != null,
                 "RESTFilterConverterFactory cannot be null");
-        checkArgument(fieldInjectors != null, "Supplied list of OntologyFieldInjectors cannot be null");
+        checkArgument(fieldInjectors != null, "Supplied list of ResponseValueInjectors cannot be null");
 
         this.restFilterConverterFactory = restFilterConverterFactory;
         this.fieldInjectors = fieldInjectors;
         this.fieldsToAdd = fieldInjectors.stream().map(ResponseValueInjector::getId).collect(Collectors.toList());
     }
 
-    @Override public QueryResult<Annotation> transform(QueryResult<Annotation> result, FilterContext filterContext) {
+    @Override public QueryResult<R> transform(QueryResult<R> result, FilterContext filterContext) {
         ResultTransformationRequests transformationRequests =
                 filterContext
                         .get(ResultTransformationRequests.class)
@@ -51,7 +47,7 @@ public class ExternalServiceResultsTransformer implements ResultTransformer<Quer
         requiredRequests.retainAll(fieldsToAdd);
 
         if (!requiredRequests.isEmpty()) {
-            List<ResponseValueInjector> requiredInjectors =
+            List<ResponseValueInjector<R>> requiredInjectors =
                     fieldInjectors.stream()
                             .filter(injector -> requiredRequests.contains(injector.getId()))
                             .collect(Collectors.toList());

@@ -1,7 +1,5 @@
-package uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer;
+package uk.ac.ebi.quickgo.rest.search.results.transformer;
 
-import uk.ac.ebi.quickgo.annotation.model.Annotation;
-import uk.ac.ebi.quickgo.annotation.service.comm.rest.common.transformer.ResponseValueInjector;
 import uk.ac.ebi.quickgo.rest.search.RetrievalException;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
@@ -14,40 +12,40 @@ import org.springframework.web.client.HttpClientErrorException;
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
- * This abstract class is responsible for providing the framework for supplementing an {@link Annotation} instance,
- * with a specialised value, through the use of a RESTful service. The value injected is specified in
+ * This abstract class is responsible for providing the framework for supplementing an {@link M} instance (e.g., a
+ * response), with a specialised value, through the use of a RESTful service. The value injected is specified in
  * concrete classes.
  *
  * Created 12/04/17
  * @author Edd
  */
-public abstract class AbstractValueInjector<T> implements ResponseValueInjector {
+public abstract class AbstractValueInjector<T, M> implements ResponseValueInjector<M> {
     private static final Logger LOGGER = getLogger(AbstractValueInjector.class);
 
     /**
      * Creates a {@link FilterRequest} tailored to this specific {@link AbstractValueInjector} implementation.
      *
-     * @param annotation the annotation upon with which the request can use values from
+     * @param model the model from which the request can use values
      * @return a tailored {@link FilterRequest}
      */
-    abstract FilterRequest buildFilterRequest(Annotation annotation);
+    public abstract FilterRequest buildFilterRequest(M model);
 
     /**
-     * The main logic used to inject new values into a given {@link Annotation} instance based on a
+     * The main logic used to inject new values into a given {@link M} instance based on a
      * {@link ConvertedFilter}, which contains the result of a RESTful response as its value.
      *
      * @param convertedRequest contains the RESTful response
-     * @param annotation the annotation into which to inject a new value
+     * @param model the model into which to inject a new value
      */
-    abstract void injectValueFromResponse(ConvertedFilter<T> convertedRequest, Annotation annotation);
+    public abstract void injectValueFromResponse(ConvertedFilter<T> convertedRequest, M model);
 
-    @Override public void inject(RESTFilterConverterFactory restFetcher, Annotation annotation) {
-        FilterRequest request = buildFilterRequest(annotation);
+    @Override public void inject(RESTFilterConverterFactory restFetcher, M model) {
+        FilterRequest request = buildFilterRequest(model);
 
         try {
             ConvertedFilter<T> convertedRequest = restFetcher.convert(request);
 
-            injectValueFromResponse(convertedRequest, annotation);
+            injectValueFromResponse(convertedRequest, model);
         } catch (RetrievalException e) {
             if (exceptionIsFatal(e)) {
                 LOGGER.error("Problem retrieving external service response from annotations service.", e);

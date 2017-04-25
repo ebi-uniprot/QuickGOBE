@@ -1,6 +1,5 @@
-package uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer;
+package uk.ac.ebi.quickgo.rest.search.results.transformer;
 
-import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.rest.comm.ResponseType;
 import uk.ac.ebi.quickgo.rest.search.RetrievalException;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
@@ -25,8 +24,8 @@ import static org.mockito.Mockito.when;
 
 /**
  * This test class demonstrates the desired behaviour of {@link AbstractValueInjector} instances, whereby:
- * a valid REST response will have its value injected into an annotation; a 404 response will leave the
- * annotation untouched; other http status codes will lead to an exception.
+ * a valid REST response will have its value injected into a model instance; a 404 response will leave the
+ * instance untouched; other http status codes will lead to an exception.
  *
  * Created 12/04/17
  * @author Edd
@@ -50,12 +49,12 @@ public class AbstractValueInjectorTest {
         ConcreteResponse concreteResponse = new ConcreteResponse(idFromResponse);
         ConvertedFilter<ConcreteResponse> stubConvertedFilter = new ConvertedFilter<>(concreteResponse);
         when(mockRestFetcher.<ConcreteResponse>convert(any())).thenReturn(stubConvertedFilter);
-        Annotation annotation = new Annotation();
-        assertThat(annotation.id, is(nullValue()));
+        ConcreteModel model = new ConcreteModel();
+        assertThat(model.id, is(nullValue()));
 
-        injector.inject(mockRestFetcher, annotation);
+        injector.inject(mockRestFetcher, model);
 
-        assertThat(annotation.id, is(idFromResponse));
+        assertThat(model.id, is(idFromResponse));
     }
 
     @Test
@@ -63,12 +62,12 @@ public class AbstractValueInjectorTest {
         ExecutionException executionException =
                 new ExecutionException(new HttpClientErrorException(HttpStatus.NOT_FOUND));
         doThrow(new RetrievalException(executionException)).when(mockRestFetcher).convert(any());
-        Annotation annotation = new Annotation();
-        assertThat(annotation.id, is(nullValue()));
+        ConcreteModel model = new ConcreteModel();
+        assertThat(model.id, is(nullValue()));
 
-        injector.inject(mockRestFetcher, annotation);
+        injector.inject(mockRestFetcher, model);
 
-        assertThat(annotation.id, is(nullValue()));
+        assertThat(model.id, is(nullValue()));
     }
 
     @Test(expected = RetrievalException.class)
@@ -76,26 +75,28 @@ public class AbstractValueInjectorTest {
         ExecutionException executionException =
                 new ExecutionException(new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
         doThrow(new RetrievalException(executionException)).when(mockRestFetcher).convert(any());
-        Annotation annotation = new Annotation();
+        ConcreteModel model = new ConcreteModel();
 
-        injector.inject(mockRestFetcher, annotation);
+        injector.inject(mockRestFetcher, model);
     }
 
-    private static class ConcreteValueInjector extends AbstractValueInjector<ConcreteResponse> {
+    private static class ConcreteValueInjector extends AbstractValueInjector<ConcreteResponse, ConcreteModel> {
 
         @Override public String getId() {
             // not required in test
             return null;
         }
 
-        @Override FilterRequest buildFilterRequest(Annotation annotation) {
+        @Override
+        public FilterRequest buildFilterRequest(ConcreteModel model) {
             // not required in test
             return null;
         }
 
-        @Override void injectValueFromResponse(
-                ConvertedFilter<ConcreteResponse> convertedRequest, Annotation annotation) {
-            annotation.id = convertedRequest.getConvertedValue().idFromResponse;
+        @Override
+        public void injectValueFromResponse(
+                ConvertedFilter<ConcreteResponse> convertedRequest, ConcreteModel model) {
+            model.id = convertedRequest.getConvertedValue().idFromResponse;
         }
 
     }
@@ -106,5 +107,9 @@ public class AbstractValueInjectorTest {
         }
 
         String idFromResponse;
+    }
+
+    private static class ConcreteModel {
+        String id;
     }
 }

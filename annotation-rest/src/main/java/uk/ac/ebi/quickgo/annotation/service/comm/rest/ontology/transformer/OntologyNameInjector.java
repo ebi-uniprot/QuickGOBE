@@ -4,6 +4,7 @@ import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.BasicOntology;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
+import uk.ac.ebi.quickgo.rest.search.results.transformer.AbstractValueInjector;
 
 import java.util.List;
 
@@ -14,7 +15,7 @@ import java.util.List;
  * Created 07/04/17
  * @author Edd
  */
-public class OntologyNameInjector extends AbstractValueInjector<BasicOntology> {
+public class OntologyNameInjector extends AbstractValueInjector<BasicOntology, Annotation> {
 
     static final String GO_ID = "goId";
     static final String GO_NAME = "goName";
@@ -24,14 +25,16 @@ public class OntologyNameInjector extends AbstractValueInjector<BasicOntology> {
         return GO_NAME;
     }
 
-    @Override FilterRequest buildFilterRequest(Annotation annotation) {
+    @Override
+    public FilterRequest buildFilterRequest(Annotation annotation) {
         return FilterRequest.newBuilder()
                         .addProperty(getId())
                         .addProperty(GO_ID, annotation.goId)
                         .build();
     }
 
-    @Override void injectValueFromResponse(ConvertedFilter<BasicOntology> convertedRequest, Annotation annotation) {
+    @Override
+    public void injectValueFromResponse(ConvertedFilter<BasicOntology> convertedRequest, Annotation annotation) {
         BasicOntology response = convertedRequest.getConvertedValue();
 
         List<BasicOntology.Result> results = response.getResults();

@@ -3,9 +3,7 @@ package uk.ac.ebi.quickgo.annotation.service.search;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationFields;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepoConfig;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
-import uk.ac.ebi.quickgo.annotation.service.comm.rest.common.transformer.ResponseValueInjector;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.OntologyNameInjector;
-import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.ExternalServiceResultsTransformer;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.SlimResultsTransformer;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.TaxonomyNameInjector;
 import uk.ac.ebi.quickgo.annotation.service.converter.AnnotationDocConverterImpl;
@@ -21,6 +19,8 @@ import uk.ac.ebi.quickgo.rest.search.query.SortCriterion;
 import uk.ac.ebi.quickgo.rest.search.request.converter.RESTFilterConverterFactory;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 import uk.ac.ebi.quickgo.rest.search.results.config.FieldNameTransformer;
+import uk.ac.ebi.quickgo.rest.search.results.transformer.ExternalServiceResultsTransformer;
+import uk.ac.ebi.quickgo.rest.search.results.transformer.ResponseValueInjector;
 import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformerChain;
 import uk.ac.ebi.quickgo.rest.search.solr.SolrQueryConverter;
 import uk.ac.ebi.quickgo.rest.search.solr.SolrRequestRetrieval;
@@ -181,7 +181,7 @@ public class SearchServiceConfig {
 
     @Bean
     public ResultTransformerChain<QueryResult<Annotation>> resultTransformerChain(
-            ExternalServiceResultsTransformer ontologyResultsTransformer) {
+            ExternalServiceResultsTransformer<Annotation> ontologyResultsTransformer) {
         ResultTransformerChain<QueryResult<Annotation>> transformerChain = new ResultTransformerChain<>();
         transformerChain.addTransformer(new SlimResultsTransformer());
         transformerChain.addTransformer(ontologyResultsTransformer);
@@ -189,11 +189,12 @@ public class SearchServiceConfig {
     }
 
     @Bean
-    public ExternalServiceResultsTransformer ontologyResultsTransformer(RESTFilterConverterFactory restFilterConverterFactory) {
-        List<ResponseValueInjector> responseValueInjectors = asList(
+    public ExternalServiceResultsTransformer<Annotation> ontologyResultsTransformer(RESTFilterConverterFactory
+    restFilterConverterFactory) {
+        List<ResponseValueInjector<Annotation>> responseValueInjectors = asList(
                 new OntologyNameInjector(),
                 new TaxonomyNameInjector());
-        return new ExternalServiceResultsTransformer(restFilterConverterFactory, responseValueInjectors);
+        return new ExternalServiceResultsTransformer<>(restFilterConverterFactory, responseValueInjectors);
     }
 
     @Bean

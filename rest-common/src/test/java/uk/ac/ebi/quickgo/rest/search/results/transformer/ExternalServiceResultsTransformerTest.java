@@ -1,13 +1,9 @@
-package uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer;
+package uk.ac.ebi.quickgo.rest.search.results.transformer;
 
-import uk.ac.ebi.quickgo.annotation.model.Annotation;
-import uk.ac.ebi.quickgo.annotation.service.comm.rest.common.transformer.ResponseValueInjector;
 import uk.ac.ebi.quickgo.rest.comm.FilterContext;
 import uk.ac.ebi.quickgo.rest.search.RetrievalException;
 import uk.ac.ebi.quickgo.rest.search.request.converter.RESTFilterConverterFactory;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
-import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformationRequest;
-import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformationRequests;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -54,7 +50,7 @@ public class ExternalServiceResultsTransformerTest {
     @Mock
     private FakeValueInjector mockTaxonNameInjector;
 
-    private ExternalServiceResultsTransformer resultsTransformer;
+    private ExternalServiceResultsTransformer<FakeResponseModel> resultsTransformer;
 
     @Before
     public void setUp() {
@@ -62,27 +58,28 @@ public class ExternalServiceResultsTransformerTest {
         when(mockTaxonNameInjector.getId()).thenReturn(TAXON_NAME_REQUEST);
 
         resultsTransformer =
-                new ExternalServiceResultsTransformer(mockRestFetcher, asList(mockGoNameInjector, mockTaxonNameInjector));
+                new ExternalServiceResultsTransformer<>(mockRestFetcher, asList(mockGoNameInjector,
+                        mockTaxonNameInjector));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void nullRESTFilterConverterFactoryCausesException() {
-        new ExternalServiceResultsTransformer(null, Collections.emptyList());
+        new ExternalServiceResultsTransformer<>(null, Collections.emptyList());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void nullFieldInjectorsCausesException() {
-        new ExternalServiceResultsTransformer(mockRestFetcher, null);
+        new ExternalServiceResultsTransformer<>(mockRestFetcher, null);
     }
 
     @Test
     public void transformingFilterContextWithGoNameRequestResultsInCallToCorrectInjector() {
         FilterContext filterContext = createFilterContext(GO_NAME_REQUEST);
 
-        List<Annotation> annotations = createMockedAnnotationList(2);
+        List<FakeResponseModel> annotations = createMockedAnnotationList(2);
         setValues(annotations, (docNum, ann) -> ann.goId = GO_ID + docNum);
 
-        QueryResult<Annotation> queryResult = createQueryResult(annotations);
+        QueryResult<FakeResponseModel> queryResult = createQueryResult(annotations);
         resultsTransformer.transform(queryResult, filterContext);
 
         verify(mockGoNameInjector, times(1)).inject(mockRestFetcher, annotations.get(0));
@@ -90,19 +87,19 @@ public class ExternalServiceResultsTransformerTest {
         verify(mockTaxonNameInjector, times(0)).inject(any(), any());
     }
 
-    private QueryResult<Annotation> createQueryResult(List<Annotation> annotations) {
+    private QueryResult<FakeResponseModel> createQueryResult(List<FakeResponseModel> annotations) {
         return new QueryResult.Builder<>(annotations.size(), annotations).build();
     }
 
     @Test
     public void transformingFilterContextWithMultipleRequestsResultsInCallsToCorrectInjector() {
         FilterContext filterContext = createFilterContext(GO_NAME_REQUEST, TAXON_NAME_REQUEST);
-        
-        List<Annotation> annotations = createMockedAnnotationList(2);
+
+        List<FakeResponseModel> annotations = createMockedAnnotationList(2);
         setValues(annotations, (docNum, ann) -> ann.goId = GO_ID + docNum);
         setValues(annotations, (docNum, ann) -> ann.taxonId = docNum);
 
-        QueryResult<Annotation> queryResult = createQueryResult(annotations);
+        QueryResult<FakeResponseModel> queryResult = createQueryResult(annotations);
         resultsTransformer.transform(queryResult, filterContext);
 
         verify(mockGoNameInjector, times(1)).inject(mockRestFetcher, annotations.get(0));
@@ -119,7 +116,7 @@ public class ExternalServiceResultsTransformerTest {
                 new ExecutionException(new HttpClientErrorException(HttpStatus.NOT_FOUND));
         doThrow(new RetrievalException(executionException)).when(mockRestFetcher).convert(any());
 
-        List<Annotation> annotations = createMockedAnnotationList(1);
+        List<FakeResponseModel> annotations = createMockedAnnotationList(1);
         assertThat(annotations.get(0).goName, is(nullValue()));
 
         resultsTransformer.transform(createQueryResult(annotations), filterContext);
@@ -129,10 +126,10 @@ public class ExternalServiceResultsTransformerTest {
     }
 
     // -------------------- helpers --------------------
-    private List<Annotation> createMockedAnnotationList(int docCount) {
-        List<Annotation> annotations = new ArrayList<>();
+    private List<FakeResponseModel> createMockedAnnotationList(int docCount) {
+        List<FakeResponseModel> annotations = new ArrayList<>();
         for (int i = 0; i < docCount; i++) {
-            annotations.add(new Annotation());
+            annotations.add(new FakeResponseModel());
         }
         return annotations;
     }
@@ -159,13 +156,20 @@ public class ExternalServiceResultsTransformerTest {
     /**
      * Used only for mocking purposes
      */
-    private static class FakeValueInjector implements ResponseValueInjector {
+    private static class FakeValueInjector implements ResponseValueInjector<FakeResponseModel> {
         @Override public String getId() {
             return "fake id";
         }
 
-        @Override public void inject(RESTFilterConverterFactory restFetcher, Annotation annotation) {
+        @Override public void inject(RESTFilterConverterFactory restFetcher, FakeResponseModel annotation) {
             // not implemented
         }
+    }
+
+    private static class FakeResponseModel {
+        String goId;
+        String goName;
+        int taxonId;
+        String taxonName;
     }
 }
