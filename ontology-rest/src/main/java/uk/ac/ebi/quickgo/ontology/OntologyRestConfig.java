@@ -35,7 +35,7 @@ import static uk.ac.ebi.quickgo.common.validator.OntologyIdPredicate.isValidGOTe
 @EnableConfigurationProperties(OntologyRestProperties.class)
 public class OntologyRestConfig {
 
-    Logger LOGGER = LoggerFactory.getLogger(OntologyRestConfig.class);
+    private Logger LOGGER = LoggerFactory.getLogger(OntologyRestConfig.class);
     public static final String CACHE_CONTROL_HEADER = "public, max-age";
     private static final String PERIOD_DELIMITER = ",";
 
@@ -61,11 +61,9 @@ public class OntologyRestConfig {
      */
     @Bean
     public HttpHeadersProvider httpHeadersProvider(RemainingTimeSupplier maxAgeProvider) {
-        List<HttpHeader> headerSources = new ArrayList<>();
         HttpHeader headerSource = new HttpHeader(HttpHeaders.CACHE_CONTROL, CACHE_CONTROL_HEADER,
                                                  () -> Long.toString(maxAgeProvider.get().getSeconds()));
-        headerSources.add(headerSource);
-        return new HttpHeadersProvider(headerSources);
+        return new HttpHeadersProvider(Collections.singletonList(headerSource));
     }
 
     @Bean
@@ -76,16 +74,17 @@ public class OntologyRestConfig {
             String[] periods = cachingAllowedPeriodValue.split(PERIOD_DELIMITER);
             try {
                 cachingAllowedPeriods = Arrays.stream(periods)
-                                              .map(s -> dailyPeriodParser.parse(s))
+                                              .map(dailyPeriodParser::parse)
+                                              .filter(Optional::isPresent)
+                                              .map(Optional::get)
                                               .collect(toList());
             } catch (Exception e) {
                 LOGGER.error("Failed to load caching allowed periods for ontology", e);
             }
         }
-        RemainingTimeSupplier maxAgeProvider =
+        return
                 new RemainingTimeSupplier(Objects.nonNull(cachingAllowedPeriods) ? cachingAllowedPeriods : new
                         ArrayList<>());
-        return maxAgeProvider;
     }
 
     @Bean
