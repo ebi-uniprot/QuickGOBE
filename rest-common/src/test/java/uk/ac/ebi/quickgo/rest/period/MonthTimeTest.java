@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.core.IsNull.notNullValue;
 
 /**
  * @author Tony Wardell
@@ -25,7 +26,8 @@ public class MonthTimeTest {
 
     @Test
     public void successfulCreation(){
-        new MonthTime(MONTH_DAY, TEA_TIME);
+        MonthTime monthTime = new MonthTime(MONTH_DAY, TEA_TIME);
+        assertThat(monthTime, notNullValue());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -52,4 +54,13 @@ public class MonthTimeTest {
         assertThat(modifiedDateTime.getMinute(), is(MINUTE));
     }
 
+
+    @Test(expected = IllegalArgumentException.class)
+    public void nullPassedToModifyThrowsException(){
+        MonthTime monthTime = new MonthTime(MONTH_DAY, TEA_TIME);
+
+        monthTime.modify(null);
+
+
+    }
 }
