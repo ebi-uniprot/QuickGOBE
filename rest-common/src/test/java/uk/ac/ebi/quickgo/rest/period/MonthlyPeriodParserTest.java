@@ -1,12 +1,11 @@
 package uk.ac.ebi.quickgo.rest.period;
 
-import java.time.DateTimeException;
-import org.junit.Before;
+import java.util.Optional;
 import org.junit.Test;
 
+import static java.util.Optional.empty;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.nullValue;
-import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 
 /**
@@ -25,78 +24,76 @@ public class MonthlyPeriodParserTest {
     public void validInputStringWithDoubleAndSingleDigitDaysOfMonth(){
         String validInput="JANUARY(12)(21:30)-FEBRUARY(2)(18:15)";
 
-        Period result = monthlyPeriodParser.parse(validInput);
+        Optional<Period> result = monthlyPeriodParser.parse(validInput);
 
-        assertThat(result, notNullValue());
-        assertThat(result, instanceOf(RemainingTimePeriod.class));
+        assertThat(result.get(), instanceOf(RemainingTimePeriod.class));
     }
 
     @Test
     public void validInputStringWithDoubleAndSingleDigitTimes(){
         String validInput="JANUARY(12)(5:7)-FEBRUARY(2)(18:15)";
 
-        Period result = monthlyPeriodParser.parse(validInput);
+        Optional<Period> result = monthlyPeriodParser.parse(validInput);
 
-        assertThat(result, notNullValue());
-        assertThat(result, instanceOf(RemainingTimePeriod.class));
+        assertThat(result.get(), instanceOf(RemainingTimePeriod.class));
     }
 
     @Test
     public void nullInput(){
-        Period result = monthlyPeriodParser.parse(null);
+        Optional<Period> result = monthlyPeriodParser.parse(null);
 
-        assertThat(result, instanceOf(ZeroDurationPeriod.class));
+        assertThat(result, equalTo(empty()));
     }
 
     @Test
     public void emptyInput(){
-        Period result = monthlyPeriodParser.parse("");
+        Optional<Period> result = monthlyPeriodParser.parse("");
 
-        assertThat(result, instanceOf(ZeroDurationPeriod.class));
+        assertThat(result, equalTo(empty()));
     }
 
     @Test
     public void toLittleData(){
         String invalidInput="JANUARY(12)(21:30)-";
 
-        Period result = monthlyPeriodParser.parse(invalidInput);
+        Optional<Period> result = monthlyPeriodParser.parse(invalidInput);
 
-        assertThat(result, nullValue());
+        assertThat(result, equalTo(empty()));
     }
 
     @Test
     public void tooMuchData(){
         String invalidInput="JANUARY(12)(21:30)-FEBRUARY(2)(18:15)-DECEMBER(25)(3:00";
 
-        Period result = monthlyPeriodParser.parse(invalidInput);
+        Optional<Period> result = monthlyPeriodParser.parse(invalidInput);
 
-        assertThat(result, nullValue());
+        assertThat(result, equalTo(empty()));
     }
 
     @Test
     public void wontMatchRegularExpression(){
         String invalidInput="BIMBLE(21:30)-FEBRUARY(21:30)";
 
-        Period result = monthlyPeriodParser.parse(invalidInput);
+        Optional<Period> result = monthlyPeriodParser.parse(invalidInput);
 
-        assertThat(result, nullValue());
+        assertThat(result, equalTo(empty()));
     }
 
     @Test
     public void matchesRegularExpressionButNotAValidTime(){
         String invalidInput="JANUARY(4)(21:30)-FEBRUARY(5)(33:30)";
 
-        Period result = monthlyPeriodParser.parse(invalidInput);
+        Optional<Period> result = monthlyPeriodParser.parse(invalidInput);
 
-        assertThat(result, nullValue());
+        assertThat(result, equalTo(empty()));
     }
 
     @Test
     public void matchesRegularExpressionButNotAValidDayOfMonth(){
         String invalidInput="JANUARY(54)(21:30)-FEBRUARY(101)(10:30)";
 
-        Period result = monthlyPeriodParser.parse(invalidInput);
+        Optional<Period> result = monthlyPeriodParser.parse(invalidInput);
 
-        assertThat(result, nullValue());
+        assertThat(result, equalTo(empty()));
     }
 }
