@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
  * the format MONTH(DATE)(HH:MM)-MONTH(DATE)(HH:MM) which defines a start month, day of month and time to an end
  * month, day of month and time.
  * An example input string
- * could be <code>JANUARY(15)(09:00)-JUNE(19)(17:00)</code>s
+ * could be <code>JANUARY(15)(09:00)-JUNE(19)(17:00)</code>
  *
  * @author Tony Wardell
  * Date: 11/04/2017

@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Turn a string containing a definition for Day And Time into DayTime instance. Strings are required to be in the
  * format DAY(HH:MM)-DAY(HH:MM) which defines a start day and time to an end day and time. An example input string
- * could be <code>MONDAY(09:00)-FRIDAY(17:00)</code>s
+ * could be <code>MONDAY(09:00)-FRIDAY(17:00)</code>
  *
  * @author Tony Wardell
  * Date: 11/04/2017
