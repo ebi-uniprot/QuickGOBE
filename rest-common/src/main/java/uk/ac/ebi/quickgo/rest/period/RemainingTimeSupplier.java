@@ -5,7 +5,6 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 import static java.util.Objects.nonNull;
 
@@ -20,7 +19,7 @@ import static java.util.Objects.nonNull;
  */
 public class RemainingTimeSupplier {
 
-    private Collection<Period> periodCollection;
+    private final Collection<Period> periodCollection;
 
     public RemainingTimeSupplier(Collection<Period> periodCollection) {
         Preconditions.checkArgument(nonNull(periodCollection), "The collection of periods to check must not " +
@@ -30,14 +29,14 @@ public class RemainingTimeSupplier {
 
     /**
      * Calculate and return the {@link Duration} between {@link LocalDateTime} 'now' and the {@link Period}s held by
-     * this instance. Return first non-zero Duration, or a Duration of Zero.
+     * this instance. Return first non-zero Duration, or a Duration of zero.
      * @return Duration left of any active periods, if they exist.
      */
     public Duration getDuration() {
         LocalDateTime now = LocalDateTime.now();
         Optional<Duration> remainingTime = periodCollection.stream()
                                                            .map(p -> p.remainingTime(now))
-                                                           .filter(d -> !d.isZero())
+                                                           .filter(duration -> !duration.isZero())
                                                            .findFirst();
         return remainingTime.orElse(Duration.ZERO);
     }
