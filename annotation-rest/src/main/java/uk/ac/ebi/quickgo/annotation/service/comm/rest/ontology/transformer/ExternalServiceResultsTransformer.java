@@ -9,7 +9,6 @@ import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformationReq
 import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformationRequests;
 import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformer;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -47,9 +46,8 @@ public class ExternalServiceResultsTransformer implements ResultTransformer<Quer
                         .get(ResultTransformationRequests.class)
                         .orElse(EMPTY_TRANSFORMATION_REQUESTS);
 
-        Set<String> allRequests = transformationRequests.getRequests().stream().map(
+        Set<String> requiredRequests = transformationRequests.getRequests().stream().map(
                 ResultTransformationRequest::getId).collect(Collectors.toSet());
-        Set<String> requiredRequests = new HashSet<>(allRequests);
         requiredRequests.retainAll(fieldsToAdd);
 
         if (!requiredRequests.isEmpty()) {
