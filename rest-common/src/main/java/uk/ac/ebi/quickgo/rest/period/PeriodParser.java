@@ -1,5 +1,7 @@
 package uk.ac.ebi.quickgo.rest.period;
 
+import java.util.Optional;
+
 /**
  * Interface for classes that interpret a String as a period definition.
  * @author Tony Wardell
@@ -12,8 +14,7 @@ public interface PeriodParser {
     /**
      * Parse a String that contains a definition of a time period, to produce an instance of Period.
      * @param input String
-     * @return instance of Period or null if no valid period could be parsed. Nulls are returned so parser can be
-     * chained if necessary, any non-null values are therefore valid to be used.
+     * @return instance an Optional of Period or an empty Optional if no valid period could be parsed.
      */
-    Period parse(String input);
+    Optional<Period> parse(String input);
 }
