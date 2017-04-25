@@ -22,7 +22,7 @@ public class DailyPeriodParserTest {
     private final DailyPeriodParser dailyPeriodParser = new DailyPeriodParser();
 
     @Test
-    public void validInputString(){
+    public void validInputCreatesPeriodSuccessfully(){
         String validInput="MONDAY(21:30)-TUESDAY(21:30)";
         DateModifier start = new DayTime(DayOfWeek.MONDAY, LocalTime.of(21, 30));
         DateModifier end = new DayTime(DayOfWeek.TUESDAY, LocalTime.of(21, 30));
@@ -34,21 +34,21 @@ public class DailyPeriodParserTest {
     }
 
     @Test
-    public void nullInput(){
+    public void nullInputCreatesEmptyPeriod(){
         Optional<Period> result = dailyPeriodParser.parse(null);
 
         assertThat(result, equalTo(empty()));
     }
 
     @Test
-    public void emptyInput(){
+    public void emptyInputCreatesEmptyPeriod(){
         Optional<Period> result = dailyPeriodParser.parse("");
 
         assertThat(result, equalTo(empty()));
     }
 
     @Test
-    public void missingDataCreatesEmptyPeriod(){
+    public void missingEndValueCreatesEmptyPeriod(){
         String invalidInput="MONDAY(21:30)-";
 
         Optional<Period> result = dailyPeriodParser.parse(invalidInput);
@@ -75,7 +75,7 @@ public class DailyPeriodParserTest {
     }
 
     @Test
-    public void invalidTimeCreatesEmptyPeriod(){
+    public void invalidEndTimeCreatesEmptyPeriod(){
         String invalidInput="MONDAY(21:30)-TUESDAY(33:30)";
 
         Optional<Period> result = dailyPeriodParser.parse(invalidInput);
