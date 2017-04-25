@@ -46,4 +46,33 @@ class DayTime implements DateModifier {
         LocalDateTime comparedDate = target.with(this.dayOfWeek);
         return comparedDate.with(this.time);
     }
+
+    @Override public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        DayTime dayTime = (DayTime) o;
+
+        if (dayOfWeek != dayTime.dayOfWeek) {
+            return false;
+        }
+        return time != null ? time.equals(dayTime.time) : dayTime.time == null;
+    }
+
+    @Override public int hashCode() {
+        int result = dayOfWeek != null ? dayOfWeek.hashCode() : 0;
+        result = 31 * result + (time != null ? time.hashCode() : 0);
+        return result;
+    }
+
+    @Override public String toString() {
+        return "DayTime{" +
+                "dayOfWeek=" + dayOfWeek +
+                ", time=" + time +
+                '}';
+    }
 }
