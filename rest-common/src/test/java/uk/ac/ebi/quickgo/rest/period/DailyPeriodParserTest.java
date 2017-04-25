@@ -10,7 +10,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 
 /**
- * Tests the creation of DayTime instances from PeriodParser.
+ * Tests the creation of DayTime instances from DailyPeriodParser.
  *
  * @author Tony Wardell
  * Date: 12/04/2017
