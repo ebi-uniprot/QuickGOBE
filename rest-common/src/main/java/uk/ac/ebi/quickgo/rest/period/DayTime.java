@@ -5,7 +5,6 @@ import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Objects;
-import javax.validation.constraints.NotNull;
 
 /**
  * Data structure holds union of day of week and time. Used to declare events that have a daily occurrence at a set
@@ -22,7 +21,8 @@ class DayTime implements DateModifier {
     private final LocalTime time;
 
     /**
-     * Create an instance of DayTime from {@link DayOfWeek} and {@link LocalTime} instance.
+     * Given a target time, this method returns a {@link LocalDateTime} instance that has the same day and time as
+     * target.
      * @param dayOfWeek this class represents.
      * @param time this class represents.
      */
@@ -40,6 +40,7 @@ class DayTime implements DateModifier {
      * @param target to modify.
      * @return a particular instant in time.
      */
+    @Override
     public LocalDateTime modify(LocalDateTime target) {
         Preconditions.checkArgument(Objects.nonNull(target), "A target LocalDateTime cannot be null");
         LocalDateTime comparedDate = target.with(this.dayOfWeek);
