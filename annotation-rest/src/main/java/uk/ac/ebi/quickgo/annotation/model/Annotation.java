@@ -25,6 +25,9 @@ public class Annotation {
 
     public String goId;
 
+    /**
+     * An optional field whose value originates from an external service.
+     */
     public String goName;
 
     public String goEvidence;
@@ -40,6 +43,9 @@ public class Annotation {
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     public int taxonId;
 
+    /**
+     * An optional field whose value originates from an external service.
+     */
     public String taxonName;
 
     public String assignedBy;
