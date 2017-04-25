@@ -1,11 +1,13 @@
 package uk.ac.ebi.quickgo.rest.period;
 
+import java.time.LocalTime;
+import java.time.Month;
+import java.time.MonthDay;
 import java.util.Optional;
 import org.junit.Test;
 
 import static java.util.Optional.empty;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertThat;
 
 /**
@@ -23,19 +25,25 @@ public class MonthlyPeriodParserTest {
     @Test
     public void validInputStringWithDoubleAndSingleDigitDaysOfMonth(){
         String validInput="JANUARY(12)(21:30)-FEBRUARY(2)(18:15)";
+        DateModifier start = new MonthTime(MonthDay.of(Month.JANUARY, 12), LocalTime.of(21, 30));
+        DateModifier end  = new MonthTime(MonthDay.of(Month.FEBRUARY, 2), LocalTime.of(18, 15));
+        RemainingTimePeriod remainingTimePeriod = new RemainingTimePeriod(start, end);
 
         Optional<Period> result = monthlyPeriodParser.parse(validInput);
 
-        assertThat(result.get(), instanceOf(RemainingTimePeriod.class));
+        assertThat(result.get(), equalTo(remainingTimePeriod));
     }
 
     @Test
     public void validInputStringWithDoubleAndSingleDigitTimes(){
         String validInput="JANUARY(12)(5:7)-FEBRUARY(2)(18:15)";
+        DateModifier start = new MonthTime(MonthDay.of(Month.JANUARY, 12), LocalTime.of(5, 7));
+        DateModifier end  = new MonthTime(MonthDay.of(Month.FEBRUARY, 2), LocalTime.of(18, 15));
+        RemainingTimePeriod remainingTimePeriod = new RemainingTimePeriod(start, end);
 
         Optional<Period> result = monthlyPeriodParser.parse(validInput);
 
-        assertThat(result.get(), instanceOf(RemainingTimePeriod.class));
+        assertThat(result.get(), equalTo(remainingTimePeriod));
     }
 
     @Test
@@ -71,7 +79,7 @@ public class MonthlyPeriodParserTest {
     }
 
     @Test
-    public void wontMatchRegularExpression(){
+    public void parsingInvalidMonthGivesEmptyPeriod(){
         String invalidInput="BIMBLE(21:30)-FEBRUARY(21:30)";
 
         Optional<Period> result = monthlyPeriodParser.parse(invalidInput);

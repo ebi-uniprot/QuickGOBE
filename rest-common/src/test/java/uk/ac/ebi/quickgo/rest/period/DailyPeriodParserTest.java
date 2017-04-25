@@ -1,11 +1,12 @@
 package uk.ac.ebi.quickgo.rest.period;
 
+import java.time.DayOfWeek;
+import java.time.LocalTime;
 import java.util.Optional;
 import org.junit.Test;
 
 import static java.util.Optional.empty;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertThat;
 
 /**
@@ -23,9 +24,13 @@ public class DailyPeriodParserTest {
     @Test
     public void validInputString(){
         String validInput="MONDAY(21:30)-TUESDAY(21:30)";
+        DateModifier start = new DayTime(DayOfWeek.MONDAY, LocalTime.of(21, 30));
+        DateModifier end = new DayTime(DayOfWeek.TUESDAY, LocalTime.of(21, 30));
+        RemainingTimePeriod remainingTimePeriod = new RemainingTimePeriod(start, end);
 
         Optional<Period> result = dailyPeriodParser.parse(validInput);
-        assertThat(result.get(), instanceOf(RemainingTimePeriod.class));
+
+        assertThat(result.get(), equalTo(remainingTimePeriod));
     }
 
     @Test
@@ -43,7 +48,7 @@ public class DailyPeriodParserTest {
     }
 
     @Test
-    public void toLittleData(){
+    public void missingDataCreatesEmptyPeriod(){
         String invalidInput="MONDAY(21:30)-";
 
         Optional<Period> result = dailyPeriodParser.parse(invalidInput);
@@ -52,7 +57,7 @@ public class DailyPeriodParserTest {
     }
 
     @Test
-    public void tooMuchData(){
+    public void tooMuchDataCreatesEmptyPeriod(){
         String invalidInput="MONDAY(21:30)-TUESDAY(21:30)-WEDNESDAY(21:30)";
 
         Optional<Period> result = dailyPeriodParser.parse(invalidInput);
@@ -61,7 +66,7 @@ public class DailyPeriodParserTest {
     }
 
     @Test
-    public void wontMatchRegularExpression(){
+    public void invalidDayOfWeekCreateEmptyPeriod(){
         String invalidInput="MONDAY(21:30)-FEBRUARY(21:30)";
 
         Optional<Period> result = dailyPeriodParser.parse(invalidInput);
@@ -70,7 +75,7 @@ public class DailyPeriodParserTest {
     }
 
     @Test
-    public void matchesRegularExpressionButNotAValidTime(){
+    public void invalidTimeCreatesEmptyPeriod(){
         String invalidInput="MONDAY(21:30)-TUESDAY(33:30)";
 
         Optional<Period> result = dailyPeriodParser.parse(invalidInput);

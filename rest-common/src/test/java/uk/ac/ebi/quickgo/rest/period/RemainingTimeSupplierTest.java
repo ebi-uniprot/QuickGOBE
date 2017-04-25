@@ -38,7 +38,7 @@ public class RemainingTimeSupplierTest {
         RemainingTimeSupplier remainingTimeSupplier =
                 new RemainingTimeSupplier(Collections.singletonList(allowedPeriod));
 
-        assertThat(remainingTimeSupplier.get(), is(ONE_HOUR));
+        assertThat(remainingTimeSupplier.getDuration(), is(ONE_HOUR));
     }
 
     @Test
@@ -51,7 +51,7 @@ public class RemainingTimeSupplierTest {
                                                                                               allowedPeriod,
                                                                                               allowedPeriod));
 
-        assertThat(remainingTimeSupplier.get(), is(ONE_HOUR));
+        assertThat(remainingTimeSupplier.getDuration(), is(ONE_HOUR));
     }
 
     @Test
@@ -64,14 +64,14 @@ public class RemainingTimeSupplierTest {
                                                                                               allowedPeriod,
                                                                                               allowedPeriod));
 
-        assertThat(remainingTimeSupplier.get(), is(Duration.ZERO));
+        assertThat(remainingTimeSupplier.getDuration(), is(Duration.ZERO));
     }
 
     @Test
     public void noDurationFoundFromEmptyPeriodList() {
         RemainingTimeSupplier remainingTimeSupplier = new RemainingTimeSupplier(new ArrayList<>());
 
-        final Duration timeLeft = remainingTimeSupplier.get();
+        final Duration timeLeft = remainingTimeSupplier.getDuration();
 
         assertThat(timeLeft, is(Duration.ZERO));
     }
