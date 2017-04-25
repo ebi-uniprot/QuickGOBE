@@ -4,10 +4,9 @@ import com.google.common.base.Preconditions;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Objects;
-import javax.validation.constraints.NotNull;
 
 /**
- * An implementation of a {@link Period} which uses two values for {@link DayTime} as start and end points to
+ * An implementation of a {@link Period} which uses two values of {@link DateModifier} as start and end points to
  * determine remaining time.
  *
  * @author Tony Wardell
@@ -17,20 +16,19 @@ import javax.validation.constraints.NotNull;
  */
 public class RemainingTimePeriod implements Period {
 
-    @NotNull
     private final DateModifier start;
-    @NotNull
     private final DateModifier end;
 
     RemainingTimePeriod(DateModifier start, DateModifier end) {
-        Preconditions.checkArgument(Objects.nonNull(start), "The ReducingDailyPeriod constructor start parameter " +
+        Preconditions.checkArgument(Objects.nonNull(start), "The RemainingTimePeriod constructor start parameter " +
                 "must not be null.");
-        Preconditions.checkArgument(Objects.nonNull(end),"The ReducingDailyPeriod constructor end parameter " +
+        Preconditions.checkArgument(Objects.nonNull(end),"The RemainingTimePeriod constructor end parameter " +
                 "must not be null.");
         this.start = start;
         this.end = end;
     }
 
+    @Override
     public Duration remainingTime(LocalDateTime target) {
         LocalDateTime startDateTime = start.modify(target);
         LocalDateTime endDateTime = end.modify(target);
