@@ -35,7 +35,7 @@ public class MonthlyPeriodParserTest {
     }
 
     @Test
-    public void validInputStringWithDoubleAndSingleDigitTimes(){
+    public void validInputStringWithDoubleAndSingleDigitTimesSuccessfullyCreatesPeriod(){
         String validInput="JANUARY(12)(5:7)-FEBRUARY(2)(18:15)";
         DateModifier start = new MonthTime(MonthDay.of(Month.JANUARY, 12), LocalTime.of(5, 7));
         DateModifier end  = new MonthTime(MonthDay.of(Month.FEBRUARY, 2), LocalTime.of(18, 15));
@@ -47,21 +47,21 @@ public class MonthlyPeriodParserTest {
     }
 
     @Test
-    public void nullInput(){
+    public void nullInputCreatesEmptyPeriod(){
         Optional<Period> result = monthlyPeriodParser.parse(null);
 
         assertThat(result, equalTo(empty()));
     }
 
     @Test
-    public void emptyInput(){
+    public void emptyInputCreatesEmptyPeriod(){
         Optional<Period> result = monthlyPeriodParser.parse("");
 
         assertThat(result, equalTo(empty()));
     }
 
     @Test
-    public void toLittleData(){
+    public void missingEndValueCreatesEmptyPeriod(){
         String invalidInput="JANUARY(12)(21:30)-";
 
         Optional<Period> result = monthlyPeriodParser.parse(invalidInput);
@@ -70,7 +70,7 @@ public class MonthlyPeriodParserTest {
     }
 
     @Test
-    public void tooMuchData(){
+    public void tooMuchDataCreatesEmptyPeriod(){
         String invalidInput="JANUARY(12)(21:30)-FEBRUARY(2)(18:15)-DECEMBER(25)(3:00";
 
         Optional<Period> result = monthlyPeriodParser.parse(invalidInput);
@@ -79,7 +79,7 @@ public class MonthlyPeriodParserTest {
     }
 
     @Test
-    public void parsingInvalidMonthGivesEmptyPeriod(){
+    public void invalidMonthCreatesEmptyPeriod(){
         String invalidInput="BIMBLE(21:30)-FEBRUARY(21:30)";
 
         Optional<Period> result = monthlyPeriodParser.parse(invalidInput);
@@ -88,7 +88,7 @@ public class MonthlyPeriodParserTest {
     }
 
     @Test
-    public void matchesRegularExpressionButNotAValidTime(){
+    public void invalidTimeCreatesEmptyPeriod(){
         String invalidInput="JANUARY(4)(21:30)-FEBRUARY(5)(33:30)";
 
         Optional<Period> result = monthlyPeriodParser.parse(invalidInput);
@@ -97,7 +97,7 @@ public class MonthlyPeriodParserTest {
     }
 
     @Test
-    public void matchesRegularExpressionButNotAValidDayOfMonth(){
+    public void invalidDayOfMonthCreatesEmptyPeriod(){
         String invalidInput="JANUARY(54)(21:30)-FEBRUARY(101)(10:30)";
 
         Optional<Period> result = monthlyPeriodParser.parse(invalidInput);
