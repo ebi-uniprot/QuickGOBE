@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
  * Time: 14:12
  * Created with IntelliJ IDEA.
  */
-public interface Period {
+public interface CountDown {
 
     /**
      * What is the Duration left from the date and time held by the implementing class, and the target LocalDateTime

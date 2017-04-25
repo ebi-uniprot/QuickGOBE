@@ -18,7 +18,7 @@ import static org.junit.Assert.assertThat;
  * Time: 15:27
  * Created with IntelliJ IDEA.
  */
-public class MonthlyPeriodParserTest {
+public class MonthlyCountDownParserTest {
 
     private MonthlyPeriodParser monthlyPeriodParser = new MonthlyPeriodParser();
 
@@ -27,9 +27,9 @@ public class MonthlyPeriodParserTest {
         String validInput="JANUARY(12)(21:30)-FEBRUARY(2)(18:15)";
         DateModifier start = new MonthTime(MonthDay.of(Month.JANUARY, 12), LocalTime.of(21, 30));
         DateModifier end  = new MonthTime(MonthDay.of(Month.FEBRUARY, 2), LocalTime.of(18, 15));
-        RemainingTimePeriod remainingTimePeriod = new RemainingTimePeriod(start, end);
+        CountDownImpl remainingTimePeriod = new CountDownImpl(start, end);
 
-        Optional<Period> result = monthlyPeriodParser.parse(validInput);
+        Optional<CountDown> result = monthlyPeriodParser.parse(validInput);
 
         assertThat(result.get(), equalTo(remainingTimePeriod));
     }
@@ -39,23 +39,23 @@ public class MonthlyPeriodParserTest {
         String validInput="JANUARY(12)(5:7)-FEBRUARY(2)(18:15)";
         DateModifier start = new MonthTime(MonthDay.of(Month.JANUARY, 12), LocalTime.of(5, 7));
         DateModifier end  = new MonthTime(MonthDay.of(Month.FEBRUARY, 2), LocalTime.of(18, 15));
-        RemainingTimePeriod remainingTimePeriod = new RemainingTimePeriod(start, end);
+        CountDownImpl remainingTimePeriod = new CountDownImpl(start, end);
 
-        Optional<Period> result = monthlyPeriodParser.parse(validInput);
+        Optional<CountDown> result = monthlyPeriodParser.parse(validInput);
 
         assertThat(result.get(), equalTo(remainingTimePeriod));
     }
 
     @Test
     public void nullInputCreatesEmptyPeriod(){
-        Optional<Period> result = monthlyPeriodParser.parse(null);
+        Optional<CountDown> result = monthlyPeriodParser.parse(null);
 
         assertThat(result, equalTo(empty()));
     }
 
     @Test
     public void emptyInputCreatesEmptyPeriod(){
-        Optional<Period> result = monthlyPeriodParser.parse("");
+        Optional<CountDown> result = monthlyPeriodParser.parse("");
 
         assertThat(result, equalTo(empty()));
     }
@@ -64,7 +64,7 @@ public class MonthlyPeriodParserTest {
     public void missingEndValueCreatesEmptyPeriod(){
         String invalidInput="JANUARY(12)(21:30)-";
 
-        Optional<Period> result = monthlyPeriodParser.parse(invalidInput);
+        Optional<CountDown> result = monthlyPeriodParser.parse(invalidInput);
 
         assertThat(result, equalTo(empty()));
     }
@@ -73,7 +73,7 @@ public class MonthlyPeriodParserTest {
     public void tooMuchDataCreatesEmptyPeriod(){
         String invalidInput="JANUARY(12)(21:30)-FEBRUARY(2)(18:15)-DECEMBER(25)(3:00";
 
-        Optional<Period> result = monthlyPeriodParser.parse(invalidInput);
+        Optional<CountDown> result = monthlyPeriodParser.parse(invalidInput);
 
         assertThat(result, equalTo(empty()));
     }
@@ -82,7 +82,7 @@ public class MonthlyPeriodParserTest {
     public void invalidMonthCreatesEmptyPeriod(){
         String invalidInput="BIMBLE(21:30)-FEBRUARY(21:30)";
 
-        Optional<Period> result = monthlyPeriodParser.parse(invalidInput);
+        Optional<CountDown> result = monthlyPeriodParser.parse(invalidInput);
 
         assertThat(result, equalTo(empty()));
     }
@@ -91,7 +91,7 @@ public class MonthlyPeriodParserTest {
     public void invalidTimeCreatesEmptyPeriod(){
         String invalidInput="JANUARY(4)(21:30)-FEBRUARY(5)(33:30)";
 
-        Optional<Period> result = monthlyPeriodParser.parse(invalidInput);
+        Optional<CountDown> result = monthlyPeriodParser.parse(invalidInput);
 
         assertThat(result, equalTo(empty()));
     }
@@ -100,7 +100,7 @@ public class MonthlyPeriodParserTest {
     public void invalidDayOfMonthCreatesEmptyPeriod(){
         String invalidInput="JANUARY(54)(21:30)-FEBRUARY(101)(10:30)";
 
-        Optional<Period> result = monthlyPeriodParser.parse(invalidInput);
+        Optional<CountDown> result = monthlyPeriodParser.parse(invalidInput);
 
         assertThat(result, equalTo(empty()));
     }

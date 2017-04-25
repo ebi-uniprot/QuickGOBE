@@ -5,7 +5,7 @@ import uk.ac.ebi.quickgo.ontology.controller.validation.OBOControllerValidationH
 import uk.ac.ebi.quickgo.rest.headers.HttpHeader;
 import uk.ac.ebi.quickgo.rest.headers.HttpHeadersProvider;
 import uk.ac.ebi.quickgo.rest.period.DailyPeriodParser;
-import uk.ac.ebi.quickgo.rest.period.Period;
+import uk.ac.ebi.quickgo.rest.period.CountDown;
 import uk.ac.ebi.quickgo.rest.period.PeriodParser;
 import uk.ac.ebi.quickgo.rest.period.RemainingTimeSupplier;
 
@@ -63,29 +63,29 @@ public class OntologyRestConfig {
     @Bean
     public HttpHeadersProvider httpHeadersProvider(RemainingTimeSupplier maxAgeProvider) {
         HttpHeader headerSource = new HttpHeader(HttpHeaders.CACHE_CONTROL, CACHE_CONTROL_HEADER,
-                                                 () -> Long.toString(maxAgeProvider.get().getSeconds()));
+                                                 () -> Long.toString(maxAgeProvider.getDuration().getSeconds()));
         return new HttpHeadersProvider(Collections.singletonList(headerSource));
     }
 
     @Bean
     RemainingTimeSupplier maxAgeProvider(@Value("${ontology.caching.allowed.period}") String cachingAllowedPeriodValue,
             PeriodParser parser) {
-        Collection<Period> cachingAllowedPeriods = null;
+        Collection<CountDown> cachingAllowedCountDowns = null;
         if (Objects.nonNull(cachingAllowedPeriodValue)) {
             String[] periods = cachingAllowedPeriodValue.split(PERIOD_DELIMITER);
             try {
-                cachingAllowedPeriods = Arrays.stream(periods)
-                                              .map(parser::parse)
-                                              .filter(Optional::isPresent)
-                                              .map(Optional::get)
-                                              .collect(toList());
+                cachingAllowedCountDowns = Arrays.stream(periods)
+                                                 .map(parser::parse)
+                                                 .filter(Optional::isPresent)
+                                                 .map(Optional::get)
+                                                 .collect(toList());
             } catch (Exception e) {
                 LOGGER.error("Failed to load caching allowed periods for ontology using " + cachingAllowedPeriodValue,
                              e);
             }
         }
         return
-                new RemainingTimeSupplier(Objects.nonNull(cachingAllowedPeriods) ? cachingAllowedPeriods :
+                new RemainingTimeSupplier(Objects.nonNull(cachingAllowedCountDowns) ? cachingAllowedCountDowns :
                                                   Collections.emptyList());
     }
 

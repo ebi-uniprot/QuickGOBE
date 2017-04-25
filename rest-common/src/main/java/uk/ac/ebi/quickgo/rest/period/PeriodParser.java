@@ -26,7 +26,7 @@ public abstract class PeriodParser {
      * @param input a string that contains a duration definition.
      * @return Optional of Period or an empty Optional if no valid period could be parsed.
      */
-    public Optional<Period> parse(String input){
+    public Optional<CountDown> parse(String input){
         if (Objects.nonNull(input) && !input.isEmpty()) {
             return getPeriod(input);
         }
@@ -41,7 +41,7 @@ public abstract class PeriodParser {
      */
     protected abstract Optional<DateModifier> toDateModifier(String input);
 
-    private Optional<Period> getPeriod(String input) {
+    private Optional<CountDown> getPeriod(String input) {
         String[] fromTo = input.split(TOO_SYMBOL);
         if (fromTo.length == REQUIRED_DATE_MODIFYING_INSTANCES) {
             List<DateModifier> durationList = Arrays.stream(fromTo)
@@ -50,7 +50,7 @@ public abstract class PeriodParser {
                                                     .map(Optional::get)            //.map(Optional::stream) in Java 9
                                                     .collect(toList());
             if (durationList.size() == REQUIRED_DATE_MODIFYING_INSTANCES) {
-                return Optional.of(new RemainingTimePeriod(durationList.get(0), durationList.get(1)));
+                return Optional.of(new CountDownImpl(durationList.get(0), durationList.get(1)));
             }
         }
         return Optional.empty();

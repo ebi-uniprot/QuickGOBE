@@ -21,7 +21,7 @@ import static org.hamcrest.core.Is.is;
  * Created with IntelliJ IDEA.
  */
 @RunWith(MockitoJUnitRunner.class)
-public class RemainingTimePeriodTest {
+public class CountDownImplTest {
 
     @Test
     public void secondsLeftWhenNowBetweenStartTimeAndEndTime(){
@@ -31,7 +31,7 @@ public class RemainingTimePeriodTest {
         DayTime startDayTime = new DayTime(start.getDayOfWeek(), start.toLocalTime());
         DayTime endDayTime = new DayTime(end.getDayOfWeek(), end.toLocalTime());
 
-        RemainingTimePeriod remainingTimePeriod = new RemainingTimePeriod(startDayTime, endDayTime);
+        CountDownImpl remainingTimePeriod = new CountDownImpl(startDayTime, endDayTime);
 
         //Provide a little wriggle room for test
         long timeLeft = remainingTimePeriod.remainingTime(now).getSeconds();
@@ -48,7 +48,7 @@ public class RemainingTimePeriodTest {
         DayTime startDayTime = new DayTime(start.getDayOfWeek(), start.toLocalTime());
         DayTime endDayTime = new DayTime(end.getDayOfWeek(), end.toLocalTime());
 
-        RemainingTimePeriod remainingTimePeriod = new RemainingTimePeriod(startDayTime, endDayTime);
+        CountDownImpl remainingTimePeriod = new CountDownImpl(startDayTime, endDayTime);
 
         //Provide a little wriggle room for test
         long timeLeft = remainingTimePeriod.remainingTime(now).getSeconds();
@@ -63,7 +63,7 @@ public class RemainingTimePeriodTest {
         DayTime startDayTime = new DayTime(start.getDayOfWeek(), start.toLocalTime());
         DayTime endDayTime = new DayTime(end.getDayOfWeek(), end.toLocalTime());
 
-        RemainingTimePeriod remainingTimePeriod = new RemainingTimePeriod(startDayTime, endDayTime);
+        CountDownImpl remainingTimePeriod = new CountDownImpl(startDayTime, endDayTime);
 
         assertThat(remainingTimePeriod.remainingTime(now), is(Duration.ZERO));
     }
@@ -76,7 +76,7 @@ public class RemainingTimePeriodTest {
         DayTime startDayTime = new DayTime(start.getDayOfWeek(), start.toLocalTime());
         DayTime endDayTime = new DayTime(end.getDayOfWeek(), end.toLocalTime());
 
-        RemainingTimePeriod remainingTimePeriod = new RemainingTimePeriod(startDayTime, endDayTime);
+        CountDownImpl remainingTimePeriod = new CountDownImpl(startDayTime, endDayTime);
 
         assertThat(remainingTimePeriod.remainingTime(now), is(Duration.ZERO));
     }
@@ -87,7 +87,7 @@ public class RemainingTimePeriodTest {
         LocalDateTime end = now.plusMinutes(1);
         DayTime endDayTime = new DayTime(end.getDayOfWeek(), end.toLocalTime());
 
-        new RemainingTimePeriod(null, endDayTime);
+        new CountDownImpl(null, endDayTime);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -96,11 +96,11 @@ public class RemainingTimePeriodTest {
         LocalDateTime start = now.plusMinutes(2);
         DayTime startDayTime = new DayTime(start.getDayOfWeek(), start.toLocalTime());
 
-        new RemainingTimePeriod(startDayTime, null);
+        new CountDownImpl(startDayTime, null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void exceptionIfStartAndEndIsNull(){
-        new RemainingTimePeriod(null, null);
+        new CountDownImpl(null, null);
     }
 }

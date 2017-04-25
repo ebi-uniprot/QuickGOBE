@@ -9,7 +9,7 @@ import java.util.Optional;
 import static java.util.Objects.nonNull;
 
 /**
- * From a collection of {@link Period}s, find the first one to cover this instant in time, and if one is found,
+ * From a collection of {@link CountDown}s, find the first one to cover this instant in time, and if one is found,
  * find out how much time is left before this period ends.
  *
  * @author Tony Wardell
@@ -19,25 +19,25 @@ import static java.util.Objects.nonNull;
  */
 public class RemainingTimeSupplier {
 
-    private final Collection<Period> periodCollection;
+    private final Collection<CountDown> countDownCollection;
 
-    public RemainingTimeSupplier(Collection<Period> periodCollection) {
-        Preconditions.checkArgument(nonNull(periodCollection), "The collection of periods to check must not " +
+    public RemainingTimeSupplier(Collection<CountDown> countDownCollection) {
+        Preconditions.checkArgument(nonNull(countDownCollection), "The collection of periods to check must not " +
                 "be null");
-        this.periodCollection = periodCollection;
+        this.countDownCollection = countDownCollection;
     }
 
     /**
-     * Calculate and return the {@link Duration} between {@link LocalDateTime} 'now' and the {@link Period}s held by
+     * Calculate and return the {@link Duration} between {@link LocalDateTime} 'now' and the {@link CountDown}s held by
      * this instance. Return first non-zero Duration, or a Duration of zero.
      * @return Duration left of any active periods, if they exist.
      */
     public Duration getDuration() {
         LocalDateTime now = LocalDateTime.now();
-        Optional<Duration> remainingTime = periodCollection.stream()
-                                                           .map(p -> p.remainingTime(now))
-                                                           .filter(duration -> !duration.isZero())
-                                                           .findFirst();
+        Optional<Duration> remainingTime = countDownCollection.stream()
+                                                              .map(p -> p.remainingTime(now))
+                                                              .filter(duration -> !duration.isZero())
+                                                              .findFirst();
         return remainingTime.orElse(Duration.ZERO);
     }
 }
