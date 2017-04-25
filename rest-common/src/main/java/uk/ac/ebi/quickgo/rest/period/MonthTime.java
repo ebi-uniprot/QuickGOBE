@@ -19,8 +19,8 @@ import javax.validation.constraints.NotNull;
  */
 public class MonthTime implements DateModifier {
 
-    @NotNull private MonthDay monthDay;
-    @NotNull private LocalTime time;
+    private MonthDay monthDay;
+    private LocalTime time;
 
     MonthTime(MonthDay monthDay, LocalTime time) {
         Preconditions.checkArgument(Objects.nonNull(monthDay), "Invalid monthDay parameter passed to " +

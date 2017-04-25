@@ -18,8 +18,8 @@ import javax.validation.constraints.NotNull;
  */
 class DayTime implements DateModifier {
 
-    @NotNull private final DayOfWeek dayOfWeek;
-    @NotNull private final LocalTime time;
+    private final DayOfWeek dayOfWeek;
+    private final LocalTime time;
 
     /**
      * Create an instance of DayTime from {@link DayOfWeek} and {@link LocalTime} instance.
