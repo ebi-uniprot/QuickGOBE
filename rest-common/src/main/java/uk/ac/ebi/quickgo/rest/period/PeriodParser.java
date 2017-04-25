@@ -2,7 +2,10 @@ package uk.ac.ebi.quickgo.rest.period;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static java.util.stream.Collectors.toList;
 
@@ -14,7 +17,7 @@ import static java.util.stream.Collectors.toList;
  * Created with IntelliJ IDEA.
  */
 public abstract class PeriodParser {
-
+    private Logger LOGGER = LoggerFactory.getLogger(PeriodParser.class);
     private static final String TOO_SYMBOL = "-";
     private static final int REQUIRED_DATE_MODIFYING_INSTANCES = 2;
 
@@ -23,7 +26,13 @@ public abstract class PeriodParser {
      * @param input a string that contains a duration definition.
      * @return Optional of Period or an empty Optional if no valid period could be parsed.
      */
-    public abstract Optional<Period> parse(String input);
+    public Optional<Period> parse(String input){
+        if (Objects.nonNull(input) && !input.isEmpty()) {
+            return getPeriod(input);
+        }
+        LOGGER.info("Period parse method sent null or empty value");
+        return Optional.empty();
+    }
 
     /**
      * Turn a String into and instance of DateModifying
@@ -32,12 +41,7 @@ public abstract class PeriodParser {
      */
     protected abstract Optional<DateModifier> toDateModifier(String input);
 
-    /**
-     * Create a period instance from a String that defines a from and to duration.
-     * @param input a string that contains a duration definition.
-     * @return
-     */
-    protected Optional<Period> getPeriod(String input) {
+    private Optional<Period> getPeriod(String input) {
         String[] fromTo = input.split(TOO_SYMBOL);
         if (fromTo.length == REQUIRED_DATE_MODIFYING_INSTANCES) {
             List<DateModifier> durationList = Arrays.stream(fromTo)

@@ -24,7 +24,6 @@ import org.slf4j.LoggerFactory;
  */
 public class MonthlyPeriodParser extends PeriodParser{
     private Logger LOGGER = LoggerFactory.getLogger(MonthlyPeriodParser.class);
-
     private static final String MONTH_DATE_TIME_REGEX = "^" +
             "(JANUARY|FEBRUARY|MARCH|APRIL|MAY|JUNE|JULY|AUGUST|SEPTEMBER|OCTOBER|NOVEMBER|DECEMBER)\\(([0-9]{1,2})" +
             "\\)\\(([0-9]{1,2}):([0-9]{1,2})\\)";
@@ -34,20 +33,6 @@ public class MonthlyPeriodParser extends PeriodParser{
     private static final int HOUR_GROUP = 3;
     private static final int MINUTE_GROUP = 4;
     private static final int EXPECTED_GROUP_COUNT = 4;
-
-    /**
-     * Parse a string that contains month, day of month and time in the format MONTH(date)(HH:MM)-MONTH(date)(HH:MM),
-     * to produce a Period instance.
-     * @param input String
-     * @return instance an Optional of Period or an empty Optional if no valid period could be parsed.
-     */
-    @Override
-    public Optional<Period> parse(String input) {
-        if (Objects.nonNull(input) && !input.isEmpty()) {
-            return getPeriod(input);
-        }
-        return Optional.empty();
-    }
 
     @Override
     protected Optional<DateModifier> toDateModifier(String input) {

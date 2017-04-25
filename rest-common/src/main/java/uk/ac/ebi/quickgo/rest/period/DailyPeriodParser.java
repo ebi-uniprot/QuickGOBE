@@ -30,20 +30,6 @@ public class DailyPeriodParser extends PeriodParser{
     private static final int MINUTE_GROUP = 3;
     private static final int EXPECTED_GROUP_COUNT = 3;
 
-    /**
-     * Parse a string that contains a day of week and time in the format DAY(HH:MM)-DAY(HH:MM), to produce a Period
-     * instance.
-     * @param input String
-     * @return instance of Optional of Period which is empty if the period could be parsed.
-     */
-    @Override
-    public Optional<Period> parse(String input) {
-        if (Objects.nonNull(input) && !input.isEmpty()) {
-            return getPeriod(input);
-        }
-        return Optional.empty();
-    }
-
     @Override
     protected Optional<DateModifier> toDateModifier(String input) {
         try {
