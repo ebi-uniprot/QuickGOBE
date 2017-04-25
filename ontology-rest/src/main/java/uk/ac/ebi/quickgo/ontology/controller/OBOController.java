@@ -113,29 +113,6 @@ public abstract class OBOController<T extends OBOTerm> {
         this.ontologyPagingConfig = ontologyPagingConfig;
         this.ontologyType = ontologyType;
         this.httpHeadersProvider = httpHeadersProvider;
-
-    }
-
-    /**
-     * Wrap a collection as a {@link Set}
-     *
-     * @param items      the items to wrap as a {@link Set}
-     * @param <ItemType> the type of the {@link Collection}, i.e., this method works for any type
-     * @return a {@link Set} wrapping the items in a {@link Collection}
-     */
-    private static <ItemType> Set<ItemType> asSet(Collection<ItemType> items) {
-        return new HashSet<>(items);
-    }
-
-    /**
-     * Converts a {@link Collection} of {@link OntologyRelationType}s to a corresponding array of
-     * {@link OntologyRelationType}s
-     *
-     * @param relations the {@link OntologyRelationType}s
-     * @return an array of {@link OntologyRelationType}s
-     */
-    private static OntologyRelationType[] asOntologyRelationTypeArray(Collection<OntologyRelationType> relations) {
-        return relations.stream().toArray(OntologyRelationType[]::new);
     }
 
     /**
@@ -167,7 +144,6 @@ public abstract class OBOController<T extends OBOTerm> {
                  new RegularPage(page, ontologyPagingConfig.defaultPageSize())),
                                     httpHeadersProvider.provide(),
                                     HttpStatus.OK);
-
     }
 
     /**
@@ -440,6 +416,26 @@ public abstract class OBOController<T extends OBOTerm> {
     }
 
     /**
+     * Wrap a collection as a {@link Set}
+     * @param items      the items to wrap as a {@link Set}
+     * @param <ItemType> the type of the {@link Collection}, i.e., this method works for any type
+     * @return a {@link Set} wrapping the items in a {@link Collection}
+     */
+    private static <ItemType> Set<ItemType> asSet(Collection<ItemType> items) {
+        return new HashSet<>(items);
+    }
+
+    /**
+     * Converts a {@link Collection} of {@link OntologyRelationType}s to a corresponding array of
+     * {@link OntologyRelationType}s
+     * @param relations the {@link OntologyRelationType}s
+     * @return an array of {@link OntologyRelationType}s
+     */
+    private static OntologyRelationType[] asOntologyRelationTypeArray(Collection<OntologyRelationType> relations) {
+        return relations.stream().toArray(OntologyRelationType[]::new);
+    }
+
+    /**
      * Creates a {@link ResponseEntity} containing a {@link QueryResult} for a list of results.
      *
      * @param results a list of results
@@ -456,7 +452,6 @@ public abstract class OBOController<T extends OBOTerm> {
         QueryResult<ResponseType> queryResult = new QueryResult.Builder<>(resultsToShow.size(), resultsToShow).build();
         return new ResponseEntity<>(queryResult, httpHeadersProvider.provide(), HttpStatus.OK);
     }
-
     private RetrievalException createChartGraphicsException(Throwable throwable) {
         String errorMessage = "Error encountered during creation of ontology chart graphics.";
         LOGGER.error(errorMessage, throwable);
