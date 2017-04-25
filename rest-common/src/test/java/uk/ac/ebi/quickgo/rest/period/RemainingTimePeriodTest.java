@@ -13,7 +13,7 @@ import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.core.Is.is;
 
 /**
- * Test CachingAllowedPeriod.
+ * Test RemainingTimePeriod.
  *
  * @author Tony Wardell
  * Date: 11/04/2017
@@ -25,7 +25,6 @@ public class RemainingTimePeriodTest {
 
     @Test
     public void secondsLeftWhenNowBetweenStartTimeAndEndTime(){
-
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime start = now.minusMinutes(1);
         LocalDateTime end = now.plusMinutes(1);
@@ -43,10 +42,9 @@ public class RemainingTimePeriodTest {
 
     @Test
     public void secondsLeftWhenComparingStartTimeAndEndTimeWithFixedTime(){
-
         LocalDateTime now = LocalDateTime.of(2012, 5, 9, 11, 59);
         LocalDateTime start = LocalDateTime.of(2012, 5, 9, 11, 58);
-        LocalDateTime end = LocalDateTime.of(2012, 5, 9, 12, 00);
+        LocalDateTime end = LocalDateTime.of(2012, 5, 9, 12, 0);
         DayTime startDayTime = new DayTime(start.getDayOfWeek(), start.toLocalTime());
         DayTime endDayTime = new DayTime(end.getDayOfWeek(), end.toLocalTime());
 
@@ -60,7 +58,6 @@ public class RemainingTimePeriodTest {
 
     @Test
     public void durationZeroWhenNowAfterEndTime(){
-
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime start = now.minusMinutes(2);
         LocalDateTime end = now.minusMinutes(1);
@@ -74,7 +71,6 @@ public class RemainingTimePeriodTest {
 
     @Test
     public void durationZeroWhenNowBeforeStartTime(){
-
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime start = now.plusMinutes(2);
         LocalDateTime end = now.plusMinutes(1);
@@ -88,7 +84,6 @@ public class RemainingTimePeriodTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void exceptionIfStartIsNull(){
-
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime end = now.plusMinutes(1);
         DayTime endDayTime = new DayTime(end.getDayOfWeek(), end.toLocalTime());
@@ -98,7 +93,6 @@ public class RemainingTimePeriodTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void exceptionIfEndIsNull(){
-
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime start = now.plusMinutes(2);
         DayTime startDayTime = new DayTime(start.getDayOfWeek(), start.toLocalTime());
