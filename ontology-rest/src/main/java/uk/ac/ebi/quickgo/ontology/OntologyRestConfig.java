@@ -2,11 +2,12 @@ package uk.ac.ebi.quickgo.ontology;
 
 import uk.ac.ebi.quickgo.ontology.controller.validation.OBOControllerValidationHelper;
 import uk.ac.ebi.quickgo.ontology.controller.validation.OBOControllerValidationHelperImpl;
-import uk.ac.ebi.quickgo.rest.period.Period;
-import uk.ac.ebi.quickgo.rest.period.RemainingTimeSupplier;
-import uk.ac.ebi.quickgo.rest.period.DailyPeriodParser;
 import uk.ac.ebi.quickgo.rest.headers.HttpHeader;
 import uk.ac.ebi.quickgo.rest.headers.HttpHeadersProvider;
+import uk.ac.ebi.quickgo.rest.period.DailyPeriodParser;
+import uk.ac.ebi.quickgo.rest.period.Period;
+import uk.ac.ebi.quickgo.rest.period.PeriodParser;
+import uk.ac.ebi.quickgo.rest.period.RemainingTimeSupplier;
 
 import java.util.*;
 import org.slf4j.Logger;
@@ -68,27 +69,28 @@ public class OntologyRestConfig {
 
     @Bean
     RemainingTimeSupplier maxAgeProvider(@Value("${ontology.caching.allowed.period}") String cachingAllowedPeriodValue,
-            DailyPeriodParser dailyPeriodParser) {
+            PeriodParser parser) {
         Collection<Period> cachingAllowedPeriods = null;
         if (Objects.nonNull(cachingAllowedPeriodValue)) {
             String[] periods = cachingAllowedPeriodValue.split(PERIOD_DELIMITER);
             try {
                 cachingAllowedPeriods = Arrays.stream(periods)
-                                              .map(dailyPeriodParser::parse)
+                                              .map(parser::parse)
                                               .filter(Optional::isPresent)
                                               .map(Optional::get)
                                               .collect(toList());
             } catch (Exception e) {
-                LOGGER.error("Failed to load caching allowed periods for ontology", e);
+                LOGGER.error("Failed to load caching allowed periods for ontology using " + cachingAllowedPeriodValue,
+                             e);
             }
         }
         return
-                new RemainingTimeSupplier(Objects.nonNull(cachingAllowedPeriods) ? cachingAllowedPeriods : new
-                        ArrayList<>());
+                new RemainingTimeSupplier(Objects.nonNull(cachingAllowedPeriods) ? cachingAllowedPeriods :
+                                                  Collections.emptyList());
     }
 
     @Bean
-    DailyPeriodParser periodParser() {
+    PeriodParser periodParser() {
         return new DailyPeriodParser();
     }
 
