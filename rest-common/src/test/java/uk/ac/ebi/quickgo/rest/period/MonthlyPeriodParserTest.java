@@ -18,7 +18,7 @@ import static org.junit.Assert.assertThat;
  * Time: 15:27
  * Created with IntelliJ IDEA.
  */
-public class MonthlyCountDownParserTest {
+public class MonthlyPeriodParserTest {
 
     private MonthlyPeriodParser monthlyPeriodParser = new MonthlyPeriodParser();
 
@@ -27,9 +27,9 @@ public class MonthlyCountDownParserTest {
         String validInput="JANUARY(12)(21:30)-FEBRUARY(2)(18:15)";
         DateModifier start = new MonthTime(MonthDay.of(Month.JANUARY, 12), LocalTime.of(21, 30));
         DateModifier end  = new MonthTime(MonthDay.of(Month.FEBRUARY, 2), LocalTime.of(18, 15));
-        CountDownImpl remainingTimePeriod = new CountDownImpl(start, end);
+        AlarmClockImpl remainingTimePeriod = new AlarmClockImpl(start, end);
 
-        Optional<CountDown> result = monthlyPeriodParser.parse(validInput);
+        Optional<AlarmClock> result = monthlyPeriodParser.parse(validInput);
 
         assertThat(result.get(), equalTo(remainingTimePeriod));
     }
@@ -39,23 +39,23 @@ public class MonthlyCountDownParserTest {
         String validInput="JANUARY(12)(5:7)-FEBRUARY(2)(18:15)";
         DateModifier start = new MonthTime(MonthDay.of(Month.JANUARY, 12), LocalTime.of(5, 7));
         DateModifier end  = new MonthTime(MonthDay.of(Month.FEBRUARY, 2), LocalTime.of(18, 15));
-        CountDownImpl remainingTimePeriod = new CountDownImpl(start, end);
+        AlarmClockImpl remainingTimePeriod = new AlarmClockImpl(start, end);
 
-        Optional<CountDown> result = monthlyPeriodParser.parse(validInput);
+        Optional<AlarmClock> result = monthlyPeriodParser.parse(validInput);
 
         assertThat(result.get(), equalTo(remainingTimePeriod));
     }
 
     @Test
     public void nullInputCreatesEmptyPeriod(){
-        Optional<CountDown> result = monthlyPeriodParser.parse(null);
+        Optional<AlarmClock> result = monthlyPeriodParser.parse(null);
 
         assertThat(result, equalTo(empty()));
     }
 
     @Test
     public void emptyInputCreatesEmptyPeriod(){
-        Optional<CountDown> result = monthlyPeriodParser.parse("");
+        Optional<AlarmClock> result = monthlyPeriodParser.parse("");
 
         assertThat(result, equalTo(empty()));
     }
@@ -64,7 +64,7 @@ public class MonthlyCountDownParserTest {
     public void missingEndValueCreatesEmptyPeriod(){
         String invalidInput="JANUARY(12)(21:30)-";
 
-        Optional<CountDown> result = monthlyPeriodParser.parse(invalidInput);
+        Optional<AlarmClock> result = monthlyPeriodParser.parse(invalidInput);
 
         assertThat(result, equalTo(empty()));
     }
@@ -73,7 +73,7 @@ public class MonthlyCountDownParserTest {
     public void tooMuchDataCreatesEmptyPeriod(){
         String invalidInput="JANUARY(12)(21:30)-FEBRUARY(2)(18:15)-DECEMBER(25)(3:00";
 
-        Optional<CountDown> result = monthlyPeriodParser.parse(invalidInput);
+        Optional<AlarmClock> result = monthlyPeriodParser.parse(invalidInput);
 
         assertThat(result, equalTo(empty()));
     }
@@ -82,7 +82,7 @@ public class MonthlyCountDownParserTest {
     public void invalidMonthCreatesEmptyPeriod(){
         String invalidInput="BIMBLE(21:30)-FEBRUARY(21:30)";
 
-        Optional<CountDown> result = monthlyPeriodParser.parse(invalidInput);
+        Optional<AlarmClock> result = monthlyPeriodParser.parse(invalidInput);
 
         assertThat(result, equalTo(empty()));
     }
@@ -91,7 +91,7 @@ public class MonthlyCountDownParserTest {
     public void invalidTimeCreatesEmptyPeriod(){
         String invalidInput="JANUARY(4)(21:30)-FEBRUARY(5)(33:30)";
 
-        Optional<CountDown> result = monthlyPeriodParser.parse(invalidInput);
+        Optional<AlarmClock> result = monthlyPeriodParser.parse(invalidInput);
 
         assertThat(result, equalTo(empty()));
     }
@@ -100,7 +100,7 @@ public class MonthlyCountDownParserTest {
     public void invalidDayOfMonthCreatesEmptyPeriod(){
         String invalidInput="JANUARY(54)(21:30)-FEBRUARY(101)(10:30)";
 
-        Optional<CountDown> result = monthlyPeriodParser.parse(invalidInput);
+        Optional<AlarmClock> result = monthlyPeriodParser.parse(invalidInput);
 
         assertThat(result, equalTo(empty()));
     }

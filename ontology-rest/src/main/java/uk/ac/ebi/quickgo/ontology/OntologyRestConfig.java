@@ -5,7 +5,7 @@ import uk.ac.ebi.quickgo.ontology.controller.validation.OBOControllerValidationH
 import uk.ac.ebi.quickgo.rest.headers.HttpHeader;
 import uk.ac.ebi.quickgo.rest.headers.HttpHeadersProvider;
 import uk.ac.ebi.quickgo.rest.period.DailyPeriodParser;
-import uk.ac.ebi.quickgo.rest.period.CountDown;
+import uk.ac.ebi.quickgo.rest.period.AlarmClock;
 import uk.ac.ebi.quickgo.rest.period.PeriodParser;
 import uk.ac.ebi.quickgo.rest.period.RemainingTimeSupplier;
 
@@ -70,22 +70,22 @@ public class OntologyRestConfig {
     @Bean
     RemainingTimeSupplier maxAgeProvider(@Value("${ontology.caching.allowed.period}") String cachingAllowedPeriodValue,
             PeriodParser parser) {
-        Collection<CountDown> cachingAllowedCountDowns = null;
+        Collection<AlarmClock> cachingAllowingAarmClocks = null;
         if (Objects.nonNull(cachingAllowedPeriodValue)) {
             String[] periods = cachingAllowedPeriodValue.split(PERIOD_DELIMITER);
             try {
-                cachingAllowedCountDowns = Arrays.stream(periods)
-                                                 .map(parser::parse)
-                                                 .filter(Optional::isPresent)
-                                                 .map(Optional::get)
-                                                 .collect(toList());
+                cachingAllowingAarmClocks = Arrays.stream(periods)
+                                                  .map(parser::parse)
+                                                  .filter(Optional::isPresent)
+                                                  .map(Optional::get)
+                                                  .collect(toList());
             } catch (Exception e) {
                 LOGGER.error("Failed to load caching allowed periods for ontology using " + cachingAllowedPeriodValue,
                              e);
             }
         }
         return
-                new RemainingTimeSupplier(Objects.nonNull(cachingAllowedCountDowns) ? cachingAllowedCountDowns :
+                new RemainingTimeSupplier(Objects.nonNull(cachingAllowingAarmClocks) ? cachingAllowingAarmClocks :
                                                   Collections.emptyList());
     }
 

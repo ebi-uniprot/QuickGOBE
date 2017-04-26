@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 /**
- * An implementation of a {@link CountDown} which uses two values of {@link DateModifier} as start and end points to
+ * An implementation of a {@link AlarmClock} which uses two values of {@link DateModifier} as start and end points to
  * determine remaining time.
  *
  * @author Tony Wardell
@@ -14,12 +14,12 @@ import java.util.Objects;
  * Time: 12:46
  * Created with IntelliJ IDEA.
  */
-public class CountDownImpl implements CountDown {
+public class AlarmClockImpl implements AlarmClock {
 
     private final DateModifier start;
     private final DateModifier end;
 
-    CountDownImpl(DateModifier start, DateModifier end) {
+    AlarmClockImpl(DateModifier start, DateModifier end) {
         Preconditions.checkArgument(Objects.nonNull(start), "The RemainingTimePeriod constructor start parameter " +
                 "must not be null.");
         Preconditions.checkArgument(Objects.nonNull(end),"The RemainingTimePeriod constructor end parameter " +
@@ -49,7 +49,7 @@ public class CountDownImpl implements CountDown {
             return false;
         }
 
-        CountDownImpl that = (CountDownImpl) o;
+        AlarmClockImpl that = (AlarmClockImpl) o;
 
         if (start != null ? !start.equals(that.start) : that.start != null) {
             return false;

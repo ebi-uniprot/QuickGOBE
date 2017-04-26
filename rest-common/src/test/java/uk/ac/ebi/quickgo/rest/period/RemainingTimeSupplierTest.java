@@ -27,43 +27,43 @@ import static org.mockito.Mockito.when;
 public class RemainingTimeSupplierTest {
 
     @Mock
-    private CountDown allowedCountDown;
+    private AlarmClock alarmClock;
     private static final Duration ONE_HOUR = Duration.ofHours(1);
     private static final Duration TWO_HOUR = Duration.ofHours(2);
 
     @Test
     public void durationReturnedFromSinglePeriod() {
-        when(allowedCountDown.remainingTime(any(LocalDateTime.class))).thenReturn(ONE_HOUR);
+        when(alarmClock.remainingTime(any(LocalDateTime.class))).thenReturn(ONE_HOUR);
 
         RemainingTimeSupplier remainingTimeSupplier =
-                new RemainingTimeSupplier(Collections.singletonList(allowedCountDown));
+                new RemainingTimeSupplier(Collections.singletonList(alarmClock));
 
         assertThat(remainingTimeSupplier.getDuration(), is(ONE_HOUR));
     }
 
     @Test
     public void durationReturnedFromFirstNonZeroPeriod() {
-        when(allowedCountDown.remainingTime(any(LocalDateTime.class))).thenReturn(Duration.ZERO)
-                                                                      .thenReturn(Duration.ZERO)
-                                                                      .thenReturn(ONE_HOUR)
-                                                                      .thenReturn(TWO_HOUR);
+        when(alarmClock.remainingTime(any(LocalDateTime.class))).thenReturn(Duration.ZERO)
+                                                                .thenReturn(Duration.ZERO)
+                                                                .thenReturn(ONE_HOUR)
+                                                                .thenReturn(TWO_HOUR);
 
-        RemainingTimeSupplier remainingTimeSupplier = new RemainingTimeSupplier(Arrays.asList(allowedCountDown,
-                                                                                              allowedCountDown,
-                                                                                              allowedCountDown));
+        RemainingTimeSupplier remainingTimeSupplier = new RemainingTimeSupplier(Arrays.asList(alarmClock,
+                                                                                              alarmClock,
+                                                                                              alarmClock));
 
         assertThat(remainingTimeSupplier.getDuration(), is(ONE_HOUR));
     }
 
     @Test
     public void noActivePeriodSoDurationIsZero() {
-        when(allowedCountDown.remainingTime(any(LocalDateTime.class))).thenReturn(Duration.ZERO)
-                                                                      .thenReturn(Duration.ZERO)
-                                                                      .thenReturn(Duration.ZERO);
+        when(alarmClock.remainingTime(any(LocalDateTime.class))).thenReturn(Duration.ZERO)
+                                                                .thenReturn(Duration.ZERO)
+                                                                .thenReturn(Duration.ZERO);
 
-        RemainingTimeSupplier remainingTimeSupplier = new RemainingTimeSupplier(Arrays.asList(allowedCountDown,
-                                                                                              allowedCountDown,
-                                                                                              allowedCountDown));
+        RemainingTimeSupplier remainingTimeSupplier = new RemainingTimeSupplier(Arrays.asList(alarmClock,
+                                                                                              alarmClock,
+                                                                                              alarmClock));
 
         assertThat(remainingTimeSupplier.getDuration(), is(Duration.ZERO));
     }

@@ -21,7 +21,7 @@ import static org.hamcrest.core.Is.is;
  * Created with IntelliJ IDEA.
  */
 @RunWith(MockitoJUnitRunner.class)
-public class CountDownImplTest {
+public class AlarmClockImplTest {
 
     @Test
     public void secondsLeftWhenNowBetweenStartTimeAndEndTime(){
@@ -31,7 +31,7 @@ public class CountDownImplTest {
         DayTime startDayTime = new DayTime(start.getDayOfWeek(), start.toLocalTime());
         DayTime endDayTime = new DayTime(end.getDayOfWeek(), end.toLocalTime());
 
-        CountDownImpl remainingTimePeriod = new CountDownImpl(startDayTime, endDayTime);
+        AlarmClockImpl remainingTimePeriod = new AlarmClockImpl(startDayTime, endDayTime);
 
         //Provide a little wriggle room for test
         long timeLeft = remainingTimePeriod.remainingTime(now).getSeconds();
@@ -48,7 +48,7 @@ public class CountDownImplTest {
         DayTime startDayTime = new DayTime(start.getDayOfWeek(), start.toLocalTime());
         DayTime endDayTime = new DayTime(end.getDayOfWeek(), end.toLocalTime());
 
-        CountDownImpl remainingTimePeriod = new CountDownImpl(startDayTime, endDayTime);
+        AlarmClockImpl remainingTimePeriod = new AlarmClockImpl(startDayTime, endDayTime);
 
         //Provide a little wriggle room for test
         long timeLeft = remainingTimePeriod.remainingTime(now).getSeconds();
@@ -63,7 +63,7 @@ public class CountDownImplTest {
         DayTime startDayTime = new DayTime(start.getDayOfWeek(), start.toLocalTime());
         DayTime endDayTime = new DayTime(end.getDayOfWeek(), end.toLocalTime());
 
-        CountDownImpl remainingTimePeriod = new CountDownImpl(startDayTime, endDayTime);
+        AlarmClockImpl remainingTimePeriod = new AlarmClockImpl(startDayTime, endDayTime);
 
         assertThat(remainingTimePeriod.remainingTime(now), is(Duration.ZERO));
     }
@@ -76,7 +76,7 @@ public class CountDownImplTest {
         DayTime startDayTime = new DayTime(start.getDayOfWeek(), start.toLocalTime());
         DayTime endDayTime = new DayTime(end.getDayOfWeek(), end.toLocalTime());
 
-        CountDownImpl remainingTimePeriod = new CountDownImpl(startDayTime, endDayTime);
+        AlarmClockImpl remainingTimePeriod = new AlarmClockImpl(startDayTime, endDayTime);
 
         assertThat(remainingTimePeriod.remainingTime(now), is(Duration.ZERO));
     }
@@ -87,7 +87,7 @@ public class CountDownImplTest {
         LocalDateTime end = now.plusMinutes(1);
         DayTime endDayTime = new DayTime(end.getDayOfWeek(), end.toLocalTime());
 
-        new CountDownImpl(null, endDayTime);
+        new AlarmClockImpl(null, endDayTime);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -96,11 +96,11 @@ public class CountDownImplTest {
         LocalDateTime start = now.plusMinutes(2);
         DayTime startDayTime = new DayTime(start.getDayOfWeek(), start.toLocalTime());
 
-        new CountDownImpl(startDayTime, null);
+        new AlarmClockImpl(startDayTime, null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void exceptionIfStartAndEndIsNull(){
-        new CountDownImpl(null, null);
+        new AlarmClockImpl(null, null);
     }
 }
