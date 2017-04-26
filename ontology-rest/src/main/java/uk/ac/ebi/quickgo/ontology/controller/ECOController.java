@@ -1,5 +1,8 @@
 package uk.ac.ebi.quickgo.ontology.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import uk.ac.ebi.quickgo.common.SearchableField;
 import uk.ac.ebi.quickgo.graphics.service.GraphImageService;
 import uk.ac.ebi.quickgo.ontology.OntologyRestConfig;
@@ -9,11 +12,11 @@ import uk.ac.ebi.quickgo.ontology.model.ECOTerm;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;
 import uk.ac.ebi.quickgo.ontology.service.search.SearchServiceConfig;
+import uk.ac.ebi.quickgo.rest.headers.HttpHeadersProvider;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import java.time.LocalTime;
+import java.util.function.Function;
 
 /**
  * REST controller for accessing ECO related information.
@@ -29,13 +32,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class ECOController extends OBOController<ECOTerm> {
    @Autowired
     public ECOController(OntologyService<ECOTerm> ecoOntologyService,
-            SearchService<OBOTerm> ontologySearchService,
-            SearchableField searchableField,
-            SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig,
-            GraphImageService graphImageService,
-            OBOControllerValidationHelper ecoValidationHelper,
-            OntologyRestConfig.OntologyPagingConfig ontologyPagingConfig) {
+                         SearchService<OBOTerm> ontologySearchService,
+                         SearchableField searchableField,
+                         SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig,
+                         GraphImageService graphImageService,
+                         OBOControllerValidationHelper ecoValidationHelper,
+                         OntologyRestConfig.OntologyPagingConfig ontologyPagingConfig,
+           HttpHeadersProvider httpHeadersProvider
+   ) {
         super(ecoOntologyService, ontologySearchService, searchableField, ontologyRetrievalConfig, graphImageService,
-              ecoValidationHelper, ontologyPagingConfig, OntologyType.ECO);
+                ecoValidationHelper, ontologyPagingConfig, OntologyType.ECO, httpHeadersProvider);
     }
 }
