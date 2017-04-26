@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.rest.search;
 
-import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
+import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 
 import java.util.stream.Stream;
 import org.junit.Before;
@@ -164,7 +164,7 @@ public abstract class SearchControllerSetup {
     }
 
     // filter queries ---------------------------------------------------------
-    protected void checkInvalidFilterQueryResponse(String query, Param... filterQuery) throws Exception {
+    protected ResultActions checkInvalidFilterQueryResponse(String query, Param... filterQuery) throws Exception {
         MockHttpServletRequestBuilder clientRequest = createRequest(query);
 
         addFiltersToRequest(clientRequest, filterQuery);
@@ -174,6 +174,8 @@ public abstract class SearchControllerSetup {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
 
         checkErrorMessage(result);
+
+        return result;
     }
 
     protected ResultActions checkValidFilterQueryResponse(String query, int expectedResponseSize,

@@ -1,18 +1,5 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
-import uk.ac.ebi.quickgo.annotation.IdGeneratorUtil;
-import uk.ac.ebi.quickgo.annotation.validation.loader.ValidationConfig;
-import uk.ac.ebi.quickgo.annotation.validation.service.JobTestRunnerConfig;
-import uk.ac.ebi.quickgo.rest.ParameterException;
-import uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern;
-
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,19 +10,28 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.ConfigFileApplicationContextInitializer;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import uk.ac.ebi.quickgo.annotation.IdGeneratorUtil;
+import uk.ac.ebi.quickgo.annotation.validation.loader.ValidationConfig;
+import uk.ac.ebi.quickgo.annotation.validation.service.JobTestRunnerConfig;
+import uk.ac.ebi.quickgo.rest.ParameterException;
+import uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.*;
 import static uk.ac.ebi.quickgo.annotation.IdGeneratorUtil.generateValues;
 import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.*;
-import static uk.ac.ebi.quickgo.annotation.validation.loader.ValidationConfig
-        .LOAD_ANNOTATION_DBX_REF_ENTITIES_STEP_NAME;
-import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.MAX_ENTRIES_PER_PAGE;
-import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.MIN_ENTRIES_PER_PAGE;
-import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.MIN_PAGE_NUMBER;
+import static uk.ac.ebi.quickgo.annotation.validation.loader.ValidationConfig.LOAD_ANNOTATION_DBX_REF_ENTITIES_STEP_NAME;
+import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.*;
 
 /**
  * Tests that the validation added to the {@link AnnotationRequest} class is correct.
@@ -169,7 +165,7 @@ public class AnnotationRequestValidationIT {
         assertThat(violations, hasSize(0));
     }
 
-    //TAXONOMY ID PARAMETER
+    //TAXONOMY ID PARAMETER (applicable to all taxonUsage values)
     @Test
     public void negativeTaxonIdIsInvalid() {
         String invalidTaxonId = "-1";
@@ -243,6 +239,51 @@ public class AnnotationRequestValidationIT {
         assertThat(violations, hasSize(1));
         assertThat(violations.iterator().next().getMessage(),
                 is(createMaxSizeErrorMessage(TAXON_ID_PARAM, MAX_TAXON_IDS)));
+    }
+
+    //TAXON USAGE
+    @Test
+    public void exactTaxonUsageIsValid() {
+        String usage = "exact";
+
+        annotationRequest.setTaxonUsage(usage);
+
+        assertThat(validator.validate(annotationRequest), hasSize(0));
+    }
+
+    @Test
+    public void descendantsTaxonUsageIsValid() {
+        String usage = "descendants";
+
+        annotationRequest.setTaxonUsage(usage);
+
+        assertThat(validator.validate(annotationRequest), hasSize(0));
+    }
+
+    @Test
+    public void multipleTaxonUsageIsInvalid() {
+        String usage = "descendants,exact";
+
+        annotationRequest.setTaxonUsage(usage);
+
+        Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+
+        assertThat(violations, hasSize(is(1)));
+        assertThat(violations.iterator().next().getMessage(),
+                containsString("Invalid " + TAXON_USAGE_FIELD + ": " + usage + ""));
+    }
+
+    @Test
+    public void taxonUsageIsInvalid() {
+        String usage = "thisisnotokay";
+
+        annotationRequest.setTaxonUsage(usage);
+
+        Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+
+        assertThat(violations, hasSize(is(1)));
+        assertThat(violations.iterator().next().getMessage(),
+                containsString("Invalid " + TAXON_USAGE_FIELD + ": " + usage + ""));
     }
 
     //GENE PRODUCT ID
@@ -326,6 +367,14 @@ public class AnnotationRequestValidationIT {
         assertThat(violations, hasSize(1));
         assertThat(violations.iterator().next().getMessage(),
                 is(createRegexErrorMessage(GO_ID_PARAM, invalidGoIds)));
+    }
+
+    @Test
+    public void requestingMaximumNumberOfGOIdentifiersIsValid() {
+        String[] goIds = generateValues(IdGeneratorUtil::createGoId, AnnotationRequest.MAX_GO_IDS);
+        annotationRequest.setGoId(goIds);
+        Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+        assertThat(violations, hasSize(0));
     }
 
     @Test
@@ -520,44 +569,44 @@ public class AnnotationRequestValidationIT {
         assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
     }
 
-    //USAGE PARAMETERS
+    //GO USAGE PARAMETERS
     @Test
-    public void descendantsUsageIsValid() {
+    public void descendantsGoUsageIsValid() {
         annotationRequest.setGoUsage("descendants");
 
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
-    public void slimUsageIsValid() {
+    public void slimGoUsageIsValid() {
         annotationRequest.setGoUsage("slim");
 
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
-    public void exactUsageIsInvalid() {
+    public void exactGoUsageIsValid() {
         annotationRequest.setGoUsage("exact");
 
-        assertThat(validator.validate(annotationRequest), hasSize(1));
+        assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
-    public void usageValueIsInvalid() {
+    public void goUsageValueIsInvalid() {
         annotationRequest.setGoUsage("thisDoesNotExistAsAValidUsage");
 
         assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
     }
 
     @Test
-    public void usageRelationshipIsValid() {
+    public void goUsageRelationshipIsValid() {
         annotationRequest.setGoUsageRelationships("is_a");
 
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
-    public void usageRelationshipIsInvalid() {
+    public void goUsageRelationshipIsInvalid() {
         String invalidRel = "invalid_relationship";
 
         annotationRequest.setGoUsageRelationships(invalidRel);
@@ -570,11 +619,70 @@ public class AnnotationRequestValidationIT {
     }
 
     @Test(expected = ParameterException.class)
-    public void cannotCreateFilterWithUsageAndNoUsageIds() {
+    public void cannotCreateFilterWithGoUsageAndNoUsageIds() {
         annotationRequest.setGoUsage("descendants");
 
         annotationRequest.createFilterRequests();
     }
+
+    //---------------------------------------
+    //ECO USAGE PARAMETERS
+    @Test
+    public void descendantsEcoUsageIsValid() {
+        annotationRequest.setEvidenceCodeUsage("descendants");
+
+        assertThat(validator.validate(annotationRequest), hasSize(0));
+    }
+
+    @Test
+    public void exactEcoUsageIsValid() {
+        annotationRequest.setEvidenceCodeUsage("exact");
+
+        assertThat(validator.validate(annotationRequest), hasSize(0));
+    }
+
+    @Test
+    public void slimEcoUsageIsInvalid() {
+        annotationRequest.setEvidenceCodeUsage("slim");
+
+        assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
+    }
+
+    @Test
+    public void ecoUsageValueIsInvalid() {
+        annotationRequest.setEvidenceCodeUsage("thisDoesNotExistAsAValidUsage");
+
+        assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
+    }
+
+    @Test
+    public void ecoUsageRelationshipIsValid() {
+        annotationRequest.setEvidenceCodeUsageRelationships("is_a");
+
+        assertThat(validator.validate(annotationRequest), hasSize(0));
+    }
+
+    @Test
+    public void ecoUsageRelationshipIsInvalid() {
+        String invalidRel = "invalid_relationship";
+
+        annotationRequest.setEvidenceCodeUsageRelationships(invalidRel);
+
+        Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
+
+        assertThat(violations, hasSize(1));
+        assertThat(violations.iterator().next().getMessage(),
+                is(createRegexErrorMessage(USAGE_RELATIONSHIP_PARAM, invalidRel)));
+    }
+
+    @Test(expected = ParameterException.class)
+    public void cannotCreateFilterWithEcoUsageAndNoUsageIds() {
+        annotationRequest.setEvidenceCodeUsage("descendants");
+
+        annotationRequest.createFilterRequests();
+    }
+    //---------------------------------------
+
 
     //WITH/FROM PARAMETER
     @Test
@@ -602,8 +710,8 @@ public class AnnotationRequestValidationIT {
 
         int numRefs = AnnotationRequest.MAX_REFERENCES + 1;
         List<String> refs = IntStream.range(0, numRefs)
-                                     .mapToObj(i -> "PMID:123456")
-                                     .collect(toList());
+                .mapToObj(i -> "PMID:123456")
+                .collect(toList());
         annotationRequest.setReference(refs.toArray(new String[0]));
         Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
 
@@ -613,18 +721,18 @@ public class AnnotationRequestValidationIT {
     }
 
     @Test
-    public void referenceIsValid(){
+    public void referenceIsValid() {
         setupDbXrefValidationData();
-        String[] refs = new String[] {"PMID:123456"};
+        String[] refs = new String[]{"PMID:123456"};
         annotationRequest.setReference(refs);
         Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
         assertThat(violations, hasSize(0));
     }
 
     @Test
-    public void referenceIsInvalid(){
+    public void referenceIsInvalid() {
         setupDbXrefValidationData();
-        String[] refs = new String[] {"PMID:ZZZZZZZZ"};
+        String[] refs = new String[]{"PMID:ZZZZZZZZ"};
         annotationRequest.setReference(refs);
         Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
         assertThat(violations, hasSize(1));
@@ -633,7 +741,7 @@ public class AnnotationRequestValidationIT {
     // QUALIFIER
     @Test
     public void qualifierWithUnderscoreNoSpacesOrNumbersIsValid() {
-        annotationRequest.setQualifier("foobar","foo_bar");
+        annotationRequest.setQualifier("foobar", "foo_bar");
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
@@ -668,11 +776,41 @@ public class AnnotationRequestValidationIT {
     }
 
     @Test
-    public void StringWithNumbersIsAnInvalidQualifier() {
+    public void stringWithNumbersIsAnInvalidQualifier() {
         annotationRequest.setQualifier("foo3bar");
         assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
     }
 
+    // DOWNLOAD LIMIT
+    @Test
+    public void negativeDownloadLimitIsInvalid() {
+        annotationRequest.setDownloadLimit(-1);
+        assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
+    }
+
+    @Test
+    public void zeroDownloadLimitIsInvalid() {
+        annotationRequest.setDownloadLimit(0);
+        assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
+    }
+
+    @Test
+    public void positiveDownloadLimitLessThanMaxIsValid() {
+        annotationRequest.setDownloadLimit(MAX_DOWNLOAD_NUMBER - 1);
+        assertThat(validator.validate(annotationRequest), is(empty()));
+    }
+
+    @Test
+    public void positiveDownloadLimitEqualToMaxIsValid() {
+        annotationRequest.setDownloadLimit(MAX_DOWNLOAD_NUMBER);
+        assertThat(validator.validate(annotationRequest), is(empty()));
+    }
+
+    @Test
+    public void positiveDownloadLimitGreaterThanMaxIsInvalid() {
+        annotationRequest.setDownloadLimit(MAX_DOWNLOAD_NUMBER + 1);
+        assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
+    }
 
     private String createRegexErrorMessage(String paramName, String... invalidItems) {
         String csvInvalidItems = Stream.of(invalidItems).collect(Collectors.joining(", "));
@@ -683,8 +821,8 @@ public class AnnotationRequestValidationIT {
         return "Number of items in '" + paramName + "' is larger than: " + maxSize;
     }
 
-    private void setupDbXrefValidationData(){
-        if(!HAS_RUN) {
+    private void setupDbXrefValidationData() {
+        if (!HAS_RUN) {
             JobExecution jobExecution = jobLauncherTestUtils.launchStep(LOAD_ANNOTATION_DBX_REF_ENTITIES_STEP_NAME);
             assertThat(jobExecution.getStatus(), is(BatchStatus.COMPLETED));
             HAS_RUN = true;

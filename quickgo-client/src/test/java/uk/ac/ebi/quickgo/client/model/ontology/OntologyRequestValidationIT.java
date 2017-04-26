@@ -177,20 +177,23 @@ public class OntologyRequestValidationIT {
     }
 
     @Test
-    public void aspectWithMixedCasingIsValid() {
-        String mixedCaseAspect = "BiOlOgIcAl_PrOcEsS";
-        ontologyRequest.setAspect(mixedCaseAspect);
-
-        assertThat(validator.validate(ontologyRequest), hasSize(0));
-    }
-
-    @Test
     public void providedFilterByAspectValuesAreAllValid() throws Exception {
-        Arrays.asList("biological_process", "molecular_function", "cellular_component")
+        Arrays.asList("Process", "PRoceSs", "Function", "funCtioN", "Component", "compONent")
                 .forEach(aspect -> {
                             ontologyRequest.setAspect(aspect);
                             assertThat("Aspect value: " + aspect + " is invalid",
                                     validator.validate(ontologyRequest), hasSize(0));
+                        }
+                );
+    }
+
+    @Test
+    public void providedFilterByAspectValuesAreAllInvalid() throws Exception {
+        Arrays.asList("biological_process", "molecular_function", "cellular_component")
+                .forEach(aspect -> {
+                            ontologyRequest.setAspect(aspect);
+                            assertThat("Aspect value: " + aspect + " is valid, but should be invalid",
+                                    validator.validate(ontologyRequest), hasSize(1));
                         }
                 );
     }

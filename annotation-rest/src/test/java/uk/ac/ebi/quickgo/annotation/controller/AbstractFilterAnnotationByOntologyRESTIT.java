@@ -4,7 +4,7 @@ import uk.ac.ebi.quickgo.annotation.AnnotationREST;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.ConvertedOntologyFilter;
-import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
+import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepoConfig;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -118,6 +118,29 @@ public abstract class AbstractFilterAnnotationByOntologyRESTIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(pageInfoExists())
                 .andExpect(totalNumOfResults(0));
+    }
+
+    @Test
+    public void defaultFilterFor1TermBy1ValidDescendant() throws Exception {
+        annotationRepository.save(createAnnotationDocWithId(createGPId(1), ontologyId(1)));
+        annotationRepository.save(createAnnotationDocWithId(createGPId(2), ontologyId(2)));
+        annotationRepository.save(createAnnotationDocWithId(createGPId(3), ontologyId(3)));
+
+        expectRestCallHasDescendants(singletonList(ontologyId(1)), emptyList(),
+                singletonList(singletonList(ontologyId(3))));
+
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE)
+                        .param(idParam, ontologyId(1)));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(pageInfoExists())
+                .andExpect(totalNumOfResults(1))
+                .andExpect(fieldsInAllResultsExist(1))
+                .andExpect(fieldDoesNotExist(SLIMMED_ID_FIELD))
+                .andExpect(valuesOccurInField(idParam, ontologyId(3)));
     }
 
     @Test

@@ -1,16 +1,25 @@
 package uk.ac.ebi.quickgo.index.ontology;
 
-import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
+import uk.ac.ebi.quickgo.common.store.BasicTemporaryFolder;
+import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 import uk.ac.ebi.quickgo.index.QuickGOIndexMain;
 import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
 import uk.ac.ebi.quickgo.index.common.JobTestRunnerConfig;
-import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocMocker;
+import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
 
+import com.redfin.sitemapgenerator.WebSitemapGenerator;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.util.List;
 import org.hamcrest.core.Is;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
+import org.mockito.stubbing.Stubber;
+import org.slf4j.Logger;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
@@ -19,37 +28,50 @@ import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationContextLoader;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.slf4j.LoggerFactory.getLogger;
 import static uk.ac.ebi.quickgo.index.ontology.OntologyConfig.ONTOLOGY_INDEXING_STEP_NAME;
+import static uk.ac.ebi.quickgo.index.ontology.OntologyIndexingBatchIT.OntologyReadResult.DOC_READER_EXCEPTION;
+import static uk.ac.ebi.quickgo.index.ontology.OntologyIndexingBatchIT.OntologyReadResult.ECO_DOC;
+import static uk.ac.ebi.quickgo.index.ontology.OntologyIndexingBatchIT.OntologyReadResult.GO_DOC;
+import static uk.ac.ebi.quickgo.index.ontology.OntologyIndexingBatchIT.OntologyReadResult.NULL;
+import static uk.ac.ebi.quickgo.index.ontology.OntologySiteMapConfig.DEFAULT_QUICKGO_FRONTEND_TERM_URL;
+import static uk.ac.ebi.quickgo.index.ontology.OntologySiteMapConfig.DEFAULT_QUICKGO_FRONTEND_URL;
+import static uk.ac.ebi.quickgo.ontology.common.document.OntologyDocMocker.createECODoc;
+import static uk.ac.ebi.quickgo.ontology.common.document.OntologyDocMocker.createGODoc;
 
 /**
  * Test specific behaviour of the job executed by {@link QuickGOIndexMain}.
- * <p>
- * To see how to steps are configured, refer to:
- * <ul>
- *     <li>https://docs.spring.io/spring-batch/reference/html/configureStep.html</li>
- * </ul>
  *
  * Created 18/12/15
  * @author Edd
  */
-@ActiveProfiles(profiles = {"QuickGOIndexOntologyMainIT", "embeddedServer"})
+@ActiveProfiles(profiles = {"embeddedServer"})
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(
-        classes = {JobTestRunnerConfig.class, OntologyConfig.class, OntologyIndexingConfig.class},
+        classes = {JobTestRunnerConfig.class, OntologyConfig.class, OntologyIndexingBatchIT.TestConfig.class},
         loader = SpringApplicationContextLoader.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class OntologyIndexingBatchIT {
     @ClassRule
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
+
+    @ClassRule
+    public static final BasicTemporaryFolder siteMapTempFolder = new BasicTemporaryFolder();
 
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
@@ -60,9 +82,17 @@ public class OntologyIndexingBatchIT {
     @Value("${indexing.ontology.skip.limit}")
     private int skipLimit;
 
+    private static final String INVALID_TERM = "INVALID_TERM";
+    private static final String GO = "go";
+    private static final String ECO = "eco";
+    private static final String SITEMAP_INDEX_XML = "sitemap_index.xml";
+    private static final String SITEMAP_XML = "sitemap.xml";
+    private static final String SITEMAP_URL_REGEX = "^[\t ]+<loc>.*</loc>.*$";
+    private static final Logger LOGGER = getLogger(OntologyIndexingBatchIT.class);
+
     @Test
     public void documentReaderExceptionThrownWhenReaderIsOpenedCausesStepFailure() {
-        Mockito.doThrow(new DocumentReaderException("Error!")).when(reader).open(any(ExecutionContext.class));
+        doThrow(new DocumentReaderException("Error!")).when(reader).open(any(ExecutionContext.class));
 
         JobExecution jobExecution = jobLauncherTestUtils.launchStep(ONTOLOGY_INDEXING_STEP_NAME);
         assertThat(jobExecution.getStatus(), is(BatchStatus.FAILED));
@@ -70,15 +100,17 @@ public class OntologyIndexingBatchIT {
 
     @Test
     public void stepSucceedsWhenNoSkips() throws Exception {
-        int docCount = 5;
+        List<OntologyReadResult> resultsFromReadingSource = asList(
+                GO_DOC,
+                GO_DOC,
+                ECO_DOC,
+                ECO_DOC,
+                ECO_DOC,
+                NULL
+        );
 
-        when(reader.read())
-                .thenReturn(OntologyDocMocker.createGODoc("go1", "go1-name"))
-                .thenReturn(OntologyDocMocker.createGODoc("go2", "go2-name"))
-                .thenReturn(OntologyDocMocker.createECODoc("eco1", "eco1-name"))
-                .thenReturn(OntologyDocMocker.createECODoc("eco2", "eco2-name"))
-                .thenReturn(OntologyDocMocker.createECODoc("eco3", "eco3-name"))
-                .thenReturn(null);
+        int docCount = validDocsReadCount(resultsFromReadingSource);
+        mockResponseFromReader(resultsFromReadingSource);
 
         JobExecution jobExecution = jobLauncherTestUtils.launchStep(ONTOLOGY_INDEXING_STEP_NAME);
         assertThat(jobExecution.getStatus(), is(BatchStatus.COMPLETED));
@@ -87,17 +119,21 @@ public class OntologyIndexingBatchIT {
         assertThat(step.getReadCount(), is(docCount));
         assertThat(step.getWriteCount(), is(docCount));
         assertThat(step.getSkipCount(), is(0));
+
+        checkSiteMapWasWritten(resultsFromReadingSource);
     }
 
     @Test
     public void stepSkipsOnceWhenReaderFindsOneEmptyOptionalDocument() throws Exception {
-        int docCount = 2;
+        List<OntologyReadResult> resultsFromReadingSource = asList(
+                GO_DOC,
+                DOC_READER_EXCEPTION,
+                ECO_DOC,
+                NULL
+        );
 
-        when(reader.read())
-                .thenReturn(OntologyDocMocker.createGODoc("go1", "go1-name"))
-                .thenThrow(new DocumentReaderException("Error!"))
-                .thenReturn(OntologyDocMocker.createECODoc("eco1", "eco1-name"))
-                .thenReturn(null);
+        int docCount = validDocsReadCount(resultsFromReadingSource);
+        mockResponseFromReader(resultsFromReadingSource);
 
         JobExecution jobExecution = jobLauncherTestUtils.launchStep(ONTOLOGY_INDEXING_STEP_NAME);
         assertThat(jobExecution.getStatus(), is(BatchStatus.COMPLETED));
@@ -106,23 +142,28 @@ public class OntologyIndexingBatchIT {
         assertThat(step.getReadCount(), is(docCount));
         assertThat(step.getWriteCount(), is(docCount));
         assertThat(step.getSkipCount(), is(1));
+
+        checkSiteMapWasWritten(resultsFromReadingSource);
     }
 
     @Test
     public void tooManySkipsCausesStepToFail() throws Exception {
-        when(reader.read())
-                .thenReturn(OntologyDocMocker.createGODoc("go1", "go1-name"))
-                .thenThrow(new DocumentReaderException("Error!"))
-                .thenReturn(OntologyDocMocker.createGODoc("go2", "go2-name"))
-                .thenThrow(new DocumentReaderException("Error!"))
-                .thenReturn(OntologyDocMocker.createECODoc("eco1", "eco1-name"))
-                .thenReturn(OntologyDocMocker.createECODoc("eco2", "eco2-name"))
+        List<OntologyReadResult> resultsFromReadingSource = asList(
+                GO_DOC,
+                DOC_READER_EXCEPTION,
+                GO_DOC,
+                DOC_READER_EXCEPTION,
+                ECO_DOC,
+                ECO_DOC,
                 // full chunk of documents now created, and should
                 // be written
 
-                .thenThrow(new DocumentReaderException("Error!"))
-                .thenReturn(OntologyDocMocker.createECODoc("eco3", "eco3-name"))
-                .thenReturn(null);
+                DOC_READER_EXCEPTION,
+                ECO_DOC,
+                NULL
+        );
+
+        mockResponseFromReader(resultsFromReadingSource);
 
         JobExecution jobExecution = jobLauncherTestUtils.launchStep(ONTOLOGY_INDEXING_STEP_NAME);
         assertThat(jobExecution.getStatus(), is(BatchStatus.FAILED));
@@ -130,38 +171,44 @@ public class OntologyIndexingBatchIT {
         StepExecution step = jobExecution.getStepExecutions().iterator().next();
         assertThat(step.getReadCount(), is(4));
         assertThat(step.getWriteCount(), is(4));
-        assertThat(step.getSkipCount(), Is.is(skipLimit));
+        assertThat(step.getSkipCount(), is(skipLimit));
+
+        checkSiteMapWasWritten(asList(GO_DOC,
+                GO_DOC,
+                ECO_DOC,
+                ECO_DOC));
     }
 
     @Test
     public void succeedsOn2ChunksButSkips1ChunkWhenSkipLimitExceeded() throws Exception {
-        int goDocIdHelper = 1;
-        int ecoDocIdHelper = 1;
-        when(reader.read())
-                .thenReturn(OntologyDocMocker.createGODoc("go" + goDocIdHelper, "go" + goDocIdHelper++ + "-name"))
-                .thenReturn(OntologyDocMocker.createGODoc("go" + goDocIdHelper, "go" + goDocIdHelper++ + "-name"))
-                .thenThrow(new DocumentReaderException("Error!"))
-                .thenReturn(OntologyDocMocker.createECODoc("eco" + ecoDocIdHelper, "eco" + ecoDocIdHelper++ + "-name"))
-                .thenReturn(OntologyDocMocker.createECODoc("eco" + ecoDocIdHelper, "eco" + ecoDocIdHelper++ + "-name"))
+        List<OntologyReadResult> resultsFromReadingSource = asList(
+                GO_DOC,
+                GO_DOC,
+                DOC_READER_EXCEPTION,
+                ECO_DOC,
+                ECO_DOC,
                 // a full chunk of documents to write has now been created, so
                 // chunk 1 should be written
 
-                .thenThrow(new DocumentReaderException("Error!"))
-                .thenReturn(OntologyDocMocker.createECODoc("eco" + ecoDocIdHelper, "eco" + ecoDocIdHelper++ + "-name"))
-                .thenReturn(OntologyDocMocker.createECODoc("eco" + ecoDocIdHelper, "eco" + ecoDocIdHelper++ + "-name"))
-                .thenReturn(OntologyDocMocker.createGODoc("go" + goDocIdHelper, "go" + goDocIdHelper++ + "-name"))
-                .thenReturn(OntologyDocMocker.createGODoc("go" + goDocIdHelper, "go" + goDocIdHelper++ + "-name"))
+                DOC_READER_EXCEPTION,
+                ECO_DOC,
+                ECO_DOC,
+                GO_DOC,
+                GO_DOC,
                 // now chunk 2 should be written
 
-                .thenReturn(OntologyDocMocker.createECODoc("eco" + ecoDocIdHelper, "eco" + ecoDocIdHelper++ + "-name"))
-                .thenReturn(OntologyDocMocker.createGODoc("go" + goDocIdHelper, "go" + goDocIdHelper + "-name"))
-                .thenThrow(new DocumentReaderException("Error!"))
+                ECO_DOC,
+                GO_DOC,
+                DOC_READER_EXCEPTION,
                 // ------ BOOM! Skip Limit exceeded now and entire step fails (throwing away latest chunk)
 
-                .thenReturn(OntologyDocMocker.createECODoc("eco" + ecoDocIdHelper, "eco" + ecoDocIdHelper + "-name"))
+                ECO_DOC,
 
                 // null indicates reading is done
-                .thenReturn(null);
+                NULL
+        );
+
+        mockResponseFromReader(resultsFromReadingSource);
 
         JobExecution jobExecution = jobLauncherTestUtils.launchStep(ONTOLOGY_INDEXING_STEP_NAME);
         assertThat(jobExecution.getStatus(), is(BatchStatus.FAILED));
@@ -170,5 +217,147 @@ public class OntologyIndexingBatchIT {
         assertThat(step.getReadCount(), is(10));
         assertThat(step.getWriteCount(), is(8));
         assertThat(step.getSkipCount(), Is.is(skipLimit));
+
+        checkSiteMapWasWritten(asList(
+                GO_DOC,
+                GO_DOC,
+                ECO_DOC,
+                ECO_DOC,
+                ECO_DOC,
+                ECO_DOC,
+                GO_DOC,
+                GO_DOC));
+    }
+
+    /**
+     * Given a list of intended results (documents / exceptions), captured within {@code readResults},
+     * configure the mocked {@link OntologyReader} to produce the corresponding results.
+     *
+     * @param readResults a list of intended results (documents / exceptions)
+     * @throws Exception this exception should never occur because the reading is being done from a mocked
+     *         {@link OntologyReader}.
+     */
+    private void mockResponseFromReader(List<OntologyReadResult> readResults) throws Exception {
+        Stubber stubber = null;
+
+        int goCount = 0;
+        int ecoCount = 0;
+        for (OntologyReadResult readResult : readResults) {
+            switch (readResult) {
+                case GO_DOC:
+                    OntologyDocument goDoc = createGODoc(GO + goCount, GO + goCount++ + "name");
+                    stubber = (stubber == null) ? doReturn(goDoc) : stubber.doReturn(goDoc);
+                    break;
+                case ECO_DOC:
+                    OntologyDocument ecoDoc = createECODoc(ECO + ecoCount, ECO + ecoCount++ + "name");
+                    stubber = (stubber == null) ? doReturn(ecoDoc) : stubber.doReturn(ecoDoc);
+                    break;
+                case NULL:
+                    stubber = (stubber == null) ? doReturn(null) : stubber.doReturn(null);
+                    break;
+                case DOC_READER_EXCEPTION:
+                    stubber = (stubber == null) ? doThrow(new DocumentReaderException("Error!"))
+                            : stubber.doThrow(new DocumentReaderException("Error!"));
+                    break;
+                default:
+                    throw new IllegalStateException("Read result not handled: " + readResult);
+            }
+        }
+
+        if (stubber != null) {
+            stubber.when(reader).read();
+        } else {
+            LOGGER.warn("Stubbed read results are null!");
+        }
+    }
+
+    private int validDocsReadCount(List<OntologyReadResult> resultsFromReadingSource) {
+        return (int) resultsFromReadingSource.stream().filter(r -> r == ECO_DOC || r == GO_DOC).count();
+    }
+
+    /**
+     * Check that the site map was written to disk, and contains the valid URLs specified in
+     * {@code docsThatShouldHaveBeenWritten}.
+     *
+     * @param docsThatShouldHaveBeenWritten The documents that should have been written to Solr
+     * @throws IOException may be produced during creation of {@link BufferedReader}
+     */
+    private void checkSiteMapWasWritten(List<OntologyReadResult> docsThatShouldHaveBeenWritten) throws IOException {
+        File siteMapTempFolderRoot = siteMapTempFolder.getRoot();
+
+        assertThat(new File(siteMapTempFolderRoot, SITEMAP_INDEX_XML).exists(), is(true));
+        File siteMapXml = new File(siteMapTempFolderRoot, SITEMAP_XML);
+        assertThat(siteMapXml.exists(), is(true));
+
+        int urlMatchCount = 0;
+        try (BufferedReader reader = Files.newBufferedReader(siteMapXml.toPath())) {
+            String line = null;
+            while ((line = reader.readLine()) != null) {
+                if (line.matches(SITEMAP_URL_REGEX)) {
+                    boolean urlMatchFound = false;
+                    int goCount = 0;
+                    int ecoCount = 0;
+                    for (OntologyReadResult readResult : docsThatShouldHaveBeenWritten) {
+                        String termUrl = null;
+                        if (readResult == GO_DOC) {
+                            termUrl = buildTermUrl(GO + goCount++);
+                        } else if (readResult == ECO_DOC) {
+                            termUrl = buildTermUrl(ECO + ecoCount++);
+                        } else {
+                            termUrl = INVALID_TERM;
+                        }
+
+                        if (line.contains(termUrl)) {
+                            urlMatchFound = true;
+                            urlMatchCount++;
+                        }
+                    }
+                    assertThat(urlMatchFound, is(true));
+                }
+            }
+        }
+
+        assertThat(urlMatchCount, is(validDocsReadCount(docsThatShouldHaveBeenWritten)));
+    }
+
+    private static String buildTermUrl(String termId) {
+        return DEFAULT_QUICKGO_FRONTEND_TERM_URL + "/" + termId;
+    }
+
+    enum OntologyReadResult {
+        GO_DOC,
+        ECO_DOC,
+        NULL,
+        DOC_READER_EXCEPTION
+    }
+
+    @Configuration
+    public static class TestConfig {
+        /**
+         * A mocked {@link OntologyReader} instance.
+         * @return A mocked {@link OntologyReader} instance.
+         */
+        @Bean
+        @Primary
+        public OntologyReader ontologyReader() {
+            return mock(OntologyReader.class);
+        }
+
+        /**
+         * A real {@link WebSitemapGenerator} instance, which is instructed to write to a temporary folder.
+         * @return the test {@link WebSitemapGenerator} instance.
+         */
+        @Bean
+        @Primary
+        public WebSitemapGenerator sitemapGenerator() {
+            try {
+                return WebSitemapGenerator
+                        .builder(DEFAULT_QUICKGO_FRONTEND_URL, siteMapTempFolder.getRoot())
+                        .build();
+            } catch (MalformedURLException e) {
+                LOGGER.error("Sitemap URL is malformed", e);
+                throw new IllegalStateException(e);
+            }
+        }
     }
 }

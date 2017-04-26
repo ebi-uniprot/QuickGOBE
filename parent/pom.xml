@@ -18,7 +18,7 @@
         <skipUTs>false</skipUTs>
 
         <!-- Test coverage -->
-        <jacoco.outputDir>${project.build.directory}/../../coverage-reports</jacoco.outputDir>
+        <jacoco.outputDir>${project.build.directory}/coverage-reports</jacoco.outputDir>
 
         <!-- Unit test report path -->
         <jacoco.out.ut.file>jacoco-ut.exec</jacoco.out.ut.file>
@@ -54,9 +54,9 @@
 
         <!-- plugin version numbers -->
         <compiler.version>3.3</compiler.version>
-        <surefire-version>2.18.1</surefire-version>
-        <failsafe-version>2.18.1</failsafe-version>
-        <jacoco.version>0.7.5.201505241946</jacoco.version>
+        <surefire-version>2.19.1</surefire-version>
+        <failsafe-version>2.19.1</failsafe-version>
+        <jacoco.version>0.7.8</jacoco.version>
         <maven-jar-plugin.version>2.6</maven-jar-plugin.version>
 
         <!-- jmeter default properties -->

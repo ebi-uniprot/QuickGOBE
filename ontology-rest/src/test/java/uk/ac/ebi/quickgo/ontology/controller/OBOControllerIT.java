@@ -1,22 +1,6 @@
 package uk.ac.ebi.quickgo.ontology.controller;
 
-import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
-import uk.ac.ebi.quickgo.graphics.model.GraphImageLayout;
-import uk.ac.ebi.quickgo.graphics.ontology.GraphImage;
-import uk.ac.ebi.quickgo.graphics.ontology.GraphImageResult;
-import uk.ac.ebi.quickgo.graphics.ontology.RenderingGraphException;
-import uk.ac.ebi.quickgo.graphics.service.GraphImageService;
-import uk.ac.ebi.quickgo.ontology.OntologyREST;
-import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
-import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
-import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
-import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
-import uk.ac.ebi.quickgo.ontology.traversal.OntologyGraph;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
+import org.apache.http.HttpHeaders;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -33,25 +17,36 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
+import uk.ac.ebi.quickgo.graphics.model.GraphImageLayout;
+import uk.ac.ebi.quickgo.graphics.ontology.GraphImage;
+import uk.ac.ebi.quickgo.graphics.ontology.GraphImageResult;
+import uk.ac.ebi.quickgo.graphics.ontology.RenderingGraphException;
+import uk.ac.ebi.quickgo.graphics.service.GraphImageService;
+import uk.ac.ebi.quickgo.ontology.OntologyREST;
+import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
+import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
+import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
+import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
+import uk.ac.ebi.quickgo.ontology.traversal.OntologyGraph;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.*;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static uk.ac.ebi.quickgo.common.converter.HelpfulConverter.toCSV;
+import static uk.ac.ebi.quickgo.ontology.OntologyRestConfig.*;
 import static uk.ac.ebi.quickgo.ontology.controller.OBOController.*;
 
 /**
@@ -74,6 +69,7 @@ public abstract class OBOControllerIT {
     private static final String RELATIONS_PARAM = "relations";
 
     private static final int RELATIONSHIP_CHAIN_LENGTH = 10;
+    public static final int WAIT_PERIOD = 10;
 
     @Autowired
     protected WebApplicationContext webApplicationContext;
@@ -83,12 +79,9 @@ public abstract class OBOControllerIT {
 
     @Autowired
     protected OntologyGraph ontologyGraph;
-
+    protected MockMvc mockMvc;
     @Autowired
     private GraphImageService graphImageService;
-
-    protected MockMvc mockMvc;
-
     private String resourceUrl;
     private String validId;
     private String validIdsShortCSV;
@@ -104,6 +97,12 @@ public abstract class OBOControllerIT {
 
     @Value("${ontology.max_page_size:30}")
     private int maxPageSize;
+
+    @Value("${ontology.cache.control.start.time:18}")
+    private int cacheControlStartTime;
+
+    @Value("${ontology.cache.control.end.time:18}")
+    private int cacheControlEndTime;
 
     @Before
     public void setup() {
@@ -860,6 +859,37 @@ public abstract class OBOControllerIT {
                 get(buildTermsURLWithSubResource(invalidId(), CHART_COORDINATES_SUB_RESOURCE)));
 
         expectInvalidIdError(response, invalidId());
+    }
+
+
+    //-----------------------  Check Http Header for Cache-Control content ------------------------------------------
+
+    @Test
+    public void cacheControlMaxAgeReducesOnSubsequentRequests() throws Exception {
+        MvcResult mvcResult = mockMvc.perform(get(buildTermsURL(validId))).andReturn();
+
+        String ccHeader = mvcResult.getResponse().getHeader(HttpHeaders.CACHE_CONTROL);
+        assertThat(ccHeader, org.hamcrest.Matchers.startsWith(CACHE_CONTROL_HEADER));
+        String[] keyValEarlier = ccHeader.split("=");
+
+        assertThat(keyValEarlier[0], is(CACHE_CONTROL_HEADER));
+        long maxAgeInFirstCall = Long.parseLong(keyValEarlier[1]);
+        assertThat(maxAgeInFirstCall, is(greaterThanOrEqualTo(0L)));
+
+        //Now wait to see if cache expiry time changes.
+        Thread.sleep(WAIT_PERIOD);
+
+        mvcResult = mockMvc.perform(get(buildTermsURL(validId))).andReturn();
+
+        ccHeader = mvcResult.getResponse().getHeader(HttpHeaders.CACHE_CONTROL);
+        String[] keyValLater = ccHeader.split("=");
+
+        assertThat(keyValLater[0], is(CACHE_CONTROL_HEADER));
+        long maxAgeInSecondCall = Long.parseLong(keyValLater[1]);
+
+        //Compare earlier to later
+        assertThat(maxAgeInSecondCall, is(greaterThanOrEqualTo(0L)));
+        assertThat(maxAgeInFirstCall, is(greaterThanOrEqualTo(maxAgeInSecondCall)));
     }
 
     private void requestToChartServiceReturnsValidImage() {

@@ -116,6 +116,11 @@ public class CompositePresetImpl implements CompositePreset {
         return sortedPresetItems(EXT_RELATIONS);
     }
 
+    @Override
+    public List<PresetItem> getExtDatabases() {
+        return sortedPresetItems(EXT_DATABASES);
+    }
+
     private void initialiseStaticPresets() {
         presetsMap.put(ASPECTS, StaticAspects.createAspects());
         presetsMap.put(GENE_PRODUCT_TYPES, StaticGeneProductTypes.createGeneProductTypes());

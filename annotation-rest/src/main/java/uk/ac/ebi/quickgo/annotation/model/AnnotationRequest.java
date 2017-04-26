@@ -8,7 +8,6 @@ import uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern;
 import uk.ac.ebi.quickgo.rest.search.AggregateFunction;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 
-import com.google.common.base.Preconditions;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.*;
 import java.util.stream.Stream;
@@ -17,6 +16,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static uk.ac.ebi.quickgo.annotation.common.AnnotationFields.Facetable;
 import static uk.ac.ebi.quickgo.annotation.common.AnnotationFields.Searchable;
 import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.*;
@@ -24,7 +24,7 @@ import static uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern.Flag.CASE_I
 
 /**
  * A data structure for the annotation filtering parameters passed in from the client.
- *
+ * <p>
  * Once the comma separated values have been set, then turn then into an object (SimpleFilter) that
  * encapsulates the list and solr field name to use for that argument.
  *
@@ -34,11 +34,14 @@ import static uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern.Flag.CASE_I
  * Created with IntelliJ IDEA.
  */
 public class AnnotationRequest {
-    static final int MAX_GO_IDS = 500;
+    static final int MAX_GO_IDS = 600;
     static final int MAX_GENE_PRODUCT_IDS = 500;
     static final int MAX_EVIDENCE_CODE = 100;
     static final int MAX_TAXON_IDS = 50;
     static final int MAX_REFERENCES = 50;
+    static final int MIN_DOWNLOAD_NUMBER = 1;
+    static final int MAX_DOWNLOAD_NUMBER = 50000;
+    static final int DEFAULT_DOWNLOAD_LIMIT = 10000;
 
     //Names of the parameters in readable format
     static final String ASSIGNED_BY_PARAM = "Assigned By";
@@ -52,15 +55,26 @@ public class AnnotationRequest {
     static final String GENE_PRODUCT_SUBSET_PARAM = "Gene Product Subset identifier";
     static final String GENE_PRODUCT_PARAM = "Gene Product ID";
     static final String REFERENCE_PARAM = "Reference";
-    static final String QUALIFIER_PARAM = "Qualifer";
 
+    static final String QUALIFIER_PARAM = "Qualifer";
+    static final String TAXON_USAGE_ID = "taxonId";
+
+    static final String TAXON_USAGE_FIELD = "taxonUsage";
     static final String GO_USAGE_ID = "goId";
     static final String GO_USAGE_FIELD = "goUsage";
-    static final String GO_USAGE_RELATIONSHIPS = "goUsageRelationships";
 
+    static final String GO_USAGE_RELATIONSHIPS = "goUsageRelationships";
     static final String EVIDENCE_CODE_USAGE_ID = "evidenceCode";
     static final String EVIDENCE_CODE_USAGE_FIELD = "evidenceCodeUsage";
+
     static final String EVIDENCE_CODE_USAGE_RELATIONSHIPS = "evidenceCodeUsageRelationships";
+    static final String DESCENDANTS_USAGE = "descendants";
+    static final String EXACT_USAGE = "exact";
+    static final String SLIM_USAGE = "slim";
+
+    static final String DEFAULT_TAXON_USAGE = DESCENDANTS_USAGE;
+    static final String DEFAULT_EVIDENCE_CODE_USAGE = DESCENDANTS_USAGE;
+    static final String DEFAULT_GO_USAGE = DESCENDANTS_USAGE;
 
     /**
      * indicates which fields should be looked at when creating filters
@@ -74,7 +88,6 @@ public class AnnotationRequest {
             Searchable.GO_EVIDENCE,
             Searchable.QUALIFIER,
             Searchable.REFERENCE,
-            Searchable.TAXON_ID,
             Searchable.TARGET_SET,
             Searchable.WITH_FROM,
             Searchable.EXTENSION
@@ -83,7 +96,7 @@ public class AnnotationRequest {
     /**
      * At the moment the definition of the list is hardcoded because we only have need to display annotation and
      * gene product statistics on a subset of types.
-     *
+     * <p>
      * Note: We can in the future change this from a hard coded implementation, to something that is decided by the
      * client.
      */
@@ -105,7 +118,7 @@ public class AnnotationRequest {
     @ApiModelProperty(
             value = "Number of results per page.",
             allowableValues = "range[" + MIN_ENTRIES_PER_PAGE + "," + MAX_ENTRIES_PER_PAGE + "]")
-    private int limit = DEFAULT_ENTRIES_PER_PAGE;
+    protected int limit = DEFAULT_ENTRIES_PER_PAGE;
 
     @ApiModelProperty(
             value = "Page number of the result set to display.",
@@ -166,9 +179,15 @@ public class AnnotationRequest {
     private String taxonId;
 
     @ApiModelProperty(
+            value = "Indicates how the taxonomic identifier within the annotations should be used.",
+            allowableValues = "descendants,exact",
+            example = "exact")
+    private String taxonUsage;
+
+    @ApiModelProperty(
             value = "Indicates how the GO terms within the annotations should be used. Is used in conjunction with " +
                     "'goUsageRelationships'.",
-            allowableValues = "descendants,slim",
+            allowableValues = "descendants,exact,slim",
             example = "descendants")
     private String goUsage;
 
@@ -183,7 +202,7 @@ public class AnnotationRequest {
     @ApiModelProperty(
             value = "Indicates how the evidence code terms within the annotations should be used. Is used in " +
                     "conjunction with 'evidenceCodeUsageRelationships'.",
-            allowableValues = "descendants",
+            allowableValues = "descendants,exact",
             example = "descendants")
     private String evidenceCodeUsage;
 
@@ -227,13 +246,19 @@ public class AnnotationRequest {
             example = "occurs_in(CL:0000032),transports_or_maintains_localization_of(UniProtKB:P10288)|" +
                     "results_in_formation_of(UBERON:0003070),occurs_in(CL:0000032),occurs_in(CL:0000008)," +
                     "results_in_formation_of(UBERON:0001675)")
-    private String[] extensions;
+    private String extension;
+
+    @ApiModelProperty(
+            value = "The number of annotations to download. Note, the page size parameter [limit] will be ignored " +
+                    "when downloading results.",
+            allowableValues = "range[" + MIN_DOWNLOAD_NUMBER + "," + MAX_DOWNLOAD_NUMBER + "]")
+    private int downloadLimit = DEFAULT_DOWNLOAD_LIMIT;
 
     private final Map<String, String[]> filterMap = new HashMap<>();
 
     /**
-     *  E.g. ASPGD,Agbase,..
-     *  In the format assignedBy=ASPGD,Agbase
+     * E.g. ASPGD,Agbase,..
+     * In the format assignedBy=ASPGD,Agbase
      */
     public void setAssignedBy(String... assignedBy) {
         if (assignedBy != null) {
@@ -293,6 +318,7 @@ public class AnnotationRequest {
      * The older evidence codes
      * E.g. IEA, IBA, IBD etc. See <a href="http://geneontology.org/page/guide-go-evidence-codes">Guide QuickGO
      * evidence codes</a>
+     *
      * @param evidence the evidence code
      */
     public void setGoIdEvidence(String... evidence) {
@@ -320,6 +346,7 @@ public class AnnotationRequest {
      * A list of with/from values, separated by commas
      * In the format withFrom=PomBase:SPBP23A10.14c,RGD:621207 etc
      * Users can supply just the id (e.g. PomBase) or id SPBP23A10.14c
+     *
      * @param withFrom comma separated with/from values
      */
     public void setWithFrom(String... withFrom) {
@@ -328,6 +355,7 @@ public class AnnotationRequest {
 
     /**
      * Return a list of with/from values, separated by commas
+     *
      * @return String containing comma separated list of with/From values.
      */
     @WithFromValidator
@@ -336,15 +364,25 @@ public class AnnotationRequest {
     }
 
     public void setTaxonId(String... taxId) {
-        filterMap.put(Searchable.TAXON_ID, taxId);
+        filterMap.put(TAXON_USAGE_ID, taxId);
     }
 
     @ArrayPattern(regexp = "^[0-9]+$", paramName = TAXON_ID_PARAM)
     @Size(max = MAX_TAXON_IDS,
             message = "Number of items in '" + TAXON_ID_PARAM + "' is larger than: {max}")
-
     public String[] getTaxonId() {
-        return filterMap.get(Searchable.TAXON_ID);
+        return filterMap.get(TAXON_USAGE_ID);
+    }
+
+    public void setTaxonUsage(String usage) {
+        if (usage != null) {
+            filterMap.put(TAXON_USAGE_FIELD, new String[]{usage.toLowerCase()});
+        }
+    }
+
+    @Pattern(regexp = "^exact|descendants$", message = "Invalid taxonUsage: ${validatedValue}", flags = {Pattern.Flag.CASE_INSENSITIVE})
+    public String getTaxonUsage() {
+        return filterMap.get(TAXON_USAGE_FIELD) == null ? DEFAULT_TAXON_USAGE : filterMap.get(TAXON_USAGE_FIELD)[0];
     }
 
     /**
@@ -367,10 +405,11 @@ public class AnnotationRequest {
         }
     }
 
-    @Pattern(regexp = "^descendants$", flags = Pattern.Flag.CASE_INSENSITIVE,
+    @Pattern(regexp = "^descendants|exact$", flags = Pattern.Flag.CASE_INSENSITIVE,
             message = "Invalid evidenceCodeUsage: ${validatedValue}")
     public String getEvidenceCodeUsage() {
-        return filterMap.get(EVIDENCE_CODE_USAGE_FIELD) == null ? null : filterMap.get(EVIDENCE_CODE_USAGE_FIELD)[0];
+        return filterMap.get(EVIDENCE_CODE_USAGE_FIELD) == null ?
+                DEFAULT_EVIDENCE_CODE_USAGE : filterMap.get(EVIDENCE_CODE_USAGE_FIELD)[0];
     }
 
     @ArrayPattern(regexp = "^is_a|part_of|occurs_in|regulates$", flags = CASE_INSENSITIVE,
@@ -406,10 +445,10 @@ public class AnnotationRequest {
         }
     }
 
-    @Pattern(regexp = "^slim|descendants$", flags = Pattern.Flag.CASE_INSENSITIVE,
+    @Pattern(regexp = "^slim|descendants|exact$", flags = Pattern.Flag.CASE_INSENSITIVE,
             message = "Invalid goUsage: ${validatedValue}")
     public String getGoUsage() {
-        return filterMap.get(GO_USAGE_FIELD) == null ? null : filterMap.get(GO_USAGE_FIELD)[0];
+        return filterMap.get(GO_USAGE_FIELD) == null ? DEFAULT_GO_USAGE : filterMap.get(GO_USAGE_FIELD)[0];
     }
 
     @ArrayPattern(regexp = "^is_a|part_of|occurs_in|regulates$", flags = CASE_INSENSITIVE,
@@ -476,6 +515,18 @@ public class AnnotationRequest {
         this.page = page;
     }
 
+    @Min(value = MIN_DOWNLOAD_NUMBER, message = "Number of entries to download cannot be less than {value} " +
+            "but found: ${validatedValue}")
+    @Max(value = MAX_DOWNLOAD_NUMBER, message = "Number of entries to download cannot be more than {value} " +
+            "but found: ${validatedValue}")
+    public int getDownloadLimit() {
+        return downloadLimit;
+    }
+
+    public void setDownloadLimit(int downloadLimit) {
+        this.downloadLimit = downloadLimit;
+    }
+
     /**
      * A list of extension relationship values, separated by commas
      * In the format extension=occurs_in(PomBase:SPBP23A10.14c),RGD:621207 etc
@@ -487,6 +538,7 @@ public class AnnotationRequest {
 
     /**
      * Return a list of annotation extension values, separated by commas
+     *
      * @return String array containing comma separated list of extension values.
      */
     public String[] getExtension() {
@@ -509,6 +561,7 @@ public class AnnotationRequest {
 
         createGoUsageFilter().ifPresent(filterRequests::add);
         createEvidenceCodeUsageFilter().ifPresent(filterRequests::add);
+        createTaxonFilter().ifPresent(filterRequests::add);
 
         return filterRequests;
     }
@@ -526,37 +579,70 @@ public class AnnotationRequest {
         return request;
     }
 
+    private Optional<FilterRequest> createTaxonFilter() {
+        Optional<String> field = Optional.empty();
+        if (filterMap.containsKey(TAXON_USAGE_ID)) {
+            switch (getTaxonUsage()) {
+                case DESCENDANTS_USAGE:
+                    field = Optional.of(Searchable.TAXON_ANCESTORS);
+                    break;
+                case EXACT_USAGE:
+                default:
+                    field = Optional.of(Searchable.TAXON_ID);
+                    break;
+            }
+        } else {
+            if (filterMap.containsKey(TAXON_USAGE_FIELD)) {
+                throwUsageWithoutIdException(TAXON_ID_PARAM, TAXON_USAGE_FIELD);
+            }
+        }
+        return field.map(f -> FilterRequest
+                .newBuilder()
+                .addProperty(f, filterMap.get(TAXON_USAGE_ID))
+                .build());
+    }
+
+    private void throwUsageWithoutIdException(String idParam, String usageParam) {
+        throw new ParameterException("Annotation " + usageParam + " requires '" + idParam + "' to be set.");
+    }
+
     private Optional<FilterRequest> createGoUsageFilter() {
-        return createUsageFilter(GO_USAGE_FIELD, GO_USAGE_ID, Searchable.GO_ID, GO_USAGE_RELATIONSHIPS);
+        return createUsageFilter(GO_USAGE_FIELD, getGoUsage(), GO_USAGE_ID, Searchable.GO_ID, GO_USAGE_RELATIONSHIPS);
     }
 
     private Optional<FilterRequest> createEvidenceCodeUsageFilter() {
-        return createUsageFilter(EVIDENCE_CODE_USAGE_FIELD, EVIDENCE_CODE_USAGE_ID,
+        return createUsageFilter(EVIDENCE_CODE_USAGE_FIELD, getEvidenceCodeUsage(), EVIDENCE_CODE_USAGE_ID,
                 Searchable.EVIDENCE_CODE, EVIDENCE_CODE_USAGE_RELATIONSHIPS);
     }
 
-    private Optional<FilterRequest> createUsageFilter(String usageParam, String idParam, String idField,
+    private Optional<FilterRequest> createUsageFilter(String usageParam, String usageValue, String idParam, String
+            idField,
             String relationshipsParam) {
         Optional<FilterRequest> request;
         FilterRequest.Builder filterBuilder = FilterRequest.newBuilder();
 
-        if (filterMap.containsKey(usageParam)) {
-            if (filterMap.containsKey(idField)) {
-                assert filterMap.get(usageParam).length == 1 : usageParam + ": can only have one value";
-
-                String usageValue = filterMap.get(usageParam)[0];
-
-                filterBuilder
-                        .addProperty(usageValue)
-                        .addProperty(idParam, filterMap.get(idField));
-
-                filterBuilder.addProperty(relationshipsParam, filterMap.get(relationshipsParam));
-                request = Optional.of(filterBuilder.build());
-            } else {
-                throw new ParameterException("Annotation " + usageParam + " requires '" + idParam + "' to be set.");
+        if (filterMap.containsKey(idField)) {
+            // term id provided
+            switch (usageValue) {
+                case SLIM_USAGE:
+                case DESCENDANTS_USAGE:
+                    request = Optional.of(filterBuilder.addProperty(usageValue)
+                            .addProperty(idParam, filterMap.get(idField))
+                            .addProperty(relationshipsParam, filterMap.get(relationshipsParam))
+                            .build());
+                    break;
+                case EXACT_USAGE:
+                default:
+                    request = Optional.of(filterBuilder.addProperty(idField, filterMap.get(idField))
+                            .build());
+                    break;
             }
         } else {
-            request = createSimpleFilter(idField);
+            // no term id
+            if (filterMap.containsKey(usageParam)) {
+                throw new ParameterException("Annotation " + usageParam + " requires '" + idParam + "' to be set.");
+            }
+            request = Optional.empty();
         }
 
         return request;
@@ -582,13 +668,12 @@ public class AnnotationRequest {
         private final List<String> types;
 
         public StatsRequest(String groupName, String groupField, String aggregateFunction, List<String> types) {
-            Preconditions.checkArgument(groupName != null && !groupName.trim().isEmpty(),
+            checkArgument(groupName != null && !groupName.trim().isEmpty(),
                     "Statistics group name cannot be null or empty");
-            Preconditions.checkArgument(groupField != null && !groupName.trim().isEmpty(),
+            checkArgument(groupField != null && !groupName.trim().isEmpty(),
                     "Statistics group field cannot be null or empty");
-            Preconditions
-                    .checkArgument(aggregateFunction != null && !aggregateFunction.trim().isEmpty(), "Statistics " +
-                            "aggregate function cannot be null or empty");
+            checkArgument(aggregateFunction != null && !aggregateFunction.trim().isEmpty(), "Statistics " +
+                    "aggregate function cannot be null or empty");
 
             this.groupName = groupName;
             this.groupField = groupField;

@@ -8,15 +8,13 @@ import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import org.slf4j.Logger;
 import org.springframework.batch.item.ItemProcessor;
 
+import static java.util.Collections.singletonList;
 import static org.slf4j.LoggerFactory.getLogger;
 import static uk.ac.ebi.quickgo.index.annotation.AnnotationParsingHelper.*;
 import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.*;
@@ -69,6 +67,7 @@ class AnnotationDocumentConverter implements ItemProcessor<Annotation, Annotatio
         doc.targetSets = constructTargetSets(propertiesMap.get(TARGET_SET));
         doc.goAspect = propertiesMap.get(GO_ASPECT);
         doc.date = createDateFromString(annotation);
+        doc.taxonAncestors = constructTaxonAncestors(propertiesMap.get(TAXON_ANCESTORS));
 
         return doc;
     }
@@ -117,15 +116,29 @@ class AnnotationDocumentConverter implements ItemProcessor<Annotation, Annotatio
         return DEFAULT_TAXON;
     }
 
+    private List<Integer> constructTaxonAncestors(String rawAncestors) {
+        if (!Strings.isNullOrEmpty(rawAncestors)) {
+            Matcher matcher = RAW_TAXON_ANCESTORS_REGEX.matcher(rawAncestors);
+            if (matcher.matches()) {
+                return createNullableIntegerListFromDelimitedValues(rawAncestors, COMMA);
+            }
+        }
+        return singletonList(DEFAULT_TAXON);
+    }
+
+    private List<Integer> createNullableIntegerListFromDelimitedValues(String value, String delimiter) {
+        return value == null ? null : splitValueToIntegerList(value, delimiter);
+    }
+
     private List<String> constructExtensions(Annotation annotation) {
-        return createNullableListFromDelimitedValues(annotation.annotationExtension, PIPE);
+        return createNullableStringListFromDelimitedValues(annotation.annotationExtension, PIPE);
     }
 
     private List<String> constructWithFrom(Annotation annotation) {
-        return createNullableListFromDelimitedValues(annotation.with, PIPE);
+        return createNullableStringListFromDelimitedValues(annotation.with, PIPE);
     }
 
-    private List<String> createNullableListFromDelimitedValues(String value, String delimiter) {
+    private List<String> createNullableStringListFromDelimitedValues(String value, String delimiter) {
         return value == null ? null : Arrays.asList(splitValue(value, delimiter));
     }
 
@@ -134,6 +147,6 @@ class AnnotationDocumentConverter implements ItemProcessor<Annotation, Annotatio
     }
 
     private List<String> constructTargetSets(String value) {
-        return createNullableListFromDelimitedValues(value, COMMA);
+        return createNullableStringListFromDelimitedValues(value, COMMA);
     }
 }

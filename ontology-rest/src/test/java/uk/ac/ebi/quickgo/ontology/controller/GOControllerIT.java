@@ -17,6 +17,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static uk.ac.ebi.quickgo.common.converter.HelpfulConverter.toCSV;
 import static uk.ac.ebi.quickgo.ontology.controller.OBOController.COMPLETE_SUB_RESOURCE;
 import static uk.ac.ebi.quickgo.ontology.controller.OBOController.CONSTRAINTS_SUB_RESOURCE;
@@ -65,6 +66,16 @@ public class GOControllerIT extends OBOControllerIT {
                 .andExpect(jsonPath("$.results.*.proteinComplexes", hasSize(1)))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    public void about() throws Exception {
+        ResultActions response = mockMvc.perform(get(getResourceURL() + "/about"));
+        final String expectedVersion = "http://purl.obolibrary.org/obo/go/releases/2017-01-12/go.owl";
+        final String expectedTimestamp = "2017-01-13 02:19";
+        response.andDo(print())
+                .andExpect(jsonPath("$.go.version").value(expectedVersion))
+                .andExpect(jsonPath("$.go.timestamp").value(expectedTimestamp));
     }
 
     /*

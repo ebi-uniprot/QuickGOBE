@@ -4,8 +4,8 @@
 
 ## ---------------------------- ASSOCIATED SOLR CORE INFO ----------------------------
 core_name="annotation";
-job_name="annotationIndexingJob";
-
+job_name="annotationIndexingJob"; #index annotations and coterms
+#job_name="coTermIndexingJob"; to run coterms only
 
 ## ---------------------------- FOR JAVA ----------------------------
 #SOLR_ADDRESS="$SOLR_ADDRESS_BASE/$CORE_NAME"

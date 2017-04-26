@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.index.geneproduct;
 
-import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
+import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductDocument;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepository;
 import uk.ac.ebi.quickgo.index.common.JobTestRunnerConfig;

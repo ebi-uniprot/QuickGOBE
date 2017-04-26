@@ -31,6 +31,7 @@ public class AnnotationFields {
     static final String REFERENCE = "reference";
     static final String TARGET_SET = "targetSet";
     static final String TAXON_ID = "taxonId";
+    static final String TAXON_ANCESTORS = "taxonAncestors";
     static final String WITH_FROM = "withFrom";
     static final String INTERACTING_TAXON_ID = "interactingTaxonId";
 
@@ -53,6 +54,7 @@ public class AnnotationFields {
         public static final String REFERENCE = storeAndGet(VALUES, "reference_search");
         public static final String TARGET_SET = storeAndGet(VALUES, "targetSet_unsorted");
         public static final String TAXON_ID = storeAndGet(VALUES, "taxonId_unsorted");
+        public static final String TAXON_ANCESTORS = storeAndGet(VALUES, "taxonAncestors_unsorted");
         public static final String WITH_FROM = storeAndGet(VALUES, "withFrom_search");
         public static final String EXTENSION = storeAndGet(VALUES, "extension_search");
 

@@ -2,10 +2,12 @@ package uk.ac.ebi.quickgo.index.annotation;
 
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
-import uk.ac.ebi.quickgo.common.solr.TemporarySolrDataStore;
-import uk.ac.ebi.quickgo.index.annotation.coterms.CoTermTemporaryDataStore;
+import uk.ac.ebi.quickgo.common.store.BasicTemporaryFolder;
+import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
+import uk.ac.ebi.quickgo.index.annotation.coterms.CoTermsConfigProperties;
 import uk.ac.ebi.quickgo.index.common.JobTestRunnerConfig;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -19,6 +21,9 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationContextLoader;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -41,15 +46,16 @@ import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermsConfig.CO_TERM_M
 @ActiveProfiles(profiles = {"embeddedServer"})
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(
-        classes = {AnnotationConfig.class, JobTestRunnerConfig.class, CoTermTemporaryDataStore.Config.class},
+        classes = {AnnotationIndexingBatchIT.TestConfig.class,
+                AnnotationIndexingConfig.class, JobTestRunnerConfig.class},
         loader = SpringApplicationContextLoader.class)
 public class AnnotationIndexingBatchIT {
 
     @ClassRule
-    public static final CoTermTemporaryDataStore coTermsDataStore = new CoTermTemporaryDataStore();
+    public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
 
     @ClassRule
-    public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
+    public static BasicTemporaryFolder basicTemporaryFolder = new BasicTemporaryFolder();
 
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
@@ -58,7 +64,7 @@ public class AnnotationIndexingBatchIT {
     private AnnotationRepository annotationRepository;
 
     @Before
-    public void setUp() {
+    public void setUp() throws IOException {
         annotationRepository.deleteAll();
     }
 
@@ -119,11 +125,27 @@ public class AnnotationIndexingBatchIT {
         //Has finished
         BatchStatus status = jobExecution.getStatus();
         assertThat(status, is(BatchStatus.COMPLETED));
-
     }
 
     private List<String> getGeneProductIdsFromAnnotationDocuments(Iterable<AnnotationDocument> repoDocsWritten) {
         return StreamSupport.stream(repoDocsWritten.spliterator(), false).map(i -> i.geneProductId).collect(Collectors
                 .toList());
+    }
+
+    /**
+     * Configure properties used by co-term generation, using test values.
+     */
+    @Configuration
+    public static class TestConfig {
+        @Primary
+        @Bean
+        public CoTermsConfigProperties primaryCoTermsConfigProperties() {
+            CoTermsConfigProperties properties = new CoTermsConfigProperties();
+            properties.setChunkSize(1);
+            properties.setLoginterval(100);
+            properties.setManual(basicTemporaryFolder.getRoot().getAbsolutePath() + "/CoTermsManual");
+            properties.setAll(basicTemporaryFolder.getRoot().getAbsolutePath() + "/CoTermsAll");
+            return properties;
+        }
     }
 }
