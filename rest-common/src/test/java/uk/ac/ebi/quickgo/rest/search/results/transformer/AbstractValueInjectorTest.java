@@ -58,7 +58,7 @@ public class AbstractValueInjectorTest {
     }
 
     @Test
-    public void restResponse404LeavesNullAnnotationGoName() {
+    public void nonFatalRestResponseLeavesNullModelId() {
         ExecutionException executionException =
                 new ExecutionException(new HttpClientErrorException(HttpStatus.NOT_FOUND));
         doThrow(new RetrievalException(executionException)).when(mockRestFetcher).convert(any());
@@ -71,7 +71,7 @@ public class AbstractValueInjectorTest {
     }
 
     @Test(expected = RetrievalException.class)
-    public void fatalRestResponseCausesExeption() {
+    public void fatalRestResponseCausesException() {
         ExecutionException executionException =
                 new ExecutionException(new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
         doThrow(new RetrievalException(executionException)).when(mockRestFetcher).convert(any());
