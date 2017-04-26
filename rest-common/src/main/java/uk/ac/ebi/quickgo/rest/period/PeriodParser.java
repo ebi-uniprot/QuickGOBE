@@ -18,7 +18,7 @@ import static java.util.stream.Collectors.toList;
  */
 public abstract class PeriodParser {
     private Logger LOGGER = LoggerFactory.getLogger(PeriodParser.class);
-    private static final String TOO_SYMBOL = "-";
+    private static final String TO_SYMBOL = "-";
     private static final int REQUIRED_DATE_MODIFYING_INSTANCES = 2;
 
     /**
@@ -42,7 +42,7 @@ public abstract class PeriodParser {
     protected abstract Optional<DateModifier> toDateModifier(String input);
 
     private Optional<AlarmClock> getPeriod(String input) {
-        String[] fromTo = input.split(TOO_SYMBOL);
+        String[] fromTo = input.split(TO_SYMBOL);
         if (fromTo.length == REQUIRED_DATE_MODIFYING_INSTANCES) {
             List<DateModifier> durationList = Arrays.stream(fromTo)
                                                     .map(this::toDateModifier)
