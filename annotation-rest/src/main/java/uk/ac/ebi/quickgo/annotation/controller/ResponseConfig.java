@@ -6,8 +6,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import uk.ac.ebi.quickgo.annotation.download.converter.AnnotationToGAF;
 import uk.ac.ebi.quickgo.annotation.download.converter.AnnotationToGPAD;
+import uk.ac.ebi.quickgo.annotation.download.converter.AnnotationToTSV;
 import uk.ac.ebi.quickgo.annotation.download.http.GAFHttpMessageConverter;
 import uk.ac.ebi.quickgo.annotation.download.http.GPADHttpMessageConverter;
+import uk.ac.ebi.quickgo.annotation.download.http.TSVHttpMessageConverter;
 import uk.ac.ebi.quickgo.rest.controller.response.NoFacetNoHighlightNoAggregateQueryResult;
 import uk.ac.ebi.quickgo.rest.controller.response.NoNextCursorPageInfo;
 import uk.ac.ebi.quickgo.rest.search.results.PageInfo;
@@ -44,11 +46,20 @@ import java.util.Map;
         return new GAFHttpMessageConverter(gafAnnotationConverter());
     }
 
+    @Bean
+    public TSVHttpMessageConverter tsvHttpMessageConverter(){
+        return new TSVHttpMessageConverter(annotationToTSV());
+    }
+
     private AnnotationToGPAD gpadAnnotationConverter() {
         return new AnnotationToGPAD();
     }
 
     private AnnotationToGAF gafAnnotationConverter() {
         return new AnnotationToGAF();
+    }
+
+    private AnnotationToTSV annotationToTSV(){
+        return new AnnotationToTSV();
     }
 }
