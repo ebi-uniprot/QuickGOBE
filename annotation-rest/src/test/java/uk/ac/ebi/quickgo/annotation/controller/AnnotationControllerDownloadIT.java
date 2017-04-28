@@ -5,8 +5,7 @@ import uk.ac.ebi.quickgo.annotation.AnnotationREST;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker;
-import uk.ac.ebi.quickgo.annotation.download.http.GAFHttpMessageConverter;
-import uk.ac.ebi.quickgo.annotation.download.http.GPADHttpMessageConverter;
+import uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory;
 import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 
 import java.util.ArrayList;
@@ -40,8 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.createGenericDocs;
 import static uk.ac.ebi.quickgo.annotation.controller.DownloadResponseVerifier.nonNullMandatoryFieldsExist;
-import static uk.ac.ebi.quickgo.annotation.download.http.GAFHttpMessageConverter.GAF_MEDIA_TYPE;
-import static uk.ac.ebi.quickgo.annotation.download.http.GPADHttpMessageConverter.GPAD_MEDIA_TYPE;
+import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.*;
 
 /**
  * Tests whether the downloading functionality of the {@link AnnotationController} works as expected.
@@ -157,6 +155,11 @@ public class AnnotationControllerDownloadIT {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    public void canDownloadInTSVFormat() throws Exception {
+        canDownload(TSV_MEDIA_TYPE);
+    }
+
     private List<AnnotationDocument> createDocs(int number) {
         return createGenericDocs(number, AnnotationDocMocker::createUniProtGPID);
     }
@@ -184,10 +187,9 @@ public class AnnotationControllerDownloadIT {
     }
 
     private void checkResponse(MediaType mediaType, ResultActions response, List<String> storedIds) throws Exception {
-        response
+        response.andDo(print())
                 .andExpect(request().asyncStarted())
                 .andDo(MvcResult::getAsyncResult)
-                .andDo(print())
                 .andExpect(header().string(CONTENT_DISPOSITION, endsWith(getFileNameEndingFor(mediaType))))
                 .andExpect(content().contentType(mediaType))
                 .andExpect(nonNullMandatoryFieldsExist(mediaType))
@@ -226,8 +228,9 @@ public class AnnotationControllerDownloadIT {
 
     private String getFileNameEndingFor(MediaType mediaType) {
         switch (mediaType.getSubtype()) {
-            case GAFHttpMessageConverter.SUB_TYPE:
-            case GPADHttpMessageConverter.SUB_TYPE:
+            case MediaTypeFactory.GAF_SUB_TYPE:
+            case MediaTypeFactory.GPAD_SUB_TYPE:
+            case MediaTypeFactory.TSV_SUB_TYPE:
                 return "." + mediaType.getSubtype() + "\"";
             default:
                 throw new IllegalArgumentException("Unknown media type: " + mediaType);
