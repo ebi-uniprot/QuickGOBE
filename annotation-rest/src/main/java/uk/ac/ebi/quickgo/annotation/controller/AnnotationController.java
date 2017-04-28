@@ -46,8 +46,10 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.http.HttpHeaders.ACCEPT;
-import static uk.ac.ebi.quickgo.annotation.download.http.GAFHttpMessageConverter.GAF_MEDIA_TYPE_STRING;
-import static uk.ac.ebi.quickgo.annotation.download.http.GPADHttpMessageConverter.GPAD_MEDIA_TYPE_STRING;
+
+import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.TSV_MEDIA_TYPE_STRING;
+import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.GAF_MEDIA_TYPE_STRING;
+import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.GPAD_MEDIA_TYPE_STRING;
 import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.searchAndTransform;
 import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.streamSearchResults;
 import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.createFirstCursorPage;
@@ -105,13 +107,11 @@ import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.createFirstCursorPa
 @RequestMapping(value = "/annotation")
 public class AnnotationController {
     private static final Logger LOGGER = getLogger(AnnotationController.class);
-    public static final DateTimeFormatter DOWNLOAD_FILE_NAME_DATE_FORMATTER =
+    private static final DateTimeFormatter DOWNLOAD_FILE_NAME_DATE_FORMATTER =
             DateTimeFormatter.ofPattern("-N-yyyyMMdd");
-    public static final String DOWNLOAD_FILE_NAME_PREFIX = "QuickGO-annotations";
+    private static final String DOWNLOAD_FILE_NAME_PREFIX = "QuickGO-annotations";
 
     private final MetaDataProvider metaDataProvider;
-
-    private final ControllerValidationHelper validationHelper;
 
     private final SearchService<Annotation> annotationSearchService;
 
@@ -126,7 +126,6 @@ public class AnnotationController {
     @Autowired
     public AnnotationController(SearchService<Annotation> annotationSearchService,
             SearchServiceConfig.AnnotationCompositeRetrievalConfig annotationRetrievalConfig,
-            ControllerValidationHelper validationHelper,
             FilterConverterFactory converterFactory,
             ResultTransformerChain<QueryResult<Annotation>> resultTransformerChain,
             StatisticsService statsService,
@@ -148,7 +147,6 @@ public class AnnotationController {
 
 
         this.annotationSearchService = annotationSearchService;
-        this.validationHelper = validationHelper;
         this.converterFactory = converterFactory;
 
         this.statsService = statsService;
@@ -216,7 +214,7 @@ public class AnnotationController {
     }
 
     @RequestMapping(value = "/downloadSearch",
-            method = {RequestMethod.GET}, produces = {GPAD_MEDIA_TYPE_STRING, GAF_MEDIA_TYPE_STRING})
+            method = {RequestMethod.GET}, produces = {GPAD_MEDIA_TYPE_STRING, GAF_MEDIA_TYPE_STRING, TSV_MEDIA_TYPE_STRING})
     public ResponseEntity<ResponseBodyEmitter> downloadLookup(
             @Valid @ModelAttribute AnnotationRequest request,
             BindingResult bindingResult,
