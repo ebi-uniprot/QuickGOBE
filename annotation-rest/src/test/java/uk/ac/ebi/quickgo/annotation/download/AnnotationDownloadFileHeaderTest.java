@@ -94,10 +94,13 @@ public class AnnotationDownloadFileHeaderTest {
         verify(mockEmitter, never()).send(decorateContent(""), MediaType.TEXT_PLAIN);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void headerOutputThrowsExceptionWhenMediaTypeIsUnexpected() throws Exception {
+    @Test
+    public void headerOutputIsDefaultWhenMediaTypeIsUnexpected() throws Exception {
         when(mockMediaType.getSubtype()).thenReturn("FOOBAR");
         annotationDownloadFileHeader.write(mockEmitter, mockRequest, mockMediaType);
+
+        //Test
+        testRestOfHeader();
     }
 
     @Test(expected = IllegalArgumentException.class)
