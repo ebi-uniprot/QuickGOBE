@@ -1,7 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.download;
 
-import uk.ac.ebi.quickgo.annotation.download.http.GAFHttpMessageConverter;
-import uk.ac.ebi.quickgo.annotation.download.http.GPADHttpMessageConverter;
+import uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -65,7 +64,7 @@ public class AnnotationDownloadFileHeaderTest {
 
     @Test
     public void produceGAFHeader() throws Exception {
-        when(mockMediaType.getSubtype()).thenReturn(GAFHttpMessageConverter.SUB_TYPE);
+        when(mockMediaType.getSubtype()).thenReturn(MediaTypeFactory.GAF_SUB_TYPE);
         annotationDownloadFileHeader.write(mockEmitter, mockRequest, mockMediaType);
 
         //Test
@@ -75,7 +74,7 @@ public class AnnotationDownloadFileHeaderTest {
 
     @Test
     public void produceGPADHeader() throws Exception {
-        when(mockMediaType.getSubtype()).thenReturn(GPADHttpMessageConverter.SUB_TYPE);
+        when(mockMediaType.getSubtype()).thenReturn(MediaTypeFactory.GPAD_SUB_TYPE);
         annotationDownloadFileHeader.write(mockEmitter, mockRequest, mockMediaType);
 
         //Test
@@ -86,7 +85,7 @@ public class AnnotationDownloadFileHeaderTest {
     @Test
     public void headerOutputDoesNotContainOntologyInformationWhenFileIsNotAvailable() throws Exception {
         Path ontologyPath = Paths.get("/nowhere/city");
-        when(mockMediaType.getSubtype()).thenReturn(GAFHttpMessageConverter.SUB_TYPE);
+        when(mockMediaType.getSubtype()).thenReturn(MediaTypeFactory.GAF_SUB_TYPE);
         annotationDownloadFileHeader = new AnnotationDownloadFileHeader(ontologyPath);
         annotationDownloadFileHeader.write(mockEmitter, mockRequest, mockMediaType);
         verify(mockEmitter, never()).send(decorateContent(ECO_VERSION), MediaType.TEXT_PLAIN);
