@@ -25,6 +25,11 @@ public class Annotation {
 
     public String goId;
 
+    /**
+     * An optional field whose value originates from an external service.
+     */
+    public String goName;
+
     public String goEvidence;
 
     public String goAspect;
@@ -37,6 +42,11 @@ public class Annotation {
 
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     public int taxonId;
+
+    /**
+     * An optional field whose value originates from an external service.
+     */
+    public String taxonName;
 
     public String assignedBy;
 
@@ -60,18 +70,21 @@ public class Annotation {
                 ", geneProductId='" + geneProductId + '\'' +
                 ", qualifier='" + qualifier + '\'' +
                 ", goId='" + goId + '\'' +
+                ", goName='" + goName + '\'' +
                 ", goEvidence='" + goEvidence + '\'' +
                 ", goAspect='" + goAspect + '\'' +
                 ", evidenceCode='" + evidenceCode + '\'' +
                 ", reference='" + reference + '\'' +
                 ", withFrom=" + withFrom +
                 ", taxonId=" + taxonId +
+                ", taxonName='" + taxonName + '\'' +
                 ", assignedBy='" + assignedBy + '\'' +
                 ", extensions=" + extensions +
                 ", slimmedIds=" + slimmedIds +
                 ", targetSets=" + targetSets +
                 ", symbol='" + symbol + '\'' +
                 ", date=" + date +
+                ", interactingTaxonId=" + interactingTaxonId +
                 '}';
     }
 
@@ -88,6 +101,9 @@ public class Annotation {
         if (taxonId != that.taxonId) {
             return false;
         }
+        if (interactingTaxonId != that.interactingTaxonId) {
+            return false;
+        }
         if (id != null ? !id.equals(that.id) : that.id != null) {
             return false;
         }
@@ -98,6 +114,9 @@ public class Annotation {
             return false;
         }
         if (goId != null ? !goId.equals(that.goId) : that.goId != null) {
+            return false;
+        }
+        if (goName != null ? !goName.equals(that.goName) : that.goName != null) {
             return false;
         }
         if (goEvidence != null ? !goEvidence.equals(that.goEvidence) : that.goEvidence != null) {
@@ -113,6 +132,9 @@ public class Annotation {
             return false;
         }
         if (withFrom != null ? !withFrom.equals(that.withFrom) : that.withFrom != null) {
+            return false;
+        }
+        if (taxonName != null ? !taxonName.equals(that.taxonName) : that.taxonName != null) {
             return false;
         }
         if (assignedBy != null ? !assignedBy.equals(that.assignedBy) : that.assignedBy != null) {
@@ -138,18 +160,21 @@ public class Annotation {
         result = 31 * result + (geneProductId != null ? geneProductId.hashCode() : 0);
         result = 31 * result + (qualifier != null ? qualifier.hashCode() : 0);
         result = 31 * result + (goId != null ? goId.hashCode() : 0);
+        result = 31 * result + (goName != null ? goName.hashCode() : 0);
         result = 31 * result + (goEvidence != null ? goEvidence.hashCode() : 0);
         result = 31 * result + (goAspect != null ? goAspect.hashCode() : 0);
         result = 31 * result + (evidenceCode != null ? evidenceCode.hashCode() : 0);
         result = 31 * result + (reference != null ? reference.hashCode() : 0);
         result = 31 * result + (withFrom != null ? withFrom.hashCode() : 0);
         result = 31 * result + taxonId;
+        result = 31 * result + (taxonName != null ? taxonName.hashCode() : 0);
         result = 31 * result + (assignedBy != null ? assignedBy.hashCode() : 0);
         result = 31 * result + (extensions != null ? extensions.hashCode() : 0);
         result = 31 * result + (slimmedIds != null ? slimmedIds.hashCode() : 0);
         result = 31 * result + (targetSets != null ? targetSets.hashCode() : 0);
         result = 31 * result + (symbol != null ? symbol.hashCode() : 0);
         result = 31 * result + (date != null ? date.hashCode() : 0);
+        result = 31 * result + interactingTaxonId;
         return result;
     }
 

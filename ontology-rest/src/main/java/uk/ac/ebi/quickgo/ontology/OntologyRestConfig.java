@@ -2,11 +2,23 @@ package uk.ac.ebi.quickgo.ontology;
 
 import uk.ac.ebi.quickgo.ontology.controller.validation.OBOControllerValidationHelper;
 import uk.ac.ebi.quickgo.ontology.controller.validation.OBOControllerValidationHelperImpl;
+import uk.ac.ebi.quickgo.rest.headers.HttpHeader;
+import uk.ac.ebi.quickgo.rest.headers.HttpHeadersProvider;
+import uk.ac.ebi.quickgo.rest.period.DailyPeriodParser;
+import uk.ac.ebi.quickgo.rest.period.AlarmClock;
+import uk.ac.ebi.quickgo.rest.period.PeriodParser;
+import uk.ac.ebi.quickgo.rest.period.RemainingTimeSupplier;
 
+import java.util.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
 
+import static java.util.stream.Collectors.toList;
 import static uk.ac.ebi.quickgo.common.validator.OntologyIdPredicate.isValidECOTermId;
 import static uk.ac.ebi.quickgo.common.validator.OntologyIdPredicate.isValidGOTermId;
 
@@ -21,7 +33,12 @@ import static uk.ac.ebi.quickgo.common.validator.OntologyIdPredicate.isValidGOTe
  *
  */
 @Configuration
+@EnableConfigurationProperties(OntologyRestProperties.class)
 public class OntologyRestConfig {
+
+    private Logger LOGGER = LoggerFactory.getLogger(OntologyRestConfig.class);
+    public static final String CACHE_CONTROL_HEADER = "public, max-age";
+    private static final String PERIOD_DELIMITER = ",";
 
     @Bean
     public OntologyPagingConfig ontologyPagingConfig(
@@ -37,6 +54,44 @@ public class OntologyRestConfig {
     @Bean
     public OBOControllerValidationHelper ecoValidationHelper(@Value("${ontology.max_page_size:600}") int maxPageSize) {
         return new OBOControllerValidationHelperImpl(maxPageSize, isValidECOTermId());
+    }
+
+    /**
+     * Configure a HttpHeadersProvider instance to write required response HTTP headers.
+     * @return HttpHeadersProvider instance
+     */
+    @Bean
+    public HttpHeadersProvider httpHeadersProvider(RemainingTimeSupplier maxAgeProvider) {
+        HttpHeader headerSource = new HttpHeader(HttpHeaders.CACHE_CONTROL, CACHE_CONTROL_HEADER,
+                                                 () -> Long.toString(maxAgeProvider.getDuration().getSeconds()));
+        return new HttpHeadersProvider(Collections.singletonList(headerSource));
+    }
+
+    @Bean
+    RemainingTimeSupplier maxAgeProvider(@Value("${ontology.caching.allowed.period}") String cachingAllowedPeriodValue,
+            PeriodParser parser) {
+        Collection<AlarmClock> cachingAllowingAarmClocks = null;
+        if (Objects.nonNull(cachingAllowedPeriodValue)) {
+            String[] periods = cachingAllowedPeriodValue.split(PERIOD_DELIMITER);
+            try {
+                cachingAllowingAarmClocks = Arrays.stream(periods)
+                                                  .map(parser::parse)
+                                                  .filter(Optional::isPresent)
+                                                  .map(Optional::get)
+                                                  .collect(toList());
+            } catch (Exception e) {
+                LOGGER.error("Failed to load caching allowed periods for ontology using " + cachingAllowedPeriodValue,
+                             e);
+            }
+        }
+        return
+                new RemainingTimeSupplier(Objects.nonNull(cachingAllowingAarmClocks) ? cachingAllowingAarmClocks :
+                                                  Collections.emptyList());
+    }
+
+    @Bean
+    PeriodParser periodParser() {
+        return new DailyPeriodParser();
     }
 
     public interface OntologyPagingConfig {
