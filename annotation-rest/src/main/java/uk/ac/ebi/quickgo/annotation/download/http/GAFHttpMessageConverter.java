@@ -28,13 +28,14 @@ import static org.slf4j.LoggerFactory.getLogger;
  * Created 19/01/17
  * @author Edd
  */
+@Deprecated
 public class GAFHttpMessageConverter extends AbstractHttpMessageConverter<Object> {
     private static final String TYPE = "text";
-    public static final String SUB_TYPE = "gaf";
+    private static final String SUB_TYPE = "gaf";
     private static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
 
-    public static final MediaType GAF_MEDIA_TYPE = new MediaType(TYPE, SUB_TYPE, DEFAULT_CHARSET);
-    public static final String GAF_MEDIA_TYPE_STRING = TYPE + "/" + SUB_TYPE;
+    private static final MediaType GAF_MEDIA_TYPE = new MediaType(TYPE, SUB_TYPE, DEFAULT_CHARSET);
+    private static final String GAF_MEDIA_TYPE_STRING = TYPE + "/" + SUB_TYPE;
 
     private static final Logger GAF_LOGGER = getLogger(GAFHttpMessageConverter.class);
     private static final int FLUSH_INTERVAL = 1000;
