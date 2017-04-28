@@ -1,7 +1,5 @@
 package uk.ac.ebi.quickgo.annotation.download;
 
-import uk.ac.ebi.quickgo.annotation.download.http.GAFHttpMessageConverter;
-import uk.ac.ebi.quickgo.annotation.download.http.GPADHttpMessageConverter;
 import uk.ac.ebi.quickgo.common.loader.GZIPFiles;
 
 import com.google.common.base.Preconditions;
@@ -22,6 +20,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 
 import static java.util.Arrays.stream;
+import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.GAF_SUB_TYPE;
+import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.GPAD_SUB_TYPE;
 
 /**
  * Produce a header for downloaded files.
@@ -51,7 +51,7 @@ import static java.util.Arrays.stream;
  */
 @Component
 public class AnnotationDownloadFileHeader {
-    private Logger logger = LoggerFactory.getLogger(AnnotationDownloadFileHeader.class);
+    private static Logger LOGGER = LoggerFactory.getLogger(AnnotationDownloadFileHeader.class);
     static final String PROJECT_NAME = "Project_name: UniProt GO Annotation (UniProt-GOA)";
 
     static final String URL = "URL: http://www.ebi.ac.uk/GOA";
@@ -99,12 +99,12 @@ public class AnnotationDownloadFileHeader {
 
     private String version(MediaType acceptHeader) {
         switch (acceptHeader.getSubtype()) {
-            case GAFHttpMessageConverter.SUB_TYPE:
+            case GAF_SUB_TYPE:
                 return GAF_VERSION;
-            case GPADHttpMessageConverter.SUB_TYPE:
+            case GPAD_SUB_TYPE:
                 return GPAD_VERSION;
             default:
-                throw new IllegalArgumentException("Unknown Media subtype requested: " + acceptHeader.getSubtype());
+                return "";
         }
     }
 
@@ -139,7 +139,7 @@ public class AnnotationDownloadFileHeader {
             }
         } catch (Exception e) {
             savedOntologyLines = Collections.emptyList();
-            logger.error("Failed to load the version of the ontology", e);
+            LOGGER.error("Failed to load the version of the ontology", e);
         }
         return savedOntologyLines;
     }
