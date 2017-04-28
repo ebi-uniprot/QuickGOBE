@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter;
 
-import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.ConvertedOntologyFilter;
+import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.OntologyDescendants;
 import uk.ac.ebi.quickgo.common.validator.OntologyIdPredicate;
 import uk.ac.ebi.quickgo.rest.search.RetrievalException;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
@@ -24,7 +24,7 @@ import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.not;
  * @author Edd
  */
 abstract class AbstractDescendantFilterConverter
-        implements FilterConverter<ConvertedOntologyFilter, QuickGOQuery> {
+        implements FilterConverter<OntologyDescendants, QuickGOQuery> {
     static final ConvertedFilter<QuickGOQuery> FILTER_EVERYTHING =
             new ConvertedFilter<>(not(QuickGOQuery.createAllQuery()));
     private static final String ERROR_MESSAGE_ON_NO_DESCENDANTS = "No descendants found for IDs, %s";
@@ -39,21 +39,21 @@ abstract class AbstractDescendantFilterConverter
     }
 
     /**
-     * Defines the procedure for transforming each descendant in a {@link ConvertedOntologyFilter} instance into a
-     * {@link ConvertedOntologyFilter} encapsulating a {@link QuickGOQuery}. Concrete implementations of this class
-     * defines both {@link #processDescendant(ConvertedOntologyFilter.Result, Set)} and
+     * Defines the procedure for transforming each descendant in a {@link OntologyDescendants} instance into a
+     * {@link OntologyDescendants} encapsulating a {@link QuickGOQuery}. Concrete implementations of this class
+     * defines both {@link #processDescendant(OntologyDescendants.Result, Set)} and
      * {@link #createFilterForAllDescendants(Set)}, which enable the necessary behaviour specialisation.
      *
-     * @param response the {@link ConvertedOntologyFilter} to transform
+     * @param response the {@link OntologyDescendants} to transform
      * @return a {@link ConvertedFilter} over {@link QuickGOQuery} instances
      */
-    @Override public ConvertedFilter<QuickGOQuery> transform(ConvertedOntologyFilter response) {
+    @Override public ConvertedFilter<QuickGOQuery> transform(OntologyDescendants response) {
         StringJoiner idsWithNoDescendants = new StringJoiner(DELIMITER);
 
         if (isNotNull(response.getResults())) {
             Set<QuickGOQuery> queries = new HashSet<>();
 
-            for (ConvertedOntologyFilter.Result result : response.getResults()) {
+            for (OntologyDescendants.Result result : response.getResults()) {
                 if (isNotNull(result.getDescendants())) {
                     forEachDescendantApply(result, processDescendant(result, queries));
                 } else {
@@ -69,14 +69,14 @@ abstract class AbstractDescendantFilterConverter
     }
 
     /**
-     * Defines the logic for how to process a descendant within the {@link #transform(ConvertedOntologyFilter)} method.
+     * Defines the logic for how to process a descendant within the {@link #transform(OntologyDescendants)} method.
      *
      * @param result the result in which the descendants reside
      * @param queries the queries to progressively build on each invocation of this method
      * @return a {@link Consumer} over {@link String}s, each of which represent a descendant identifier
      */
     protected abstract Consumer<String> processDescendant(
-            ConvertedOntologyFilter.Result result, Set<QuickGOQuery> queries);
+            OntologyDescendants.Result result, Set<QuickGOQuery> queries);
 
     /**
      * Creates the {@link ConvertedFilter} over {@link QuickGOQuery}s representing the supplied {@code queries}.
@@ -110,12 +110,12 @@ abstract class AbstractDescendantFilterConverter
     /**
      * Apply a {@link Consumer} action to each descendant in the descendants of {@code result}.
      *
-     * @param result the {@link uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.ConvertedOntologyFilter.Result}
+     * @param result the {@link OntologyDescendants.Result}
      *               whose descendants are being iterated through
      * @param action the action to apply for each descendant
      */
     private static void forEachDescendantApply(
-            ConvertedOntologyFilter.Result result,
+            OntologyDescendants.Result result,
             Consumer<String> action) {
         result.getDescendants().stream()
                 .filter(AbstractDescendantFilterConverter::notNullOrEmpty)

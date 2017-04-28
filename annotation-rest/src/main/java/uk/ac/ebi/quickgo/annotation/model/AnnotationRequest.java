@@ -7,6 +7,8 @@ import uk.ac.ebi.quickgo.rest.ParameterException;
 import uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern;
 import uk.ac.ebi.quickgo.rest.search.AggregateFunction;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
+import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformationRequest;
+import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformationRequests;
 
 import io.swagger.annotations.ApiModelProperty;
 import java.util.*;
@@ -55,8 +57,9 @@ public class AnnotationRequest {
     static final String GENE_PRODUCT_SUBSET_PARAM = "Gene Product Subset identifier";
     static final String GENE_PRODUCT_PARAM = "Gene Product ID";
     static final String REFERENCE_PARAM = "Reference";
+    static final String INCLUDE_FIELD_PARAM = "Optional fields";
 
-    static final String QUALIFIER_PARAM = "Qualifer";
+    static final String QUALIFIER_PARAM = "Qualifier";
     static final String TAXON_USAGE_ID = "taxonId";
 
     static final String TAXON_USAGE_FIELD = "taxonUsage";
@@ -239,7 +242,8 @@ public class AnnotationRequest {
     private String goIdEvidence;
 
     @ApiModelProperty(value = "An annotation extension is used to extend " +
-            "(i.e., add more specificity to) the GO term used in an annotation; the combination of the GO term plus the" +
+            "(i.e., add more specificity to) the GO term used in an annotation; the combination of the GO term plus " +
+            "the" +
             " extension is equivalent to a more specific GO term. " +
             "An annotation extension is stored in the database, and transmitted in annotation files, as a single " +
             "string, structured as a pipe-separated list of comma-separated lists of components.",
@@ -253,6 +257,12 @@ public class AnnotationRequest {
                     "when downloading results.",
             allowableValues = "range[" + MIN_DOWNLOAD_NUMBER + "," + MAX_DOWNLOAD_NUMBER + "]")
     private int downloadLimit = DEFAULT_DOWNLOAD_LIMIT;
+
+    @ApiModelProperty(
+            value = "Optional fields to include in the response.",
+            allowableValues = "goName",
+            example = "goName")
+    private String[] includeFields;
 
     private final Map<String, String[]> filterMap = new HashMap<>();
 
@@ -380,7 +390,8 @@ public class AnnotationRequest {
         }
     }
 
-    @Pattern(regexp = "^exact|descendants$", message = "Invalid taxonUsage: ${validatedValue}", flags = {Pattern.Flag.CASE_INSENSITIVE})
+    @Pattern(regexp = "^exact|descendants$", message = "Invalid taxonUsage: ${validatedValue}",
+            flags = {Pattern.Flag.CASE_INSENSITIVE})
     public String getTaxonUsage() {
         return filterMap.get(TAXON_USAGE_FIELD) == null ? DEFAULT_TAXON_USAGE : filterMap.get(TAXON_USAGE_FIELD)[0];
     }
@@ -546,6 +557,23 @@ public class AnnotationRequest {
     }
 
     /**
+     * Include fields whose values derive from external resources
+     * @param includeFields a vararg of fields to include
+     */
+    public void setIncludeFields(String... includeFields) {
+        this.includeFields = includeFields;
+    }
+
+    /**
+     * An array of fields whose values derive from external resources, which are to be included in the response
+     * @return the array of fields from external resources to include in the response
+     */
+    @ArrayPattern(regexp = "^goName|taxonName$", flags = CASE_INSENSITIVE, paramName = INCLUDE_FIELD_PARAM)
+    public String[] getIncludeFields() {
+        return this.includeFields;
+    }
+
+    /**
      * Produces a set of {@link FilterRequest} objects given the filter attributes provided by the user.
      *
      * @return a list of {@link FilterRequest}
@@ -613,6 +641,22 @@ public class AnnotationRequest {
     private Optional<FilterRequest> createEvidenceCodeUsageFilter() {
         return createUsageFilter(EVIDENCE_CODE_USAGE_FIELD, getEvidenceCodeUsage(), EVIDENCE_CODE_USAGE_ID,
                 Searchable.EVIDENCE_CODE, EVIDENCE_CODE_USAGE_RELATIONSHIPS);
+    }
+    
+    /**
+     * Create a {@link ResultTransformationRequest}s instance, indicating how the results
+     * should be transformed to fulfil the initial client request. For example, this instance
+     * would include a {@link ResultTransformationRequest} instance for each field in "includeFields=goName".
+     *
+     * @return a {@link ResultTransformationRequests} instance indicating how the request's results
+     * should be transformed
+     */
+    public ResultTransformationRequests createResultTransformationRequests() {
+        ResultTransformationRequests transformationRequests = new ResultTransformationRequests();
+        if (includeFields != null && includeFields.length > 0) {
+            Stream.of(includeFields).map(ResultTransformationRequest::new).forEach(transformationRequests::addTransformationRequest);
+        }
+        return transformationRequests;
     }
 
     private Optional<FilterRequest> createUsageFilter(String usageParam, String usageValue, String idParam, String

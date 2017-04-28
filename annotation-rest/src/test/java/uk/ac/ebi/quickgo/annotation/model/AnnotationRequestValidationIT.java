@@ -812,6 +812,32 @@ public class AnnotationRequestValidationIT {
         assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
     }
 
+    // OPTIONALLY INCLUDED RESPONSE FIELDS
+    @Test
+    public void goNameAsIncludedFieldIsValid() {
+        annotationRequest.setIncludeFields("goName");
+        assertThat(validator.validate(annotationRequest), is(empty()));
+    }
+
+    @Test
+    public void taxonNameAsIncludedFieldIsValid() {
+        annotationRequest.setIncludeFields("taxonName");
+        assertThat(validator.validate(annotationRequest), is(empty()));
+    }
+
+    @Test
+    public void multipleValidIncludedFieldsAreValid() {
+        annotationRequest.setIncludeFields("goName", "taxonName");
+        assertThat(validator.validate(annotationRequest), is(empty()));
+    }
+
+    @Test
+    public void invalidIncludedFieldProducesValidationError() {
+        annotationRequest.setIncludeFields("XXXXXXXXX");
+        assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
+    }
+
+    // Helpers
     private String createRegexErrorMessage(String paramName, String... invalidItems) {
         String csvInvalidItems = Stream.of(invalidItems).collect(Collectors.joining(", "));
         return String.format(ArrayPattern.DEFAULT_ERROR_MSG, paramName, csvInvalidItems);
