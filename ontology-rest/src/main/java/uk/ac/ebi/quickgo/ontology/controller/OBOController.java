@@ -14,6 +14,7 @@ import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;
 import uk.ac.ebi.quickgo.ontology.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
+import uk.ac.ebi.quickgo.rest.headers.HttpHeadersProvider;
 import uk.ac.ebi.quickgo.rest.search.RetrievalException;
 import uk.ac.ebi.quickgo.rest.search.SearchDispatcher;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
@@ -30,7 +31,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
-import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,6 +83,7 @@ public abstract class OBOController<T extends OBOTerm> {
     private final GraphImageService graphImageService;
     private final OntologyRestConfig.OntologyPagingConfig ontologyPagingConfig;
     private final OntologyType ontologyType;
+    private final HttpHeadersProvider httpHeadersProvider;
 
     public OBOController(OntologyService<T> ontologyService,
             SearchService<OBOTerm> ontologySearchService,
@@ -91,7 +92,8 @@ public abstract class OBOController<T extends OBOTerm> {
             GraphImageService graphImageService,
             OBOControllerValidationHelper oboControllerValidationHelper,
             OntologyRestConfig.OntologyPagingConfig ontologyPagingConfig,
-            OntologyType ontologyType) {
+            OntologyType ontologyType,
+            HttpHeadersProvider httpHeadersProvider) {
         checkArgument(ontologyService != null, "Ontology service cannot be null");
         checkArgument(ontologySearchService != null, "Ontology search service cannot be null");
         checkArgument(searchableField != null, "Ontology searchable field cannot be null");
@@ -100,7 +102,7 @@ public abstract class OBOController<T extends OBOTerm> {
         checkArgument(oboControllerValidationHelper != null, "OBO validation helper cannot be null");
         checkArgument(ontologyPagingConfig != null, "Paging config cannot be null");
         checkArgument(ontologyType != null, "Ontology type config cannot be null");
-
+        checkArgument(httpHeadersProvider != null, "Http Headers Provider cannot be null");
 
         this.ontologyService = ontologyService;
         this.ontologySearchService = ontologySearchService;
@@ -110,6 +112,7 @@ public abstract class OBOController<T extends OBOTerm> {
         this.graphImageService = graphImageService;
         this.ontologyPagingConfig = ontologyPagingConfig;
         this.ontologyType = ontologyType;
+        this.httpHeadersProvider = httpHeadersProvider;
     }
 
     /**
@@ -136,8 +139,11 @@ public abstract class OBOController<T extends OBOTerm> {
     public ResponseEntity<QueryResult<T>> baseUrl(
             @RequestParam(value = "page", defaultValue = DEFAULT_PAGE_NUMBER) int page) {
 
-        return new ResponseEntity<>(ontologyService.findAllByOntologyType(this.ontologyType,
-                new RegularPage(page, ontologyPagingConfig.defaultPageSize())), HttpStatus.OK);
+        return new ResponseEntity<>(ontologyService.findAllByOntologyType
+                (this.ontologyType,
+                 new RegularPage(page, ontologyPagingConfig.defaultPageSize())),
+                                    httpHeadersProvider.provide(),
+                                    HttpStatus.OK);
     }
 
     /**
@@ -157,8 +163,7 @@ public abstract class OBOController<T extends OBOTerm> {
     @RequestMapping(value = TERMS_RESOURCE + "/{ids}", method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsCoreAttr(@PathVariable(value = "ids") String ids) {
-        return getResultsResponse(ontologyService.findCoreInfoByOntologyId(validationHelper.validateCSVIds
-                (ids)));
+        return getResultsResponse(ontologyService.findCoreInfoByOntologyId(validationHelper.validateCSVIds(ids)));
     }
 
     /**
@@ -197,6 +202,7 @@ public abstract class OBOController<T extends OBOTerm> {
     @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + HISTORY_SUB_RESOURCE, method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsHistory(@PathVariable(value = "ids") String ids) {
+
         return getResultsResponse(
                 ontologyService.findHistoryInfoByOntologyId(validationHelper.validateCSVIds(ids)));
     }
@@ -278,7 +284,8 @@ public abstract class OBOController<T extends OBOTerm> {
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsAnnotationGuideLines(@PathVariable(value = "ids") String ids) {
         return getResultsResponse(ontologyService
-                .findAnnotationGuideLinesInfoByOntologyId(validationHelper.validateCSVIds(ids)));
+                                          .findAnnotationGuideLinesInfoByOntologyId(validationHelper.validateCSVIds
+                                                  (ids)));
     }
 
     /**
@@ -394,14 +401,12 @@ public abstract class OBOController<T extends OBOTerm> {
     @ApiOperation(value = "Retrieves coordinate information about terms within the PNG chart from the " +
             CHART_SUB_RESOURCE + " sub-resource")
     @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + CHART_COORDINATES_SUB_RESOURCE,
-            method =
-            RequestMethod.GET,
+            method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<GraphImageLayout> getChartCoordinates(@PathVariable(value = "ids") String ids) {
         try {
             GraphImageLayout layout = graphImageService
                     .createChart(validationHelper.validateCSVIds(ids), ontologyType.name()).getLayout();
-
             return ResponseEntity
                     .ok()
                     .body(layout);
@@ -412,12 +417,12 @@ public abstract class OBOController<T extends OBOTerm> {
 
     /**
      * Wrap a collection as a {@link Set}
-     * @param items the items to wrap as a {@link Set}
+     * @param items      the items to wrap as a {@link Set}
      * @param <ItemType> the type of the {@link Collection}, i.e., this method works for any type
      * @return a {@link Set} wrapping the items in a {@link Collection}
      */
     private static <ItemType> Set<ItemType> asSet(Collection<ItemType> items) {
-        return items.stream().collect(Collectors.toSet());
+        return new HashSet<>(items);
     }
 
     /**
@@ -445,9 +450,8 @@ public abstract class OBOController<T extends OBOTerm> {
         }
 
         QueryResult<ResponseType> queryResult = new QueryResult.Builder<>(resultsToShow.size(), resultsToShow).build();
-        return new ResponseEntity<>(queryResult, HttpStatus.OK);
+        return new ResponseEntity<>(queryResult, httpHeadersProvider.provide(), HttpStatus.OK);
     }
-
     private RetrievalException createChartGraphicsException(Throwable throwable) {
         String errorMessage = "Error encountered during creation of ontology chart graphics.";
         LOGGER.error(errorMessage, throwable);
@@ -479,7 +483,7 @@ public abstract class OBOController<T extends OBOTerm> {
                 .ok()
                 .contentLength(os.size())
                 .contentType(MediaType.IMAGE_PNG)
-                .header("Content-Encoding","base64")
+                .header("Content-Encoding", "base64")
                 .body(new InputStreamResource(is));
     }
 
@@ -497,7 +501,7 @@ public abstract class OBOController<T extends OBOTerm> {
 
         if (!ontologyRetrievalConfig.getSearchReturnedFields().isEmpty()) {
             ontologyRetrievalConfig.getSearchReturnedFields()
-                    .forEach(builder::addProjectedField);
+                                   .forEach(builder::addProjectedField);
         }
 
         return builder.build();
@@ -513,7 +517,7 @@ public abstract class OBOController<T extends OBOTerm> {
      */
     private QuickGOQuery restrictQueryToOTypeResults(QuickGOQuery query) {
         return and(query,
-                ontologyQueryConverter.convert(
-                        OntologyFields.Searchable.ONTOLOGY_TYPE + COLON + ontologyType.name()));
+                   ontologyQueryConverter.convert(
+                           OntologyFields.Searchable.ONTOLOGY_TYPE + COLON + ontologyType.name()));
     }
 }
