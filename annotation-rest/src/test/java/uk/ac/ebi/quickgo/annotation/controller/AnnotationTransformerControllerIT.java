@@ -67,7 +67,6 @@ import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.totalNumO
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = {AnnotationREST.class, OntologyRepoConfig.class})
 @WebAppConfiguration
-@DirtiesContext(classMode = BEFORE_CLASS)
 public class AnnotationTransformerControllerIT {
     @ClassRule
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
