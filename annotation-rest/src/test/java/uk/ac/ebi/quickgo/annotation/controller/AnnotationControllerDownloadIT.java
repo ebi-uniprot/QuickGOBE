@@ -186,7 +186,8 @@ public class AnnotationControllerDownloadIT {
     @Test
     public void canDownloadInTSVFormat() throws Exception {
         for(int i=1; i<=97; i++) {
-            expectGoTermsHaveGoNamesViaRest(singletonList(goId(3824)), singletonList(goName(3824)));
+            expectGoTermsHaveGoNamesViaRest(singletonList(IdGeneratorUtil.createGoId(3824)), singletonList
+                    ("catalytic activity"));
         }
         canDownloadWithOptionalFields(TSV_MEDIA_TYPE);
     }
@@ -232,9 +233,9 @@ public class AnnotationControllerDownloadIT {
 
 
     private void checkResponse(MediaType mediaType, ResultActions response, List<String> storedIds) throws Exception {
-        response.andDo(print())
-                .andExpect(request().asyncStarted())
+        response.andExpect(request().asyncStarted())
                 .andDo(MvcResult::getAsyncResult)
+                .andDo(print())
                 .andExpect(header().string(CONTENT_DISPOSITION, endsWith(getFileNameEndingFor(mediaType))))
                 .andExpect(content().contentType(mediaType))
                 .andExpect(nonNullMandatoryFieldsExist(mediaType))
@@ -326,13 +327,6 @@ public class AnnotationControllerDownloadIT {
                 .collect(Collectors.toList());
     }
 
-    private void expectRestCallResponse(HttpMethod method, String url, ResponseCreator response) {
-        mockRestServiceServer.expect(
-                requestTo(BASE_URL + url))
-                             .andExpect(method(method))
-                             .andRespond(response);
-    }
-
     private void expectRestCallSuccess(HttpMethod method, String url, String response) {
         mockRestServiceServer.expect(requestTo(BASE_URL + url))
                              .andExpect(method(method))
@@ -398,13 +392,5 @@ public class AnnotationControllerDownloadIT {
         } catch (JsonProcessingException e) {
             throw new IllegalStateException("Problem constructing mocked GO term REST response:", e);
         }
-    }
-
-    private String goId(int id) {
-        return IdGeneratorUtil.createGoId(id);
-    }
-
-    private String goName(int id) {
-        return IdGeneratorUtil.createGoId(id) + " name";
     }
 }
