@@ -23,6 +23,7 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.client.MockRestServiceServer;
@@ -40,6 +41,7 @@ import static java.util.Collections.singletonList;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_CLASS;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
@@ -65,6 +67,7 @@ import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.totalNumO
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = {AnnotationREST.class, OntologyRepoConfig.class})
 @WebAppConfiguration
+@DirtiesContext(classMode = BEFORE_CLASS)
 public class AnnotationTransformerControllerIT {
     @ClassRule
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
@@ -388,9 +391,7 @@ public class AnnotationTransformerControllerIT {
             String termName = termNames.get(i);
             expectRestCallSuccess(
                     GET,
-                    buildResource(
-                            GO_TERM_RESOURCE_FORMAT,
-                            termId),
+                    buildResource( GO_TERM_RESOURCE_FORMAT,termId),
                     constructGoTermsResponseObject(singletonList(termId), singletonList(termName)));
         }
     }
