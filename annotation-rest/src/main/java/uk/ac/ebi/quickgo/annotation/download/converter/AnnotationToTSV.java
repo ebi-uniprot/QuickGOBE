@@ -39,7 +39,7 @@ public class AnnotationToTSV extends AnnotationTo implements Function<Annotation
                         .add(nullToEmptyString.apply(annotation.symbol))
                         .add(nullToEmptyString.apply(annotation.qualifier))
                         .add(nullToEmptyString.apply(goId))
-                        .add(nullToEmptyString.apply("TEST"))           //will be goName
+                        .add(nullToEmptyString.apply(annotation.goName))
                         .add(nullToEmptyString.apply(annotation.evidenceCode + " (" + annotation.goEvidence + ")"))
                         .add(nullToEmptyString.apply(annotation.reference))
                         .add(withFromAsString(annotation.withFrom))
