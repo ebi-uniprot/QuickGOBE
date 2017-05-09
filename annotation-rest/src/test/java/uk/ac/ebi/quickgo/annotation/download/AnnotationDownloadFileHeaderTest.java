@@ -24,7 +24,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.ac.ebi.quickgo.annotation.download.AnnotationDownloadFileHeader.GO_USAGE_SLIM;
 import static uk.ac.ebi.quickgo.annotation.download.AnnotationDownloadFileHeader.REQUEST_LINE_INDENTATION;
+import static uk.ac.ebi.quickgo.annotation.download.AnnotationDownloadFileHeader.TSV_COL_HEADINGS_EXCLUDING_SLIM;
+import static uk.ac.ebi.quickgo.annotation.download.AnnotationDownloadFileHeader.TSV_COL_HEADINGS_INCLUDING_SLIM;
+import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.GAF_SUB_TYPE;
+import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.GPAD_SUB_TYPE;
+import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.TSV_SUB_TYPE;
 
 /**
  * @author Tony Wardell
@@ -64,28 +70,49 @@ public class AnnotationDownloadFileHeaderTest {
 
     @Test
     public void produceGAFHeader() throws Exception {
-        when(mockMediaType.getSubtype()).thenReturn(MediaTypeFactory.GAF_SUB_TYPE);
+        when(mockMediaType.getSubtype()).thenReturn(GAF_SUB_TYPE);
         annotationDownloadFileHeader.write(mockEmitter, mockRequest, mockMediaType);
 
         //Test
         verify(mockEmitter).send(decorateContent(AnnotationDownloadFileHeader.GAF_VERSION), MediaType.TEXT_PLAIN);
-        testRestOfHeader();
+        testMostOfHeader();
     }
 
     @Test
     public void produceGPADHeader() throws Exception {
-        when(mockMediaType.getSubtype()).thenReturn(MediaTypeFactory.GPAD_SUB_TYPE);
+        when(mockMediaType.getSubtype()).thenReturn(GPAD_SUB_TYPE);
         annotationDownloadFileHeader.write(mockEmitter, mockRequest, mockMediaType);
 
         //Test
         verify(mockEmitter).send(decorateContent(AnnotationDownloadFileHeader.GPAD_VERSION), MediaType.TEXT_PLAIN);
-        testRestOfHeader();
+        testMostOfHeader();
+    }
+
+    @Test
+    public void produceTSVHeader() throws Exception {
+        when(mockMediaType.getSubtype()).thenReturn(TSV_SUB_TYPE);
+        annotationDownloadFileHeader.write(mockEmitter, mockRequest, mockMediaType);
+
+        //Test
+        testMostOfHeader();
+        verify(mockEmitter).send(TSV_COL_HEADINGS_EXCLUDING_SLIM + "\n", MediaType.TEXT_PLAIN);
+    }
+
+    @Test
+    public void produceTSVHeaderForSlimmedRequest() throws Exception {
+        when(mockMediaType.getSubtype()).thenReturn(TSV_SUB_TYPE);
+        when(mockRequest.getQueryString()).thenReturn(GO_USAGE_SLIM);
+        annotationDownloadFileHeader.write(mockEmitter, mockRequest, mockMediaType);
+
+        //Test
+        testMostOfHeader();
+        verify(mockEmitter).send(TSV_COL_HEADINGS_INCLUDING_SLIM + "\n", MediaType.TEXT_PLAIN);
     }
 
     @Test
     public void headerOutputDoesNotContainOntologyInformationWhenFileIsNotAvailable() throws Exception {
         Path ontologyPath = Paths.get("/nowhere/city");
-        when(mockMediaType.getSubtype()).thenReturn(MediaTypeFactory.GAF_SUB_TYPE);
+        when(mockMediaType.getSubtype()).thenReturn(GAF_SUB_TYPE);
         annotationDownloadFileHeader = new AnnotationDownloadFileHeader(ontologyPath);
         annotationDownloadFileHeader.write(mockEmitter, mockRequest, mockMediaType);
         verify(mockEmitter, never()).send(decorateContent(ECO_VERSION), MediaType.TEXT_PLAIN);
@@ -100,7 +127,7 @@ public class AnnotationDownloadFileHeaderTest {
         annotationDownloadFileHeader.write(mockEmitter, mockRequest, mockMediaType);
 
         //Test
-        testRestOfHeader();
+        testMostOfHeader();
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -108,15 +135,15 @@ public class AnnotationDownloadFileHeaderTest {
         new AnnotationDownloadFileHeader(null);
     }
 
-    private void testRestOfHeader() throws IOException {
+    private void testMostOfHeader() throws IOException {
         verify(mockEmitter).send(decorateContent(AnnotationDownloadFileHeader.PROJECT_NAME), MediaType.TEXT_PLAIN);
         verify(mockEmitter).send(decorateContent(AnnotationDownloadFileHeader.URL), MediaType.TEXT_PLAIN);
         verify(mockEmitter).send(decorateContent(AnnotationDownloadFileHeader.EMAIL), MediaType.TEXT_PLAIN);
         verify(mockEmitter).send(decorateContent(AnnotationDownloadFileHeader.DATE + TODAYS_DATE),
-                MediaType.TEXT_PLAIN);
+                                 MediaType.TEXT_PLAIN);
         verify(mockEmitter).send(decorateContent(AnnotationDownloadFileHeader.FILTERS_INTRO), MediaType.TEXT_PLAIN);
         verify(mockEmitter).send(decorateContent(REQUEST_LINE_INDENTATION + URI + "?assignedBy=foo,bar&evidence=ECO:12345"),
-                MediaType.TEXT_PLAIN);
+                                 MediaType.TEXT_PLAIN);
         verify(mockEmitter).send(decorateContent(ECO_VERSION),
                 MediaType.TEXT_PLAIN);
         verify(mockEmitter).send(decorateContent(GO_VERSION),
