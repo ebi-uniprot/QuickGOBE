@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
@@ -22,6 +23,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter
 import static java.util.Arrays.stream;
 import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.GAF_SUB_TYPE;
 import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.GPAD_SUB_TYPE;
+import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.TSV_SUB_TYPE;
 
 /**
  * Produce a header for downloaded files.
@@ -51,6 +53,7 @@ import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.GPAD_S
  */
 @Component
 public class AnnotationDownloadFileHeader {
+    public static final String GO_USAGE_SLIM = "goUsage=slim";
     private static Logger LOGGER = LoggerFactory.getLogger(AnnotationDownloadFileHeader.class);
     static final String PROJECT_NAME = "Project_name: UniProt GO Annotation (UniProt-GOA)";
 
@@ -63,6 +66,11 @@ public class AnnotationDownloadFileHeader {
     static final String GAF_VERSION = "gaf-version: 2.1";
     static final String GPAD_VERSION = "gpa-version: 1.1";
     private static final String HEADER_LINE_PREFIX = "!";
+    static final String TSV_COL_HEADINGS_INCLUDING_SLIM = "GENE PRODUCT\tSYMBOL\tQUALIFIER\tGO TERM\tGO TERM " +
+            "NAME\tSLIMMED FROM\tEVIDENCE\tREFERENCE\tWITH/FROM\tTAXON\tASSIGNED BY\tANNOTATION EXTENSION" +
+            "\tDATE\tTAXON NAME";
+    static final String TSV_COL_HEADINGS_EXCLUDING_SLIM = "GENE PRODUCT\tSYMBOL\tQUALIFIER\tGO TERM\tGO TERM " +
+            "NAME\tEVIDENCE\tREFERENCE\tWITH/FROM\tTAXON\tASSIGNED BY\tANNOTATION EXTENSION\tDATE\tTAXON NAME";
     private final Path ontologyPath;
     private List<String> savedOntologyLines;
     private FileTime previousTimeStamp;
@@ -79,7 +87,10 @@ public class AnnotationDownloadFileHeader {
      * @param acceptHeader holds the response type 'GAF' or 'GPAD';
      */
     public void write(ResponseBodyEmitter emitter, HttpServletRequest request, MediaType acceptHeader) {
-        send(emitter, version(acceptHeader));
+        final String version = version(acceptHeader);
+        if(Objects.nonNull(version)){
+            send(emitter, version);
+        }
         send(emitter, PROJECT_NAME);
         send(emitter, URL);
         send(emitter, EMAIL);
@@ -87,6 +98,20 @@ public class AnnotationDownloadFileHeader {
         ontology().forEach(s -> send(emitter, s));
         send(emitter, FILTERS_INTRO);
         send(emitter, request(request));
+        if(TSV_SUB_TYPE.equals(acceptHeader.getSubtype())){
+            try {
+                emitter.send(colHeadings(request) + "\n", MediaType.TEXT_PLAIN);
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to send download header", e);
+            }
+        }
+    }
+
+    private String colHeadings(HttpServletRequest request) {
+        if(Objects.nonNull(request.getQueryString()) && request.getQueryString().contains(GO_USAGE_SLIM)){
+           return TSV_COL_HEADINGS_INCLUDING_SLIM;
+        }
+        return TSV_COL_HEADINGS_EXCLUDING_SLIM;
     }
 
     private void send(ResponseBodyEmitter emitter, String content) {
@@ -104,7 +129,7 @@ public class AnnotationDownloadFileHeader {
             case GPAD_SUB_TYPE:
                 return GPAD_VERSION;
             default:
-                return "";
+                return null;
         }
     }
 
