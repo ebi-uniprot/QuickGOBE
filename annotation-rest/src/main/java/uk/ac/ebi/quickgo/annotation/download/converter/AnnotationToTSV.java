@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.function.Function;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static java.util.stream.Collectors.toList;
 
@@ -24,7 +26,9 @@ import static java.util.stream.Collectors.toList;
  */
 public class AnnotationToTSV extends AnnotationTo implements Function<Annotation, List<String>> {
 
-    public static final String YEAR_MONTH_DAY = "yyyyMMdd";
+    private Logger LOGGER = LoggerFactory.getLogger(AnnotationToTSV.class);
+
+    private static final String YEAR_MONTH_DAY = "yyyyMMdd";
 
     @Override public List<String> apply(Annotation annotation) {
         if (Objects.isNull(annotation.slimmedIds) || annotation.slimmedIds.isEmpty()) {
@@ -37,6 +41,9 @@ public class AnnotationToTSV extends AnnotationTo implements Function<Annotation
     }
 
     private String toOutputRecord(Annotation annotation) {
+
+        LOGGER.info("Converting annotation to TSV output record to download.");
+
         StringJoiner tsvJoiner = new StringJoiner(OUTPUT_DELIMITER);
         //todo replace annotation.date with annotation.dateTime,
         //todo then we can replace DateFormat with DateTimeFormatter from java 8
@@ -64,7 +71,7 @@ public class AnnotationToTSV extends AnnotationTo implements Function<Annotation
         StringBuilder evidenceBuilder = new StringBuilder();
         evidenceBuilder.append(nullToEmptyString.apply((annotation.evidenceCode)));
         if ((annotation.goEvidence != null) && !annotation.goEvidence.isEmpty()) {
-            evidenceBuilder.append("(" + annotation.goEvidence + ")");
+            evidenceBuilder.append("(").append(annotation.goEvidence).append(")");
         }
         return evidenceBuilder.toString();
     }
