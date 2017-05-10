@@ -222,7 +222,7 @@ public class AnnotationController {
             BindingResult bindingResult,
             @RequestHeader(ACCEPT) MediaType mediaTypeAcceptHeader,
             HttpServletRequest servletRequest) {
-        LOGGER.error("Download Request");
+        LOGGER.info("Download Request:: " + request + ", " + mediaTypeAcceptHeader);
 
         checkBindingErrors(bindingResult);
 
@@ -242,6 +242,7 @@ public class AnnotationController {
                         resultTransformerChain, filterQueryInfo.getFilterContext(), request.getDownloadLimit()),
                 mediaTypeAcceptHeader));
 
+        LOGGER.info("Writing download response:: " + request + ", " + mediaTypeAcceptHeader);
         return ResponseEntity
                 .ok()
                 .headers(createHttpDownloadHeader(mediaTypeAcceptHeader))
