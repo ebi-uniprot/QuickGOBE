@@ -6,6 +6,7 @@ import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
@@ -62,7 +63,12 @@ public class GenericHttpMessageConverter extends AbstractHttpMessageConverter<Ob
         if (object instanceof ResponseExceptionHandler.ErrorInfo) {
             writeError(out, (ResponseExceptionHandler.ErrorInfo) object);
         } else {
-            writeAnnotations(out, (Stream<QueryResult<Annotation>>) object);
+            if(object instanceof LinkedHashMap){
+                LOGGER.info("Must deal with LinkedHashMap " + object );
+                writeAnnotations(out, (Stream<QueryResult<Annotation>>) ((LinkedHashMap)object).entrySet().stream());
+            }else {
+                writeAnnotations(out, (Stream<QueryResult<Annotation>>) object);
+            }
         }
     }
 
