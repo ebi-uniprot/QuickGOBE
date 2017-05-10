@@ -222,7 +222,7 @@ public class AnnotationController {
             BindingResult bindingResult,
             @RequestHeader(ACCEPT) MediaType mediaTypeAcceptHeader,
             HttpServletRequest servletRequest) {
-        LOGGER.info("Download Request");
+        LOGGER.error("Download Request");
 
         checkBindingErrors(bindingResult);
 
