@@ -64,8 +64,9 @@ public class GenericHttpMessageConverter extends AbstractHttpMessageConverter<Ob
             writeError(out, (ResponseExceptionHandler.ErrorInfo) object);
         } else {
             if(object instanceof LinkedHashMap){
+                // Must deal with LinkedHashMap {timestamp=Wed May 10 16:18:09 BST 2017, status=200, error=OK, message=No message available, path=/QuickGO/services/annotation/downloadSearch}
                 LOGGER.info("Must deal with LinkedHashMap " + object );
-                writeAnnotations(out, (Stream<QueryResult<Annotation>>) ((LinkedHashMap)object).entrySet().stream());
+                //writeAnnotations(out, (Stream<QueryResult<Annotation>>) ((LinkedHashMap)object).entrySet().stream());
             }else {
                 writeAnnotations(out, (Stream<QueryResult<Annotation>>) object);
             }
