@@ -14,12 +14,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpInputMessage;
-import org.springframework.http.HttpOutputMessage;
+
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.AbstractHttpMessageConverter;
-import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.http.converter.HttpMessageNotWritableException;
+
 
 /**
  * Writes a stream of {@link QueryResult}s containing {@link Annotation} instances to a response's output stream,
@@ -33,7 +30,7 @@ import org.springframework.http.converter.HttpMessageNotWritableException;
 public class ConverterHelper {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ConverterHelper.class);
-    private static final int FLUSH_INTERVAL = 1000;
+    private static final int FLUSH_INTERVAL = 5;
     private final Function<Annotation, List<String>> converter;
     private final MediaType type;
 
