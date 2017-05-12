@@ -642,7 +642,7 @@ public class AnnotationRequest {
         return createUsageFilter(EVIDENCE_CODE_USAGE_FIELD, getEvidenceCodeUsage(), EVIDENCE_CODE_USAGE_ID,
                 Searchable.EVIDENCE_CODE, EVIDENCE_CODE_USAGE_RELATIONSHIPS);
     }
-    
+
     /**
      * Create a {@link ResultTransformationRequest}s instance, indicating how the results
      * should be transformed to fulfil the initial client request. For example, this instance
@@ -700,6 +700,35 @@ public class AnnotationRequest {
         return Stream.of(args)
                 .map(String::toLowerCase)
                 .toArray(String[]::new);
+    }
+
+    @Override public String toString() {
+        return "AnnotationRequest{" +
+                "limit=" + limit +
+                ", page=" + page +
+                ", aspect='" + aspect + '\'' +
+                ", assignedBy=" + Arrays.toString(assignedBy) +
+                ", reference='" + reference + '\'' +
+                ", geneProductId='" + geneProductId + '\'' +
+                ", evidenceCode='" + evidenceCode + '\'' +
+                ", goId='" + goId + '\'' +
+                ", qualifier='" + qualifier + '\'' +
+                ", withFrom='" + withFrom + '\'' +
+                ", taxonId='" + taxonId + '\'' +
+                ", taxonUsage='" + taxonUsage + '\'' +
+                ", goUsage='" + goUsage + '\'' +
+                ", goUsageRelationships='" + goUsageRelationships + '\'' +
+                ", evidenceCodeUsage='" + evidenceCodeUsage + '\'' +
+                ", evidenceCodeUsageRelationships='" + evidenceCodeUsageRelationships + '\'' +
+                ", geneProductType='" + geneProductType + '\'' +
+                ", targetSet='" + targetSet + '\'' +
+                ", geneProductSubset='" + geneProductSubset + '\'' +
+                ", goIdEvidence='" + goIdEvidence + '\'' +
+                ", extension='" + extension + '\'' +
+                ", downloadLimit=" + downloadLimit +
+                ", includeFields=" + Arrays.toString(includeFields) +
+                ", filterMap=" + filterMap +
+                '}';
     }
 
     /**
