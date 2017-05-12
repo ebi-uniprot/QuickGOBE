@@ -36,17 +36,41 @@ import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.*;
     }
 
     @Bean
-    public GenericHttpMessageConverter gpadHttpMessageConverter() {
-        return new GenericHttpMessageConverter(new AnnotationToGPAD(), GPAD_MEDIA_TYPE);
+    public GPADHttpMessageConverter gpadHttpMessageConverter() {
+        return new GPADHttpMessageConverter(gpadAnnotationConverter());
     }
 
     @Bean
-    public GenericHttpMessageConverter gafHttpMessageConverter() {
-        return new GenericHttpMessageConverter(new AnnotationToGAF(), GAF_MEDIA_TYPE);
+    public GAFHttpMessageConverter gafHttpMessageConverter() {
+        return new GAFHttpMessageConverter(gafAnnotationConverter());
     }
 
     @Bean
-    public GenericHttpMessageConverter tsvHttpMessageConverter(){
-        return new GenericHttpMessageConverter(new AnnotationToTSV(), TSV_MEDIA_TYPE);
+    public TSVHttpMessageConverter tsvHttpMessageConverter(){
+        return new TSVHttpMessageConverter(new ConverterHelper(new AnnotationToTSV(), TSV_MEDIA_TYPE));
     }
+
+    private AnnotationToGPAD gpadAnnotationConverter() {
+        return new AnnotationToGPAD();
     }
+
+    private AnnotationToGAF gafAnnotationConverter() {
+        return new AnnotationToGAF();
+    }
+
+//    @Bean
+//    public GenericHttpMessageConverter gpadHttpMessageConverter() {
+//        return new GenericHttpMessageConverter(new AnnotationToGPAD(), GPAD_MEDIA_TYPE);
+//    }
+//
+//    @Bean
+//    public GenericHttpMessageConverter gafHttpMessageConverter() {
+//        return new GenericHttpMessageConverter(new AnnotationToGAF(), GAF_MEDIA_TYPE);
+//    }
+//
+//    @Bean
+//    public GenericHttpMessageConverter tsvHttpMessageConverter(){
+//        return new GenericHttpMessageConverter(new AnnotationToTSV(), TSV_MEDIA_TYPE);
+//    }
+
+}
