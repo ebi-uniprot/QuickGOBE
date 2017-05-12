@@ -43,6 +43,7 @@ public abstract class AbstractValueInjector<T, M> implements ResponseValueInject
         FilterRequest request = buildFilterRequest(model);
 
         try {
+            LOGGER.info("Using RESTFilterConverterFactory " + restFetcher + " to convert request " + request);
             ConvertedFilter<T> convertedRequest = restFetcher.convert(request);
 
             injectValueFromResponse(convertedRequest, model);
