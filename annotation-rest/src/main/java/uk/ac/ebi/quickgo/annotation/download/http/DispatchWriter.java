@@ -27,20 +27,20 @@ import org.springframework.http.MediaType;
  * Time: 14:49
  * Created with IntelliJ IDEA.
  */
-public class ConverterHelper {
+public class DispatchWriter {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ConverterHelper.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DispatchWriter.class);
     private static final int FLUSH_INTERVAL = 5;
     private final Function<Annotation, List<String>> converter;
     private final MediaType type;
 
-    public ConverterHelper(Function<Annotation, List<String>> converter, MediaType mediaType) {
+    public DispatchWriter(Function<Annotation, List<String>> converter, MediaType mediaType) {
         this.converter = converter;
         this.type = mediaType;
     }
 
     @SuppressWarnings("unchecked")
-    void dispatchWriting(Object object, OutputStream out) throws IOException {
+    void write(Object object, OutputStream out) throws IOException {
         if (object instanceof ResponseExceptionHandler.ErrorInfo) {
             writeError(out, (ResponseExceptionHandler.ErrorInfo) object);
         } else {
@@ -60,7 +60,7 @@ public class ConverterHelper {
     }
 
     private void writeAnnotations(OutputStream out, Stream<QueryResult<Annotation>> annotationStream) {
-        LOGGER.info("GenericHttpMessageConverter writeAnnotations called.");
+        LOGGER.info("DispatchWriter writeAnnotations called.");
         AtomicInteger counter = new AtomicInteger(0);
         AtomicInteger batchCount = new AtomicInteger(0);
         try {
