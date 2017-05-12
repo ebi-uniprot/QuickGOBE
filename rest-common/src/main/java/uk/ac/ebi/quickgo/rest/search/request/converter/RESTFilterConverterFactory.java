@@ -60,4 +60,11 @@ public class RESTFilterConverterFactory {
                     "Could not find signature (" + request.getSignature() + ") in " + filterConfigRetrieval);
         }
     }
+
+    @Override public String toString() {
+        return "RESTFilterConverterFactory{" +
+                "filterConfigRetrieval=" + filterConfigRetrieval +
+                ", restOperations=" + restOperations +
+                '}';
+    }
 }
