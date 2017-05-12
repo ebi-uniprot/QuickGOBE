@@ -30,6 +30,7 @@ import org.springframework.http.converter.HttpMessageNotWritableException;
  * Time: 14:49
  * Created with IntelliJ IDEA.
  */
+@Deprecated
 public class GenericHttpMessageConverter extends AbstractHttpMessageConverter<Object> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GenericHttpMessageConverter.class);
