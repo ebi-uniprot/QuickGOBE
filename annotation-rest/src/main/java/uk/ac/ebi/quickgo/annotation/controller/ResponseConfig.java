@@ -47,7 +47,7 @@ import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.*;
 
     @Bean
     public TSVHttpMessageConverter tsvHttpMessageConverter(){
-        return new TSVHttpMessageConverter(new ConverterHelper(new AnnotationToTSV(), TSV_MEDIA_TYPE));
+        return new TSVHttpMessageConverter(new DispatchWriter(new AnnotationToTSV(), TSV_MEDIA_TYPE));
     }
 
     private AnnotationToGPAD gpadAnnotationConverter() {
@@ -57,20 +57,4 @@ import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.*;
     private AnnotationToGAF gafAnnotationConverter() {
         return new AnnotationToGAF();
     }
-
-//    @Bean
-//    public GenericHttpMessageConverter gpadHttpMessageConverter() {
-//        return new GenericHttpMessageConverter(new AnnotationToGPAD(), GPAD_MEDIA_TYPE);
-//    }
-//
-//    @Bean
-//    public GenericHttpMessageConverter gafHttpMessageConverter() {
-//        return new GenericHttpMessageConverter(new AnnotationToGAF(), GAF_MEDIA_TYPE);
-//    }
-//
-//    @Bean
-//    public GenericHttpMessageConverter tsvHttpMessageConverter(){
-//        return new GenericHttpMessageConverter(new AnnotationToTSV(), TSV_MEDIA_TYPE);
-//    }
-
 }
