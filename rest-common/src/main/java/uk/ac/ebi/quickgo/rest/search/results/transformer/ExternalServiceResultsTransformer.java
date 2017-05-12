@@ -7,6 +7,8 @@ import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
@@ -18,6 +20,7 @@ import static com.google.common.base.Preconditions.checkArgument;
  * @author Edd
  */
 public class ExternalServiceResultsTransformer<R> implements ResultTransformer<QueryResult<R>> {
+    Logger LOGGER = LoggerFactory.getLogger(ExternalServiceResultsTransformer.class);
 
     private static final ResultTransformationRequests EMPTY_TRANSFORMATION_REQUESTS =
             new ResultTransformationRequests();
@@ -37,13 +40,16 @@ public class ExternalServiceResultsTransformer<R> implements ResultTransformer<Q
     }
 
     @Override public QueryResult<R> transform(QueryResult<R> result, FilterContext filterContext) {
-        ResultTransformationRequests transformationRequests =
-                filterContext
-                        .get(ResultTransformationRequests.class)
-                        .orElse(EMPTY_TRANSFORMATION_REQUESTS);
+        LOGGER.info("ExternalServiceResultsTransformer.transform results.");
 
-        Set<String> requiredRequests = transformationRequests.getRequests().stream().map(
-                ResultTransformationRequest::getId).collect(Collectors.toSet());
+        ResultTransformationRequests transformationRequests = filterContext.get(ResultTransformationRequests.class)
+                                                                           .orElse(EMPTY_TRANSFORMATION_REQUESTS);
+
+        LOGGER.info("ExternalServiceResultsTransformer.transform build collection of required requests.");
+        Set<String> requiredRequests = transformationRequests.getRequests()
+                                                             .stream()
+                                                             .map(ResultTransformationRequest::getId)
+                                                             .collect(Collectors.toSet());
         requiredRequests.retainAll(fieldsToAdd);
 
         if (!requiredRequests.isEmpty()) {
@@ -52,12 +58,13 @@ public class ExternalServiceResultsTransformer<R> implements ResultTransformer<Q
                             .filter(injector -> requiredRequests.contains(injector.getId()))
                             .collect(Collectors.toList());
 
+            LOGGER.info("ExternalServiceResultsTransformer.transform build collection of required injectors.");
             result.getResults().forEach(annotation ->
                     requiredInjectors.forEach(valueInjector ->
                             valueInjector.inject(restFilterConverterFactory, annotation))
             );
         }
-
+        LOGGER.info("ExternalServiceResultsTransformer.transform return transformed results.");
         return result;
     }
 }
