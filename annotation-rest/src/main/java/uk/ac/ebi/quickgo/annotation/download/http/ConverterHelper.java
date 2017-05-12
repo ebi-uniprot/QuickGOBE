@@ -57,12 +57,12 @@ public class ConverterHelper {
         }
     }
 
-    void writeError(OutputStream out, ResponseExceptionHandler.ErrorInfo errorInfo) throws IOException {
+    private void writeError(OutputStream out, ResponseExceptionHandler.ErrorInfo errorInfo) throws IOException {
         out.write(("URL:\n\t" + errorInfo.getUrl() + "\n").getBytes());
         out.write(("Messages:\n\t" + errorInfo.getMessages().stream().collect(Collectors.joining(",\n"))).getBytes());
     }
 
-    void writeAnnotations(OutputStream out, Stream<QueryResult<Annotation>> annotationStream) {
+    private void writeAnnotations(OutputStream out, Stream<QueryResult<Annotation>> annotationStream) {
         LOGGER.info("GenericHttpMessageConverter writeAnnotations called.");
         AtomicInteger counter = new AtomicInteger(0);
         AtomicInteger batchCount = new AtomicInteger(0);
@@ -81,7 +81,7 @@ public class ConverterHelper {
         LOGGER.info("Written " + counter.get() +  type.getType() + " annotations");
     }
 
-    void stream(OutputStream out, AtomicInteger counter, AtomicInteger batchCount, String content) {
+    private void stream(OutputStream out, AtomicInteger counter, AtomicInteger batchCount, String content) {
         try {
             out.write((content + "\n").getBytes());
             updateCountersAndFlushStreamWhenRequired(out, counter, batchCount);
@@ -91,7 +91,7 @@ public class ConverterHelper {
         }
     }
 
-    void updateCountersAndFlushStreamWhenRequired(OutputStream out, AtomicInteger counter,
+    private void updateCountersAndFlushStreamWhenRequired(OutputStream out, AtomicInteger counter,
             AtomicInteger batchCount) throws IOException {
         counter.getAndIncrement();
         batchCount.getAndIncrement();
