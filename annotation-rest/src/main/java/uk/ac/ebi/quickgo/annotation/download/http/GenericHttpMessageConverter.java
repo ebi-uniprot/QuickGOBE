@@ -54,6 +54,7 @@ public class GenericHttpMessageConverter extends AbstractHttpMessageConverter<Ob
 
     @Override protected void writeInternal(Object annotationStream, HttpOutputMessage outputMessage)
             throws IOException, HttpMessageNotWritableException {
+        LOGGER.info("GenericHttpMessageConverter writeInternal called.");
         OutputStream out = outputMessage.getBody();
         dispatchWriting(annotationStream, out);
     }
@@ -79,6 +80,7 @@ public class GenericHttpMessageConverter extends AbstractHttpMessageConverter<Ob
     }
 
     private void writeAnnotations(OutputStream out, Stream<QueryResult<Annotation>> annotationStream) {
+        LOGGER.info("GenericHttpMessageConverter writeAnnotations called.");
         AtomicInteger counter = new AtomicInteger(0);
         AtomicInteger batchCount = new AtomicInteger(0);
         try {
