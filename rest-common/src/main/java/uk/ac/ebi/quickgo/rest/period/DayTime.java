@@ -5,6 +5,8 @@ import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Objects;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Data structure holds union of day of week and time. Used to declare events that have a daily occurrence at a set
@@ -17,6 +19,7 @@ import java.util.Objects;
  */
 class DayTime implements DateModifier {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(DayTime.class);
     private final DayOfWeek dayOfWeek;
     private final LocalTime time;
 
@@ -42,6 +45,7 @@ class DayTime implements DateModifier {
      */
     @Override
     public LocalDateTime modify(LocalDateTime target) {
+        LOGGER.info("Modifying " + target + " in DayTime");
         Preconditions.checkArgument(Objects.nonNull(target), "A target LocalDateTime cannot be null");
         LocalDateTime comparedDate = target.with(this.dayOfWeek);
         return comparedDate.with(this.time);
