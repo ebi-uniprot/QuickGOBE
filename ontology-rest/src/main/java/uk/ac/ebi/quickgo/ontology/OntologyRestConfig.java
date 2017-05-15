@@ -70,11 +70,12 @@ public class OntologyRestConfig {
     @Bean
     RemainingTimeSupplier maxAgeProvider(@Value("${ontology.caching.allowed.period}") String cachingAllowedPeriodValue,
             PeriodParser parser) {
-        Collection<AlarmClock> cachingAllowingAarmClocks = null;
+        LOGGER.info("Setting caching allowed period using " + cachingAllowedPeriodValue);
+        Collection<AlarmClock> cachingAllowingAlarmClocks = null;
         if (Objects.nonNull(cachingAllowedPeriodValue)) {
             String[] periods = cachingAllowedPeriodValue.split(PERIOD_DELIMITER);
             try {
-                cachingAllowingAarmClocks = Arrays.stream(periods)
+                cachingAllowingAlarmClocks = Arrays.stream(periods)
                                                   .map(parser::parse)
                                                   .filter(Optional::isPresent)
                                                   .map(Optional::get)
@@ -85,7 +86,7 @@ public class OntologyRestConfig {
             }
         }
         return
-                new RemainingTimeSupplier(Objects.nonNull(cachingAllowingAarmClocks) ? cachingAllowingAarmClocks :
+                new RemainingTimeSupplier(Objects.nonNull(cachingAllowingAlarmClocks) ? cachingAllowingAlarmClocks :
                                                   Collections.emptyList());
     }
 

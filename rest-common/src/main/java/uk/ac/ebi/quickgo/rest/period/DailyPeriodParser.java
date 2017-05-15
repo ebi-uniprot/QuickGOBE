@@ -37,11 +37,13 @@ public class DailyPeriodParser extends PeriodParser{
             if(periodMatcher.matches() && periodMatcher.groupCount() == EXPECTED_GROUP_COUNT) {
                 final int hours = Integer.parseInt(periodMatcher.group(HOUR_GROUP));
                 final int minutes = Integer.parseInt(periodMatcher.group(MINUTE_GROUP));
-                return Optional.of(new DayTime(DayOfWeek.valueOf(periodMatcher.group(DAY_GROUP)),
-                                               LocalTime.of(hours, minutes)));
+                final DayTime dayTime = new DayTime(DayOfWeek.valueOf(periodMatcher.group(DAY_GROUP)),
+                                                  LocalTime.of(hours, minutes));
+                LOGGER.info("DailyPeriodParser toDateModifier from " + input + " to " + dayTime);
+                return Optional.of(dayTime);
             }
         } catch (Exception e) {
-            LOGGER.info("DailyPeriodParser parsed " + input + " but encountered an exception.", e);
+            LOGGER.error("DailyPeriodParser parsed " + input + " but encountered an exception.", e);
         }
         return Optional.empty();
     }

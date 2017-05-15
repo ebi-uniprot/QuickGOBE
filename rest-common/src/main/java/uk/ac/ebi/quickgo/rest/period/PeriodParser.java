@@ -30,7 +30,7 @@ public abstract class PeriodParser {
         if (Objects.nonNull(input) && !input.isEmpty()) {
             return getPeriod(input);
         }
-        LOGGER.info("Period parse method sent null or empty value");
+        LOGGER.error("PeriodParser parse method sent null or empty value");
         return Optional.empty();
     }
 
@@ -49,6 +49,7 @@ public abstract class PeriodParser {
                                                     .filter(Optional::isPresent)   //replace these two lines with
                                                     .map(Optional::get)            //.map(Optional::stream) in Java 9
                                                     .collect(toList());
+            LOGGER.info("PeriodParser - created durationList " + durationList);
             if (durationList.size() == REQUIRED_DATE_MODIFYING_INSTANCES) {
                 return Optional.of(new AlarmClockImpl(durationList.get(0), durationList.get(1)));
             }
