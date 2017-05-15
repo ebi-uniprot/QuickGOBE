@@ -4,6 +4,8 @@ import com.google.common.base.Preconditions;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Objects;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An implementation of a {@link AlarmClock} which uses two values of {@link DateModifier} as start and end points to
@@ -16,8 +18,10 @@ import java.util.Objects;
  */
 public class AlarmClockImpl implements AlarmClock {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(AlarmClockImpl.class);
     private final DateModifier start;
     private final DateModifier end;
+
 
     AlarmClockImpl(DateModifier start, DateModifier end) {
         Preconditions.checkArgument(Objects.nonNull(start), "The RemainingTimePeriod constructor start parameter " +
@@ -32,12 +36,16 @@ public class AlarmClockImpl implements AlarmClock {
     public Duration remainingTime(LocalDateTime target) {
         LocalDateTime startDateTime = start.modify(target);
         LocalDateTime endDateTime = end.modify(target);
+        LOGGER.info("AlarmClockImpl calculating remaining time between " + startDateTime + " to " + endDateTime +
+                            "starting from " + target);
+
         Duration remaining;
         if (target.isAfter(startDateTime) && target.isBefore(endDateTime)){
             remaining = Duration.between(target, endDateTime);
         }else{
             remaining = Duration.ZERO;
         }
+        LOGGER.info("AlarmClockImpl remaining time is " + remaining);
         return remaining;
     }
 
