@@ -34,6 +34,7 @@ public class AlarmClockImpl implements AlarmClock {
 
     @Override
     public Duration remainingTime(LocalDateTime target) {
+        LOGGER.info("AlarmClockImpl calculating remaining time.");
         LocalDateTime startDateTime = start.modify(target);
         LocalDateTime endDateTime = end.modify(target);
         LOGGER.info("AlarmClockImpl calculating remaining time between " + startDateTime + " to " + endDateTime +
