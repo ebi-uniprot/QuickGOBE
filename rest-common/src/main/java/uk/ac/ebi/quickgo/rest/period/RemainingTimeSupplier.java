@@ -37,6 +37,7 @@ public class RemainingTimeSupplier {
      * @return Duration left of any active periods, if they exist.
      */
     public Duration getDuration() {
+        LOGGER.info("RemainingTimeSupplier checking " + alarmClocks.size() + " alarm clock instances");
         LocalDateTime now = LocalDateTime.now();
         Optional<Duration> remainingTime = alarmClocks.stream()
                                                       .map(p -> p.remainingTime(now))
