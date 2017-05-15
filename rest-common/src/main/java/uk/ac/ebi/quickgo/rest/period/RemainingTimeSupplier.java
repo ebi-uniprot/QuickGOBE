@@ -5,6 +5,8 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static java.util.Objects.nonNull;
 
@@ -20,10 +22,12 @@ import static java.util.Objects.nonNull;
 public class RemainingTimeSupplier {
 
     private final Collection<AlarmClock> alarmClocks;
+    private static final Logger LOGGER = LoggerFactory.getLogger(RemainingTimeSupplier.class);
 
     public RemainingTimeSupplier(Collection<AlarmClock> alarmClocks) {
         Preconditions.checkArgument(nonNull(alarmClocks), "The collection of periods to check must not " +
                 "be null");
+        LOGGER.info("Populating RemainingTimeSupplier with alarm clocks " + alarmClocks);
         this.alarmClocks = alarmClocks;
     }
 
@@ -38,6 +42,7 @@ public class RemainingTimeSupplier {
                                                       .map(p -> p.remainingTime(now))
                                                       .filter(duration -> !duration.isZero())
                                                       .findFirst();
+        LOGGER.info("RemainingTimeSupplier getDuration calculation has result in a remaining time of " + remainingTime);
         return remainingTime.orElse(Duration.ZERO);
     }
 }
