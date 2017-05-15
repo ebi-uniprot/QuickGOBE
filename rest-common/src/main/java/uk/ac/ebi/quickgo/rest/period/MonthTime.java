@@ -6,6 +6,8 @@ import java.time.LocalTime;
 import java.time.MonthDay;
 import java.util.Objects;
 import javax.validation.constraints.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A union of {@link MonthDay} and {@link LocalTime} to represent a particular day of month, month and time
@@ -19,6 +21,7 @@ import javax.validation.constraints.NotNull;
  */
 public class MonthTime implements DateModifier {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(MonthTime.class);
     private MonthDay monthDay;
     private LocalTime time;
 
@@ -38,6 +41,7 @@ public class MonthTime implements DateModifier {
      */
     @Override
     public LocalDateTime modify(LocalDateTime target) {
+        LOGGER.info("Modifying " + target + " in DayTime");
         Preconditions.checkArgument(Objects.nonNull(target), "A target LocalDateTime cannot be null");
         LocalDateTime comparedDate = target.with(this.monthDay);
         return comparedDate.with(this.time);
