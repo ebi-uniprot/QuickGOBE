@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * An implementation of a {@link AlarmClock} which uses two values of {@link DateModifier} as start and end points to
+ * An implementation of a {@link AlarmClock} which uses two values of {@link DayTime} as start and end points to
  * determine remaining time.
  *
  * @author Tony Wardell
@@ -16,14 +16,14 @@ import org.slf4j.LoggerFactory;
  * Time: 12:46
  * Created with IntelliJ IDEA.
  */
-public class AlarmClockImpl implements AlarmClock {
+public class AlarmClockDayTime implements AlarmClock {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AlarmClockImpl.class);
-    private final DateModifier start;
-    private final DateModifier end;
+    private static final Logger LOGGER = LoggerFactory.getLogger(AlarmClockDayTime.class);
+    private final DayTime start;
+    private final DayTime end;
 
 
-    AlarmClockImpl(DateModifier start, DateModifier end) {
+    AlarmClockDayTime(DayTime start, DayTime end) {
         Preconditions.checkArgument(Objects.nonNull(start), "The RemainingTimePeriod constructor start parameter " +
                 "must not be null.");
         Preconditions.checkArgument(Objects.nonNull(end),"The RemainingTimePeriod constructor end parameter " +
@@ -35,13 +35,20 @@ public class AlarmClockImpl implements AlarmClock {
     @Override
     public Duration remainingTime(LocalDateTime target) {
         LOGGER.info("AlarmClockImpl calculating remaining time.");
-        LocalDateTime startDateTime = start.modify(target);
-        LocalDateTime endDateTime = end.modify(target);
-        LOGGER.info("AlarmClockImpl calculating remaining time between " + startDateTime + " to " + endDateTime +
-                            "starting from " + target);
+        Duration remaining = Duration.ZERO;
+        if(PeriodComparison.dayBetweenStartAndEnd(start.dayOfWeek, end.dayOfWeek, target.getDayOfWeek())){
+            remaining = comparedModifiedTimes(target);
+        }
+        return remaining;
+    }
+
+    private Duration comparedModifiedTimes(LocalDateTime target){
+        LocalDateTime startDateTime = start.modifyToPrevious(target);
+        LocalDateTime endDateTime = end.modifyToNext(target);
+        LOGGER.info("AlarmClockImpl calculating remaining time between " + target + " and " + endDateTime);
 
         Duration remaining;
-        if (target.isAfter(startDateTime) && target.isBefore(endDateTime)){
+        if(startDateTime.isBefore(target) && endDateTime.isAfter(target)) {
             remaining = Duration.between(target, endDateTime);
         }else{
             remaining = Duration.ZERO;
@@ -58,7 +65,7 @@ public class AlarmClockImpl implements AlarmClock {
             return false;
         }
 
-        AlarmClockImpl that = (AlarmClockImpl) o;
+        AlarmClockDayTime that = (AlarmClockDayTime) o;
 
         if (start != null ? !start.equals(that.start) : that.start != null) {
             return false;
