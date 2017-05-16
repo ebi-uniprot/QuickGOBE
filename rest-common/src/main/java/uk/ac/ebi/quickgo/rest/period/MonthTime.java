@@ -5,7 +5,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.MonthDay;
 import java.util.Objects;
-import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,11 +18,11 @@ import org.slf4j.LoggerFactory;
  * Time: 11:19
  * Created with IntelliJ IDEA.
  */
-public class MonthTime implements DateModifier {
+public class MonthTime {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MonthTime.class);
-    private MonthDay monthDay;
-    private LocalTime time;
+    private final MonthDay monthDay;
+    final LocalTime time;
 
     MonthTime(MonthDay monthDay, LocalTime time) {
         Preconditions.checkArgument(Objects.nonNull(monthDay), "Invalid monthDay parameter passed to " +
@@ -39,9 +38,8 @@ public class MonthTime implements DateModifier {
      * @param target to modify.
      * @return a particular instant in time.
      */
-    @Override
-    public LocalDateTime modify(LocalDateTime target) {
-        LOGGER.info("Modifying " + target + " in DayTime");
+    LocalDateTime modify(LocalDateTime target) {
+        LOGGER.info("Modifying " + target + " in MonthTime");
         Preconditions.checkArgument(Objects.nonNull(target), "A target LocalDateTime cannot be null");
         LocalDateTime comparedDate = target.with(this.monthDay);
         return comparedDate.with(this.time);
