@@ -4,6 +4,8 @@ import com.google.common.base.Preconditions;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.temporal.TemporalAdjuster;
+import java.time.temporal.TemporalAdjusters;
 import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,11 +19,11 @@ import org.slf4j.LoggerFactory;
  * Time: 16:15
  * Created with IntelliJ IDEA.
  */
-class DayTime implements DateModifier {
+class DayTime {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DayTime.class);
-    private final DayOfWeek dayOfWeek;
-    private final LocalTime time;
+    final DayOfWeek dayOfWeek;
+    public final LocalTime time;
 
     /**
      * Given a target time, this method returns a {@link LocalDateTime} instance that has the same day and time as
@@ -38,17 +40,23 @@ class DayTime implements DateModifier {
         this.time = time;
     }
 
-    /**
-     * Modify the targetTime to be an instant defined by the values held in this instance.
-     * @param target to modify.
-     * @return a particular instant in time.
-     */
-    @Override
-    public LocalDateTime modify(LocalDateTime target) {
-        LOGGER.info("Modifying " + target + " in DayTime");
+    private LocalDateTime modify(LocalDateTime target, TemporalAdjuster toDay) {
         Preconditions.checkArgument(Objects.nonNull(target), "A target LocalDateTime cannot be null");
-        LocalDateTime comparedDate = target.with(this.dayOfWeek);
-        return comparedDate.with(this.time);
+        LocalDateTime comparedDate = target.with(toDay);
+        comparedDate = comparedDate.with(this.time);
+        return comparedDate;
+    }
+
+    LocalDateTime modifyToPrevious(LocalDateTime target) {
+        LOGGER.info("modifyToPrevious " + target + " in DayTime");
+        TemporalAdjuster toDay = TemporalAdjusters.previousOrSame(this.dayOfWeek);
+        return modify(target, toDay);
+    }
+
+    LocalDateTime modifyToNext(LocalDateTime target) {
+        LOGGER.info("modifyToNext " + target + " in DayTime");
+        TemporalAdjuster toDay = TemporalAdjusters.nextOrSame(this.dayOfWeek);
+        return modify(target, toDay);
     }
 
     @Override public boolean equals(Object o) {
