@@ -24,22 +24,23 @@ import static org.hamcrest.core.Is.is;
 @RunWith(MockitoJUnitRunner.class)
 public class AlarmClockDayTimeTest {
 
-    LocalDateTime input;
-    DayTime startDayTime;
-    DayTime endDayTime;
+    private LocalDateTime input;
+    private DayTime startDayTime;
+    private DayTime endDayTime;
+    private AlarmClockDayTime alarmClock;
 
     @Before
     public void setup(){
        input = LocalDateTime.of(2017, 5, 17, 12, 00);   //WED
        startDayTime = new DayTime(DayOfWeek.MONDAY, LocalTime.of(12, 00));
        endDayTime = new DayTime(DayOfWeek.FRIDAY, LocalTime.of(11, 59));
+      alarmClock = new AlarmClockDayTime(startDayTime, endDayTime);
     }
 
     @Test
     public void secondsLeftWhenComparingStartTimeAndEndTimeWithFixedTime(){
-        AlarmClockDayTime alarmClock = new AlarmClockDayTime(startDayTime, endDayTime);
-
         long timeLeft = alarmClock.remainingTime(input).getSeconds();
+
         assertThat(timeLeft, is(172740L));
     }
 
@@ -47,9 +48,9 @@ public class AlarmClockDayTimeTest {
     public void durationZeroWhenInputAfterEndTime(){
         input = input.withDayOfMonth(19);
 
-        AlarmClockDayTime alarmClock = new AlarmClockDayTime(startDayTime, endDayTime);
+        final Duration remainingTime = alarmClock.remainingTime(input);
 
-        assertThat(alarmClock.remainingTime(input), is(Duration.ZERO));
+        assertThat(remainingTime, is(Duration.ZERO));
     }
 
     @Test
@@ -58,9 +59,9 @@ public class AlarmClockDayTimeTest {
         input = input.withHour(11);
         input = input.withMinute(59);
 
-        AlarmClockDayTime alarmClock = new AlarmClockDayTime(startDayTime, endDayTime);
+        final Duration remainingTime = alarmClock.remainingTime(input);
 
-        assertThat(alarmClock.remainingTime(input), is(Duration.ZERO));
+        assertThat(remainingTime, is(Duration.ZERO));
     }
 
     @Test(expected = IllegalArgumentException.class)
