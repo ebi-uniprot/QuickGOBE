@@ -34,7 +34,7 @@ public class AlarmClockDayTimeTest {
        input = LocalDateTime.of(2017, 5, 17, 12, 00);   //WED
        startDayTime = new DayTime(DayOfWeek.MONDAY, LocalTime.of(12, 00));
        endDayTime = new DayTime(DayOfWeek.FRIDAY, LocalTime.of(11, 59));
-      alarmClock = new AlarmClockDayTime(startDayTime, endDayTime);
+       alarmClock = new AlarmClockDayTime(startDayTime, endDayTime);
     }
 
     @Test
