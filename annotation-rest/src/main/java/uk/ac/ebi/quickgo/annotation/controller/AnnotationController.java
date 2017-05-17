@@ -31,6 +31,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -124,6 +125,11 @@ public class AnnotationController {
     private final StatisticsService statsService;
     private final TaskExecutor taskExecutor;
     private final AnnotationDownloadFileHeader annotationDownloadFileHeader;
+    private static final Consumer<? super QueryResult<Annotation>> LOGGING_CONSUMER
+            = (Consumer<QueryResult<Annotation>>) annotationQueryResult -> {
+        LOGGER.info("QueryResult received by emitter");
+        LOGGER.info(annotationQueryResult.toString());
+    };
 
     @Autowired
     public AnnotationController(SearchService<Annotation> annotationSearchService,
@@ -236,17 +242,27 @@ public class AnnotationController {
         ResponseBodyEmitter emitter = new ResponseBodyEmitter();
         annotationDownloadFileHeader.write(emitter, servletRequest, mediaTypeAcceptHeader);
 
-        taskExecutor.execute(() -> emitStreamWithMediaType(
-                emitter,
-                streamSearchResults(queryRequest, queryTemplate, annotationSearchService,
-                        resultTransformerChain, filterQueryInfo.getFilterContext(), request.getDownloadLimit()),
-                mediaTypeAcceptHeader));
+        taskExecutor.execute(() -> {
+            final Stream<QueryResult<Annotation>> annotationResultStream =
+                    getQueryResultStream(request, filterQueryInfo, queryRequest);
+            emitStreamWithMediaType(emitter, annotationResultStream, mediaTypeAcceptHeader);
+        });
 
         LOGGER.info("Writing download response:: " + request + ", " + mediaTypeAcceptHeader);
         return ResponseEntity
                 .ok()
                 .headers(createHttpDownloadHeader(mediaTypeAcceptHeader))
                 .body(emitter);
+    }
+
+    private Stream<QueryResult<Annotation>> getQueryResultStream(@Valid @ModelAttribute AnnotationRequest request,
+            FilterQueryInfo filterQueryInfo, QueryRequest queryRequest) {
+        return streamSearchResults(queryRequest,
+                            queryTemplate,
+                            annotationSearchService,
+                            resultTransformerChain,
+                            filterQueryInfo.getFilterContext(),
+                            request.getDownloadLimit());
     }
 
     /**
@@ -355,6 +371,7 @@ public class AnnotationController {
             ResponseBodyEmitter emitter,
             Stream<QueryResult<Annotation>> annotationResultStream,
             MediaType mediaType) {
+        annotationResultStream.peek(LOGGING_CONSUMER);
         try {
             emitter.send(annotationResultStream, mediaType);
         } catch (IOException e) {
