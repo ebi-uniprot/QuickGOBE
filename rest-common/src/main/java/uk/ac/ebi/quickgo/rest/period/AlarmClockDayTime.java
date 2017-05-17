@@ -36,7 +36,8 @@ public class AlarmClockDayTime implements AlarmClock {
     public Duration remainingTime(LocalDateTime target) {
         LOGGER.info("AlarmClockImpl calculating remaining time.");
         Duration remaining = Duration.ZERO;
-        if(PeriodComparison.dayBetweenStartAndEnd(start.dayOfWeek, end.dayOfWeek, target.getDayOfWeek())){
+        final DayOfWeekRange dayOfWeekRange = new DayOfWeekRange(start.dayOfWeek, end.dayOfWeek);
+        if(dayOfWeekRange.includes(target.getDayOfWeek())){
             remaining = comparedModifiedTimes(target);
         }
         return remaining;
