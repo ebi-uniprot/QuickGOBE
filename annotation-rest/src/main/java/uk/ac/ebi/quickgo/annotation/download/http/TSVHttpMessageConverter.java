@@ -46,7 +46,7 @@ public class TSVHttpMessageConverter extends AbstractHttpMessageConverter<Object
 
     @Override protected void writeInternal(Object annotationStream, HttpOutputMessage outputMessage)
             throws IOException, HttpMessageNotWritableException {
-        LOGGER.info("GenericHttpMessageConverter writeInternal called.");
+        LOGGER.info("TSVHttpMessageConverter writeInternal called.");
         OutputStream out = outputMessage.getBody();
         helper.write(annotationStream, out);
     }
