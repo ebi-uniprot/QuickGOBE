@@ -28,7 +28,6 @@ import static org.slf4j.LoggerFactory.getLogger;
  * Created 19/01/17
  * @author Edd
  */
-@Deprecated
 public class GAFHttpMessageConverter extends AbstractHttpMessageConverter<Object> {
     private static final String TYPE = "text";
     private static final String SUB_TYPE = "gaf";
