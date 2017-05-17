@@ -4,7 +4,7 @@ import uk.ac.ebi.quickgo.ontology.controller.validation.OBOControllerValidationH
 import uk.ac.ebi.quickgo.ontology.controller.validation.OBOControllerValidationHelperImpl;
 import uk.ac.ebi.quickgo.rest.headers.HttpHeader;
 import uk.ac.ebi.quickgo.rest.headers.HttpHeadersProvider;
-import uk.ac.ebi.quickgo.rest.period.DailyPeriodParser;
+import uk.ac.ebi.quickgo.rest.period.PeriodParserDayTime;
 import uk.ac.ebi.quickgo.rest.period.AlarmClock;
 import uk.ac.ebi.quickgo.rest.period.PeriodParser;
 import uk.ac.ebi.quickgo.rest.period.RemainingTimeSupplier;
@@ -92,7 +92,7 @@ public class OntologyRestConfig {
 
     @Bean
     PeriodParser periodParser() {
-        return new DailyPeriodParser();
+        return new PeriodParserDayTime();
     }
 
     public interface OntologyPagingConfig {
