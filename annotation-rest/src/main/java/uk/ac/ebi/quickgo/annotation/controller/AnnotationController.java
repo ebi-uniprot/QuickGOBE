@@ -371,9 +371,9 @@ public class AnnotationController {
             ResponseBodyEmitter emitter,
             Stream<QueryResult<Annotation>> annotationResultStream,
             MediaType mediaType) {
-        annotationResultStream.peek(LOGGING_CONSUMER);
+        Stream<QueryResult<Annotation>> peakedStream = annotationResultStream.peek(LOGGING_CONSUMER);
         try {
-            emitter.send(annotationResultStream, mediaType);
+            emitter.send(peakedStream, mediaType);
         } catch (IOException e) {
             LOGGER.error("Failed to stream annotation results", e);
             emitter.completeWithError(e);
