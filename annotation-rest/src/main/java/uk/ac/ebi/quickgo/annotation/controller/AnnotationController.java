@@ -371,6 +371,7 @@ public class AnnotationController {
             ResponseBodyEmitter emitter,
             Stream<QueryResult<Annotation>> annotationResultStream,
             MediaType mediaType) {
+        LOGGER.info("Sending result stream via emitter");
         Stream<QueryResult<Annotation>> peakedStream = annotationResultStream.peek(LOGGING_CONSUMER);
         try {
             emitter.send(peakedStream, mediaType);

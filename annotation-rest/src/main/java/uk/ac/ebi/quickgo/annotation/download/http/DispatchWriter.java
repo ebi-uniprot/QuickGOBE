@@ -41,13 +41,13 @@ public class DispatchWriter {
 
     @SuppressWarnings("unchecked")
     void write(Object object, OutputStream out) throws IOException {
+        LOGGER.info("DispatchWriter write called with " + object + ", " + out);
         if (object instanceof ResponseExceptionHandler.ErrorInfo) {
             writeError(out, (ResponseExceptionHandler.ErrorInfo) object);
         } else {
             if(object instanceof LinkedHashMap){
                 // Must deal with LinkedHashMap {timestamp=Wed May 10 16:18:09 BST 2017, status=200, error=OK, message=No message available, path=/QuickGO/services/annotation/downloadSearch}
-                LOGGER.info("Must deal with LinkedHashMap " + object );
-                //writeAnnotations(out, (Stream<QueryResult<Annotation>>) ((LinkedHashMap)object).entrySet().stream());
+                LOGGER.info("DispatchWriter write must deal with LinkedHashMap " + object );
             }else {
                 writeAnnotations(out, (Stream<QueryResult<Annotation>>) object);
             }
