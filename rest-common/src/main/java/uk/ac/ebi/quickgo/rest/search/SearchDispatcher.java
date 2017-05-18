@@ -159,7 +159,7 @@ public final class SearchDispatcher {
                 MutableValue<Integer> fetchedCount = new MutableValue<>(0);
 
                 int pageSize = firstQueryRequest.getPage().getPageSize();
-                LOGGER.info("download first request info: {} wanted, {} page size", limit, pageSize);
+                LOGGER.info("SearchDispatcher:: download first request info: {} wanted, {} page size", limit, pageSize);
                 int requiredIterations = getRequiredNumberOfPagesToFetch(
                         pageSize,
                         totalHits,

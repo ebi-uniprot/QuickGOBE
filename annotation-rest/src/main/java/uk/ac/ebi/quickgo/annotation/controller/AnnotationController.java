@@ -231,15 +231,16 @@ public class AnnotationController {
         LOGGER.info("Download Request:: " + request + ", " + mediaTypeAcceptHeader);
 
         checkBindingErrors(bindingResult);
-
         FilterQueryInfo filterQueryInfo = extractFilterQueryInfo(request);
 
+        LOGGER.info("Build QueryRequest");
         QueryRequest queryRequest = downloadQueryTemplate.newBuilder()
                 .setQuery(QuickGOQuery.createAllQuery())
                 .addFilters(filterQueryInfo.getFilterQueries())
                 .build();
 
         ResponseBodyEmitter emitter = new ResponseBodyEmitter();
+        LOGGER.info("Write download header");
         annotationDownloadFileHeader.write(emitter, servletRequest, mediaTypeAcceptHeader);
 
         taskExecutor.execute(() -> {
@@ -257,12 +258,15 @@ public class AnnotationController {
 
     private Stream<QueryResult<Annotation>> getQueryResultStream(@Valid @ModelAttribute AnnotationRequest request,
             FilterQueryInfo filterQueryInfo, QueryRequest queryRequest) {
-        return streamSearchResults(queryRequest,
+        LOGGER.info("Creating stream of search results.");
+        Stream<QueryResult<Annotation>> resultStream = streamSearchResults(queryRequest,
                             queryTemplate,
                             annotationSearchService,
                             resultTransformerChain,
                             filterQueryInfo.getFilterContext(),
                             request.getDownloadLimit());
+        LOGGER.info("Finished creating stream of search results.");
+        return resultStream;
     }
 
     /**
@@ -295,8 +299,7 @@ public class AnnotationController {
         return template;
     }
 
-    private FilterQueryInfo extractFilterQueryInfo(
-            AnnotationRequest request) {
+    private FilterQueryInfo extractFilterQueryInfo(AnnotationRequest request) {
         Set<QuickGOQuery> filterQueries = new HashSet<>();
         Set<FilterContext> filterContexts = new HashSet<>();
 
@@ -322,9 +325,7 @@ public class AnnotationController {
      * @param filterQueries the {@link QuickGOQuery} list to append to
      * @param filterContexts the {@link FilterContext} list to append to
      */
-    private void convertFilterRequests(
-            AnnotationRequest request,
-            Set<QuickGOQuery> filterQueries,
+    private void convertFilterRequests(AnnotationRequest request, Set<QuickGOQuery> filterQueries,
             Set<FilterContext> filterContexts) {
         request.createFilterRequests().stream()
                 .map(converterFactory::convert)
@@ -340,9 +341,7 @@ public class AnnotationController {
      * @param request the annotation request
      * @param filterContexts the {@link FilterContext} list to append to
      */
-    private void convertResultTransformationRequests(
-            AnnotationRequest request,
-            Set<FilterContext> filterContexts) {
+    private void convertResultTransformationRequests( AnnotationRequest request, Set<FilterContext> filterContexts) {
         ResultTransformationRequests transformationRequests = request.createResultTransformationRequests();
         if (!transformationRequests.getRequests().isEmpty()) {
             FilterContext transformationContext = new FilterContext();
