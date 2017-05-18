@@ -80,4 +80,12 @@ import org.springframework.stereotype.Component;
 
         return config;
     }
+
+    @Override public String toString() {
+        return "GlobalFilterConfigRetrieval{" +
+                "configCache=" + configCache +
+                ", internalExecutionConfig=" + internalExecutionConfig +
+                ", externalExecutionConfig=" + externalExecutionConfig +
+                '}';
+    }
 }

@@ -40,12 +40,12 @@ public class ExternalServiceResultsTransformer<R> implements ResultTransformer<Q
     }
 
     @Override public QueryResult<R> transform(QueryResult<R> result, FilterContext filterContext) {
-        LOGGER.info("ExternalServiceResultsTransformer.transform results.");
+        LOGGER.info("ExternalServiceResultsTransformer::transform starting.");
 
         ResultTransformationRequests transformationRequests = filterContext.get(ResultTransformationRequests.class)
                                                                            .orElse(EMPTY_TRANSFORMATION_REQUESTS);
 
-        LOGGER.info("ExternalServiceResultsTransformer.transform build collection of required requests.");
+        LOGGER.info("ExternalServiceResultsTransformer::transform build collection of required requests.");
         Set<String> requiredRequests = transformationRequests.getRequests()
                                                              .stream()
                                                              .map(ResultTransformationRequest::getId)
@@ -66,5 +66,13 @@ public class ExternalServiceResultsTransformer<R> implements ResultTransformer<Q
         }
         LOGGER.info("ExternalServiceResultsTransformer.transform return transformed results.");
         return result;
+    }
+
+    @Override public String toString() {
+        return "ExternalServiceResultsTransformer{" +
+                "restFilterConverterFactory=" + restFilterConverterFactory +
+                ", fieldInjectors=" + fieldInjectors +
+                ", fieldsToAdd=" + fieldsToAdd +
+                '}';
     }
 }
