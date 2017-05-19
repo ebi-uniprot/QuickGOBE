@@ -40,18 +40,19 @@ public class ExternalServiceResultsTransformer<R> implements ResultTransformer<Q
     }
 
     @Override public QueryResult<R> transform(QueryResult<R> result, FilterContext filterContext) {
-        LOGGER.info("ExternalServiceResultsTransformer::transform starting.");
+        LOGGER.info("ExternalServiceResultsTransformer#transform starting.");
 
         ResultTransformationRequests transformationRequests = filterContext.get(ResultTransformationRequests.class)
                                                                            .orElse(EMPTY_TRANSFORMATION_REQUESTS);
 
-        LOGGER.info("ExternalServiceResultsTransformer::transform build collection of required requests.");
+        LOGGER.info("ExternalServiceResultsTransformer#transform build collection of required requests."
+                            + transformationRequests.getRequests());
         Set<String> requiredRequests = transformationRequests.getRequests()
                                                              .stream()
                                                              .map(ResultTransformationRequest::getId)
                                                              .collect(Collectors.toSet());
         requiredRequests.retainAll(fieldsToAdd);
-
+        LOGGER.info("ExternalServiceResultsTransformer#transform process required requests. " + requiredRequests);
         if (!requiredRequests.isEmpty()) {
             List<ResponseValueInjector<R>> requiredInjectors =
                     fieldInjectors.stream()
@@ -65,7 +66,7 @@ public class ExternalServiceResultsTransformer<R> implements ResultTransformer<Q
                             valueInjector.inject(restFilterConverterFactory, annotation))
             );
         }
-        LOGGER.info("ExternalServiceResultsTransformer.transform return transformed results. " + result);
+        LOGGER.info("ExternalServiceResultsTransformer#transform return transformed results. " + result);
         return result;
     }
 

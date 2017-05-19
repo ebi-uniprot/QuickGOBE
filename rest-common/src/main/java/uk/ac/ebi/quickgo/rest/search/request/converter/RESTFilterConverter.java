@@ -75,6 +75,7 @@ class RESTFilterConverter<T> implements FilterConverter<FilterRequest, T> {
         try {
             Class<?> restResponseType = loadResponseType();
             FilterConverter<ResponseType, T> converter = createConverter();
+            LOGGER.info("RESTFilterConverter#transform using FilterConverter " + converter);
             ResponseType results = (ResponseType) fetchResults(restRequesterBuilder.build(), restResponseType);
             return converter.transform(results);
         } catch (Exception e) {
