@@ -58,13 +58,14 @@ public class ExternalServiceResultsTransformer<R> implements ResultTransformer<Q
                             .filter(injector -> requiredRequests.contains(injector.getId()))
                             .collect(Collectors.toList());
 
-            LOGGER.info("ExternalServiceResultsTransformer.transform build collection of required injectors.");
+            LOGGER.info("ExternalServiceResultsTransformer.transform build collection of required injectors. " +
+                                requiredInjectors);
             result.getResults().forEach(annotation ->
                     requiredInjectors.forEach(valueInjector ->
                             valueInjector.inject(restFilterConverterFactory, annotation))
             );
         }
-        LOGGER.info("ExternalServiceResultsTransformer.transform return transformed results.");
+        LOGGER.info("ExternalServiceResultsTransformer.transform return transformed results. " + result);
         return result;
     }
 
