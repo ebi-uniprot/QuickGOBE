@@ -8,6 +8,8 @@ import uk.ac.ebi.quickgo.rest.search.request.config.FilterConfigRetrieval;
 
 import com.google.common.base.Preconditions;
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Component;
@@ -27,7 +29,7 @@ import org.springframework.web.client.RestOperations;
 @Component
 @Import(FilterRequestConfig.class)
 public class RESTFilterConverterFactory {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(RESTFilterConverterFactory.class);
     private final FilterConfigRetrieval filterConfigRetrieval;
     private final RestOperations restOperations;
 
@@ -48,6 +50,8 @@ public class RESTFilterConverterFactory {
             FilterConfig filterConfig = configOpt.get();
             switch (filterConfig.getExecution()) {
                 case REST_COMM:
+                    LOGGER.info("RESTFilterConverterFactory#convert running transform using RESTFilterConverter, " +
+                                        "filterConfig " + filterConfig + " restOperations "  + restOperations);
                     return new RESTFilterConverter<T>(filterConfig, restOperations).transform(request);
                 default:
                     throw new IllegalStateException(

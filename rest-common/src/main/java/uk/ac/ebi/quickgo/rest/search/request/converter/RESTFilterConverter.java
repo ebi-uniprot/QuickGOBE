@@ -69,11 +69,13 @@ class RESTFilterConverter<T> implements FilterConverter<FilterRequest, T> {
 
     @Override public ConvertedFilter<T> transform(FilterRequest request) {
         Preconditions.checkArgument(request != null, "FilterRequest cannot be null");
-
+        LOGGER.info("RESTFilterConverter#transform start of method.");
         RESTRequesterImpl.Builder restRequesterBuilder = initRequestBuilder(request);
 
         try {
+            LOGGER.info("RESTFilterConverter#transform create restResponseType.");
             Class<?> restResponseType = loadResponseType();
+            LOGGER.info("RESTFilterConverter#transform created restResponseType" + restResponseType);
             FilterConverter<ResponseType, T> converter = createConverter();
             LOGGER.info("RESTFilterConverter#transform using FilterConverter " + converter);
             ResponseType results = (ResponseType) fetchResults(restRequesterBuilder.build(), restResponseType);
