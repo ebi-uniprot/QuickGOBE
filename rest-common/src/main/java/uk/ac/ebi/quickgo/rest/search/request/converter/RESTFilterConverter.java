@@ -160,7 +160,7 @@ class RESTFilterConverter<T> implements FilterConverter<FilterRequest, T> {
                         key,
                         value.stream()
                                 .collect(Collectors.joining(COMMA))));
-        
+
         return restRequesterBuilder;
     }
 
@@ -192,9 +192,13 @@ class RESTFilterConverter<T> implements FilterConverter<FilterRequest, T> {
 
     private <R> R fetchResults(RESTRequesterImpl restRequester, Class<R> responseType)
             throws ExecutionException, InterruptedException, TimeoutException {
-        return restRequester
+        LOGGER.info("RESTFilterConverter#fetchResults making request to REST service " + restRequester + " , for " +
+                            "responseType " + responseType);
+        final R results = restRequester
                 .get(responseType)
                 .get(timeoutMillis, TimeUnit.MILLISECONDS);
+        LOGGER.info("RESTFilterConverter#fetchResults returned " + results);
+        return results;
     }
 
     static class InvalidHostNameException extends RuntimeException {
