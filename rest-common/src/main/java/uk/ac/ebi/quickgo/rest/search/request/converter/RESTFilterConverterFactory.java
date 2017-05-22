@@ -46,7 +46,10 @@ public class RESTFilterConverterFactory {
 
     public <T> ConvertedFilter<T> convert(FilterRequest request) {
         LOGGER.info("RESTFilterConverterFactory#convert filterConfigRetrieval.getBySignature "  + filterConfigRetrieval);
+        LOGGER.info("RESTFilterConverterFactory#convert request.getSignature() is "  + request.getSignature());
         Optional<FilterConfig> configOpt = filterConfigRetrieval.getBySignature(request.getSignature());
+        LOGGER.info("RESTFilterConverterFactory#convert configOpt is "  + configOpt);
+
         if (configOpt.isPresent()) {
             FilterConfig filterConfig = configOpt.get();
             switch (filterConfig.getExecution()) {
