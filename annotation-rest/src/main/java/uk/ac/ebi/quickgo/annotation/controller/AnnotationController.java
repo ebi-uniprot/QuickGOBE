@@ -258,7 +258,7 @@ public class AnnotationController {
 
     private Stream<QueryResult<Annotation>> getQueryResultStream(@Valid @ModelAttribute AnnotationRequest request,
             FilterQueryInfo filterQueryInfo, QueryRequest queryRequest) {
-        LOGGER.info("Creating stream of search results.");
+        LOGGER.info("Creating stream of search results. With limit " + request.getDownloadLimit());
         Stream<QueryResult<Annotation>> resultStream = streamSearchResults(queryRequest,
                             queryTemplate,
                             annotationSearchService,

@@ -45,21 +45,11 @@ public class RESTFilterConverterFactory {
     }
 
     public <T> ConvertedFilter<T> convert(FilterRequest request) {
-        LOGGER.info("RESTFilterConverterFactory#convert filterConfigRetrieval.getBySignature "  + filterConfigRetrieval);
-        LOGGER.info("RESTFilterConverterFactory#convert request.getSignature() is "  + request.getSignature());
         Optional<FilterConfig> configOpt = filterConfigRetrieval.getBySignature(request.getSignature());
-        LOGGER.info("RESTFilterConverterFactory#convert configOpt is "  + configOpt);
-        LOGGER.info("RESTFilterConverterFactory#convert configOpt.isPresent() is "  + configOpt.isPresent());
-
         if (configOpt.isPresent()) {
             FilterConfig filterConfig = configOpt.get();
-            LOGGER.info("RESTFilterConverterFactory#convert filterConfig is "  + filterConfig);
-            LOGGER.info("RESTFilterConverterFactory#convert filterConfig.getExecution() is "  + filterConfig.getExecution());
-
             switch (filterConfig.getExecution()) {
                 case REST_COMM:
-                    LOGGER.info("RESTFilterConverterFactory#convert running transform using RESTFilterConverter, " +
-                                        "filterConfig " + filterConfig + " restOperations "  + restOperations);
                     return new RESTFilterConverter<T>(filterConfig, restOperations).transform(request);
                 default:
                     throw new IllegalStateException(

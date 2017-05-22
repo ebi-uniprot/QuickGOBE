@@ -43,14 +43,9 @@ public abstract class AbstractValueInjector<T, M> implements ResponseValueInject
         FilterRequest request = buildFilterRequest(model);
 
         try {
-            LOGGER.info("AbstractValueInjector::inject using RESTFilterConverterFactory " + restFetcher + " to " +
-                                "convert request " + request);
             ConvertedFilter<T> convertedRequest = restFetcher.convert(request);
-            LOGGER.info("AbstractValueInjector::inject created ConvertedFilter " + convertedRequest);
 
-            LOGGER.info("AbstractValueInjector::inject starting injectValueFromResponse to model " + model);
             injectValueFromResponse(convertedRequest, model);
-            LOGGER.info("AbstractValueInjector::inject finished injectValueFromResponse.");
         } catch (RetrievalException e) {
             if (exceptionIsFatal(e)) {
                 LOGGER.error("Problem retrieving external service response from annotations service.", e);

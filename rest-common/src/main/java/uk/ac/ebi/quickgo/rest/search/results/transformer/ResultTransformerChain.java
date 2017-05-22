@@ -42,9 +42,7 @@ public class ResultTransformerChain<R> {
      */
     public R applyTransformations(R result, FilterContext filterContext) {
         R transformation = result;
-        LOGGER.info("ResultTransformerChain::applyTransformations applying " + transformers.size() + " transformers.");
         for (ResultTransformer<R> transformer : transformers) {
-            LOGGER.info("ResultTransformerChain::applyTransformations using " + transformer);
             transformation = transformer.transform(result, filterContext);
         }
         return transformation;
