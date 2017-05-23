@@ -1,6 +1,9 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
-import uk.ac.ebi.quickgo.annotation.download.AnnotationDownloadFileHeader;
+import uk.ac.ebi.quickgo.annotation.download.header.HeaderContent;
+import uk.ac.ebi.quickgo.annotation.download.header.HeaderCreator;
+import uk.ac.ebi.quickgo.annotation.download.header.HeaderCreatorFactory;
+import uk.ac.ebi.quickgo.annotation.download.header.HeaderUri;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
 import uk.ac.ebi.quickgo.annotation.model.StatisticsGroup;
@@ -9,7 +12,6 @@ import uk.ac.ebi.quickgo.annotation.service.statistics.StatisticsService;
 import uk.ac.ebi.quickgo.rest.ParameterBindingException;
 import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
 import uk.ac.ebi.quickgo.rest.comm.FilterContext;
-import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
 import uk.ac.ebi.quickgo.rest.metadata.MetaData;
 import uk.ac.ebi.quickgo.rest.metadata.MetaDataProvider;
 import uk.ac.ebi.quickgo.rest.search.DefaultSearchQueryTemplate;
@@ -30,6 +32,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
@@ -113,6 +116,7 @@ public class AnnotationController {
     private static final DateTimeFormatter DOWNLOAD_FILE_NAME_DATE_FORMATTER =
             DateTimeFormatter.ofPattern("-N-yyyyMMdd");
     private static final String DOWNLOAD_FILE_NAME_PREFIX = "QuickGO-annotations";
+    private static final String GO_USAGE_SLIM = "goUsage=slim";
 
     private final MetaDataProvider metaDataProvider;
 
@@ -124,12 +128,13 @@ public class AnnotationController {
     private final ResultTransformerChain<QueryResult<Annotation>> resultTransformerChain;
     private final StatisticsService statsService;
     private final TaskExecutor taskExecutor;
-    private final AnnotationDownloadFileHeader annotationDownloadFileHeader;
+    private final HeaderCreatorFactory headerCreatorFactory;
     private static final Consumer<? super QueryResult<Annotation>> LOGGING_CONSUMER
             = (Consumer<QueryResult<Annotation>>) annotationQueryResult -> {
         LOGGER.info("QueryResult received by emitter");
         LOGGER.info(annotationQueryResult.toString());
     };
+    HeaderCreatorFactory headerCreator;
 
     @Autowired
     public AnnotationController(SearchService<Annotation> annotationSearchService,
@@ -138,7 +143,7 @@ public class AnnotationController {
             ResultTransformerChain<QueryResult<Annotation>> resultTransformerChain,
             StatisticsService statsService,
             TaskExecutor taskExecutor,
-            AnnotationDownloadFileHeader annotationDownloadFileHeader,
+            HeaderCreatorFactory headerCreatorFactory,
             MetaDataProvider metaDataProvider) {
         checkArgument(annotationSearchService != null, "The SearchService<Annotation> instance passed " +
                 "to the constructor of AnnotationController should not be null.");
@@ -150,7 +155,7 @@ public class AnnotationController {
                 "The ResultTransformerChain<QueryResult<Annotation>> cannot be null.");
         checkArgument(statsService != null, "Annotation stats service cannot be null.");
         checkArgument(taskExecutor != null, "TaskExecutor cannot be null.");
-        checkArgument(annotationDownloadFileHeader != null, "AnnotationDownloadFileHeader cannot be null.");
+        checkArgument(headerCreatorFactory != null, "HeaderCreatorFactory cannot be null.");
         checkArgument(metaDataProvider != null, "Metadata provider cannot be null.");
 
 
@@ -164,7 +169,7 @@ public class AnnotationController {
         this.downloadQueryTemplate = createDownloadSearchQueryTemplate(annotationRetrievalConfig);
 
         this.taskExecutor = taskExecutor;
-        this.annotationDownloadFileHeader = annotationDownloadFileHeader;
+        this.headerCreatorFactory = headerCreatorFactory;
 
         this.metaDataProvider = metaDataProvider;
     }
@@ -241,7 +246,10 @@ public class AnnotationController {
 
         ResponseBodyEmitter emitter = new ResponseBodyEmitter();
         LOGGER.info("Write download header");
-        annotationDownloadFileHeader.write(emitter, servletRequest, mediaTypeAcceptHeader);
+
+        HeaderCreator headerCreator = headerCreatorFactory.provide(mediaTypeAcceptHeader.getSubtype());
+        HeaderContent headerContent = buildHeaderContent(servletRequest);
+        headerCreator.write(emitter, headerContent);
 
         taskExecutor.execute(() -> {
             final Stream<QueryResult<Annotation>> annotationResultStream =
@@ -254,6 +262,18 @@ public class AnnotationController {
                 .ok()
                 .headers(createHttpDownloadHeader(mediaTypeAcceptHeader))
                 .body(emitter);
+    }
+
+    private HeaderContent buildHeaderContent(HttpServletRequest servletRequest) {
+        HeaderContent.Builder contentBuilder = new HeaderContent.Builder();
+        contentBuilder.isSlimmed(isSlimmed(servletRequest));
+        contentBuilder.uri(HeaderUri.uri(servletRequest));
+        contentBuilder.date(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE));
+        return contentBuilder.build();
+    }
+
+    private boolean isSlimmed(HttpServletRequest servletRequest) {
+        return Objects.nonNull(servletRequest.getQueryString()) && servletRequest.getQueryString().contains(GO_USAGE_SLIM);
     }
 
     private Stream<QueryResult<Annotation>> getQueryResultStream(@Valid @ModelAttribute AnnotationRequest request,
