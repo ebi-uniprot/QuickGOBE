@@ -52,6 +52,7 @@ import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.TSV_SU
  * Created with IntelliJ IDEA.
  */
 @Component
+@Deprecated
 public class AnnotationDownloadFileHeader {
     public static final String GO_USAGE_SLIM = "goUsage=slim";
     private static Logger LOGGER = LoggerFactory.getLogger(AnnotationDownloadFileHeader.class);
