@@ -4,6 +4,7 @@ import uk.ac.ebi.quickgo.annotation.download.header.HeaderContent;
 import uk.ac.ebi.quickgo.annotation.download.header.HeaderCreator;
 import uk.ac.ebi.quickgo.annotation.download.header.HeaderCreatorFactory;
 import uk.ac.ebi.quickgo.annotation.download.header.HeaderUri;
+import uk.ac.ebi.quickgo.annotation.download.model.DownloadContent;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
 import uk.ac.ebi.quickgo.annotation.model.StatisticsGroup;
@@ -34,7 +35,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -129,12 +129,6 @@ public class AnnotationController {
     private final StatisticsService statsService;
     private final TaskExecutor taskExecutor;
     private final HeaderCreatorFactory headerCreatorFactory;
-    private static final Consumer<? super QueryResult<Annotation>> LOGGING_CONSUMER
-            = (Consumer<QueryResult<Annotation>>) annotationQueryResult -> {
-        LOGGER.info("QueryResult received by emitter");
-        LOGGER.info(annotationQueryResult.toString());
-    };
-    HeaderCreatorFactory headerCreator;
 
     @Autowired
     public AnnotationController(SearchService<Annotation> annotationSearchService,
@@ -233,19 +227,16 @@ public class AnnotationController {
             BindingResult bindingResult,
             @RequestHeader(ACCEPT) MediaType mediaTypeAcceptHeader,
             HttpServletRequest servletRequest) {
-        LOGGER.info("Download Request:: " + request + ", " + mediaTypeAcceptHeader);
 
         checkBindingErrors(bindingResult);
         FilterQueryInfo filterQueryInfo = extractFilterQueryInfo(request);
 
-        LOGGER.info("Build QueryRequest");
         QueryRequest queryRequest = downloadQueryTemplate.newBuilder()
                 .setQuery(QuickGOQuery.createAllQuery())
                 .addFilters(filterQueryInfo.getFilterQueries())
                 .build();
 
         ResponseBodyEmitter emitter = new ResponseBodyEmitter();
-        LOGGER.info("Write download header");
 
         HeaderCreator headerCreator = headerCreatorFactory.provide(mediaTypeAcceptHeader.getSubtype());
         HeaderContent headerContent = buildHeaderContent(servletRequest);
@@ -254,10 +245,10 @@ public class AnnotationController {
         taskExecutor.execute(() -> {
             final Stream<QueryResult<Annotation>> annotationResultStream =
                     getQueryResultStream(request, filterQueryInfo, queryRequest);
-            emitStreamWithMediaType(emitter, annotationResultStream, mediaTypeAcceptHeader);
+            DownloadContent downloadContent = new DownloadContent(annotationResultStream, request);
+            emitDownloadWithMediaType(emitter, downloadContent, mediaTypeAcceptHeader);
         });
 
-        LOGGER.info("Writing download response:: " + request + ", " + mediaTypeAcceptHeader);
         return ResponseEntity
                 .ok()
                 .headers(createHttpDownloadHeader(mediaTypeAcceptHeader))
@@ -386,14 +377,12 @@ public class AnnotationController {
         return httpHeaders;
     }
 
-    private void emitStreamWithMediaType(
+    private void emitDownloadWithMediaType(
             ResponseBodyEmitter emitter,
-            Stream<QueryResult<Annotation>> annotationResultStream,
+            DownloadContent downloadContent,
             MediaType mediaType) {
-        LOGGER.info("Sending result stream via emitter");
-        Stream<QueryResult<Annotation>> peakedStream = annotationResultStream.peek(LOGGING_CONSUMER);
         try {
-            emitter.send(peakedStream, mediaType);
+            emitter.send(downloadContent, mediaType);
         } catch (IOException e) {
             LOGGER.error("Failed to stream annotation results", e);
             emitter.completeWithError(e);
