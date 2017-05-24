@@ -31,16 +31,18 @@ public class AnnotationMocker {
     public static final String SYMBOL = "atf4-creb1_mouse";
     public static final String QUALIFIER = "enables";
     public static final String REFERENCE = "PMID:12871976";
-    public static final String EVIDENCE_CODE = "ECO:0000353";
+    public static final String ECO_ID = "ECO:0000353";
     public static final String GO_EVIDENCE = "IPI";
     public static final int TAXON_ID = 12345;
+    public static final String TAXON_NAME = "Hipdedipdiflorous";
     public static final int INTERACTING_TAXON_ID = 54321;
     public static final String DB = "IntAct";
     public static final String ID = "EBI-10043081";
     public static final String GO_ID = "GO:0003824";
     public static final String GO_NAME = "catalytic activity";
     public static final String DATE_AS_STRING = "20121002";
-    public static final List<String> SLIMMED_TO_IDS = Collections.singletonList("GO:0071840");
+    private static final String SLIMMED_FROM_GO_ID = "GO:0071840";
+    public static final List<String> SLIMMED_TO_IDS = Collections.singletonList(SLIMMED_FROM_GO_ID);
     private static final String COMMA = ",";
     private static final List<List<Supplier<Annotation.SimpleXRef>>> WITH_FROM = asList(
             singletonList(IPR_1), asList(IPR_2, IPR_3));
@@ -62,7 +64,7 @@ public class AnnotationMocker {
         annotation.goEvidence = GO_EVIDENCE;
         annotation.assignedBy = ASSIGNED_BY;
         annotation.date = DATE;
-        annotation.evidenceCode = EVIDENCE_CODE;
+        annotation.evidenceCode = ECO_ID;
         annotation.geneProductId = GENE_PRODUCT_ID;
         annotation.qualifier = QUALIFIER;
         annotation.symbol = SYMBOL;
@@ -71,6 +73,7 @@ public class AnnotationMocker {
         annotation.goId = GO_ID;
         annotation.interactingTaxonId = INTERACTING_TAXON_ID;
         annotation.goName = GO_NAME;
+        annotation.taxonName = TAXON_NAME;
         return annotation;
     }
 
