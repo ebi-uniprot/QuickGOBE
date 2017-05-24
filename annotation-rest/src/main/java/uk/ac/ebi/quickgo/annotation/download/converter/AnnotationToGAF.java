@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -37,7 +38,7 @@ import static java.util.stream.Collectors.toList;
  * Time: 11:54
  * Created with IntelliJ IDEA.
  */
-public class AnnotationToGAF extends AnnotationTo implements Function<Annotation, List<String>> {
+public class AnnotationToGAF extends AnnotationTo implements BiFunction<Annotation, List<String>, List<String>> {
     private static final String UNIPROT_KB = "UniProtKB";
     private static final Logger LOGGER = LoggerFactory.getLogger(AnnotationToGAF.class);
     private static final String TAXON = "taxon:";
@@ -48,11 +49,12 @@ public class AnnotationToGAF extends AnnotationTo implements Function<Annotation
     /**
      * Convert an {@link Annotation} to a String representation.
      * @param annotation instance
+     * @param selectedFields ignore for GAF
      * @return String TSV delimited representation of an annotation in GAF format.
      *
      */
     @Override
-    public List<String> apply(Annotation annotation) {
+    public List<String> apply(Annotation annotation, List<String> selectedFields) {
         if (Objects.isNull(annotation.slimmedIds) || annotation.slimmedIds.isEmpty()) {
             return Collections.singletonList(toOutputRecord(annotation, annotation.goId));
         } else {
