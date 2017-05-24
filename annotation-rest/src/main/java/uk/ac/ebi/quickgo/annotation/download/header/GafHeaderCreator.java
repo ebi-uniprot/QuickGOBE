@@ -9,7 +9,7 @@ package uk.ac.ebi.quickgo.annotation.download.header;
  */
 public class GafHeaderCreator extends GTypeHeaderCreator {
 
-    public static final String VERSION = "gaf-version: 2.1";
+    static final String VERSION = "gaf-version: 2.1";
 
     public GafHeaderCreator(Ontology ontology) {
         super(ontology);
