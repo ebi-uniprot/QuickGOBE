@@ -1,25 +1,17 @@
 package uk.ac.ebi.quickgo.annotation.download.http;
 
-import uk.ac.ebi.quickgo.annotation.download.converter.AnnotationToGPAD;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
-import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.charset.Charset;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import org.slf4j.Logger;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
-import org.springframework.http.MediaType;
 import org.springframework.http.converter.AbstractHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 
-import static org.slf4j.LoggerFactory.getLogger;
+import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.GPAD_MEDIA_TYPE;
 
 /**
  * GPAD message converter that writes a stream of {@link QueryResult} containing {@link Annotation} instances,
@@ -29,92 +21,25 @@ import static org.slf4j.LoggerFactory.getLogger;
  * @author Edd
  */
 public class GPADHttpMessageConverter extends AbstractHttpMessageConverter<Object> {
-    private static final String TYPE = "text";
-    private static final String SUB_TYPE = "gpad";
-    private static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
+    private final DispatchWriter helper;
 
-    private static final MediaType GPAD_MEDIA_TYPE = new MediaType(TYPE, SUB_TYPE, DEFAULT_CHARSET);
-    private static final String GPAD_MEDIA_TYPE_STRING = TYPE + "/" + SUB_TYPE;
-
-    private static final Logger GPAD_LOGGER = getLogger(GPADHttpMessageConverter.class);
-    private static final int FLUSH_INTERVAL = 5000;
-    private final AnnotationToGPAD converter;
-
-    public GPADHttpMessageConverter(AnnotationToGPAD converter) {
+    public GPADHttpMessageConverter(DispatchWriter helper) {
         super(GPAD_MEDIA_TYPE);
-        this.converter = converter;
+        this.helper = helper;
     }
 
-    @Override
-    protected boolean supports(Class<?> aClass) {
+    @Override protected boolean supports(Class<?> clazz) {
         return true;
     }
 
-    @Override
-    protected Object readInternal(
-            Class<?> aClass,
-            HttpInputMessage httpInputMessage)
+    @Override protected Object readInternal(Class<?> clazz, HttpInputMessage inputMessage)
             throws IOException, HttpMessageNotReadableException {
         return null;
     }
 
-    @Override
-    protected void writeInternal(
-            Object annotationStream,
-            HttpOutputMessage httpOutputMessage)
+    @Override protected void writeInternal(Object downloadPackage, HttpOutputMessage outputMessage)
             throws IOException, HttpMessageNotWritableException {
-        OutputStream out = httpOutputMessage.getBody();
-
-        dispatchWriting(annotationStream, out);
-    }
-
-    @SuppressWarnings("unchecked") private void dispatchWriting(Object object, OutputStream out) throws IOException {
-        if (object instanceof ResponseExceptionHandler.ErrorInfo) {
-            writeError(out, (ResponseExceptionHandler.ErrorInfo) object);
-        } else {
-            writeAnnotations(out, (Stream<QueryResult<Annotation>>) object);
-        }
-    }
-
-    private void writeError(OutputStream out, ResponseExceptionHandler.ErrorInfo errorInfo) throws IOException {
-        out.write(("URL:\n\t" + errorInfo.getUrl() + "\n").getBytes());
-        out.write(("Messages:\n\t" + errorInfo.getMessages().stream().collect(Collectors.joining(",\n"))).getBytes());
-    }
-
-    private void writeAnnotations(OutputStream out, Stream<QueryResult<Annotation>> annotationStream) {
-        AtomicInteger counter = new AtomicInteger(0);
-        AtomicInteger batchCount = new AtomicInteger(0);
-        try {
-            annotationStream.forEach(annotationResult ->
-                    annotationResult.getResults().forEach(annotation -> converter.apply(annotation)
-                            .forEach(s -> {
-                                try {
-                                    out.write((s + "\n").getBytes());
-
-                                    updateCountersAndFlushStreamWhenRequired(out, counter, batchCount);
-                                } catch (IOException e) {
-                                    throw new StopStreamException(
-                                            "Could not write OutputStream whilst writing GPAD annotation: " +
-                                                    annotation,
-                                            e);
-                                }
-                            })));
-        } catch (StopStreamException e) {
-            GPAD_LOGGER.error("Client aborted streaming: closing stream.", e);
-            annotationStream.close();
-        }
-        GPAD_LOGGER.info("Written " + counter.get() + " GPAD annotations");
-    }
-
-    private void updateCountersAndFlushStreamWhenRequired(OutputStream out, AtomicInteger counter,
-            AtomicInteger batchCount) throws IOException {
-        counter.getAndIncrement();
-        batchCount.getAndIncrement();
-        if (batchCount.get() >= FLUSH_INTERVAL) {
-            out.flush();
-            GPAD_LOGGER.info("Flushed GAF http message converter output stream after: " +
-                    counter.get() + " annotations.");
-            batchCount.set(0);
-        }
+        OutputStream out = outputMessage.getBody();
+        helper.write(downloadPackage, out);
     }
 }
