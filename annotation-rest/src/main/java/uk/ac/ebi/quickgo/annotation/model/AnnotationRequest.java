@@ -264,6 +264,12 @@ public class AnnotationRequest {
             example = "goName")
     private String[] includeFields;
 
+    @ApiModelProperty(
+            value = "For TSV downloads only, fields to return.",
+            allowableValues = "x",
+            example = "x")
+    private String[] selectedFields;
+
     private final Map<String, String[]> filterMap = new HashMap<>();
 
     /**
@@ -557,7 +563,7 @@ public class AnnotationRequest {
     }
 
     /**
-     * Include fields whose values derive from external resources
+     * Select which fields will appear in the TSV download
      * @param includeFields a vararg of fields to include
      */
     public void setIncludeFields(String... includeFields) {
@@ -568,9 +574,16 @@ public class AnnotationRequest {
      * An array of fields whose values derive from external resources, which are to be included in the response
      * @return the array of fields from external resources to include in the response
      */
-    @ArrayPattern(regexp = "^goName|taxonName$", flags = CASE_INSENSITIVE, paramName = INCLUDE_FIELD_PARAM)
-    public String[] getIncludeFields() {
-        return this.includeFields;
+    public String[] getSelectedFields() {
+        return this.selectedFields;
+    }
+
+    /**
+     * Select which fields will appear in the TSV download
+     * @param selectedFields a vararg of fields to include
+     */
+    public void setSelectedFields(String... selectedFields) {
+        this.selectedFields = selectedFields;
     }
 
     /**
