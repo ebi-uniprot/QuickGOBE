@@ -27,7 +27,6 @@ import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.TSV_ME
  */
 public class TSVHttpMessageConverter extends AbstractHttpMessageConverter<Object> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TSVHttpMessageConverter.class);
     private final DispatchWriter helper;
 
     public TSVHttpMessageConverter(DispatchWriter helper) {
@@ -44,10 +43,9 @@ public class TSVHttpMessageConverter extends AbstractHttpMessageConverter<Object
         return null;
     }
 
-    @Override protected void writeInternal(Object annotationStream, HttpOutputMessage outputMessage)
+    @Override protected void writeInternal(Object downloadPackage, HttpOutputMessage outputMessage)
             throws IOException, HttpMessageNotWritableException {
-        LOGGER.info("TSVHttpMessageConverter writeInternal called.");
         OutputStream out = outputMessage.getBody();
-        helper.write(annotationStream, out);
+        helper.write(downloadPackage, out);
     }
 }
