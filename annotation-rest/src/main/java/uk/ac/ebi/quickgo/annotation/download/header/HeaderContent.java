@@ -1,7 +1,10 @@
 package uk.ac.ebi.quickgo.annotation.download.header;
 
+import java.util.List;
 
 /**
+ * Hold content used to populate and control the output of downloaded file headers.
+ *
  * @author Tony Wardell
  * Date: 23/05/2017
  * Time: 10:44
@@ -12,9 +15,14 @@ public class HeaderContent {
     private String uri;
     private boolean isSlimmed;
     private String date;
+    private List<String> selectedFields;
 
     public String date() {
         return date;
+    }
+
+    List<String> selectedFields() {
+        return selectedFields;
     }
 
     String uri() {
@@ -25,10 +33,11 @@ public class HeaderContent {
         return isSlimmed;
     }
 
-    public static class  Builder{
+    public static class Builder{
         String uri;
         boolean isSlimmed;
         String date;
+        List<String> selectedFields;
 
         public Builder uri(String uri){
             this.uri = uri;
@@ -45,6 +54,11 @@ public class HeaderContent {
             return this;
         }
 
+        public Builder selectedFields(List<String> selectedFields){
+            this.selectedFields = selectedFields;
+            return this;
+        }
+
         public HeaderContent build(){
             return new HeaderContent(this);
         }
@@ -54,5 +68,6 @@ public class HeaderContent {
         this.uri = builder.uri;
         this.isSlimmed = builder.isSlimmed;
         this.date = builder.date;
+        this.selectedFields = builder.selectedFields;
     }
 }
