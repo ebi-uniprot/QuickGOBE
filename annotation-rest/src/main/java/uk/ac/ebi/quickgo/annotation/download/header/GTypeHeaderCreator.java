@@ -4,15 +4,12 @@ import com.google.common.base.Preconditions;
 import java.io.IOException;
 
 import java.util.Objects;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 
 
 /**
- * Produce a header for downloaded files.
- *
+ * Produce a header for GPAD and GAF files.
  *
  * @author Tony Wardell
  * Date: 25/01/2017
@@ -20,7 +17,6 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter
  * Created with IntelliJ IDEA.
  */
 public abstract class GTypeHeaderCreator implements HeaderCreator{
-    private static Logger LOGGER = LoggerFactory.getLogger(GTypeHeaderCreator.class);
     static final String PROJECT_NAME = "Project_name: UniProt GO Annotation (UniProt-GOA)";
 
     static final String URL = "URL: http://www.ebi.ac.uk/GOA";
@@ -31,7 +27,7 @@ public abstract class GTypeHeaderCreator implements HeaderCreator{
     static final String PREFIX = "!";
     private final Ontology ontology;
 
-    public GTypeHeaderCreator(Ontology ontology) {
+    GTypeHeaderCreator(Ontology ontology) {
         Preconditions.checkArgument(ontology != null, "The ontology instance must not be null");
         this.ontology = ontology;
     }
