@@ -32,9 +32,7 @@ import io.swagger.annotations.ApiResponses;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -239,7 +237,7 @@ public class AnnotationController {
         ResponseBodyEmitter emitter = new ResponseBodyEmitter();
 
         HeaderCreator headerCreator = headerCreatorFactory.provide(mediaTypeAcceptHeader.getSubtype());
-        HeaderContent headerContent = buildHeaderContent(servletRequest);
+        HeaderContent headerContent = buildHeaderContent(servletRequest, request);
         headerCreator.write(emitter, headerContent);
 
         taskExecutor.execute(() -> {
@@ -255,11 +253,13 @@ public class AnnotationController {
                 .body(emitter);
     }
 
-    private HeaderContent buildHeaderContent(HttpServletRequest servletRequest) {
+    private HeaderContent buildHeaderContent(HttpServletRequest servletRequest, AnnotationRequest annotationRequest) {
         HeaderContent.Builder contentBuilder = new HeaderContent.Builder();
         contentBuilder.isSlimmed(isSlimmed(servletRequest));
         contentBuilder.uri(HeaderUri.uri(servletRequest));
         contentBuilder.date(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE));
+        contentBuilder.selectedFields(Collections.unmodifiableList(Arrays.asList(annotationRequest.getSelectedFields
+                ())));
         return contentBuilder.build();
     }
 
