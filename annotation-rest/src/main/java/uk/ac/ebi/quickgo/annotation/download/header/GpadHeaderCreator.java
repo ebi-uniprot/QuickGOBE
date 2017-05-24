@@ -9,7 +9,7 @@ package uk.ac.ebi.quickgo.annotation.download.header;
  */
 public class GpadHeaderCreator extends GTypeHeaderCreator {
 
-    public static final String VERSION = "gpa-version: 1.1";
+    static final String VERSION = "gpa-version: 1.1";
 
     public GpadHeaderCreator(Ontology ontology) {
         super(ontology);
