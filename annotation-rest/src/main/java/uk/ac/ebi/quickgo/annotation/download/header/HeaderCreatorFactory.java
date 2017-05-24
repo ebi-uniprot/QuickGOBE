@@ -3,6 +3,8 @@ package uk.ac.ebi.quickgo.annotation.download.header;
 import java.util.Map;
 
 /**
+ * Source of header creators, based on the associated file/media type.
+ *
  * @author Tony Wardell
  * Date: 22/05/2017
  * Time: 15:46
