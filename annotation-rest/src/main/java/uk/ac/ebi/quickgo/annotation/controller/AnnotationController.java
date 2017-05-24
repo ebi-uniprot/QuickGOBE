@@ -50,10 +50,9 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.http.HttpHeaders.ACCEPT;
-
-import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.TSV_MEDIA_TYPE_STRING;
 import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.GAF_MEDIA_TYPE_STRING;
 import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.GPAD_MEDIA_TYPE_STRING;
+import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.TSV_MEDIA_TYPE_STRING;
 import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.searchAndTransform;
 import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.streamSearchResults;
 import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.createFirstCursorPage;
@@ -255,12 +254,12 @@ public class AnnotationController {
 
     private HeaderContent buildHeaderContent(HttpServletRequest servletRequest, AnnotationRequest annotationRequest) {
         HeaderContent.Builder contentBuilder = new HeaderContent.Builder();
-        contentBuilder.isSlimmed(isSlimmed(servletRequest));
-        contentBuilder.uri(HeaderUri.uri(servletRequest));
-        contentBuilder.date(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE));
-        contentBuilder.selectedFields(Collections.unmodifiableList(Arrays.asList(annotationRequest.getSelectedFields
-                ())));
-        return contentBuilder.build();
+        return contentBuilder.isSlimmed(isSlimmed(servletRequest))
+                             .uri(HeaderUri.uri(servletRequest))
+                             .date(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE))
+                             .selectedFields(Collections.unmodifiableList(Arrays.asList(annotationRequest
+                                                                                                .getSelectedFields())))
+                             .build();
     }
 
     private boolean isSlimmed(HttpServletRequest servletRequest) {
