@@ -192,10 +192,9 @@ public class AnnotationRequestTest {
     @Test
     public void canCreateExactFilterWithGoIds() {
         String goId = "GO:0000001";
-        String usage = EXACT_USAGE;
 
         annotationRequest.setGoId(goId);
-        annotationRequest.setGoUsage(usage);
+        annotationRequest.setGoUsage(EXACT_USAGE);
 
         FilterRequest request = FilterRequest.newBuilder()
                 .addProperty(AnnotationFields.Searchable.GO_ID, goId.toUpperCase())
@@ -207,11 +206,10 @@ public class AnnotationRequestTest {
     @Test
     public void canCreateExactFilterWithGoIdsAndUnusedGoUsageRelationships() {
         String goId = "GO:0000001";
-        String usage = EXACT_USAGE;
         String relationships = "is_A";
 
         annotationRequest.setGoId(goId);
-        annotationRequest.setGoUsage(usage);
+        annotationRequest.setGoUsage(EXACT_USAGE);
         annotationRequest.setGoUsageRelationships(relationships);
 
         FilterRequest request = FilterRequest.newBuilder()
@@ -406,10 +404,9 @@ public class AnnotationRequestTest {
     @Test
     public void canCreateExactFilterWithEcoIds() {
         String ecoId = "ECO:0000001";
-        String usage = EXACT_USAGE;
 
         annotationRequest.setEvidenceCode(ecoId);
-        annotationRequest.setEvidenceCodeUsage(usage);
+        annotationRequest.setEvidenceCodeUsage(EXACT_USAGE);
 
         FilterRequest request = FilterRequest.newBuilder()
                 .addProperty(AnnotationFields.Searchable.EVIDENCE_CODE, ecoId.toUpperCase())
@@ -421,11 +418,10 @@ public class AnnotationRequestTest {
     @Test
     public void canCreateExactFilterWithECOIdsAndUnusedECOUsageRelationships() {
         String ecoId = "ECO:0000001";
-        String usage = EXACT_USAGE;
         String relationships = "is_A";
 
         annotationRequest.setEvidenceCode(ecoId);
-        annotationRequest.setEvidenceCodeUsage(usage);
+        annotationRequest.setEvidenceCodeUsage(EXACT_USAGE);
         annotationRequest.setEvidenceCodeUsageRelationships(relationships);
 
         FilterRequest request = FilterRequest.newBuilder()
@@ -511,7 +507,7 @@ public class AnnotationRequestTest {
     public void setAndGetIncludeFields() {
         String field = "goName";
         annotationRequest.setIncludeFields(field);
-        assertThat(annotationRequest.getIncludeFields(), arrayContaining(field));
+        assertThat(annotationRequest.getSelectedFields(), arrayContaining(field));
     }
 
     @Test
