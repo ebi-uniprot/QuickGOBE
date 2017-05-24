@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.annotation.download.header;
 
 /**
+ * Specific GAF Header information is contained in this class.
  * @author Tony Wardell
  * Date: 22/05/2017
  * Time: 15:44
