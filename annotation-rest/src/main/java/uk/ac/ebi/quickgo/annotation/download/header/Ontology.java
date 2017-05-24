@@ -15,6 +15,8 @@ import org.slf4j.LoggerFactory;
 import static java.util.Arrays.stream;
 
 /**
+ * Provide the details of the latest ontology sources.
+ *
  * @author Tony Wardell
  * Date: 23/05/2017
  * Time: 10:37
@@ -33,7 +35,11 @@ public class Ontology {
         this.ontologyPath = ontologyPath;
     }
 
-    public List<String> versions() {
+    /**
+     * The version details of the current ontology sources.
+     * @return a list of versions, commonly GO & ECO.
+     */
+    List<String> versions() {
         try {
             FileTime lastModifiedTime = Files.getLastModifiedTime(ontologyPath);
 
