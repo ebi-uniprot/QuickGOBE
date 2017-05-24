@@ -37,24 +37,16 @@ import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.*;
 
     @Bean
     public GPADHttpMessageConverter gpadHttpMessageConverter() {
-        return new GPADHttpMessageConverter(gpadAnnotationConverter());
+        return new GPADHttpMessageConverter(new DispatchWriter(new AnnotationToGPAD(), GPAD_MEDIA_TYPE));
     }
 
     @Bean
     public GAFHttpMessageConverter gafHttpMessageConverter() {
-        return new GAFHttpMessageConverter(gafAnnotationConverter());
+        return new GAFHttpMessageConverter(new DispatchWriter(new AnnotationToGAF(), GAF_MEDIA_TYPE));
     }
 
     @Bean
     public TSVHttpMessageConverter tsvHttpMessageConverter(){
         return new TSVHttpMessageConverter(new DispatchWriter(new AnnotationToTSV(), TSV_MEDIA_TYPE));
-    }
-
-    private AnnotationToGPAD gpadAnnotationConverter() {
-        return new AnnotationToGPAD();
-    }
-
-    private AnnotationToGAF gafAnnotationConverter() {
-        return new AnnotationToGAF();
     }
 }
