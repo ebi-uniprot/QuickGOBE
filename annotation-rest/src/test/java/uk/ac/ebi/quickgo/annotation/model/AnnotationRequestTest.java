@@ -507,6 +507,13 @@ public class AnnotationRequestTest {
     public void setAndGetIncludeFields() {
         String field = "goName";
         annotationRequest.setIncludeFields(field);
+        assertThat(annotationRequest.getIncludeFields(), arrayContaining(field));
+    }
+
+    @Test
+    public void setAndGetSelectedFields() {
+        String field = "symbol";
+        annotationRequest.setSelectedFields(field);
         assertThat(annotationRequest.getSelectedFields(), arrayContaining(field));
     }
 
