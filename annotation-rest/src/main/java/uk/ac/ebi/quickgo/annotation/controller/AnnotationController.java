@@ -236,13 +236,14 @@ public class AnnotationController {
         ResponseBodyEmitter emitter = new ResponseBodyEmitter();
 
         HeaderCreator headerCreator = headerCreatorFactory.provide(mediaTypeAcceptHeader.getSubtype());
-        HeaderContent headerContent = buildHeaderContent(servletRequest, request);
+        final List<String> selectedFields = selectedFieldList(request);
+        HeaderContent headerContent = buildHeaderContent(servletRequest, selectedFields);
         headerCreator.write(emitter, headerContent);
 
         taskExecutor.execute(() -> {
             final Stream<QueryResult<Annotation>> annotationResultStream =
                     getQueryResultStream(request, filterQueryInfo, queryRequest);
-            DownloadContent downloadContent = new DownloadContent(annotationResultStream, request);
+            DownloadContent downloadContent = new DownloadContent(annotationResultStream, selectedFields);
             emitDownloadWithMediaType(emitter, downloadContent, mediaTypeAcceptHeader);
         });
 
@@ -252,14 +253,19 @@ public class AnnotationController {
                 .body(emitter);
     }
 
-    private HeaderContent buildHeaderContent(HttpServletRequest servletRequest, AnnotationRequest annotationRequest) {
+    private HeaderContent buildHeaderContent(HttpServletRequest servletRequest, List<String> selectedFields) {
         HeaderContent.Builder contentBuilder = new HeaderContent.Builder();
         return contentBuilder.isSlimmed(isSlimmed(servletRequest))
                              .uri(HeaderUri.uri(servletRequest))
                              .date(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE))
-                             .selectedFields(Collections.unmodifiableList(Arrays.asList(annotationRequest
-                                                                                                .getSelectedFields())))
+                             .selectedFields(selectedFields)
                              .build();
+    }
+
+    private List<String> selectedFieldList(AnnotationRequest annotationRequest) {
+        return annotationRequest.getSelectedFields() != null ? Arrays.asList
+                (annotationRequest
+                         .getSelectedFields()) : Collections.emptyList();
     }
 
     private boolean isSlimmed(HttpServletRequest servletRequest) {
