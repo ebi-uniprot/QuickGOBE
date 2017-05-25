@@ -48,6 +48,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static java.util.stream.Collectors.toList;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.GAF_MEDIA_TYPE_STRING;
@@ -263,9 +264,12 @@ public class AnnotationController {
     }
 
     private List<String> selectedFieldList(AnnotationRequest annotationRequest) {
-        return annotationRequest.getSelectedFields() != null ? Arrays.asList
-                (annotationRequest
-                         .getSelectedFields()) : Collections.emptyList();
+        if(annotationRequest.getSelectedFields() != null){
+            return Arrays.stream(annotationRequest.getSelectedFields())
+                         .map(f -> f.toLowerCase())
+                         .collect(toList());
+        }
+        return Collections.emptyList();
     }
 
     private boolean isSlimmed(HttpServletRequest servletRequest) {
