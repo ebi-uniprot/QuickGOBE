@@ -12,6 +12,7 @@ import static java.util.Arrays.asList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.ac.ebi.quickgo.annotation.download.converter.AnnotationToTSV.*;
 import static uk.ac.ebi.quickgo.annotation.download.header.TsvHeaderCreator.*;
 
 /**
