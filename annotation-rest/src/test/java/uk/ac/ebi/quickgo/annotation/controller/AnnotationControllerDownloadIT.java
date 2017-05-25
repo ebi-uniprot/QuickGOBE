@@ -53,8 +53,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.INCLUDE_FIELD_PARAM;
+import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.SELECTED_FIELD_PARAM;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.createGenericDocs;
 import static uk.ac.ebi.quickgo.annotation.controller.DownloadResponseVerifier.nonNullMandatoryFieldsExist;
+import static uk.ac.ebi.quickgo.annotation.controller.DownloadResponseVerifier.selectedFieldsExist;
 import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.*;
 
 /**
@@ -82,6 +84,9 @@ public class AnnotationControllerDownloadIT {
     private static final String GO_NAME_FIELD = "goName";
     private static final String GO_TERM_RESOURCE_FORMAT = "/ontology/go/terms/%s";
     private static final String BASE_URL = "http://localhost";
+    private static final String GENE_PRODUCT_ID_FIELD_NAME_MIXED_CASE = "geneproDuctid";
+    private static final String SYMBOL_FIELD_NAME_MIXED_CASE = "sYmbol";
+    private static final String WITH_FROM_FIELD_NAME_MIXED_CASE = "withfrOm";
     private MockMvc mockMvc;
 
     private List<AnnotationDocument> genericDocs;
@@ -192,6 +197,11 @@ public class AnnotationControllerDownloadIT {
         canDownloadWithOptionalFields(TSV_MEDIA_TYPE);
     }
 
+    @Test
+    public void canDownloadInTSVFormatWithSelectedFieldsCaseInsensitive() throws Exception {
+        canDownloadWithSelectedFields(TSV_MEDIA_TYPE);
+    }
+
     private List<AnnotationDocument> createDocs(int number) {
         return createGenericDocs(number, AnnotationDocMocker::createUniProtGPID);
     }
@@ -231,6 +241,20 @@ public class AnnotationControllerDownloadIT {
         checkResponse(mediaType, response, storedIds);
     }
 
+    private void canDownloadWithSelectedFields(MediaType mediaType) throws Exception {
+        int expectedDownloadCount = 97;
+        ResultActions response = mockMvc.perform(
+                get(DOWNLOAD_SEARCH_URL)
+                        .header(ACCEPT, mediaType)
+                        .param(DOWNLOAD_LIMIT_PARAM, Integer.toString(expectedDownloadCount))
+                        .param(SELECTED_FIELD_PARAM.getName(), GENE_PRODUCT_ID_FIELD_NAME_MIXED_CASE,
+                               SYMBOL_FIELD_NAME_MIXED_CASE, WITH_FROM_FIELD_NAME_MIXED_CASE));
+
+        List<String> storedIds = getFieldValuesFromRepo(doc -> idFrom(doc.geneProductId), expectedDownloadCount);
+
+        checkResponseForSelectedFields(response, storedIds);
+    }
+
 
     private void checkResponse(MediaType mediaType, ResultActions response, List<String> storedIds) throws Exception {
         response.andExpect(request().asyncStarted())
@@ -240,6 +264,13 @@ public class AnnotationControllerDownloadIT {
                 .andExpect(content().contentType(mediaType))
                 .andExpect(nonNullMandatoryFieldsExist(mediaType))
                 .andExpect(content().string(stringContainsInOrder(storedIds)));
+    }
+
+    private void checkResponseForSelectedFields(ResultActions response, List<String> storedIds) throws Exception {
+        response.andExpect(request().asyncStarted())
+                .andDo(MvcResult::getAsyncResult)
+                .andDo(print())
+                .andExpect(selectedFieldsExist());
     }
 
     private void canDownloadWithFilter(MediaType mediaType) throws Exception {

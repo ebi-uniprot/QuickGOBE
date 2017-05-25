@@ -25,7 +25,8 @@ public enum AnnotationParameters {
     TARGET_SET_PARAM("targetSet"),
     GO_ASPECT_PARAM("aspect"),
     EXTENSION_PARAM("extension"),
-    INCLUDE_FIELD_PARAM("includeFields");
+    INCLUDE_FIELD_PARAM("includeFields"),
+    SELECTED_FIELD_PARAM("selectedFields");
 
     private String name;
 
