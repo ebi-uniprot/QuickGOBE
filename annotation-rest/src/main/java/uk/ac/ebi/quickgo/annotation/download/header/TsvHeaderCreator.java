@@ -52,6 +52,7 @@ public class TsvHeaderCreator implements HeaderCreator{
     public static final String ANNOTATION_EXTENSION_FIELD_NAME = "extensions";
     public static final String DATE_FIELD_NAME = "date";
     public static final String TAXON_NAME_FIELD_NAME = "taxonName";
+
     /**
      * Write the contents of the header to the ResponseBodyEmitter instance.
      * @param emitter streams the header content to the client
