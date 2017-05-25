@@ -14,7 +14,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
-import static uk.ac.ebi.quickgo.annotation.download.header.TsvHeaderCreator.*;
+import static uk.ac.ebi.quickgo.annotation.download.converter.AnnotationToTSV.*;
 import static uk.ac.ebi.quickgo.annotation.model.AnnotationMocker.*;
 
 /**
