@@ -10,6 +10,8 @@ import java.util.StringJoiner;
 import org.springframework.http.MediaType;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 
+import static uk.ac.ebi.quickgo.annotation.download.converter.AnnotationToTSV.*;
+
 /**
  * Produce a header for TSV downloaded files. Only the (selected) column names are required. Or all columns if none
  * are selected.
@@ -38,20 +40,6 @@ public class TsvHeaderCreator implements HeaderCreator{
     static final String DATE = "DATE";
     static final String TAXON_NAME = "TAXON NAME";
 
-    public static final String GENE_PRODUCT_ID_FIELD_NAME = "geneProductId";
-    public static final String SYMBOL_FIELD_NAME = "symbol";
-    public static final String QUALIFIER_FIELD_NAME = "qualifier";
-    public static final String GO_TERM_FIELD_NAME = "goId";
-    public static final String GO_NAME_FIELD_NAME = "goName";
-    public static final String ECO_ID_FIELD_NAME = "evidenceCode";
-    public static final String GO_EVIDENCE_CODE_FIELD_NAME = "goEvidence";
-    public static final String REFERENCE_FIELD_NAME = "reference";
-    public static final String WITH_FROM_FIELD_NAME = "withFrom";
-    public static final String TAXON_ID_FIELD_NAME = "taxonId";
-    public static final String ASSIGNED_BY_FIELD_NAME = "assignedBy";
-    public static final String ANNOTATION_EXTENSION_FIELD_NAME = "extensions";
-    public static final String DATE_FIELD_NAME = "date";
-    public static final String TAXON_NAME_FIELD_NAME = "taxonName";
 
     /**
      * Write the contents of the header to the ResponseBodyEmitter instance.
