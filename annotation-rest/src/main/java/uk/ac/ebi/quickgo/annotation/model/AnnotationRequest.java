@@ -58,6 +58,7 @@ public class AnnotationRequest {
     static final String GENE_PRODUCT_PARAM = "Gene Product ID";
     static final String REFERENCE_PARAM = "Reference";
     static final String INCLUDE_FIELD_PARAM = "Optional fields";
+    static final String SELECT_FIELD_PARAM = "Selectable fields";
 
     static final String QUALIFIER_PARAM = "Qualifier";
     static final String TAXON_USAGE_ID = "taxonId";
@@ -266,8 +267,8 @@ public class AnnotationRequest {
 
     @ApiModelProperty(
             value = "For TSV downloads only, fields to return.",
-            allowableValues = "x",
-            example = "x")
+            allowableValues = "geneProductId,symbol,qualifier,goId,goName,evidenceCode,goEvidence,reference,withFrom," +
+                    "taxonId,assignedBy,extensions,date,taxonName")
     private String[] selectedFields;
 
     private final Map<String, String[]> filterMap = new HashMap<>();
@@ -563,7 +564,7 @@ public class AnnotationRequest {
     }
 
     /**
-     * Select which fields will appear in the TSV download
+     * Include fields whose values derive from external resources
      * @param includeFields a vararg of fields to include
      */
     public void setIncludeFields(String... includeFields) {
@@ -574,8 +575,9 @@ public class AnnotationRequest {
      * An array of fields whose values derive from external resources, which are to be included in the response
      * @return the array of fields from external resources to include in the response
      */
-    public String[] getSelectedFields() {
-        return this.selectedFields;
+    @ArrayPattern(regexp = "^goName|taxonName$", flags = CASE_INSENSITIVE, paramName = INCLUDE_FIELD_PARAM)
+    public String[] getIncludeFields() {
+        return this.includeFields;
     }
 
     /**
@@ -584,6 +586,16 @@ public class AnnotationRequest {
      */
     public void setSelectedFields(String... selectedFields) {
         this.selectedFields = selectedFields;
+    }
+
+    /**
+     * An array of fields whose values will appear in the TSV download
+     * @return the array of fields from external resources to include in the response
+     */
+    @ArrayPattern(regexp = "^geneProductId|symbol|qualifier|goId|goName|evidenceCode|goEvidence|reference|withFrom" +
+            "|taxonId|assignedBy|extensions|date$", flags = CASE_INSENSITIVE, paramName = SELECT_FIELD_PARAM)
+    public String[] getSelectedFields() {
+        return this.selectedFields;
     }
 
     /**
