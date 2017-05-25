@@ -29,6 +29,21 @@ import static java.util.stream.Collectors.toList;
  */
 public class AnnotationToTSV extends AnnotationTo implements BiFunction<Annotation, List<String>, List<String>> {
 
+    public static final String GENE_PRODUCT_ID_FIELD_NAME = "geneproductid";
+    public static final String SYMBOL_FIELD_NAME = "symbol";
+    public static final String QUALIFIER_FIELD_NAME = "qualifier";
+    public static final String GO_TERM_FIELD_NAME = "goid";
+    public static final String GO_NAME_FIELD_NAME = "goname";
+    public static final String ECO_ID_FIELD_NAME = "evidencecode";
+    public static final String GO_EVIDENCE_CODE_FIELD_NAME = "goevidence";
+    public static final String REFERENCE_FIELD_NAME = "reference";
+    public static final String WITH_FROM_FIELD_NAME = "withfrom";
+    public static final String TAXON_ID_FIELD_NAME = "taxonid";
+    public static final String ASSIGNED_BY_FIELD_NAME = "assignedby";
+    public static final String ANNOTATION_EXTENSION_FIELD_NAME = "extensions";
+    public static final String DATE_FIELD_NAME = "date";
+    public static final String TAXON_NAME_FIELD_NAME = "taxonname";
+
     private static final String YEAR_MONTH_DAY = "yyyyMMdd";
     private Logger LOGGER = LoggerFactory.getLogger(AnnotationToTSV.class);
 
@@ -54,49 +69,49 @@ public class AnnotationToTSV extends AnnotationTo implements BiFunction<Annotati
         final SimpleDateFormat dateFormat = new SimpleDateFormat(YEAR_MONTH_DAY);
         //todo missing the following fields that come from other services yet to be plugged in
         //todo name, synonym, type from the gene product service
-        if (selectedFields.isEmpty() || selectedFields.contains("geneProductId")) {
+        if (selectedFields.isEmpty() || selectedFields.contains(GENE_PRODUCT_ID_FIELD_NAME)) {
             tsvJoiner.add(nullToEmptyString.apply(annotation.geneProductId));
         }
-        if (selectedFields.isEmpty() || selectedFields.contains("symbol")) {
+        if (selectedFields.isEmpty() || selectedFields.contains(SYMBOL_FIELD_NAME)) {
             tsvJoiner.add(nullToEmptyString.apply(annotation.symbol));
         }
-        if (selectedFields.isEmpty() || selectedFields.contains("qualifier")) {
+        if (selectedFields.isEmpty() || selectedFields.contains(QUALIFIER_FIELD_NAME)) {
             tsvJoiner.add(nullToEmptyString.apply(annotation.qualifier));
         }
-        if (selectedFields.isEmpty() || selectedFields.contains("goId")) {
+        if (selectedFields.isEmpty() || selectedFields.contains(GO_TERM_FIELD_NAME)) {
             if (Objects.nonNull(slimmedToGoId)) {
                 tsvJoiner.add(slimmedToGoId);
             }
             tsvJoiner.add(nullToEmptyString.apply(annotation.goId));
         }
-        if (selectedFields.isEmpty() || selectedFields.contains("goName")) {
+        if (selectedFields.isEmpty() || selectedFields.contains(GO_NAME_FIELD_NAME)) {
             tsvJoiner.add(nullToEmptyString.apply(annotation.goName));
         }
-        if (selectedFields.isEmpty() || selectedFields.contains("evidenceCode")) {
+        if (selectedFields.isEmpty() || selectedFields.contains(ECO_ID_FIELD_NAME)) {
             tsvJoiner.add(nullToEmptyString.apply(annotation.evidenceCode));
         }
-        if (selectedFields.isEmpty() || selectedFields.contains("goEvidence")) {
+        if (selectedFields.isEmpty() || selectedFields.contains(GO_EVIDENCE_CODE_FIELD_NAME)) {
             tsvJoiner.add(nullToEmptyString.apply(annotation.goEvidence));
         }
-        if (selectedFields.isEmpty() || selectedFields.contains("reference")) {
+        if (selectedFields.isEmpty() || selectedFields.contains(REFERENCE_FIELD_NAME)) {
             tsvJoiner.add(nullToEmptyString.apply(annotation.reference));
         }
-        if (selectedFields.isEmpty() || selectedFields.contains("withFrom")) {
+        if (selectedFields.isEmpty() || selectedFields.contains(WITH_FROM_FIELD_NAME)) {
             tsvJoiner.add(withFromAsString(annotation.withFrom));
         }
-        if (selectedFields.isEmpty() || selectedFields.contains("taxonId")) {
+        if (selectedFields.isEmpty() || selectedFields.contains(TAXON_ID_FIELD_NAME)) {
             tsvJoiner.add(annotation.taxonId == 0 ? "" :Integer.toString(annotation.taxonId));
         }
-        if (selectedFields.isEmpty() || selectedFields.contains("assignedBy")) {
+        if (selectedFields.isEmpty() || selectedFields.contains(ASSIGNED_BY_FIELD_NAME)) {
             tsvJoiner.add(nullToEmptyString.apply(annotation.assignedBy));
         }
-        if (selectedFields.isEmpty() || selectedFields.contains("extensions")) {
+        if (selectedFields.isEmpty() || selectedFields.contains(ANNOTATION_EXTENSION_FIELD_NAME)) {
             tsvJoiner.add(extensionsAsString(annotation.extensions));
         }
-        if (selectedFields.isEmpty() || selectedFields.contains("date")) {
+        if (selectedFields.isEmpty() || selectedFields.contains(DATE_FIELD_NAME)) {
             tsvJoiner.add(annotation.date == null ?"" : dateFormat.format(annotation.date));
         }
-        if (selectedFields.isEmpty() || selectedFields.contains("taxonName")) {
+        if (selectedFields.isEmpty() || selectedFields.contains(TAXON_NAME_FIELD_NAME)) {
             tsvJoiner.add(nullToEmptyString.apply(annotation.taxonName));
         }
         return tsvJoiner.toString();
