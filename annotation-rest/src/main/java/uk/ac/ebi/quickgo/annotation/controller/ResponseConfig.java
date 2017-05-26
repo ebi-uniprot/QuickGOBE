@@ -36,17 +36,29 @@ import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.*;
     }
 
     @Bean
-    public GPADHttpMessageConverter gpadHttpMessageConverter() {
-        return new GPADHttpMessageConverter(new DispatchWriter(new AnnotationToGPAD(), GPAD_MEDIA_TYPE));
+    public HttpMessageConverter gpadHttpMessageConverter() {
+        return new HttpMessageConverter(gpadDispatchWriter(), GPAD_MEDIA_TYPE);
+    }
+
+    private DispatchWriter gpadDispatchWriter() {
+        return new DispatchWriter(new AnnotationToGPAD(), GPAD_MEDIA_TYPE);
     }
 
     @Bean
-    public GAFHttpMessageConverter gafHttpMessageConverter() {
-        return new GAFHttpMessageConverter(new DispatchWriter(new AnnotationToGAF(), GAF_MEDIA_TYPE));
+    public HttpMessageConverter gafHttpMessageConverter() {
+        return new HttpMessageConverter(gafDispatchWriter(),GAF_MEDIA_TYPE);
+    }
+
+    private DispatchWriter gafDispatchWriter() {
+        return new DispatchWriter(new AnnotationToGAF(), GAF_MEDIA_TYPE);
     }
 
     @Bean
-    public TSVHttpMessageConverter tsvHttpMessageConverter(){
-        return new TSVHttpMessageConverter(new DispatchWriter(new AnnotationToTSV(), TSV_MEDIA_TYPE));
+    public HttpMessageConverter tsvHttpMessageConverter(){
+        return new HttpMessageConverter(tsvDispatchWriter(), TSV_MEDIA_TYPE);
+    }
+
+    private DispatchWriter tsvDispatchWriter() {
+        return new DispatchWriter(new AnnotationToTSV(), TSV_MEDIA_TYPE);
     }
 }
