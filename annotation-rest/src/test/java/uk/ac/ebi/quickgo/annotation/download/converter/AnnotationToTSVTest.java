@@ -123,6 +123,17 @@ public class AnnotationToTSVTest {
     }
 
     @Test
+    public void outputCreatedInOrderOfSelectedFields(){
+        List<String> selectedFields = Arrays.asList(ASSIGNED_BY_FIELD_NAME, ECO_ID_FIELD_NAME, QUALIFIER_FIELD_NAME );
+
+        String[] elements = annotationToElements(annotation, selectedFields);
+
+        assertThat(elements[0], is(equalTo(DB)));
+        assertThat(elements[1], is(equalTo(ECO_ID)));
+        assertThat(elements[2], is(equalTo(QUALIFIER)));
+    }
+
+    @Test
     public void nullGeneProductId() {
         annotation.geneProductId = null;
         String[] elements = annotationToElements(annotation);
