@@ -6,8 +6,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import uk.ac.ebi.quickgo.annotation.download.converter.AnnotationToGAF;
 import uk.ac.ebi.quickgo.annotation.download.converter.AnnotationToGPAD;
-import uk.ac.ebi.quickgo.annotation.download.http.GAFHttpMessageConverter;
-import uk.ac.ebi.quickgo.annotation.download.http.GPADHttpMessageConverter;
+import uk.ac.ebi.quickgo.annotation.download.converter.AnnotationToTSV;
+import uk.ac.ebi.quickgo.annotation.download.http.*;
 import uk.ac.ebi.quickgo.rest.controller.response.NoFacetNoHighlightNoAggregateQueryResult;
 import uk.ac.ebi.quickgo.rest.controller.response.NoNextCursorPageInfo;
 import uk.ac.ebi.quickgo.rest.search.results.PageInfo;
@@ -16,6 +16,7 @@ import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.*;
 
 /**
  * Configures how the response to the client should be handled.
@@ -35,20 +36,29 @@ import java.util.Map;
     }
 
     @Bean
-    public GPADHttpMessageConverter gpadHttpMessageConverter() {
-        return new GPADHttpMessageConverter(gpadAnnotationConverter());
+    public HttpMessageConverter gpadHttpMessageConverter() {
+        return new HttpMessageConverter(gpadDispatchWriter(), GPAD_MEDIA_TYPE);
+    }
+
+    private DispatchWriter gpadDispatchWriter() {
+        return new DispatchWriter(new AnnotationToGPAD(), GPAD_MEDIA_TYPE);
     }
 
     @Bean
-    public GAFHttpMessageConverter gafHttpMessageConverter() {
-        return new GAFHttpMessageConverter(gafAnnotationConverter());
+    public HttpMessageConverter gafHttpMessageConverter() {
+        return new HttpMessageConverter(gafDispatchWriter(),GAF_MEDIA_TYPE);
     }
 
-    private AnnotationToGPAD gpadAnnotationConverter() {
-        return new AnnotationToGPAD();
+    private DispatchWriter gafDispatchWriter() {
+        return new DispatchWriter(new AnnotationToGAF(), GAF_MEDIA_TYPE);
     }
 
-    private AnnotationToGAF gafAnnotationConverter() {
-        return new AnnotationToGAF();
+    @Bean
+    public HttpMessageConverter tsvHttpMessageConverter(){
+        return new HttpMessageConverter(tsvDispatchWriter(), TSV_MEDIA_TYPE);
+    }
+
+    private DispatchWriter tsvDispatchWriter() {
+        return new DispatchWriter(new AnnotationToTSV(), TSV_MEDIA_TYPE);
     }
 }

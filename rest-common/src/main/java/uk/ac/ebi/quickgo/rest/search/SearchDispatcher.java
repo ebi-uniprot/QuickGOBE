@@ -144,28 +144,29 @@ public final class SearchDispatcher {
             ResultTransformerChain<QueryResult<T>> transformer,
             FilterContext context,
             int limit) {
+
         Stream<QueryResult<T>> resultStream;
 
         if (firstQueryRequest == null) {
             resultStream = Stream.empty();
         } else {
             try {
-                QueryResult<T> firstQueryResult = transformer.applyTransformations(
-                        searchService.findByQuery(firstQueryRequest),
-                        context);
-                long totalHits = firstQueryResult.getNumberOfHits();
-                firstQueryResult = resizeResultsIfRequired(firstQueryResult, limit);
+                LOGGER.info("SearchDispatcher:: download firstQueryResult");
+                final QueryResult<T> firstQueryResult = searchService.findByQuery(firstQueryRequest);
+                int pageSize = firstQueryRequest.getPage().getPageSize();
+                LOGGER.info("SearchDispatcher:: download first request info: {} wanted, {} page size", limit, pageSize);
+
+                LOGGER.info("SearchDispatcher:: transforming firstQueryResult");
+                QueryResult<T> firstTransformedQueryResult = transformer.applyTransformations(firstQueryResult, context);
+                long totalHits = firstTransformedQueryResult.getNumberOfHits();
+
+                firstTransformedQueryResult = resizeResultsIfRequired(firstTransformedQueryResult, limit);
                 MutableValue<String> cursor = new MutableValue<>(FIRST_CURSOR);
                 MutableValue<Integer> fetchedCount = new MutableValue<>(0);
+                int requiredIterations = getRequiredNumberOfPagesToFetch(pageSize, totalHits, limit);
+                LOGGER.info("SearchDispatcher:: required iterations " + requiredIterations);
 
-                int pageSize = firstQueryRequest.getPage().getPageSize();
-                LOGGER.info("download first request info: {} wanted, {} page size", limit, pageSize);
-                int requiredIterations = getRequiredNumberOfPagesToFetch(
-                        pageSize,
-                        totalHits,
-                        limit);
-
-                resultStream = Stream.iterate(firstQueryResult, qr -> {
+                resultStream = Stream.iterate(firstTransformedQueryResult, qr -> {
                     String nextCursor = qr.getPageInfo().getNextCursor();
                     if (isCursorAtEnd(cursor.getValue(), nextCursor)) {
                         return qr;
