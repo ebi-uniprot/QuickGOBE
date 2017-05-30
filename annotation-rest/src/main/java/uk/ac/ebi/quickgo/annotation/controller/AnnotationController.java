@@ -225,6 +225,7 @@ public class AnnotationController {
             BindingResult bindingResult,
             @RequestHeader(ACCEPT) MediaType mediaTypeAcceptHeader,
             HttpServletRequest servletRequest) {
+        LOGGER.info("Download Request:: " + request + ", " + mediaTypeAcceptHeader);
 
         checkBindingErrors(bindingResult);
         FilterQueryInfo filterQueryInfo = extractFilterQueryInfo(request);

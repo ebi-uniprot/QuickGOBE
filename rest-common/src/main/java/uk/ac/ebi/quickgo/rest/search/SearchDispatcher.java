@@ -151,12 +151,12 @@ public final class SearchDispatcher {
             resultStream = Stream.empty();
         } else {
             try {
-                LOGGER.info("SearchDispatcher:: download firstQueryResult");
+                LOGGER.info("SearchDispatcher#streamSearchResults download firstQueryResult");
                 final QueryResult<T> firstQueryResult = searchService.findByQuery(firstQueryRequest);
                 int pageSize = firstQueryRequest.getPage().getPageSize();
                 LOGGER.info("SearchDispatcher:: download first request info: {} wanted, {} page size", limit, pageSize);
 
-                LOGGER.info("SearchDispatcher:: transforming firstQueryResult");
+                LOGGER.info("SearchDispatcher#streamSearchResults transforming firstQueryResult");
                 QueryResult<T> firstTransformedQueryResult = transformer.applyTransformations(firstQueryResult, context);
                 long totalHits = firstTransformedQueryResult.getNumberOfHits();
 
