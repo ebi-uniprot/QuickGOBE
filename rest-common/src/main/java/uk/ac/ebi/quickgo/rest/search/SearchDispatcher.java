@@ -160,6 +160,7 @@ public final class SearchDispatcher {
                 QueryResult<T> firstTransformedQueryResult = transformer.applyTransformations(firstQueryResult, context);
                 long totalHits = firstTransformedQueryResult.getNumberOfHits();
 
+                LOGGER.info("SearchDispatcher:: resizeResultsIfRequired");
                 firstTransformedQueryResult = resizeResultsIfRequired(firstTransformedQueryResult, limit);
                 MutableValue<String> cursor = new MutableValue<>(FIRST_CURSOR);
                 MutableValue<Integer> fetchedCount = new MutableValue<>(0);
