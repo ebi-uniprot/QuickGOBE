@@ -119,7 +119,7 @@ public class AnnotationController {
     private final MetaDataProvider metaDataProvider;
 
     private final SearchService<Annotation> annotationSearchService;
-
+    private final SearchServiceConfig.AnnotationCompositeRetrievalConfig annotationRetrievalConfig;
     private final DefaultSearchQueryTemplate queryTemplate;
     private final DefaultSearchQueryTemplate downloadQueryTemplate;
     private final FilterConverterFactory converterFactory;
@@ -157,6 +157,7 @@ public class AnnotationController {
         this.statsService = statsService;
         this.resultTransformerChain = resultTransformerChain;
 
+        this.annotationRetrievalConfig = annotationRetrievalConfig;
         this.queryTemplate = createSearchQueryTemplate(annotationRetrievalConfig);
         this.downloadQueryTemplate = createDownloadSearchQueryTemplate(annotationRetrievalConfig);
 
@@ -230,10 +231,13 @@ public class AnnotationController {
         checkBindingErrors(bindingResult);
         FilterQueryInfo filterQueryInfo = extractFilterQueryInfo(request);
 
+        final int pageLimit = request.getDownloadLimit() < this.annotationRetrievalConfig.getDownloadPageSize()?
+                request.getDownloadLimit() : this.annotationRetrievalConfig.getDownloadPageSize();
         QueryRequest queryRequest = downloadQueryTemplate.newBuilder()
-                .setQuery(QuickGOQuery.createAllQuery())
-                .addFilters(filterQueryInfo.getFilterQueries())
-                .build();
+                                                         .setQuery(QuickGOQuery.createAllQuery())
+                                                         .addFilters(filterQueryInfo.getFilterQueries())
+                                                         .setPage(createFirstCursorPage(pageLimit))
+                                                         .build();
 
         ResponseBodyEmitter emitter = new ResponseBodyEmitter();
 
