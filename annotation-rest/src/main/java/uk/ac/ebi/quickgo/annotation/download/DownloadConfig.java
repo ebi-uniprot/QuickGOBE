@@ -30,7 +30,7 @@ import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.TSV_SU
 @EnableScheduling
 @ConfigurationProperties(prefix = "annotation.download")
 public class DownloadConfig {
-    private static final int DEFAULT_DOWNLOAD_EMITTER_TIMEOUT_MILLIS = 30 * 60 * 1000;
+    private static final int DEFAULT_DOWNLOAD_EMITTER_TIMEOUT_MILLIS = 40 * 60 * 1000;
     private static final Path DEFAULT_ONTOLOGY_PATH = Paths.get("ONTOLOGY_IRI.dat.gz");
 
     private TaskExecutorProperties taskExecutor = new TaskExecutorProperties();
