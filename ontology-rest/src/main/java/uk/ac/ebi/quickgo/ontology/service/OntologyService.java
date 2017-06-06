@@ -123,4 +123,6 @@ public interface OntologyService<T extends OBOTerm> {
      */
     List<T> findDescendantsInfoByOntologyId(List<String> ids, OntologyRelationType... relations);
 
+    public List<T> findAncestorsAndPathsByOntologyId(List<String> ids, OntologyRelationType... relations);
+
 }

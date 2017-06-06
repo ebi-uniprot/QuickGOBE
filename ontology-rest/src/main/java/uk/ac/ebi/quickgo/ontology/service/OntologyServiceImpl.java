@@ -142,6 +142,13 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<T> findAncestorsAndPathsByOntologyId(List<String> ids, OntologyRelationType... relations) {
+        return convertDocs(ontologyRepository.findCoreAttrByTermId(ontologyType, buildIdList(ids)))
+                .map(term -> this.insertAncestors(term, relations))
+                .collect(Collectors.toList());
+    }
+
     List<String> buildIdList(List<String> ids) {
         Preconditions.checkArgument(ids != null, "List of IDs cannot be null");
 
