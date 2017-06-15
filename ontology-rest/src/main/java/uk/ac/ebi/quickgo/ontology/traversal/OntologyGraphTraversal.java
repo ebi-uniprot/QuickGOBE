@@ -6,7 +6,6 @@ import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
 
 import java.util.List;
 import java.util.Set;
-import org.jgrapht.DirectedGraph;
 
 /**
  * This class defines a contract for typical ontology graph traversal operations.
