@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.ontology.service;
 
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
 import uk.ac.ebi.quickgo.ontology.common.OntologyType;
+import uk.ac.ebi.quickgo.ontology.model.AncestorGraph;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
@@ -123,6 +124,18 @@ public interface OntologyService<T extends OBOTerm> {
      */
     List<T> findDescendantsInfoByOntologyId(List<String> ids, OntologyRelationType... relations);
 
-    public List<T> findAncestorsAndPathsByOntologyId(List<String> ids, OntologyRelationType... relations);
+    /**
+     * Find the set of ancestor vertices reachable from a list of ids, {@code ids}, navigable via a specified
+     * set of relations.
+     *
+     * @param startingIds a {@link Set} of ids whose ancestors one is interested in
+     * @param endingIds a {@link Set} of ids whose ancestors one is not interested in. An empty set means all
+     * ancestors are of interest.
+     * @param relations a varargs value containing the relationships over which paths can only travel.
+     *                  By omitting a {@code relation} value, all paths will be returned.
+     * @return a {@link AncestorGraph} corresponding to the sub-graph of ontology constrained by the selected ids.
+     */
+    AncestorGraph findOntologySubGraphById(Set<String> startingIds, Set<String> endingIds,
+            OntologyRelationType... relations);
 
 }

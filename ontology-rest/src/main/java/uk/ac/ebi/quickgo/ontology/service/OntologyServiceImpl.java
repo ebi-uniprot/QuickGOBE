@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
 import uk.ac.ebi.quickgo.ontology.common.OntologyType;
+import uk.ac.ebi.quickgo.ontology.model.AncestorGraph;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
@@ -143,10 +144,9 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
     }
 
     @Override
-    public List<T> findAncestorsAndPathsByOntologyId(List<String> ids, OntologyRelationType... relations) {
-        return convertDocs(ontologyRepository.findCoreAttrByTermId(ontologyType, buildIdList(ids)))
-                .map(term -> this.insertAncestors(term, relations))
-                .collect(Collectors.toList());
+    public AncestorGraph findOntologySubGraphById(Set<String> startingIds, Set<String> endingIds,
+            OntologyRelationType... relations){
+        return ontologyTraversal.subGraph(startingIds, endingIds, relations);
     }
 
     List<String> buildIdList(List<String> ids) {

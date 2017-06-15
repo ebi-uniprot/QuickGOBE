@@ -3,10 +3,7 @@ package uk.ac.ebi.quickgo.ontology.service;
 import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
 import uk.ac.ebi.quickgo.ontology.common.OntologyType;
-import uk.ac.ebi.quickgo.ontology.model.ECOTerm;
-import uk.ac.ebi.quickgo.ontology.model.GOTerm;
-import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
-import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
+import uk.ac.ebi.quickgo.ontology.model.*;
 import uk.ac.ebi.quickgo.ontology.service.converter.ECODocConverter;
 import uk.ac.ebi.quickgo.ontology.service.converter.GODocConverter;
 import uk.ac.ebi.quickgo.ontology.traversal.OntologyGraphTraversal;
@@ -393,6 +390,7 @@ public class OntologyServiceImplTest {
             assertThat(descendants.get(0).descendants, is(myDescendants));
         }
 
+        //PATHS
         @Test(expected = IllegalArgumentException.class)
         public void illegalArgumentWhenFindingPathsForZeroFromTerms() {
             Set<String> fromIds = Collections.emptySet();
@@ -451,6 +449,28 @@ public class OntologyServiceImplTest {
 
         private List<String> idsViaOntologyService(String... ids) {
             return goOntologyService.buildIdList(Arrays.asList(ids));
+        }
+
+        //SUB-GRAPH
+        @Test(expected = IllegalArgumentException.class)
+        public void illegalArgumentWhenFindingSubGraphForZeroFromTerms() {
+            Set<String> fromIds = Collections.emptySet();
+            Set<String> toIds = idsViaOntologyService("GO:0000001").stream().collect(Collectors.toSet());
+            doThrow(IllegalArgumentException.class).when(ontologyTraversalMock).subGraph(fromIds, toIds, new
+                    OntologyRelationType[]{});
+            goOntologyService.findOntologySubGraphById(fromIds, toIds, new OntologyRelationType[]{});
+        }
+
+        @Test
+        public void findsEmptyAncestorGraphForMissingTerm() {
+            Set<String> fromIds = idsViaOntologyService("GO:0000001").stream().collect(Collectors.toSet());
+            Set<String> toIds = idsViaOntologyService("GO:0000002").stream().collect(Collectors.toSet());
+            when(ontologyTraversalMock.subGraph(fromIds, toIds, new OntologyRelationType[]{}))
+                    .thenReturn(new AncestorGraph( new HashSet<>(), new HashSet<>()));
+            AncestorGraph ancestorGraph = goOntologyService.findOntologySubGraphById(fromIds, toIds, new
+                    OntologyRelationType[]{});
+            assertThat(ancestorGraph.edges, hasSize(0));
+            assertThat(ancestorGraph.vertices, hasSize(0));
         }
     }
 
