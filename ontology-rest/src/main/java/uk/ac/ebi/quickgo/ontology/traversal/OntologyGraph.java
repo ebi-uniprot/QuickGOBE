@@ -182,16 +182,21 @@ public class OntologyGraph implements OntologyGraphTraversal {
             if(!vertexIsStopNode(base, stopNodes)){
                 addParentsToAncestorGraph(base, stopNodes, targetRelations, ancestorGraph);
             }
-            //todo make sure baseVertex is in ontology
-            ancestorGraph.vertices.add(base);
-
+            if(ontology.containsVertex(base)) {
+                ancestorGraph.vertices.add(base);
+            }
         }
         return ancestorGraph;
     }
 
     private void addParentsToAncestorGraph(String base, Set<String> stopNodes, OntologyRelationType[] targetRelations,
             AncestorGraph ancestorGraph) {
-        Set<OntologyRelationship> parents = this.parents(base, targetRelations);
+        Set<OntologyRelationship> parents = null;
+        try {
+            parents = this.parents(base, targetRelations);
+        } catch (Exception e) {
+           return;
+        }
         Set<String> parentVertices = parents.stream()
                                             .map(p -> p.parent)
                                             .collect(toSet());
