@@ -1,10 +1,12 @@
 package uk.ac.ebi.quickgo.ontology.traversal;
 
+import uk.ac.ebi.quickgo.ontology.model.AncestorGraph;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
 
 import java.util.List;
 import java.util.Set;
+import org.jgrapht.DirectedGraph;
 
 /**
  * This class defines a contract for typical ontology graph traversal operations.
@@ -75,4 +77,18 @@ public interface OntologyGraphTraversal {
      * @throws IllegalArgumentException if the {@code topVertex} is null, empty or does not exist in the graph
      */
     Set<OntologyRelationship> children(String topVertex, OntologyRelationType... relations);
+
+    /**
+     * Find the sub-graph between two sets of vertices in a graph, navigable via
+     * a specified set of relations.
+     *
+     * @param baseVertices the base vertices which are the lowest level of the sub-graph
+     * @param stopVertices the ending vertices beyond which Ontology vertices and edges are not returned. If this
+     * value is empty or null then the default stop nodes for the ontology are used.
+     * @param relations a varargs value used to filter edges to the sub-graph. By omitting a {@code relation} value,
+     * edges of all relation types will be returned.
+     * @return a graph from {@code child} to {@code parent} via {@code relations}
+     */
+    AncestorGraph subGraph(Set<String> baseVertices, Set<String> stopVertices,
+            OntologyRelationType... relations);
 }

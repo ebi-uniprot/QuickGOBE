@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.ontology.traversal;
 
+import uk.ac.ebi.quickgo.ontology.model.AncestorGraph;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
 
@@ -12,6 +13,8 @@ import org.jgrapht.GraphPath;
 import org.jgrapht.alg.AllDirectedPaths;
 import org.jgrapht.graph.ClassBasedEdgeFactory;
 import org.jgrapht.graph.DirectedMultigraph;
+
+import static java.util.stream.Collectors.toSet;
 
 /**
  * This class represents an ontology graph whose vertices are ontology terms,
@@ -74,29 +77,24 @@ public class OntologyGraph implements OntologyGraphTraversal {
 
         Preconditions.checkArgument(!isNullOrEmpty(startingVertices), "Starting vertices cannot be null/empty.");
         Preconditions.checkArgument(!isNullOrEmpty(endingVertices), "Ending vertices cannot be null/empty.");
+        errorIfAllStartingVerticesAreEndingVertices(startingVertices, endingVertices);
 
         Set<OntologyRelationType> relationsSet = createRelevantRelationsSet(relations);
-
-        Set<String> startEndIntersection = new HashSet<>(startingVertices);
-        startEndIntersection.retainAll(endingVertices);
-        if (!startEndIntersection.isEmpty()) {
-            throw new IllegalArgumentException("Cannot find paths intersecting start/end vertex sets:\n"
-                    + "\tstarting vertices: " + startingVertices
-                    + "\tending vertices: " + endingVertices);
-        }
-
-        List<List<OntologyRelationship>> interestingPaths = new ArrayList<>();
-
-        List<OntologyRelationship> immediateSuccessors = successorEdges(startingVertices, endingVertices, relationsSet);
-        if (immediateSuccessors.size() > 0) {
-            immediateSuccessors.stream()
-                    .map(Collections::singletonList)
-                    .forEach(interestingPaths::add);
-        }
+        List<List<OntologyRelationship>> interestingPaths =
+                calculateInterestingPaths(startingVertices, endingVertices, relationsSet);
 
         AllDirectedPaths<String, OntologyRelationship> allPaths = new AllDirectedPaths<>(ontology);
         List<GraphPath<String, OntologyRelationship>> v1v2Paths =
                 allPaths.getAllPaths(startingVertices, endingVertices, true, null);
+        removeInvalidPaths(relationsSet, v1v2Paths);
+
+        interestingPaths.addAll(v1v2Paths.stream().map(GraphPath::getEdgeList).collect(Collectors.toList()));
+
+        return interestingPaths;
+    }
+
+    private void removeInvalidPaths(Set<OntologyRelationType> relationsSet,
+            List<GraphPath<String, OntologyRelationship>> v1v2Paths) {
         List<GraphPath<String, OntologyRelationship>> invalidPaths = new ArrayList<>();
 
         for (GraphPath<String, OntologyRelationship> path : v1v2Paths) {
@@ -107,10 +105,6 @@ public class OntologyGraph implements OntologyGraphTraversal {
         }
 
         v1v2Paths.removeAll(invalidPaths);
-
-        interestingPaths.addAll(v1v2Paths.stream().map(GraphPath::getEdgeList).collect(Collectors.toList()));
-
-        return interestingPaths;
     }
 
     @Override
@@ -142,7 +136,7 @@ public class OntologyGraph implements OntologyGraphTraversal {
 
         return ontology.outgoingEdgesOf(baseVertex).stream()
                 .filter(ontologyRelationship -> relationsSet.contains(ontologyRelationship.relationship))
-                .collect(Collectors.toSet());
+                .collect(toSet());
     }
 
     @Override
@@ -165,7 +159,48 @@ public class OntologyGraph implements OntologyGraphTraversal {
 
         return ontology.incomingEdgesOf(topVertex).stream()
                 .filter(ontologyRelationship -> relationsSet.contains(ontologyRelationship.relationship))
-                .collect(Collectors.toSet());
+                .collect(toSet());
+    }
+
+    @Override public AncestorGraph subGraph(Set<String> baseVertices, Set<String> stopNodes,
+            OntologyRelationType... relations) {
+        Preconditions.checkArgument(!isNullOrEmpty(baseVertices), "Starting vertices cannot be null/empty.");
+
+        if(stopNodes.isEmpty()){
+            stopNodes.addAll(STOP_NODES);
+        }
+
+        Set<OntologyRelationType> relationsSet = createRelevantRelationsSet(relations);
+        OntologyRelationType[] targetRelations = relationsSet.toArray(new OntologyRelationType[]{});
+
+        Set<String> ancestorsFound = new HashSet<>();
+        Set<OntologyRelationship> edgesFound = new HashSet<>();
+
+        AncestorGraph ancestorGraph = new AncestorGraph(edgesFound, ancestorsFound);
+
+        for (String base : baseVertices) {
+            if(!vertexIsStopNode(base, stopNodes)){
+                addParentsToAncestorGraph(base, stopNodes, targetRelations, ancestorGraph);
+            }
+            //todo make sure baseVertex is in ontology
+            ancestorGraph.vertices.add(base);
+
+        }
+        return ancestorGraph;
+    }
+
+    private void addParentsToAncestorGraph(String base, Set<String> stopNodes, OntologyRelationType[] targetRelations,
+            AncestorGraph ancestorGraph) {
+        Set<OntologyRelationship> parents = this.parents(base, targetRelations);
+        Set<String> parentVertices = parents.stream()
+                                            .map(p -> p.parent)
+                                            .collect(toSet());
+        if (!parents.isEmpty()) {
+            AncestorGraph parentSubGraph = this.subGraph(parentVertices, stopNodes, targetRelations);
+            ancestorGraph.edges.addAll(parentSubGraph.edges);
+            ancestorGraph.vertices.addAll(parentSubGraph.vertices);
+        }
+        ancestorGraph.edges.addAll(parents);
     }
 
     @Override public int hashCode() {
@@ -189,6 +224,35 @@ public class OntologyGraph implements OntologyGraphTraversal {
         }
         return ancestorEdgesMap != null ? ancestorEdgesMap.equals(that.ancestorEdgesMap) :
                 that.ancestorEdgesMap == null;
+    }
+
+    private List<List<OntologyRelationship>> calculateInterestingPaths(Set<String> startingVertices,
+            Set<String> endingVertices, Set<OntologyRelationType> relationsSet) {
+        List<List<OntologyRelationship>> interestingPaths = new ArrayList<>();
+        List<OntologyRelationship> immediateSuccessors = successorEdges(startingVertices, endingVertices, relationsSet);
+        if (immediateSuccessors.size() > 0) {
+            immediateSuccessors.stream()
+                               .map(Collections::singletonList)
+                               .forEach(interestingPaths::add);
+        }
+        return interestingPaths;
+    }
+
+    private Set<String> errorIfAllStartingVerticesAreEndingVertices(Set<String> baseVertices, Set<String> topVertices) {
+        Set<String> startEndIntersection = new HashSet<>(baseVertices);
+        startEndIntersection.retainAll(topVertices);
+
+        if (!startEndIntersection.isEmpty()) {
+            throw new IllegalArgumentException("Cannot find paths intersecting start/end vertex sets:\n"
+                                                       + "\tstarting vertices: " + baseVertices
+                                                       + "\tending vertices: " + topVertices);
+        }
+
+        return startEndIntersection;
+    }
+
+    private boolean vertexIsStopNode(String vertex, Set<String> stopNodes) {
+        return stopNodes.contains(vertex);
     }
 
     private static String getOppositeVertex(Graph<String, OntologyRelationship> graph, OntologyRelationship edge,
