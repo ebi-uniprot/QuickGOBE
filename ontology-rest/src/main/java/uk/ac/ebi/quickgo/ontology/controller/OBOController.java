@@ -8,6 +8,7 @@ import uk.ac.ebi.quickgo.ontology.OntologyRestConfig;
 import uk.ac.ebi.quickgo.ontology.common.OntologyFields;
 import uk.ac.ebi.quickgo.ontology.common.OntologyType;
 import uk.ac.ebi.quickgo.ontology.controller.validation.OBOControllerValidationHelper;
+import uk.ac.ebi.quickgo.ontology.model.AncestorGraph;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
@@ -69,6 +70,7 @@ public abstract class OBOController<T extends OBOTerm> {
     static final String PATHS_SUB_RESOURCE = "paths";
     static final String CHART_SUB_RESOURCE = "chart";
     static final String CHART_COORDINATES_SUB_RESOURCE = CHART_SUB_RESOURCE + "/coords";
+    static final String GRAPH_SUB_RESOURCE = "graph";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OBOController.class);
     private static final String COLON = ":";
@@ -413,6 +415,32 @@ public abstract class OBOController<T extends OBOTerm> {
         } catch (RenderingGraphException e) {
             throw createChartGraphicsException(e);
         }
+    }
+
+    /**
+     * Retrieves a subgraph of the ontology graph information as jason
+     *
+     * @param baseIds the term ids whose image is required
+     * @param stopIds the term ids whose image is required
+     * @return the json data corresponding to the requested term ids
+     */
+    @ApiOperation(value = "")
+    @RequestMapping(value = TERMS_RESOURCE + "/graph", method = RequestMethod.GET, produces = {MediaType
+            .APPLICATION_JSON_VALUE})
+    public ResponseEntity<AncestorGraph> getGraph(@RequestParam(value = "baseIds") String baseIds,
+            @RequestParam(value = "stopIds", required = false) String stopIds,
+            @RequestParam(value = "relations", required = false) String relations) {
+        final AncestorGraph ancestorGraph = ontologyService.findOntologySubGraphById(
+                asSet(validationHelper.validateCSVIds(baseIds)),
+                asSet(validationHelper.validateCSVIds(stopIds)),
+                emptyOrValidatedRelations(relations));
+        return new ResponseEntity<>(ancestorGraph, httpHeadersProvider.provide(), HttpStatus.OK);
+    }
+
+    private OntologyRelationType[] emptyOrValidatedRelations(String relations) {
+        return Objects.isNull(relations) || relations.isEmpty() ? new
+                    OntologyRelationType[]{} :
+                    asOntologyRelationTypeArray(validationHelper.validateRelationTypes(relations));
     }
 
     /**

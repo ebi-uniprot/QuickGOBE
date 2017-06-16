@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.ontology.controller;
 
+import java.util.Set;
 import org.apache.http.HttpHeaders;
 import org.junit.After;
 import org.junit.Before;
@@ -88,7 +89,7 @@ public abstract class OBOControllerIT {
     private String validIdsCSV;
     private List<String> validIdShortList;
     private List<String> validIdList;
-    private List<OntologyRelationship> relationships;
+    private List<OntologyRelationship>  relationships;
     private String validRelation;
     private String invalidRelation;
 
@@ -862,6 +863,17 @@ public abstract class OBOControllerIT {
     }
 
 
+    @Test
+    public void canFetchAncestorGraphFor1Term() throws Exception {
+        Set<String> vertices = ontologyGraph.getVertices();
+        for(String vertex : vertices) {
+            ResultActions response = mockMvc.perform(get(resourceUrl + "/terms/graph").param("baseIds", vertex));
+
+            response.andDo(print())
+                    .andExpect(jsonPath("$.numberOfHits").value(1))
+                    .andExpect(jsonPath("$.results[0].ancestorGraph", hasSize(1)));
+        }
+    }
     //-----------------------  Check Http Header for Cache-Control content ------------------------------------------
 
     @Test
