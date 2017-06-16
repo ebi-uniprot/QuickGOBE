@@ -1,23 +1,5 @@
 package uk.ac.ebi.quickgo.ontology.controller;
 
-import java.util.Set;
-import org.apache.http.HttpHeaders;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 import uk.ac.ebi.quickgo.graphics.model.GraphImageLayout;
 import uk.ac.ebi.quickgo.graphics.ontology.GraphImage;
@@ -35,6 +17,23 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.apache.http.HttpHeaders;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.is;
@@ -42,12 +41,16 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.ac.ebi.quickgo.common.converter.HelpfulConverter.toCSV;
-import static uk.ac.ebi.quickgo.ontology.OntologyRestConfig.*;
+import static uk.ac.ebi.quickgo.ontology.OntologyRestConfig.CACHE_CONTROL_HEADER;
 import static uk.ac.ebi.quickgo.ontology.controller.OBOController.*;
 
 /**
@@ -460,7 +463,6 @@ public abstract class OBOControllerIT {
 
         int totalEntries = defaultPageSize + 1;
         int pageSize = 1;
-        int pageNumWhichIsTooHigh = totalEntries;
 
         createAndSaveDocs(totalEntries);
 
@@ -468,7 +470,7 @@ public abstract class OBOControllerIT {
                 get(buildSearchURL())
                         .param(QUERY_PARAM, validId)
                         .param(LIMIT_PARAM, String.valueOf(pageSize))
-                        .param(PAGE_PARAM, String.valueOf(pageNumWhichIsTooHigh)));
+                        .param(PAGE_PARAM, String.valueOf(totalEntries)));
 
         response.andDo(print())
                 .andExpect(status().isBadRequest());
@@ -862,18 +864,37 @@ public abstract class OBOControllerIT {
         expectInvalidIdError(response, invalidId());
     }
 
-
     @Test
     public void canFetchAncestorGraphFor1Term() throws Exception {
-        Set<String> vertices = ontologyGraph.getVertices();
-        for(String vertex : vertices) {
-            ResultActions response = mockMvc.perform(get(resourceUrl + "/terms/graph").param("baseIds", vertex));
+        String baseId = relationships.get(0).child;
+        ResultActions response = mockMvc.perform(get(resourceUrl + "/terms/graph").param("baseIds", baseId));
 
-            response.andDo(print())
-                    .andExpect(jsonPath("$.numberOfHits").value(1))
-                    .andExpect(jsonPath("$.results").isArray());
-        }
+        response.andDo(print())
+                .andExpect(jsonPath("$.numberOfHits").value(1))
+                .andExpect(jsonPath("$.results").isArray());
     }
+
+    @Test
+    public void canFetchAncestorGraphForMultipleTerms() throws Exception {
+        String baseIds = relationships.stream().limit(10).map(r -> r.child).collect(Collectors.joining(","));
+
+        ResultActions response = mockMvc.perform(get(resourceUrl + "/terms/graph").param("baseIds", baseIds));
+
+        response.andDo(print())
+                .andExpect(jsonPath("$.numberOfHits").value(1))
+                .andExpect(jsonPath("$.results").isArray());
+    }
+
+    @Test
+    public void fetchingGraphForUnknownTermResultsInEmptyResult() throws Exception {
+        ResultActions response = mockMvc.perform(get(resourceUrl + "/terms/graph").param("baseIds",
+                                                                                         idMissingInRepository()));
+
+        response.andDo(print())
+                .andExpect(jsonPath("$.numberOfHits").value(0))
+                .andExpect(jsonPath("$.results").isArray());
+    }
+
     //-----------------------  Check Http Header for Cache-Control content ------------------------------------------
 
     @Test
