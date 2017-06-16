@@ -70,7 +70,6 @@ public abstract class OBOController<T extends OBOTerm> {
     static final String PATHS_SUB_RESOURCE = "paths";
     static final String CHART_SUB_RESOURCE = "chart";
     static final String CHART_COORDINATES_SUB_RESOURCE = CHART_SUB_RESOURCE + "/coords";
-    static final String GRAPH_SUB_RESOURCE = "graph";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OBOController.class);
     private static final String COLON = ":";
@@ -427,14 +426,15 @@ public abstract class OBOController<T extends OBOTerm> {
     @ApiOperation(value = "")
     @RequestMapping(value = TERMS_RESOURCE + "/graph", method = RequestMethod.GET, produces = {MediaType
             .APPLICATION_JSON_VALUE})
-    public ResponseEntity<AncestorGraph> getGraph(@RequestParam(value = "baseIds") String baseIds,
+    public ResponseEntity<QueryResult<AncestorGraph>> getGraph(@RequestParam(value = "baseIds") String baseIds,
             @RequestParam(value = "stopIds", required = false) String stopIds,
             @RequestParam(value = "relations", required = false) String relations) {
         final AncestorGraph ancestorGraph = ontologyService.findOntologySubGraphById(
                 asSet(validationHelper.validateCSVIds(baseIds)),
                 asSet(validationHelper.validateCSVIds(stopIds)),
                 emptyOrValidatedRelations(relations));
-        return new ResponseEntity<>(ancestorGraph, httpHeadersProvider.provide(), HttpStatus.OK);
+        final List<AncestorGraph> agList = Collections.singletonList(ancestorGraph);
+        return getResultsResponse(agList);
     }
 
     private OntologyRelationType[] emptyOrValidatedRelations(String relations) {
@@ -460,7 +460,7 @@ public abstract class OBOController<T extends OBOTerm> {
      * @return an array of {@link OntologyRelationType}s
      */
     private static OntologyRelationType[] asOntologyRelationTypeArray(Collection<OntologyRelationType> relations) {
-        return relations.stream().toArray(OntologyRelationType[]::new);
+        return relations.toArray(new OntologyRelationType[0]);
     }
 
     /**

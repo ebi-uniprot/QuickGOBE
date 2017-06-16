@@ -871,7 +871,7 @@ public abstract class OBOControllerIT {
 
             response.andDo(print())
                     .andExpect(jsonPath("$.numberOfHits").value(1))
-                    .andExpect(jsonPath("$.results[0].ancestorGraph", hasSize(1)));
+                    .andExpect(jsonPath("$.results").isArray());
         }
     }
     //-----------------------  Check Http Header for Cache-Control content ------------------------------------------
