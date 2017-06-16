@@ -433,8 +433,12 @@ public abstract class OBOController<T extends OBOTerm> {
                 asSet(validationHelper.validateCSVIds(baseIds)),
                 asSet(validationHelper.validateCSVIds(stopIds)),
                 emptyOrValidatedRelations(relations));
-        final List<AncestorGraph> agList = Collections.singletonList(ancestorGraph);
-        return getResultsResponse(agList);
+
+        if(ancestorGraph.vertices.size()== 0 && ancestorGraph.edges.size() == 0){
+            return getResultsResponse(Collections.emptyList());
+        }else{
+            return getResultsResponse(Collections.singletonList(ancestorGraph));
+        }
     }
 
     private OntologyRelationType[] emptyOrValidatedRelations(String relations) {
