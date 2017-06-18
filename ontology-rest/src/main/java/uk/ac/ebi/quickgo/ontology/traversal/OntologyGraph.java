@@ -1,18 +1,18 @@
 package uk.ac.ebi.quickgo.ontology.traversal;
 
-import uk.ac.ebi.quickgo.ontology.model.AncestorGraph;
-import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
-import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
-
 import com.google.common.base.Preconditions;
-import java.util.*;
-import java.util.stream.Collectors;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.AllDirectedPaths;
 import org.jgrapht.graph.ClassBasedEdgeFactory;
 import org.jgrapht.graph.DirectedMultigraph;
+import uk.ac.ebi.quickgo.ontology.model.AncestorGraph;
+import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
+import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toSet;
 
@@ -39,6 +39,20 @@ public class OntologyGraph implements OntologyGraphTraversal {
 
     public OntologyGraph() {
         ontology = new DirectedMultigraph<>(new ClassBasedEdgeFactory<>(OntologyRelationship.class));
+    }
+
+    private static String getOppositeVertex(Graph<String, OntologyRelationship> graph, OntologyRelationship edge,
+                                            String vertex) {
+        String source = graph.getEdgeSource(edge);
+        String target = graph.getEdgeTarget(edge);
+        if (vertex.equals(source)) {
+            return target;
+        } else if (vertex.equals(target)) {
+            return source;
+        } else {
+            throw new IllegalArgumentException(
+                    "No such graph vertex: " + vertex);
+        }
     }
 
     public Set<OntologyRelationship> getEdges() {
@@ -179,11 +193,12 @@ public class OntologyGraph implements OntologyGraphTraversal {
         AncestorGraph ancestorGraph = new AncestorGraph(edgesFound, ancestorsFound);
 
         for (String base : baseVertices) {
-            if(!vertexIsStopNode(base, stopNodes)){
-                addParentsToAncestorGraph(base, stopNodes, targetRelations, ancestorGraph);
-            }
             if(ontology.containsVertex(base)) {
                 ancestorGraph.vertices.add(base);
+
+                if (!stopNodes.contains(base)) {
+                    addParentsToAncestorGraph(base, stopNodes, targetRelations, ancestorGraph);
+                }
             }
         }
         return ancestorGraph;
@@ -258,20 +273,6 @@ public class OntologyGraph implements OntologyGraphTraversal {
 
     private boolean vertexIsStopNode(String vertex, Set<String> stopNodes) {
         return stopNodes.contains(vertex);
-    }
-
-    private static String getOppositeVertex(Graph<String, OntologyRelationship> graph, OntologyRelationship edge,
-            String vertex) {
-        String source = graph.getEdgeSource(edge);
-        String target = graph.getEdgeTarget(edge);
-        if (vertex.equals(source)) {
-            return target;
-        } else if (vertex.equals(target)) {
-            return source;
-        } else {
-            throw new IllegalArgumentException(
-                    "No such graph vertex: " + vertex);
-        }
     }
 
     private boolean isNullOrEmpty(Collection<?> collection) {
