@@ -212,10 +212,11 @@ public class OntologyGraph implements OntologyGraphTraversal {
         } catch (Exception e) {
            return;
         }
-        Set<String> parentVertices = parents.stream()
-                                            .map(p -> p.parent)
-                                            .collect(toSet());
+
         if (!parents.isEmpty()) {
+            Set<String> parentVertices = parents.stream()
+                                                .map(p -> p.parent)
+                                                .collect(toSet());
             AncestorGraph parentSubGraph = this.subGraph(parentVertices, stopNodes, targetRelations);
             ancestorGraph.edges.addAll(parentSubGraph.edges);
             ancestorGraph.vertices.addAll(parentSubGraph.vertices);
