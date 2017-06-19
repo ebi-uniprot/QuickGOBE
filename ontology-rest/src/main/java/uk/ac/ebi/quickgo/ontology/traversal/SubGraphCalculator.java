@@ -8,6 +8,8 @@ import java.util.Deque;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Encapsulates the calculation of a edges for a single vertex, and the creation of further instances for vertexes
@@ -18,6 +20,8 @@ import java.util.Set;
  * Created with IntelliJ IDEA.
  */
 class SubGraphCalculator {
+
+    private static Logger LOGGER = LoggerFactory.getLogger(SubGraphCalculator.class);
 
     static Trampoline<AncestorGraph> createTrampoline(Deque<String> targetVertices, Set<String> stopNodes,
             OntologyRelationType[] targetRelations, AncestorGraph ancestorGraph, OntologyGraph ontologyGraph) {
@@ -39,7 +43,8 @@ class SubGraphCalculator {
                         addParentsToWorkQueue(targetVertices, parents);
 
                     } catch (Exception e) {
-                        //continue processing.
+                        LOGGER.error("SubGraphCalculator#createTrampoline looked up parents for " + target + " but " +
+                                             "received exception ", e);
                     }
                 }
             }
