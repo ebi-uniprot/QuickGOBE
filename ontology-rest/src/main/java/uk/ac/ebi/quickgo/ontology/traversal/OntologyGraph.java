@@ -180,7 +180,7 @@ public class OntologyGraph implements OntologyGraphTraversal {
             OntologyRelationType... relations) {
         Preconditions.checkArgument(!isNullOrEmpty(baseVertices), "Starting vertices cannot be null/empty.");
 
-        stopNodes.addAll(STOP_NODES);
+        stopNodes.addAll(STOP_NODES); //todo ECO
         OntologyRelationType[] targetRelations = useAllRelationsIfNotSpecified(relations); //todo ECO
         AncestorGraph ancestorGraph = AncestorGraph.create();
         Deque<String> targetVertices = new LinkedList<>();
@@ -193,7 +193,6 @@ public class OntologyGraph implements OntologyGraphTraversal {
         Set<OntologyRelationType> relationsSet = createRelevantRelationsSet(relations);
         return relationsSet.toArray(new OntologyRelationType[]{});
     }
-
 
     private void subgraphOnlyForVertexesThatAppearInGraph(Set<String> baseVertices, Deque<String> targetVertices) {
         baseVertices.stream()
