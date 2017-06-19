@@ -180,48 +180,25 @@ public class OntologyGraph implements OntologyGraphTraversal {
             OntologyRelationType... relations) {
         Preconditions.checkArgument(!isNullOrEmpty(baseVertices), "Starting vertices cannot be null/empty.");
 
-        if(stopNodes.isEmpty()){
-            stopNodes.addAll(STOP_NODES);
-        }
-
-        Set<OntologyRelationType> relationsSet = createRelevantRelationsSet(relations);
-        OntologyRelationType[] targetRelations = relationsSet.toArray(new OntologyRelationType[]{});
-
-        Set<String> ancestorsFound = new HashSet<>();
-        Set<OntologyRelationship> edgesFound = new HashSet<>();
-
-        AncestorGraph ancestorGraph = new AncestorGraph(edgesFound, ancestorsFound);
-
-        for (String base : baseVertices) {
-            if(ontology.containsVertex(base)) {
-                ancestorGraph.vertices.add(base);
-
-                if (!stopNodes.contains(base)) {
-                    addParentsToAncestorGraph(base, stopNodes, targetRelations, ancestorGraph);
-                }
-            }
-        }
+        stopNodes.addAll(STOP_NODES);
+        OntologyRelationType[] targetRelations = useAllRelationsIfNotSpecified(relations); //todo ECO
+        AncestorGraph ancestorGraph = AncestorGraph.create();
+        Deque<String> targetVertices = new LinkedList<>();
+        subgraphOnlyForVertexesThatAppearInGraph(baseVertices, targetVertices);
+        SubGraphCalculator.createTrampoline(targetVertices, stopNodes, targetRelations, ancestorGraph, this).compute();
         return ancestorGraph;
     }
 
-    private void addParentsToAncestorGraph(String base, Set<String> stopNodes, OntologyRelationType[] targetRelations,
-            AncestorGraph ancestorGraph) {
-        Set<OntologyRelationship> parents = null;
-        try {
-            parents = this.parents(base, targetRelations);
-        } catch (Exception e) {
-           return;
-        }
+    private OntologyRelationType[] useAllRelationsIfNotSpecified(OntologyRelationType[] relations) {
+        Set<OntologyRelationType> relationsSet = createRelevantRelationsSet(relations);
+        return relationsSet.toArray(new OntologyRelationType[]{});
+    }
 
-        if (!parents.isEmpty()) {
-            Set<String> parentVertices = parents.stream()
-                                                .map(p -> p.parent)
-                                                .collect(toSet());
-            AncestorGraph parentSubGraph = this.subGraph(parentVertices, stopNodes, targetRelations);
-            ancestorGraph.edges.addAll(parentSubGraph.edges);
-            ancestorGraph.vertices.addAll(parentSubGraph.vertices);
-        }
-        ancestorGraph.edges.addAll(parents);
+
+    private void subgraphOnlyForVertexesThatAppearInGraph(Set<String> baseVertices, Deque<String> targetVertices) {
+        baseVertices.stream()
+                    .filter(b -> ontology.containsVertex(b))
+                    .forEach(b -> targetVertices.add(b));
     }
 
     @Override public int hashCode() {
