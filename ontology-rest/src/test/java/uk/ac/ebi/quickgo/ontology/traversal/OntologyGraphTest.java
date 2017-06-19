@@ -790,7 +790,7 @@ public class OntologyGraphTest {
         }
 
         @Test
-        public void findSubGraphSpecifyingRelationsSpecifyStopNode() {
+        public void findSubGraphSpecifyingRelationsDoNotSpecifyStopNode() {
             final HashSet<String> baseVertices = new HashSet<>(Collections.singletonList(catalyticActivity.id));
             final Set<String> stopNodes =  new HashSet<>();
             final OntologyRelationType[] relations = {OntologyRelationType.IS_A};
