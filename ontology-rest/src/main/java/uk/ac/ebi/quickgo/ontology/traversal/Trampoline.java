@@ -7,7 +7,7 @@ import java.util.Optional;
  * <p>
  * https://stackoverflow.com/questions/32685660/achieving-stackless-recursion-in-java-8
  * <p>
- * Created by Tony on 17-Jun-17.
+ * Created by Tony Wardell on 17-Jun-17.
  */
 public class Trampoline<T> {
     public T getValue() {
@@ -18,7 +18,7 @@ public class Trampoline<T> {
         return Optional.empty();
     }
 
-    public final T compute() {
+    final T compute() {
         Trampoline<T> trampoline = this;
 
         while (trampoline.nextTrampoline().isPresent()) {
