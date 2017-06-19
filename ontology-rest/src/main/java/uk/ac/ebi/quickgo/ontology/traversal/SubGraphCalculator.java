@@ -24,33 +24,43 @@ class SubGraphCalculator {
 
         String target = targetVertices.pollFirst();
 
-        if(Objects.nonNull(target)){
-            ancestorGraph.vertices.add(target);
-        }
+        if (Objects.nonNull(target)) {
 
-        //if target is null, or is a stop node, and we don't have any more to process then don't create any more
-        if (Objects.isNull(target) || stopNodes.contains(target) && targetVertices.isEmpty()){
-            return new Trampoline<AncestorGraph>(){
-                public AncestorGraph getValue() { return ancestorGraph; }
-            };
-        }
+            //Process this node if it hasn't already been considered.
+            if (!ancestorGraph.vertices.contains(target)) {
+                ancestorGraph.vertices.add(target);
 
-        try {
-            Set<OntologyRelationship> parents = ontologyGraph.parents(target, targetRelations);
-            ancestorGraph.edges.addAll(parents);
-            addParentsToWorkQueue(targetVertices, parents);
+                //if target is not a stop node look for parents
+                if (!stopNodes.contains(target)) {
 
-        } catch (Exception e) {
-            return new Trampoline<AncestorGraph>(){
-                public AncestorGraph getValue() { return ancestorGraph; }
-            };
-        }
+                    try {
+                        Set<OntologyRelationship> parents = ontologyGraph.parents(target, targetRelations);
+                        ancestorGraph.edges.addAll(parents);
+                        addParentsToWorkQueue(targetVertices, parents);
 
-        return new Trampoline<AncestorGraph>() {
-            public Optional<Trampoline<AncestorGraph>> nextTrampoline() {
-                return Optional.of(createTrampoline(targetVertices, stopNodes, targetRelations, ancestorGraph, ontologyGraph));
+                    } catch (Exception e) {
+                        //continue processing.
+                    }
+                }
             }
+
+            if(!targetVertices.isEmpty()) {
+                return new Trampoline<AncestorGraph>() {
+                    public Optional<Trampoline<AncestorGraph>> nextTrampoline() {
+                        return Optional.of(createTrampoline(targetVertices,
+                                                            stopNodes,
+                                                            targetRelations,
+                                                            ancestorGraph,
+                                                            ontologyGraph));
+                    }
+                };
+            }
+
+        }
+        return new Trampoline<AncestorGraph>() {
+            public AncestorGraph getValue() { return ancestorGraph; }
         };
+
     }
 
     private static void addParentsToWorkQueue(Deque<String> targetVertices, Set<OntologyRelationship> parents) {
