@@ -939,6 +939,43 @@ public class OntologyGraphTest {
             assertThat(ancestorGraph.edges, hasSize(0));
         }
 
+
+        @Test
+        public void cyclicalOntologyDoNotHitCycleAsHitStopNodeFirst() {
+            OntologyRelationship mf_OI_py = new OntologyRelationship(molecularFunction.id,
+                                                                     pyrophosphataseActivity.id, OCCURS_IN);
+            og.addRelationships(asList(mf_OI_py));
+            final HashSet<String> baseVertices = new HashSet<>(Collections.singletonList(pyrophosphataseActivity.id));
+            final HashSet<String> stopNodes = new HashSet<>();
+            final OntologyRelationType[] relations = {};
+
+            AncestorGraph ancestorGraph = og.subGraph(baseVertices, stopNodes, relations);
+
+            assertThat(ancestorGraph.vertices, hasSize(4));
+            assertThat(ancestorGraph.vertices, containsInAnyOrder(pyrophosphataseActivity.id, cyclaseActivity.id,
+                                                                  catalyticActivity.id, molecularFunction.id));
+            assertThat(ancestorGraph.edges, hasSize(3));
+            assertThat(ancestorGraph.edges, containsInAnyOrder(py_IA_cy, cy_IA_ca, ca_IA_mf));
+        }
+
+        @Test
+        public void findSubGraphForWhereRelationshipsCanBeCyclical() {
+            OntologyRelationship ca_OI_py = new OntologyRelationship(catalyticActivity.id,
+                                                                     pyrophosphataseActivity.id, OCCURS_IN);
+            og.addRelationships(asList(ca_OI_py));
+            final HashSet<String> baseVertices = new HashSet<>(Collections.singletonList(pyrophosphataseActivity.id));
+            final HashSet<String> stopNodes = new HashSet<>();
+            final OntologyRelationType[] relations = {};
+
+            AncestorGraph ancestorGraph = og.subGraph(baseVertices, stopNodes, relations);
+
+            assertThat(ancestorGraph.vertices, hasSize(4));
+            assertThat(ancestorGraph.vertices, containsInAnyOrder(pyrophosphataseActivity.id, cyclaseActivity.id,
+                                                                  catalyticActivity.id, molecularFunction.id));
+            assertThat(ancestorGraph.edges, hasSize(4));
+            assertThat(ancestorGraph.edges, containsInAnyOrder(py_IA_cy, cy_IA_ca, ca_IA_mf, ca_OI_py));
+        }
+
         private class OntologyVertex {
             final String id;
             final String name;
