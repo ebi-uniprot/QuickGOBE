@@ -176,13 +176,13 @@ public class OntologyGraph implements OntologyGraphTraversal {
                 .collect(toSet());
     }
 
-    @Override public AncestorGraph subGraph(Set<String> baseVertices, Set<String> stopNodes,
+    @Override public AncestorGraph<String> subGraph(Set<String> baseVertices, Set<String> stopNodes,
             OntologyRelationType... relations) {
         Preconditions.checkArgument(!isNullOrEmpty(baseVertices), "Starting vertices cannot be null/empty.");
 
         stopNodes.addAll(STOP_NODES); //todo ECO
         OntologyRelationType[] targetRelations = useAllRelationsIfNotSpecified(relations); //todo ECO
-        AncestorGraph ancestorGraph = AncestorGraph.create();
+        AncestorGraph<String> ancestorGraph = new AncestorGraph<>(new HashSet<>(), new HashSet<>());
         Deque<String> targetVertices = new LinkedList<>();
         subgraphOnlyForVertexesThatAppearInGraph(baseVertices, targetVertices);
         SubGraphCalculator.createTrampoline(targetVertices, stopNodes, targetRelations, ancestorGraph, this).compute();
