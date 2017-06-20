@@ -416,18 +416,18 @@ public abstract class OBOController<T extends OBOTerm> {
     /**
      * Retrieves a subgraph of the ontology graph information as jason
      *
-     * @param baseIds the term ids whose image is required
+     * @param startIds the term ids whose image is required
      * @param stopIds the term ids whose image is required
      * @return the json data corresponding to the requested term ids
      */
     @ApiOperation(value = "")
     @RequestMapping(value = TERMS_RESOURCE + "/graph", method = RequestMethod.GET, produces = {MediaType
             .APPLICATION_JSON_VALUE})
-    public ResponseEntity<QueryResult<AncestorGraph>> getGraph(@RequestParam(value = "baseIds") String baseIds,
+    public ResponseEntity<QueryResult<AncestorGraph>> getGraph(@RequestParam(value = "startIds") String startIds,
             @RequestParam(value = "stopIds", required = false) String stopIds,
             @RequestParam(value = "relations", required = false) String relations) {
         final AncestorGraph<AncestorVertex> ancestorGraph = ontologyService.findOntologySubGraphById(
-                asSet(validationHelper.validateCSVIds(baseIds)),
+                asSet(validationHelper.validateCSVIds(startIds)),
                 asSet(validationHelper.validateCSVIds(stopIds)),
                 emptyOrValidatedRelations(relations));
 

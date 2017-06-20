@@ -139,9 +139,9 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
     }
 
     @Override
-    public AncestorGraph<AncestorVertex> findOntologySubGraphById(Set<String> startingIds, Set<String> endingIds,
+    public AncestorGraph<AncestorVertex> findOntologySubGraphById(Set<String> startIds, Set<String> stopIds,
             OntologyRelationType... relations) {
-        AncestorGraph<String> ancestorGraph = ontologyTraversal.subGraph(startingIds, endingIds, relations);
+        AncestorGraph<String> ancestorGraph = ontologyTraversal.subGraph(startIds, stopIds, relations);
         Set<AncestorVertex> coreVertices = new HashSet<>();
         if (!ancestorGraph.vertices.isEmpty()) {
             List<T> coreList = this.findCoreInfoByOntologyId(new ArrayList<>(ancestorGraph.vertices));

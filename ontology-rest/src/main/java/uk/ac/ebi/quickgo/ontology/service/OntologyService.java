@@ -132,7 +132,7 @@ public interface OntologyService<T extends OBOTerm> {
      *                  By omitting a {@code relation} value, all paths will be returned.
      * @return a {@link AncestorGraph} corresponding to the sub-graph of ontology constrained by the selected ids.
      */
-    AncestorGraph<AncestorVertex> findOntologySubGraphById(Set<String> startingIds, Set<String> endingIds,
+    AncestorGraph<AncestorVertex> findOntologySubGraphById(Set<String> startIds, Set<String> stopIds,
             OntologyRelationType... relations);
 
 }

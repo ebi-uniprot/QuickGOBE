@@ -866,8 +866,8 @@ public abstract class OBOControllerIT {
 
     @Test
     public void canFetchAncestorGraphFor1Term() throws Exception {
-        String baseId = relationships.get(0).child;
-        ResultActions response = mockMvc.perform(get(resourceUrl + "/terms/graph").param("baseIds", baseId));
+        String startIds = relationships.get(0).child;
+        ResultActions response = mockMvc.perform(get(resourceUrl + "/terms/graph").param("startIds", startIds));
 
         response.andDo(print())
                 .andExpect(jsonPath("$.numberOfHits").value(1))
@@ -876,9 +876,9 @@ public abstract class OBOControllerIT {
 
     @Test
     public void canFetchAncestorGraphForMultipleTerms() throws Exception {
-        String baseIds = relationships.stream().limit(10).map(r -> r.child).collect(Collectors.joining(","));
+        String startIds = relationships.stream().limit(10).map(r -> r.child).collect(Collectors.joining(","));
 
-        ResultActions response = mockMvc.perform(get(resourceUrl + "/terms/graph").param("baseIds", baseIds));
+        ResultActions response = mockMvc.perform(get(resourceUrl + "/terms/graph").param("startIds", startIds));
 
         response.andDo(print())
                 .andExpect(jsonPath("$.numberOfHits").value(1))
@@ -887,7 +887,7 @@ public abstract class OBOControllerIT {
 
     @Test
     public void fetchingGraphForUnknownTermResultsInEmptyResult() throws Exception {
-        ResultActions response = mockMvc.perform(get(resourceUrl + "/terms/graph").param("baseIds",
+        ResultActions response = mockMvc.perform(get(resourceUrl + "/terms/graph").param("startIds",
                                                                                          idMissingInRepository()));
 
         response.andDo(print())

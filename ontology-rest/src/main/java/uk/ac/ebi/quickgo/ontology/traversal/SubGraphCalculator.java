@@ -23,7 +23,7 @@ class SubGraphCalculator {
 
     private static Logger LOGGER = LoggerFactory.getLogger(SubGraphCalculator.class);
 
-    static Trampoline<AncestorGraph> createTrampoline(Deque<String> targetVertices, Set<String> stopNodes,
+    static Trampoline<AncestorGraph> createTrampoline(Deque<String> targetVertices, Set<String> stopVertices,
             OntologyRelationType[] targetRelations, AncestorGraph ancestorGraph, OntologyGraph ontologyGraph) {
 
         String target = targetVertices.pollFirst();
@@ -35,7 +35,7 @@ class SubGraphCalculator {
                 ancestorGraph.vertices.add(target);
 
                 //if target is not a stop node look for parents
-                if (!stopNodes.contains(target)) {
+                if (!stopVertices.contains(target)) {
 
                     try {
                         Set<OntologyRelationship> parents = ontologyGraph.parents(target, targetRelations);
@@ -53,7 +53,7 @@ class SubGraphCalculator {
                 return new Trampoline<AncestorGraph>() {
                     public Optional<Trampoline<AncestorGraph>> nextTrampoline() {
                         return Optional.of(createTrampoline(targetVertices,
-                                                            stopNodes,
+                                                            stopVertices,
                                                             targetRelations,
                                                             ancestorGraph,
                                                             ontologyGraph));
