@@ -767,7 +767,7 @@ public class OntologyGraphTest {
             final Set<String> stopNodes = new HashSet<>();
             final OntologyRelationType[] relations = {};
 
-            AncestorGraph ancestorGraph = og.subGraph(baseVertices, stopNodes, relations);
+            AncestorGraph<String> ancestorGraph = og.subGraph(baseVertices, stopNodes, relations);
 
             assertThat(ancestorGraph.vertices, hasSize(2));
             assertThat(ancestorGraph.vertices, containsInAnyOrder(catalyticActivity.id, molecularFunction.id));
@@ -781,7 +781,7 @@ public class OntologyGraphTest {
             final HashSet<String> stopNodes = new HashSet<>(Collections.singletonList(molecularFunction.id));
             final OntologyRelationType[] relations = {};
 
-            AncestorGraph ancestorGraph = og.subGraph(baseVertices, stopNodes, relations);
+            AncestorGraph<String> ancestorGraph = og.subGraph(baseVertices, stopNodes, relations);
 
             assertThat(ancestorGraph.vertices, hasSize(2));
             assertThat(ancestorGraph.vertices, containsInAnyOrder(catalyticActivity.id, molecularFunction.id));
@@ -795,7 +795,7 @@ public class OntologyGraphTest {
             final Set<String> stopNodes =  new HashSet<>();
             final OntologyRelationType[] relations = {OntologyRelationType.IS_A};
 
-            AncestorGraph ancestorGraph = og.subGraph(baseVertices, stopNodes, relations);
+            AncestorGraph<String> ancestorGraph = og.subGraph(baseVertices, stopNodes, relations);
 
             assertThat(ancestorGraph.vertices, hasSize(2));
             assertThat(ancestorGraph.vertices, containsInAnyOrder(catalyticActivity.id, molecularFunction.id));
@@ -809,7 +809,7 @@ public class OntologyGraphTest {
             final HashSet<String> stopNodes = new HashSet<>(Collections.singletonList(catalyticActivity.id));
             final OntologyRelationType[] relations = {OntologyRelationType.IS_A};
 
-            AncestorGraph ancestorGraph = og.subGraph(baseVertices, stopNodes, relations);
+            AncestorGraph<String> ancestorGraph = og.subGraph(baseVertices, stopNodes, relations);
 
             assertThat(ancestorGraph.vertices, hasSize(3));
             assertThat(ancestorGraph.vertices, containsInAnyOrder(pyrophosphataseActivity.id, cyclaseActivity.id,
@@ -826,7 +826,7 @@ public class OntologyGraphTest {
             final HashSet<String> stopNodes = new HashSet<>();
             final OntologyRelationType[] relations = {};
 
-            AncestorGraph ancestorGraph = og.subGraph(baseVertices, stopNodes, relations);
+            AncestorGraph<String> ancestorGraph = og.subGraph(baseVertices, stopNodes, relations);
 
             assertThat(ancestorGraph.vertices, hasSize(4));
             assertThat(ancestorGraph.vertices, containsInAnyOrder(pyrophosphataseActivity.id, cyclaseActivity.id,
@@ -844,7 +844,7 @@ public class OntologyGraphTest {
             final HashSet<String> stopNodes = new HashSet<>();
             final OntologyRelationType[] relations = {};
 
-            AncestorGraph ancestorGraph = og.subGraph(baseVertices, stopNodes, relations);
+            AncestorGraph<String> ancestorGraph = og.subGraph(baseVertices, stopNodes, relations);
 
             assertThat(ancestorGraph.vertices, hasSize(4));
             assertThat(ancestorGraph.vertices, containsInAnyOrder(pyrophosphataseActivity.id, cyclaseActivity.id,
@@ -862,7 +862,7 @@ public class OntologyGraphTest {
             final HashSet<String> stopNodes = new HashSet<>();
             final OntologyRelationType[] relations = {OCCURS_IN};
 
-            AncestorGraph ancestorGraph = og.subGraph(baseVertices, stopNodes, relations);
+            AncestorGraph<String> ancestorGraph = og.subGraph(baseVertices, stopNodes, relations);
 
             assertThat(ancestorGraph.vertices, hasSize(2));
             assertThat(ancestorGraph.vertices, containsInAnyOrder(pyrophosphataseActivity.id, molecularFunction.id));
@@ -882,7 +882,7 @@ public class OntologyGraphTest {
             final HashSet<String> stopNodes = new HashSet<>();
             final OntologyRelationType[] relations = {IS_A};
 
-            AncestorGraph ancestorGraph = og.subGraph(baseVertices, stopNodes, relations);
+            AncestorGraph<String> ancestorGraph = og.subGraph(baseVertices, stopNodes, relations);
 
             assertThat(ancestorGraph.vertices, hasSize(4));
             assertThat(ancestorGraph.vertices, containsInAnyOrder(pyrophosphataseActivity.id, cyclaseActivity.id,
@@ -907,7 +907,7 @@ public class OntologyGraphTest {
             final Set<String> stopNodes = new HashSet<>();
             final OntologyRelationType[] relations = {};
 
-            AncestorGraph ancestorGraph = og.subGraph(baseVertices, stopNodes, relations);
+            AncestorGraph<String> ancestorGraph = og.subGraph(baseVertices, stopNodes, relations);
 
             assertThat(ancestorGraph.vertices, hasSize(0));
             assertThat(ancestorGraph.edges, hasSize(0));
@@ -919,7 +919,7 @@ public class OntologyGraphTest {
             final Set<String> stopNodes = new HashSet<>();
             final OntologyRelationType[] relations = {};
 
-            AncestorGraph ancestorGraph = og.subGraph(baseVertices, stopNodes, relations);
+            AncestorGraph<String> ancestorGraph = og.subGraph(baseVertices, stopNodes, relations);
 
             assertThat(ancestorGraph.vertices, hasSize(1));
             assertThat(ancestorGraph.vertices, containsInAnyOrder(molecularFunction.id));
@@ -932,7 +932,7 @@ public class OntologyGraphTest {
             final Set<String> stopNodes = new HashSet<>(Collections.singletonList(molecularFunction.id));
             final OntologyRelationType[] relations = {};
 
-            AncestorGraph ancestorGraph = og.subGraph(baseVertices, stopNodes, relations);
+            AncestorGraph<String> ancestorGraph = og.subGraph(baseVertices, stopNodes, relations);
 
             assertThat(ancestorGraph.vertices, hasSize(1));
             assertThat(ancestorGraph.vertices, containsInAnyOrder(molecularFunction.id));
@@ -949,7 +949,7 @@ public class OntologyGraphTest {
             final HashSet<String> stopNodes = new HashSet<>();
             final OntologyRelationType[] relations = {};
 
-            AncestorGraph ancestorGraph = og.subGraph(baseVertices, stopNodes, relations);
+            AncestorGraph<String> ancestorGraph = og.subGraph(baseVertices, stopNodes, relations);
 
             assertThat(ancestorGraph.vertices, hasSize(4));
             assertThat(ancestorGraph.vertices, containsInAnyOrder(pyrophosphataseActivity.id, cyclaseActivity.id,
@@ -967,7 +967,7 @@ public class OntologyGraphTest {
             final HashSet<String> stopNodes = new HashSet<>();
             final OntologyRelationType[] relations = {};
 
-            AncestorGraph ancestorGraph = og.subGraph(baseVertices, stopNodes, relations);
+            AncestorGraph<String> ancestorGraph = og.subGraph(baseVertices, stopNodes, relations);
 
             assertThat(ancestorGraph.vertices, hasSize(4));
             assertThat(ancestorGraph.vertices, containsInAnyOrder(pyrophosphataseActivity.id, cyclaseActivity.id,
