@@ -1,16 +1,9 @@
 package uk.ac.ebi.quickgo.ontology.service;
 
-import com.google.common.base.Preconditions;
-import org.slf4j.Logger;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
 import uk.ac.ebi.quickgo.ontology.common.OntologyType;
-import uk.ac.ebi.quickgo.ontology.model.AncestorGraph;
-import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
-import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
-import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
+import uk.ac.ebi.quickgo.ontology.model.*;
 import uk.ac.ebi.quickgo.ontology.service.converter.OntologyDocConverter;
 import uk.ac.ebi.quickgo.ontology.traversal.OntologyGraphTraversal;
 import uk.ac.ebi.quickgo.rest.search.QueryStringSanitizer;
@@ -18,12 +11,14 @@ import uk.ac.ebi.quickgo.rest.search.query.RegularPage;
 import uk.ac.ebi.quickgo.rest.search.results.PageInfo;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import com.google.common.base.Preconditions;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.slf4j.Logger;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import static java.util.Collections.singleton;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -144,9 +139,17 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
     }
 
     @Override
-    public AncestorGraph findOntologySubGraphById(Set<String> startingIds, Set<String> endingIds,
-            OntologyRelationType... relations){
-        return ontologyTraversal.subGraph(startingIds, endingIds, relations);
+    public AncestorGraph<AncestorVertex> findOntologySubGraphById(Set<String> startingIds, Set<String> endingIds,
+            OntologyRelationType... relations) {
+        AncestorGraph<String> ancestorGraph = ontologyTraversal.subGraph(startingIds, endingIds, relations);
+        Set<AncestorVertex> coreVertices = new HashSet<>();
+        if (!ancestorGraph.vertices.isEmpty()) {
+            List<T> coreList = this.findCoreInfoByOntologyId(new ArrayList<>(ancestorGraph.vertices));
+            coreList.stream()
+                    .map(coreInfo -> new AncestorVertex(coreInfo.id, coreInfo.name))
+                    .forEach(coreVertices::add);
+        }
+        return new AncestorGraph<>(ancestorGraph.edges, coreVertices);
     }
 
     List<String> buildIdList(List<String> ids) {
