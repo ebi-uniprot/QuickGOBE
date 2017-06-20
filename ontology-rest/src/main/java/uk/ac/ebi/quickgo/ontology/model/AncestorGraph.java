@@ -1,6 +1,5 @@
 package uk.ac.ebi.quickgo.ontology.model;
 
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -10,19 +9,13 @@ import java.util.Set;
  * Time: 10:47
  * Created with IntelliJ IDEA.
  */
-public class AncestorGraph {
+public class AncestorGraph<T> {
 
     public final Set<OntologyRelationship> edges;
-    public final Set<String> vertices;
+    public final Set<T> vertices;
 
-    public AncestorGraph(Set<OntologyRelationship> edges, Set<String> vertices) {
+    public AncestorGraph(Set<OntologyRelationship> edges, Set<T> vertices) {
         this.edges = edges;
         this.vertices = vertices;
-    }
-
-    public static AncestorGraph create() {
-        Set<String> ancestorsFound = new HashSet<>();
-        Set<OntologyRelationship> edgesFound = new HashSet<>();
-        return new AncestorGraph(edgesFound, ancestorsFound);
     }
 }
