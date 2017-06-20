@@ -939,7 +939,6 @@ public class OntologyGraphTest {
             assertThat(ancestorGraph.edges, hasSize(0));
         }
 
-
         @Test
         public void cyclicalOntologyDoNotHitCycleAsHitStopNodeFirst() {
             OntologyRelationship mf_OI_py = new OntologyRelationship(molecularFunction.id,
