@@ -8,10 +8,7 @@ import uk.ac.ebi.quickgo.ontology.OntologyRestConfig;
 import uk.ac.ebi.quickgo.ontology.common.OntologyFields;
 import uk.ac.ebi.quickgo.ontology.common.OntologyType;
 import uk.ac.ebi.quickgo.ontology.controller.validation.OBOControllerValidationHelper;
-import uk.ac.ebi.quickgo.ontology.model.AncestorGraph;
-import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
-import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
-import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
+import uk.ac.ebi.quickgo.ontology.model.*;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;
 import uk.ac.ebi.quickgo.ontology.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
@@ -429,7 +426,7 @@ public abstract class OBOController<T extends OBOTerm> {
     public ResponseEntity<QueryResult<AncestorGraph>> getGraph(@RequestParam(value = "baseIds") String baseIds,
             @RequestParam(value = "stopIds", required = false) String stopIds,
             @RequestParam(value = "relations", required = false) String relations) {
-        final AncestorGraph ancestorGraph = ontologyService.findOntologySubGraphById(
+        final AncestorGraph<AncestorVertex> ancestorGraph = ontologyService.findOntologySubGraphById(
                 asSet(validationHelper.validateCSVIds(baseIds)),
                 asSet(validationHelper.validateCSVIds(stopIds)),
                 emptyOrValidatedRelations(relations));
