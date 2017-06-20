@@ -88,6 +88,6 @@ public interface OntologyGraphTraversal {
      * edges of all relation types will be returned.
      * @return a graph from {@code child} to {@code parent} via {@code relations}
      */
-    AncestorGraph subGraph(Set<String> baseVertices, Set<String> stopVertices,
+    AncestorGraph<String> subGraph(Set<String> baseVertices, Set<String> stopVertices,
             OntologyRelationType... relations);
 }
