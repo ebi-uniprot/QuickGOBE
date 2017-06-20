@@ -2,10 +2,7 @@ package uk.ac.ebi.quickgo.ontology.service;
 
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
 import uk.ac.ebi.quickgo.ontology.common.OntologyType;
-import uk.ac.ebi.quickgo.ontology.model.AncestorGraph;
-import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
-import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
-import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
+import uk.ac.ebi.quickgo.ontology.model.*;
 import uk.ac.ebi.quickgo.rest.search.query.RegularPage;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
@@ -135,7 +132,7 @@ public interface OntologyService<T extends OBOTerm> {
      *                  By omitting a {@code relation} value, all paths will be returned.
      * @return a {@link AncestorGraph} corresponding to the sub-graph of ontology constrained by the selected ids.
      */
-    AncestorGraph findOntologySubGraphById(Set<String> startingIds, Set<String> endingIds,
+    AncestorGraph<AncestorVertex> findOntologySubGraphById(Set<String> startingIds, Set<String> endingIds,
             OntologyRelationType... relations);
 
 }
