@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.ontology.traversal;
 
-import uk.ac.ebi.quickgo.ontology.model.AncestorEdge;
-import uk.ac.ebi.quickgo.ontology.model.AncestorGraph;
+import uk.ac.ebi.quickgo.ontology.model.graph.AncestorEdge;
+import uk.ac.ebi.quickgo.ontology.model.graph.AncestorGraph;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
 
