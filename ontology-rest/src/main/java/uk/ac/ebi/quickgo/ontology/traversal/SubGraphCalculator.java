@@ -70,7 +70,7 @@ class SubGraphCalculator {
     private static Set<AncestorEdge> mapOntologyRelationshipsToAncestorEdges(Set<OntologyRelationship> parents) {
         Set<AncestorEdge> edgeSet = new HashSet<>();
         parents.stream()
-               .map(or -> new AncestorEdge(or.child, or.relationship.toString(), or.parent))
+               .map(or -> new AncestorEdge(or.child, or.relationship.getLongName(), or.parent))
                .forEach(edgeSet::add);
         return edgeSet;
     }

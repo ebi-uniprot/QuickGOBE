@@ -991,7 +991,7 @@ public class OntologyGraphTest {
         }
 
         private AncestorEdge toAE(OntologyRelationship or){
-            return new AncestorEdge(or.child, or.relationship.toString(), or.parent);
+            return new AncestorEdge(or.child, or.relationship.getLongName(), or.parent);
         }
     }
 }
