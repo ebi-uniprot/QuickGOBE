@@ -7,9 +7,10 @@ import org.jgrapht.GraphPath;
 import org.jgrapht.alg.AllDirectedPaths;
 import org.jgrapht.graph.ClassBasedEdgeFactory;
 import org.jgrapht.graph.DirectedMultigraph;
-import uk.ac.ebi.quickgo.ontology.model.AncestorGraph;
+import uk.ac.ebi.quickgo.ontology.model.graph.AncestorGraph;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
+import uk.ac.ebi.quickgo.ontology.model.graph.AncestorGraphRequest;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -180,12 +181,12 @@ public class OntologyGraph implements OntologyGraphTraversal {
             OntologyRelationType... relations) {
         Preconditions.checkArgument(!isNullOrEmpty(startVertices), "Starting vertices cannot be null/empty.");
 
-        stopVertices.addAll(STOP_NODES); //todo ECO
-        OntologyRelationType[] targetRelations = useAllRelationsIfNotSpecified(relations); //todo ECO
+        stopVertices.addAll(STOP_NODES);
+        OntologyRelationType[] targetRelations = useAllRelationsIfNotSpecified(relations);
         AncestorGraph<String> ancestorGraph = new AncestorGraph<>(new HashSet<>(), new HashSet<>());
-        Deque<String> targetVertices = new LinkedList<>();
-        subgraphOnlyForVertexesThatAppearInGraph(startVertices, targetVertices);
-        SubGraphCalculator.createTrampoline(targetVertices, stopVertices, targetRelations, ancestorGraph, this).compute();
+        Deque<String> targetVertices = buildTargetVertices(startVertices);
+        AncestorGraphRequest request = new AncestorGraphRequest(targetVertices, stopVertices, targetRelations);
+        SubGraphCalculator.createTrampoline(request, ancestorGraph, this).compute();
         return ancestorGraph;
     }
 
@@ -194,10 +195,12 @@ public class OntologyGraph implements OntologyGraphTraversal {
         return relationsSet.toArray(new OntologyRelationType[]{});
     }
 
-    private void subgraphOnlyForVertexesThatAppearInGraph(Set<String> baseVertices, Deque<String> targetVertices) {
+    private Deque<String> buildTargetVertices(Set<String> baseVertices) {
+        Deque<String> targetVertices = new LinkedList<>();
         baseVertices.stream()
                     .filter(b -> ontology.containsVertex(b))
                     .forEach(b -> targetVertices.add(b));
+        return targetVertices;
     }
 
     @Override public int hashCode() {
