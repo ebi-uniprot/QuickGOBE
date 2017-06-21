@@ -5,6 +5,7 @@ import uk.ac.ebi.quickgo.ontology.model.graph.AncestorGraph;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
 import uk.ac.ebi.quickgo.ontology.model.graph.AncestorGraphRequest;
 
+import com.google.common.base.Preconditions;
 import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,19 +23,23 @@ class SubGraphCalculator {
     private static Logger LOGGER = LoggerFactory.getLogger(SubGraphCalculator.class);
 
     static Trampoline<AncestorGraph> createTrampoline(AncestorGraphRequest request, AncestorGraph<String> ancestorGraph,
-            OntologyGraph ontologyGraph) {
+            OntologyGraphTraversal ontologyGraphTraversal) {
+        Preconditions.checkArgument(Objects.nonNull(request), "SubGraphCalculator#createTrampoline cannot accept an " +
+                "argument for request that is null");
+        Preconditions.checkArgument(Objects.nonNull(ancestorGraph), "SubGraphCalculator#createTrampoline cannot accept an " +
+                "argument for ancestorGraph that is null");
+        Preconditions.checkArgument(Objects.nonNull(ontologyGraphTraversal), "SubGraphCalculator#createTrampoline cannot accept an " +
+                "argument for ontologyGraphTraversal that is null");
+
         String target = request.targetVertices.pollFirst();
         if (Objects.nonNull(target)) {
-
-            //Process this node if it hasn't already been considered.
-            if (!ancestorGraph.vertices.contains(target)) {
-                ancestorGraph.vertices.add(target);
+            if (ancestorGraph.vertices.add(target)) {
 
                 //if target is not a stop node look for parents
                 if (!request.stopVertices.contains(target)) {
 
                     try {
-                        Set<OntologyRelationship> parents = ontologyGraph.parents(target, request.targetRelations);
+                        Set<OntologyRelationship> parents = ontologyGraphTraversal.parents(target, request.targetRelations);
                         addParentsToWorkQueue(request, parents);
                         ancestorGraph.edges.addAll(mapOntologyRelationshipsToAncestorEdges(parents));
 
@@ -50,7 +55,7 @@ class SubGraphCalculator {
                     public Optional<Trampoline<AncestorGraph>> nextTrampoline() {
                         return Optional.of(createTrampoline(request,
                                                             ancestorGraph,
-                                                            ontologyGraph));
+                                                            ontologyGraphTraversal));
                     }
                 };
             }
