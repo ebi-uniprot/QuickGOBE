@@ -44,4 +44,12 @@ public class AncestorEdge {
         result = 31 * result + (object != null ? object.hashCode() : 0);
         return result;
     }
+
+    @Override public String toString() {
+        return "AncestorEdge{" +
+                "subject='" + subject + '\'' +
+                ", predicate='" + predicate + '\'' +
+                ", object='" + object + '\'' +
+                '}';
+    }
 }
