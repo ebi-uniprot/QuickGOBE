@@ -4,6 +4,8 @@ import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
 import uk.ac.ebi.quickgo.ontology.common.OntologyType;
 import uk.ac.ebi.quickgo.ontology.model.*;
+import uk.ac.ebi.quickgo.ontology.model.graph.AncestorGraph;
+import uk.ac.ebi.quickgo.ontology.model.graph.AncestorVertex;
 import uk.ac.ebi.quickgo.ontology.service.converter.OntologyDocConverter;
 import uk.ac.ebi.quickgo.ontology.traversal.OntologyGraphTraversal;
 import uk.ac.ebi.quickgo.rest.search.QueryStringSanitizer;
