@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.ontology.model;
+package uk.ac.ebi.quickgo.ontology.model.graph;
 
 /**
  * Data structure for the vertex within an Ontology.

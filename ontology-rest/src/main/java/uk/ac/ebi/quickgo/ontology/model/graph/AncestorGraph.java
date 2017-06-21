@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.ontology.model;
+package uk.ac.ebi.quickgo.ontology.model.graph;
 
 
 import java.util.Set;
