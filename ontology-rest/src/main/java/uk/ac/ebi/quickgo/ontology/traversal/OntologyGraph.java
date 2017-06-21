@@ -251,10 +251,6 @@ public class OntologyGraph implements OntologyGraphTraversal {
         return startEndIntersection;
     }
 
-    private boolean vertexIsStopNode(String vertex, Set<String> stopNodes) {
-        return stopNodes.contains(vertex);
-    }
-
     private boolean isNullOrEmpty(Collection<?> collection) {
         return collection == null || collection.isEmpty();
     }
