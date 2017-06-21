@@ -127,8 +127,8 @@ public interface OntologyService<T extends OBOTerm> {
      * Find the set of ancestor vertices reachable from a list of ids, {@code ids}, navigable via a specified
      * set of relations.
      *
-     * @param startingIds a {@link Set} of ids whose ancestors one is interested in
-     * @param endingIds a {@link Set} of ids whose ancestors one is not interested in. An empty set means all
+     * @param startIds a {@link Set} of ids whose ancestors one is interested in
+     * @param stopIds a {@link Set} of ids whose ancestors one is not interested in. An empty set means all
      * ancestors are of interest.
      * @param relations a varargs value containing the relationships over which paths can only travel.
      *                  By omitting a {@code relation} value, all paths will be returned.
