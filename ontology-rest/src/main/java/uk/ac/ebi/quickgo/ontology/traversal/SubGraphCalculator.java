@@ -1,9 +1,9 @@
 package uk.ac.ebi.quickgo.ontology.traversal;
 
-import uk.ac.ebi.quickgo.ontology.model.AncestorEdge;
-import uk.ac.ebi.quickgo.ontology.model.AncestorGraph;
-import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
+import uk.ac.ebi.quickgo.ontology.model.graph.AncestorEdge;
+import uk.ac.ebi.quickgo.ontology.model.graph.AncestorGraph;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
+import uk.ac.ebi.quickgo.ontology.model.graph.AncestorGraphRequest;
 
 import java.util.*;
 import org.slf4j.Logger;
@@ -21,11 +21,9 @@ class SubGraphCalculator {
 
     private static Logger LOGGER = LoggerFactory.getLogger(SubGraphCalculator.class);
 
-    static Trampoline<AncestorGraph> createTrampoline(Deque<String> targetVertices, Set<String> stopVertices,
-            OntologyRelationType[] targetRelations, AncestorGraph<String> ancestorGraph, OntologyGraph ontologyGraph) {
-
-        String target = targetVertices.pollFirst();
-
+    static Trampoline<AncestorGraph> createTrampoline(AncestorGraphRequest request, AncestorGraph<String> ancestorGraph,
+            OntologyGraph ontologyGraph) {
+        String target = request.targetVertices.pollFirst();
         if (Objects.nonNull(target)) {
 
             //Process this node if it hasn't already been considered.
@@ -33,17 +31,12 @@ class SubGraphCalculator {
                 ancestorGraph.vertices.add(target);
 
                 //if target is not a stop node look for parents
-                if (!stopVertices.contains(target)) {
+                if (!request.stopVertices.contains(target)) {
 
                     try {
-                        Set<OntologyRelationship> parents = ontologyGraph.parents(target, targetRelations);
-                        addParentsToWorkQueue(targetVertices, parents);
-
-                        Set<AncestorEdge> edgeSet = new HashSet<>();
-                        parents.stream()
-                               .map(or -> new AncestorEdge(or.child, or.relationship.toString(), or.parent))
-                               .forEach(edgeSet::add);
-                        ancestorGraph.edges.addAll(edgeSet);
+                        Set<OntologyRelationship> parents = ontologyGraph.parents(target, request.targetRelations);
+                        addParentsToWorkQueue(request, parents);
+                        ancestorGraph.edges.addAll(mapOntologyRelationshipsToAncestorEdges(parents));
 
                     } catch (Exception e) {
                         LOGGER.error("SubGraphCalculator#createTrampoline looked up parents for " + target + " but " +
@@ -52,12 +45,10 @@ class SubGraphCalculator {
                 }
             }
 
-            if(!targetVertices.isEmpty()) {
+            if(!request.targetVertices.isEmpty()) {
                 return new Trampoline<AncestorGraph>() {
                     public Optional<Trampoline<AncestorGraph>> nextTrampoline() {
-                        return Optional.of(createTrampoline(targetVertices,
-                                                            stopVertices,
-                                                            targetRelations,
+                        return Optional.of(createTrampoline(request,
                                                             ancestorGraph,
                                                             ontologyGraph));
                     }
@@ -71,9 +62,17 @@ class SubGraphCalculator {
 
     }
 
-    private static void addParentsToWorkQueue(Deque<String> targetVertices, Set<OntologyRelationship> parents) {
+    private static Set<AncestorEdge> mapOntologyRelationshipsToAncestorEdges(Set<OntologyRelationship> parents) {
+        Set<AncestorEdge> edgeSet = new HashSet<>();
+        parents.stream()
+               .map(or -> new AncestorEdge(or.child, or.relationship.toString(), or.parent))
+               .forEach(edgeSet::add);
+        return edgeSet;
+    }
+
+    private static void addParentsToWorkQueue(AncestorGraphRequest request, Set<OntologyRelationship> parents) {
         parents.stream()
                .map(p -> p.parent)
-               .forEach(targetVertices::addLast);
+               .forEach(request.targetVertices::addLast);
     }
 }
