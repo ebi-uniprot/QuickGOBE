@@ -16,6 +16,7 @@ import org.junit.Test;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -66,9 +67,9 @@ public class SubGraphCalculatorTest {
         assertThat(ancestorGraph.vertices, hasSize(4));
         assertThat(ancestorGraph.vertices, containsInAnyOrder(pyrophosphataseActivity, cyclaseActivity,
                                                               catalyticActivity, molecularFunction));
-
         assertThat(ancestorGraph.edges, hasSize(3));
         assertThat(ancestorGraph.edges, containsInAnyOrder(toAE(py_IA_cy), toAE(cy_IA_ca), toAE(ca_IA_mf)));
+        ancestorGraph.edges.stream().forEach(e -> assertThat(e.predicate, equalTo("is_a")));
     }
 
     @Test
@@ -80,13 +81,12 @@ public class SubGraphCalculatorTest {
         assertThat(ancestorGraph.vertices, hasSize(3));
         assertThat(ancestorGraph.vertices, containsInAnyOrder(pyrophosphataseActivity, cyclaseActivity,
                                                               catalyticActivity));
-
         assertThat(ancestorGraph.edges, hasSize(2));
         assertThat(ancestorGraph.edges, containsInAnyOrder(toAE(py_IA_cy), toAE(cy_IA_ca)));
     }
 
     private AncestorEdge toAE(OntologyRelationship or){
-        return new AncestorEdge(or.child, or.relationship.toString(), or.parent);
+        return new AncestorEdge(or.child, or.relationship.getLongName(), or.parent);
     }
 
     @Test(expected = IllegalArgumentException.class)
