@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.ontology.traversal;
 
+import uk.ac.ebi.quickgo.ontology.model.AncestorEdge;
 import uk.ac.ebi.quickgo.ontology.model.AncestorGraph;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
@@ -772,7 +773,7 @@ public class OntologyGraphTest {
             assertThat(ancestorGraph.vertices, hasSize(2));
             assertThat(ancestorGraph.vertices, containsInAnyOrder(catalyticActivity.id, molecularFunction.id));
             assertThat(ancestorGraph.edges, hasSize(1));
-            assertThat(ancestorGraph.edges, containsInAnyOrder(ca_IA_mf));
+            assertThat(ancestorGraph.edges, containsInAnyOrder(toAE(ca_IA_mf)));
         }
 
         @Test
@@ -786,7 +787,7 @@ public class OntologyGraphTest {
             assertThat(ancestorGraph.vertices, hasSize(2));
             assertThat(ancestorGraph.vertices, containsInAnyOrder(catalyticActivity.id, molecularFunction.id));
             assertThat(ancestorGraph.edges, hasSize(1));
-            assertThat(ancestorGraph.edges, containsInAnyOrder(ca_IA_mf));
+            assertThat(ancestorGraph.edges, containsInAnyOrder(toAE(ca_IA_mf)));
         }
 
         @Test
@@ -800,7 +801,7 @@ public class OntologyGraphTest {
             assertThat(ancestorGraph.vertices, hasSize(2));
             assertThat(ancestorGraph.vertices, containsInAnyOrder(catalyticActivity.id, molecularFunction.id));
             assertThat(ancestorGraph.edges, hasSize(1));
-            assertThat(ancestorGraph.edges, containsInAnyOrder(ca_IA_mf));
+            assertThat(ancestorGraph.edges, containsInAnyOrder(toAE(ca_IA_mf)));
         }
 
         @Test
@@ -815,7 +816,7 @@ public class OntologyGraphTest {
             assertThat(ancestorGraph.vertices, containsInAnyOrder(pyrophosphataseActivity.id, cyclaseActivity.id,
                                                                   catalyticActivity.id));
             assertThat(ancestorGraph.edges, hasSize(2));
-            assertThat(ancestorGraph.edges, containsInAnyOrder(py_IA_cy, cy_IA_ca));
+            assertThat(ancestorGraph.edges, containsInAnyOrder(toAE(py_IA_cy), toAE(cy_IA_ca)));
         }
 
         @Test
@@ -832,7 +833,8 @@ public class OntologyGraphTest {
             assertThat(ancestorGraph.vertices, containsInAnyOrder(pyrophosphataseActivity.id, cyclaseActivity.id,
                                                                   catalyticActivity.id, molecularFunction.id));
             assertThat(ancestorGraph.edges, hasSize(4));
-            assertThat(ancestorGraph.edges, containsInAnyOrder(py_IA_cy, cy_IA_ca, ca_IA_mf, py_IA_mf));
+            assertThat(ancestorGraph.edges, containsInAnyOrder(toAE(py_IA_cy), toAE(cy_IA_ca), toAE(ca_IA_mf),
+                                                               toAE(py_IA_mf)));
         }
 
         @Test
@@ -850,7 +852,8 @@ public class OntologyGraphTest {
             assertThat(ancestorGraph.vertices, containsInAnyOrder(pyrophosphataseActivity.id, cyclaseActivity.id,
                                                                   catalyticActivity.id, molecularFunction.id));
             assertThat(ancestorGraph.edges, hasSize(4));
-            assertThat(ancestorGraph.edges, containsInAnyOrder(py_IA_cy, cy_IA_ca, ca_IA_mf, py_OI_mf));
+            assertThat(ancestorGraph.edges, containsInAnyOrder(toAE(py_IA_cy), toAE(cy_IA_ca), toAE(ca_IA_mf),
+                                                               toAE(py_OI_mf)));
         }
 
         @Test
@@ -867,7 +870,7 @@ public class OntologyGraphTest {
             assertThat(ancestorGraph.vertices, hasSize(2));
             assertThat(ancestorGraph.vertices, containsInAnyOrder(pyrophosphataseActivity.id, molecularFunction.id));
             assertThat(ancestorGraph.edges, hasSize(1));
-            assertThat(ancestorGraph.edges, containsInAnyOrder(py_OI_mf));
+            assertThat(ancestorGraph.edges, containsInAnyOrder(toAE(py_OI_mf)));
         }
 
         @Test
@@ -888,7 +891,7 @@ public class OntologyGraphTest {
             assertThat(ancestorGraph.vertices, containsInAnyOrder(pyrophosphataseActivity.id, cyclaseActivity.id,
                                                                   catalyticActivity.id, molecularFunction.id));
             assertThat(ancestorGraph.edges, hasSize(3));
-            assertThat(ancestorGraph.edges, containsInAnyOrder(py_IA_cy, cy_IA_ca, ca_IA_mf));
+            assertThat(ancestorGraph.edges, containsInAnyOrder(toAE(py_IA_cy), toAE(cy_IA_ca), toAE(ca_IA_mf)));
 
             //Now try un-related
             baseVertices = new HashSet<>(Collections.singletonList(estOfLocalization.id));
@@ -898,7 +901,7 @@ public class OntologyGraphTest {
             assertThat(ancestorGraph.vertices, containsInAnyOrder(estOfLocalization.id, localization.id,
                                                                   biologicalProcess.id));
             assertThat(ancestorGraph.edges, hasSize(2));
-            assertThat(ancestorGraph.edges, containsInAnyOrder(lo_IA_bp, el_IA_lo));
+            assertThat(ancestorGraph.edges, containsInAnyOrder(toAE(lo_IA_bp), toAE(el_IA_lo)));
         }
 
         @Test
@@ -954,7 +957,7 @@ public class OntologyGraphTest {
             assertThat(ancestorGraph.vertices, containsInAnyOrder(pyrophosphataseActivity.id, cyclaseActivity.id,
                                                                   catalyticActivity.id, molecularFunction.id));
             assertThat(ancestorGraph.edges, hasSize(3));
-            assertThat(ancestorGraph.edges, containsInAnyOrder(py_IA_cy, cy_IA_ca, ca_IA_mf));
+            assertThat(ancestorGraph.edges, containsInAnyOrder(toAE(py_IA_cy), toAE(cy_IA_ca), toAE(ca_IA_mf)));
         }
 
         @Test
@@ -972,7 +975,8 @@ public class OntologyGraphTest {
             assertThat(ancestorGraph.vertices, containsInAnyOrder(pyrophosphataseActivity.id, cyclaseActivity.id,
                                                                   catalyticActivity.id, molecularFunction.id));
             assertThat(ancestorGraph.edges, hasSize(4));
-            assertThat(ancestorGraph.edges, containsInAnyOrder(py_IA_cy, cy_IA_ca, ca_IA_mf, ca_OI_py));
+            assertThat(ancestorGraph.edges, containsInAnyOrder(toAE(py_IA_cy), toAE(cy_IA_ca), toAE(ca_IA_mf),
+                                                               toAE(ca_OI_py)));
         }
 
         private class OntologyVertex {
@@ -983,6 +987,10 @@ public class OntologyGraphTest {
                 this.id = id;
                 this.name = name;
             }
+        }
+
+        private AncestorEdge toAE(OntologyRelationship or){
+            return new AncestorEdge(or.child, or.relationship.toString(), or.parent);
         }
     }
 }

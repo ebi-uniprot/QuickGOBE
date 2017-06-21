@@ -485,11 +485,11 @@ public class OntologyServiceImplTest {
            // Set up results from OntologyGraph
             Set<String> fromIds = new HashSet<>(idsViaOntologyService(child));
             Set<String> toIds = new HashSet<>(idsViaOntologyService(parent));
-            final OntologyRelationship relationship = new OntologyRelationship(
+            final AncestorEdge relationship = new AncestorEdge(
                     child,
-                    parent,
-                    OntologyRelationType.IS_A);
-            final Set<OntologyRelationship> edges = new HashSet<>(Collections
+                    OntologyRelationType.IS_A.toString(),
+                    parent);
+            final Set<AncestorEdge> edges = new HashSet<>(Collections
                                                                               .singletonList(relationship));
             final Set<String> vertices = new HashSet<>(Arrays.asList(child, parent));
             when(ontologyTraversalMock.subGraph(fromIds, toIds))

@@ -1,13 +1,11 @@
 package uk.ac.ebi.quickgo.ontology.traversal;
 
+import uk.ac.ebi.quickgo.ontology.model.AncestorEdge;
 import uk.ac.ebi.quickgo.ontology.model.AncestorGraph;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
 
-import java.util.Deque;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,7 +22,7 @@ class SubGraphCalculator {
     private static Logger LOGGER = LoggerFactory.getLogger(SubGraphCalculator.class);
 
     static Trampoline<AncestorGraph> createTrampoline(Deque<String> targetVertices, Set<String> stopVertices,
-            OntologyRelationType[] targetRelations, AncestorGraph ancestorGraph, OntologyGraph ontologyGraph) {
+            OntologyRelationType[] targetRelations, AncestorGraph<String> ancestorGraph, OntologyGraph ontologyGraph) {
 
         String target = targetVertices.pollFirst();
 
@@ -39,8 +37,13 @@ class SubGraphCalculator {
 
                     try {
                         Set<OntologyRelationship> parents = ontologyGraph.parents(target, targetRelations);
-                        ancestorGraph.edges.addAll(parents);
                         addParentsToWorkQueue(targetVertices, parents);
+
+                        Set<AncestorEdge> edgeSet = new HashSet<>();
+                        parents.stream()
+                               .map(or -> new AncestorEdge(or.child, or.relationship.toString(), or.parent))
+                               .forEach(edgeSet::add);
+                        ancestorGraph.edges.addAll(edgeSet);
 
                     } catch (Exception e) {
                         LOGGER.error("SubGraphCalculator#createTrampoline looked up parents for " + target + " but " +
