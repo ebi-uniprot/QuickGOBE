@@ -1,9 +1,7 @@
 package uk.ac.ebi.quickgo.ontology.model;
 
 import com.fasterxml.jackson.annotation.JsonValue;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.Arrays.asList;
@@ -120,5 +118,9 @@ public enum OntologyRelationType {
                 || (this == IDENTITY)
                 || (type == this)
                 || (type == REGULATES && (this == POSITIVE_REGULATES || this == NEGATIVE_REGULATES));
+    }
+
+    public static HashSet<OntologyRelationType> createRelevantRelationsSet(OntologyRelationType... relations) {
+        return new HashSet<>(Arrays.asList(relations.length == 0 ? OntologyRelationType.values() : relations));
     }
 }
