@@ -120,7 +120,7 @@ public enum OntologyRelationType {
                 || (type == REGULATES && (this == POSITIVE_REGULATES || this == NEGATIVE_REGULATES));
     }
 
-    public static HashSet<OntologyRelationType> createRelevantRelationsSet(OntologyRelationType... relations) {
+    public static Set<OntologyRelationType> createRelevantRelationsSet(OntologyRelationType... relations) {
         return new HashSet<>(Arrays.asList(relations.length == 0 ? OntologyRelationType.values() : relations));
     }
 }
