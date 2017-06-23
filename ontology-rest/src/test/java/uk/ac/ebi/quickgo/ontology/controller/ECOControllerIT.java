@@ -46,6 +46,14 @@ public class ECOControllerIT extends OBOControllerIT {
         return String.format("ECO:%07d", idNum);
     }
 
+    @Override protected String getValidRelations() {
+        return "used_in";
+    }
+
+    @Override protected String getInvalidRelations(){
+        return "part_of";
+    }
+
     @Override
     protected String getResourceURL() {
         return RESOURCE_URL;
