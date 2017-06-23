@@ -105,6 +105,14 @@ public class GOControllerIT extends OBOControllerIT {
         return String.format("GO:%07d", idNum);
     }
 
+    @Override protected String getValidRelations() {
+        return "part_of";
+    }
+
+    @Override protected String getInvalidRelations(){
+        return "used_in";
+    }
+
     @Override
     protected List<OntologyDocument> createBasicDocs() {
         return Arrays.asList(
