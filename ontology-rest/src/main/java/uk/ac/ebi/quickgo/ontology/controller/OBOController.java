@@ -44,6 +44,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.DEFAULT_TRAVERSAL_TYPES;
 import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.DEFAULT_TRAVERSAL_TYPES_CSV;
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.and;
 
@@ -84,6 +85,7 @@ public abstract class OBOController<T extends OBOTerm> {
     private final OntologyRestConfig.OntologyPagingConfig ontologyPagingConfig;
     private final OntologyType ontologyType;
     private final HttpHeadersProvider httpHeadersProvider;
+    private final List<OntologyRelationType> allowedGraphTraversalTypes;
 
     public OBOController(OntologyService<T> ontologyService,
             SearchService<OBOTerm> ontologySearchService,
@@ -93,7 +95,8 @@ public abstract class OBOController<T extends OBOTerm> {
             OBOControllerValidationHelper oboControllerValidationHelper,
             OntologyRestConfig.OntologyPagingConfig ontologyPagingConfig,
             OntologyType ontologyType,
-            HttpHeadersProvider httpHeadersProvider) {
+            HttpHeadersProvider httpHeadersProvider,
+            List<OntologyRelationType> allowedGraphTraversalTypes) {
         checkArgument(ontologyService != null, "Ontology service cannot be null");
         checkArgument(ontologySearchService != null, "Ontology search service cannot be null");
         checkArgument(searchableField != null, "Ontology searchable field cannot be null");
@@ -103,6 +106,7 @@ public abstract class OBOController<T extends OBOTerm> {
         checkArgument(ontologyPagingConfig != null, "Paging config cannot be null");
         checkArgument(ontologyType != null, "Ontology type config cannot be null");
         checkArgument(httpHeadersProvider != null, "Http Headers Provider cannot be null");
+        checkArgument(allowedGraphTraversalTypes != null, "Allowed Graph Traversal Types cannot be null");
 
         this.ontologyService = ontologyService;
         this.ontologySearchService = ontologySearchService;
@@ -113,6 +117,7 @@ public abstract class OBOController<T extends OBOTerm> {
         this.ontologyPagingConfig = ontologyPagingConfig;
         this.ontologyType = ontologyType;
         this.httpHeadersProvider = httpHeadersProvider;
+        this.allowedGraphTraversalTypes = allowedGraphTraversalTypes;
     }
 
     /**
@@ -331,7 +336,8 @@ public abstract class OBOController<T extends OBOTerm> {
         return getResultsResponse(
                 ontologyService.findAncestorsInfoByOntologyId(
                         validationHelper.validateCSVIds(ids),
-                        asOntologyRelationTypeArray(validationHelper.validateRelationTypes(relations))));
+                        asOntologyRelationTypeArray(validationHelper.validateRelationTypes(relations,
+                                                                                           DEFAULT_TRAVERSAL_TYPES))));
     }
 
     /**
@@ -349,7 +355,8 @@ public abstract class OBOController<T extends OBOTerm> {
         return getResultsResponse(
                 ontologyService.findDescendantsInfoByOntologyId(
                         validationHelper.validateCSVIds(ids),
-                        asOntologyRelationTypeArray(validationHelper.validateRelationTypes(relations))));
+                        asOntologyRelationTypeArray(validationHelper.validateRelationTypes(relations,
+                                                                                           DEFAULT_TRAVERSAL_TYPES))));
     }
 
     /**
@@ -371,7 +378,8 @@ public abstract class OBOController<T extends OBOTerm> {
                 ontologyService.paths(
                         asSet(validationHelper.validateCSVIds(ids)),
                         asSet(validationHelper.validateCSVIds(toIds)),
-                        asOntologyRelationTypeArray(validationHelper.validateRelationTypes(relations))
+                        asOntologyRelationTypeArray(validationHelper.validateRelationTypes(relations,
+                                                                                           DEFAULT_TRAVERSAL_TYPES))
                 ));
     }
 
@@ -431,7 +439,7 @@ public abstract class OBOController<T extends OBOTerm> {
         final AncestorGraph<AncestorVertex> ancestorGraph = ontologyService.findOntologySubGraphById(
                 asSet(validationHelper.validateCSVIds(startIds)),
                 asSet(validationHelper.validateCSVIds(stopIds)),
-                emptyOrValidatedRelations(relations));
+                 validRelations(relations).toArray(new OntologyRelationType[]{}));
 
         if(ancestorGraph.vertices.size()== 0 && ancestorGraph.edges.size() == 0){
             return getResultsResponse(Collections.emptyList());
@@ -440,10 +448,9 @@ public abstract class OBOController<T extends OBOTerm> {
         }
     }
 
-    private OntologyRelationType[] emptyOrValidatedRelations(String relations) {
-        return Objects.isNull(relations) || relations.isEmpty() ? new
-                    OntologyRelationType[]{} :
-                    asOntologyRelationTypeArray(validationHelper.validateRelationTypes(relations));
+    private List<OntologyRelationType> validRelations(String relations) {
+        return Objects.isNull(relations) || relations.isEmpty() ? this.allowedGraphTraversalTypes :
+                    validationHelper.validateRelationTypes(relations, this.allowedGraphTraversalTypes);
     }
 
     /**
