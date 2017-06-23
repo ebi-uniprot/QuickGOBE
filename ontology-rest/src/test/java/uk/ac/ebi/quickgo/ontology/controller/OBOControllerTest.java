@@ -6,6 +6,7 @@ import uk.ac.ebi.quickgo.ontology.OntologyRestConfig;
 import uk.ac.ebi.quickgo.ontology.common.OntologyType;
 import uk.ac.ebi.quickgo.ontology.controller.validation.OBOControllerValidationHelper;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
+import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;
 import uk.ac.ebi.quickgo.ontology.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.rest.headers.HttpHeadersProvider;
@@ -13,7 +14,9 @@ import uk.ac.ebi.quickgo.rest.search.SearchService;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import org.junit.Before;
@@ -58,6 +61,7 @@ public class OBOControllerTest {
     @Mock
     private HttpHeadersProvider headersProvider;
     private OBOController<FakeOBOTerm> controller;
+    private List<OntologyRelationType> validRelations = new ArrayList<>();
 
     private static OBOController<FakeOBOTerm> createOBOController(
             final OntologyService<FakeOBOTerm> ontologyService, final SearchService<OBOTerm> searchService,
@@ -67,7 +71,8 @@ public class OBOControllerTest {
             OBOControllerValidationHelper oboControllerValidationHelper,
             OntologyRestConfig.OntologyPagingConfig ontologyPagingConfig,
             OntologyType ontologyType,
-            HttpHeadersProvider headersProvider) {
+            HttpHeadersProvider headersProvider,
+            List<OntologyRelationType> validRelations) {
         return new OBOController<FakeOBOTerm>(ontologyService,
                                               searchService,
                                               searchableField,
@@ -76,7 +81,8 @@ public class OBOControllerTest {
                                               oboControllerValidationHelper,
                                               ontologyPagingConfig,
                                               ontologyType,
-                                              headersProvider) {
+                                              headersProvider,
+                                              validRelations) {
         };
     }
 
@@ -91,7 +97,8 @@ public class OBOControllerTest {
                                               oboControllerValidationHelper,
                                               ontologyPagingConfig,
                                               OntologyType.GO,
-                                              headersProvider);
+                                              headersProvider,
+                                              validRelations);
     }
 
     @Test
@@ -127,7 +134,9 @@ public class OBOControllerTest {
                 graphImageService,
                 oboControllerValidationHelper,
                 ontologyPagingConfig,
-                OntologyType.GO, headersProvider);
+                OntologyType.GO,
+                headersProvider,
+                validRelations);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -139,7 +148,9 @@ public class OBOControllerTest {
                             graphImageService,
                             oboControllerValidationHelper,
                             ontologyPagingConfig,
-                            OntologyType.GO, headersProvider);
+                            OntologyType.GO,
+                            headersProvider,
+                            validRelations);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -151,7 +162,9 @@ public class OBOControllerTest {
                             graphImageService,
                             oboControllerValidationHelper,
                             ontologyPagingConfig,
-                            OntologyType.GO, headersProvider);
+                            OntologyType.GO,
+                            headersProvider,
+                            validRelations);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -163,7 +176,9 @@ public class OBOControllerTest {
                             graphImageService,
                             oboControllerValidationHelper,
                             ontologyPagingConfig,
-                            OntologyType.GO, headersProvider);
+                            OntologyType.GO,
+                            headersProvider,
+                            validRelations);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -175,25 +190,36 @@ public class OBOControllerTest {
                             null,
                             oboControllerValidationHelper,
                             ontologyPagingConfig,
-                            OntologyType.GO, headersProvider);
+                            OntologyType.GO,
+                            headersProvider,
+                            validRelations);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void controllerInstantiationFailsOnNullValidationHelper() {
         createOBOController(ontologyService, searchService, searchableField, retrievalConfig, graphImageService, null,
-                            ontologyPagingConfig, OntologyType.GO, headersProvider);
+                            ontologyPagingConfig, OntologyType.GO, headersProvider, validRelations);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void controllerInstantiationFailsOnNullPagingConfig() {
         createOBOController(ontologyService, searchService, searchableField, retrievalConfig, graphImageService,
-                            oboControllerValidationHelper, null, OntologyType.GO, headersProvider);
+                            oboControllerValidationHelper, null, OntologyType.GO, headersProvider,
+                            validRelations);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void controllerInstantiationFailsOnNullOntologyType() {
         createOBOController(ontologyService, searchService, searchableField, retrievalConfig, graphImageService,
-                            oboControllerValidationHelper, ontologyPagingConfig, null, headersProvider);
+                            oboControllerValidationHelper, ontologyPagingConfig, null, headersProvider,
+                            validRelations);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void controllerInstantiationFailsOnNullValidRelations() {
+        createOBOController(ontologyService, searchService, searchableField, retrievalConfig, graphImageService,
+                            oboControllerValidationHelper, ontologyPagingConfig, null, headersProvider,
+                              null);
     }
 
     private static class FakeOBOTerm extends OBOTerm {}
