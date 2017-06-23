@@ -895,6 +895,28 @@ public abstract class OBOControllerIT {
                 .andExpect(jsonPath("$.results").isArray());
     }
 
+    @Test
+    public void canUseValidRelationsForSubGraph() throws Exception{
+        String startIds = relationships.get(0).child;
+        ResultActions response = mockMvc.perform(get(getResourceURL() + "/terms/graph")
+                                                         .param("startIds", startIds)
+                                                         .param(RELATIONS_PARAM, getValidRelations() ));
+
+        response.andDo(print())
+                .andExpect(jsonPath("$.numberOfHits").value(1))
+                .andExpect(jsonPath("$.results").isArray());
+    }
+
+    @Test
+    public void cannotUseInvalidRelationsForSubGraph() throws Exception{
+        String startIds = relationships.get(0).child;
+        ResultActions response = mockMvc.perform(get(getResourceURL() + "/terms/graph")
+                                                         .param("startIds", startIds)
+                                                         .param(RELATIONS_PARAM, getInvalidRelations()));
+
+        expectUntransverseableRelationError(response, getInvalidRelations());
+    }
+
     //-----------------------  Check Http Header for Cache-Control content ------------------------------------------
 
     @Test
@@ -956,6 +978,10 @@ public abstract class OBOControllerIT {
     protected abstract String invalidId();
 
     protected abstract String createId(int idNum);
+
+    protected abstract String getValidRelations();
+
+    protected abstract String getInvalidRelations();
 
     protected ResultActions expectCoreFields(ResultActions result, String id) throws Exception {
         return expectCoreFields(result, id, "$.");
@@ -1048,6 +1074,15 @@ public abstract class OBOControllerIT {
                 .andExpect(jsonPath("$.url", is(requestUrl(result))))
                 .andExpect(jsonPath("$.messages", hasItem(
                         containsString("Unknown relationship requested: '" + relation + "'"))));
+    }
+
+    protected ResultActions expectUntransverseableRelationError(ResultActions result, String relation) throws
+                                                                                                       Exception {
+        return result
+                .andDo(print())
+                .andExpect(jsonPath("$.url", is(requestUrl(result))))
+                .andExpect(jsonPath("$.messages", hasItem(
+                        containsString("Cannot traverse over relation type: " + relation + ". Can only traverse over:"))));
     }
 
     protected ResultActions expectChartCreationError(ResultActions result, String messagePrefix) throws Exception {
