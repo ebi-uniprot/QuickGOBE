@@ -49,6 +49,19 @@ public enum OntologyRelationType {
                     .map(OntologyRelationType::getByLongName)
                     .collect(Collectors.toList());
 
+    public static final String GO_GRAPH_TRAVERSAL_TYPES_CSV = "is_a,part_of,occurs_in,regulates," +
+            "positively_regulates,negatively_regulates,has_part,capable_of,capable_of_part_of";
+    public static final List<OntologyRelationType> GO_GRAPH_TRAVERSAL_TYPES =
+            asList(GO_GRAPH_TRAVERSAL_TYPES_CSV.split(",")).stream()
+                                                           .map(OntologyRelationType::getByLongName)
+                                                           .collect(Collectors.toList());
+
+    public static final String ECO_GRAPH_TRAVERSAL_TYPES_CSV = "is_a,used_in";
+    public static final List<OntologyRelationType> ECO_GRAPH_TRAVERSAL_TYPES =
+            asList(ECO_GRAPH_TRAVERSAL_TYPES_CSV.split(",")).stream()
+                                                            .map(OntologyRelationType::getByLongName)
+                                                            .collect(Collectors.toList());
+
     OntologyRelationType(String shortName, String longName) {
         this.shortName = shortName;
         this.longName = longName;
