@@ -183,7 +183,10 @@ public class OntologyGraph implements OntologyGraphTraversal {
     @Override public AncestorGraph<String> subGraph(Set<String> startVertices, Set<String> stopVertices,
             OntologyRelationType... relations) {
         Preconditions.checkArgument(!isNullOrEmpty(startVertices), "Starting vertices cannot be null/empty.");
-
+        // Valid relationship list is ontology dependent and therefore must be supplied.
+        // We can't use the full list as there maybe edges with relationships that should not be displayed in the
+        // subgraph
+        Preconditions.checkArgument(Objects.nonNull(relations) && relations.length > 0, "Relations cannot be null");
         AncestorGraph<String> ancestorGraph = new AncestorGraph<>(new HashSet<>(), new HashSet<>());
         Deque<String> targetVertices = buildTargetVertices(startVertices);
         if(!targetVertices.isEmpty()){
