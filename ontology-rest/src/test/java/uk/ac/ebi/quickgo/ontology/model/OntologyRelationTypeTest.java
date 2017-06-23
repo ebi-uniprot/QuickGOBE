@@ -49,6 +49,20 @@ public class OntologyRelationTypeTest {
             }
         }
 
+        @Test
+        public void ensureGoTraversalTypesAreValid() {
+            for (String traversalType : GO_GRAPH_TRAVERSAL_TYPES_CSV.split(COMMA)) {
+                OntologyRelationType.getByLongName(traversalType);
+            }
+        }
+
+        @Test
+        public void ensureEcoTraversalTypesAreValid() {
+            for (String traversalType : GO_GRAPH_TRAVERSAL_TYPES_CSV.split(COMMA)) {
+                OntologyRelationType.getByLongName(traversalType);
+            }
+        }
+
         @Test(expected = IllegalArgumentException.class)
         public void invalidRelationshipCausesIllegalArgumentException() {
             OntologyRelationType.getByShortName("THIS_DOES_NOT_EXIST");
