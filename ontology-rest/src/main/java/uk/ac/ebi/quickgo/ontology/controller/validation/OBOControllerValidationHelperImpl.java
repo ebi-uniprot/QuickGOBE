@@ -27,7 +27,8 @@ public class OBOControllerValidationHelperImpl
         super(maxPageResults, validIDCondition);
     }
 
-    @Override public List<OntologyRelationType> validateRelationTypes(String relationTypesCSV) {
+    @Override public List<OntologyRelationType> validateRelationTypes(String relationTypesCSV,
+            List<OntologyRelationType> validTypes) {
         relationTypesCSV = relationTypesCSV.toLowerCase();
 
         List<String> relationTypeStrList = csvToList(relationTypesCSV);
@@ -43,7 +44,7 @@ public class OBOControllerValidationHelperImpl
             }
 
             if (relationType != null) {
-                checkValidTraversalRelationType(relationType);
+                checkValidTraversalRelationType(relationType, validTypes);
                 relationTypes.add(relationType);
             }
         }
@@ -51,10 +52,10 @@ public class OBOControllerValidationHelperImpl
         return relationTypes;
     }
 
-    void checkValidTraversalRelationType(OntologyRelationType relationType) {
-        if (!DEFAULT_TRAVERSAL_TYPES.contains(relationType)) {
+    void checkValidTraversalRelationType(OntologyRelationType relationType,List<OntologyRelationType> validTypes) {
+        if (!validTypes.contains(relationType)) {
             String errorMessage = "Cannot traverse over relation type: " + relationType.getLongName() + ". " +
-                    "Can only traverse over: " + DEFAULT_TRAVERSAL_TYPES_CSV;
+                    "Can only traverse over: " + validTypes;
             LOGGER.error(errorMessage);
             throw new ParameterException(errorMessage);
         }
