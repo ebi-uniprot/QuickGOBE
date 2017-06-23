@@ -15,8 +15,7 @@ import uk.ac.ebi.quickgo.ontology.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.rest.headers.HttpHeadersProvider;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
 
-import java.time.LocalTime;
-import java.util.function.Function;
+import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.ECO_GRAPH_TRAVERSAL_TYPES;
 
 /**
  * REST controller for accessing ECO related information.
@@ -41,6 +40,7 @@ public class ECOController extends OBOController<ECOTerm> {
            HttpHeadersProvider httpHeadersProvider
    ) {
         super(ecoOntologyService, ontologySearchService, searchableField, ontologyRetrievalConfig, graphImageService,
-                ecoValidationHelper, ontologyPagingConfig, OntologyType.ECO, httpHeadersProvider);
+              ecoValidationHelper, ontologyPagingConfig, OntologyType.ECO, httpHeadersProvider,
+              ECO_GRAPH_TRAVERSAL_TYPES);
     }
 }
