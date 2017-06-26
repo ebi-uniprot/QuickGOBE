@@ -64,6 +64,15 @@ public class Annotation {
 
     public int interactingTaxonId;
 
+    public String type;
+
+    /**
+     * Optional field whose value originates from the gene product service.
+     */
+    public List<String> synonyms;
+    public String name;
+
+
     @Override public String toString() {
         return "Annotation{" +
                 "id='" + id + '\'' +
@@ -85,6 +94,9 @@ public class Annotation {
                 ", symbol='" + symbol + '\'' +
                 ", date=" + date +
                 ", interactingTaxonId=" + interactingTaxonId +
+                ", synonym='" + synonyms + '\'' +
+                ", name='" + name + '\'' +
+                ", type='" + type + '\'' +
                 '}';
     }
 
@@ -152,7 +164,16 @@ public class Annotation {
         if (symbol != null ? !symbol.equals(that.symbol) : that.symbol != null) {
             return false;
         }
-        return date != null ? date.equals(that.date) : that.date == null;
+        if (date != null ? !date.equals(that.date) : that.date != null) {
+            return false;
+        }
+        if (synonyms != null ? !synonyms.equals(that.synonyms) : that.synonyms != null) {
+            return false;
+        }
+        if (name != null ? !name.equals(that.name) : that.name != null) {
+            return false;
+        }
+        return type != null ? type.equals(that.type) : that.type == null;
     }
 
     @Override public int hashCode() {
@@ -175,6 +196,9 @@ public class Annotation {
         result = 31 * result + (symbol != null ? symbol.hashCode() : 0);
         result = 31 * result + (date != null ? date.hashCode() : 0);
         result = 31 * result + interactingTaxonId;
+        result = 31 * result + (synonyms != null ? synonyms.hashCode() : 0);
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (type != null ? type.hashCode() : 0);
         return result;
     }
 
