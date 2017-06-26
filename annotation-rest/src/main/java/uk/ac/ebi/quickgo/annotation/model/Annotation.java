@@ -69,7 +69,7 @@ public class Annotation {
     /**
      * Optional field whose value originates from the gene product service.
      */
-    public List<String> synonyms;
+    public String synonyms;
     public String name;
 
 

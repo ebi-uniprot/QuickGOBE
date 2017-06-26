@@ -8,6 +8,8 @@ import uk.ac.ebi.quickgo.rest.search.results.transformer.AbstractValueInjector;
 
 import java.util.List;
 
+import static uk.ac.ebi.quickgo.common.converter.HelpfulConverter.toCSV;
+
 /**
  * This class is responsible for supplementing an {@link Annotation} instance, which contains
  * a gene product identifier, with a list of gene product synonyms, through the use of a RESTful service.
@@ -40,7 +42,7 @@ public class GeneProductSynonymsInjector extends AbstractValueInjector<BasicGene
 
         List<BasicGeneProduct.Result> results = response.getResults();
         if (!results.isEmpty()) {
-            annotation.synonyms = results.get(0).getSynonyms();
+            annotation.synonyms = toCSV(results.get(0).getSynonyms());
         }
     }
 }
