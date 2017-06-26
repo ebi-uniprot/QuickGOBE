@@ -32,7 +32,7 @@ public class GeneProductSynonymsInjector extends AbstractValueInjector<BasicGene
     public FilterRequest buildFilterRequest(Annotation annotation) {
         return FilterRequest.newBuilder()
                             .addProperty(getId())
-                            .addProperty(GENE_PRODUCT_ID, annotation.geneProductId)
+                            .addProperty(GENE_PRODUCT_ID, annotation.geneProductId.split(":")[1])
                             .build();
     }
 

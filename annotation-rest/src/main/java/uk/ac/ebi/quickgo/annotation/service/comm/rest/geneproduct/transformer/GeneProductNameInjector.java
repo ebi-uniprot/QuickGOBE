@@ -30,7 +30,7 @@ public class GeneProductNameInjector extends AbstractValueInjector<BasicGeneProd
     public FilterRequest buildFilterRequest(Annotation annotation) {
         return FilterRequest.newBuilder()
                             .addProperty(getId())
-                            .addProperty(GENE_PRODUCT_ID, annotation.geneProductId)
+                            .addProperty(GENE_PRODUCT_ID, GENE_PRODUCT_ID, annotation.geneProductId.split(":")[1])
                             .build();
     }
 
