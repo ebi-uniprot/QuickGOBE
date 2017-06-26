@@ -1,5 +1,7 @@
 package uk.ac.ebi.quickgo.annotation.service.comm.rest.geneproduct.model;
 
+import uk.ac.ebi.quickgo.rest.comm.ResponseType;
+
 import java.util.List;
 
 /**
@@ -15,7 +17,7 @@ import java.util.List;
  * Time: 15:07
  * Created with IntelliJ IDEA.
  */
-public class BasicGeneProduct {
+public class BasicGeneProduct implements ResponseType {
 
     private List<Result> results;
 
