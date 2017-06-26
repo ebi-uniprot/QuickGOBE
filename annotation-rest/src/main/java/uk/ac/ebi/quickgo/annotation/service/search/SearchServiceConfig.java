@@ -3,6 +3,8 @@ package uk.ac.ebi.quickgo.annotation.service.search;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationFields;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepoConfig;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
+import uk.ac.ebi.quickgo.annotation.service.comm.rest.geneproduct.transformer.GeneProductNameInjector;
+import uk.ac.ebi.quickgo.annotation.service.comm.rest.geneproduct.transformer.GeneProductSynonymsInjector;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.OntologyNameInjector;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.SlimResultsTransformer;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.TaxonomyNameInjector;
@@ -181,10 +183,12 @@ public class SearchServiceConfig {
 
     @Bean
     public ResultTransformerChain<QueryResult<Annotation>> resultTransformerChain(
-            ExternalServiceResultsTransformer<Annotation> ontologyResultsTransformer) {
+            ExternalServiceResultsTransformer<Annotation> ontologyResultsTransformer,
+            ExternalServiceResultsTransformer<Annotation> geneProductResultsTransformer) {
         ResultTransformerChain<QueryResult<Annotation>> transformerChain = new ResultTransformerChain<>();
         transformerChain.addTransformer(new SlimResultsTransformer());
         transformerChain.addTransformer(ontologyResultsTransformer);
+        transformerChain.addTransformer(geneProductResultsTransformer);
         return transformerChain;
     }
 
@@ -194,6 +198,15 @@ public class SearchServiceConfig {
         List<ResponseValueInjector<Annotation>> responseValueInjectors = asList(
                 new OntologyNameInjector(),
                 new TaxonomyNameInjector());
+        return new ExternalServiceResultsTransformer<>(restFilterConverterFactory, responseValueInjectors);
+    }
+
+    @Bean
+    public ExternalServiceResultsTransformer<Annotation> geneProductResultsTransformer(RESTFilterConverterFactory
+            restFilterConverterFactory) {
+        List<ResponseValueInjector<Annotation>> responseValueInjectors = asList(
+                new GeneProductNameInjector(),
+                new GeneProductSynonymsInjector());
         return new ExternalServiceResultsTransformer<>(restFilterConverterFactory, responseValueInjectors);
     }
 
