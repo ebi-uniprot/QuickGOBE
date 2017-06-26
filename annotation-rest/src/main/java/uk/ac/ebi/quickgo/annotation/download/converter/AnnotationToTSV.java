@@ -39,15 +39,20 @@ public class AnnotationToTSV extends AnnotationTo implements BiFunction<Annotati
     public static final String ANNOTATION_EXTENSION_FIELD_NAME = "extensions";
     public static final String DATE_FIELD_NAME = "date";
     public static final String TAXON_NAME_FIELD_NAME = "taxonname";
+    public static final String GENE_PRODUCT_NAME_FIELD_NAME = "geneProductName";
+    public static final String GENE_PRODUCT_SYNONYMS_FIELD_NAME = "geneProductSynonyms";
+    //public static final String GENE_PRODUCT_TYPE_FIELD_NAME = "geneProductType";
 
     private static final List<String> FULL_FIELD_LIST = Arrays.asList(GENE_PRODUCT_ID_FIELD_NAME, SYMBOL_FIELD_NAME,
-                                                                    QUALIFIER_FIELD_NAME, GO_TERM_FIELD_NAME,
-                                                                    GO_NAME_FIELD_NAME, ECO_ID_FIELD_NAME,
-                                                                    GO_EVIDENCE_CODE_FIELD_NAME,
-                                                                    REFERENCE_FIELD_NAME, WITH_FROM_FIELD_NAME,
-                                                                    TAXON_ID_FIELD_NAME, ASSIGNED_BY_FIELD_NAME,
-                                                                    ANNOTATION_EXTENSION_FIELD_NAME, DATE_FIELD_NAME,
-                                                                    TAXON_NAME_FIELD_NAME);
+                                                                      QUALIFIER_FIELD_NAME, GO_TERM_FIELD_NAME,
+                                                                      GO_NAME_FIELD_NAME, ECO_ID_FIELD_NAME,
+                                                                      GO_EVIDENCE_CODE_FIELD_NAME,
+                                                                      REFERENCE_FIELD_NAME, WITH_FROM_FIELD_NAME,
+                                                                      TAXON_ID_FIELD_NAME, ASSIGNED_BY_FIELD_NAME,
+                                                                      ANNOTATION_EXTENSION_FIELD_NAME, DATE_FIELD_NAME,
+                                                                      TAXON_NAME_FIELD_NAME,
+                                                                      GENE_PRODUCT_NAME_FIELD_NAME,
+                                                                      GENE_PRODUCT_SYNONYMS_FIELD_NAME);
 
     private static final String YEAR_MONTH_DAY = "yyyyMMdd";
 
@@ -87,8 +92,9 @@ public class AnnotationToTSV extends AnnotationTo implements BiFunction<Annotati
                              });
         selected2Content.put(TAXON_NAME_FIELD_NAME, (c, j) -> j.add(nullToEmptyString.apply(c.annotation.taxonName)));
         selected2Content.put(SYMBOL_FIELD_NAME, (c, j) -> j.add(nullToEmptyString.apply(c.annotation.symbol)));
-        selected2Content.put(SYMBOL_FIELD_NAME, (c, j) -> j.add(nullToEmptyString.apply(c.annotation.symbol)));
-        selected2Content.put(SYMBOL_FIELD_NAME, (c, j) -> j.add(nullToEmptyString.apply(c.annotation.symbol)));
+        selected2Content.put(GENE_PRODUCT_NAME_FIELD_NAME, (c, j) -> j.add(nullToEmptyString.apply(c.annotation.name)));
+        selected2Content.put(GENE_PRODUCT_SYNONYMS_FIELD_NAME, (c, j) -> j.add(nullToEmptyString.apply(c.annotation
+                                                                                                               .synonyms    )));
 
     }
 
