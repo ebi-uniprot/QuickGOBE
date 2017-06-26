@@ -268,7 +268,7 @@ public class AnnotationRequest {
     @ApiModelProperty(
             value = "For TSV downloads only, fields to return.",
             allowableValues = "geneProductId,symbol,qualifier,goId,goName,evidenceCode,goEvidence,reference,withFrom," +
-                    "taxonId,assignedBy,extensions,date,taxonName")
+                    "taxonId,assignedBy,extensions,date,taxonName,synonym,name,type")
     private String[] selectedFields;
 
     private final Map<String, String[]> filterMap = new HashMap<>();
@@ -575,7 +575,8 @@ public class AnnotationRequest {
      * An array of fields whose values derive from external resources, which are to be included in the response
      * @return the array of fields from external resources to include in the response
      */
-    @ArrayPattern(regexp = "^goName|taxonName$", flags = CASE_INSENSITIVE, paramName = INCLUDE_FIELD_PARAM)
+    @ArrayPattern(regexp = "^goName|taxonName|name|synonyms$", flags = CASE_INSENSITIVE, paramName =
+            INCLUDE_FIELD_PARAM)
     public String[] getIncludeFields() {
         return this.includeFields;
     }
@@ -679,7 +680,9 @@ public class AnnotationRequest {
     public ResultTransformationRequests createResultTransformationRequests() {
         ResultTransformationRequests transformationRequests = new ResultTransformationRequests();
         if (includeFields != null && includeFields.length > 0) {
-            Stream.of(includeFields).map(ResultTransformationRequest::new).forEach(transformationRequests::addTransformationRequest);
+            Stream.of(includeFields)
+                  .map(ResultTransformationRequest::new)
+                  .forEach(transformationRequests::addTransformationRequest);
         }
         return transformationRequests;
     }
