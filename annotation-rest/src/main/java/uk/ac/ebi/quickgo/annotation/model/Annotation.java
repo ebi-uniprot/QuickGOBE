@@ -64,7 +64,7 @@ public class Annotation {
 
     public int interactingTaxonId;
 
-    public String type;
+    public String geneProductType;
 
     /**
      * Optional field whose value originates from the gene product service.
@@ -96,7 +96,7 @@ public class Annotation {
                 ", interactingTaxonId=" + interactingTaxonId +
                 ", synonym='" + synonyms + '\'' +
                 ", name='" + name + '\'' +
-                ", type='" + type + '\'' +
+                ", type='" + geneProductType + '\'' +
                 '}';
     }
 
@@ -173,7 +173,7 @@ public class Annotation {
         if (name != null ? !name.equals(that.name) : that.name != null) {
             return false;
         }
-        return type != null ? type.equals(that.type) : that.type == null;
+        return geneProductType != null ? geneProductType.equals(that.geneProductType) : that.geneProductType == null;
     }
 
     @Override public int hashCode() {
@@ -198,7 +198,7 @@ public class Annotation {
         result = 31 * result + interactingTaxonId;
         result = 31 * result + (synonyms != null ? synonyms.hashCode() : 0);
         result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (type != null ? type.hashCode() : 0);
+        result = 31 * result + (geneProductType != null ? geneProductType.hashCode() : 0);
         return result;
     }
 
