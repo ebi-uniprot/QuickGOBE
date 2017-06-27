@@ -39,6 +39,7 @@ public class AnnotationDocConverterImpl implements AnnotationDocConverter {
         annotation.withFrom = asWithFromXRefList(annotationDocument.withFrom, this::createSimpleXRef);
         annotation.extensions = asExtensionsXRefList(annotationDocument.extensions, this::createQualifiedXRef);
         annotation.date = annotationDocument.date;
+        annotation.geneProductType = annotationDocument.geneProductType;
 
         return annotation;
     }
