@@ -54,6 +54,7 @@ public class AnnotationMocker {
     private static final String GO_ASPECT = "molecular_function";
     private static final Date DATE = Date.from(
             LocalDate.of(2012, 10, 2).atStartOfDay(ZoneId.systemDefault()).toInstant());
+    private static final String PROTEIN = "protein";
 
     public static Annotation createValidAnnotation() {
         Annotation annotation = new Annotation();
@@ -74,6 +75,7 @@ public class AnnotationMocker {
         annotation.interactingTaxonId = INTERACTING_TAXON_ID;
         annotation.goName = GO_NAME;
         annotation.taxonName = TAXON_NAME;
+        annotation.geneProductType = PROTEIN;
         return annotation;
     }
 
