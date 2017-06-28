@@ -104,9 +104,9 @@ class DownloadResponseVerifier {
     }
 
     static class TSVMandatoryFieldMatcher extends TypeSafeMatcher<String> {
-        private static final int FIELD_COUNT = 13;
+        private static final int FIELD_COUNT = 17;
         private static final String TYPE = "TSV";
-        private static final List<Integer> MANDATORY_INDICES = asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12);
+        private static final List<Integer> MANDATORY_INDICES = asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
 
         @Override public void describeTo(Description description) {
             description.appendText("mandatory indices were not populated: " + MANDATORY_INDICES);
