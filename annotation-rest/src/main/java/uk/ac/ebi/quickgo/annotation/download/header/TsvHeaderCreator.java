@@ -10,7 +10,7 @@ import java.util.StringJoiner;
 import org.springframework.http.MediaType;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 
-import static uk.ac.ebi.quickgo.annotation.download.converter.AnnotationToTSV.*;
+import static uk.ac.ebi.quickgo.annotation.download.TSVDownload.*;
 
 /**
  * Produce a header for TSV downloaded files. Only the (selected) column names are required. Or all columns if none
@@ -65,6 +65,7 @@ public class TsvHeaderCreator implements HeaderCreator{
         //todo missing the following fields that come from other services yet to be plugged in
         //todo name, synonym, type from the gene product service
         List<String> selectedFields = headerContent.selectedFields();
+
         if (selectedFields.isEmpty() || selectedFields.contains(GENE_PRODUCT_ID_FIELD_NAME)) {
             tsvJoiner.add(GENE_PRODUCT_ID);
         }
