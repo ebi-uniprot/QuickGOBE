@@ -63,7 +63,6 @@ public class AnnotationToTSV extends AnnotationTo implements BiFunction<Annotati
                                  j.add(c.annotation.date == null ? "" : dateFormat.format(c.annotation.date));
                              });
         selected2Content.put(TAXON_NAME_FIELD_NAME, (c, j) -> j.add(nullToEmptyString.apply(c.annotation.taxonName)));
-        selected2Content.put(SYMBOL_FIELD_NAME, (c, j) -> j.add(nullToEmptyString.apply(c.annotation.symbol)));
         selected2Content.put(GENE_PRODUCT_NAME_FIELD_NAME, (c, j) -> j.add(nullToEmptyString.apply(c.annotation.name)));
         selected2Content.put(GENE_PRODUCT_SYNONYMS_FIELD_NAME, (c, j) -> j.add(nullToEmptyString.apply(c.annotation
                                                                                                                .synonyms )));
