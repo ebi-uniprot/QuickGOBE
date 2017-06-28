@@ -12,7 +12,7 @@ import static java.util.Arrays.asList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.ac.ebi.quickgo.annotation.download.converter.AnnotationToTSV.*;
+import static uk.ac.ebi.quickgo.annotation.download.TSVDownload.*;
 import static uk.ac.ebi.quickgo.annotation.download.header.TsvHeaderCreator.*;
 
 /**
@@ -26,11 +26,11 @@ public class TsvHeaderCreatorTest {
     private static final String REQUEST_URI =
             "/QuickGO/services/annotation/downloadSearch?downloadLimit=7&geneProductId" +
                     "=UniProtKB:A0A000&includeFields=goName,taxonName";
-    private Ontology mockOntology = mock(Ontology.class);
-    private ResponseBodyEmitter mockEmitter = mock(ResponseBodyEmitter.class);
-    private HeaderContent mockContent = mock(HeaderContent.class);
+    private final Ontology mockOntology = mock(Ontology.class);
+    private final ResponseBodyEmitter mockEmitter = mock(ResponseBodyEmitter.class);
+    private final HeaderContent mockContent = mock(HeaderContent.class);
 
-    private static List<String[]> fields2Columns = new ArrayList<>();
+    private static final List<String[]> fields2Columns = new ArrayList<>();
     static {
         fields2Columns.add(new String[]{GENE_PRODUCT_ID_FIELD_NAME,GENE_PRODUCT_ID});
         fields2Columns.add(new String[]{SYMBOL_FIELD_NAME,SYMBOL});
@@ -87,6 +87,20 @@ public class TsvHeaderCreatorTest {
                                          + TsvHeaderCreator.GO_NAME + "\t"
                                          + TsvHeaderCreator.TAXON_NAME + "\n", MediaType.TEXT_PLAIN);
     }
+
+//    @Test
+//    public void writeHeaderForSeveralSelectedFieldsInNewOrder() throws Exception {
+//        when(mockContent.isSlimmed()).thenReturn(false);
+//        when(mockContent.selectedFields()).thenReturn(asList(TAXON_NAME_FIELD_NAME, GO_NAME_FIELD_NAME,
+//                                                             GENE_PRODUCT_ID_FIELD_NAME));
+//        TsvHeaderCreator tsvHeaderCreator = new TsvHeaderCreator();
+//
+//        tsvHeaderCreator.write(mockEmitter, mockContent);
+//
+//        verify(mockEmitter).send(TsvHeaderCreator.TAXON_NAME  + "\t"
+//                                         + TsvHeaderCreator.GO_NAME + "\t"
+//                                         + TsvHeaderCreator.GENE_PRODUCT_ID + "\n", MediaType.TEXT_PLAIN);
+//    }
 
     @Test
     public void writeHeaderForFullListOfFieldsNotSlimmed() throws Exception {
