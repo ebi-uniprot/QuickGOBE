@@ -45,7 +45,10 @@ public class TsvHeaderCreatorTest {
         fields2Columns.add(new String[]{ASSIGNED_BY_FIELD_NAME,ASSIGNED_BY});
         fields2Columns.add(new String[]{ANNOTATION_EXTENSION_FIELD_NAME,ANNOTATION_EXTENSION});
         fields2Columns.add(new String[]{DATE_FIELD_NAME,DATE});
-        fields2Columns.add(new String[]{TAXON_NAME_FIELD_NAME,TAXON_NAME});
+        fields2Columns.add(new String[]{TAXON_NAME_FIELD_NAME, TAXON_NAME});
+        fields2Columns.add(new String[]{GENE_PRODUCT_NAME_FIELD_NAME, GENE_PRODUCT_NAME});
+        fields2Columns.add(new String[]{GENE_PRODUCT_SYNONYMS_FIELD_NAME, GENE_PRODUCT_SYNONYMS});
+        fields2Columns.add(new String[]{GENE_PRODUCT_TYPE_FIELD_NAME, GENE_PRODUCT_TYPE});
     }
 
     @Before
@@ -86,7 +89,7 @@ public class TsvHeaderCreatorTest {
     }
 
     @Test
-    public void writeHeaderForFullListOfFieldsUnslimmed() throws Exception {
+    public void writeHeaderForFullListOfFieldsNotSlimmed() throws Exception {
         when(mockContent.isSlimmed()).thenReturn(false);
         when(mockContent.selectedFields()).thenReturn(Collections.emptyList());
 
@@ -107,7 +110,10 @@ public class TsvHeaderCreatorTest {
                                          + ASSIGNED_BY + "\t"
                                          + ANNOTATION_EXTENSION + "\t"
                                          + DATE + "\t"
-                                         + TAXON_NAME + "\n",
+                                         + TAXON_NAME + "\t"
+                                         + GENE_PRODUCT_NAME + "\t"
+                                         + GENE_PRODUCT_SYNONYMS + "\t"
+                                         + GENE_PRODUCT_TYPE + "\n",
                                  MediaType.TEXT_PLAIN);
     }
 

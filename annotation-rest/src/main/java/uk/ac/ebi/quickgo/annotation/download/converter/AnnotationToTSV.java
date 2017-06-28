@@ -39,9 +39,9 @@ public class AnnotationToTSV extends AnnotationTo implements BiFunction<Annotati
     public static final String ANNOTATION_EXTENSION_FIELD_NAME = "extensions";
     public static final String DATE_FIELD_NAME = "date";
     public static final String TAXON_NAME_FIELD_NAME = "taxonname";
-    public static final String GENE_PRODUCT_NAME_FIELD_NAME = "geneProductName";
-    public static final String GENE_PRODUCT_SYNONYMS_FIELD_NAME = "geneProductSynonyms";
-    //public static final String GENE_PRODUCT_TYPE_FIELD_NAME = "geneProductType";
+    public static final String GENE_PRODUCT_NAME_FIELD_NAME = "name";
+    public static final String GENE_PRODUCT_SYNONYMS_FIELD_NAME = "synonyms";
+    public static final String GENE_PRODUCT_TYPE_FIELD_NAME = "geneProductType";
 
     private static final List<String> FULL_FIELD_LIST = Arrays.asList(GENE_PRODUCT_ID_FIELD_NAME, SYMBOL_FIELD_NAME,
                                                                       QUALIFIER_FIELD_NAME, GO_TERM_FIELD_NAME,

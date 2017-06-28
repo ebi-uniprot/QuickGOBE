@@ -39,7 +39,9 @@ public class TsvHeaderCreator implements HeaderCreator{
     static final String ANNOTATION_EXTENSION = "ANNOTATION EXTENSION";
     static final String DATE = "DATE";
     static final String TAXON_NAME = "TAXON NAME";
-
+    static final String GENE_PRODUCT_NAME = "GENE_PRODUCT_NAME";
+    static final String GENE_PRODUCT_SYNONYMS = "GENE_PRODUCT_SYNONYMS";
+    static final String GENE_PRODUCT_TYPE = "GENE_PRODUCT_TYPE";
 
     /**
      * Write the contents of the header to the ResponseBodyEmitter instance.
@@ -107,6 +109,15 @@ public class TsvHeaderCreator implements HeaderCreator{
         }
         if (selectedFields.isEmpty() || selectedFields.contains(TAXON_NAME_FIELD_NAME)) {
             tsvJoiner.add(TAXON_NAME);
+        }
+        if (selectedFields.isEmpty() || selectedFields.contains(GENE_PRODUCT_NAME_FIELD_NAME)) {
+            tsvJoiner.add(GENE_PRODUCT_NAME);
+        }
+        if (selectedFields.isEmpty() || selectedFields.contains(GENE_PRODUCT_SYNONYMS_FIELD_NAME)) {
+            tsvJoiner.add(GENE_PRODUCT_SYNONYMS);
+        }
+        if (selectedFields.isEmpty() || selectedFields.contains(GENE_PRODUCT_TYPE_FIELD_NAME)) {
+            tsvJoiner.add(GENE_PRODUCT_TYPE);
         }
         return tsvJoiner.toString();
     }
