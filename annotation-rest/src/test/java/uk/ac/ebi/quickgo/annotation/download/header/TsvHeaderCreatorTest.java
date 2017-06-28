@@ -88,19 +88,19 @@ public class TsvHeaderCreatorTest {
                                          + TsvHeaderCreator.TAXON_NAME + "\n", MediaType.TEXT_PLAIN);
     }
 
-//    @Test
-//    public void writeHeaderForSeveralSelectedFieldsInNewOrder() throws Exception {
-//        when(mockContent.isSlimmed()).thenReturn(false);
-//        when(mockContent.selectedFields()).thenReturn(asList(TAXON_NAME_FIELD_NAME, GO_NAME_FIELD_NAME,
-//                                                             GENE_PRODUCT_ID_FIELD_NAME));
-//        TsvHeaderCreator tsvHeaderCreator = new TsvHeaderCreator();
-//
-//        tsvHeaderCreator.write(mockEmitter, mockContent);
-//
-//        verify(mockEmitter).send(TsvHeaderCreator.TAXON_NAME  + "\t"
-//                                         + TsvHeaderCreator.GO_NAME + "\t"
-//                                         + TsvHeaderCreator.GENE_PRODUCT_ID + "\n", MediaType.TEXT_PLAIN);
-//    }
+    @Test
+    public void writeHeaderForSeveralSelectedFieldsInNewOrder() throws Exception {
+        when(mockContent.isSlimmed()).thenReturn(false);
+        when(mockContent.selectedFields()).thenReturn(asList(TAXON_NAME_FIELD_NAME, GO_NAME_FIELD_NAME,
+                                                             GENE_PRODUCT_ID_FIELD_NAME));
+        TsvHeaderCreator tsvHeaderCreator = new TsvHeaderCreator();
+
+        tsvHeaderCreator.write(mockEmitter, mockContent);
+
+        verify(mockEmitter).send(TsvHeaderCreator.TAXON_NAME  + "\t"
+                                         + TsvHeaderCreator.GO_NAME + "\t"
+                                         + TsvHeaderCreator.GENE_PRODUCT_ID + "\n", MediaType.TEXT_PLAIN);
+    }
 
     @Test
     public void writeHeaderForFullListOfFieldsNotSlimmed() throws Exception {

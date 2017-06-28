@@ -1,12 +1,11 @@
 package uk.ac.ebi.quickgo.annotation.download.header;
 
+import uk.ac.ebi.quickgo.annotation.download.TSVDownload;
+
 import com.google.common.base.Preconditions;
 import java.io.IOException;
-
-import java.util.List;
-import java.util.Objects;
-import java.util.StringJoiner;
-
+import java.util.*;
+import java.util.function.BiConsumer;
 import org.springframework.http.MediaType;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 
@@ -43,6 +42,36 @@ public class TsvHeaderCreator implements HeaderCreator{
     static final String GENE_PRODUCT_SYNONYMS = "GENE_PRODUCT_SYNONYMS";
     static final String GENE_PRODUCT_TYPE = "GENE_PRODUCT_TYPE";
 
+
+    private static Map<String, BiConsumer<HeaderContent,StringJoiner>> selected2Content;
+
+    static {
+        selected2Content = new HashMap<>();
+        selected2Content.put(GENE_PRODUCT_ID_FIELD_NAME, (hc,j) -> j.add(GENE_PRODUCT_ID));
+        selected2Content.put(SYMBOL_FIELD_NAME, (hc,j) -> j.add(SYMBOL));
+        selected2Content.put(QUALIFIER_FIELD_NAME, (hc,j) -> j.add(QUALIFIER));
+        selected2Content.put(GO_TERM_FIELD_NAME, (hc, j) -> {
+            j.add(GO_TERM);
+            if (hc.isSlimmed()) {
+                j.add(SLIMMED_FROM);
+            }
+        });
+        selected2Content.put(GO_NAME_FIELD_NAME, (hc,j) -> j.add(GO_NAME));
+        selected2Content.put(ECO_ID_FIELD_NAME, (hc,j) ->  j.add(ECO_ID));
+        selected2Content.put(GO_EVIDENCE_CODE_FIELD_NAME, (hc,j) ->  j.add(GO_EVIDENCE_CODE));
+        selected2Content.put(REFERENCE_FIELD_NAME, (hc,j) ->  j.add(REFERENCE));
+        selected2Content.put(WITH_FROM_FIELD_NAME, (hc,j) ->  j.add(WITH_FROM));
+        selected2Content.put(TAXON_ID_FIELD_NAME, (hc,j) ->  j.add(TAXON_ID));
+        selected2Content.put(ASSIGNED_BY_FIELD_NAME, (hc,j) ->  j.add(ASSIGNED_BY));
+        selected2Content.put(ANNOTATION_EXTENSION_FIELD_NAME, (hc,j) ->  j.add(ANNOTATION_EXTENSION));
+        selected2Content.put(DATE_FIELD_NAME, (hc,j) ->  j.add(DATE));
+        selected2Content.put(TAXON_NAME_FIELD_NAME, (hc,j) ->  j.add(TAXON_NAME));
+        selected2Content.put(GENE_PRODUCT_NAME_FIELD_NAME, (hc,j) ->  j.add(GENE_PRODUCT_NAME));
+        selected2Content.put(GENE_PRODUCT_SYNONYMS_FIELD_NAME, (hc,j) ->  j.add(GENE_PRODUCT_SYNONYMS));
+        selected2Content.put(GENE_PRODUCT_TYPE_FIELD_NAME, (hc,j) ->  j.add(GENE_PRODUCT_TYPE));
+    }
+
+
     /**
      * Write the contents of the header to the ResponseBodyEmitter instance.
      * @param emitter streams the header content to the client
@@ -54,72 +83,19 @@ public class TsvHeaderCreator implements HeaderCreator{
         Preconditions.checkArgument(Objects.nonNull(content), "The GTypeHeaderCreator content instance must not be " +
                 "null");
         try {
-            emitter.send(colHeadings(content) + "\n", MediaType.TEXT_PLAIN);
+            emitter.send(output(content) + "\n", MediaType.TEXT_PLAIN);
         } catch (IOException e) {
             throw new RuntimeException("Failed to send TSV download header", e);
         }
     }
 
-    private String colHeadings(HeaderContent headerContent) {
+    private String output(HeaderContent headerContent) {
         StringJoiner tsvJoiner = new StringJoiner(OUTPUT_DELIMITER);
-        //todo missing the following fields that come from other services yet to be plugged in
-        //todo name, synonym, type from the gene product service
-        List<String> selectedFields = headerContent.selectedFields();
-
-        if (selectedFields.isEmpty() || selectedFields.contains(GENE_PRODUCT_ID_FIELD_NAME)) {
-            tsvJoiner.add(GENE_PRODUCT_ID);
-        }
-        if (selectedFields.isEmpty() || selectedFields.contains(SYMBOL_FIELD_NAME)) {
-            tsvJoiner.add(SYMBOL);
-        }
-        if (selectedFields.isEmpty() || selectedFields.contains(QUALIFIER_FIELD_NAME)) {
-            tsvJoiner.add(QUALIFIER);
-        }
-        if (selectedFields.isEmpty() || selectedFields.contains(GO_TERM_FIELD_NAME)) {
-            tsvJoiner.add(GO_TERM);
-        }
-        if (headerContent.isSlimmed()) {
-            tsvJoiner.add(SLIMMED_FROM);
-        }
-        if (selectedFields.isEmpty() || selectedFields.contains(GO_NAME_FIELD_NAME)) {
-            tsvJoiner.add(GO_NAME);
-        }
-        if (selectedFields.isEmpty() || selectedFields.contains(ECO_ID_FIELD_NAME)) {
-            tsvJoiner.add(ECO_ID);
-        }
-        if (selectedFields.isEmpty() || selectedFields.contains(GO_EVIDENCE_CODE_FIELD_NAME)) {
-            tsvJoiner.add(GO_EVIDENCE_CODE);
-        }
-        if (selectedFields.isEmpty() || selectedFields.contains(REFERENCE_FIELD_NAME)) {
-            tsvJoiner.add(REFERENCE);
-        }
-        if (selectedFields.isEmpty() || selectedFields.contains(WITH_FROM_FIELD_NAME)) {
-            tsvJoiner.add(WITH_FROM);
-        }
-        if (selectedFields.isEmpty() || selectedFields.contains(TAXON_ID_FIELD_NAME)) {
-            tsvJoiner.add(TAXON_ID);
-        }
-        if (selectedFields.isEmpty() || selectedFields.contains(ASSIGNED_BY_FIELD_NAME)) {
-            tsvJoiner.add(ASSIGNED_BY);
-        }
-        if (selectedFields.isEmpty() || selectedFields.contains(ANNOTATION_EXTENSION_FIELD_NAME)) {
-            tsvJoiner.add(ANNOTATION_EXTENSION);
-        }
-        if (selectedFields.isEmpty() || selectedFields.contains(DATE_FIELD_NAME)) {
-            tsvJoiner.add(DATE);
-        }
-        if (selectedFields.isEmpty() || selectedFields.contains(TAXON_NAME_FIELD_NAME)) {
-            tsvJoiner.add(TAXON_NAME);
-        }
-        if (selectedFields.isEmpty() || selectedFields.contains(GENE_PRODUCT_NAME_FIELD_NAME)) {
-            tsvJoiner.add(GENE_PRODUCT_NAME);
-        }
-        if (selectedFields.isEmpty() || selectedFields.contains(GENE_PRODUCT_SYNONYMS_FIELD_NAME)) {
-            tsvJoiner.add(GENE_PRODUCT_SYNONYMS);
-        }
-        if (selectedFields.isEmpty() || selectedFields.contains(GENE_PRODUCT_TYPE_FIELD_NAME)) {
-            tsvJoiner.add(GENE_PRODUCT_TYPE);
+        List<String> selectedFields = TSVDownload.whichColumnsWillWeShow(headerContent.selectedFields());
+        for (String selectedField : selectedFields) {
+            selected2Content.get(selectedField).accept(headerContent, tsvJoiner);
         }
         return tsvJoiner.toString();
     }
+
 }
