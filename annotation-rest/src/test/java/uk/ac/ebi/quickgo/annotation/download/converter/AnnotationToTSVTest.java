@@ -14,7 +14,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
-import static uk.ac.ebi.quickgo.annotation.download.converter.AnnotationToTSV.*;
+import static uk.ac.ebi.quickgo.annotation.download.TSVDownload.*;
 import static uk.ac.ebi.quickgo.annotation.model.AnnotationMocker.*;
 
 /**
@@ -30,22 +30,25 @@ public class AnnotationToTSVTest {
     private Annotation annotation;
     private AnnotationToTSV annotationToTSV;
 
-    private static List<String[]> unslimmedFieldNames2Data = new ArrayList<>();
+    private static final List<String[]> unSlimmedFieldNames2Data = new ArrayList<>();
     static {
-        unslimmedFieldNames2Data.add(new String[]{GENE_PRODUCT_ID_FIELD_NAME, DB + ":" + ID});
-        unslimmedFieldNames2Data.add(new String[]{SYMBOL_FIELD_NAME,SYMBOL});
-        unslimmedFieldNames2Data.add(new String[]{QUALIFIER_FIELD_NAME,QUALIFIER});
-        unslimmedFieldNames2Data.add(new String[]{GO_TERM_FIELD_NAME,GO_ID});
-        unslimmedFieldNames2Data.add(new String[]{GO_NAME_FIELD_NAME,GO_NAME});
-        unslimmedFieldNames2Data.add(new String[]{ECO_ID_FIELD_NAME,ECO_ID});
-        unslimmedFieldNames2Data.add(new String[]{GO_EVIDENCE_CODE_FIELD_NAME,GO_EVIDENCE});
-        unslimmedFieldNames2Data.add(new String[]{REFERENCE_FIELD_NAME,REFERENCE});
-        unslimmedFieldNames2Data.add(new String[]{WITH_FROM_FIELD_NAME,WITH_FROM_AS_STRING});
-        unslimmedFieldNames2Data.add(new String[]{TAXON_ID_FIELD_NAME,Integer.toString(TAXON_ID)});
-        unslimmedFieldNames2Data.add(new String[]{ASSIGNED_BY_FIELD_NAME,DB});
-        unslimmedFieldNames2Data.add(new String[]{ANNOTATION_EXTENSION_FIELD_NAME,EXTENSIONS_AS_STRING});
-        unslimmedFieldNames2Data.add(new String[]{DATE_FIELD_NAME,DATE_AS_STRING});
-        unslimmedFieldNames2Data.add(new String[]{TAXON_NAME_FIELD_NAME,TAXON_NAME});
+        unSlimmedFieldNames2Data.add(new String[]{GENE_PRODUCT_ID_FIELD_NAME, DB + ":" + ID});
+        unSlimmedFieldNames2Data.add(new String[]{SYMBOL_FIELD_NAME,SYMBOL});
+        unSlimmedFieldNames2Data.add(new String[]{QUALIFIER_FIELD_NAME,QUALIFIER});
+        unSlimmedFieldNames2Data.add(new String[]{GO_TERM_FIELD_NAME,GO_ID});
+        unSlimmedFieldNames2Data.add(new String[]{GO_NAME_FIELD_NAME,GO_NAME});
+        unSlimmedFieldNames2Data.add(new String[]{ECO_ID_FIELD_NAME,ECO_ID});
+        unSlimmedFieldNames2Data.add(new String[]{GO_EVIDENCE_CODE_FIELD_NAME,GO_EVIDENCE});
+        unSlimmedFieldNames2Data.add(new String[]{REFERENCE_FIELD_NAME,REFERENCE});
+        unSlimmedFieldNames2Data.add(new String[]{WITH_FROM_FIELD_NAME,WITH_FROM_AS_STRING});
+        unSlimmedFieldNames2Data.add(new String[]{TAXON_ID_FIELD_NAME,Integer.toString(TAXON_ID)});
+        unSlimmedFieldNames2Data.add(new String[]{ASSIGNED_BY_FIELD_NAME,DB});
+        unSlimmedFieldNames2Data.add(new String[]{ANNOTATION_EXTENSION_FIELD_NAME,EXTENSIONS_AS_STRING});
+        unSlimmedFieldNames2Data.add(new String[]{DATE_FIELD_NAME,DATE_AS_STRING});
+        unSlimmedFieldNames2Data.add(new String[]{TAXON_NAME_FIELD_NAME,TAXON_NAME});
+        unSlimmedFieldNames2Data.add(new String[]{GENE_PRODUCT_NAME_FIELD_NAME,NAME});
+        unSlimmedFieldNames2Data.add(new String[]{GENE_PRODUCT_SYNONYMS_FIELD_NAME,SYNONYMS});
+        unSlimmedFieldNames2Data.add(new String[]{GENE_PRODUCT_TYPE_FIELD_NAME,PROTEIN});
     }
 
     @Before
@@ -57,7 +60,7 @@ public class AnnotationToTSVTest {
     @Test
     public void createTsvStringFromAnnotationModelContainingIntAct() {
         String[] elements = annotationToElements(annotation);
-        assertThat(elements[NonSlimmedColumns.COL_GENEPRODUCT], is(DB + ":" + ID));
+        assertThat(elements[NonSlimmedColumns.COL_GENE_PRODUCT], is(DB + ":" + ID));
         assertThat(elements[NonSlimmedColumns.COL_DB_OBJECT_SYMBOL], is(SYMBOL));
         assertThat(elements[NonSlimmedColumns.COL_QUALIFIER], is(QUALIFIER));
         assertThat(elements[NonSlimmedColumns.COL_GO_ID], is(GO_ID));
@@ -69,9 +72,10 @@ public class AnnotationToTSVTest {
         assertThat(elements[NonSlimmedColumns.COL_TAXON], is(Integer.toString(TAXON_ID)));
         assertThat(elements[NonSlimmedColumns.COL_ASSIGNED_BY], equalTo(DB));
         assertThat(elements[NonSlimmedColumns.COL_ANNOTATION_EXTENSION], is(EXTENSIONS_AS_STRING));
-//        assertThat(elements[NonSlimmedColumns.COL_DB_OBJECT_NAME], is(""));      //Not yet available - requires GP data
-//        assertThat(elements[NonSlimmedColumns.COL_DB_OBJECT_SYNONYM], is(""));   //Not yet available - requires GP data
-//        assertThat(elements[NonSlimmedColumns.COL_DB_OBJECT_TYPE], is(gpType));  //Not yet available - requires GP data
+        assertThat(elements[NonSlimmedColumns.COL_TAXON_NAME],is(TAXON_NAME));
+        assertThat(elements[NonSlimmedColumns.COL_DB_OBJECT_NAME], is(NAME));
+        assertThat(elements[NonSlimmedColumns.COL_DB_OBJECT_SYNONYM], is(SYNONYMS));
+        assertThat(elements[NonSlimmedColumns.COL_DB_OBJECT_TYPE], is(PROTEIN));
         assertThat(elements[NonSlimmedColumns.COL_DATE], equalTo(DATE_AS_STRING));
     }
 
@@ -79,7 +83,7 @@ public class AnnotationToTSVTest {
     public void createTsvStringFromAnnotationModelContainingSlimmedToIds(){
         annotation.slimmedIds = SLIMMED_TO_IDS;
         String[] elements = annotationToElements(annotation);
-        assertThat(elements[SlimmedColumns.COL_GENEPRODUCT], is(DB + ":" + ID));
+        assertThat(elements[SlimmedColumns.COL_GENE_PRODUCT], is(DB + ":" + ID));
         assertThat(elements[SlimmedColumns.COL_DB_OBJECT_SYMBOL], is(SYMBOL));
         assertThat(elements[SlimmedColumns.COL_QUALIFIER], is(QUALIFIER));
         assertThat(elements[SlimmedColumns.COL_GO_ID], is(SLIMMED_TO_IDS.get(0)));
@@ -92,9 +96,10 @@ public class AnnotationToTSVTest {
         assertThat(elements[SlimmedColumns.COL_TAXON], is(Integer.toString(TAXON_ID)));
         assertThat(elements[SlimmedColumns.COL_ASSIGNED_BY], equalTo(DB));
         assertThat(elements[SlimmedColumns.COL_ANNOTATION_EXTENSION], is(EXTENSIONS_AS_STRING));
-        //        assertThat(elements[SlimmedColumns.COL_DB_OBJECT_NAME], is(""));             //Not yet available - requires GP data
-        //        assertThat(elements[SlimmedColumns.COL_DB_OBJECT_SYNONYM], is(""));          //Not yet available - requires GP data
-        //        assertThat(elements[SlimmedColumns.COL_DB_OBJECT_TYPE], is(gpType));         //Not yet available - requires GP data
+        assertThat(elements[SlimmedColumns.COL_TAXON_NAME],is(TAXON_NAME));
+        assertThat(elements[SlimmedColumns.COL_DB_OBJECT_NAME], is(NAME));
+        assertThat(elements[SlimmedColumns.COL_DB_OBJECT_SYNONYM], is(SYNONYMS));
+        assertThat(elements[SlimmedColumns.COL_DB_OBJECT_TYPE], is(PROTEIN));
         assertThat(elements[SlimmedColumns.COL_DATE], equalTo(DATE_AS_STRING));
     }
 
@@ -114,7 +119,7 @@ public class AnnotationToTSVTest {
 
     @Test
     public void outputForIndividualSelectedFieldsWithNoSlimming() throws Exception {
-        for(String[] fieldName2Data : unslimmedFieldNames2Data){
+        for(String[] fieldName2Data : unSlimmedFieldNames2Data){
 
             String[] elements = annotationToElements(annotation, Collections.singletonList(fieldName2Data[0]));
 
@@ -137,14 +142,14 @@ public class AnnotationToTSVTest {
     public void nullGeneProductId() {
         annotation.geneProductId = null;
         String[] elements = annotationToElements(annotation);
-        assertThat(elements[NonSlimmedColumns.COL_GENEPRODUCT], is(""));
+        assertThat(elements[NonSlimmedColumns.COL_GENE_PRODUCT], is(""));
     }
 
     @Test
     public void emptyGeneProductId() {
         annotation.geneProductId = "";
         String[] elements = annotationToElements(annotation);
-        assertThat(elements[NonSlimmedColumns.COL_GENEPRODUCT], is(""));
+        assertThat(elements[NonSlimmedColumns.COL_GENE_PRODUCT], is(""));
     }
 
     @Test
@@ -269,7 +274,7 @@ public class AnnotationToTSVTest {
     }
 
     private class NonSlimmedColumns{
-        private static final int COL_GENEPRODUCT = 0;
+        private static final int COL_GENE_PRODUCT = 0;
         private static final int COL_DB_OBJECT_SYMBOL = 1;
         private static final int COL_QUALIFIER = 2;
         private static final int COL_GO_ID = 3;
@@ -282,10 +287,14 @@ public class AnnotationToTSVTest {
         private static final int COL_ASSIGNED_BY = 10;
         private static final int COL_ANNOTATION_EXTENSION = 11;
         private static final int COL_DATE = 12;
+        private static final int COL_TAXON_NAME = 13;
+        private static final int COL_DB_OBJECT_NAME = 14 ;
+        private static final int COL_DB_OBJECT_SYNONYM = 15;
+        private static final int COL_DB_OBJECT_TYPE = 16;
     }
 
     private class SlimmedColumns{
-        private static final int COL_GENEPRODUCT = 0;
+        private static final int COL_GENE_PRODUCT = 0;
         private static final int COL_DB_OBJECT_SYMBOL = 1;
         private static final int COL_QUALIFIER = 2;
         private static final int COL_GO_ID = 3;
@@ -299,5 +308,9 @@ public class AnnotationToTSVTest {
         private static final int COL_ASSIGNED_BY = 11;
         private static final int COL_ANNOTATION_EXTENSION = 12;
         private static final int COL_DATE = 13;
+        private static final int COL_TAXON_NAME = 14;
+        private static final int COL_DB_OBJECT_NAME = 15 ;
+        private static final int COL_DB_OBJECT_SYNONYM = 16;
+        private static final int COL_DB_OBJECT_TYPE = 17;
     }
 }
