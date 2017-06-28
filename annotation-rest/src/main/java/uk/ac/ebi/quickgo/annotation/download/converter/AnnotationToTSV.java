@@ -8,6 +8,7 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
 import static java.util.stream.Collectors.toList;
+import static uk.ac.ebi.quickgo.annotation.download.TSVDownload.*;
 
 /**
  * Convert an {@link Annotation} to a String representation of the view seen in QuickGO front end.
@@ -24,35 +25,6 @@ import static java.util.stream.Collectors.toList;
  * Created with IntelliJ IDEA.
  */
 public class AnnotationToTSV extends AnnotationTo implements BiFunction<Annotation, List<String>, List<String>> {
-
-    public static final String GENE_PRODUCT_ID_FIELD_NAME = "geneproductid";
-    public static final String SYMBOL_FIELD_NAME = "symbol";
-    public static final String QUALIFIER_FIELD_NAME = "qualifier";
-    public static final String GO_TERM_FIELD_NAME = "goid";
-    public static final String GO_NAME_FIELD_NAME = "goname";
-    public static final String ECO_ID_FIELD_NAME = "evidencecode";
-    public static final String GO_EVIDENCE_CODE_FIELD_NAME = "goevidence";
-    public static final String REFERENCE_FIELD_NAME = "reference";
-    public static final String WITH_FROM_FIELD_NAME = "withfrom";
-    public static final String TAXON_ID_FIELD_NAME = "taxonid";
-    public static final String ASSIGNED_BY_FIELD_NAME = "assignedby";
-    public static final String ANNOTATION_EXTENSION_FIELD_NAME = "extensions";
-    public static final String DATE_FIELD_NAME = "date";
-    public static final String TAXON_NAME_FIELD_NAME = "taxonname";
-    public static final String GENE_PRODUCT_NAME_FIELD_NAME = "name";
-    public static final String GENE_PRODUCT_SYNONYMS_FIELD_NAME = "synonyms";
-    public static final String GENE_PRODUCT_TYPE_FIELD_NAME = "geneProductType";
-
-    private static final List<String> FULL_FIELD_LIST = Arrays.asList(GENE_PRODUCT_ID_FIELD_NAME, SYMBOL_FIELD_NAME,
-                                                                      QUALIFIER_FIELD_NAME, GO_TERM_FIELD_NAME,
-                                                                      GO_NAME_FIELD_NAME, ECO_ID_FIELD_NAME,
-                                                                      GO_EVIDENCE_CODE_FIELD_NAME,
-                                                                      REFERENCE_FIELD_NAME, WITH_FROM_FIELD_NAME,
-                                                                      TAXON_ID_FIELD_NAME, ASSIGNED_BY_FIELD_NAME,
-                                                                      ANNOTATION_EXTENSION_FIELD_NAME, DATE_FIELD_NAME,
-                                                                      TAXON_NAME_FIELD_NAME,
-                                                                      GENE_PRODUCT_NAME_FIELD_NAME,
-                                                                      GENE_PRODUCT_SYNONYMS_FIELD_NAME);
 
     private static final String YEAR_MONTH_DAY = "yyyyMMdd";
 
@@ -94,8 +66,9 @@ public class AnnotationToTSV extends AnnotationTo implements BiFunction<Annotati
         selected2Content.put(SYMBOL_FIELD_NAME, (c, j) -> j.add(nullToEmptyString.apply(c.annotation.symbol)));
         selected2Content.put(GENE_PRODUCT_NAME_FIELD_NAME, (c, j) -> j.add(nullToEmptyString.apply(c.annotation.name)));
         selected2Content.put(GENE_PRODUCT_SYNONYMS_FIELD_NAME, (c, j) -> j.add(nullToEmptyString.apply(c.annotation
-                                                                                                               .synonyms    )));
-
+                                                                                                               .synonyms )));
+        selected2Content.put(GENE_PRODUCT_TYPE_FIELD_NAME, (c, j) -> j.add(nullToEmptyString.apply(c.annotation
+                                                                                                               .geneProductType )));
     }
 
     @Override public List<String> apply(Annotation annotation, List<String> selectedFields) {
@@ -111,10 +84,6 @@ public class AnnotationToTSV extends AnnotationTo implements BiFunction<Annotati
 
     private boolean isSlimmedRequest(Annotation annotation) {
         return Objects.isNull(annotation.slimmedIds) || annotation.slimmedIds.isEmpty();
-    }
-
-    private List<String> whichColumnsWillWeShow(List<String> selectedFields) {
-        return selectedFields.isEmpty() ? FULL_FIELD_LIST : selectedFields;
     }
 
     private String output(OutputContent outputContent) {
