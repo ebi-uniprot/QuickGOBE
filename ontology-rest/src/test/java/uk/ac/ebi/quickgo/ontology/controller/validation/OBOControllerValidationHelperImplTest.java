@@ -69,8 +69,6 @@ public class OBOControllerValidationHelperImplTest {
         OntologyRelationType validRelation0 = OntologyRelationType.DEFAULT_TRAVERSAL_TYPES.get(0);
         OntologyRelationType validRelation1 = OntologyRelationType.DEFAULT_TRAVERSAL_TYPES.get(1);
 
-        //        List<OntologyRelationType> validRelations = validator.validateRelationTypes(
-        //                relationsToCSV(validRelation0, validRelation1));
         List<OntologyRelationType> validRelations = validator.validateRelationTypes(toCSV
                                                                                             (validRelation0.getLongName(),
                                                                                              validRelation1.getLongName()),
