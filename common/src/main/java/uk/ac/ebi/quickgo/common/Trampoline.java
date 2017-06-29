@@ -68,7 +68,7 @@ import java.util.Optional;
  */
 public class Trampoline<T> {
     public T getValue() {
-        throw new RuntimeException("Not implemented");
+        throw new IllegalStateException("No value can be returned from Trampoline, this instance does not contain one");
     }
 
     public Optional<Trampoline<T>> nextTrampoline() {
