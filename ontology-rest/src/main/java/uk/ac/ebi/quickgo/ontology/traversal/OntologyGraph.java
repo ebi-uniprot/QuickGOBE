@@ -94,7 +94,7 @@ public class OntologyGraph implements OntologyGraphTraversal {
         Preconditions.checkArgument(notEmpty(endingVertices), "Ending vertices cannot be null/empty.");
         errorIfAllStartingVerticesAreEndingVertices(startingVertices, endingVertices);
 
-        Set<OntologyRelationType> relationsSet = createRelevantRelationSet(relations);
+        Set<OntologyRelationType> relationsSet = createRelevantRelationsSet(relations);
         List<List<OntologyRelationship>> interestingPaths =
                 calculateInterestingPaths(startingVertices, endingVertices, relationsSet);
 
@@ -129,11 +129,12 @@ public class OntologyGraph implements OntologyGraphTraversal {
         return new ArrayList<>(ancestorsFound);
     }
 
-    @Override public Set<OntologyRelationship> parents(String baseVertex, OntologyRelationType... relations) {
+    @Override
+    public Set<OntologyRelationship> parents(String baseVertex, OntologyRelationType... relations) {
         Preconditions.checkArgument(baseVertex != null && !baseVertex.trim().isEmpty(),
                                     "Base vertex cannot be null or empty");
 
-        Set<OntologyRelationType> relationsSet = createRelevantRelationSet(relations);
+        Set<OntologyRelationType> relationsSet = createRelevantRelationsSet(relations);
         return ontology.outgoingEdgesOf(baseVertex).stream()
                        .filter(ontologyRelationship -> relationsSet.contains(ontologyRelationship.relationship))
                        .collect(toSet());
@@ -146,47 +147,51 @@ public class OntologyGraph implements OntologyGraphTraversal {
         Set<String> descendantsFound = new HashSet<>();
         descendantsFound.addAll(topVertices); // as with ancestors, include itself (indicating IDENTITY relationship)
 
-        Set<OntologyRelationType> relationsSet = createRelevantRelationSet(relations);
+        Set<OntologyRelationType> relationsSet = createRelevantRelationsSet(relations);
         descendants(topVertices, descendantsFound, relationsSet);
         return new ArrayList<>(descendantsFound);
     }
 
-    @Override public Set<OntologyRelationship> children(String topVertex, OntologyRelationType... relations) {
+    @Override
+    public Set<OntologyRelationship> children(String topVertex, OntologyRelationType... relations) {
         Preconditions.checkArgument(topVertex != null && !topVertex.trim().isEmpty(),
                                     "Top vertex cannot be null or empty");
 
-        Set<OntologyRelationType> relationsSet = createRelevantRelationSet(relations);
+        Set<OntologyRelationType> relationsSet = createRelevantRelationsSet(relations);
 
         return ontology.incomingEdgesOf(topVertex).stream()
                        .filter(ontologyRelationship -> relationsSet.contains(ontologyRelationship.relationship))
                        .collect(toSet());
     }
 
-    @Override public AncestorGraph<String> subGraph(Set<String> startVertices, Set<String> stopVertices,
+    @Override
+    public AncestorGraph<String> subGraph(Set<String> startVertices, Set<String> stopVertices,
             OntologyRelationType... relations) {
         Preconditions.checkArgument(notEmpty(startVertices), "Starting vertices cannot be null/empty.");
         // Valid relationship list is ontology dependent and therefore must be supplied.
         // We can't use the full list as there maybe edges with relationships that should not be displayed in the
         // subgraph
         Preconditions.checkArgument(Objects.nonNull(relations) && relations.length > 0, "Relations cannot be null");
-        AncestorGraph<String> ancestorGraph = new AncestorGraph<>(new HashSet<>(), new HashSet<>());
+        AncestorGraph<String> ancestorGraph = AncestorGraph.newAncestorGraphString();
         Queue<String> targetVertices = buildTargetVertices(startVertices);
         if (!targetVertices.isEmpty()) {
             stopVertices.addAll(STOP_NODES);
             OntologyRelationType[] targetRelations = OntologyRelationType.relevantRelations(relations);
             AncestorGraphRequest request = new AncestorGraphRequest(targetVertices, stopVertices, targetRelations);
-            SubGraphCalculator.calculateGraph(request, ancestorGraph, this).compute();
+            SubGraphCalculator.populateAncestorGraphForRequest(request, this, ancestorGraph).compute();
         }
         return ancestorGraph;
     }
 
-    @Override public int hashCode() {
+    @Override
+    public int hashCode() {
         int result = ontology != null ? ontology.hashCode() : 0;
         result = 31 * result + (ancestorEdgesMap != null ? ancestorEdgesMap.hashCode() : 0);
         return result;
     }
 
-    @Override public boolean equals(Object o) {
+    @Override
+    public boolean equals(Object o) {
         if (this == o) {
             return true;
         }
@@ -217,7 +222,7 @@ public class OntologyGraph implements OntologyGraphTraversal {
         v1v2Paths.removeAll(invalidPaths);
     }
 
-    private HashSet<OntologyRelationType> createRelevantRelationSet(OntologyRelationType[] relations) {
+    private HashSet<OntologyRelationType> createRelevantRelationsSet(OntologyRelationType[] relations) {
         return new HashSet<>(Arrays.asList(OntologyRelationType.relevantRelations(relations)));
     }
 
