@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.ontology.traversal;
+package uk.ac.ebi.quickgo.common;
 
 import java.util.Optional;
 
@@ -75,7 +75,7 @@ public class Trampoline<T> {
         return Optional.empty();
     }
 
-    final T compute() {
+    public final T compute() {
         Trampoline<T> trampoline = this;
 
         while (trampoline.nextTrampoline().isPresent()) {
