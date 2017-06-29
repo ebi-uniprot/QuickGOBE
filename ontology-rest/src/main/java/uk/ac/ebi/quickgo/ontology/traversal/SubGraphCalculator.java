@@ -32,7 +32,7 @@ class SubGraphCalculator {
         Preconditions.checkArgument(Objects.nonNull(ontologyGraphTraversal), "SubGraphCalculator#calculateGraph cannot accept an " +
                 "argument for ontologyGraphTraversal that is null");
 
-        String target = request.targetVertices.pollFirst();
+        String target = request.targetVertices.poll();
         if (Objects.nonNull(target)) {
             if (ancestorGraph.vertices.add(target) && !request.stopVertices.contains(target)) {
                 try {
@@ -75,6 +75,6 @@ class SubGraphCalculator {
     private static void addParentsToWorkQueue(AncestorGraphRequest request, Set<OntologyRelationship> parents) {
         parents.stream()
                .map(p -> p.parent)
-               .forEach(request.targetVertices::addLast);
+               .forEach(request.targetVertices::add);
     }
 }
