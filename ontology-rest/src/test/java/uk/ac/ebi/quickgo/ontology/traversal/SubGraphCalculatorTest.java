@@ -6,10 +6,7 @@ import uk.ac.ebi.quickgo.ontology.model.graph.AncestorEdge;
 import uk.ac.ebi.quickgo.ontology.model.graph.AncestorGraph;
 import uk.ac.ebi.quickgo.ontology.model.graph.AncestorGraphRequest;
 
-import java.util.Deque;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Set;
+import java.util.*;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -46,7 +43,7 @@ public class SubGraphCalculatorTest {
 
     @Before
     public void setup() {
-        Deque<String> targetVertices = new LinkedList<>(singletonList(pyrophosphataseActivity));
+        Queue<String> targetVertices = new LinkedList<>(singletonList(pyrophosphataseActivity));
         Set<String> stopVertices = new HashSet<>(singletonList(molecularFunction));
         targetRelations = new OntologyRelationType[]{OntologyRelationType.IS_A};
         request = new AncestorGraphRequest(targetVertices, stopVertices, targetRelations);
