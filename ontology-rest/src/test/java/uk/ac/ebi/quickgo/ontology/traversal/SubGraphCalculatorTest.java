@@ -43,6 +43,7 @@ public class SubGraphCalculatorTest {
     private OntologyRelationType[] targetRelations;
     private AncestorGraphRequest request;
     private AncestorGraph<String> ancestorGraph;
+
     @Before
     public void setup() {
         Deque<String> targetVertices = new LinkedList<>(singletonList(pyrophosphataseActivity));
@@ -85,22 +86,22 @@ public class SubGraphCalculatorTest {
         assertThat(ancestorGraph.edges, containsInAnyOrder(toAE(py_IA_cy), toAE(cy_IA_ca)));
     }
 
-    private AncestorEdge toAE(OntologyRelationship or){
-        return new AncestorEdge(or.child, or.relationship.getLongName(), or.parent);
-    }
-
     @Test(expected = IllegalArgumentException.class)
-    public void exceptionThrownIfAncestorGraphRequestArgumentIsNull(){
+    public void exceptionThrownIfAncestorGraphRequestArgumentIsNull() {
         SubGraphCalculator.calculateGraph(null, ancestorGraph, ontologyGraphMock);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void exceptionThrownIfAncestorGraphArgumentIsNull(){
+    public void exceptionThrownIfAncestorGraphArgumentIsNull() {
         SubGraphCalculator.calculateGraph(request, null, ontologyGraphMock);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void exceptionThrownIfOntologyGraphTraversalArgumentIsNull(){
+    public void exceptionThrownIfOntologyGraphTraversalArgumentIsNull() {
         SubGraphCalculator.calculateGraph(request, ancestorGraph, null);
+    }
+
+    private AncestorEdge toAE(OntologyRelationship or) {
+        return new AncestorEdge(or.child, or.relationship.getLongName(), or.parent);
     }
 }
