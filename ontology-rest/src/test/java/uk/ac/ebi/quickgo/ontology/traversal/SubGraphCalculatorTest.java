@@ -60,7 +60,7 @@ public class SubGraphCalculatorTest {
 
     @Test
     public void createSimpleSubGraph() {
-        SubGraphCalculator.calculateGraph(request, ancestorGraph, ontologyGraphMock).compute();
+        SubGraphCalculator.populateAncestorGraphForRequest(request, ontologyGraphMock, ancestorGraph).compute();
 
         assertThat(ancestorGraph.vertices, hasSize(4));
         assertThat(ancestorGraph.vertices, containsInAnyOrder(pyrophosphataseActivity, cyclaseActivity,
@@ -74,7 +74,7 @@ public class SubGraphCalculatorTest {
     public void noParentsExistForVertex() {
         when(ontologyGraphMock.parents(catalyticActivity, targetRelations)).thenThrow(new IllegalArgumentException());
 
-        SubGraphCalculator.calculateGraph(request, ancestorGraph, ontologyGraphMock).compute();
+        SubGraphCalculator.populateAncestorGraphForRequest(request, ontologyGraphMock, ancestorGraph).compute();
 
         assertThat(ancestorGraph.vertices, hasSize(3));
         assertThat(ancestorGraph.vertices, containsInAnyOrder(pyrophosphataseActivity, cyclaseActivity,
@@ -85,17 +85,17 @@ public class SubGraphCalculatorTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void exceptionThrownIfAncestorGraphRequestArgumentIsNull() {
-        SubGraphCalculator.calculateGraph(null, ancestorGraph, ontologyGraphMock);
+        SubGraphCalculator.populateAncestorGraphForRequest(null, ontologyGraphMock, ancestorGraph);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void exceptionThrownIfAncestorGraphArgumentIsNull() {
-        SubGraphCalculator.calculateGraph(request, null, ontologyGraphMock);
+        SubGraphCalculator.populateAncestorGraphForRequest(request, ontologyGraphMock, null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void exceptionThrownIfOntologyGraphTraversalArgumentIsNull() {
-        SubGraphCalculator.calculateGraph(request, ancestorGraph, null);
+        SubGraphCalculator.populateAncestorGraphForRequest(request, null, ancestorGraph);
     }
 
     private AncestorEdge toAE(OntologyRelationship or) {
