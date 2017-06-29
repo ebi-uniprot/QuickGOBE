@@ -23,8 +23,8 @@ class SubGraphCalculator {
 
     private static Logger LOGGER = LoggerFactory.getLogger(SubGraphCalculator.class);
 
-    static Trampoline<AncestorGraph> calculateGraph(AncestorGraphRequest request, AncestorGraph<String> ancestorGraph,
-            OntologyGraphTraversal ontologyGraphTraversal) {
+    static Trampoline<AncestorGraph> populateAncestorGraphForRequest(AncestorGraphRequest request,
+            OntologyGraphTraversal ontologyGraphTraversal, AncestorGraph<String> ancestorGraph) {
         Preconditions.checkArgument(Objects.nonNull(request), "SubGraphCalculator#calculateGraph cannot accept an " +
                 "argument for request that is null");
         Preconditions.checkArgument(Objects.nonNull(ancestorGraph), "SubGraphCalculator#calculateGraph cannot accept an " +
@@ -50,9 +50,9 @@ class SubGraphCalculator {
                 return new Trampoline<AncestorGraph>() {
                     @Override
                     public Optional<Trampoline<AncestorGraph>> nextTrampoline() {
-                        return Optional.of(calculateGraph(request,
-                                                          ancestorGraph,
-                                                          ontologyGraphTraversal));
+                        return Optional.of(populateAncestorGraphForRequest(request,
+                                                                           ontologyGraphTraversal, ancestorGraph
+                        ));
                     }
                 };
             }
