@@ -66,15 +66,12 @@ public abstract class OBOControllerIT {
     // temporary data store for solr's data, which is automatically cleaned on exit
     @ClassRule
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
-
+    public static final int WAIT_PERIOD = 10;
     private static final String QUERY_PARAM = "query";
     private static final String PAGE_PARAM = "page";
     private static final String LIMIT_PARAM = "limit";
     private static final String RELATIONS_PARAM = "relations";
-
     private static final int RELATIONSHIP_CHAIN_LENGTH = 10;
-    public static final int WAIT_PERIOD = 10;
-
     @Autowired
     protected WebApplicationContext webApplicationContext;
 
@@ -92,7 +89,7 @@ public abstract class OBOControllerIT {
     private String validIdsCSV;
     private List<String> validIdShortList;
     private List<String> validIdList;
-    private List<OntologyRelationship>  relationships;
+    private List<OntologyRelationship> relationships;
     private String validRelation;
     private String invalidRelation;
 
@@ -244,7 +241,8 @@ public abstract class OBOControllerIT {
 
     @Test
     public void canRetrieveCompleteByTwoIds() throws Exception {
-        ResultActions response = mockMvc.perform(get(buildTermsURLWithSubResource(validIdsShortCSV, COMPLETE_SUB_RESOURCE)));
+        ResultActions response =
+                mockMvc.perform(get(buildTermsURLWithSubResource(validIdsShortCSV, COMPLETE_SUB_RESOURCE)));
 
         expectCompleteFieldsInResults(response, validIdShortList)
                 .andExpect(jsonPath("$.results.*.history", hasSize(2)))
@@ -264,7 +262,8 @@ public abstract class OBOControllerIT {
 
     @Test
     public void canRetrieveHistoryByTwoIds() throws Exception {
-        ResultActions response = mockMvc.perform(get(buildTermsURLWithSubResource(validIdsShortCSV, HISTORY_SUB_RESOURCE)));
+        ResultActions response =
+                mockMvc.perform(get(buildTermsURLWithSubResource(validIdsShortCSV, HISTORY_SUB_RESOURCE)));
 
         expectBasicFieldsInResults(response, validIdShortList)
                 .andExpect(jsonPath("$.results.*.history", hasSize(2)))
@@ -284,7 +283,8 @@ public abstract class OBOControllerIT {
 
     @Test
     public void canRetrieveXRefsByTwoIds() throws Exception {
-        ResultActions response = mockMvc.perform(get(buildTermsURLWithSubResource(validIdsShortCSV, XREFS_SUB_RESOURCE)));
+        ResultActions response =
+                mockMvc.perform(get(buildTermsURLWithSubResource(validIdsShortCSV, XREFS_SUB_RESOURCE)));
 
         expectBasicFieldsInResults(response, validIdShortList)
                 .andExpect(jsonPath("$.results.*.xRefs", hasSize(2)))
@@ -553,11 +553,10 @@ public abstract class OBOControllerIT {
                 .andExpect(jsonPath("$.results", hasSize(maxPageSize)));
     }
 
-
     @Test
     public void numberOfTermsRequestedGreaterThanTermLimitReturns400() throws Exception {
         ontologyRepository.deleteAll();
-        List<OntologyDocument> nDocs = createAndSaveDocs(maxPageSize+1);
+        List<OntologyDocument> nDocs = createAndSaveDocs(maxPageSize + 1);
         List<String> ids = nDocs.stream()
                                 .map(doc -> doc.id)
                                 .collect(Collectors.toList());
@@ -896,11 +895,11 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canUseValidRelationsForSubGraph() throws Exception{
+    public void canUseValidRelationsForSubGraph() throws Exception {
         String startIds = relationships.get(0).child;
         ResultActions response = mockMvc.perform(get(getResourceURL() + "/terms/graph")
                                                          .param("startIds", startIds)
-                                                         .param(RELATIONS_PARAM, getValidRelations() ));
+                                                         .param(RELATIONS_PARAM, getValidRelations()));
 
         response.andDo(print())
                 .andExpect(jsonPath("$.numberOfHits").value(1))
@@ -908,7 +907,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void cannotUseInvalidRelationsForSubGraph() throws Exception{
+    public void cannotUseInvalidRelationsForSubGraph() throws Exception {
         String startIds = relationships.get(0).child;
         ResultActions response = mockMvc.perform(get(getResourceURL() + "/terms/graph")
                                                          .param("startIds", startIds)
@@ -945,16 +944,6 @@ public abstract class OBOControllerIT {
         //Compare earlier to later
         assertThat(maxAgeInSecondCall, is(greaterThanOrEqualTo(0L)));
         assertThat(maxAgeInFirstCall, is(greaterThanOrEqualTo(maxAgeInSecondCall)));
-    }
-
-    private void requestToChartServiceReturnsValidImage() {
-        GraphImageResult mockGraphImageResult = mock(GraphImageResult.class);
-        when(mockGraphImageResult.getGraphImage()).thenReturn(new GraphImage("Mocked GraphImage"));
-        GraphImageLayout layout = new GraphImageLayout();
-        layout.title = "layout title";
-        when(mockGraphImageResult.getLayout()).thenReturn(layout);
-        when(graphImageService.createChart(anyListOf(String.class), anyString()))
-                .thenReturn(mockGraphImageResult);
     }
 
     protected abstract String getResourceURL();
@@ -1082,7 +1071,8 @@ public abstract class OBOControllerIT {
                 .andDo(print())
                 .andExpect(jsonPath("$.url", is(requestUrl(result))))
                 .andExpect(jsonPath("$.messages", hasItem(
-                        containsString("Cannot traverse over relation type: " + relation + ". Can only traverse over:"))));
+                        containsString(
+                                "Cannot traverse over relation type: " + relation + ". Can only traverse over:"))));
     }
 
     protected ResultActions expectChartCreationError(ResultActions result, String messagePrefix) throws Exception {
@@ -1110,6 +1100,16 @@ public abstract class OBOControllerIT {
         }
 
         return result;
+    }
+
+    private void requestToChartServiceReturnsValidImage() {
+        GraphImageResult mockGraphImageResult = mock(GraphImageResult.class);
+        when(mockGraphImageResult.getGraphImage()).thenReturn(new GraphImage("Mocked GraphImage"));
+        GraphImageLayout layout = new GraphImageLayout();
+        layout.title = "layout title";
+        when(mockGraphImageResult.getLayout()).thenReturn(layout);
+        when(graphImageService.createChart(anyListOf(String.class), anyString()))
+                .thenReturn(mockGraphImageResult);
     }
 
     private void setupSimpleRelationshipChain() {
