@@ -62,7 +62,7 @@ public class SubGraphCalculatorTest {
 
     @Test
     public void createSimpleSubGraph() {
-        SubGraphCalculator.createTrampoline(request, ancestorGraph, ontologyGraphMock).compute();
+        SubGraphCalculator.calculateGraph(request, ancestorGraph, ontologyGraphMock).compute();
 
         assertThat(ancestorGraph.vertices, hasSize(4));
         assertThat(ancestorGraph.vertices, containsInAnyOrder(pyrophosphataseActivity, cyclaseActivity,
@@ -76,7 +76,7 @@ public class SubGraphCalculatorTest {
     public void noParentsExistForVertex() {
         when(ontologyGraphMock.parents(catalyticActivity, targetRelations)).thenThrow(new IllegalArgumentException());
 
-        SubGraphCalculator.createTrampoline(request, ancestorGraph, ontologyGraphMock).compute();
+        SubGraphCalculator.calculateGraph(request, ancestorGraph, ontologyGraphMock).compute();
 
         assertThat(ancestorGraph.vertices, hasSize(3));
         assertThat(ancestorGraph.vertices, containsInAnyOrder(pyrophosphataseActivity, cyclaseActivity,
@@ -91,16 +91,16 @@ public class SubGraphCalculatorTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void exceptionThrownIfAncestorGraphRequestArgumentIsNull(){
-        SubGraphCalculator.createTrampoline(null, ancestorGraph, ontologyGraphMock);
+        SubGraphCalculator.calculateGraph(null, ancestorGraph, ontologyGraphMock);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void exceptionThrownIfAncestorGraphArgumentIsNull(){
-        SubGraphCalculator.createTrampoline(request, null, ontologyGraphMock);
+        SubGraphCalculator.calculateGraph(request, null, ontologyGraphMock);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void exceptionThrownIfOntologyGraphTraversalArgumentIsNull(){
-        SubGraphCalculator.createTrampoline(request, ancestorGraph, null);
+        SubGraphCalculator.calculateGraph(request, ancestorGraph, null);
     }
 }

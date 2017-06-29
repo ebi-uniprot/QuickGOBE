@@ -22,40 +22,36 @@ class SubGraphCalculator {
 
     private static Logger LOGGER = LoggerFactory.getLogger(SubGraphCalculator.class);
 
-    static Trampoline<AncestorGraph> createTrampoline(AncestorGraphRequest request, AncestorGraph<String> ancestorGraph,
+    static Trampoline<AncestorGraph> calculateGraph(AncestorGraphRequest request, AncestorGraph<String> ancestorGraph,
             OntologyGraphTraversal ontologyGraphTraversal) {
-        Preconditions.checkArgument(Objects.nonNull(request), "SubGraphCalculator#createTrampoline cannot accept an " +
+        Preconditions.checkArgument(Objects.nonNull(request), "SubGraphCalculator#calculateGraph cannot accept an " +
                 "argument for request that is null");
-        Preconditions.checkArgument(Objects.nonNull(ancestorGraph), "SubGraphCalculator#createTrampoline cannot accept an " +
+        Preconditions.checkArgument(Objects.nonNull(ancestorGraph), "SubGraphCalculator#calculateGraph cannot accept an " +
                 "argument for ancestorGraph that is null");
-        Preconditions.checkArgument(Objects.nonNull(ontologyGraphTraversal), "SubGraphCalculator#createTrampoline cannot accept an " +
+        Preconditions.checkArgument(Objects.nonNull(ontologyGraphTraversal), "SubGraphCalculator#calculateGraph cannot accept an " +
                 "argument for ontologyGraphTraversal that is null");
 
         String target = request.targetVertices.pollFirst();
         if (Objects.nonNull(target)) {
-            if (ancestorGraph.vertices.add(target)) {
+            if (ancestorGraph.vertices.add(target) && !request.stopVertices.contains(target)) {
+                try {
+                    Set<OntologyRelationship> parents = ontologyGraphTraversal.parents(target, request.targetRelations);
+                    addParentsToWorkQueue(request, parents);
+                    ancestorGraph.edges.addAll(mapOntologyRelationshipsToAncestorEdges(parents));
 
-                //if target is not a stop node look for parents
-                if (!request.stopVertices.contains(target)) {
-
-                    try {
-                        Set<OntologyRelationship> parents = ontologyGraphTraversal.parents(target, request.targetRelations);
-                        addParentsToWorkQueue(request, parents);
-                        ancestorGraph.edges.addAll(mapOntologyRelationshipsToAncestorEdges(parents));
-
-                    } catch (Exception e) {
-                        LOGGER.error("SubGraphCalculator#createTrampoline looked up parents for " + target + " but " +
-                                             "received exception ", e);
-                    }
+                } catch (Exception e) {
+                    LOGGER.error("SubGraphCalculator#calculateGraph looked up parents for " + target + " but " +
+                                         "received exception ", e);
                 }
             }
 
             if(!request.targetVertices.isEmpty()) {
                 return new Trampoline<AncestorGraph>() {
+                    @Override
                     public Optional<Trampoline<AncestorGraph>> nextTrampoline() {
-                        return Optional.of(createTrampoline(request,
-                                                            ancestorGraph,
-                                                            ontologyGraphTraversal));
+                        return Optional.of(calculateGraph(request,
+                                                          ancestorGraph,
+                                                          ontologyGraphTraversal));
                     }
                 };
             }

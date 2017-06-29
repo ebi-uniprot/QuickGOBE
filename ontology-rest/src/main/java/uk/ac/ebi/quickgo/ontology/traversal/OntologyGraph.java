@@ -193,7 +193,7 @@ public class OntologyGraph implements OntologyGraphTraversal {
             stopVertices.addAll(STOP_NODES);
             OntologyRelationType[] targetRelations = OntologyRelationType.relevantRelations(relations);
             AncestorGraphRequest request = new AncestorGraphRequest(targetVertices, stopVertices, targetRelations);
-            SubGraphCalculator.createTrampoline(request, ancestorGraph, this).compute();
+            SubGraphCalculator.calculateGraph(request, ancestorGraph, this).compute();
         }
         return ancestorGraph;
     }
