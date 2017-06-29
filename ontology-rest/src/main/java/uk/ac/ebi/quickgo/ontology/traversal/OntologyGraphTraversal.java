@@ -82,7 +82,7 @@ public interface OntologyGraphTraversal {
      * a specified set of relations.
      *
      * @param startVertices the base vertices which are the lowest level of the sub-graph
-     * @param stopVertices the ending vertices beyond which Ontology vertices and edges are not returned. If this
+     * @param stopVertices the ending vertices beyond which ontology vertices and edges are not returned. If this
      * value is empty or null then the default stop nodes for the ontology are used.
      * @param relations a varargs value used to filter edges to the sub-graph. By omitting a {@code relation} value,
      * edges of all relation types will be returned.
