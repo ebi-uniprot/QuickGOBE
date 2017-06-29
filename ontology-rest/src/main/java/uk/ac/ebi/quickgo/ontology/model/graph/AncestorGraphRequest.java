@@ -2,7 +2,7 @@ package uk.ac.ebi.quickgo.ontology.model.graph;
 
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
 
-import java.util.Deque;
+import java.util.Queue;
 import java.util.Set;
 
 /**
@@ -14,11 +14,11 @@ import java.util.Set;
  */
 public class AncestorGraphRequest {
 
-    public final Deque<String> targetVertices;
+    public final Queue<String> targetVertices;
     public final Set<String> stopVertices;
     public final OntologyRelationType[] targetRelations;
 
-    public AncestorGraphRequest(Deque<String> targetVertices, Set<String> stopVertices,
+    public AncestorGraphRequest(Queue<String> targetVertices, Set<String> stopVertices,
             OntologyRelationType[] targetRelations) {
         this.targetVertices = targetVertices;
         this.stopVertices = stopVertices;
