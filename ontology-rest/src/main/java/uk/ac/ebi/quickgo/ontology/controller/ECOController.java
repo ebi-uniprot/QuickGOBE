@@ -10,6 +10,7 @@ import uk.ac.ebi.quickgo.ontology.common.OntologyType;
 import uk.ac.ebi.quickgo.ontology.controller.validation.OBOControllerValidationHelper;
 import uk.ac.ebi.quickgo.ontology.model.ECOTerm;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
+import uk.ac.ebi.quickgo.ontology.model.OntologySpecifier;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;
 import uk.ac.ebi.quickgo.ontology.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.rest.headers.HttpHeadersProvider;
@@ -29,6 +30,10 @@ import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.ECO_GRAPH_TR
 @RestController
 @RequestMapping(value = "/ontology/eco")
 public class ECOController extends OBOController<ECOTerm> {
+
+    private static final OntologySpecifier ECO_SPECIFIER = new OntologySpecifier(OntologyType.ECO,
+                                                                                 ECO_GRAPH_TRAVERSAL_TYPES);
+
    @Autowired
     public ECOController(OntologyService<ECOTerm> ecoOntologyService,
                          SearchService<OBOTerm> ontologySearchService,
@@ -40,7 +45,6 @@ public class ECOController extends OBOController<ECOTerm> {
            HttpHeadersProvider httpHeadersProvider
    ) {
         super(ecoOntologyService, ontologySearchService, searchableField, ontologyRetrievalConfig, graphImageService,
-              ecoValidationHelper, ontologyPagingConfig, OntologyType.ECO, httpHeadersProvider,
-              ECO_GRAPH_TRAVERSAL_TYPES);
+              ecoValidationHelper, ontologyPagingConfig, ECO_SPECIFIER, httpHeadersProvider);
     }
 }

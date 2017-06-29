@@ -18,6 +18,7 @@ import uk.ac.ebi.quickgo.ontology.common.OntologyType;
 import uk.ac.ebi.quickgo.ontology.controller.validation.OBOControllerValidationHelper;
 import uk.ac.ebi.quickgo.ontology.model.GOTerm;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
+import uk.ac.ebi.quickgo.ontology.model.OntologySpecifier;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;
 import uk.ac.ebi.quickgo.ontology.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.rest.headers.HttpHeadersProvider;
@@ -42,6 +43,8 @@ import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.GO_GRAPH_TRA
 public class GOController extends OBOController<GOTerm> {
 
     private final MetaDataProvider metaDataProvider;
+    private static final OntologySpecifier GO_SPECIFIER = new OntologySpecifier(OntologyType.GO,
+                                                                                GO_GRAPH_TRAVERSAL_TYPES);
 
     @Autowired
     public GOController(OntologyService<GOTerm> goOntologyService,
@@ -52,9 +55,9 @@ public class GOController extends OBOController<GOTerm> {
                         OBOControllerValidationHelper goValidationHelper,
                         OntologyRestConfig.OntologyPagingConfig ontologyPagingConfig,
                         MetaDataProvider metaDataProvider,
-            HttpHeadersProvider httpHeadersProvider) {
+                        HttpHeadersProvider httpHeadersProvider) {
         super(goOntologyService, ontologySearchService, searchableField, ontologyRetrievalConfig, graphImageService,
-              goValidationHelper, ontologyPagingConfig, OntologyType.GO, httpHeadersProvider, GO_GRAPH_TRAVERSAL_TYPES);
+              goValidationHelper, ontologyPagingConfig, GO_SPECIFIER, httpHeadersProvider);
         Preconditions.checkArgument(metaDataProvider != null, "Metadata provider cannot be null.");
         this.metaDataProvider = metaDataProvider;
     }

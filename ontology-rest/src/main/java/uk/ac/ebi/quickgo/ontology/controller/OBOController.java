@@ -83,9 +83,9 @@ public abstract class OBOController<T extends OBOTerm> {
     private final OBOControllerValidationHelper validationHelper;
     private final GraphImageService graphImageService;
     private final OntologyRestConfig.OntologyPagingConfig ontologyPagingConfig;
-    private final OntologyType ontologyType;
+    private final OntologySpecifier ontologySpecifier;
     private final HttpHeadersProvider httpHeadersProvider;
-    private final List<OntologyRelationType> allowedGraphTraversalTypes;
+
 
     public OBOController(OntologyService<T> ontologyService,
             SearchService<OBOTerm> ontologySearchService,
@@ -94,9 +94,8 @@ public abstract class OBOController<T extends OBOTerm> {
             GraphImageService graphImageService,
             OBOControllerValidationHelper oboControllerValidationHelper,
             OntologyRestConfig.OntologyPagingConfig ontologyPagingConfig,
-            OntologyType ontologyType,
-            HttpHeadersProvider httpHeadersProvider,
-            List<OntologyRelationType> allowedGraphTraversalTypes) {
+            OntologySpecifier ontologySpecifier,
+            HttpHeadersProvider httpHeadersProvider) {
         checkArgument(ontologyService != null, "Ontology service cannot be null");
         checkArgument(ontologySearchService != null, "Ontology search service cannot be null");
         checkArgument(searchableField != null, "Ontology searchable field cannot be null");
@@ -104,9 +103,8 @@ public abstract class OBOController<T extends OBOTerm> {
         checkArgument(graphImageService != null, "Graph image service cannot be null");
         checkArgument(oboControllerValidationHelper != null, "OBO validation helper cannot be null");
         checkArgument(ontologyPagingConfig != null, "Paging config cannot be null");
-        checkArgument(ontologyType != null, "Ontology type config cannot be null");
+        checkArgument(ontologySpecifier != null, "Ontology specifier cannot be null");
         checkArgument(httpHeadersProvider != null, "Http Headers Provider cannot be null");
-        checkArgument(allowedGraphTraversalTypes != null, "Allowed Graph Traversal Types cannot be null");
 
         this.ontologyService = ontologyService;
         this.ontologySearchService = ontologySearchService;
@@ -115,9 +113,8 @@ public abstract class OBOController<T extends OBOTerm> {
         this.validationHelper = oboControllerValidationHelper;
         this.graphImageService = graphImageService;
         this.ontologyPagingConfig = ontologyPagingConfig;
-        this.ontologyType = ontologyType;
+        this.ontologySpecifier = ontologySpecifier;
         this.httpHeadersProvider = httpHeadersProvider;
-        this.allowedGraphTraversalTypes = allowedGraphTraversalTypes;
     }
 
     /**
@@ -145,7 +142,7 @@ public abstract class OBOController<T extends OBOTerm> {
             @RequestParam(value = "page", defaultValue = DEFAULT_PAGE_NUMBER) int page) {
 
         return new ResponseEntity<>(ontologyService.findAllByOntologyType
-                (this.ontologyType,
+                (this.ontologySpecifier.ontologyType,
                  new RegularPage(page, ontologyPagingConfig.defaultPageSize())),
                                     httpHeadersProvider.provide(),
                                     HttpStatus.OK);
@@ -414,7 +411,7 @@ public abstract class OBOController<T extends OBOTerm> {
     public ResponseEntity<GraphImageLayout> getChartCoordinates(@PathVariable(value = "ids") String ids) {
         try {
             GraphImageLayout layout = graphImageService
-                    .createChart(validationHelper.validateCSVIds(ids), ontologyType.name()).getLayout();
+                    .createChart(validationHelper.validateCSVIds(ids), ontologySpecifier.ontologyType.name()).getLayout();
             return ResponseEntity
                     .ok()
                     .body(layout);
@@ -449,8 +446,8 @@ public abstract class OBOController<T extends OBOTerm> {
     }
 
     private List<OntologyRelationType> validRelations(String relations) {
-        return Objects.isNull(relations) || relations.isEmpty() ? this.allowedGraphTraversalTypes :
-                    validationHelper.validateRelationTypes(relations, this.allowedGraphTraversalTypes);
+        return Objects.isNull(relations) || relations.isEmpty() ? this.ontologySpecifier.allowedRelations :
+                    validationHelper.validateRelationTypes(relations, this.ontologySpecifier.allowedRelations);
     }
 
     /**
@@ -509,7 +506,7 @@ public abstract class OBOController<T extends OBOTerm> {
             throws IOException, RenderingGraphException {
         RenderedImage renderedImage =
                 graphImageService
-                        .createChart(ids, ontologyType.name())
+                        .createChart(ids, ontologySpecifier.ontologyType.name())
                         .getGraphImage()
                         .render();
         ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -556,6 +553,6 @@ public abstract class OBOController<T extends OBOTerm> {
     private QuickGOQuery restrictQueryToOTypeResults(QuickGOQuery query) {
         return and(query,
                    ontologyQueryConverter.convert(
-                           OntologyFields.Searchable.ONTOLOGY_TYPE + COLON + ontologyType.name()));
+                           OntologyFields.Searchable.ONTOLOGY_TYPE + COLON + ontologySpecifier.ontologyType.name()));
     }
 }
