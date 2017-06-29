@@ -466,32 +466,15 @@ public class OntologyServiceImplTest {
             // Set up getting parent name
             OntologyDocument docParent = createGODoc(parent, "name2");
             GOTerm termParent = createGOTerm(parent, "name2");
-            when(repositoryMock
-                         .findCoreAttrByTermId(OntologyType.GO.name(), idsViaOntologyService(child, parent)))
-                    .thenReturn(Arrays.asList(docChild, docParent));
-            when(repositoryMock
-                         .findCoreAttrByTermId(OntologyType.GO.name(), idsViaOntologyService(child)))
-                    .thenReturn(singletonList(docChild));
-            when(repositoryMock
-                         .findCoreAttrByTermId(OntologyType.GO.name(), idsViaOntologyService(parent)))
-                    .thenReturn(singletonList(docParent));
+            setupRepository(child, parent, docChild, docParent);
 
             // Set up results from OntologyGraph
             Set<String> fromIds = new HashSet<>(idsViaOntologyService(child));
             Set<String> toIds = new HashSet<>(idsViaOntologyService(parent));
-            final AncestorEdge relationship = new AncestorEdge(
-                    child,
-                    OntologyRelationType.IS_A.toString(),
-                    parent);
-            final Set<AncestorEdge> edges = new HashSet<>(Collections
-                                                                  .singletonList(relationship));
-            final Set<String> vertices = new HashSet<>(Arrays.asList(child, parent));
-            when(ontologyTraversalMock.subGraph(fromIds, toIds))
-                    .thenReturn(new AncestorGraph<>(edges, vertices));
+            final AncestorEdge relationship = setupRelationships(child, parent, fromIds, toIds);
 
             // Setup children for child term
             when(ontologyTraversalMock.children(child)).thenReturn(new HashSet<>());
-
             when(goDocumentConverterMock.convert(docChild)).thenReturn(termChild);
             when(goDocumentConverterMock.convert(docParent)).thenReturn(termParent);
 
@@ -504,6 +487,19 @@ public class OntologyServiceImplTest {
             AncestorVertex childVertex = new AncestorVertex(child, "name1");
             AncestorVertex parentVertex = new AncestorVertex(parent, "name2");
             assertThat(ancestorGraph.vertices, containsInAnyOrder(childVertex, parentVertex));
+        }
+
+        private void setupRepository(String child, String parent, OntologyDocument docChild,
+                OntologyDocument docParent) {
+            when(repositoryMock
+                         .findCoreAttrByTermId(OntologyType.GO.name(), idsViaOntologyService(child, parent)))
+                    .thenReturn(Arrays.asList(docChild, docParent));
+            when(repositoryMock
+                         .findCoreAttrByTermId(OntologyType.GO.name(), idsViaOntologyService(child)))
+                    .thenReturn(singletonList(docChild));
+            when(repositoryMock
+                         .findCoreAttrByTermId(OntologyType.GO.name(), idsViaOntologyService(parent)))
+                    .thenReturn(singletonList(docParent));
         }
 
         @Test(expected = IllegalArgumentException.class)
@@ -540,6 +536,19 @@ public class OntologyServiceImplTest {
         private List<String> idsViaOntologyService(String... ids) {
             return goOntologyService.buildIdList(Arrays.asList(ids));
         }
+    }
+
+    private AncestorEdge setupRelationships(String child, String parent, Set<String> fromIds, Set<String> toIds) {
+        final AncestorEdge relationship = new AncestorEdge(
+                child,
+                OntologyRelationType.IS_A.toString(),
+                parent);
+        final Set<AncestorEdge> edges = new HashSet<>(Collections
+                                                              .singletonList(relationship));
+        final Set<String> vertices = new HashSet<>(Arrays.asList(child, parent));
+        when(ontologyTraversalMock.subGraph(fromIds, toIds))
+                .thenReturn(new AncestorGraph<>(edges, vertices));
+        return relationship;
     }
 
     public class ECOServiceTests {
