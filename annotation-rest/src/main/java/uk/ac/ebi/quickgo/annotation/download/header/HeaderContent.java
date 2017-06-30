@@ -12,10 +12,10 @@ import java.util.List;
  */
 public class HeaderContent {
 
-    private String uri;
-    private boolean isSlimmed;
-    private String date;
-    private List<String> selectedFields;
+    private final String uri;
+    private final boolean isSlimmed;
+    private final String date;
+    private final List<String> selectedFields;
 
     public String date() {
         return date;
