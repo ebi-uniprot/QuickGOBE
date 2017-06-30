@@ -22,7 +22,7 @@ import static java.util.stream.Collectors.toList;
  * Time: 15:26
  * Created with IntelliJ IDEA.
  */
-public class PeriodParserDayTime extends PeriodParser{
+public class PeriodParserDayTime extends PeriodParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(PeriodParserDayTime.class);
     private static final String DAY_TIME_REGEX = "^(MONDAY|TUESDAY|WEDNESDAY|THURSDAY|FRIDAY|SATURDAY|SUNDAY)\\(" +
             "([0-9]{2}):([0-9]{2})\\)";
@@ -42,11 +42,11 @@ public class PeriodParserDayTime extends PeriodParser{
         String[] fromTo = input.split(TO_SYMBOL);
         if (fromTo.length == REQUIRED_DATE_MODIFYING_INSTANCES) {
             List<DayTime> durationList = Arrays.stream(fromTo)
-                                                    .map(this::mapToDayTime)
-                                                    .filter(Optional::isPresent)   //replace these two lines with
-                                                    .map(Optional::get)            //.map(Optional::stream) in Java 9
-                                                    .collect(toList());
-            LOGGER.info("PeriodParser - created durationList " + durationList);
+                                               .map(this::mapToDayTime)
+                                               .filter(Optional::isPresent)   //replace these two lines with
+                                               .map(Optional::get)            //.map(Optional::stream) in Java 9
+                                               .collect(toList());
+            LOGGER.debug("Created durationList " + durationList);
             if (durationList.size() == REQUIRED_DATE_MODIFYING_INSTANCES) {
                 return Optional.of(new AlarmClockDayTime(durationList.get(0), durationList.get(1)));
             }
@@ -57,12 +57,11 @@ public class PeriodParserDayTime extends PeriodParser{
     private Optional<DayTime> mapToDayTime(String input) {
         try {
             Matcher periodMatcher = DAY_TIME_PATTERN.matcher(input);
-            if(periodMatcher.matches() && periodMatcher.groupCount() == EXPECTED_GROUP_COUNT) {
+            if (periodMatcher.matches() && periodMatcher.groupCount() == EXPECTED_GROUP_COUNT) {
                 final int hours = Integer.parseInt(periodMatcher.group(HOUR_GROUP));
                 final int minutes = Integer.parseInt(periodMatcher.group(MINUTE_GROUP));
                 final DayTime dayTime = new DayTime(DayOfWeek.valueOf(periodMatcher.group(DAY_GROUP)),
                                                     LocalTime.of(hours, minutes));
-                LOGGER.info(PeriodParserDayTime.class.getName() + " toDateModifier from " + input + " to " + dayTime);
                 return Optional.of(dayTime);
             }
         } catch (Exception e) {
