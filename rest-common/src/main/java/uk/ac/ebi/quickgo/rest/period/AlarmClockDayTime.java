@@ -22,11 +22,10 @@ public class AlarmClockDayTime implements AlarmClock {
     private final DayTime start;
     private final DayTime end;
 
-
     AlarmClockDayTime(DayTime start, DayTime end) {
         Preconditions.checkArgument(Objects.nonNull(start), "The RemainingTimePeriod constructor start parameter " +
                 "must not be null.");
-        Preconditions.checkArgument(Objects.nonNull(end),"The RemainingTimePeriod constructor end parameter " +
+        Preconditions.checkArgument(Objects.nonNull(end), "The RemainingTimePeriod constructor end parameter " +
                 "must not be null.");
         this.start = start;
         this.end = end;
@@ -34,27 +33,27 @@ public class AlarmClockDayTime implements AlarmClock {
 
     @Override
     public Duration remainingTime(LocalDateTime target) {
-        LOGGER.info("AlarmClockImpl calculating remaining time.");
+        LOGGER.debug("Calculating remaining time.");
         Duration remaining = Duration.ZERO;
         final DayOfWeekRange dayOfWeekRange = new DayOfWeekRange(start.dayOfWeek, end.dayOfWeek);
-        if(dayOfWeekRange.includes(target.getDayOfWeek())){
+        if (dayOfWeekRange.includes(target.getDayOfWeek())) {
             remaining = comparedModifiedTimes(target);
         }
         return remaining;
     }
 
-    private Duration comparedModifiedTimes(LocalDateTime target){
+    private Duration comparedModifiedTimes(LocalDateTime target) {
         LocalDateTime startDateTime = start.modifyToPrevious(target);
         LocalDateTime endDateTime = end.modifyToNext(target);
-        LOGGER.info("AlarmClockImpl calculating remaining time between " + target + " and " + endDateTime);
+        LOGGER.debug("AlarmClockImpl calculating remaining time between " + target + " and " + endDateTime);
 
         Duration remaining;
-        if(startDateTime.isBefore(target) && endDateTime.isAfter(target)) {
+        if (startDateTime.isBefore(target) && endDateTime.isAfter(target)) {
             remaining = Duration.between(target, endDateTime);
-        }else{
+        } else {
             remaining = Duration.ZERO;
         }
-        LOGGER.info("AlarmClockImpl remaining time is " + remaining);
+        LOGGER.debug(String.format("Remaining time is %s", remaining));
         return remaining;
     }
 
@@ -68,10 +67,8 @@ public class AlarmClockDayTime implements AlarmClock {
 
         AlarmClockDayTime that = (AlarmClockDayTime) o;
 
-        if (start != null ? !start.equals(that.start) : that.start != null) {
-            return false;
-        }
-        return end != null ? end.equals(that.end) : that.end == null;
+        return (start != null ? start.equals(that.start) : that.start == null) &&
+                (end != null ? end.equals(that.end) : that.end == null);
     }
 
     @Override public int hashCode() {
