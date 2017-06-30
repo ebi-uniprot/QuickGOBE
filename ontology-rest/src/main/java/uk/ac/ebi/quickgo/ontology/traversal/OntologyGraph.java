@@ -170,24 +170,30 @@ public class OntologyGraph implements OntologyGraphTraversal {
                        .collect(toSet());
     }
 
+    /**
+     *  Calculate a sub-graph on the ontology using the specified starting and stopping vertices.
+     * @param startVertices the base vertices which are the lowest level of the sub-graph
+     * @param stopVertices the ending vertices beyond which ontology vertices and edges are not returned. If this
+     * value is empty or null then the default stop nodes for the ontology are used.
+     * @param relations a varargs value used to filter edges to the sub-graph. By omitting a {@code relation} value,
+     * edges of all relation types will be returned. Valid relationship list is ontology dependent and therefore must be
+     * supplied.  We can't use the full list as there maybe edges with relationships that should not be displayed in the
+     * sub-graph.
+     * @return sub-graph
+     */
     @Override
     public AncestorGraph<String> subGraph(Set<String> startVertices, Set<String> stopVertices,
             OntologyRelationType... relations) {
         Preconditions.checkArgument(notEmpty(startVertices), "Starting vertices cannot be null/empty.");
-        // Valid relationship list is ontology dependent and therefore must be supplied.
-        // We can't use the full list as there maybe edges with relationships that should not be displayed in the
-        // subgraph
         Preconditions.checkArgument(Objects.nonNull(relations) && relations.length > 0, "Relations cannot be null");
-        AncestorGraph<String> ancestorGraph = AncestorGraph.newAncestorGraphString();
         Queue<String> targetVertices = buildTargetVertices(startVertices);
         stopVertices.addAll(STOP_NODES);
         OntologyRelationType[] targetRelations = OntologyRelationType.relevantRelations(relations);
         AncestorGraphRequest request = new AncestorGraphRequest(targetVertices, stopVertices, targetRelations);
-        //SubGraphCalculator.populateAncestorGraphForRequest(request, this, ancestorGraph).compute();
         return populateAncestorGraphForRequest(request);
     }
 
-     AncestorGraph populateAncestorGraphForRequest(AncestorGraphRequest request) {
+     private AncestorGraph populateAncestorGraphForRequest(AncestorGraphRequest request) {
          AncestorGraph<String> ancestorGraph = AncestorGraph.newAncestorGraphString();
 
          while (!request.targetVertices.isEmpty() ){
