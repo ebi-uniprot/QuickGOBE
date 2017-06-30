@@ -271,7 +271,7 @@ public class AnnotationController {
     private List<String> selectedFieldList(AnnotationRequest annotationRequest) {
         if(annotationRequest.getSelectedFields() != null){
             return Arrays.stream(annotationRequest.getSelectedFields())
-                         .map(f -> f.toLowerCase())
+                         .map(String::toLowerCase)
                          .collect(toList());
         }
         return Collections.emptyList();
