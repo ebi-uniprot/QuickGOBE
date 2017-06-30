@@ -25,8 +25,8 @@ import static java.util.stream.Collectors.toList;
  * Time: 15:26
  * Created with IntelliJ IDEA.
  */
-public class PeriodParserMonthTime extends PeriodParser{
-    private Logger LOGGER = LoggerFactory.getLogger(PeriodParserMonthTime.class);
+public class PeriodParserMonthTime extends PeriodParser {
+    private final Logger LOGGER = LoggerFactory.getLogger(PeriodParserMonthTime.class);
     private static final String MONTH_DATE_TIME_REGEX = "^" +
             "(JANUARY|FEBRUARY|MARCH|APRIL|MAY|JUNE|JULY|AUGUST|SEPTEMBER|OCTOBER|NOVEMBER|DECEMBER)\\(([0-9]{1,2})" +
             "\\)\\(([0-9]{1,2}):([0-9]{1,2})\\)";
@@ -41,11 +41,11 @@ public class PeriodParserMonthTime extends PeriodParser{
         String[] fromTo = input.split(TO_SYMBOL);
         if (fromTo.length == REQUIRED_DATE_MODIFYING_INSTANCES) {
             List<MonthTime> durationList = Arrays.stream(fromTo)
-                                               .map(this::mapToMonthTime)
-                                               .filter(Optional::isPresent)   //replace these two lines with
-                                               .map(Optional::get)            //.map(Optional::stream) in Java 9
-                                               .collect(toList());
-            LOGGER.info("PeriodParser - created durationList " + durationList);
+                                                 .map(this::mapToMonthTime)
+                                                 .filter(Optional::isPresent)   //replace these two lines with
+                                                 .map(Optional::get)            //.map(Optional::stream) in Java 9
+                                                 .collect(toList());
+            LOGGER.debug("Created durationList " + durationList);
             if (durationList.size() == REQUIRED_DATE_MODIFYING_INSTANCES) {
                 return Optional.of(new AlarmClockMonthTime(durationList.get(0), durationList.get(1)));
             }
@@ -56,7 +56,7 @@ public class PeriodParserMonthTime extends PeriodParser{
     private Optional<MonthTime> mapToMonthTime(String input) {
         try {
             Matcher periodMatcher = MONTH_DATE_TIME_PATTERN.matcher(input);
-            if(periodMatcher.matches() && periodMatcher.groupCount() == EXPECTED_GROUP_COUNT) {
+            if (periodMatcher.matches() && periodMatcher.groupCount() == EXPECTED_GROUP_COUNT) {
                 final Month month = Month.valueOf(periodMatcher.group(MONTH_GROUP));
                 final int dayOfMonth = Integer.parseInt(periodMatcher.group(DATE_GROUP));
                 final int hours = Integer.parseInt(periodMatcher.group(HOUR_GROUP));
@@ -65,8 +65,7 @@ public class PeriodParserMonthTime extends PeriodParser{
                 return Optional.of(new MonthTime(monthDay, LocalTime.of(hours, minutes)));
             }
         } catch (Exception e) {
-            LOGGER.info(PeriodParserMonthTime.class.getName() + " parsed " + input + " but encountered an exception.",
-                        e);
+            LOGGER.debug("Parsed " + input + " but encountered an exception.", e);
         }
         return Optional.empty();
     }
