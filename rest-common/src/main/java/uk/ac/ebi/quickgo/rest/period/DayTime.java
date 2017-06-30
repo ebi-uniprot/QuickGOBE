@@ -48,13 +48,11 @@ class DayTime {
     }
 
     LocalDateTime modifyToPrevious(LocalDateTime target) {
-        LOGGER.info("modifyToPrevious " + target + " in DayTime");
         TemporalAdjuster toDay = TemporalAdjusters.previousOrSame(this.dayOfWeek);
         return modify(target, toDay);
     }
 
     LocalDateTime modifyToNext(LocalDateTime target) {
-        LOGGER.info("modifyToNext " + target + " in DayTime");
         TemporalAdjuster toDay = TemporalAdjusters.nextOrSame(this.dayOfWeek);
         return modify(target, toDay);
     }
