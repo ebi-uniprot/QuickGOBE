@@ -9,7 +9,7 @@ import uk.ac.ebi.quickgo.rest.search.results.transformer.AbstractValueInjector;
 import java.util.List;
 
 /**
- * This class is responsible for supplementing an {@link Annotation} instance, which contains
+ * Responsible for supplementing an {@link Annotation} instance, which contains
  * a gene product identifier, with a list of gene product synonyms, through the use of a RESTful service.
  * @author Tony Wardell
  * Date: 23/06/2017
@@ -18,8 +18,8 @@ import java.util.List;
  */
 public class GeneProductNameInjector extends AbstractValueInjector<BasicGeneProduct, Annotation> {
 
-    static final String GENE_PRODUCT_ID = "geneProductId";
-    static final String GENE_PRODUCT_NAME= "name";
+    private static final String GENE_PRODUCT_ID = "geneProductId";
+    static final String GENE_PRODUCT_NAME = "name";
 
     @Override
     public String getId() {
