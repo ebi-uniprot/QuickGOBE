@@ -28,7 +28,7 @@ public class AnnotationToTSV extends AnnotationTo implements BiFunction<Annotati
 
     private static final String YEAR_MONTH_DAY = "yyyyMMdd";
 
-    private Map<String, BiConsumer<OutputContent, StringJoiner>> selected2Content;
+    private final Map<String, BiConsumer<OutputContent, StringJoiner>> selected2Content;
 
     public AnnotationToTSV() {
         selected2Content = new HashMap<>();
@@ -94,9 +94,9 @@ public class AnnotationToTSV extends AnnotationTo implements BiFunction<Annotati
     }
 
     private static class OutputContent{
-        Annotation annotation;
-        List<String> selectedFields;
-        String slimmedToGoId;
+        final Annotation annotation;
+        final List<String> selectedFields;
+        final String slimmedToGoId;
 
         private OutputContent(Annotation annotation, List<String> selectedFields, String slimmedToGoId) {
             this.annotation = annotation;
