@@ -17,7 +17,6 @@ public class DayOfWeekRangeTest {
 
     @Test
     public void testIncludes(){
-
         assertTrue(new DayOfWeekRange(DayOfWeek.SATURDAY, DayOfWeek.SATURDAY).includes(DayOfWeek.SATURDAY));
         assertTrue(new DayOfWeekRange(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY).includes(DayOfWeek.SATURDAY));
         assertTrue(new DayOfWeekRange(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY).includes(DayOfWeek.SUNDAY));
@@ -29,6 +28,5 @@ public class DayOfWeekRangeTest {
         assertFalse(new DayOfWeekRange(DayOfWeek.SATURDAY, DayOfWeek.SATURDAY).includes(DayOfWeek.SUNDAY));
         assertFalse(new DayOfWeekRange(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY).includes(DayOfWeek.WEDNESDAY));
         assertFalse(new DayOfWeekRange(DayOfWeek.FRIDAY, DayOfWeek.WEDNESDAY).includes(DayOfWeek.THURSDAY));
-
     }
 }
