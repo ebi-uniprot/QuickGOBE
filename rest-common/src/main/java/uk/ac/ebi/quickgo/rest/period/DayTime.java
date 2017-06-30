@@ -7,8 +7,6 @@ import java.time.LocalTime;
 import java.time.temporal.TemporalAdjuster;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Objects;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Data structure holds union of day of week and time. Used to declare events that have a daily occurrence at a set
@@ -21,9 +19,8 @@ import org.slf4j.LoggerFactory;
  */
 class DayTime {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DayTime.class);
     final DayOfWeek dayOfWeek;
-    public final LocalTime time;
+    private final LocalTime time;
 
     /**
      * Given a target time, this method returns a {@link LocalDateTime} instance that has the same day and time as
