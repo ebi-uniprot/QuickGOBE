@@ -6,8 +6,6 @@ import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.converter.AbstractHttpMessageConverter;
