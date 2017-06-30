@@ -12,8 +12,8 @@ import java.time.DayOfWeek;
 class DayOfWeekRange {
 
     private static final int ONE_DAY = 1;
-    private DayOfWeek start;
-    private DayOfWeek end;
+    private final DayOfWeek start;
+    private final DayOfWeek end;
 
     DayOfWeekRange(DayOfWeek start, DayOfWeek end) {
         this.start = start;
@@ -21,18 +21,18 @@ class DayOfWeekRange {
     }
 
     /**
-     * Does this range iclude the target day of the week
+     * Does this range include the target day of the week
      * @param target DayOfWeek
      * @return boolean for inclusion.
      */
-    boolean includes(DayOfWeek target){
+    boolean includes(DayOfWeek target) {
         DayOfWeek comparison = start;
         boolean checkedEnd = false;
-        while(!checkedEnd) {
-            if (comparison.equals(target)){
+        while (!checkedEnd) {
+            if (comparison.equals(target)) {
                 return true;
             }
-            if(comparison.equals(end)){
+            if (comparison.equals(end)) {
                 checkedEnd = true;
             }
             comparison = comparison.plus(ONE_DAY);
