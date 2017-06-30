@@ -22,8 +22,4 @@ public class DownloadContent {
         this.annotationStream = annotationResultStream;
         this.selectedFields = selectedFields;
     }
-
-    public List<String> selectedFields() {
-        return selectedFields;
-    }
 }
