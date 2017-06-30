@@ -43,7 +43,7 @@ public class TsvHeaderCreator implements HeaderCreator{
     static final String GENE_PRODUCT_TYPE = "GENE_PRODUCT_TYPE";
 
 
-    private static Map<String, BiConsumer<HeaderContent,StringJoiner>> selected2Content;
+    private static final Map<String, BiConsumer<HeaderContent,StringJoiner>> selected2Content;
 
     static {
         selected2Content = new HashMap<>();
