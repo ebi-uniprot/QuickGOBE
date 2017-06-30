@@ -24,7 +24,7 @@ public class AlarmClockMonthTime implements AlarmClock {
     AlarmClockMonthTime(MonthTime start, MonthTime end) {
         Preconditions.checkArgument(Objects.nonNull(start), "The RemainingTimePeriod constructor start parameter " +
                 "must not be null.");
-        Preconditions.checkArgument(Objects.nonNull(end),"The RemainingTimePeriod constructor end parameter " +
+        Preconditions.checkArgument(Objects.nonNull(end), "The RemainingTimePeriod constructor end parameter " +
                 "must not be null.");
         this.start = start;
         this.end = end;
@@ -32,25 +32,25 @@ public class AlarmClockMonthTime implements AlarmClock {
 
     @Override
     public Duration remainingTime(LocalDateTime target) {
-        LOGGER.info("AlarmClockImpl calculating remaining time.");
+        LOGGER.debug("Calculating remaining time.");
         return comparedModifiedTimes(target);
     }
 
-    private Duration comparedModifiedTimes(LocalDateTime target){
+    private Duration comparedModifiedTimes(LocalDateTime target) {
         LocalDateTime startDateTime = start.modify(target);
         LocalDateTime endDateTime = end.modify(target);
-        if(endDateTime.isBefore(startDateTime)){
+        if (endDateTime.isBefore(startDateTime)) {
             endDateTime = endDateTime.plusYears(1);
         }
-        LOGGER.info("AlarmClockImpl calculating remaining time between " + target + " and " + endDateTime);
+        LOGGER.debug("Calculating remaining time between " + target + " and " + endDateTime);
 
         Duration remaining;
-        if(startDateTime.isBefore(target) && endDateTime.isAfter(target)) {
+        if (startDateTime.isBefore(target) && endDateTime.isAfter(target)) {
             remaining = Duration.between(target, endDateTime);
-        }else{
+        } else {
             remaining = Duration.ZERO;
         }
-        LOGGER.info("AlarmClockImpl remaining time is " + remaining);
+        LOGGER.debug("Remaining time is " + remaining);
         return remaining;
     }
 
@@ -64,10 +64,8 @@ public class AlarmClockMonthTime implements AlarmClock {
 
         AlarmClockMonthTime that = (AlarmClockMonthTime) o;
 
-        if (start != null ? !start.equals(that.start) : that.start != null) {
-            return false;
-        }
-        return end != null ? end.equals(that.end) : that.end == null;
+        return (start != null ? start.equals(that.start) : that.start == null) &&
+                (end != null ? end.equals(that.end) : that.end == null);
     }
 
     @Override public int hashCode() {
