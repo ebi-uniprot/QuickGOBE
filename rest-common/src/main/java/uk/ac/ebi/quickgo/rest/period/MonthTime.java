@@ -22,7 +22,7 @@ public class MonthTime {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MonthTime.class);
     private final MonthDay monthDay;
-    final LocalTime time;
+    private final LocalTime time;
 
     MonthTime(MonthDay monthDay, LocalTime time) {
         Preconditions.checkArgument(Objects.nonNull(monthDay), "Invalid monthDay parameter passed to " +
@@ -39,7 +39,6 @@ public class MonthTime {
      * @return a particular instant in time.
      */
     LocalDateTime modify(LocalDateTime target) {
-        LOGGER.info("Modifying " + target + " in MonthTime");
         Preconditions.checkArgument(Objects.nonNull(target), "A target LocalDateTime cannot be null");
         LocalDateTime comparedDate = target.with(this.monthDay);
         return comparedDate.with(this.time);
