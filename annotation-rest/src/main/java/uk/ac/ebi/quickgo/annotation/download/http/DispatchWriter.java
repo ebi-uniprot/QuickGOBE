@@ -67,7 +67,7 @@ public class DispatchWriter {
         try {
             downloadContent.annotationStream.forEach(annotationResult ->
                 annotationResult.getResults()
-                                .forEach(annotation -> converter.apply(annotation, downloadContent.selectedFields())
+                                .forEach(annotation -> converter.apply(annotation, downloadContent.selectedFields)
                                                                              .forEach(content -> stream(out,
                                                                                                         counter,
                                                                                                         batchCount,
