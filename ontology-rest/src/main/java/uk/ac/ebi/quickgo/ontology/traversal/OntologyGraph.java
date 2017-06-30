@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.ontology.traversal;
 
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
+import uk.ac.ebi.quickgo.ontology.model.graph.AncestorEdge;
 import uk.ac.ebi.quickgo.ontology.model.graph.AncestorGraph;
 import uk.ac.ebi.quickgo.ontology.model.graph.AncestorGraphRequest;
 
@@ -14,6 +15,8 @@ import org.jgrapht.GraphPath;
 import org.jgrapht.alg.AllDirectedPaths;
 import org.jgrapht.graph.ClassBasedEdgeFactory;
 import org.jgrapht.graph.DirectedMultigraph;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static java.util.stream.Collectors.toSet;
 
@@ -26,6 +29,9 @@ import static java.util.stream.Collectors.toSet;
  * @author Edd
  */
 public class OntologyGraph implements OntologyGraphTraversal {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(OntologyGraph.class);
+
     static final String MOLECULAR_FUNCTION_STOP_NODE = "GO:0003674";
     static final String BIOLOGICAL_PROCESS_STOP_NODE = "GO:0008150";
     static final String CELLULAR_COMPONENT_STOP_NODE = "GO:0005575";
@@ -174,13 +180,47 @@ public class OntologyGraph implements OntologyGraphTraversal {
         Preconditions.checkArgument(Objects.nonNull(relations) && relations.length > 0, "Relations cannot be null");
         AncestorGraph<String> ancestorGraph = AncestorGraph.newAncestorGraphString();
         Queue<String> targetVertices = buildTargetVertices(startVertices);
-        if (!targetVertices.isEmpty()) {
-            stopVertices.addAll(STOP_NODES);
-            OntologyRelationType[] targetRelations = OntologyRelationType.relevantRelations(relations);
-            AncestorGraphRequest request = new AncestorGraphRequest(targetVertices, stopVertices, targetRelations);
-            SubGraphCalculator.populateAncestorGraphForRequest(request, this, ancestorGraph).compute();
-        }
+        stopVertices.addAll(STOP_NODES);
+        OntologyRelationType[] targetRelations = OntologyRelationType.relevantRelations(relations);
+        AncestorGraphRequest request = new AncestorGraphRequest(targetVertices, stopVertices, targetRelations);
+        //SubGraphCalculator.populateAncestorGraphForRequest(request, this, ancestorGraph).compute();
+        return populateAncestorGraphForRequest(request);
+    }
+
+     AncestorGraph populateAncestorGraphForRequest(AncestorGraphRequest request) {
+         AncestorGraph<String> ancestorGraph = AncestorGraph.newAncestorGraphString();
+
+         while (!request.targetVertices.isEmpty() ){
+             String target = request.targetVertices.poll();
+             if (Objects.nonNull(target)) {
+                 if (ancestorGraph.vertices.add(target) && !request.stopVertices.contains(target)) {
+                     try {
+                         Set<OntologyRelationship> parents = this.parents(target, request.targetRelations);
+                         addParentsToWorkQueue(request, parents);
+                         ancestorGraph.edges.addAll(mapOntologyRelationshipsToAncestorEdges(parents));
+
+                     } catch (Exception e) {
+                         LOGGER.error("SubGraphCalculator#calculateGraph looked up parents for " + target + " but " +
+                                              "received exception ", e);
+                     }
+                 }
+             }
+         }
         return ancestorGraph;
+    }
+
+    private static Set<AncestorEdge> mapOntologyRelationshipsToAncestorEdges(Set<OntologyRelationship> parents) {
+        Set<AncestorEdge> edgeSet = new HashSet<>();
+        parents.stream()
+               .map(or -> new AncestorEdge(or.child, or.relationship.getLongName(), or.parent))
+               .forEach(edgeSet::add);
+        return edgeSet;
+    }
+
+    private static void addParentsToWorkQueue(AncestorGraphRequest request, Set<OntologyRelationship> parents) {
+        parents.stream()
+               .map(p -> p.parent)
+               .forEach(request.targetVertices::add);
     }
 
     @Override
