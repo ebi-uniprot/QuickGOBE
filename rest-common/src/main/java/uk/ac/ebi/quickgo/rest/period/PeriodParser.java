@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
  * Created with IntelliJ IDEA.
  */
 public abstract class PeriodParser {
-    private Logger LOGGER = LoggerFactory.getLogger(PeriodParser.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PeriodParser.class);
     static final String TO_SYMBOL = "-";
     static final int REQUIRED_DATE_MODIFYING_INSTANCES = 2;
 
@@ -22,7 +22,7 @@ public abstract class PeriodParser {
      * @param input a string that contains a duration definition.
      * @return Optional of Period or an empty Optional if no valid period could be parsed.
      */
-    public Optional<AlarmClock> parse(String input){
+    public Optional<AlarmClock> parse(String input) {
         if (Objects.nonNull(input) && !input.isEmpty()) {
             return getPeriod(input);
         }
