@@ -27,7 +27,6 @@ public class RemainingTimeSupplier {
     public RemainingTimeSupplier(Collection<AlarmClock> alarmClocks) {
         Preconditions.checkArgument(nonNull(alarmClocks), "The collection of periods to check must not " +
                 "be null");
-        LOGGER.info("Populating RemainingTimeSupplier with alarm clocks " + alarmClocks);
         this.alarmClocks = alarmClocks;
     }
 
@@ -37,13 +36,12 @@ public class RemainingTimeSupplier {
      * @return Duration left of any active periods, if they exist.
      */
     public Duration getDuration() {
-        LOGGER.info("RemainingTimeSupplier checking " + alarmClocks.size() + " alarm clock instances");
         LocalDateTime now = LocalDateTime.now();
         Optional<Duration> remainingTime = alarmClocks.stream()
                                                       .map(p -> p.remainingTime(now))
                                                       .filter(duration -> !duration.isZero())
                                                       .findFirst();
-        LOGGER.info("RemainingTimeSupplier getDuration calculation has result in a remaining time of " + remainingTime);
+        LOGGER.debug("Get Duration calculation has result in a remaining time of " + remainingTime);
         return remainingTime.orElse(Duration.ZERO);
     }
 }
