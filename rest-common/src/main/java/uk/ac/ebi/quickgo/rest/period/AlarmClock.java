@@ -15,7 +15,7 @@ public interface AlarmClock {
 
     /**
      * What is the Duration left from the date and time held by the implementing class, and the target LocalDateTime
-     * @param target Date and time for which to calculate remaing time.
+     * @param target Date and time for which to calculate remaining time.
      * @return Remaining time as a Duration.
      */
     Duration remainingTime(LocalDateTime target);

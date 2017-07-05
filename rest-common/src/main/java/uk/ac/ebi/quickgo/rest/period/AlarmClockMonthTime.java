@@ -4,25 +4,27 @@ import com.google.common.base.Preconditions;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Objects;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * An implementation of a {@link AlarmClock} which uses two values of {@link DateModifier} as start and end points to
- * determine remaining time.
+ * JANUARY(12)(5:7)-FEBRUARY(2)(18:15)
  *
  * @author Tony Wardell
- * Date: 11/04/2017
- * Time: 12:46
+ * Date: 16/05/2017
+ * Time: 13:06
  * Created with IntelliJ IDEA.
  */
-public class AlarmClockImpl implements AlarmClock {
+public class AlarmClockMonthTime implements AlarmClock {
 
-    private final DateModifier start;
-    private final DateModifier end;
+    private static final Logger LOGGER = LoggerFactory.getLogger(AlarmClockDayTime.class);
+    private final MonthTime start;
+    private final MonthTime end;
 
-    AlarmClockImpl(DateModifier start, DateModifier end) {
+    AlarmClockMonthTime(MonthTime start, MonthTime end) {
         Preconditions.checkArgument(Objects.nonNull(start), "The RemainingTimePeriod constructor start parameter " +
                 "must not be null.");
-        Preconditions.checkArgument(Objects.nonNull(end),"The RemainingTimePeriod constructor end parameter " +
+        Preconditions.checkArgument(Objects.nonNull(end), "The RemainingTimePeriod constructor end parameter " +
                 "must not be null.");
         this.start = start;
         this.end = end;
@@ -30,14 +32,25 @@ public class AlarmClockImpl implements AlarmClock {
 
     @Override
     public Duration remainingTime(LocalDateTime target) {
+        LOGGER.debug("Calculating remaining time.");
+        return comparedModifiedTimes(target);
+    }
+
+    private Duration comparedModifiedTimes(LocalDateTime target) {
         LocalDateTime startDateTime = start.modify(target);
         LocalDateTime endDateTime = end.modify(target);
+        if (endDateTime.isBefore(startDateTime)) {
+            endDateTime = endDateTime.plusYears(1);
+        }
+        LOGGER.debug("Calculating remaining time between " + target + " and " + endDateTime);
+
         Duration remaining;
-        if (target.isAfter(startDateTime) && target.isBefore(endDateTime)){
+        if (startDateTime.isBefore(target) && endDateTime.isAfter(target)) {
             remaining = Duration.between(target, endDateTime);
-        }else{
+        } else {
             remaining = Duration.ZERO;
         }
+        LOGGER.debug("Remaining time is " + remaining);
         return remaining;
     }
 
@@ -49,12 +62,10 @@ public class AlarmClockImpl implements AlarmClock {
             return false;
         }
 
-        AlarmClockImpl that = (AlarmClockImpl) o;
+        AlarmClockMonthTime that = (AlarmClockMonthTime) o;
 
-        if (start != null ? !start.equals(that.start) : that.start != null) {
-            return false;
-        }
-        return end != null ? end.equals(that.end) : that.end == null;
+        return (start != null ? start.equals(that.start) : that.start == null) &&
+                (end != null ? end.equals(that.end) : that.end == null);
     }
 
     @Override public int hashCode() {

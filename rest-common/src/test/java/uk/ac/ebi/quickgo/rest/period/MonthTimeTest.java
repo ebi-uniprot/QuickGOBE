@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNull.notNullValue;
 
 /**
@@ -22,42 +23,39 @@ public class MonthTimeTest {
     private static final MonthDay MONTH_DAY = MonthDay.of(Month.APRIL, DAY_OF_MONTH);
     private static final int HOUR = 15;
     private static final int MINUTE = 10;
-    private static final LocalTime TEA_TIME = LocalTime.of(HOUR, MINUTE);
+    private static final LocalTime LOCAL_TIME = LocalTime.of(HOUR, MINUTE);
 
     @Test
     public void successfulCreation(){
-        MonthTime monthTime = new MonthTime(MONTH_DAY, TEA_TIME);
+        MonthTime monthTime = new MonthTime(MONTH_DAY, LOCAL_TIME);
         assertThat(monthTime, notNullValue());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void unsuccessfulCreationWithNullMonthDay(){
-        new MonthTime(null, TEA_TIME);
+        new MonthTime(null, LOCAL_TIME);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void unsuccessfulCreationWithNullLocalTiime(){
+    public void unsuccessfulCreationWithNullLocalTime(){
         new MonthTime(MONTH_DAY, null);
     }
 
     @Test
     public void successfulModificationOfATargetLocalDateTime(){
-        MonthTime monthTime = new MonthTime(MONTH_DAY, TEA_TIME);
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime input = LocalDateTime.of(2017, 5, 17, 12, 00);
 
-        LocalDateTime modifiedDateTime = monthTime.modify(now);
+        MonthTime monthTime = new MonthTime(MONTH_DAY, LOCAL_TIME);
+        LocalDateTime modifiedDateTime = monthTime.modify(input);
 
-        assertThat(modifiedDateTime.getYear(), is(now.getYear()));
-        assertThat(modifiedDateTime.getMonth(), is(Month.APRIL));
-        assertThat(modifiedDateTime.getDayOfMonth(), is(DAY_OF_MONTH));
-        assertThat(modifiedDateTime.getHour(), is(HOUR));
-        assertThat(modifiedDateTime.getMinute(), is(MINUTE));
+        LocalDateTime expectedDateTime = LocalDateTime.of(2017, Month.APRIL, DAY_OF_MONTH, HOUR, MINUTE);
+        assertThat(modifiedDateTime, is(equalTo(expectedDateTime)));
     }
 
 
     @Test(expected = IllegalArgumentException.class)
     public void nullPassedToModifyThrowsException(){
-        MonthTime monthTime = new MonthTime(MONTH_DAY, TEA_TIME);
+        MonthTime monthTime = new MonthTime(MONTH_DAY, LOCAL_TIME);
 
         monthTime.modify(null);
 

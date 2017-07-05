@@ -4,7 +4,7 @@ import uk.ac.ebi.quickgo.ontology.controller.validation.OBOControllerValidationH
 import uk.ac.ebi.quickgo.ontology.controller.validation.OBOControllerValidationHelperImpl;
 import uk.ac.ebi.quickgo.rest.headers.HttpHeader;
 import uk.ac.ebi.quickgo.rest.headers.HttpHeadersProvider;
-import uk.ac.ebi.quickgo.rest.period.DailyPeriodParser;
+import uk.ac.ebi.quickgo.rest.period.PeriodParserDayTime;
 import uk.ac.ebi.quickgo.rest.period.AlarmClock;
 import uk.ac.ebi.quickgo.rest.period.PeriodParser;
 import uk.ac.ebi.quickgo.rest.period.RemainingTimeSupplier;
@@ -70,11 +70,12 @@ public class OntologyRestConfig {
     @Bean
     RemainingTimeSupplier maxAgeProvider(@Value("${ontology.caching.allowed.period}") String cachingAllowedPeriodValue,
             PeriodParser parser) {
-        Collection<AlarmClock> cachingAllowingAarmClocks = null;
+        LOGGER.info("Setting caching allowed period using " + cachingAllowedPeriodValue);
+        Collection<AlarmClock> cachingAllowingAlarmClocks = null;
         if (Objects.nonNull(cachingAllowedPeriodValue)) {
             String[] periods = cachingAllowedPeriodValue.split(PERIOD_DELIMITER);
             try {
-                cachingAllowingAarmClocks = Arrays.stream(periods)
+                cachingAllowingAlarmClocks = Arrays.stream(periods)
                                                   .map(parser::parse)
                                                   .filter(Optional::isPresent)
                                                   .map(Optional::get)
@@ -85,13 +86,13 @@ public class OntologyRestConfig {
             }
         }
         return
-                new RemainingTimeSupplier(Objects.nonNull(cachingAllowingAarmClocks) ? cachingAllowingAarmClocks :
+                new RemainingTimeSupplier(Objects.nonNull(cachingAllowingAlarmClocks) ? cachingAllowingAlarmClocks :
                                                   Collections.emptyList());
     }
 
     @Bean
     PeriodParser periodParser() {
-        return new DailyPeriodParser();
+        return new PeriodParserDayTime();
     }
 
     public interface OntologyPagingConfig {

@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import org.junit.Test;
 
-
+import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.Matchers.equalTo;
 
 
@@ -20,16 +20,14 @@ import static org.hamcrest.MatcherAssert.assertThat;
  */
 public class PeriodParserTest {
 
-    private static final DateModifier DATE_MODIFIER = target -> null;
+    private static final AlarmClock ALARM_CLOCK = target -> null;
     private final PeriodParser periodParser = getPeriodParser();
 
     @Test
     public void parseValidInputString() throws Exception {
-        AlarmClock testAlarmClock = new AlarmClockImpl(DATE_MODIFIER, DATE_MODIFIER);
-
         Optional<AlarmClock> alarmClock = periodParser.parse("START-END");
 
-        assertThat(alarmClock.get(), equalTo(testAlarmClock));
+        assertTrue(alarmClock.isPresent());
     }
 
     @Test
@@ -47,15 +45,8 @@ public class PeriodParserTest {
     }
 
     @Test
-    public void tooManyToSymbolsReturnsEmptyOptional(){
-        Optional<AlarmClock> alarmClock = periodParser.parse("YA-BOO-SUCKS");
-
-        assertThat(alarmClock, equalTo(Optional.empty()));
-    }
-
-    @Test
     public void toDateModifierReturnsEmptyOptional() throws Exception {
-        PeriodParser periodParser = getPeriodParserToDateModifierReturnsEmptyOptional();
+        PeriodParser periodParser = getPeriodParserToAlarmClockReturnsEmptyOptional();
 
         Optional<AlarmClock> alarmClock = periodParser.parse("START-END");
 
@@ -64,15 +55,15 @@ public class PeriodParserTest {
 
     private PeriodParser getPeriodParser() {
         return new PeriodParser() {
-            @Override protected Optional<DateModifier> toDateModifier(String input) {
-                return Optional.of(DATE_MODIFIER);
+            @Override protected Optional<AlarmClock> getPeriod(String input) {
+                return Optional.of(ALARM_CLOCK);
             }
         };
     }
 
-    private PeriodParser getPeriodParserToDateModifierReturnsEmptyOptional() {
+    private PeriodParser getPeriodParserToAlarmClockReturnsEmptyOptional() {
         return new PeriodParser() {
-            @Override protected Optional<DateModifier> toDateModifier(String input) {
+            @Override protected Optional<AlarmClock> getPeriod(String input) {
                 return Optional.empty();
             }
         };

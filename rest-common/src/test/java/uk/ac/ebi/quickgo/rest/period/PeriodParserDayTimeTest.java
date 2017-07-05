@@ -17,32 +17,33 @@ import static org.junit.Assert.assertThat;
  * Time: 15:27
  * Created with IntelliJ IDEA.
  */
-public class DailyPeriodParserTest {
+public class PeriodParserDayTimeTest {
 
-    private final DailyPeriodParser dailyPeriodParser = new DailyPeriodParser();
+    private final PeriodParserDayTime periodParserDayTime = new PeriodParserDayTime();
 
     @Test
     public void validInputCreatesPeriodSuccessfully(){
         String validInput="MONDAY(21:30)-TUESDAY(21:30)";
-        DateModifier start = new DayTime(DayOfWeek.MONDAY, LocalTime.of(21, 30));
-        DateModifier end = new DayTime(DayOfWeek.TUESDAY, LocalTime.of(21, 30));
-        AlarmClockImpl remainingTimePeriod = new AlarmClockImpl(start, end);
+        DayTime start = new DayTime(DayOfWeek.MONDAY, LocalTime.of(21, 30));
+        DayTime end = new DayTime(DayOfWeek.TUESDAY, LocalTime.of(21, 30));
+        AlarmClockDayTime remainingTimePeriod = new AlarmClockDayTime(start, end);
 
-        Optional<AlarmClock> result = dailyPeriodParser.parse(validInput);
+        Optional<AlarmClock> result = periodParserDayTime.parse(validInput);
 
+        assertThat(result.isPresent(), equalTo(true));
         assertThat(result.get(), equalTo(remainingTimePeriod));
     }
 
     @Test
     public void nullInputCreatesEmptyPeriod(){
-        Optional<AlarmClock> result = dailyPeriodParser.parse(null);
+        Optional<AlarmClock> result = periodParserDayTime.parse(null);
 
         assertThat(result, equalTo(empty()));
     }
 
     @Test
     public void emptyInputCreatesEmptyPeriod(){
-        Optional<AlarmClock> result = dailyPeriodParser.parse("");
+        Optional<AlarmClock> result = periodParserDayTime.parse("");
 
         assertThat(result, equalTo(empty()));
     }
@@ -51,7 +52,7 @@ public class DailyPeriodParserTest {
     public void missingEndValueCreatesEmptyPeriod(){
         String invalidInput="MONDAY(21:30)-";
 
-        Optional<AlarmClock> result = dailyPeriodParser.parse(invalidInput);
+        Optional<AlarmClock> result = periodParserDayTime.parse(invalidInput);
 
         assertThat(result, equalTo(empty()));
     }
@@ -60,7 +61,7 @@ public class DailyPeriodParserTest {
     public void tooMuchDataCreatesEmptyPeriod(){
         String invalidInput="MONDAY(21:30)-TUESDAY(21:30)-WEDNESDAY(21:30)";
 
-        Optional<AlarmClock> result = dailyPeriodParser.parse(invalidInput);
+        Optional<AlarmClock> result = periodParserDayTime.parse(invalidInput);
 
         assertThat(result, equalTo(empty()));
     }
@@ -69,7 +70,7 @@ public class DailyPeriodParserTest {
     public void invalidDayOfWeekCreateEmptyPeriod(){
         String invalidInput="MONDAY(21:30)-FEBRUARY(21:30)";
 
-        Optional<AlarmClock> result = dailyPeriodParser.parse(invalidInput);
+        Optional<AlarmClock> result = periodParserDayTime.parse(invalidInput);
 
         assertThat(result, equalTo(empty()));
     }
@@ -78,7 +79,7 @@ public class DailyPeriodParserTest {
     public void invalidEndTimeCreatesEmptyPeriod(){
         String invalidInput="MONDAY(21:30)-TUESDAY(33:30)";
 
-        Optional<AlarmClock> result = dailyPeriodParser.parse(invalidInput);
+        Optional<AlarmClock> result = periodParserDayTime.parse(invalidInput);
 
         assertThat(result, equalTo(empty()));
     }
