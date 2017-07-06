@@ -9,8 +9,8 @@ import uk.ac.ebi.quickgo.rest.search.results.transformer.AbstractValueInjector;
 import java.util.List;
 
 /**
- * Responsible for supplementing an {@link Annotation} instance, which contains
- * a gene product identifier, with a list of gene product synonyms, through the use of a RESTful service.
+ * Responsible for supplementing an {@link Annotation} instance, which contains a gene product identifier, with the gene
+ * product name using a RESTful service.
  * @author Tony Wardell
  * Date: 23/06/2017
  * Time: 14:56
