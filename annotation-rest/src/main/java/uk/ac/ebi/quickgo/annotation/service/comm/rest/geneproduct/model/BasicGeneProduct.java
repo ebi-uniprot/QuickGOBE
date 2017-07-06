@@ -41,6 +41,7 @@ public class BasicGeneProduct implements ResponseType {
         private String id;
         private String name;
         private List<String> synonyms;
+        private String type;
 
         public Result() {}
 
@@ -68,11 +69,20 @@ public class BasicGeneProduct implements ResponseType {
             this.synonyms = synonyms;
         }
 
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
+        }
+
         @Override public String toString() {
             return "Result{" +
                     "id='" + id + '\'' +
                     ", name='" + name + '\'' +
                     ", synonyms=" + synonyms +
+                    ", type='" + type + '\'' +
                     '}';
         }
     }
