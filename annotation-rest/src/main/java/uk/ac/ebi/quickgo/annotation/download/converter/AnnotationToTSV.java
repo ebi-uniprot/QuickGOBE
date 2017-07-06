@@ -6,6 +6,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static java.util.stream.Collectors.toList;
 import static uk.ac.ebi.quickgo.annotation.download.TSVDownload.*;
@@ -26,8 +28,8 @@ import static uk.ac.ebi.quickgo.annotation.download.TSVDownload.*;
  */
 public class AnnotationToTSV extends AnnotationTo implements BiFunction<Annotation, List<String>, List<String>> {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(AnnotationToTSV.class);
     private static final String YEAR_MONTH_DAY = "yyyyMMdd";
-
     private final Map<String, BiConsumer<OutputContent, StringJoiner>> selected2Content;
 
     public AnnotationToTSV() {
@@ -71,6 +73,7 @@ public class AnnotationToTSV extends AnnotationTo implements BiFunction<Annotati
     }
 
     @Override public List<String> apply(Annotation annotation, List<String> selectedFields) {
+        LOGGER.debug("Write out TSV for " + annotation);
         final List<String> columns = whichColumnsWillWeShow(selectedFields);
         if (isSlimmedRequest(annotation)) {
             return Collections.singletonList(output(new OutputContent(annotation, columns,null)));
