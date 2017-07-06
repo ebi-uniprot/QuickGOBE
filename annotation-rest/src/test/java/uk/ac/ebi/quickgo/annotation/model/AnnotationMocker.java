@@ -79,7 +79,7 @@ public class AnnotationMocker {
         annotation.taxonName = TAXON_NAME;
         annotation.name = NAME;
         annotation.synonyms = SYNONYMS;
-        annotation.geneProductType = PROTEIN;
+        annotation.type = PROTEIN;
         return annotation;
     }
 

@@ -67,7 +67,7 @@ public class Annotation {
     /**
      * Optional fields whose value originates from the gene product service.
      */
-    public String geneProductType;
+    public String type;
     public String synonyms;
     public String name;
 
@@ -92,7 +92,7 @@ public class Annotation {
                 ", symbol='" + symbol + '\'' +
                 ", date=" + date +
                 ", interactingTaxonId=" + interactingTaxonId +
-                ", geneProductType='" + geneProductType + '\'' +
+                ", geneProductType='" + type + '\'' +
                 ", synonyms='" + synonyms + '\'' +
                 ", name='" + name + '\'' +
                 '}';
@@ -165,7 +165,7 @@ public class Annotation {
         if (date != null ? !date.equals(that.date) : that.date != null) {
             return false;
         }
-        if (geneProductType != null ? !geneProductType.equals(that.geneProductType) : that.geneProductType != null) {
+        if (type != null ? !type.equals(that.type) : that.type != null) {
             return false;
         }
         if (synonyms != null ? !synonyms.equals(that.synonyms) : that.synonyms != null) {
@@ -194,7 +194,7 @@ public class Annotation {
         result = 31 * result + (symbol != null ? symbol.hashCode() : 0);
         result = 31 * result + (date != null ? date.hashCode() : 0);
         result = 31 * result + interactingTaxonId;
-        result = 31 * result + (geneProductType != null ? geneProductType.hashCode() : 0);
+        result = 31 * result + (type != null ? type.hashCode() : 0);
         result = 31 * result + (synonyms != null ? synonyms.hashCode() : 0);
         result = 31 * result + (name != null ? name.hashCode() : 0);
         return result;
