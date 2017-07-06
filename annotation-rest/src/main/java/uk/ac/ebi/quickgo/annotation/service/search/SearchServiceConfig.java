@@ -207,8 +207,8 @@ public class SearchServiceConfig {
             restFilterConverterFactory) {
         List<ResponseValueInjector<Annotation>> responseValueInjectors = asList(
                 new GeneProductNameInjector(),
-                new GeneProductSynonymsInjector());
-                new GeneProductTypeInjector();
+                new GeneProductSynonymsInjector(),
+                new GeneProductTypeInjector());
         return new ExternalServiceResultsTransformer<>(restFilterConverterFactory, responseValueInjectors);
     }
 
