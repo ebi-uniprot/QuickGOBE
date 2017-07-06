@@ -64,11 +64,10 @@ public class Annotation {
 
     public int interactingTaxonId;
 
-    public String geneProductType;
-
     /**
-     * Optional field whose value originates from the gene product service.
+     * Optional fields whose value originates from the gene product service.
      */
+    public String geneProductType;
     public String synonyms;
     public String name;
 
