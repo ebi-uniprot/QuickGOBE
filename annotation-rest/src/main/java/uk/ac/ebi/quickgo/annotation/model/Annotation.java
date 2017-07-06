@@ -71,7 +71,6 @@ public class Annotation {
     public String synonyms;
     public String name;
 
-
     @Override public String toString() {
         return "Annotation{" +
                 "id='" + id + '\'' +
@@ -93,9 +92,9 @@ public class Annotation {
                 ", symbol='" + symbol + '\'' +
                 ", date=" + date +
                 ", interactingTaxonId=" + interactingTaxonId +
-                ", synonym='" + synonyms + '\'' +
+                ", geneProductType='" + geneProductType + '\'' +
+                ", synonyms='" + synonyms + '\'' +
                 ", name='" + name + '\'' +
-                ", type='" + geneProductType + '\'' +
                 '}';
     }
 
@@ -166,13 +165,13 @@ public class Annotation {
         if (date != null ? !date.equals(that.date) : that.date != null) {
             return false;
         }
+        if (geneProductType != null ? !geneProductType.equals(that.geneProductType) : that.geneProductType != null) {
+            return false;
+        }
         if (synonyms != null ? !synonyms.equals(that.synonyms) : that.synonyms != null) {
             return false;
         }
-        if (name != null ? !name.equals(that.name) : that.name != null) {
-            return false;
-        }
-        return geneProductType != null ? geneProductType.equals(that.geneProductType) : that.geneProductType == null;
+        return name != null ? name.equals(that.name) : that.name == null;
     }
 
     @Override public int hashCode() {
@@ -195,9 +194,9 @@ public class Annotation {
         result = 31 * result + (symbol != null ? symbol.hashCode() : 0);
         result = 31 * result + (date != null ? date.hashCode() : 0);
         result = 31 * result + interactingTaxonId;
+        result = 31 * result + (geneProductType != null ? geneProductType.hashCode() : 0);
         result = 31 * result + (synonyms != null ? synonyms.hashCode() : 0);
         result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (geneProductType != null ? geneProductType.hashCode() : 0);
         return result;
     }
 
