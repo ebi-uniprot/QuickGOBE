@@ -19,7 +19,7 @@ import java.util.List;
 public class GeneProductTypeInjector extends AbstractValueInjector<BasicGeneProduct, Annotation> {
 
     private static final String GENE_PRODUCT_ID = "geneProductId";
-    static final String GENE_PRODUCT_TYPE = "geneproducttype";
+    static final String GENE_PRODUCT_TYPE = "geneProductType";
 
     @Override
     public String getId() {
