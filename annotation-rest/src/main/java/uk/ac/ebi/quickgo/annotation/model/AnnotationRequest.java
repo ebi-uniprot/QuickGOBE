@@ -575,7 +575,7 @@ public class AnnotationRequest {
      * An array of fields whose values derive from external resources, which are to be included in the response
      * @return the array of fields from external resources to include in the response
      */
-    @ArrayPattern(regexp = "^goName|taxonName|name|synonyms$", flags = CASE_INSENSITIVE, paramName =
+    @ArrayPattern(regexp = "^goName|taxonName|name|synonyms|geneProductType$", flags = CASE_INSENSITIVE, paramName =
             INCLUDE_FIELD_PARAM)
     public String[] getIncludeFields() {
         return this.includeFields;
