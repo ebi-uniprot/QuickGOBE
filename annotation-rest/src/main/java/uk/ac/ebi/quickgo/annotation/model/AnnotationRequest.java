@@ -268,7 +268,7 @@ public class AnnotationRequest {
     @ApiModelProperty(
             value = "For TSV downloads only, fields to return.",
             allowableValues = "geneProductId,symbol,qualifier,goId,goName,evidenceCode,goEvidence,reference,withFrom," +
-                    "taxonId,assignedBy,extensions,date,taxonName,synonym,name,type")
+                    "taxonId,assignedBy,extensions,date,taxonName,synonym,name,geneProductType.")
     private String[] selectedFields;
 
     private final Map<String, String[]> filterMap = new HashMap<>();
@@ -594,7 +594,9 @@ public class AnnotationRequest {
      * @return the array of fields from external resources to include in the response
      */
     @ArrayPattern(regexp = "^geneProductId|symbol|qualifier|goId|goName|evidenceCode|goEvidence|reference|withFrom" +
-            "|taxonId|assignedBy|extensions|date$", flags = CASE_INSENSITIVE, paramName = SELECT_FIELD_PARAM)
+            "|taxonId|assignedBy|extensions|date|name|synonyms|geneProductType$", flags = CASE_INSENSITIVE,
+            paramName =
+            SELECT_FIELD_PARAM)
     public String[] getSelectedFields() {
         return this.selectedFields;
     }
