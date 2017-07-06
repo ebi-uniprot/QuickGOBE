@@ -77,7 +77,7 @@
     <field name="evidenceCode" type="string" indexed="true" stored="true" multiValued="false" docValues="true"/>
     <field name="extension" type="string" indexed="false" stored="true" multiValued="true"/>
     <field name="geneProductId" type="string" indexed="true" stored="true" multiValued="false" docValues="true"/>
-    <field name="geneProductType" type="string" indexed="true" stored="true" multiValued="false"/>
+    <field name="geneProductType" type="string" indexed="true" stored="false" multiValued="false"/>
     <field name="geneProductSubset" type="string" indexed="true" stored="false" multiValued="false"/>
     <field name="goEvidence" type="string" indexed="true" stored="true" multiValued="false"/>
     <field name="goAspect" type="string" indexed="true" stored="true" multiValued="false" docValues="true"/>
