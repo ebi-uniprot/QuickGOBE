@@ -9,8 +9,8 @@ import uk.ac.ebi.quickgo.rest.search.results.transformer.AbstractValueInjector;
 import java.util.List;
 
 /**
- * Responsible for supplementing an {@link Annotation} instance, which contains
- * a gene product identifier, with a list of gene product synonyms, through the use of a RESTful service.
+ * Responsible for supplementing an {@link Annotation} instance, which contains a gene product identifier, with a gene
+ * product type using a RESTful service.
  * @author Tony Wardell
  * Date: 23/06/2017
  * Time: 14:56
@@ -19,7 +19,7 @@ import java.util.List;
 public class GeneProductTypeInjector extends AbstractValueInjector<BasicGeneProduct, Annotation> {
 
     private static final String GENE_PRODUCT_ID = "geneProductId";
-    static final String GENE_PRODUCT_TYPE = "geneProductType";
+    static final String GENE_PRODUCT_TYPE = "geneproducttype";
 
     @Override
     public String getId() {
