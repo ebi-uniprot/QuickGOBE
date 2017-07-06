@@ -6,6 +6,8 @@ import com.google.common.base.Preconditions;
 import java.io.IOException;
 import java.util.*;
 import java.util.function.BiConsumer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 
@@ -21,6 +23,8 @@ import static uk.ac.ebi.quickgo.annotation.download.TSVDownload.*;
  * Created with IntelliJ IDEA.
  */
 public class TsvHeaderCreator implements HeaderCreator{
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(TsvHeaderCreator.class);
 
     private static final String OUTPUT_DELIMITER = "\t";
     static final String GENE_PRODUCT_ID = "GENE PRODUCT ID";
@@ -92,6 +96,8 @@ public class TsvHeaderCreator implements HeaderCreator{
     private String output(HeaderContent headerContent) {
         StringJoiner tsvJoiner = new StringJoiner(OUTPUT_DELIMITER);
         List<String> selectedFields = TSVDownload.whichColumnsWillWeShow(headerContent.selectedFields());
+        LOGGER.debug("Requested which fields will we show from " + headerContent.selectedFields() + " and will show "
+                             + selectedFields);
         for (String selectedField : selectedFields) {
             selected2Content.get(selectedField).accept(headerContent, tsvJoiner);
         }
