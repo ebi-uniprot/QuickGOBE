@@ -67,8 +67,8 @@ public class DownloadConfig {
     @Bean
     public HeaderCreatorFactory headerCreatorFactory(Ontology ontology) throws IOException {
         Map<String, HeaderCreator> headerCreatorMap = new HashMap<>();
-        headerCreatorMap.put(GAF_SUB_TYPE, new GpadHeaderCreator(ontology));
-        headerCreatorMap.put(GPAD_SUB_TYPE, new GafHeaderCreator(ontology));
+        headerCreatorMap.put(GAF_SUB_TYPE, new GafHeaderCreator(ontology));
+        headerCreatorMap.put(GPAD_SUB_TYPE, new GpadHeaderCreator(ontology));
         headerCreatorMap.put(TSV_SUB_TYPE, new TsvHeaderCreator());
         return new HeaderCreatorFactory(headerCreatorMap);
     }
