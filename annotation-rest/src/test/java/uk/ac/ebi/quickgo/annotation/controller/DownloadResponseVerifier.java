@@ -41,8 +41,8 @@ class DownloadResponseVerifier {
         return content().string(fieldMatcher);
     }
 
-    static ResultMatcher selectedFieldsExist() {
-        Matcher<String> fieldMatcher = new TSVSelectedFieldsMatcher();
+    static ResultMatcher selectedFieldsExist(String[] expectedFields) {
+        Matcher<String> fieldMatcher = new TSVSelectedFieldsMatcher(expectedFields);
         return content().string(fieldMatcher);
     }
 
@@ -136,12 +136,15 @@ class DownloadResponseVerifier {
     }
 
     static class TSVSelectedFieldsMatcher extends TypeSafeMatcher<String> {
-        private static final int FIELD_COUNT = 3;
         private static final String TYPE = "TSV";
-        private static final List<Integer> MANDATORY_INDICES = asList(0,1,2);
+        private String[] expectedFields;
+
+        public TSVSelectedFieldsMatcher(String[] expectedFields) {
+            this.expectedFields = expectedFields;
+        }
 
         @Override public void describeTo(Description description) {
-            description.appendText("mandatory indices were not populated: " + MANDATORY_INDICES);
+            description.appendText("mandatory columns were not populated: " + expectedFields);
         }
 
         @Override protected boolean matchesSafely(String s) {
@@ -150,14 +153,15 @@ class DownloadResponseVerifier {
             for (String line : dataLines) {
                 if (!line.startsWith("!")) {
                     String[] components = line.split("\t");
-                    if (components.length != FIELD_COUNT) {
-                        LOGGER.error(TYPE + " line should contain " + FIELD_COUNT + " fields, but found: " + components
+
+                    if (components.length != expectedFields.length) {
+                        LOGGER.error(TYPE + " line should contain " + expectedFields.length + " fields, but found: " + components
                                 .length);
                         return false;
                     }
-                    for (Integer mandatoryIndex : MANDATORY_INDICES) {
-                        if (components[mandatoryIndex].isEmpty()) {
-                            LOGGER.error("Mandatory " + TYPE + " index should not be empty: " + mandatoryIndex);
+                    for (int i = 0; i > expectedFields.length; i++) {
+                        if (components[i].isEmpty()) {
+                            LOGGER.error("Mandatory " + TYPE + " index should not be empty at column " + i);
                             return false;
                         }
                     }
