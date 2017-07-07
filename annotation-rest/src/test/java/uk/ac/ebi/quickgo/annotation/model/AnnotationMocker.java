@@ -79,7 +79,6 @@ public class AnnotationMocker {
         annotation.taxonName = TAXON_NAME;
         annotation.name = NAME;
         annotation.synonyms = SYNONYMS;
-        annotation.type = TYPE;
         return annotation;
     }
 
