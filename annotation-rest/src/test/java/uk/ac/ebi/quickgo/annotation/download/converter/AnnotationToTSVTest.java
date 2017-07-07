@@ -48,7 +48,7 @@ public class AnnotationToTSVTest {
         unSlimmedFieldNames2Data.add(new String[]{TAXON_NAME_FIELD_NAME,TAXON_NAME});
         unSlimmedFieldNames2Data.add(new String[]{GENE_PRODUCT_NAME_FIELD_NAME,NAME});
         unSlimmedFieldNames2Data.add(new String[]{GENE_PRODUCT_SYNONYMS_FIELD_NAME,SYNONYMS});
-        unSlimmedFieldNames2Data.add(new String[]{GENE_PRODUCT_TYPE_FIELD_NAME,PROTEIN});
+        unSlimmedFieldNames2Data.add(new String[]{GENE_PRODUCT_TYPE_FIELD_NAME,TYPE});
     }
 
     @Before
@@ -75,7 +75,7 @@ public class AnnotationToTSVTest {
         assertThat(elements[NonSlimmedColumns.COL_TAXON_NAME],is(TAXON_NAME));
         assertThat(elements[NonSlimmedColumns.COL_DB_OBJECT_NAME], is(NAME));
         assertThat(elements[NonSlimmedColumns.COL_DB_OBJECT_SYNONYM], is(SYNONYMS));
-        assertThat(elements[NonSlimmedColumns.COL_DB_OBJECT_TYPE], is(PROTEIN));
+        assertThat(elements[NonSlimmedColumns.COL_DB_OBJECT_TYPE], is(TYPE));
         assertThat(elements[NonSlimmedColumns.COL_DATE], equalTo(DATE_AS_STRING));
     }
 
@@ -99,7 +99,7 @@ public class AnnotationToTSVTest {
         assertThat(elements[SlimmedColumns.COL_TAXON_NAME],is(TAXON_NAME));
         assertThat(elements[SlimmedColumns.COL_DB_OBJECT_NAME], is(NAME));
         assertThat(elements[SlimmedColumns.COL_DB_OBJECT_SYNONYM], is(SYNONYMS));
-        assertThat(elements[SlimmedColumns.COL_DB_OBJECT_TYPE], is(PROTEIN));
+        assertThat(elements[SlimmedColumns.COL_DB_OBJECT_TYPE], is(TYPE));
         assertThat(elements[SlimmedColumns.COL_DATE], equalTo(DATE_AS_STRING));
     }
 
