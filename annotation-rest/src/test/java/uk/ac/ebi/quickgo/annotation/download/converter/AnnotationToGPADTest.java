@@ -125,7 +125,7 @@ public class AnnotationToGPADTest {
     public void emptyInteractingTaxonId() {
         annotation.interactingTaxonId = 0;
         String[] elements = annotationToElements(annotation);
-        assertThat(elements[COL_INTERACTING_DB], is("0"));
+        assertThat(elements[COL_INTERACTING_DB], is(""));
     }
 
     @Test
