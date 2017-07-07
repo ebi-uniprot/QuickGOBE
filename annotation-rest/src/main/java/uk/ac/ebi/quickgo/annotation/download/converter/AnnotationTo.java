@@ -8,6 +8,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class contains methods that are shared between the AnnotationToX converters.
@@ -17,7 +19,9 @@ import java.util.stream.Collectors;
  * Created with IntelliJ IDEA.
  */
 abstract class AnnotationTo {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AnnotationTo.class);
     private static final String ID_DELIMITER = ":";
+    public static final int DB = 0;
     private static final String COMMA = ",";
     private static final String PIPE = "|";
     private static final DateTimeFormatter YYYYMMDD_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd");
@@ -65,4 +69,18 @@ abstract class AnnotationTo {
     }
 
     final Function<String, String> nullToEmptyString = s -> s == null ? "" : s;
+
+    protected String toGeneProductType(String db) {
+        switch (db) {
+            case "UniProtKB":
+                return "protein";
+            case "IntAct":
+                return "complex";
+            case "RNAcentral":
+                return "miRNA";
+            default:
+                LOGGER.error("Cannot determine gene product type for based on DB of " + db);
+        }
+        return "";
+    }
 }
