@@ -101,8 +101,7 @@ final class ResponseVerifier {
                 .addMatcher(jsonPath(path + "targetSets").exists())
                 .addMatcher(jsonPath(path + "symbol").exists())
                 .addMatcher(jsonPath(path + "date").exists())
-                .addMatcher(jsonPath(path + "extensions").exists())
-                .addMatcher(jsonPath(path + "geneProductType").exists());
+                .addMatcher(jsonPath(path + "extensions").exists());
     }
 
     static ResultMatcher fieldsInAllResultsExist(int numResults) throws Exception {
