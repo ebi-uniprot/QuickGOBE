@@ -5,7 +5,6 @@ import uk.ac.ebi.quickgo.annotation.common.AnnotationRepoConfig;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.geneproduct.transformer.GeneProductNameInjector;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.geneproduct.transformer.GeneProductSynonymsInjector;
-import uk.ac.ebi.quickgo.annotation.service.comm.rest.geneproduct.transformer.GeneProductTypeInjector;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.OntologyNameInjector;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.SlimResultsTransformer;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.TaxonomyNameInjector;
@@ -207,8 +206,7 @@ public class SearchServiceConfig {
             restFilterConverterFactory) {
         List<ResponseValueInjector<Annotation>> responseValueInjectors = asList(
                 new GeneProductNameInjector(),
-                new GeneProductSynonymsInjector(),
-                new GeneProductTypeInjector());
+                new GeneProductSynonymsInjector());
         return new ExternalServiceResultsTransformer<>(restFilterConverterFactory, responseValueInjectors);
     }
 
