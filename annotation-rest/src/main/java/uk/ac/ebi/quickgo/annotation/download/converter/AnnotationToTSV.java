@@ -67,7 +67,9 @@ public class AnnotationToTSV extends AnnotationTo implements BiFunction<Annotati
         selected2Content.put(TAXON_NAME_FIELD_NAME, (c, j) -> j.add(nullToEmptyString.apply(c.annotation.taxonName)));
         selected2Content.put(GENE_PRODUCT_NAME_FIELD_NAME, (c, j) -> j.add(nullToEmptyString.apply(c.annotation.name)));
         selected2Content.put(GENE_PRODUCT_SYNONYMS_FIELD_NAME, (c, j) -> j.add(nullToEmptyString.apply(c.annotation.synonyms )));
-        selected2Content.put(GENE_PRODUCT_TYPE_FIELD_NAME, (c, j) -> j.add(nullToEmptyString.apply(c.annotation.type)));
+        selected2Content.put(GENE_PRODUCT_TYPE_FIELD_NAME, (c, j) -> j.add(toGeneProductType(idToComponents
+                                                                                                     (c.annotation
+                                                                                                              .geneProductId)[DB])));
     }
 
     @Override public List<String> apply(Annotation annotation, List<String> selectedFields) {
