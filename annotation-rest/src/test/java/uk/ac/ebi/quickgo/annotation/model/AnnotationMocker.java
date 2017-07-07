@@ -54,9 +54,9 @@ public class AnnotationMocker {
     private static final String GO_ASPECT = "molecular_function";
     private static final Date DATE = Date.from(
             LocalDate.of(2012, 10, 2).atStartOfDay(ZoneId.systemDefault()).toInstant());
-    public static final String PROTEIN = "protein";
     public static final String SYNONYMS = "A0A000_9ACTN,moeA5";
     public static final String NAME = "MoeA5";
+    public static final String TYPE = "complex";
 
     public static Annotation createValidAnnotation() {
         Annotation annotation = new Annotation();
@@ -79,7 +79,7 @@ public class AnnotationMocker {
         annotation.taxonName = TAXON_NAME;
         annotation.name = NAME;
         annotation.synonyms = SYNONYMS;
-        annotation.type = PROTEIN;
+        annotation.type = TYPE;
         return annotation;
     }
 
