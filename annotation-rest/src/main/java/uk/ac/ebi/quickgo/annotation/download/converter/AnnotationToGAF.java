@@ -79,7 +79,7 @@ public class AnnotationToGAF extends AnnotationTo implements BiFunction<Annotati
                 .add(populateAspect(annotation.goAspect))
                 .add("")   // name    - in GP core optional not used
                 .add("")   // synonym - in GP core  e.g. 'Nit79A3_0905' optional not used
-                .add(nullToEmptyString.apply(toGeneProductType(idElements[0])))
+                .add(nullToEmptyString.apply(toGeneProductType(idElements[DB])))
                 .add(TAXON + annotation.taxonId)
                 .add(toYMD(annotation.date))
                 .add(nullToEmptyString.apply(annotation.assignedBy))
@@ -97,20 +97,6 @@ public class AnnotationToGAF extends AnnotationTo implements BiFunction<Annotati
             aspectCharacter = "";
         }
         return aspectCharacter;
-    }
-
-    private String toGeneProductType(String idElement) {
-        switch (idElement) {
-            case "UniProtKB":
-                return "protein";
-            case "IntAct":
-                return "complex";
-            case "RNAcentral":
-                return "miRNA";
-            default:
-                LOGGER.error("Cannot determine gene product type for based on DB of " + idElement);
-        }
-        return "";
     }
 
     private enum Aspect {
