@@ -110,7 +110,9 @@ public class AnnotationToTSVTest {
         final String slimmedToGoId2 = "GO:2005524";
         annotation.slimmedIds = Arrays.asList(slimmedToGoId0, slimmedToGoId1, slimmedToGoId2);
         List<String> selectedFields = Collections.emptyList();
+
         List<String> converted = annotationToTSV.apply(annotation, selectedFields);
+
         assertThat(converted, hasSize(annotation.slimmedIds.size()));
         checkReturned(slimmedToGoId0, converted.get(0));
         checkReturned(slimmedToGoId1, converted.get(1));
@@ -256,6 +258,16 @@ public class AnnotationToTSVTest {
         annotation.date = null;
         String[] elements = annotationToElements(annotation);
         assertThat(elements[NonSlimmedColumns.COL_DATE], is(""));
+    }
+
+    @Test
+    public void onlyGetRequestedColumn() {
+        List<String> selectedFields = Collections.singletonList("qualifier");
+
+        List<String> converted = annotationToTSV.apply(annotation, selectedFields);
+
+        assertThat(converted, hasSize(1));
+        assertThat(converted.get(0), equalTo("enables"));
     }
 
     private String[] annotationToElements(Annotation annotation) {
