@@ -27,7 +27,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.client.MockRestServiceServer;
-import org.springframework.test.web.client.ResponseCreator;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
@@ -253,9 +252,10 @@ public class AnnotationControllerDownloadIT {
                         .param(SELECTED_FIELD_PARAM.getName(), GENE_PRODUCT_ID_FIELD_NAME_MIXED_CASE,
                                SYMBOL_FIELD_NAME_MIXED_CASE, WITH_FROM_FIELD_NAME_MIXED_CASE));
 
-        List<String> storedIds = getFieldValuesFromRepo(doc -> idFrom(doc.geneProductId), expectedDownloadCount);
+        getFieldValuesFromRepo(doc -> idFrom(doc.geneProductId), expectedDownloadCount);
 
-        checkResponseForSelectedFields(response, storedIds);
+        checkResponseForSelectedFields(response, GENE_PRODUCT_ID_FIELD_NAME_MIXED_CASE,
+                                       SYMBOL_FIELD_NAME_MIXED_CASE, WITH_FROM_FIELD_NAME_MIXED_CASE);
     }
 
 
@@ -269,21 +269,11 @@ public class AnnotationControllerDownloadIT {
                 .andExpect(content().string(stringContainsInOrder(storedIds)));
     }
 
-    private void checkResponseForOptionalFields(MediaType mediaType, ResultActions response)
-            throws Exception {
+    private void checkResponseForSelectedFields(ResultActions response, String... expectedFields) throws Exception {
         response.andExpect(request().asyncStarted())
                 .andDo(MvcResult::getAsyncResult)
                 .andDo(print())
-                .andExpect(header().string(CONTENT_DISPOSITION, endsWith(getFileNameEndingFor(mediaType))))
-                .andExpect(content().contentType(mediaType))
-                .andExpect(nonNullMandatoryFieldsExist(mediaType));
-    }
-
-    private void checkResponseForSelectedFields(ResultActions response, List<String> storedIds) throws Exception {
-        response.andExpect(request().asyncStarted())
-                .andDo(MvcResult::getAsyncResult)
-                .andDo(print())
-                .andExpect(selectedFieldsExist());
+                .andExpect(selectedFieldsExist(expectedFields));
     }
 
     private void canDownloadWithFilter(MediaType mediaType) throws Exception {
