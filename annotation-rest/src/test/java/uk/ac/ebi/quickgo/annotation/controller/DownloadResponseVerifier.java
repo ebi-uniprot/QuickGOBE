@@ -46,7 +46,6 @@ class DownloadResponseVerifier {
         return content().string(fieldMatcher);
     }
 
-
     static class GAFMandatoryFieldMatcher extends TypeSafeMatcher<String> {
         private static final List<Integer> MANDATORY_INDICES = asList(0, 1, 2, 4, 5, 6, 8, 11, 12, 13, 14);
 
@@ -114,7 +113,7 @@ class DownloadResponseVerifier {
 
         @Override protected boolean matchesSafely(String s) {
             String[] allLines = s.split("\n");
-            String[] dataLines = Arrays.copyOfRange(allLines, 1, allLines.length-1 );
+            String[] dataLines = Arrays.copyOfRange(allLines, 1, allLines.length - 1);
             for (String line : dataLines) {
                 if (!line.startsWith("!")) {
                     String[] components = line.split("\t");
@@ -139,24 +138,25 @@ class DownloadResponseVerifier {
         private static final String TYPE = "TSV";
         private String[] expectedFields;
 
-        public TSVSelectedFieldsMatcher(String[] expectedFields) {
+        TSVSelectedFieldsMatcher(String[] expectedFields) {
             this.expectedFields = expectedFields;
         }
 
         @Override public void describeTo(Description description) {
-            description.appendText("mandatory columns were not populated: " + expectedFields);
+            description.appendText("mandatory columns were not populated: " + Arrays.toString(expectedFields));
         }
 
         @Override protected boolean matchesSafely(String s) {
             String[] allLines = s.split("\n");
-            String[] dataLines = Arrays.copyOfRange(allLines, 1, allLines.length-1 );
+            String[] dataLines = Arrays.copyOfRange(allLines, 1, allLines.length - 1);
             for (String line : dataLines) {
                 if (!line.startsWith("!")) {
                     String[] components = line.split("\t");
 
                     if (components.length != expectedFields.length) {
-                        LOGGER.error(TYPE + " line should contain " + expectedFields.length + " fields, but found: " + components
-                                .length);
+                        LOGGER.error(TYPE + " line should contain " + expectedFields.length + " fields, but found: " +
+                                components
+                                        .length);
                         return false;
                     }
                     for (int i = 0; i > expectedFields.length; i++) {
