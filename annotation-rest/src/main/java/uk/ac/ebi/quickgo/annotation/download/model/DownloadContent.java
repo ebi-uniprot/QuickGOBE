@@ -8,6 +8,7 @@ import java.util.stream.Stream;
 
 /**
  * Data structure for content to download.
+ * 
  * @author Tony Wardell
  * Date: 24/05/2017
  * Time: 09:00
@@ -18,7 +19,6 @@ public class DownloadContent {
     public final List<String> selectedFields;
 
     public DownloadContent(Stream<QueryResult<Annotation>> annotationResultStream, List<String> selectedFields) {
-
         this.annotationStream = annotationResultStream;
         this.selectedFields = selectedFields;
     }
