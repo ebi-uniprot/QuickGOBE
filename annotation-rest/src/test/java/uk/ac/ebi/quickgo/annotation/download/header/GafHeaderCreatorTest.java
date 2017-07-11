@@ -1,9 +1,5 @@
 package uk.ac.ebi.quickgo.annotation.download.header;
 
-import uk.ac.ebi.quickgo.annotation.download.header.GafHeaderCreator;
-import uk.ac.ebi.quickgo.annotation.download.header.HeaderContent;
-import uk.ac.ebi.quickgo.annotation.download.header.Ontology;
-
 import java.util.Collections;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,7 +19,7 @@ import static org.mockito.Mockito.mock;
  */
 public class GafHeaderCreatorTest {
 
-    private Ontology mockOntology = mock(Ontology.class);
+    private OntologyHeaderInfo mockOntology = mock(OntologyHeaderInfo.class);
     private ResponseBodyEmitter mockEmitter = mock(ResponseBodyEmitter.class);
     private HeaderContent mockContent = mock(HeaderContent.class);
 

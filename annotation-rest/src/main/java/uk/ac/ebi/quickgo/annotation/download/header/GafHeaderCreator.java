@@ -11,7 +11,7 @@ public class GafHeaderCreator extends GTypeHeaderCreator {
 
     static final String VERSION = "gaf-version: 2.1";
 
-    public GafHeaderCreator(Ontology ontology) {
+    public GafHeaderCreator(OntologyHeaderInfo ontology) {
         super(ontology);
     }
 

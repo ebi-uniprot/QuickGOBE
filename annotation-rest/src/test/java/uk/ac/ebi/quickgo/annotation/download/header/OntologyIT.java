@@ -41,7 +41,7 @@ public class OntologyIT {
 
     @Test
     public void loadOntologySuccessfully(){
-        Ontology ontology = new Ontology(path);
+        OntologyHeaderInfo ontology = new OntologyHeaderInfo(path);
 
         List<String> versions = ontology.versions();
 
@@ -50,7 +50,7 @@ public class OntologyIT {
 
     @Test(expected = IllegalArgumentException.class)
     public void creatingOntologyWithNullArgumentToConstructorCreatesException(){
-        new Ontology(null);
+        new OntologyHeaderInfo(null);
     }
 
 }

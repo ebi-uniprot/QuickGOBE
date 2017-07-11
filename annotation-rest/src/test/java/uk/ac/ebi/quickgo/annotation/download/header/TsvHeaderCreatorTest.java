@@ -26,7 +26,7 @@ public class TsvHeaderCreatorTest {
     private static final String REQUEST_URI =
             "/QuickGO/services/annotation/downloadSearch?downloadLimit=7&geneProductId" +
                     "=UniProtKB:A0A000&includeFields=goName,taxonName";
-    private final Ontology mockOntology = mock(Ontology.class);
+    private final OntologyHeaderInfo mockOntology = mock(OntologyHeaderInfo.class);
     private final ResponseBodyEmitter mockEmitter = mock(ResponseBodyEmitter.class);
     private final HeaderContent mockContent = mock(HeaderContent.class);
 

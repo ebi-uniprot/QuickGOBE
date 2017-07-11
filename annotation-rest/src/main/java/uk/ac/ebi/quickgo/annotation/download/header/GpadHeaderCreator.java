@@ -11,7 +11,7 @@ public class GpadHeaderCreator extends GTypeHeaderCreator {
 
     static final String VERSION = "gpa-version: 1.1";
 
-    public GpadHeaderCreator(Ontology ontology) {
+    public GpadHeaderCreator(OntologyHeaderInfo ontology) {
         super(ontology);
     }
 

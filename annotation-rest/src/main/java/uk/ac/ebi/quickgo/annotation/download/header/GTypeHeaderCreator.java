@@ -25,9 +25,9 @@ public abstract class GTypeHeaderCreator implements HeaderCreator{
     static final String FILTERS_INTRO = "Filtering parameters selected to generate file:";
 
     static final String PREFIX = "!";
-    private final Ontology ontology;
+    private final OntologyHeaderInfo ontology;
 
-    GTypeHeaderCreator(Ontology ontology) {
+    GTypeHeaderCreator(OntologyHeaderInfo ontology) {
         Preconditions.checkArgument(ontology != null, "The ontology instance must not be null");
         this.ontology = ontology;
     }

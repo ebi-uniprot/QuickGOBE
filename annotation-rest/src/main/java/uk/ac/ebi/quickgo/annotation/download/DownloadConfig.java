@@ -65,7 +65,7 @@ public class DownloadConfig {
     }
 
     @Bean
-    public HeaderCreatorFactory headerCreatorFactory(Ontology ontology) throws IOException {
+    public HeaderCreatorFactory headerCreatorFactory(OntologyHeaderInfo ontology) throws IOException {
         Map<String, HeaderCreator> headerCreatorMap = new HashMap<>();
         headerCreatorMap.put(GAF_SUB_TYPE, new GafHeaderCreator(ontology));
         headerCreatorMap.put(GPAD_SUB_TYPE, new GpadHeaderCreator(ontology));
@@ -74,9 +74,9 @@ public class DownloadConfig {
     }
 
     @Bean
-    Ontology ontology() throws IOException {
+    OntologyHeaderInfo ontology() throws IOException {
         Path osPath = ontologySource != null ? Paths.get(ontologySource.getURI()) : DEFAULT_ONTOLOGY_PATH;
-        return new Ontology(osPath);
+        return new OntologyHeaderInfo(osPath);
     }
 
     public TaskExecutorProperties getTaskExecutor() {

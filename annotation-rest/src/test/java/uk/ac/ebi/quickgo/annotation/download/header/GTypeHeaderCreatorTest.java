@@ -24,7 +24,7 @@ public class GTypeHeaderCreatorTest {
                     "=UniProtKB:A0A000&includeFields=goName,taxonName";
     private final String FORMAT_VERSION_1 = "test-version_1";
     private final String FORMAT_VERSION_2 = "test-version_2";
-    private Ontology mockOntology = mock(Ontology.class);
+    private OntologyHeaderInfo mockOntology = mock(OntologyHeaderInfo.class);
     private ResponseBodyEmitter mockEmitter = mock(ResponseBodyEmitter.class);
     private HeaderContent mockContent = mock(HeaderContent.class);
 
@@ -78,7 +78,7 @@ public class GTypeHeaderCreatorTest {
     private static class TestGTypeHeaderCreator extends GTypeHeaderCreator {
         final static String VERSION = "TEST";
 
-        public TestGTypeHeaderCreator(Ontology ontology) {
+        public TestGTypeHeaderCreator(OntologyHeaderInfo ontology) {
             super(ontology);
         }
 

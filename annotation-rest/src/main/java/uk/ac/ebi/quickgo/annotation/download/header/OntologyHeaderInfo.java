@@ -12,8 +12,6 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static java.util.Arrays.stream;
-
 /**
  * Provide the details of the latest ontology sources.
  *
@@ -22,15 +20,14 @@ import static java.util.Arrays.stream;
  * Time: 10:37
  * Created with IntelliJ IDEA.
  */
-public class Ontology {
-
-    private static Logger LOGGER = LoggerFactory.getLogger(Ontology.class);
+public class OntologyHeaderInfo {
+    private static Logger LOGGER = LoggerFactory.getLogger(OntologyHeaderInfo.class);
 
     private final Path ontologyPath;
     private List<String> savedOntologyLines;
     private FileTime previousTimeStamp;
 
-    public Ontology(Path ontologyPath) {
+    public OntologyHeaderInfo(Path ontologyPath) {
         Preconditions.checkArgument(ontologyPath != null, "The path to the ontology file must not be null");
         this.ontologyPath = ontologyPath;
     }
@@ -46,9 +43,9 @@ public class Ontology {
             if (!lastModifiedTime.equals(previousTimeStamp)) {
                 previousTimeStamp = lastModifiedTime;
                 savedOntologyLines = GZIPFiles.lines(ontologyPath)
-                                              .skip(1)
-                                              .map(s -> s.substring(s.indexOf("http:")))
-                                              .collect(Collectors.toList());
+                        .skip(1)
+                        .map(s -> s.substring(s.indexOf("http:")))
+                        .collect(Collectors.toList());
 
             }
         } catch (Exception e) {
