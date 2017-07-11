@@ -30,31 +30,15 @@ public class TsvHeaderCreatorTest {
     private static final String REQUEST_URI =
             "/QuickGO/services/annotation/downloadSearch?downloadLimit=7&geneProductId" +
                     "=UniProtKB:A0A000&includeFields=goName,taxonName";
-    private final OntologyHeaderInfo mockOntology = mock(OntologyHeaderInfo.class);
-    private final ResponseBodyEmitter mockEmitter = mock(ResponseBodyEmitter.class);
-    private final HeaderContent mockContent = mock(HeaderContent.class);
-
     private static final List<String[]> fields2Columns = new ArrayList<>();
 
     static {
-        fields2Columns.add(new String[]{GENE_PRODUCT_ID_FIELD_NAME, GENE_PRODUCT_ID});
-        fields2Columns.add(new String[]{SYMBOL_FIELD_NAME, SYMBOL});
-        fields2Columns.add(new String[]{QUALIFIER_FIELD_NAME, QUALIFIER});
-        fields2Columns.add(new String[]{GO_TERM_FIELD_NAME, GO_TERM});
-        fields2Columns.add(new String[]{GO_NAME_FIELD_NAME, GO_NAME});
-        fields2Columns.add(new String[]{ECO_ID_FIELD_NAME, ECO_ID});
-        fields2Columns.add(new String[]{GO_EVIDENCE_CODE_FIELD_NAME, GO_EVIDENCE_CODE});
-        fields2Columns.add(new String[]{REFERENCE_FIELD_NAME, REFERENCE});
-        fields2Columns.add(new String[]{WITH_FROM_FIELD_NAME, WITH_FROM});
-        fields2Columns.add(new String[]{TAXON_ID_FIELD_NAME, TAXON_ID});
-        fields2Columns.add(new String[]{ASSIGNED_BY_FIELD_NAME, ASSIGNED_BY});
-        fields2Columns.add(new String[]{ANNOTATION_EXTENSION_FIELD_NAME, ANNOTATION_EXTENSION});
-        fields2Columns.add(new String[]{DATE_FIELD_NAME, DATE});
-        fields2Columns.add(new String[]{TAXON_NAME_FIELD_NAME, TAXON_NAME});
-        fields2Columns.add(new String[]{GENE_PRODUCT_NAME_FIELD_NAME, GENE_PRODUCT_NAME});
-        fields2Columns.add(new String[]{GENE_PRODUCT_SYNONYMS_FIELD_NAME, GENE_PRODUCT_SYNONYMS});
-        fields2Columns.add(new String[]{GENE_PRODUCT_TYPE_FIELD_NAME, GENE_PRODUCT_TYPE});
+        initialiseFieldColumns();
     }
+
+    private final OntologyHeaderInfo mockOntology = mock(OntologyHeaderInfo.class);
+    private final ResponseBodyEmitter mockEmitter = mock(ResponseBodyEmitter.class);
+    private final HeaderContent mockContent = mock(HeaderContent.class);
 
     @Before
     public void setup() {
@@ -175,5 +159,23 @@ public class TsvHeaderCreatorTest {
         tsvHeaderCreator.write(mockEmitter, null);
     }
 
-    
+    private static void initialiseFieldColumns() {
+        fields2Columns.add(new String[]{GENE_PRODUCT_ID_FIELD_NAME, GENE_PRODUCT_ID});
+        fields2Columns.add(new String[]{SYMBOL_FIELD_NAME, SYMBOL});
+        fields2Columns.add(new String[]{QUALIFIER_FIELD_NAME, QUALIFIER});
+        fields2Columns.add(new String[]{GO_TERM_FIELD_NAME, GO_TERM});
+        fields2Columns.add(new String[]{GO_NAME_FIELD_NAME, GO_NAME});
+        fields2Columns.add(new String[]{ECO_ID_FIELD_NAME, ECO_ID});
+        fields2Columns.add(new String[]{GO_EVIDENCE_CODE_FIELD_NAME, GO_EVIDENCE_CODE});
+        fields2Columns.add(new String[]{REFERENCE_FIELD_NAME, REFERENCE});
+        fields2Columns.add(new String[]{WITH_FROM_FIELD_NAME, WITH_FROM});
+        fields2Columns.add(new String[]{TAXON_ID_FIELD_NAME, TAXON_ID});
+        fields2Columns.add(new String[]{ASSIGNED_BY_FIELD_NAME, ASSIGNED_BY});
+        fields2Columns.add(new String[]{ANNOTATION_EXTENSION_FIELD_NAME, ANNOTATION_EXTENSION});
+        fields2Columns.add(new String[]{DATE_FIELD_NAME, DATE});
+        fields2Columns.add(new String[]{TAXON_NAME_FIELD_NAME, TAXON_NAME});
+        fields2Columns.add(new String[]{GENE_PRODUCT_NAME_FIELD_NAME, GENE_PRODUCT_NAME});
+        fields2Columns.add(new String[]{GENE_PRODUCT_SYNONYMS_FIELD_NAME, GENE_PRODUCT_SYNONYMS});
+        fields2Columns.add(new String[]{GENE_PRODUCT_TYPE_FIELD_NAME, GENE_PRODUCT_TYPE});
+    }
 }
