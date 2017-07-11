@@ -2,7 +2,6 @@ package uk.ac.ebi.quickgo.annotation.download.converter;
 
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
@@ -29,13 +28,28 @@ import static uk.ac.ebi.quickgo.annotation.download.TSVDownload.*;
 public class AnnotationToTSV extends AnnotationTo implements BiFunction<Annotation, List<String>, List<String>> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AnnotationToTSV.class);
-    private static final String YEAR_MONTH_DAY = "yyyyMMdd";
     private final Map<String, BiConsumer<OutputContent, StringJoiner>> selected2Content;
 
     public AnnotationToTSV() {
         selected2Content = new HashMap<>();
-        selected2Content.put(GENE_PRODUCT_ID_FIELD_NAME, (c, j) -> j.add(nullToEmptyString.apply(c.annotation
-                                                                                                         .geneProductId)));
+        initialiseContentMappings();
+    }
+
+    @Override public List<String> apply(Annotation annotation, List<String> selectedFields) {
+        LOGGER.debug("Write out TSV for " + annotation);
+        final List<String> columns = whichColumnsWillWeShow(selectedFields);
+        if (isSlimmedRequest(annotation)) {
+            return Collections.singletonList(output(new OutputContent(annotation, columns, null)));
+        } else {
+            return annotation.slimmedIds.stream()
+                    .map(goId -> output(new OutputContent(annotation, columns, goId)))
+                    .collect(toList());
+        }
+    }
+
+    private void initialiseContentMappings() {
+        selected2Content.put(GENE_PRODUCT_ID_FIELD_NAME,
+                (c, j) -> j.add(nullToEmptyString.apply(c.annotation.geneProductId)));
         selected2Content.put(SYMBOL_FIELD_NAME, (c, j) -> j.add(nullToEmptyString.apply(c.annotation.symbol)));
         selected2Content.put(QUALIFIER_FIELD_NAME, (c, j) -> j.add(nullToEmptyString.apply(c.annotation.qualifier)));
         selected2Content.put(GO_TERM_FIELD_NAME, (c, j) -> {
@@ -46,42 +60,23 @@ public class AnnotationToTSV extends AnnotationTo implements BiFunction<Annotati
         });
         selected2Content.put(GO_NAME_FIELD_NAME, (c, j) -> j.add(nullToEmptyString.apply(c.annotation.goName)));
         selected2Content.put(ECO_ID_FIELD_NAME, (c, j) -> j.add(nullToEmptyString.apply(c.annotation.evidenceCode)));
-        selected2Content.put(GO_EVIDENCE_CODE_FIELD_NAME, (c, j) -> j.add(nullToEmptyString.apply(c.annotation
-                                                                                                          .goEvidence)));
+        selected2Content.put(GO_EVIDENCE_CODE_FIELD_NAME,
+                (c, j) -> j.add(nullToEmptyString.apply(c.annotation.goEvidence)));
         selected2Content.put(REFERENCE_FIELD_NAME, (c, j) -> j.add(nullToEmptyString.apply(c.annotation.reference)));
         selected2Content.put(WITH_FROM_FIELD_NAME, (c, j) -> j.add(withFromAsString(c.annotation.withFrom)));
-        selected2Content.put(TAXON_ID_FIELD_NAME, (c, j) -> j.add(c.annotation.taxonId == 0 ? "" : Integer.toString
-                (c.annotation.taxonId)));
-        selected2Content.put(ASSIGNED_BY_FIELD_NAME, (c, j) -> j.add(nullToEmptyString.apply(c.annotation
-                                                                                                     .assignedBy)));
-        selected2Content.put(ANNOTATION_EXTENSION_FIELD_NAME, (c, j) -> j.add(extensionsAsString(c.annotation
-                                                                                                         .extensions)));
-        //todo replace annotation.date with annotation.dateTime,
-        //todo then we can replace DateFormat with DateTimeFormatter from java 8
-        //todo DateFormat is not thread safe so we cannot use an instance variable
-        selected2Content.put(DATE_FIELD_NAME,
-                             (c, j) -> {
-                                 final SimpleDateFormat dateFormat = new SimpleDateFormat(YEAR_MONTH_DAY);
-                                 j.add(c.annotation.date == null ? "" : dateFormat.format(c.annotation.date));
-                             });
+        selected2Content.put(TAXON_ID_FIELD_NAME,
+                (c, j) -> j.add(c.annotation.taxonId == 0 ? "" : Integer.toString(c.annotation.taxonId)));
+        selected2Content.put(ASSIGNED_BY_FIELD_NAME,
+                (c, j) -> j.add(nullToEmptyString.apply(c.annotation.assignedBy)));
+        selected2Content.put(ANNOTATION_EXTENSION_FIELD_NAME,
+                (c, j) -> j.add(extensionsAsString(c.annotation.extensions)));
+        selected2Content.put(DATE_FIELD_NAME, (c, j) -> j.add(toYMD(c.annotation.date)));
         selected2Content.put(TAXON_NAME_FIELD_NAME, (c, j) -> j.add(nullToEmptyString.apply(c.annotation.taxonName)));
         selected2Content.put(GENE_PRODUCT_NAME_FIELD_NAME, (c, j) -> j.add(nullToEmptyString.apply(c.annotation.name)));
-        selected2Content.put(GENE_PRODUCT_SYNONYMS_FIELD_NAME, (c, j) -> j.add(nullToEmptyString.apply(c.annotation.synonyms )));
-        selected2Content.put(GENE_PRODUCT_TYPE_FIELD_NAME, (c, j) -> j.add(toGeneProductType(idToComponents
-                                                                                                     (c.annotation
-                                                                                                              .geneProductId)[DB])));
-    }
-
-    @Override public List<String> apply(Annotation annotation, List<String> selectedFields) {
-        LOGGER.debug("Write out TSV for " + annotation);
-        final List<String> columns = whichColumnsWillWeShow(selectedFields);
-        if (isSlimmedRequest(annotation)) {
-            return Collections.singletonList(output(new OutputContent(annotation, columns,null)));
-        } else {
-            return annotation.slimmedIds.stream()
-                                        .map(goId -> output(new OutputContent(annotation, columns, goId)))
-                                        .collect(toList());
-        }
+        selected2Content.put(GENE_PRODUCT_SYNONYMS_FIELD_NAME,
+                (c, j) -> j.add(nullToEmptyString.apply(c.annotation.synonyms)));
+        selected2Content.put(GENE_PRODUCT_TYPE_FIELD_NAME,
+                (c, j) -> j.add(toGeneProductType(idToComponents(c.annotation.geneProductId)[DB])));
     }
 
     private boolean isSlimmedRequest(Annotation annotation) {
@@ -96,7 +91,7 @@ public class AnnotationToTSV extends AnnotationTo implements BiFunction<Annotati
         return tsvJoiner.toString();
     }
 
-    private static class OutputContent{
+    private static class OutputContent {
         final Annotation annotation;
         final List<String> selectedFields;
         final String slimmedToGoId;
