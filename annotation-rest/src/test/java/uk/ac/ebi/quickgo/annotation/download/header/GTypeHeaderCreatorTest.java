@@ -30,7 +30,6 @@ public class GTypeHeaderCreatorTest {
 
     @Before
     public void setup() {
-
         when(mockContent.getDate()).thenReturn(DATE);
         when(mockContent.getUri()).thenReturn(REQUEST_URI);
         when(mockOntology.versions()).thenReturn(Arrays.asList(FORMAT_VERSION_1, FORMAT_VERSION_2));
@@ -43,9 +42,9 @@ public class GTypeHeaderCreatorTest {
         gTypeHeaderCreator.write(mockEmitter, mockContent);
 
         verify(mockEmitter).send(GTypeHeaderCreator.PREFIX + TestGTypeHeaderCreator.VERSION + "\n",
-                                 MediaType.TEXT_PLAIN);
+                MediaType.TEXT_PLAIN);
         verify(mockEmitter).send(GTypeHeaderCreator.PREFIX + GTypeHeaderCreator.PROJECT_NAME + "\n",
-                                 MediaType.TEXT_PLAIN);
+                MediaType.TEXT_PLAIN);
         verify(mockEmitter).send(GTypeHeaderCreator.PREFIX + GTypeHeaderCreator.URL + "\n", MediaType.TEXT_PLAIN);
         verify(mockEmitter).send(GTypeHeaderCreator.PREFIX + GTypeHeaderCreator.EMAIL + "\n", MediaType.TEXT_PLAIN);
         verify(mockEmitter).send(GTypeHeaderCreator.PREFIX + GTypeHeaderCreator.DATE + DATE + "\n", MediaType
@@ -59,18 +58,18 @@ public class GTypeHeaderCreatorTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void exceptionThrownIfOntologyIsNull(){
+    public void exceptionThrownIfOntologyIsNull() {
         new TestGTypeHeaderCreator(null);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void exceptionThrownIfEmitterIsNull(){
+    public void exceptionThrownIfEmitterIsNull() {
         GTypeHeaderCreator gTypeHeaderCreator = new TestGTypeHeaderCreator(mockOntology);
         gTypeHeaderCreator.write(null, mockContent);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void exceptionThrownIfContentIsNull(){
+    public void exceptionThrownIfContentIsNull() {
         GTypeHeaderCreator gTypeHeaderCreator = new TestGTypeHeaderCreator(mockOntology);
         gTypeHeaderCreator.write(mockEmitter, null);
     }
@@ -78,7 +77,7 @@ public class GTypeHeaderCreatorTest {
     private static class TestGTypeHeaderCreator extends GTypeHeaderCreator {
         final static String VERSION = "TEST";
 
-        public TestGTypeHeaderCreator(OntologyHeaderInfo ontology) {
+        TestGTypeHeaderCreator(OntologyHeaderInfo ontology) {
             super(ontology);
         }
 

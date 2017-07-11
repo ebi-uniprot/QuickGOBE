@@ -2,11 +2,12 @@ package uk.ac.ebi.quickgo.annotation.download.header;
 
 import com.google.common.base.Preconditions;
 import java.io.IOException;
-
 import java.util.Objects;
+import org.slf4j.Logger;
 import org.springframework.http.MediaType;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Produce a header for GPAD and GAF files.
@@ -16,15 +17,15 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter
  * Time: 10:09
  * Created with IntelliJ IDEA.
  */
-public abstract class GTypeHeaderCreator implements HeaderCreator{
+public abstract class GTypeHeaderCreator implements HeaderCreator {
     static final String PROJECT_NAME = "Project_name: UniProt GO Annotation (UniProt-GOA)";
-
     static final String URL = "URL: http://www.ebi.ac.uk/GOA";
     static final String EMAIL = "Contact Email: goa@ebi.ac.uk";
     static final String DATE = "Date downloaded from QuickGO: ";
     static final String FILTERS_INTRO = "Filtering parameters selected to generate file:";
-
     static final String PREFIX = "!";
+    
+    private static final Logger LOGGER = getLogger(GTypeHeaderCreator.class);
     private final OntologyHeaderInfo ontology;
 
     GTypeHeaderCreator(OntologyHeaderInfo ontology) {
@@ -37,6 +38,7 @@ public abstract class GTypeHeaderCreator implements HeaderCreator{
      * @param emitter streams the header content to the client
      * @param content holds the URI and parameter list to be added to the header information.
      */
+    @Override
     public void write(ResponseBodyEmitter emitter, HeaderContent content) {
         Preconditions.checkArgument(Objects.nonNull(emitter), "The GTypeHeaderCreator emitter must not be null");
         Preconditions.checkArgument(Objects.nonNull(content), "The GTypeHeaderCreator content instance must not be " +
@@ -51,15 +53,18 @@ public abstract class GTypeHeaderCreator implements HeaderCreator{
         send(emitter, content.getUri());
     }
 
+    abstract String version();
+
     private void send(ResponseBodyEmitter emitter, String content) {
         try {
             emitter.send(PREFIX + content + "\n", MediaType.TEXT_PLAIN);
         } catch (IOException e) {
-            throw new RuntimeException("Failed to send download header", e);
+            String errorMessage = "Failed to send TSV download header";
+            HeaderCreationException headerCreationException = new HeaderCreationException(errorMessage, e);
+            LOGGER.error(errorMessage, headerCreationException);
+            throw headerCreationException;
         }
     }
-
-    abstract String version();
 
     private String date(HeaderContent content) {
         return DATE + content.getDate();

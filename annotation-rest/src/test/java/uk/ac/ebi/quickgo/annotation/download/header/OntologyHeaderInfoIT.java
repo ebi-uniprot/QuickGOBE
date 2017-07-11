@@ -1,6 +1,5 @@
 package uk.ac.ebi.quickgo.annotation.download.header;
 
-
 import uk.ac.ebi.quickgo.annotation.download.DownloadConfig;
 
 import java.io.IOException;
@@ -26,21 +25,20 @@ import static org.hamcrest.Matchers.hasItems;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = DownloadConfig.class)
-public class OntologyIT {
+public class OntologyHeaderInfoIT {
     private static final String ECO_VERSION = "http://purl.obolibrary.org/obo/eco/releases/2017-01-06/eco.owl";
     private static final String GO_VERSION = "http://purl.obolibrary.org/obo/go/releases/2017-01-12/go.owl";
+    private static final Resource ONTOLOGY_RESOURCE = new ClassPathResource("ONTOLOGY_IRI.dat.gz");
 
-    private static final Resource resource = new ClassPathResource("ONTOLOGY_IRI.dat.gz");
     private Path path;
-
 
     @Before
     public void setup() throws IOException {
-        path = Paths.get(resource.getURI());
+        path = Paths.get(ONTOLOGY_RESOURCE.getURI());
     }
 
     @Test
-    public void loadOntologySuccessfully(){
+    public void loadOntologySuccessfully() {
         OntologyHeaderInfo ontology = new OntologyHeaderInfo(path);
 
         List<String> versions = ontology.versions();
@@ -49,7 +47,7 @@ public class OntologyIT {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void creatingOntologyWithNullArgumentToConstructorCreatesException(){
+    public void creatingOntologyWithNullArgumentToConstructorCreatesException() {
         new OntologyHeaderInfo(null);
     }
 

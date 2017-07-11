@@ -6,10 +6,9 @@ import org.junit.Test;
 import org.springframework.http.MediaType;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.mock;
 
 /**
  * @author Tony Wardell
@@ -26,7 +25,6 @@ public class GafHeaderCreatorTest {
     @Before
     public void setup() {
         when(mockOntology.versions()).thenReturn(Collections.emptyList());
-
     }
 
     @Test
