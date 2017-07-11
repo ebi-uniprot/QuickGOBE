@@ -17,7 +17,7 @@ import static org.slf4j.LoggerFactory.getLogger;
  * Time: 10:09
  * Created with IntelliJ IDEA.
  */
-public abstract class GTypeHeaderCreator implements HeaderCreator {
+public abstract class GeneTypeHeaderCreator implements HeaderCreator {
     static final String PROJECT_NAME = "Project_name: UniProt GO Annotation (UniProt-GOA)";
     static final String URL = "URL: http://www.ebi.ac.uk/GOA";
     static final String EMAIL = "Contact Email: goa@ebi.ac.uk";
@@ -25,10 +25,10 @@ public abstract class GTypeHeaderCreator implements HeaderCreator {
     static final String FILTERS_INTRO = "Filtering parameters selected to generate file:";
     static final String PREFIX = "!";
     
-    private static final Logger LOGGER = getLogger(GTypeHeaderCreator.class);
+    private static final Logger LOGGER = getLogger(GeneTypeHeaderCreator.class);
     private final OntologyHeaderInfo ontology;
 
-    GTypeHeaderCreator(OntologyHeaderInfo ontology) {
+    GeneTypeHeaderCreator(OntologyHeaderInfo ontology) {
         Preconditions.checkArgument(ontology != null, "The ontology instance must not be null");
         this.ontology = ontology;
     }

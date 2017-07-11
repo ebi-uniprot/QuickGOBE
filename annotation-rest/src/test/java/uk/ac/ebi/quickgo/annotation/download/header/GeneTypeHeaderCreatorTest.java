@@ -16,7 +16,7 @@ import static org.mockito.Mockito.when;
  * Time: 12:10
  * Created with IntelliJ IDEA.
  */
-public class GTypeHeaderCreatorTest {
+public class GeneTypeHeaderCreatorTest {
 
     private static final String DATE = "2017-05-23";
     private static final String REQUEST_URI =
@@ -37,23 +37,23 @@ public class GTypeHeaderCreatorTest {
 
     @Test
     public void writeIsComplete() throws Exception {
-        GTypeHeaderCreator gTypeHeaderCreator = new TestGTypeHeaderCreator(mockOntology);
+        GeneTypeHeaderCreator gTypeHeaderCreator = new TestGTypeHeaderCreator(mockOntology);
 
         gTypeHeaderCreator.write(mockEmitter, mockContent);
 
-        verify(mockEmitter).send(GTypeHeaderCreator.PREFIX + TestGTypeHeaderCreator.VERSION + "\n",
+        verify(mockEmitter).send(GeneTypeHeaderCreator.PREFIX + TestGTypeHeaderCreator.VERSION + "\n",
                 MediaType.TEXT_PLAIN);
-        verify(mockEmitter).send(GTypeHeaderCreator.PREFIX + GTypeHeaderCreator.PROJECT_NAME + "\n",
+        verify(mockEmitter).send(GeneTypeHeaderCreator.PREFIX + GeneTypeHeaderCreator.PROJECT_NAME + "\n",
                 MediaType.TEXT_PLAIN);
-        verify(mockEmitter).send(GTypeHeaderCreator.PREFIX + GTypeHeaderCreator.URL + "\n", MediaType.TEXT_PLAIN);
-        verify(mockEmitter).send(GTypeHeaderCreator.PREFIX + GTypeHeaderCreator.EMAIL + "\n", MediaType.TEXT_PLAIN);
-        verify(mockEmitter).send(GTypeHeaderCreator.PREFIX + GTypeHeaderCreator.DATE + DATE + "\n", MediaType
+        verify(mockEmitter).send(GeneTypeHeaderCreator.PREFIX + GeneTypeHeaderCreator.URL + "\n", MediaType.TEXT_PLAIN);
+        verify(mockEmitter).send(GeneTypeHeaderCreator.PREFIX + GeneTypeHeaderCreator.EMAIL + "\n", MediaType.TEXT_PLAIN);
+        verify(mockEmitter).send(GeneTypeHeaderCreator.PREFIX + GeneTypeHeaderCreator.DATE + DATE + "\n", MediaType
                 .TEXT_PLAIN);
-        verify(mockEmitter).send(GTypeHeaderCreator.PREFIX + FORMAT_VERSION_1 + "\n", MediaType.TEXT_PLAIN);
-        verify(mockEmitter).send(GTypeHeaderCreator.PREFIX + FORMAT_VERSION_2 + "\n", MediaType.TEXT_PLAIN);
-        verify(mockEmitter).send(GTypeHeaderCreator.PREFIX + GTypeHeaderCreator.FILTERS_INTRO + "\n", MediaType
+        verify(mockEmitter).send(GeneTypeHeaderCreator.PREFIX + FORMAT_VERSION_1 + "\n", MediaType.TEXT_PLAIN);
+        verify(mockEmitter).send(GeneTypeHeaderCreator.PREFIX + FORMAT_VERSION_2 + "\n", MediaType.TEXT_PLAIN);
+        verify(mockEmitter).send(GeneTypeHeaderCreator.PREFIX + GeneTypeHeaderCreator.FILTERS_INTRO + "\n", MediaType
                 .TEXT_PLAIN);
-        verify(mockEmitter).send(GTypeHeaderCreator.PREFIX + REQUEST_URI + "\n", MediaType
+        verify(mockEmitter).send(GeneTypeHeaderCreator.PREFIX + REQUEST_URI + "\n", MediaType
                 .TEXT_PLAIN);
     }
 
@@ -64,17 +64,17 @@ public class GTypeHeaderCreatorTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void exceptionThrownIfEmitterIsNull() {
-        GTypeHeaderCreator gTypeHeaderCreator = new TestGTypeHeaderCreator(mockOntology);
+        GeneTypeHeaderCreator gTypeHeaderCreator = new TestGTypeHeaderCreator(mockOntology);
         gTypeHeaderCreator.write(null, mockContent);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void exceptionThrownIfContentIsNull() {
-        GTypeHeaderCreator gTypeHeaderCreator = new TestGTypeHeaderCreator(mockOntology);
+        GeneTypeHeaderCreator gTypeHeaderCreator = new TestGTypeHeaderCreator(mockOntology);
         gTypeHeaderCreator.write(mockEmitter, null);
     }
 
-    private static class TestGTypeHeaderCreator extends GTypeHeaderCreator {
+    private static class TestGTypeHeaderCreator extends GeneTypeHeaderCreator {
         final static String VERSION = "TEST";
 
         TestGTypeHeaderCreator(OntologyHeaderInfo ontology) {

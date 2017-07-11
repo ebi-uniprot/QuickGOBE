@@ -7,7 +7,7 @@ package uk.ac.ebi.quickgo.annotation.download.header;
  * Time: 15:44
  * Created with IntelliJ IDEA.
  */
-public class GafHeaderCreator extends GTypeHeaderCreator {
+public class GafHeaderCreator extends GeneTypeHeaderCreator {
 
     static final String VERSION = "gaf-version: 2.1";
 

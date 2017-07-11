@@ -7,7 +7,7 @@ package uk.ac.ebi.quickgo.annotation.download.header;
  * Time: 15:33
  * Created with IntelliJ IDEA.
  */
-public class GpadHeaderCreator extends GTypeHeaderCreator {
+public class GpadHeaderCreator extends GeneTypeHeaderCreator {
 
     static final String VERSION = "gpa-version: 1.1";
 
