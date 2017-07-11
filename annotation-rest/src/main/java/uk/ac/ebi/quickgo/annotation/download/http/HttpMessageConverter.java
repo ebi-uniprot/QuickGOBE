@@ -1,10 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.download.http;
 
-import uk.ac.ebi.quickgo.annotation.model.Annotation;
-import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
-
 import java.io.IOException;
-import java.io.OutputStream;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
@@ -13,20 +9,20 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 
 /**
- * GAF message converter that writes a stream of {@link QueryResult} containing {@link Annotation} instances,
- * to a response's output stream.
+ * An HTTP message converter wrapper that defers the actual writing to an instance of {@link DispatchWriter}.
  *
  * Created 19/01/17
- * @author Edd
+ * @author Tony Wardell
  */
 public class HttpMessageConverter extends AbstractHttpMessageConverter<Object> {
 
-    private final DispatchWriter helper;
+    private final DispatchWriter writer;
 
-    public HttpMessageConverter(DispatchWriter helper, MediaType mediaType) {
+    public HttpMessageConverter(DispatchWriter dispatchWriter, MediaType mediaType) {
         super(mediaType);
-        this.helper = helper;
+        this.writer = dispatchWriter;
     }
+
     @Override protected boolean supports(Class<?> clazz) {
         return true;
     }
@@ -38,7 +34,6 @@ public class HttpMessageConverter extends AbstractHttpMessageConverter<Object> {
 
     @Override protected void writeInternal(Object downloadPackage, HttpOutputMessage outputMessage)
             throws IOException, HttpMessageNotWritableException {
-        OutputStream out = outputMessage.getBody();
-        helper.write(downloadPackage, out);
+        writer.write(downloadPackage, outputMessage.getBody());
     }
 }

@@ -25,5 +25,4 @@ public class MediaTypeFactory {
     public static final MediaType TSV_MEDIA_TYPE = new MediaType(TYPE, TSV_SUB_TYPE, DEFAULT_CHARSET);
     public static final MediaType GAF_MEDIA_TYPE = new MediaType(TYPE, GAF_SUB_TYPE, DEFAULT_CHARSET);
     public static final MediaType GPAD_MEDIA_TYPE = new MediaType(TYPE, GPAD_SUB_TYPE, DEFAULT_CHARSET);
-
 }
