@@ -7,16 +7,13 @@ import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.http.MediaType;
-
 
 /**
  * Writes a stream of {@link QueryResult}s containing {@link Annotation} instances to a response's output stream,
@@ -45,12 +42,10 @@ public class DispatchWriter {
         if (object instanceof ResponseExceptionHandler.ErrorInfo) {
             writeError(out, (ResponseExceptionHandler.ErrorInfo) object);
         } else {
-            if(object instanceof LinkedHashMap){
-                // Must deal with LinkedHashMap {timestamp=Wed May 10 16:18:09 BST 2017, status=200, error=OK, message=No message available, path=/QuickGO/services/annotation/downloadSearch}
-                LOGGER.info("DispatchWriter write must deal with LinkedHashMap " + object );
-            }else {
-                //writeAnnotations(out, (Stream<QueryResult<Annotation>>) object);
+            if (object instanceof DownloadContent) {
                 writeAnnotations(out, (DownloadContent) object);
+            } else {
+                LOGGER.warn("DispatchWriter write must handle: " + object.getClass());
             }
         }
     }
@@ -61,31 +56,29 @@ public class DispatchWriter {
     }
 
     private void writeAnnotations(OutputStream out, DownloadContent downloadContent) {
-        LOGGER.info("DispatchWriter writeAnnotations called.");
         AtomicInteger counter = new AtomicInteger(0);
         AtomicInteger batchCount = new AtomicInteger(0);
         try {
             downloadContent.annotationStream.forEach(annotationResult ->
-                annotationResult.getResults()
-                                .forEach(annotation -> converter.apply(annotation, downloadContent.selectedFields)
-                                                                             .forEach(content -> stream(out,
-                                                                                                        counter,
-                                                                                                        batchCount,
-                                                                                                        content))));
+                    annotationResult.getResults()
+                            .forEach(annotation -> converter.apply(annotation, downloadContent.selectedFields)
+                                    .forEach(content ->
+                                            writeContent(content, out, counter, batchCount))));
         } catch (StopStreamException e) {
             LOGGER.error("Client aborted streaming: closing stream.", e);
             downloadContent.annotationStream.close();
         }
-        LOGGER.info("Written " + counter.get() +  type.getType() + " annotations");
+        LOGGER.debug("Written " + counter.get() + type.getType() + " annotations");
     }
 
-    private void stream(OutputStream out, AtomicInteger counter, AtomicInteger batchCount, String content) {
+    private void writeContent(String content, OutputStream out, AtomicInteger counter, AtomicInteger batchCount) {
         try {
             out.write((content + "\n").getBytes());
             updateCountersAndFlushStreamWhenRequired(out, counter, batchCount);
         } catch (IOException e) {
-            throw new StopStreamException("Could not write OutputStream whilst writing " + type.getType() + " annotation: " +
-                                                  content, e);
+            throw new StopStreamException(
+                    "Could not write OutputStream whilst writing " + type.getType() + " annotation: " +
+                            content, e);
         }
     }
 
@@ -95,8 +88,8 @@ public class DispatchWriter {
         batchCount.getAndIncrement();
         if (batchCount.get() >= FLUSH_INTERVAL) {
             out.flush();
-            LOGGER.info("Flushed " + type.getType() + " http message converter output stream after: " +
-                                counter.get() + " annotations.");
+            LOGGER.debug("Flushed " + type.getType() + " http message converter output stream after: " +
+                    counter.get() + " annotations.");
             batchCount.set(0);
         }
     }
