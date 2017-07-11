@@ -8,8 +8,6 @@ import uk.ac.ebi.quickgo.rest.search.request.config.FilterConfigRetrieval;
 
 import com.google.common.base.Preconditions;
 import java.util.Optional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Component;
@@ -29,7 +27,6 @@ import org.springframework.web.client.RestOperations;
 @Component
 @Import(FilterRequestConfig.class)
 public class RESTFilterConverterFactory {
-    private static final Logger LOGGER = LoggerFactory.getLogger(RESTFilterConverterFactory.class);
     private final FilterConfigRetrieval filterConfigRetrieval;
     private final RestOperations restOperations;
 
