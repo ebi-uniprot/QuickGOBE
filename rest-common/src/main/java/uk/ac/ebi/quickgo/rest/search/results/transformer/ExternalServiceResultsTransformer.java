@@ -7,8 +7,6 @@ import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
@@ -20,8 +18,6 @@ import static com.google.common.base.Preconditions.checkArgument;
  * @author Edd
  */
 public class ExternalServiceResultsTransformer<R> implements ResultTransformer<QueryResult<R>> {
-    Logger LOGGER = LoggerFactory.getLogger(ExternalServiceResultsTransformer.class);
-
     private static final ResultTransformationRequests EMPTY_TRANSFORMATION_REQUESTS =
             new ResultTransformationRequests();
     private final RESTFilterConverterFactory restFilterConverterFactory;
@@ -41,26 +37,19 @@ public class ExternalServiceResultsTransformer<R> implements ResultTransformer<Q
 
     @Override public QueryResult<R> transform(QueryResult<R> result, FilterContext filterContext) {
         ResultTransformationRequests transformationRequests = filterContext.get(ResultTransformationRequests.class)
-                                                                           .orElse(EMPTY_TRANSFORMATION_REQUESTS);
-
-        LOGGER.info("ExternalServiceResultsTransformer#transform " + transformationRequests.getRequests().size() +
-                " transformationRequests.");
+                .orElse(EMPTY_TRANSFORMATION_REQUESTS);
 
         Set<String> requiredRequests = transformationRequests.getRequests()
-                                                             .stream()
-                                                             .map(ResultTransformationRequest::getId)
-                                                             .collect(Collectors.toSet());
+                .stream()
+                .map(ResultTransformationRequest::getId)
+                .collect(Collectors.toSet());
         requiredRequests.retainAll(fieldsToAdd);
         if (!requiredRequests.isEmpty()) {
-            LOGGER.info("ExternalServiceResultsTransformer#transform " + fieldInjectors.size() +
-                                " fieldInjectors.");
             List<ResponseValueInjector<R>> requiredInjectors =
                     fieldInjectors.stream()
                             .filter(injector -> requiredRequests.contains(injector.getId()))
                             .collect(Collectors.toList());
 
-            LOGGER.info("ExternalServiceResultsTransformer#transform " + result.getResults().size() +
-                                " result.getResults()");
             result.getResults().forEach(annotation ->
                     requiredInjectors.forEach(valueInjector ->
                             valueInjector.inject(restFilterConverterFactory, annotation))
