@@ -96,10 +96,7 @@ public class AnnotationTransformerControllerIT {
                 .build();
         mockRestServiceServer = MockRestServiceServer.createServer((RestTemplate) restOperations);
         dtoMapper = new ObjectMapper();
-    }
 
-    @After
-    public void deleteCoreContents() {
         annotationRepository.deleteAll();
     }
 
@@ -164,7 +161,6 @@ public class AnnotationTransformerControllerIT {
     // ----------------- taxonomy name values -----------------
     @Test
     public void requestOmittingTaxonNameProducesResultWhereTaxonNameIsNull() throws Exception {
-        annotationRepository.deleteAll();
         annotationRepository.save(annotationDocWithTaxon(goId(1), taxonId(1)));
 
         expectTaxonIdHasGivenTaxonNameViaRest(taxonId(1), taxonName(1));
