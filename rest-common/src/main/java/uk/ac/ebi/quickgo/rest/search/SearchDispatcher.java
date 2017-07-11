@@ -151,21 +151,16 @@ public final class SearchDispatcher {
             resultStream = Stream.empty();
         } else {
             try {
-                LOGGER.info("SearchDispatcher#streamSearchResults download firstQueryResult");
                 final QueryResult<T> firstQueryResult = searchService.findByQuery(firstQueryRequest);
                 int pageSize = firstQueryRequest.getPage().getPageSize();
-                LOGGER.info("SearchDispatcher:: download first request info: {} wanted, {} page size", limit, pageSize);
 
-                LOGGER.info("SearchDispatcher#streamSearchResults transforming firstQueryResult");
                 QueryResult<T> firstTransformedQueryResult = transformer.applyTransformations(firstQueryResult, context);
                 long totalHits = firstTransformedQueryResult.getNumberOfHits();
 
-                LOGGER.info("SearchDispatcher:: resizeResultsIfRequired");
                 firstTransformedQueryResult = resizeResultsIfRequired(firstTransformedQueryResult, limit);
                 MutableValue<String> cursor = new MutableValue<>(FIRST_CURSOR);
                 MutableValue<Integer> fetchedCount = new MutableValue<>(0);
                 int requiredIterations = getRequiredNumberOfPagesToFetch(pageSize, totalHits, limit);
-                LOGGER.info("SearchDispatcher:: required iterations " + requiredIterations);
 
                 resultStream = Stream.iterate(firstTransformedQueryResult, qr -> {
                     String nextCursor = qr.getPageInfo().getNextCursor();
@@ -179,8 +174,6 @@ public final class SearchDispatcher {
                         QueryRequest nextQueryRequest =
                                 createNextCursorQueryRequest(queryTemplate, firstQueryRequest, nextCursor, nextPageSize);
 
-                        LOGGER.info("download iteration info: {} wanted, {} fetched, {} page size, {} next page size"
-                                , limit, fetchedCount.getValue(), pageSize, nextPageSize);
                         return transformer.applyTransformations(
                                 searchService.findByQuery(nextQueryRequest),
                                 context);
