@@ -387,7 +387,7 @@ public class AnnotationTransformerControllerIT {
             String termName = termNames.get(i);
             expectRestCallSuccess(
                     GET,
-                    buildResource( GO_TERM_RESOURCE_FORMAT,termId),
+                    buildResource(GO_TERM_RESOURCE_FORMAT, termId),
                     constructGoTermsResponseObject(singletonList(termId), singletonList(termName)));
         }
     }
