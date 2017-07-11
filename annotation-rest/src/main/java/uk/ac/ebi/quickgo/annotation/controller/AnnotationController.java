@@ -261,10 +261,10 @@ public class AnnotationController {
 
     private HeaderContent buildHeaderContent(HttpServletRequest servletRequest, List<String> selectedFields) {
         HeaderContent.Builder contentBuilder = new HeaderContent.Builder();
-        return contentBuilder.isSlimmed(isSlimmed(servletRequest))
-                             .uri(HeaderUri.uri(servletRequest))
-                             .date(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE))
-                             .selectedFields(selectedFields)
+        return contentBuilder.setIsSlimmed(isSlimmed(servletRequest))
+                             .setUri(HeaderUri.uri(servletRequest))
+                             .setDate(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE))
+                             .setSelectedFields(selectedFields)
                              .build();
     }
 

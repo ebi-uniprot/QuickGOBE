@@ -53,7 +53,7 @@ public class TsvHeaderCreatorTest {
 
     @Before
     public void setup() {
-        when(mockContent.uri()).thenReturn(REQUEST_URI);
+        when(mockContent.getUri()).thenReturn(REQUEST_URI);
         String FORMAT_VERSION_1 = "test-version_1";
         String FORMAT_VERSION_2 = "test-version_2";
         when(mockOntology.versions()).thenReturn(asList(FORMAT_VERSION_1, FORMAT_VERSION_2));
@@ -65,7 +65,7 @@ public class TsvHeaderCreatorTest {
         for(String[] field2Column : fields2Columns){
             HeaderContent content = mock(HeaderContent.class);
             when(content.isSlimmed()).thenReturn(false);
-            when(content.selectedFields()).thenReturn(Collections.singletonList(field2Column[0]));
+            when(content.getSelectedFields()).thenReturn(Collections.singletonList(field2Column[0]));
             ResponseBodyEmitter emitter = mock(ResponseBodyEmitter.class);
 
             tsvHeaderCreator.write(emitter, content);
@@ -77,7 +77,7 @@ public class TsvHeaderCreatorTest {
     @Test
     public void writeHeaderForSeveralSelectedFields() throws Exception {
         when(mockContent.isSlimmed()).thenReturn(false);
-        when(mockContent.selectedFields()).thenReturn(asList(GENE_PRODUCT_ID_FIELD_NAME, GO_NAME_FIELD_NAME, TAXON_NAME_FIELD_NAME));
+        when(mockContent.getSelectedFields()).thenReturn(asList(GENE_PRODUCT_ID_FIELD_NAME, GO_NAME_FIELD_NAME, TAXON_NAME_FIELD_NAME));
 
         TsvHeaderCreator tsvHeaderCreator = new TsvHeaderCreator();
 
@@ -91,7 +91,7 @@ public class TsvHeaderCreatorTest {
     @Test
     public void writeHeaderForSeveralSelectedFieldsInNewOrder() throws Exception {
         when(mockContent.isSlimmed()).thenReturn(false);
-        when(mockContent.selectedFields()).thenReturn(asList(TAXON_NAME_FIELD_NAME, GO_NAME_FIELD_NAME,
+        when(mockContent.getSelectedFields()).thenReturn(asList(TAXON_NAME_FIELD_NAME, GO_NAME_FIELD_NAME,
                                                              GENE_PRODUCT_ID_FIELD_NAME));
         TsvHeaderCreator tsvHeaderCreator = new TsvHeaderCreator();
 
@@ -105,7 +105,7 @@ public class TsvHeaderCreatorTest {
     @Test
     public void writeHeaderForFullListOfFieldsNotSlimmed() throws Exception {
         when(mockContent.isSlimmed()).thenReturn(false);
-        when(mockContent.selectedFields()).thenReturn(Collections.emptyList());
+        when(mockContent.getSelectedFields()).thenReturn(Collections.emptyList());
 
         TsvHeaderCreator tsvHeaderCreator = new TsvHeaderCreator();
 
@@ -134,7 +134,7 @@ public class TsvHeaderCreatorTest {
     @Test
     public void writeHeaderForSeveralSelectedFieldsWhenSlimmed() throws Exception {
         when(mockContent.isSlimmed()).thenReturn(true);
-        when(mockContent.selectedFields()).thenReturn(asList(GENE_PRODUCT_ID_FIELD_NAME,
+        when(mockContent.getSelectedFields()).thenReturn(asList(GENE_PRODUCT_ID_FIELD_NAME,
                                                              GO_TERM_FIELD_NAME,
                                                              TAXON_NAME_FIELD_NAME));
 

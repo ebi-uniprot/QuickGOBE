@@ -95,8 +95,8 @@ public class TsvHeaderCreator implements HeaderCreator{
 
     private String output(HeaderContent headerContent) {
         StringJoiner tsvJoiner = new StringJoiner(OUTPUT_DELIMITER);
-        List<String> selectedFields = TSVDownload.whichColumnsWillWeShow(headerContent.selectedFields());
-        LOGGER.debug("Requested which fields will we show from " + headerContent.selectedFields() + " and will show "
+        List<String> selectedFields = TSVDownload.whichColumnsWillWeShow(headerContent.getSelectedFields());
+        LOGGER.debug("Requested which fields will we show from " + headerContent.getSelectedFields() + " and will show "
                              + selectedFields);
         for (String selectedField : selectedFields) {
             selected2Content.get(selectedField).accept(headerContent, tsvJoiner);

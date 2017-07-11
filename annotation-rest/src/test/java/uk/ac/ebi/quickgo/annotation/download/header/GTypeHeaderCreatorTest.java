@@ -31,8 +31,8 @@ public class GTypeHeaderCreatorTest {
     @Before
     public void setup() {
 
-        when(mockContent.date()).thenReturn(DATE);
-        when(mockContent.uri()).thenReturn(REQUEST_URI);
+        when(mockContent.getDate()).thenReturn(DATE);
+        when(mockContent.getUri()).thenReturn(REQUEST_URI);
         when(mockOntology.versions()).thenReturn(Arrays.asList(FORMAT_VERSION_1, FORMAT_VERSION_2));
     }
 

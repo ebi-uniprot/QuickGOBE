@@ -17,57 +17,57 @@ public class HeaderContent {
     private final String date;
     private final List<String> selectedFields;
 
-    public String date() {
+    private HeaderContent(Builder builder) {
+        this.uri = builder.uri;
+        this.isSlimmed = builder.isSlimmed;
+        this.date = builder.date;
+        this.selectedFields = builder.selectedFields;
+    }
+
+    public String getDate() {
         return date;
     }
 
-    List<String> selectedFields() {
+    List<String> getSelectedFields() {
         return selectedFields;
     }
 
-    String uri() {
+    String getUri() {
         return uri;
     }
 
-    boolean isSlimmed(){
+    boolean isSlimmed() {
         return isSlimmed;
     }
 
-    public static class Builder{
+    public static class Builder {
         String uri;
         boolean isSlimmed;
         String date;
         List<String> selectedFields;
 
-        public Builder uri(String uri){
+        public Builder setUri(String uri) {
             this.uri = uri;
             return this;
         }
 
-        public Builder isSlimmed(boolean isSlimmed){
+        public Builder setIsSlimmed(boolean isSlimmed) {
             this.isSlimmed = isSlimmed;
             return this;
         }
 
-        public Builder date(String date){
+        public Builder setDate(String date) {
             this.date = date;
             return this;
         }
 
-        public Builder selectedFields(List<String> selectedFields){
+        public Builder setSelectedFields(List<String> selectedFields) {
             this.selectedFields = selectedFields;
             return this;
         }
 
-        public HeaderContent build(){
+        public HeaderContent build() {
             return new HeaderContent(this);
         }
-    }
-
-    private HeaderContent(Builder builder){
-        this.uri = builder.uri;
-        this.isSlimmed = builder.isSlimmed;
-        this.date = builder.date;
-        this.selectedFields = builder.selectedFields;
     }
 }

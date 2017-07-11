@@ -19,12 +19,12 @@ public class HeaderContentTest {
     @Test
     public void creationSuccessful(){
         HeaderContent.Builder builder = new HeaderContent.Builder();
-        builder.uri(URL);
-        builder.date(DATE);
-        builder.isSlimmed(true);
+        builder.setUri(URL);
+        builder.setDate(DATE);
+        builder.setIsSlimmed(true);
         HeaderContent headerContent = builder.build();
-        assertThat(headerContent.uri(), is(URL));
-        assertThat(headerContent.date(), is(DATE));
+        assertThat(headerContent.getUri(), is(URL));
+        assertThat(headerContent.getDate(), is(DATE));
         assertThat(headerContent.isSlimmed(), is(true));
     }
 

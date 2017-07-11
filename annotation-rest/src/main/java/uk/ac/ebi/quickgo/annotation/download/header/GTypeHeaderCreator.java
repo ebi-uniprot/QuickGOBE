@@ -48,7 +48,7 @@ public abstract class GTypeHeaderCreator implements HeaderCreator{
         send(emitter, date(content));
         ontology.versions().forEach(s -> send(emitter, s));
         send(emitter, FILTERS_INTRO);
-        send(emitter, content.uri());
+        send(emitter, content.getUri());
     }
 
     private void send(ResponseBodyEmitter emitter, String content) {
@@ -62,7 +62,7 @@ public abstract class GTypeHeaderCreator implements HeaderCreator{
     abstract String version();
 
     private String date(HeaderContent content) {
-        return DATE + content.date();
+        return DATE + content.getDate();
     }
 
 }
