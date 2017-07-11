@@ -191,13 +191,9 @@ class RESTFilterConverter<T> implements FilterConverter<FilterRequest, T> {
 
     private <R> R fetchResults(RESTRequesterImpl restRequester, Class<R> responseType)
             throws ExecutionException, InterruptedException, TimeoutException {
-        LOGGER.info("RESTFilterConverter#fetchResults fetching using RESTRequesterImpl " + restRequester.toString() +
-                            " using time out of " + timeoutMillis);
-        final R results = restRequester
+        return restRequester
                 .get(responseType)
                 .get(timeoutMillis, TimeUnit.MILLISECONDS);
-        LOGGER.info("RESTFilterConverter#fetchResults fetching has fetched results");
-        return results;
     }
 
     static class InvalidHostNameException extends RuntimeException {
