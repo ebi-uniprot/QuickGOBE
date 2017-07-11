@@ -38,7 +38,7 @@ public class GeneProductNameInjectorTest {
     }
 
     @Test
-    public void injectorIdIsGoName() {
+    public void injectorIdIsGeneProductName() {
         assertThat(nameInjector.getId(), is(GENE_PRODUCT_NAME));
     }
 
