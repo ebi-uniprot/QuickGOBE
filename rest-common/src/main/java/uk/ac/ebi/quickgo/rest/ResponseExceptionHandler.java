@@ -26,7 +26,7 @@ public class ResponseExceptionHandler {
     @ExceptionHandler({IllegalStateException.class, RetrievalException.class, ServiceConfigException.class})
     protected ResponseEntity<ErrorInfo> handleInternalServer(RuntimeException ex, HttpServletRequest request) {
         ErrorInfo error = new ErrorInfo(request.getRequestURL().toString(), ex.getMessage());
-        LOGGER.error("Internal Server Error = " + ex);
+        LOGGER.error("Internal Server Error: ", ex);
         return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
