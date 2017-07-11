@@ -22,11 +22,8 @@ import static uk.ac.ebi.quickgo.annotation.download.TSVDownload.*;
  * Time: 10:09
  * Created with IntelliJ IDEA.
  */
-public class TsvHeaderCreator implements HeaderCreator{
+public class TsvHeaderCreator implements HeaderCreator {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TsvHeaderCreator.class);
-
-    private static final String OUTPUT_DELIMITER = "\t";
     static final String GENE_PRODUCT_ID = "GENE PRODUCT ID";
     static final String SYMBOL = "SYMBOL";
     static final String QUALIFIER = "QUALIFIER";
@@ -46,35 +43,14 @@ public class TsvHeaderCreator implements HeaderCreator{
     static final String GENE_PRODUCT_SYNONYMS = "GENE_PRODUCT_SYNONYMS";
     static final String GENE_PRODUCT_TYPE = "GENE_PRODUCT_TYPE";
 
-
-    private static final Map<String, BiConsumer<HeaderContent,StringJoiner>> selected2Content;
+    private static final Logger LOGGER = LoggerFactory.getLogger(TsvHeaderCreator.class);
+    private static final String OUTPUT_DELIMITER = "\t";
+    private static final Map<String, BiConsumer<HeaderContent, StringJoiner>> selected2Content;
 
     static {
         selected2Content = new HashMap<>();
-        selected2Content.put(GENE_PRODUCT_ID_FIELD_NAME, (hc,j) -> j.add(GENE_PRODUCT_ID));
-        selected2Content.put(SYMBOL_FIELD_NAME, (hc,j) -> j.add(SYMBOL));
-        selected2Content.put(QUALIFIER_FIELD_NAME, (hc,j) -> j.add(QUALIFIER));
-        selected2Content.put(GO_TERM_FIELD_NAME, (hc, j) -> {
-            j.add(GO_TERM);
-            if (hc.isSlimmed()) {
-                j.add(SLIMMED_FROM);
-            }
-        });
-        selected2Content.put(GO_NAME_FIELD_NAME, (hc,j) -> j.add(GO_NAME));
-        selected2Content.put(ECO_ID_FIELD_NAME, (hc,j) ->  j.add(ECO_ID));
-        selected2Content.put(GO_EVIDENCE_CODE_FIELD_NAME, (hc,j) ->  j.add(GO_EVIDENCE_CODE));
-        selected2Content.put(REFERENCE_FIELD_NAME, (hc,j) ->  j.add(REFERENCE));
-        selected2Content.put(WITH_FROM_FIELD_NAME, (hc,j) ->  j.add(WITH_FROM));
-        selected2Content.put(TAXON_ID_FIELD_NAME, (hc,j) ->  j.add(TAXON_ID));
-        selected2Content.put(ASSIGNED_BY_FIELD_NAME, (hc,j) ->  j.add(ASSIGNED_BY));
-        selected2Content.put(ANNOTATION_EXTENSION_FIELD_NAME, (hc,j) ->  j.add(ANNOTATION_EXTENSION));
-        selected2Content.put(DATE_FIELD_NAME, (hc,j) ->  j.add(DATE));
-        selected2Content.put(TAXON_NAME_FIELD_NAME, (hc,j) ->  j.add(TAXON_NAME));
-        selected2Content.put(GENE_PRODUCT_NAME_FIELD_NAME, (hc,j) ->  j.add(GENE_PRODUCT_NAME));
-        selected2Content.put(GENE_PRODUCT_SYNONYMS_FIELD_NAME, (hc,j) ->  j.add(GENE_PRODUCT_SYNONYMS));
-        selected2Content.put(GENE_PRODUCT_TYPE_FIELD_NAME, (hc,j) ->  j.add(GENE_PRODUCT_TYPE));
+        initialiseContentMappings();
     }
-
 
     /**
      * Write the contents of the header to the ResponseBodyEmitter instance.
@@ -89,15 +65,43 @@ public class TsvHeaderCreator implements HeaderCreator{
         try {
             emitter.send(output(content) + "\n", MediaType.TEXT_PLAIN);
         } catch (IOException e) {
-            throw new RuntimeException("Failed to send TSV download header", e);
+            String errorMessage = "Failed to send TSV download header";
+            HeaderCreationException headerCreationException = new HeaderCreationException(errorMessage, e);
+            LOGGER.error(errorMessage, headerCreationException);
+            throw headerCreationException;
         }
+    }
+
+    private static void initialiseContentMappings() {
+        selected2Content.put(GENE_PRODUCT_ID_FIELD_NAME, (hc, j) -> j.add(GENE_PRODUCT_ID));
+        selected2Content.put(SYMBOL_FIELD_NAME, (hc, j) -> j.add(SYMBOL));
+        selected2Content.put(QUALIFIER_FIELD_NAME, (hc, j) -> j.add(QUALIFIER));
+        selected2Content.put(GO_TERM_FIELD_NAME, (hc, j) -> {
+            j.add(GO_TERM);
+            if (hc.isSlimmed()) {
+                j.add(SLIMMED_FROM);
+            }
+        });
+        selected2Content.put(GO_NAME_FIELD_NAME, (hc, j) -> j.add(GO_NAME));
+        selected2Content.put(ECO_ID_FIELD_NAME, (hc, j) -> j.add(ECO_ID));
+        selected2Content.put(GO_EVIDENCE_CODE_FIELD_NAME, (hc, j) -> j.add(GO_EVIDENCE_CODE));
+        selected2Content.put(REFERENCE_FIELD_NAME, (hc, j) -> j.add(REFERENCE));
+        selected2Content.put(WITH_FROM_FIELD_NAME, (hc, j) -> j.add(WITH_FROM));
+        selected2Content.put(TAXON_ID_FIELD_NAME, (hc, j) -> j.add(TAXON_ID));
+        selected2Content.put(ASSIGNED_BY_FIELD_NAME, (hc, j) -> j.add(ASSIGNED_BY));
+        selected2Content.put(ANNOTATION_EXTENSION_FIELD_NAME, (hc, j) -> j.add(ANNOTATION_EXTENSION));
+        selected2Content.put(DATE_FIELD_NAME, (hc, j) -> j.add(DATE));
+        selected2Content.put(TAXON_NAME_FIELD_NAME, (hc, j) -> j.add(TAXON_NAME));
+        selected2Content.put(GENE_PRODUCT_NAME_FIELD_NAME, (hc, j) -> j.add(GENE_PRODUCT_NAME));
+        selected2Content.put(GENE_PRODUCT_SYNONYMS_FIELD_NAME, (hc, j) -> j.add(GENE_PRODUCT_SYNONYMS));
+        selected2Content.put(GENE_PRODUCT_TYPE_FIELD_NAME, (hc, j) -> j.add(GENE_PRODUCT_TYPE));
     }
 
     private String output(HeaderContent headerContent) {
         StringJoiner tsvJoiner = new StringJoiner(OUTPUT_DELIMITER);
         List<String> selectedFields = TSVDownload.whichColumnsWillWeShow(headerContent.getSelectedFields());
         LOGGER.debug("Requested which fields will we show from " + headerContent.getSelectedFields() + " and will show "
-                             + selectedFields);
+                + selectedFields);
         for (String selectedField : selectedFields) {
             selected2Content.get(selectedField).accept(headerContent, tsvJoiner);
         }
