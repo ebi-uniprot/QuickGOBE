@@ -27,7 +27,7 @@ import org.springframework.http.MediaType;
 public class DispatchWriter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DispatchWriter.class);
-    private static final int FLUSH_INTERVAL = 5;
+    private static final int FLUSH_INTERVAL = 500;
     private final BiFunction<Annotation, List<String>, List<String>> converter;
     private final MediaType type;
 
@@ -38,7 +38,6 @@ public class DispatchWriter {
 
     @SuppressWarnings("unchecked")
     void write(Object object, OutputStream out) throws IOException {
-        LOGGER.info("DispatchWriter write called with " + object + ", " + out);
         if (object instanceof ResponseExceptionHandler.ErrorInfo) {
             writeError(out, (ResponseExceptionHandler.ErrorInfo) object);
         } else {
@@ -68,7 +67,7 @@ public class DispatchWriter {
             LOGGER.error("Client aborted streaming: closing stream.", e);
             downloadContent.annotationStream.close();
         }
-        LOGGER.debug("Written " + counter.get() + type.getType() + " annotations");
+        LOGGER.debug("Written {} {} annotations", counter.get(), type.getType());
     }
 
     private void writeContent(String content, OutputStream out, AtomicInteger counter, AtomicInteger batchCount) {

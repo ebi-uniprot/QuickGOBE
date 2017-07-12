@@ -36,7 +36,6 @@ public class AnnotationToTSV extends AnnotationTo implements BiFunction<Annotati
     }
 
     @Override public List<String> apply(Annotation annotation, List<String> selectedFields) {
-        LOGGER.debug("Write out TSV for " + annotation);
         final List<String> columns = whichColumnsWillWeShow(selectedFields);
         if (isSlimmedRequest(annotation)) {
             return Collections.singletonList(output(new OutputContent(annotation, columns, null)));
