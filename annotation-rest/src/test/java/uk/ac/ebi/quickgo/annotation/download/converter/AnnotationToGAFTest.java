@@ -61,7 +61,7 @@ public class AnnotationToGAFTest {
         assertThat(elements[COL_QUALIFIER], is(QUALIFIER));
         assertThat(elements[COL_GO_ID], is(GO_ID));
         assertThat(elements[COL_REFERENCE], is(REFERENCE));
-        assertThat(elements[COL_EVIDENCE], is(EVIDENCE_CODE));
+        assertThat(elements[COL_EVIDENCE], is(ECO_ID));
         assertThat(elements[COL_WITH], equalTo(WITH_FROM_AS_STRING));
         assertThat(elements[COL_ASPECT], is("F"));
         assertThat(elements[COL_DB_OBJECT_NAME], is(""));        //name
@@ -90,7 +90,7 @@ public class AnnotationToGAFTest {
         assertThat(elements[COL_QUALIFIER], is(QUALIFIER));
         assertThat(elements[COL_GO_ID], is(GO_ID));
         assertThat(elements[COL_REFERENCE], is(REFERENCE));
-        assertThat(elements[COL_EVIDENCE], is(EVIDENCE_CODE));
+        assertThat(elements[COL_EVIDENCE], is(ECO_ID));
         assertThat(elements[COL_WITH], equalTo(WITH_FROM_AS_STRING));
         assertThat(elements[COL_ASPECT], is("F"));
         assertThat(elements[COL_DB_OBJECT_NAME], is(""));        //name
@@ -120,7 +120,7 @@ public class AnnotationToGAFTest {
         assertThat(elements[COL_QUALIFIER], is(QUALIFIER));
         assertThat(elements[COL_GO_ID], is(GO_ID));
         assertThat(elements[COL_REFERENCE], is(REFERENCE));
-        assertThat(elements[COL_EVIDENCE], is(EVIDENCE_CODE));
+        assertThat(elements[COL_EVIDENCE], is(ECO_ID));
         assertThat(elements[COL_WITH], equalTo(WITH_FROM_AS_STRING));
         assertThat(elements[COL_ASPECT], is("F"));
         assertThat(elements[COL_DB_OBJECT_NAME], is(""));        //name
@@ -147,7 +147,7 @@ public class AnnotationToGAFTest {
         assertThat(elements[COL_QUALIFIER], is(QUALIFIER));
         assertThat(elements[COL_GO_ID], is(GO_ID));
         assertThat(elements[COL_REFERENCE], is(REFERENCE));
-        assertThat(elements[COL_EVIDENCE], is(EVIDENCE_CODE));
+        assertThat(elements[COL_EVIDENCE], is(ECO_ID));
         assertThat(elements[COL_WITH], equalTo(WITH_FROM_AS_STRING));
         assertThat(elements[COL_ASPECT], is("F"));
         assertThat(elements[COL_DB_OBJECT_NAME], is(""));        //name
@@ -189,7 +189,7 @@ public class AnnotationToGAFTest {
         final String slimmedToGoId1 = "GO:1005524";
         final String slimmedToGoId2 = "GO:2005524";
         annotation.slimmedIds = Arrays.asList(slimmedToGoId0, slimmedToGoId1, slimmedToGoId2);
-        List<String> converted = annotationToGAF.apply(annotation);
+        List<String> converted = annotationToGAF.apply(annotation, null);
         assertThat(converted, hasSize(annotation.slimmedIds.size()));
         checkReturned(slimmedToGoId0, converted.get(0));
         checkReturned(slimmedToGoId1, converted.get(1));
@@ -314,7 +314,7 @@ public class AnnotationToGAFTest {
     }
 
     private String[] annotationToElements(Annotation annotation) {
-        return annotationToGAF.apply(annotation).get(0)
+        return annotationToGAF.apply(annotation, null).get(0)
                 .split(AnnotationToGAF.OUTPUT_DELIMITER, -1);
     }
 }

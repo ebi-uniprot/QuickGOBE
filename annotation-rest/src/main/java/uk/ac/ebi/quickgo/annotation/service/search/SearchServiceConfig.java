@@ -1,15 +1,13 @@
 package uk.ac.ebi.quickgo.annotation.service.search;
 
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.*;
-import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
-import org.springframework.data.solr.core.SolrTemplate;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationFields;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepoConfig;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
+import uk.ac.ebi.quickgo.annotation.service.comm.rest.geneproduct.transformer.GeneProductNameInjector;
+import uk.ac.ebi.quickgo.annotation.service.comm.rest.geneproduct.transformer.GeneProductSynonymsInjector;
+import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.OntologyNameInjector;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.SlimResultsTransformer;
+import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.TaxonomyNameInjector;
 import uk.ac.ebi.quickgo.annotation.service.converter.AnnotationDocConverterImpl;
 import uk.ac.ebi.quickgo.common.SearchableField;
 import uk.ac.ebi.quickgo.common.loader.DbXRefLoader;
@@ -20,8 +18,11 @@ import uk.ac.ebi.quickgo.rest.search.RequestRetrieval;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequestConverter;
 import uk.ac.ebi.quickgo.rest.search.query.SortCriterion;
+import uk.ac.ebi.quickgo.rest.search.request.converter.RESTFilterConverterFactory;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 import uk.ac.ebi.quickgo.rest.search.results.config.FieldNameTransformer;
+import uk.ac.ebi.quickgo.rest.search.results.transformer.ExternalServiceResultsTransformer;
+import uk.ac.ebi.quickgo.rest.search.results.transformer.ResponseValueInjector;
 import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformerChain;
 import uk.ac.ebi.quickgo.rest.search.solr.SolrQueryConverter;
 import uk.ac.ebi.quickgo.rest.search.solr.SolrRequestRetrieval;
@@ -34,6 +35,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.*;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.data.solr.core.SolrTemplate;
 
 import static java.util.Arrays.asList;
 
@@ -61,10 +68,10 @@ public class SearchServiceConfig {
                     "qualifier_unsorted,targetSet_unsorted,taxonId_unsorted";
     private static final String DEFAULT_ANNOTATION_SEARCH_RETURN_FIELDS =
             "id,geneProductId,qualifier,goId,goEvidence," +
-                    "evidenceCode,reference,withFrom,taxonId,assignedBy,extensions,symbol";
+                    "evidenceCode,reference,withFrom,taxonId,assignedBy,extensions,symbol,geneProductId";
     private static final String SOLR_ANNOTATION_QUERY_REQUEST_HANDLER = "/query";
     private static final String DEFAULT_DOWNLOAD_SORT_FIELDS = "rowNumber,id";
-    private static final int DEFAULT_DOWNLOAD_PAGE_SIZE = 5000;
+    private static final int DEFAULT_DOWNLOAD_PAGE_SIZE = 500;
 
     @Value("${geneproduct.db.xref.valid.regexes}")
     String xrefValidationRegexFile;
@@ -175,10 +182,32 @@ public class SearchServiceConfig {
     }
 
     @Bean
-    public ResultTransformerChain<QueryResult<Annotation>> resultTransformerChain() {
+    public ResultTransformerChain<QueryResult<Annotation>> resultTransformerChain(
+            ExternalServiceResultsTransformer<Annotation> ontologyResultsTransformer,
+            ExternalServiceResultsTransformer<Annotation> geneProductResultsTransformer) {
         ResultTransformerChain<QueryResult<Annotation>> transformerChain = new ResultTransformerChain<>();
         transformerChain.addTransformer(new SlimResultsTransformer());
+        transformerChain.addTransformer(ontologyResultsTransformer);
+        transformerChain.addTransformer(geneProductResultsTransformer);
         return transformerChain;
+    }
+
+    @Bean
+    public ExternalServiceResultsTransformer<Annotation> ontologyResultsTransformer(RESTFilterConverterFactory
+    restFilterConverterFactory) {
+        List<ResponseValueInjector<Annotation>> responseValueInjectors = asList(
+                new OntologyNameInjector(),
+                new TaxonomyNameInjector());
+        return new ExternalServiceResultsTransformer<>(restFilterConverterFactory, responseValueInjectors);
+    }
+
+    @Bean
+    public ExternalServiceResultsTransformer<Annotation> geneProductResultsTransformer(RESTFilterConverterFactory
+            restFilterConverterFactory) {
+        List<ResponseValueInjector<Annotation>> responseValueInjectors = asList(
+                new GeneProductNameInjector(),
+                new GeneProductSynonymsInjector());
+        return new ExternalServiceResultsTransformer<>(restFilterConverterFactory, responseValueInjectors);
     }
 
     @Bean

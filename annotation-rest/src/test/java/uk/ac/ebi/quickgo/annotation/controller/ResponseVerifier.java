@@ -89,7 +89,7 @@ final class ResponseVerifier {
         String path = String.format(RESULTS_CONTENT_BY_INDEX, resultIndex);
 
         return new CompositeResultMatcher().addMatcher(jsonPath(path + "id").exists())
-                .addMatcher(jsonPath(path + "id").exists())
+                .addMatcher(jsonPath(path + "geneProductId").exists())
                 .addMatcher(jsonPath(path + "qualifier").exists())
                 .addMatcher(jsonPath(path + "goId").exists())
                 .addMatcher(jsonPath(path + "goEvidence").exists())

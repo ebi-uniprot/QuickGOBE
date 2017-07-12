@@ -9,6 +9,8 @@ import uk.ac.ebi.quickgo.rest.search.request.config.FilterConfig;
 import com.google.common.base.Preconditions;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -46,6 +48,7 @@ class RESTFilterConverter<T> implements FilterConverter<FilterRequest, T> {
 
     private final FilterConfig filterConfig;
     private final RestOperations restOperations;
+    private final Map<String, Constructor<?>> constructorMap;
     private int timeoutMillis;
 
     RESTFilterConverter(FilterConfig filterConfig, RestOperations restOperations) {
@@ -60,12 +63,12 @@ class RESTFilterConverter<T> implements FilterConverter<FilterRequest, T> {
         checkMandatoryProperty(RESPONSE_CLASS);
         checkMandatoryProperty(RESPONSE_CONVERTER_CLASS);
 
+        this.constructorMap = new HashMap<>();
         this.timeoutMillis = loadTimeout();
     }
 
     @Override public ConvertedFilter<T> transform(FilterRequest request) {
         Preconditions.checkArgument(request != null, "FilterRequest cannot be null");
-
         RESTRequesterImpl.Builder restRequesterBuilder = initRequestBuilder(request);
 
         try {
@@ -135,20 +138,28 @@ class RESTFilterConverter<T> implements FilterConverter<FilterRequest, T> {
             throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException,
                    InstantiationException {
         String converterClassName = filterConfig.getProperties().get(RESPONSE_CONVERTER_CLASS);
-        Class<?> converterClass = Class.forName(converterClassName);
 
-        Constructor<?> declaredConstructor = converterClass.getDeclaredConstructor();
+        Constructor<?> declaredConstructor;
+        if (constructorMap.containsKey(converterClassName)) {
+            declaredConstructor = constructorMap.get(converterClassName);
+        } else {
+            Class<?> converterClass = Class.forName(converterClassName);
+            declaredConstructor = converterClass.getDeclaredConstructor();
+            constructorMap.put(converterClassName, declaredConstructor);
+        }
+
         return (FilterConverter<ResponseType, T>) declaredConstructor.newInstance();
     }
 
     private RESTRequesterImpl.Builder initRequestBuilder(FilterRequest request) {
         RESTRequesterImpl.Builder restRequesterBuilder = createRestRequesterBuilder();
-        request.getProperties().entrySet().forEach(entry ->
+
+        request.getProperties().forEach((key, value) ->
                 restRequesterBuilder.addRequestParameter(
-                        entry.getKey(),
-                        entry.getValue().stream()
-                                .collect(Collectors.joining(COMMA)))
-        );
+                        key,
+                        value.stream()
+                                .collect(Collectors.joining(COMMA))));
+
         return restRequesterBuilder;
     }
 

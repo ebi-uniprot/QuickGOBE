@@ -16,10 +16,10 @@ import java.util.List;
  * Created 09/08/16
  * @author Edd
  */
-public class ConvertedOntologyFilter implements ResponseType {
+public class OntologyDescendants implements ResponseType {
     private List<Result> results;
 
-    public ConvertedOntologyFilter() {}
+    public OntologyDescendants() {}
 
     public List<Result> getResults() {
         return results;
