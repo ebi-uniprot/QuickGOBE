@@ -70,10 +70,10 @@ abstract class AnnotationTo {
                 "" : YYYYMMDD_DATE_FORMAT.format(date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
     }
 
-    final Function<String, String> nullToEmptyString = s -> s == null ? "" : s;
     String taxonIdAsString(int taxonId) {
         return taxonId < LOWEST_VALID_TAXON_ID ? "" : Integer.toString(taxonId);
     }
+
     private String simpleRefAndToString(Annotation.ConnectedXRefs<Annotation.SimpleXRef> itemList) {
         return itemList.getConnectedXrefs()
                 .stream()
@@ -86,4 +86,5 @@ abstract class AnnotationTo {
                 .stream()
                 .map(Annotation.QualifiedXref::asXref)
                 .collect(Collectors.joining(COMMA));
+    }
 }
