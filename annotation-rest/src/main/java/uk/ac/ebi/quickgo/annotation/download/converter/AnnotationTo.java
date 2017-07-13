@@ -19,13 +19,29 @@ import org.slf4j.LoggerFactory;
  * Created with IntelliJ IDEA.
  */
 abstract class AnnotationTo {
+    public static final int DB = 0;
+    static final String OUTPUT_DELIMITER = "\t";
+    static final Function<String, String> nullToEmptyString = s -> s == null ? "" : s;
     private static final Logger LOGGER = LoggerFactory.getLogger(AnnotationTo.class);
     private static final String ID_DELIMITER = ":";
-    public static final int DB = 0;
+    private static final int LOWEST_VALID_TAXON_ID = 1;
     private static final String COMMA = ",";
     private static final String PIPE = "|";
     private static final DateTimeFormatter YYYYMMDD_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd");
-    static final String OUTPUT_DELIMITER = "\t";
+
+    String toGeneProductType(String db) {
+        switch (db) {
+            case "UniProtKB":
+                return "protein";
+            case "IntAct":
+                return "complex";
+            case "RNAcentral":
+                return "miRNA";
+            default:
+                LOGGER.error("Cannot determine gene product type for based on DB of " + db);
+        }
+        return "";
+    }
 
     String withFromAsString(List<Annotation.ConnectedXRefs<Annotation.SimpleXRef>> connectedXRefs) {
         if (connectedXRefs == null || connectedXRefs.isEmpty()) {
@@ -36,13 +52,6 @@ abstract class AnnotationTo {
                 .collect(Collectors.joining(PIPE));
     }
 
-    private String simpleRefAndToString(Annotation.ConnectedXRefs<Annotation.SimpleXRef> itemList) {
-        return itemList.getConnectedXrefs()
-                .stream()
-                .map(Annotation.SimpleXRef::asXref)
-                .collect(Collectors.joining(COMMA));
-    }
-
     String extensionsAsString(List<Annotation.ConnectedXRefs<Annotation.QualifiedXref>> connectedXRefs) {
         if (connectedXRefs == null || connectedXRefs.isEmpty()) {
             return "";
@@ -50,13 +59,6 @@ abstract class AnnotationTo {
         return connectedXRefs.stream()
                 .map(this::qualifiedRefAndToString)
                 .collect(Collectors.joining(PIPE));
-    }
-
-    private String qualifiedRefAndToString(Annotation.ConnectedXRefs<Annotation.QualifiedXref> itemList) {
-        return itemList.getConnectedXrefs()
-                .stream()
-                .map(Annotation.QualifiedXref::asXref)
-                .collect(Collectors.joining(COMMA));
     }
 
     String[] idToComponents(String id) {
@@ -69,18 +71,19 @@ abstract class AnnotationTo {
     }
 
     final Function<String, String> nullToEmptyString = s -> s == null ? "" : s;
-
-    protected String toGeneProductType(String db) {
-        switch (db) {
-            case "UniProtKB":
-                return "protein";
-            case "IntAct":
-                return "complex";
-            case "RNAcentral":
-                return "miRNA";
-            default:
-                LOGGER.error("Cannot determine gene product type for based on DB of \"{}\"", db);
-        }
-        return "";
+    String taxonIdAsString(int taxonId) {
+        return taxonId < LOWEST_VALID_TAXON_ID ? "" : Integer.toString(taxonId);
     }
+    private String simpleRefAndToString(Annotation.ConnectedXRefs<Annotation.SimpleXRef> itemList) {
+        return itemList.getConnectedXrefs()
+                .stream()
+                .map(Annotation.SimpleXRef::asXref)
+                .collect(Collectors.joining(COMMA));
+    }
+
+    private String qualifiedRefAndToString(Annotation.ConnectedXRefs<Annotation.QualifiedXref> itemList) {
+        return itemList.getConnectedXrefs()
+                .stream()
+                .map(Annotation.QualifiedXref::asXref)
+                .collect(Collectors.joining(COMMA));
 }

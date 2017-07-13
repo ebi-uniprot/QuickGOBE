@@ -53,7 +53,7 @@ public class AnnotationToGPAD extends AnnotationTo implements BiFunction<Annotat
                         .add(nullToEmptyString.apply(annotation.reference))
                         .add(nullToEmptyString.apply(annotation.evidenceCode))
                         .add(withFromAsString(annotation.withFrom))
-                        .add(Integer.toString(annotation.interactingTaxonId))
+                        .add(taxonIdAsString(annotation.interactingTaxonId))
                         .add(toYMD(annotation.date))
                         .add(nullToEmptyString.apply(annotation.assignedBy))
                         .add(extensionsAsString(annotation.extensions))
