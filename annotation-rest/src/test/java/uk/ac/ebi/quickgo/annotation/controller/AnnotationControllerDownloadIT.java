@@ -38,9 +38,11 @@ import org.springframework.web.context.WebApplicationContext;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.stringContainsInOrder;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
+import static org.springframework.http.HttpHeaders.VARY;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
@@ -258,11 +260,11 @@ public class AnnotationControllerDownloadIT {
                                        SYMBOL_FIELD_NAME_MIXED_CASE, WITH_FROM_FIELD_NAME_MIXED_CASE);
     }
 
-
     private void checkResponse(MediaType mediaType, ResultActions response, List<String> storedIds) throws Exception {
         response.andExpect(request().asyncStarted())
                 .andDo(MvcResult::getAsyncResult)
                 .andDo(print())
+                .andExpect(header().string(VARY, is(ACCEPT)))
                 .andExpect(header().string(CONTENT_DISPOSITION, endsWith(getFileNameEndingFor(mediaType))))
                 .andExpect(content().contentType(mediaType))
                 .andExpect(nonNullMandatoryFieldsExist(mediaType))

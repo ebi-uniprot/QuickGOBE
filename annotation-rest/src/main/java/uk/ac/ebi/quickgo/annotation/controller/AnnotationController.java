@@ -51,6 +51,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.stream.Collectors.toList;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.HttpHeaders.VARY;
 import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.GAF_MEDIA_TYPE_STRING;
 import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.GPAD_MEDIA_TYPE_STRING;
 import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.TSV_MEDIA_TYPE_STRING;
@@ -150,7 +151,6 @@ public class AnnotationController {
         checkArgument(headerCreatorFactory != null, "HeaderCreatorFactory cannot be null.");
         checkArgument(metaDataProvider != null, "Metadata provider cannot be null.");
 
-
         this.annotationSearchService = annotationSearchService;
         this.converterFactory = converterFactory;
 
@@ -160,7 +160,7 @@ public class AnnotationController {
         this.annotationRetrievalConfig = annotationRetrievalConfig;
         this.queryTemplate = createSearchQueryTemplate(annotationRetrievalConfig);
         this.downloadQueryTemplate = createDownloadSearchQueryTemplate(annotationRetrievalConfig);
-
+    
         this.taskExecutor = taskExecutor;
         this.headerCreatorFactory = headerCreatorFactory;
 
@@ -388,6 +388,7 @@ public class AnnotationController {
         String fileName = DOWNLOAD_FILE_NAME_PREFIX + now.format(DOWNLOAD_FILE_NAME_DATE_FORMATTER) + extension;
         httpHeaders.setContentDispositionFormData("attachment", fileName);
         httpHeaders.setContentType(mediaType);
+        httpHeaders.add(VARY, ACCEPT);
         return httpHeaders;
     }
 
