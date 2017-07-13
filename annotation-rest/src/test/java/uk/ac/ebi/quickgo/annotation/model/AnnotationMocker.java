@@ -29,7 +29,7 @@ public class AnnotationMocker {
     public static final String WITH_FROM_AS_STRING = IPR_1 + "|" + IPR_2 + "," + IPR_3;
     public static final String EXTENSIONS_AS_STRING = OCCURS_IN_CL_1 + "|" + OCCURS_IN_CL_2 + "," + OCCURS_IN_CL_3;
     public static final String SYMBOL = "atf4-creb1_mouse";
-    public static final String QUALIFIER = "enables";
+    public static final String QUALIFIER = "contributes_to";
     public static final String REFERENCE = "PMID:12871976";
     public static final String ECO_ID = "ECO:0000353";
     public static final String GO_EVIDENCE = "IPI";

@@ -4,12 +4,12 @@ import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationMocker;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -161,6 +161,45 @@ public class AnnotationToGAFTest {
     }
 
     @Test
+    public void createGAFStringWithEmptyQualifier() {
+        String emptyGafQualifier = "";
+
+        List<String> qualifiersToBeEmptyForGaf = asList("enables", "part_of", "involved_in", "spurious_value");
+
+        for (String qualifierToBeEmptyInGaf : qualifiersToBeEmptyForGaf) {
+            annotation.qualifier = qualifierToBeEmptyInGaf;
+            String[] elements = annotationToElements(annotation);
+            assertThat(elements[COL_QUALIFIER], is(emptyGafQualifier));
+        }
+    }
+
+    @Test
+    public void createGAFQualifierNOTAppropriately() {
+        String notQualifier = "NOT";
+
+        List<String> qualifiersToBeEmptyForGaf = asList("NOT|enables", "NOT|part_of", "NOT|involved_in");
+
+        for (String qualifierToBeEmptyInGaf : qualifiersToBeEmptyForGaf) {
+            annotation.qualifier = qualifierToBeEmptyInGaf;
+            String[] elements = annotationToElements(annotation);
+            assertThat(elements[COL_QUALIFIER], is(notQualifier));
+        }
+    }
+
+    @Test
+    public void createValidGAFQualifiers() {
+        List<String> qualifiersToBeSetForGaf = asList(
+                "contributes_to", "NOT|contributes_to",
+                "colocalizes_with", "NOT|colocalizes_with");
+
+        for (String qualifier : qualifiersToBeSetForGaf) {
+            annotation.qualifier = qualifier;
+            String[] elements = annotationToElements(annotation);
+            assertThat(elements[COL_QUALIFIER], is(qualifier));
+        }
+    }
+
+    @Test
     public void createGAFStringFromAnnotationWhereAspectIsBiologicalProcess() {
         annotation.goAspect = "biological_process";
         String[] elements = annotationToElements(annotation);
@@ -188,7 +227,7 @@ public class AnnotationToGAFTest {
         final String slimmedToGoId0 = "GO:0005524";
         final String slimmedToGoId1 = "GO:1005524";
         final String slimmedToGoId2 = "GO:2005524";
-        annotation.slimmedIds = Arrays.asList(slimmedToGoId0, slimmedToGoId1, slimmedToGoId2);
+        annotation.slimmedIds = asList(slimmedToGoId0, slimmedToGoId1, slimmedToGoId2);
         List<String> converted = annotationToGAF.apply(annotation, null);
         assertThat(converted, hasSize(annotation.slimmedIds.size()));
         checkReturned(slimmedToGoId0, converted.get(0));
