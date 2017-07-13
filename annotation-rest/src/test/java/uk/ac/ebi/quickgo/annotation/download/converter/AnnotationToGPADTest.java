@@ -129,6 +129,13 @@ public class AnnotationToGPADTest {
     }
 
     @Test
+    public void lowestInteractingTaxonIdIsPopulatedCorrectly() {
+        annotation.interactingTaxonId = 1;
+        String[] elements = annotationToElements(annotation);
+        assertThat(elements[COL_INTERACTING_DB], is("1"));
+    }
+
+    @Test
     public void nullDate() {
         annotation.date = null;
         String[] elements = annotationToElements(annotation);

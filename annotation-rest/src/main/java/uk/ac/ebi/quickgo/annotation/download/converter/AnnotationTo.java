@@ -71,7 +71,7 @@ abstract class AnnotationTo {
     }
 
     String taxonIdAsString(int taxonId) {
-        return taxonId <= LOWEST_VALID_TAXON_ID ? "" : Integer.toString(taxonId);
+        return taxonId < LOWEST_VALID_TAXON_ID ? "" : Integer.toString(taxonId);
     }
 
     private String simpleRefAndToString(Annotation.ConnectedXRefs<Annotation.SimpleXRef> itemList) {
