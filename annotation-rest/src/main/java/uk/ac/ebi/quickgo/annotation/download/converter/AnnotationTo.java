@@ -79,7 +79,7 @@ abstract class AnnotationTo {
             case "RNAcentral":
                 return "miRNA";
             default:
-                LOGGER.error("Cannot determine gene product type for based on DB of " + db);
+                LOGGER.error("Cannot determine gene product type for based on DB of \"{}\"", db);
         }
         return "";
     }

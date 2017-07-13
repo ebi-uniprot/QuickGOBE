@@ -267,7 +267,7 @@ public class AnnotationToTSVTest {
         List<String> converted = annotationToTSV.apply(annotation, selectedFields);
 
         assertThat(converted, hasSize(1));
-        assertThat(converted.get(0), equalTo("enables"));
+        assertThat(converted.get(0), equalTo(QUALIFIER));
     }
 
     private String[] annotationToElements(Annotation annotation) {
