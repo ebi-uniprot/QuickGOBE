@@ -32,6 +32,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.io.Resource;
 import org.springframework.web.client.RestOperations;
 
+import static java.util.stream.Collectors.toCollection;
 import static org.slf4j.LoggerFactory.getLogger;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfig.SKIP_LIMIT;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelper.compositeItemProcessor;
@@ -121,10 +122,16 @@ public class AssignedByPresetsConfig {
         FilterRequest assignedByRequest = FilterRequest.newBuilder().addProperty(ASSIGNED_BY).build();
 
         Set<String> relevantAssignedByPresets =
-                Stream.of(assignedByDefaults).collect(Collectors.toCollection(LinkedHashSet::new));
+                Stream.of(assignedByDefaults).collect(toCollection(LinkedHashSet::new));
+        LOGGER.debug("Loading Assigned By preset values from defaults.");
+        relevantAssignedByPresets.stream().forEach(e ->LOGGER.debug(e));
+
         try {
             ConvertedFilter<List<String>> convertedFilter = converterFactory.convert(assignedByRequest);
-            relevantAssignedByPresets.addAll(convertedFilter.getConvertedValue());
+            final List<String> convertedValues = convertedFilter.getConvertedValue();
+            LOGGER.debug("Loading Assigned By preset values from RESTful call.");
+            convertedValues.stream().forEach(e ->LOGGER.debug(e));
+            relevantAssignedByPresets.addAll(convertedValues);
         } catch (RetrievalException | IllegalStateException e) {
             LOGGER.error("Failed to retrieve via REST call the relevant 'assignedBy' values: ", e);
         }
