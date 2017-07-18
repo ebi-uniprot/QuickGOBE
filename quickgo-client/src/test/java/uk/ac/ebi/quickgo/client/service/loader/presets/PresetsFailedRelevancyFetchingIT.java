@@ -58,7 +58,7 @@ public class PresetsFailedRelevancyFetchingIT {
         assertThat(status, is(BatchStatus.COMPLETED));
         assertThat(
                 extractPresetValues(presets.getAssignedBy(), p -> p.getProperty(PresetItem.Property.NAME.getKey())),
-                IsIterableContainingInOrder.contains(MockPresetDataConfig.UNIPROT_KB));
+                is(empty()));
     }
 
     @Test
