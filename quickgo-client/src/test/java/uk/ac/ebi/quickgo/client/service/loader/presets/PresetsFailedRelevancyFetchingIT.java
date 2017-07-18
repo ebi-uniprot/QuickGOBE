@@ -4,12 +4,10 @@ import uk.ac.ebi.quickgo.client.model.presets.CompositePreset;
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
 import uk.ac.ebi.quickgo.client.service.loader.presets.assignedby.AssignedByPresetsConfig;
 import uk.ac.ebi.quickgo.client.service.loader.presets.qualifier.QualifierPresetsConfig;
-import uk.ac.ebi.quickgo.client.service.loader.presets.taxon.TaxonPresetsConfig;
 
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import org.hamcrest.collection.IsIterableContainingInOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.BatchStatus;
@@ -24,6 +22,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.util.MatcherAssertionErrors.assertThat;
 
@@ -58,7 +57,7 @@ public class PresetsFailedRelevancyFetchingIT {
         assertThat(status, is(BatchStatus.COMPLETED));
         assertThat(
                 extractPresetValues(presets.getAssignedBy(), p -> p.getProperty(PresetItem.Property.NAME.getKey())),
-                is(empty()));
+                hasSize(greaterThan(1)));
     }
 
     @Test

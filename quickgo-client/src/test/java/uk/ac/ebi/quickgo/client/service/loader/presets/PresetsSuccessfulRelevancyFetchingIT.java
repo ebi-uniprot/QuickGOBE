@@ -65,7 +65,7 @@ public class PresetsSuccessfulRelevancyFetchingIT {
         assertThat(status, is(BatchStatus.COMPLETED));
         assertThat(
                 extractPresetValues(presets.getAssignedBy(), p -> p.getProperty(NAME)),
-                IsIterableContainingInOrder.contains(MockPresetDataConfig.UNIPROT_KB, MockPresetDataConfig.ENSEMBL));
+                IsIterableContainingInOrder.contains(MockPresetDataConfig.ENSEMBL, MockPresetDataConfig.UNIPROT_KB));
     }
 
     @Test
