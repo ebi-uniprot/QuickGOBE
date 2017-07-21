@@ -57,6 +57,7 @@ public class AnnotationFields {
         public static final String TAXON_ANCESTORS = storeAndGet(VALUES, "taxonAncestors_unsorted");
         public static final String WITH_FROM = storeAndGet(VALUES, "withFrom_search");
         public static final String EXTENSION = storeAndGet(VALUES, "extension_search");
+        public static final String EXTENSION_REL_DB = storeAndGet(VALUES, "extension_rel_db_search");
 
         public static boolean isSearchable(String field) {
             return VALUES.contains(field);
