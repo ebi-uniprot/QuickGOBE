@@ -6,6 +6,7 @@ import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker;
 import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 
+import com.sun.org.apache.xml.internal.dtm.ref.DTMDefaultBaseIterators;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
@@ -1909,9 +1910,6 @@ public class AnnotationControllerIT {
 
     @Test
     public void filterByExtensionRelationshipAndDbIdentifierOnly() throws Exception {
-//        final String searchString = ("results_in_development_of"); //$2
-//        final String searchString = ("UBERON"); //$4
-//        final String searchString = ("results_in_development_of(UBERON)"); //$4
         final String searchString = EXTENSION_RELATIONSHIP1 + "(" + EXTENSION_DB1 + ")";
 
                 ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
@@ -1925,7 +1923,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterByInvalidExtensionRelationshipAndDbIdentifierReturnsBadRequest() throws Exception {
+    public void filterByIncorrectlyConstructedArgumentReturnsBadRequest() throws Exception {
         final String searchString = EXTENSION_RELATIONSHIP1 + "()";
 
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
@@ -1933,6 +1931,60 @@ public class AnnotationControllerIT {
         response.andDo(print())
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    public void searchArgumentMissingBracketsReturnsBadRequest() throws Exception {
+        final String searchString = EXTENSION_RELATIONSHIP1 + EXTENSION_DB1;
+
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
+                                                         .param(EXTENSION_REL_DB_PARAM.getName(), searchString));
+        response.andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void filterByInvalidRelationshipReturnsNoResults() throws Exception {
+        final String searchString = "FuBar" + "(" + EXTENSION_DB1 + ")";
+
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
+                                                         .param(EXTENSION_REL_DB_PARAM.getName(), searchString));
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(0));
+    }
+
+    @Test
+    public void filterByInvalidDbReturnsNoResults() throws Exception {
+        final String searchString = EXTENSION_RELATIONSHIP1 + "(FuBar)";
+
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
+                                                         .param(EXTENSION_REL_DB_PARAM.getName(), searchString));
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(0));
+    }
+
+    @Test
+    public void filterByExtensionRelationshipAndDbIdentifierWhereDbContainsUnderscore() throws Exception {
+        final String relationship = "indicative_of";
+        final String db = "NCBI_gi";
+        genericDocs = createGenericDocs(2);
+        genericDocs.stream().forEach(d ->
+                                             d.extensions = Collections.singletonList (relationship + "(" + db + ":937938)"));
+        repository.save(genericDocs);
+        final String searchString = relationship + "(" + db + ")";
+
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
+                                                         .param(EXTENSION_REL_DB_PARAM.getName(), searchString));
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(2))
+                .andExpect(fieldsInAllResultsExist(2));
+    }
+
 
     // ------------------------------- Check date format -------------------------------
     @Test
