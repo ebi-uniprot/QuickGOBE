@@ -300,7 +300,7 @@
         <analyzer type="index">
             <tokenizer class="solr.KeywordTokenizerFactory"/>
             <filter class="solr.PatternCaptureGroupFilterFactory" pattern="([^,]+)" preserve_original="false"/>
-            <filter class="solr.PatternReplaceFilterFactory" pattern="([\w_]+)\(([A-Z]+):([\d]+)\)"
+            <filter class="solr.PatternReplaceFilterFactory" pattern="([\w_]+)\(([A-Za-z0-9_]+):([\S]+)\)"
                                                           replacement="$1($2)" replace="all"/>
             <filter class="solr.LowerCaseFilterFactory"/>
         </analyzer>
