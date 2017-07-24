@@ -549,6 +549,24 @@ public class AnnotationRequestTest {
         assertThat(requestIds, containsInAnyOrder(goName, taxonName));
     }
 
+    //----------------- Annotation Extension Relationship & Db search field
+
+    @Test
+    public void setAndGetExtensionFields() {
+        String field = "indicative_of(ncbi_gi:12345)";
+        annotationRequest.setExtension(field);
+        assertThat(annotationRequest.getExtension(), arrayContaining(field));
+    }
+
+    //----------------- Annotation Extension Relationship & Db search field
+
+    @Test
+    public void setAndGetExtensionRelDbFields() {
+        String field = "indicative_of(ncbi_gi)";
+        annotationRequest.setExtensionRelDb(field);
+        assertThat(annotationRequest.getExtensionRelDb(), arrayContaining(field));
+    }
+
     //----------------- helpers
     private String getDefaultTaxonSearchField() {
         String field;
