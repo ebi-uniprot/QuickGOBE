@@ -1665,9 +1665,9 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterByExtensionDatabase() throws Exception {
+    public void filterByExtensionDatabaseWithUnderscore() throws Exception {
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
-                .param(EXTENSION_PARAM.getName(), EXTENSION_DB1));
+                                                         .param(EXTENSION_PARAM.getName(), EXTENSION_DB1));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -1677,9 +1677,80 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterById() throws Exception {
+    public void filterByExtensionDatabaseMixedCase() throws Exception {
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
+                                           .param(EXTENSION_PARAM.getName(), EXTENSION_DB2));
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
+                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS));
+    }
+
+    @Test
+    public void filterByExtensionDatabaseWithHyphen() throws Exception {
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
+                                           .param(EXTENSION_PARAM.getName(), EXTENSION_DB3));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
+                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS));
+    }
+
+    @Test
+    public void filterByExtensionDatabaseWithNumber() throws Exception {
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
+                                                         .param(EXTENSION_PARAM.getName(), EXTENSION_DB4));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
+                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS));
+    }
+
+    @Test
+    public void filterByIdPurelyNumeric() throws Exception {
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
                 .param(EXTENSION_PARAM.getName(), EXTENSION_ID1));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
+                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS));
+    }
+
+    @Test
+    public void filterByIdWhichContainsColon() throws Exception {
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
+                                                         .param(EXTENSION_PARAM.getName(), EXTENSION_ID2));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
+                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS));
+    }
+
+    @Test
+    public void filterByIdWhichContainsHyphen() throws Exception {
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
+                                                         .param(EXTENSION_PARAM.getName(), EXTENSION_ID3));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
+                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS));
+    }
+
+    @Test
+    public void filterByIdWhichContainsUnderscore() throws Exception {
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
+                                                         .param(EXTENSION_PARAM.getName(), EXTENSION_ID4));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -1699,8 +1770,6 @@ public class AnnotationControllerIT {
                 .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
                 .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS));
     }
-
-
 
     @Test
     public void filterByExtensionTarget2() throws Exception {
