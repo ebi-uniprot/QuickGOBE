@@ -6,7 +6,6 @@ import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker;
 import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 
-import com.sun.org.apache.xml.internal.dtm.ref.DTMDefaultBaseIterators;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
@@ -18,7 +17,6 @@ import java.util.stream.Stream;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1910,9 +1908,9 @@ public class AnnotationControllerIT {
 
     @Test
     public void filterByExtensionRelationshipAndDbIdentifierOnly() throws Exception {
-        final String searchString = EXTENSION_RELATIONSHIP1 + "(" + EXTENSION_DB1 + ")";
+        final String searchString = relationshipDbAnnotationExtSearchString(EXTENSION_RELATIONSHIP1, EXTENSION_DB1);
 
-                ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
                                                          .param(EXTENSION_REL_DB_PARAM.getName(), searchString));
 
         response.andDo(print())
@@ -1924,7 +1922,7 @@ public class AnnotationControllerIT {
 
     @Test
     public void filterByIncorrectlyConstructedArgumentReturnsBadRequest() throws Exception {
-        final String searchString = EXTENSION_RELATIONSHIP1 + "()";
+        final String searchString = relationshipDbAnnotationExtSearchString(EXTENSION_RELATIONSHIP1, "");
 
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
                                                          .param(EXTENSION_REL_DB_PARAM.getName(), searchString));
@@ -1934,7 +1932,8 @@ public class AnnotationControllerIT {
 
     @Test
     public void searchArgumentMissingBracketsReturnsBadRequest() throws Exception {
-        final String searchString = EXTENSION_RELATIONSHIP1 + EXTENSION_DB1;
+        final String searchString = relationshipDbAnnotationExtSearchString(EXTENSION_RELATIONSHIP1
+                                                                                    + EXTENSION_DB1, "");
 
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
                                                          .param(EXTENSION_REL_DB_PARAM.getName(), searchString));
@@ -1944,7 +1943,7 @@ public class AnnotationControllerIT {
 
     @Test
     public void filterByInvalidRelationshipReturnsNoResults() throws Exception {
-        final String searchString = "FuBar" + "(" + EXTENSION_DB1 + ")";
+        final String searchString = relationshipDbAnnotationExtSearchString("FuBar", EXTENSION_DB1);
 
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
                                                          .param(EXTENSION_REL_DB_PARAM.getName(), searchString));
@@ -1956,7 +1955,7 @@ public class AnnotationControllerIT {
 
     @Test
     public void filterByInvalidDbReturnsNoResults() throws Exception {
-        final String searchString = EXTENSION_RELATIONSHIP1 + "(FuBar)";
+        final String searchString = relationshipDbAnnotationExtSearchString(EXTENSION_RELATIONSHIP1, "FuBar");
 
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
                                                          .param(EXTENSION_REL_DB_PARAM.getName(), searchString));
@@ -1967,14 +1966,12 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterByExtensionRelationshipAndDbIdentifierWhereDbContainsUnderscore() throws Exception {
+    public void filterByDbContainsDigits() throws Exception {
         final String relationship = "indicative_of";
-        final String db = "NCBI_gi";
-        genericDocs = createGenericDocs(2);
-        genericDocs.stream().forEach(d ->
-                                             d.extensions = Collections.singletonList (relationship + "(" + db + ":937938)"));
-        repository.save(genericDocs);
-        final String searchString = relationship + "(" + db + ")";
+        final String db = "NCBI8987";
+        final String id = "937938";
+        saveDocsWithTargetAnnotationExtension(relationship, db, id);
+        final String searchString = relationshipDbAnnotationExtSearchString(relationship, db);
 
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
                                                          .param(EXTENSION_REL_DB_PARAM.getName(), searchString));
@@ -1985,6 +1982,82 @@ public class AnnotationControllerIT {
                 .andExpect(fieldsInAllResultsExist(2));
     }
 
+    @Test
+    public void filterByDbContainsUnderscore() throws Exception {
+        final String relationship = "indicative_of";
+        final String db = "NCBI_gi";
+        final String id = "937938";
+        saveDocsWithTargetAnnotationExtension(relationship, db, id);
+        final String searchString = relationshipDbAnnotationExtSearchString(relationship, db);
+
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
+                                                         .param(EXTENSION_REL_DB_PARAM.getName(), searchString));
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(2))
+                .andExpect(fieldsInAllResultsExist(2));
+    }
+
+    @Test
+    public void filterByDbContainsHyphen() throws Exception {
+        final String relationship = "indicative_of";
+        final String db = "NCBI-gi";
+        final String id = "09938";
+        saveDocsWithTargetAnnotationExtension(relationship, db, id);
+        final String searchString = relationshipDbAnnotationExtSearchString(relationship, db);
+
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
+                                                         .param(EXTENSION_REL_DB_PARAM.getName(), searchString));
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(2))
+                .andExpect(fieldsInAllResultsExist(2));
+    }
+
+    @Test
+    public void filterByIdContainsColon() throws Exception {
+        final String relationship = "indicative_of";
+        final String db = "NCBI_gi";
+        final String id = "ABC:938";
+        saveDocsWithTargetAnnotationExtension(relationship, db, id);
+        final String searchString = relationshipDbAnnotationExtSearchString(relationship, db);
+
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
+                                                         .param(EXTENSION_REL_DB_PARAM.getName(), searchString));
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(2))
+                .andExpect(fieldsInAllResultsExist(2));
+    }
+
+    @Test
+    public void filterByIdContainsHyphen() throws Exception {
+        final String relationship = "indicative_of";
+        final String db = "NCBI_gi";
+        final String id = "ABC-938";
+        saveDocsWithTargetAnnotationExtension(relationship, db, id);
+        final String searchString = relationshipDbAnnotationExtSearchString(relationship, db);
+
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
+                                                         .param(EXTENSION_REL_DB_PARAM.getName(), searchString));
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(2))
+                .andExpect(fieldsInAllResultsExist(2));
+    }
+
+    private void saveDocsWithTargetAnnotationExtension(String relationship, String db, String id) {
+        List<AnnotationDocument> additionalDocs = createGenericDocs(2);
+        for (AnnotationDocument d : additionalDocs) {
+            d.extensions = Collections.singletonList(annotationExtension(relationship, db, id));
+        }
+        repository.deleteAll();
+        repository.save(additionalDocs);
+    }
 
     // ------------------------------- Check date format -------------------------------
     @Test
@@ -2079,6 +2152,14 @@ public class AnnotationControllerIT {
 
     private String getRequiredDateString(int year, int month, int date) {
         return String.format(DATE_STRING_FORMAT, year, month, date);
+    }
+
+    private String annotationExtension(String relationship, String db, String id){
+        return String.format("%s(%s:%s)", relationship, db, id);
+    }
+
+    private String relationshipDbAnnotationExtSearchString(String relationship, String db){
+        return String.format("%s(%s)", relationship, db);
     }
 
     //----- Setup data ---------------------//
