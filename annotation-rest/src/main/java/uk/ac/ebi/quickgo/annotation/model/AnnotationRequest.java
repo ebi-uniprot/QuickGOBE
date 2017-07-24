@@ -585,7 +585,7 @@ public class AnnotationRequest {
      */
     @ArrayPattern(regexp = "(([\\w_]+)\\((([^,]+))\\))", flags = CASE_INSENSITIVE, paramName =
             INCLUDE_FIELD_PARAM)
-    public String[] getExtensionRelD() {
+    public String[] getExtensionRelDb() {
         return filterMap.get(Searchable.EXTENSION_REL_DB);
     }
 
