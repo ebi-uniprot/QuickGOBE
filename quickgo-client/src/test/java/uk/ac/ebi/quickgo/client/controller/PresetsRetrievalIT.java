@@ -47,7 +47,8 @@ public class PresetsRetrievalIT {
         mockMvc.perform(get(RESOURCE_URL))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.assignedBy").exists());
+                .andExpect(jsonPath("$.assignedBy").exists())
+                .andExpect(jsonPath("$.assignedBy.*", hasSize(25)));
     }
 
     @Test
