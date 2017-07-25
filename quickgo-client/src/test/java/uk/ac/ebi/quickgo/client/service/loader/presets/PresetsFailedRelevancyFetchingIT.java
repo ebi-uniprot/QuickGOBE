@@ -8,6 +8,7 @@ import uk.ac.ebi.quickgo.client.service.loader.presets.qualifier.QualifierPreset
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.hamcrest.collection.IsIterableContainingInOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.BatchStatus;
@@ -57,7 +58,7 @@ public class PresetsFailedRelevancyFetchingIT {
         assertThat(status, is(BatchStatus.COMPLETED));
         assertThat(
                 extractPresetValues(presets.getAssignedBy(), p -> p.getProperty(PresetItem.Property.NAME.getKey())),
-                hasSize(greaterThan(1)));
+                IsIterableContainingInOrder.contains(MockPresetDataConfig.UNIPROT_KB));
     }
 
     @Test
