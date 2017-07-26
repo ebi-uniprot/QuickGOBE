@@ -23,7 +23,6 @@ import org.springframework.test.context.web.WebAppConfiguration;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.util.MatcherAssertionErrors.assertThat;
 
@@ -58,7 +57,7 @@ public class PresetsFailedRelevancyFetchingIT {
         assertThat(status, is(BatchStatus.COMPLETED));
         assertThat(
                 extractPresetValues(presets.getAssignedBy(), p -> p.getProperty(PresetItem.Property.NAME.getKey())),
-                IsIterableContainingInOrder.contains(MockPresetDataConfig.UNIPROT_KB));
+                hasSize(24));
     }
 
     @Test

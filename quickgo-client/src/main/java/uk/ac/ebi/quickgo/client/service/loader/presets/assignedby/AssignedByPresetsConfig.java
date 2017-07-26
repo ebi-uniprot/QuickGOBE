@@ -57,6 +57,7 @@ public class AssignedByPresetsConfig {
     private Resource[] assignedByResources;
     @Value("${assignedBy.preset.header.lines:1}")
     private int assignedByHeaderLines;
+    private Set<String> duplicatePrevent = new HashSet<>();
 
     @Bean
     public Step assignedByStep(
@@ -78,7 +79,8 @@ public class AssignedByPresetsConfig {
                 .<RawNamedPreset>reader(rawPresetMultiFileReader(assignedByResources, itemReader))
                 .processor(compositeItemProcessor(
                         assignedByValidator(),
-                        assignedByFilter(converterFactory)))
+                        assignedByFilter(converterFactory),
+                        duplicateChecker()))
                 .writer(rawPresetWriter(presets))
                 .listener(new LogStepListener())
                 .build();
@@ -126,5 +128,9 @@ public class AssignedByPresetsConfig {
             LOGGER.error("Failed to retrieve via REST call the relevant 'assignedBy' values: ", e);
         }
         return  rawNamedPreset -> rawNamedPreset;
+    }
+
+    private ItemProcessor<RawNamedPreset, RawNamedPreset> duplicateChecker() {
+        return rawNamedPreset -> duplicatePrevent.add(rawNamedPreset.name.toLowerCase())? rawNamedPreset : null;
     }
 }

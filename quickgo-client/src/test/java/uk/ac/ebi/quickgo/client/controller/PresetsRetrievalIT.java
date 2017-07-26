@@ -48,7 +48,7 @@ public class PresetsRetrievalIT {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.assignedBy").exists())
-                .andExpect(jsonPath("$.assignedBy.*", hasSize(25)));
+                .andExpect(jsonPath("$.assignedBy.*", hasSize(24)));
     }
 
     @Test
