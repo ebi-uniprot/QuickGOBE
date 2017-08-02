@@ -1,11 +1,15 @@
 package uk.ac.ebi.quickgo.index.geneproduct;
 
+import uk.ac.ebi.quickgo.common.QuickGODocument;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductDocument;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepoConfig;
 import uk.ac.ebi.quickgo.index.common.SolrServerWriter;
+import uk.ac.ebi.quickgo.index.common.listener.ItemRateWriterListener;
 import uk.ac.ebi.quickgo.index.common.listener.LogJobListener;
+import uk.ac.ebi.quickgo.index.common.listener.LogStepListener;
 import uk.ac.ebi.quickgo.index.common.listener.SkipLoggerListener;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
@@ -113,6 +117,8 @@ public class GeneProductConfig {
                 .<GeneProduct>reader(geneProductMultiFileReader())
                 .processor(geneProductCompositeProcessor())
                 .writer(geneProductRepositoryWriter())
+                .listener(logWriteRateListener())
+                .listener(logStepListener())
                 .build();
     }
 
@@ -205,5 +211,13 @@ public class GeneProductConfig {
         backOffPolicy.setInitialInterval(initialBackOffInterval);
         backOffPolicy.setMaxInterval(maxBackOffInterval);
         return backOffPolicy;
+    }
+
+    private ItemWriteListener<QuickGODocument> logWriteRateListener() {
+        return new ItemRateWriterListener<>(Instant.now());
+    }
+
+    private StepExecutionListener logStepListener() {
+        return new LogStepListener();
     }
 }
