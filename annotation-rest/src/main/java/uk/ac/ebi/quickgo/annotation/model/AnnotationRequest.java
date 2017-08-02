@@ -594,7 +594,7 @@ public class AnnotationRequest {
      * @return the array of fields from external resources to include in the response
      */
     @ArrayPattern(regexp = "^geneProductId|symbol|qualifier|goId|goName|evidenceCode|goEvidence|reference|withFrom" +
-            "|taxonId|assignedBy|extensions|date|name|synonyms|type$", flags = CASE_INSENSITIVE,
+            "|taxonId|taxonName|assignedBy|extensions|date|name|synonyms|type$", flags = CASE_INSENSITIVE,
             paramName =
             SELECT_FIELD_PARAM)
     public String[] getSelectedFields() {

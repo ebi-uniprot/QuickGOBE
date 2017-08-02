@@ -6,6 +6,7 @@ import uk.ac.ebi.quickgo.rest.ParameterException;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformationRequest;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -512,9 +513,14 @@ public class AnnotationRequestTest {
 
     @Test
     public void setAndGetSelectedFields() {
-        String field = "symbol";
-        annotationRequest.setSelectedFields(field);
-        assertThat(annotationRequest.getSelectedFields(), arrayContaining(field));
+        List<String> selectedFields = Arrays.asList("geneProductId", "symbol", "qualifier", "goId", "goName",
+                                               "evidenceCode", "goEvidence","reference","withFrom","taxonId",
+                                                    "taxonName", "assignedBy", "extensions", "date", "name", "synonyms",
+                                                    "type");
+        for (String field : selectedFields) {
+            annotationRequest.setSelectedFields(field);
+            assertThat(annotationRequest.getSelectedFields(), arrayContaining(field));
+        }
     }
 
     @Test
