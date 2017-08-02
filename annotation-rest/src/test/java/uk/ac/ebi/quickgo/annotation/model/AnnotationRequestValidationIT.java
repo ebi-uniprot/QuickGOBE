@@ -843,7 +843,7 @@ public class AnnotationRequestValidationIT {
     public void validSelectedFieldsAreAllValidatedCorrectly() {
         String[] validSelectedFields =
                 ("geneProductId|symbol|qualifier|goId|goName|evidenceCode|goEvidence|reference" +
-                "|withFrom|taxonId|assignedBy|extensions|date|name|synonyms|type").split("\\|");
+                "|withFrom|taxonId|taxonName|assignedBy|extensions|date|name|synonyms|type").split("\\|");
 
         for (String validSelectedField : validSelectedFields) {
             annotationRequest.setSelectedFields(validSelectedField);
