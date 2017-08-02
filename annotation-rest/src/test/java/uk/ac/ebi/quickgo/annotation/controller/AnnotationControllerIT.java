@@ -1649,6 +1649,7 @@ public class AnnotationControllerIT {
                 .andExpect(fieldsInAllResultsExist(1));
     }
 
+    //----- Tests for Annotation Extension ---------------------//
     @Test
     public void filterByExtensionRelationship() throws Exception {
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
@@ -1662,7 +1663,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterByExtensionDatabase() throws Exception {
+    public void filterByExtensionDatabaseWithUnderscore() throws Exception {
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
                 .param(EXTENSION_PARAM.getName(), EXTENSION_DB1));
 
@@ -1674,9 +1675,80 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterById() throws Exception {
+    public void filterByExtensionDatabaseMixedCase() throws Exception {
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
+                                           .param(EXTENSION_PARAM.getName(), EXTENSION_DB2));
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
+                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS));
+    }
+
+    @Test
+    public void filterByExtensionDatabaseWithHyphen() throws Exception {
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
+                                           .param(EXTENSION_PARAM.getName(), EXTENSION_DB3));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
+                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS));
+    }
+
+    @Test
+    public void filterByExtensionDatabaseWithNumber() throws Exception {
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
+                                                         .param(EXTENSION_PARAM.getName(), EXTENSION_DB4));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
+                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS));
+    }
+
+    @Test
+    public void filterByIdPurelyNumeric() throws Exception {
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
                 .param(EXTENSION_PARAM.getName(), EXTENSION_ID1));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
+                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS));
+    }
+
+    @Test
+    public void filterByIdWhichContainsColon() throws Exception {
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
+                                                         .param(EXTENSION_PARAM.getName(), EXTENSION_ID2));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
+                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS));
+    }
+
+    @Test
+    public void filterByIdWhichContainsHyphen() throws Exception {
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
+                                                         .param(EXTENSION_PARAM.getName(), EXTENSION_ID3));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
+                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS));
+    }
+
+    @Test
+    public void filterByIdWhichContainsUnderscore() throws Exception {
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
+                                                         .param(EXTENSION_PARAM.getName(), EXTENSION_ID4));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -1696,8 +1768,6 @@ public class AnnotationControllerIT {
                 .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
                 .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS));
     }
-
-    //----- Tests for Annotation Extension ---------------------//
 
     @Test
     public void filterByExtensionTarget2() throws Exception {
@@ -1725,7 +1795,6 @@ public class AnnotationControllerIT {
 
     @Test
     public void filterByUniqueExtensionTarget() throws Exception {
-
         String extension = "results_in_development_of(UBERON:1234567)";
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A123");
         doc.extensions = Collections.singletonList(extension);
@@ -1743,7 +1812,6 @@ public class AnnotationControllerIT {
 
     @Test
     public void filterByMultipleUniqueExtensionTargets() throws Exception {
-
         String extension1 = "results_in_development_of(UBERON:888888)";
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A123");
         doc.extensions = Collections.singletonList(extension1);
@@ -1851,6 +1919,109 @@ public class AnnotationControllerIT {
     }
 
     @Test
+    public void extensionRelationAndDBFindsSingleMatch() throws Exception {
+        String filter = relationshipDbAnnotationExtSearchString("positively_regulates", "GO");
+
+        String extension = "positively_regulates(GO:0050840)";
+        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A123");
+        doc.extensions = Collections.singletonList(extension);
+        repository.save(doc);
+
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
+                .param(EXTENSION_PARAM.getName(), filter));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(1))
+                .andExpect(fieldsInAllResultsExist(1));
+    }
+
+    @Test
+    public void extensionRelationAndDBFindsMultipleMatches() throws Exception {
+        String filter = relationshipDbAnnotationExtSearchString("positively_regulates", "GO");
+
+        String extension1 = "positively_regulates(GO:0000001)";
+        String extension2 = "positively_regulates(GO:0000002)";
+        String extension3 = "positively_regulates(GO:0000003)";
+        String extension4 = "positively_regulates(CL:0000001)";
+
+        AnnotationDocument doc1 = AnnotationDocMocker.createAnnotationDoc("Q000001");
+        doc1.extensions = Collections.singletonList(extension1);
+        repository.save(doc1);
+
+        AnnotationDocument doc2 = AnnotationDocMocker.createAnnotationDoc("Q000002");
+        doc2.extensions = Collections.singletonList(extension2);
+        repository.save(doc2);
+
+        AnnotationDocument doc3 = AnnotationDocMocker.createAnnotationDoc("Q000002");
+        doc3.extensions = Collections.singletonList(extension3);
+        repository.save(doc3);
+
+        AnnotationDocument doc4 = AnnotationDocMocker.createAnnotationDoc("A0A123");
+        doc4.extensions = Collections.singletonList(extension4);
+        repository.save(doc4);
+
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
+                .param(EXTENSION_PARAM.getName(), filter));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(3))
+                .andExpect(fieldsInAllResultsExist(3))
+        .andExpect(valuesOccurInField(GENE_PRODUCT_ID_PARAM.getName(), asList("Q000001", "Q000002", "Q000002")));
+    }
+
+    @Test
+    public void extensionRelationWithWrongDBFindsZeroMatches() throws Exception {
+        String filter = relationshipDbAnnotationExtSearchString("positively_regulates", "XX");
+
+        String extension1 = "positively_regulates(GO:0000001)";
+        String extension2 = "positively_regulates(CL:0000001)";
+
+        AnnotationDocument doc1 = AnnotationDocMocker.createAnnotationDoc("Q000001");
+        doc1.extensions = Collections.singletonList(extension1);
+        repository.save(doc1);
+
+        AnnotationDocument doc2 = AnnotationDocMocker.createAnnotationDoc("Q000002");
+        doc2.extensions = Collections.singletonList(extension2);
+        repository.save(doc2);
+
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
+                .param(EXTENSION_PARAM.getName(), filter));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(0));
+    }
+
+    @Test
+    public void extensionWithWrongRelationButCorrectDBFindsZeroMatches() throws Exception {
+        String filter = relationshipDbAnnotationExtSearchString("regulates", "GO");
+
+        String extension1 = "positively_regulates(GO:0000001)";
+        String extension2 = "positively_regulates(CL:0000001)";
+
+        AnnotationDocument doc1 = AnnotationDocMocker.createAnnotationDoc("Q000001");
+        doc1.extensions = Collections.singletonList(extension1);
+        repository.save(doc1);
+
+        AnnotationDocument doc2 = AnnotationDocMocker.createAnnotationDoc("Q000002");
+        doc2.extensions = Collections.singletonList(extension2);
+        repository.save(doc2);
+
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
+                .param(EXTENSION_PARAM.getName(), filter));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(0));
+    }
+
+    @Test
     public void multipleTargetsRequestedThatExistButInDifferentOrderReturnsAnnotations() throws Exception {
         String filter = String.format("%s,%s", EXTENSION_2, EXTENSION_1);
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
@@ -1874,18 +2045,17 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(3));
     }
-
+    
     @Test
     public void resultsReturnedInOrderWrittenToSolrRelevancyNotUsed() throws Exception {
-
-        //Create an Annotation with a mixture of new and existing extensions.
+        // Create an Annotation with a mixture of new and existing extensions.
         String newExtension = "results_in_development_of(UBERON:8888888)";
         final String newGeneProduct = "UniProtKB:A0A123";
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc(newGeneProduct);
         doc.extensions = asList(newExtension, EXTENSION_3);
         repository.save(doc);
 
-        //Although this filter will match the newly added Annotation for two extension strings (the existing test
+        // Although this filter will match the newly added Annotation for two extension strings (the existing test
         // Annotations only have one matching extension) the results will still come back in the standard (written to
         // Solr) order.
         String filter = String.format("%s,%s", newExtension, EXTENSION_3);
@@ -1994,6 +2164,14 @@ public class AnnotationControllerIT {
 
     private String getRequiredDateString(int year, int month, int date) {
         return String.format(DATE_STRING_FORMAT, year, month, date);
+    }
+
+    private String annotationExtension(String relationship, String db, String id){
+        return String.format("%s(%s:%s)", relationship, db, id);
+    }
+
+    private String relationshipDbAnnotationExtSearchString(String relationship, String db){
+        return String.format("%s(%s)", relationship, db);
     }
 
     //----- Setup data ---------------------//
