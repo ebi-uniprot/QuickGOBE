@@ -42,20 +42,25 @@ public class AnnotationDocMocker {
     public static final Date DATE = Date.from(
             LocalDate.of(1869, 10, 2).atStartOfDay(ZoneId.systemDefault()).toInstant());
 
-    public static final String EXTENSION_DB1 = "UBERON";
-    public static final String EXTENSION_DB2 = "CL";
-    public static final String EXTENSION_DB3 = "UNIPROT";
+    public static final String EXTENSION_DB1 = "NCBI_gi";
+    public static final String EXTENSION_DB2 = "Cl";
+    public static final String EXTENSION_DB3 = "UBERON-AG";
+    public static final String EXTENSION_DB4 = "PO1234";
     public static final String EXTENSION_ID1 = "0001675";
-    public static final String EXTENSION_ID2 = "0000032";
-    public static final String EXTENSION_ID3 = "0006000";
+    public static final String EXTENSION_ID2 = "AbC:0032";
+    public static final String EXTENSION_ID3 = "000-6000";
+    public static final String EXTENSION_ID4 = "QWE_90hy";
     public static final String EXTENSION_RELATIONSHIP1 = "results_in_development_of";
     public static final String EXTENSION_RELATIONSHIP2 = "acts_on_population_of";
     public static final String EXTENSION_RELATIONSHIP3 = "indicative_of";
+    public static final String EXTENSION_RELATIONSHIP4 = "happy_about";
 
     public static final String EXTENSION_1 = asExtension(EXTENSION_RELATIONSHIP1, EXTENSION_DB1, EXTENSION_ID1);
     public static final String EXTENSION_2 = asExtension(EXTENSION_RELATIONSHIP2, EXTENSION_DB2, EXTENSION_ID2);
     public static final String EXTENSION_3 = asExtension(EXTENSION_RELATIONSHIP3, EXTENSION_DB3, EXTENSION_ID3);
-    public static final List<String> EXTENSIONS = asList(String.format("%s,%s", EXTENSION_1, EXTENSION_2), EXTENSION_3);
+    public static final String EXTENSION_4 = asExtension(EXTENSION_RELATIONSHIP4, EXTENSION_DB4, EXTENSION_ID4);
+    public static final List<String> EXTENSIONS = asList(String.format("%s,%s", EXTENSION_1, EXTENSION_2), String
+            .format("%s,%s",EXTENSION_3, EXTENSION_4));
 
     public static AtomicLong rowNumberGenerator = new AtomicLong();
 

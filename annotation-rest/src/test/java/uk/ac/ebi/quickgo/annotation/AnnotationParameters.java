@@ -26,7 +26,8 @@ public enum AnnotationParameters {
     GO_ASPECT_PARAM("aspect"),
     EXTENSION_PARAM("extension"),
     INCLUDE_FIELD_PARAM("includeFields"),
-    SELECTED_FIELD_PARAM("selectedFields");
+    SELECTED_FIELD_PARAM("selectedFields"),
+    EXTENSION_REL_DB_PARAM("extensionRelDb");
 
     private String name;
 

@@ -152,6 +152,10 @@
     <field name="extension_search" type="extension_ignorecase" indexed="true" stored="false" multiValued="true"/>
     <copyField source="extension" dest="extension_search"/>
 
+    <field name="extension_rel_db_search" type="extension_rel_db" indexed="true" stored="false" multiValued="true"/>
+    <copyField source="extension" dest="extension_rel_db_search"/>
+
+
     <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
     <!-- Fields that are used specifically for Ordering -->
     <field name="rowNumber" type="row_number" indexed="true" stored="true" multiValued="false"/>
@@ -269,16 +273,36 @@
     E.g. positively_regulates(GO:0050840)
     Match 1
     Full match	0-32	`positively_regulates(GO:0050840)`
-    Group 1.	0-20	`positively_regulates`
-    Group 2.	21-31	`GO:0050840`
-    Group 3.	21-23	`GO`
-    Group 4.	24-31	`0050840`
+    Group 1.	0-32	`positively_regulates(GO:0050840)`
+    Group 2.	0-20	`positively_regulates`
+    Group 3.	21-31	`GO:0050840`
+    Group 4.	21-23	`GO`
+    Group 5.	24-31	`0050840`
+
+    We also want to search without using the identifier, e.g. positively_regulates(GO)
     -->
+
     <fieldType name="extension_ignorecase" class="solr.TextField" positionIncrementGap="100">
         <analyzer type="index">
             <tokenizer class="solr.KeywordTokenizerFactory"/>
-            <filter class="solr.PatternCaptureGroupFilterFactory" pattern="(([\w_]+)\((([^,]+):([^,]+))\))"
+            <filter class="solr.PatternCaptureGroupFilterFactory" pattern="([^,]+)" preserve_original="false"/>
+            <filter class="solr.PatternCaptureGroupFilterFactory" pattern="(([\w_]+)\((([A-Za-z0-9_-]+):([\S]+))\))"
                     preserve_original="false"/>
+            <filter class="solr.LowerCaseFilterFactory"/>
+        </analyzer>
+        <analyzer type="query">
+            <tokenizer class="solr.KeywordTokenizerFactory"/>
+            <filter class="solr.LowerCaseFilterFactory"/>
+        </analyzer>
+    </fieldType>
+
+    <!-- Process searches for annotation extensions in the format 'relationship(db)'  i.e. without an identifier -->
+    <fieldType name="extension_rel_db" class="solr.TextField" positionIncrementGap="100">
+        <analyzer type="index">
+            <tokenizer class="solr.KeywordTokenizerFactory"/>
+            <filter class="solr.PatternCaptureGroupFilterFactory" pattern="([^,]+)" preserve_original="false"/>
+            <filter class="solr.PatternReplaceFilterFactory" pattern="([\w_]+)\(([A-Za-z0-9_-]+):([\S]+)\)"
+                                                          replacement="$1($2)" replace="all"/>
             <filter class="solr.LowerCaseFilterFactory"/>
         </analyzer>
         <analyzer type="query">

@@ -4,6 +4,7 @@ import uk.ac.ebi.quickgo.annotation.validation.service.ReferenceValidator;
 import uk.ac.ebi.quickgo.annotation.validation.service.WithFromValidator;
 import uk.ac.ebi.quickgo.common.validator.GeneProductIDList;
 import uk.ac.ebi.quickgo.rest.ParameterException;
+import uk.ac.ebi.quickgo.rest.controller.request.AllowableFacets;
 import uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern;
 import uk.ac.ebi.quickgo.rest.search.AggregateFunction;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
@@ -94,7 +95,8 @@ public class AnnotationRequest {
             Searchable.REFERENCE,
             Searchable.TARGET_SET,
             Searchable.WITH_FROM,
-            Searchable.EXTENSION
+            Searchable.EXTENSION,
+            Searchable.EXTENSION_REL_DB
     };
 
     /**
@@ -252,6 +254,11 @@ public class AnnotationRequest {
                     "results_in_formation_of(UBERON:0003070),occurs_in(CL:0000032),occurs_in(CL:0000008)," +
                     "results_in_formation_of(UBERON:0001675)")
     private String extension;
+
+    @ApiModelProperty(value ="Allow a search for a combination of relation and database without specifiying " +
+            "an id.",
+            example = "occurs_in(CL),transports_or_maintains_localization_of(UniProtKB)")
+    private String extensionRelDb;
 
     @ApiModelProperty(
             value = "The number of annotations to download. Note, the page size parameter [limit] will be ignored " +
@@ -564,6 +571,25 @@ public class AnnotationRequest {
     }
 
     /**
+     * A list of extension relationship to db search values, separated by commas
+     * In the format extensionRelDb=occurs_in(PomBase),acts_on_population_of(CL) etc.
+     */
+    public void setExtensionRelDb(String... relDb) {
+        filterMap.put(Searchable.EXTENSION_REL_DB, relDb);
+    }
+
+    /**
+     * Return a list of annotation extensionRelDb values, separated by commas
+     *
+     * @return String array containing comma separated list of extensionRelDb values.
+     */
+    @ArrayPattern(regexp = "(([\\w_]+)\\((([^,]+))\\))", flags = CASE_INSENSITIVE, paramName =
+            INCLUDE_FIELD_PARAM)
+    public String[] getExtensionRelDb() {
+        return filterMap.get(Searchable.EXTENSION_REL_DB);
+    }
+
+    /**
      * Include fields whose values derive from external resources
      * @param includeFields a vararg of fields to include
      */
@@ -755,8 +781,10 @@ public class AnnotationRequest {
                 ", geneProductSubset='" + geneProductSubset + '\'' +
                 ", goIdEvidence='" + goIdEvidence + '\'' +
                 ", extension='" + extension + '\'' +
+                ", extensionRelDb='" + extensionRelDb + '\'' +
                 ", downloadLimit=" + downloadLimit +
                 ", includeFields=" + Arrays.toString(includeFields) +
+                ", selectedFields=" + Arrays.toString(selectedFields) +
                 ", filterMap=" + filterMap +
                 '}';
     }
