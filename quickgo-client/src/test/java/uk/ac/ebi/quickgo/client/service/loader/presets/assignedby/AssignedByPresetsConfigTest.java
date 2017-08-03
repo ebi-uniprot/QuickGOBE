@@ -1,6 +1,5 @@
-package uk.ac.ebi.quickgo.client.service.loader.presets.assignedBy;
+package uk.ac.ebi.quickgo.client.service.loader.presets.assignedby;
 
-import uk.ac.ebi.quickgo.client.service.loader.presets.assignedby.AssignedByPresetsConfig;
 import uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPreset;
 
 import org.junit.Before;
