@@ -130,7 +130,7 @@ public class AssignedByPresetsConfig {
         return  rawNamedPreset -> rawNamedPreset;
     }
 
-    private ItemProcessor<RawNamedPreset, RawNamedPreset> duplicateChecker() {
+    public ItemProcessor<RawNamedPreset, RawNamedPreset> duplicateChecker() {
         return rawNamedPreset -> duplicatePrevent.add(rawNamedPreset.name.toLowerCase())? rawNamedPreset : null;
     }
 }
