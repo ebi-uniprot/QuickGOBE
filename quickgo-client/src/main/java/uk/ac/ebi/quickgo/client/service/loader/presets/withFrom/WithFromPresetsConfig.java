@@ -7,7 +7,9 @@ import uk.ac.ebi.quickgo.client.service.loader.presets.LogStepListener;
 import uk.ac.ebi.quickgo.client.service.loader.presets.PresetsCommonConfig;
 import uk.ac.ebi.quickgo.client.service.loader.presets.ff.*;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.item.ItemProcessor;
@@ -50,6 +52,7 @@ public class WithFromPresetsConfig {
     private int headerLines;
     @Value("#{'${withfrom.db.preset.defaults:" + DEFAULTS + "}'.split(',')}")
     private List<String> defaults;
+    private Set<String> duplicatePrevent = new HashSet<>();
 
     @Bean
     public Step withFromDbStep(
@@ -66,7 +69,8 @@ public class WithFromPresetsConfig {
                 .<RawNamedPreset>reader(rawPresetMultiFileReader(resources, itemReader))
                 .processor(compositeItemProcessor(
                         rawPresetValidator(),
-                        new RawNamedPresetRelevanceChecker(defaults)))
+                        new RawNamedPresetRelevanceChecker(defaults),
+                        duplicateChecker()))
                 .writer(rawPresetWriter(presets))
                 .listener(new LogStepListener())
                 .build();
@@ -93,5 +97,9 @@ public class WithFromPresetsConfig {
 
     private ItemProcessor<RawNamedPreset, RawNamedPreset> rawPresetValidator() {
         return new RawNamedPresetValidator();
+    }
+
+    ItemProcessor<RawNamedPreset, RawNamedPreset> duplicateChecker() {
+        return rawNamedPreset -> duplicatePrevent.add(rawNamedPreset.name.toLowerCase())? rawNamedPreset : null;
     }
 }
