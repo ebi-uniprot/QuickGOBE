@@ -41,8 +41,8 @@ class DownloadResponseVerifier {
         return content().string(fieldMatcher);
     }
 
-    static ResultMatcher selectedFieldsExist(String[] expectedFields) {
-        Matcher<String> fieldMatcher = new TSVSelectedFieldsMatcher(expectedFields);
+    static ResultMatcher selectedFieldsExist(String[] expectedFields, int expectedNumberOfFields) {
+        Matcher<String> fieldMatcher = new TSVSelectedFieldsMatcher(expectedFields, expectedNumberOfFields);
         return content().string(fieldMatcher);
     }
 
@@ -103,7 +103,7 @@ class DownloadResponseVerifier {
     }
 
     static class TSVMandatoryFieldMatcher extends TypeSafeMatcher<String> {
-        private static final int FIELD_COUNT = 17;
+        private static final int FIELD_COUNT = 18;
         private static final String TYPE = "TSV";
         private static final List<Integer> MANDATORY_INDICES = asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
 
@@ -136,10 +136,12 @@ class DownloadResponseVerifier {
 
     static class TSVSelectedFieldsMatcher extends TypeSafeMatcher<String> {
         private static final String TYPE = "TSV";
+        private final int expectedNumberOfFields;
         private String[] expectedFields;
 
-        TSVSelectedFieldsMatcher(String[] expectedFields) {
+        TSVSelectedFieldsMatcher(String[] expectedFields, int expectedNumberOfFields) {
             this.expectedFields = expectedFields;
+            this.expectedNumberOfFields = expectedNumberOfFields;
         }
 
         @Override public void describeTo(Description description) {
@@ -153,13 +155,13 @@ class DownloadResponseVerifier {
                 if (!line.startsWith("!")) {
                     String[] components = line.split("\t");
 
-                    if (components.length != expectedFields.length) {
+                    if (components.length != expectedNumberOfFields) {
                         LOGGER.error(TYPE + " line should contain " + expectedFields.length + " fields, but found: " +
                                 components
                                         .length);
                         return false;
                     }
-                    for (int i = 0; i > expectedFields.length; i++) {
+                    for (int i = 0; i < expectedNumberOfFields; i++) {
                         if (components[i].isEmpty()) {
                             LOGGER.error("Mandatory " + TYPE + " index should not be empty at column " + i);
                             return false;
