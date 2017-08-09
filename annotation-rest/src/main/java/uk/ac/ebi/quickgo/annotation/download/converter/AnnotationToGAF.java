@@ -55,7 +55,6 @@ public class AnnotationToGAF extends AnnotationTo implements BiFunction<Annotati
     private static final Set<String> VALID_GAF_QUALIFIERS =
             new HashSet<>(asList("contributes_to", "NOT|contributes_to", "colocalizes_with", "NOT|colocalizes_with"));
     private final Function<String, String> toCanonical = new IdCanonicaliser();
-    
     private final Function<String, String> createCanonical = toCanonical.compose(nullToEmptyString);
 
     /**
@@ -124,29 +123,6 @@ public class AnnotationToGAF extends AnnotationTo implements BiFunction<Annotati
             aspectCharacter = "";
         }
         return aspectCharacter;
-    }
-
-    private enum Aspect {
-        BIOLOGICAL_PROCESS("biological_process", "P"),
-        MOLECULAR_FUNCTION("molecular_function", "F"),
-        CELLULAR_COMPONENT("cellular_component", "C");
-
-        private final String scientificName;
-        private final String character;
-
-        Aspect(String scientificName, String character) {
-            this.scientificName = scientificName;
-            this.character = character;
-        }
-
-        public static Aspect fromScientificName(String scientificName) {
-            for (Aspect aspect : Aspect.values()) {
-                if (aspect.scientificName.equals(scientificName)) {
-                    return aspect;
-                }
-            }
-            throw new IllegalArgumentException("Unrecognized Aspect scientificName: " + scientificName);
-        }
     }
 
     private static class IdCanonicaliser implements Function<String, String> {
