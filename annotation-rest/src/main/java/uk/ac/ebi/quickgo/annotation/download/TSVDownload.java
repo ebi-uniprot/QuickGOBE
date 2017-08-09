@@ -33,7 +33,8 @@ public class TSVDownload {
 
     private static final List<String> FULL_FIELD_LIST = Arrays.asList(GENE_PRODUCT_ID_FIELD_NAME, SYMBOL_FIELD_NAME,
                                                                       QUALIFIER_FIELD_NAME, GO_TERM_FIELD_NAME,
-                                                                      GO_NAME_FIELD_NAME, ECO_ID_FIELD_NAME,
+                                                                      GO_ASPECT_FIELD_NAME, GO_NAME_FIELD_NAME,
+                                                                      ECO_ID_FIELD_NAME,
                                                                       GO_EVIDENCE_CODE_FIELD_NAME,
                                                                       REFERENCE_FIELD_NAME, WITH_FROM_FIELD_NAME,
                                                                       TAXON_ID_FIELD_NAME, ASSIGNED_BY_FIELD_NAME,
