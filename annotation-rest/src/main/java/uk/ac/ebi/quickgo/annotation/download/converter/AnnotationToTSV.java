@@ -57,6 +57,7 @@ public class AnnotationToTSV extends AnnotationTo implements BiFunction<Annotati
             }
             j.add(nullToEmptyString.apply(c.annotation.goId));
         });
+        selected2Content.put(GO_ASPECT_FIELD_NAME, (c, j) -> j.add(nullToEmptyString.apply(c.annotation.goAspect)));
         selected2Content.put(GO_NAME_FIELD_NAME, (c, j) -> j.add(nullToEmptyString.apply(c.annotation.goName)));
         selected2Content.put(ECO_ID_FIELD_NAME, (c, j) -> j.add(nullToEmptyString.apply(c.annotation.evidenceCode)));
         selected2Content.put(GO_EVIDENCE_CODE_FIELD_NAME,

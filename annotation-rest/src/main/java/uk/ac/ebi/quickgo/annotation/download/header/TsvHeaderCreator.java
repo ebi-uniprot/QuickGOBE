@@ -28,6 +28,7 @@ public class TsvHeaderCreator implements HeaderCreator {
     static final String SYMBOL = "SYMBOL";
     static final String QUALIFIER = "QUALIFIER";
     static final String GO_TERM = "GO TERM";
+    static final String GO_ASPECT = "GO ASPECT";
     static final String GO_NAME = "GO NAME";
     static final String SLIMMED_FROM = "SLIMMED FROM";
     static final String ECO_ID = "ECO_ID";
@@ -82,6 +83,7 @@ public class TsvHeaderCreator implements HeaderCreator {
                 j.add(SLIMMED_FROM);
             }
         });
+        selected2Content.put(GO_ASPECT_FIELD_NAME, (hc, j) -> j.add(GO_ASPECT));
         selected2Content.put(GO_NAME_FIELD_NAME, (hc, j) -> j.add(GO_NAME));
         selected2Content.put(ECO_ID_FIELD_NAME, (hc, j) -> j.add(ECO_ID));
         selected2Content.put(GO_EVIDENCE_CODE_FIELD_NAME, (hc, j) -> j.add(GO_EVIDENCE_CODE));

@@ -111,23 +111,24 @@ public class TsvHeaderCreatorTest {
         tsvHeaderCreator.write(mockEmitter, mockContent);
 
         verify(mockEmitter).send(GENE_PRODUCT_ID + "\t"
-                        + SYMBOL + "\t"
-                        + QUALIFIER + "\t"
-                        + GO_TERM + "\t"
-                        + GO_NAME + "\t"
-                        + ECO_ID + "\t"
-                        + GO_EVIDENCE_CODE + "\t"
-                        + REFERENCE + "\t"
-                        + WITH_FROM + "\t"
-                        + TAXON_ID + "\t"
-                        + ASSIGNED_BY + "\t"
-                        + ANNOTATION_EXTENSION + "\t"
-                        + DATE + "\t"
-                        + TAXON_NAME + "\t"
-                        + GENE_PRODUCT_NAME + "\t"
-                        + GENE_PRODUCT_SYNONYMS + "\t"
-                        + GENE_PRODUCT_TYPE + "\n",
-                MediaType.TEXT_PLAIN);
+                                         + SYMBOL + "\t"
+                                         + QUALIFIER + "\t"
+                                         + GO_TERM + "\t"
+                                         + GO_ASPECT + "\t"
+                                         + GO_NAME + "\t"
+                                         + ECO_ID + "\t"
+                                         + GO_EVIDENCE_CODE + "\t"
+                                         + REFERENCE + "\t"
+                                         + WITH_FROM + "\t"
+                                         + TAXON_ID + "\t"
+                                         + ASSIGNED_BY + "\t"
+                                         + ANNOTATION_EXTENSION + "\t"
+                                         + DATE + "\t"
+                                         + TAXON_NAME + "\t"
+                                         + GENE_PRODUCT_NAME + "\t"
+                                         + GENE_PRODUCT_SYNONYMS + "\t"
+                                         + GENE_PRODUCT_TYPE + "\n",
+                                 MediaType.TEXT_PLAIN);
     }
 
     @Test
@@ -164,6 +165,7 @@ public class TsvHeaderCreatorTest {
         fields2Columns.add(new String[]{SYMBOL_FIELD_NAME, SYMBOL});
         fields2Columns.add(new String[]{QUALIFIER_FIELD_NAME, QUALIFIER});
         fields2Columns.add(new String[]{GO_TERM_FIELD_NAME, GO_TERM});
+        fields2Columns.add(new String[]{GO_ASPECT_FIELD_NAME, GO_ASPECT});
         fields2Columns.add(new String[]{GO_NAME_FIELD_NAME, GO_NAME});
         fields2Columns.add(new String[]{ECO_ID_FIELD_NAME, ECO_ID});
         fields2Columns.add(new String[]{GO_EVIDENCE_CODE_FIELD_NAME, GO_EVIDENCE_CODE});
