@@ -74,7 +74,7 @@ public class TsvHeaderCreator implements HeaderCreator {
     }
 
     private static void initialiseContentMappings() {
-        selected2Content.put(GENE_PRODUCT_ID_FIELD_NAME, (hc, j) -> {
+        selected2Content.put(GENE_PRODUCT_FIELD_NAME, (hc, j) -> {
             j.add(GENE_PRODUCT_DB);
             j.add(GENE_PRODUCT_ID);
         });
