@@ -103,7 +103,7 @@ class DownloadResponseVerifier {
     }
 
     static class TSVMandatoryFieldMatcher extends TypeSafeMatcher<String> {
-        private static final int FIELD_COUNT = 17;
+        private static final int FIELD_COUNT = 18;
         private static final String TYPE = "TSV";
         private static final List<Integer> MANDATORY_INDICES = asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
 
