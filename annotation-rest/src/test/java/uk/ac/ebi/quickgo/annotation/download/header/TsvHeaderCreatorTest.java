@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.download.header;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -52,32 +53,31 @@ public class TsvHeaderCreatorTest {
     public void writeColumnNameForIndividualField() throws Exception {
         TsvHeaderCreator tsvHeaderCreator = new TsvHeaderCreator();
         for (String[] field2Column : fields2Columns) {
-            HeaderContent content = mock(HeaderContent.class);
-            when(content.isSlimmed()).thenReturn(false);
-            when(content.getSelectedFields()).thenReturn(singletonList(field2Column[0]));
-            ResponseBodyEmitter emitter = mock(ResponseBodyEmitter.class);
-
-            tsvHeaderCreator.write(emitter, content);
-
-            verify(emitter).send(field2Column[1] + "\n", MediaType.TEXT_PLAIN);
+            veryColumnNameForIndividualField(tsvHeaderCreator, singletonList(field2Column[0]), field2Column[1] + "\n");
         }
 
         //Test gene product separately
+        veryColumnNameForIndividualField(tsvHeaderCreator, singletonList(GENE_PRODUCT_FIELD_NAME),
+                                         GENE_PRODUCT_DB + "\t" + GENE_PRODUCT_ID + "\n");
+    }
+
+    private void veryColumnNameForIndividualField(TsvHeaderCreator tsvHeaderCreator, List<String> selectedFields,
+            String columnName) throws IOException {
         HeaderContent content = mock(HeaderContent.class);
         when(content.isSlimmed()).thenReturn(false);
-        when(content.getSelectedFields()).thenReturn(singletonList(GENE_PRODUCT_ID_FIELD_NAME));
+        when(content.getSelectedFields()).thenReturn(selectedFields);
         ResponseBodyEmitter emitter = mock(ResponseBodyEmitter.class);
 
         tsvHeaderCreator.write(emitter, content);
 
-        verify(emitter).send(GENE_PRODUCT_DB + "\t" + GENE_PRODUCT_ID + "\n", MediaType.TEXT_PLAIN);
+        verify(emitter).send(columnName, MediaType.TEXT_PLAIN);
     }
 
     @Test
     public void writeHeaderForSeveralSelectedFields() throws Exception {
         when(mockContent.isSlimmed()).thenReturn(false);
         when(mockContent.getSelectedFields())
-                .thenReturn(asList(GENE_PRODUCT_ID_FIELD_NAME, GO_NAME_FIELD_NAME, TAXON_NAME_FIELD_NAME));
+                .thenReturn(asList(GENE_PRODUCT_FIELD_NAME, GO_NAME_FIELD_NAME, TAXON_NAME_FIELD_NAME));
 
         TsvHeaderCreator tsvHeaderCreator = new TsvHeaderCreator();
 
@@ -93,7 +93,7 @@ public class TsvHeaderCreatorTest {
     public void writeHeaderForSeveralSelectedFieldsInNewOrder() throws Exception {
         when(mockContent.isSlimmed()).thenReturn(false);
         when(mockContent.getSelectedFields()).thenReturn(asList(TAXON_NAME_FIELD_NAME, GO_NAME_FIELD_NAME,
-                                                                GENE_PRODUCT_ID_FIELD_NAME));
+                                                                GENE_PRODUCT_FIELD_NAME));
         TsvHeaderCreator tsvHeaderCreator = new TsvHeaderCreator();
 
         tsvHeaderCreator.write(mockEmitter, mockContent);
@@ -147,9 +147,9 @@ public class TsvHeaderCreatorTest {
     @Test
     public void writeHeaderForSeveralSelectedFieldsWhenSlimmed() throws Exception {
         when(mockContent.isSlimmed()).thenReturn(true);
-        when(mockContent.getSelectedFields()).thenReturn(asList(GENE_PRODUCT_ID_FIELD_NAME,
-                GO_TERM_FIELD_NAME,
-                TAXON_NAME_FIELD_NAME));
+        when(mockContent.getSelectedFields()).thenReturn(asList(GENE_PRODUCT_FIELD_NAME,
+                                                                GO_TERM_FIELD_NAME,
+                                                                TAXON_NAME_FIELD_NAME));
 
         TsvHeaderCreator tsvHeaderCreator = new TsvHeaderCreator();
 
