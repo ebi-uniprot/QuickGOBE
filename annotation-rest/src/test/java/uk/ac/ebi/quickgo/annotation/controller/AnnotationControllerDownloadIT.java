@@ -191,17 +191,21 @@ public class AnnotationControllerDownloadIT {
 
     @Test
     public void canDownloadInTSVFormat() throws Exception {
-        for(int i=1; i<=97; i++) {
+        int downloadCount = 97;
+        for(int i=1; i<=downloadCount; i++) {
             expectGoTermsHaveGoNamesViaRest(singletonList(IdGeneratorUtil.createGoId(3824)), singletonList
                     ("catalytic activity"));
         }
-        canDownloadWithOptionalFields(TSV_MEDIA_TYPE);
+        canDownloadWithOptionalFields(TSV_MEDIA_TYPE, downloadCount, 18);
     }
 
     @Test
     public void canDownloadInTSVFormatWithSelectedFieldsCaseInsensitive() throws Exception {
         int expectedNumberOfFields = 4;
-        canDownloadWithSelectedFields(TSV_MEDIA_TYPE, expectedNumberOfFields);
+        int downloadSize = 10;
+        String[] expectedFields = new String[] {GENE_PRODUCT_ID_FIELD_NAME_MIXED_CASE,
+                SYMBOL_FIELD_NAME_MIXED_CASE, WITH_FROM_FIELD_NAME_MIXED_CASE};
+        canDownloadWithSelectedFields(TSV_MEDIA_TYPE, expectedNumberOfFields, expectedFields, downloadSize);
     }
 
     private List<AnnotationDocument> createDocs(int number) {
@@ -230,8 +234,8 @@ public class AnnotationControllerDownloadIT {
         checkResponse(mediaType, response, storedIds);
     }
 
-    private void canDownloadWithOptionalFields(MediaType mediaType) throws Exception {
-        int expectedDownloadCount = 97;
+    private void canDownloadWithOptionalFields(MediaType mediaType, int expectedDownloadCount, int
+            expectedNumberOfFields) throws Exception {
         ResultActions response = mockMvc.perform(
                 get(DOWNLOAD_SEARCH_URL)
                         .header(ACCEPT, mediaType)
@@ -243,22 +247,19 @@ public class AnnotationControllerDownloadIT {
         perLine.add("GENE");
         //StringContainsInOrder.matchesSafely not working as expected, not finding A0A009, so cut down list.
         perLine.addAll(storedIds.subList(0,8));
-        checkResponse(mediaType, response, perLine);
+        checkResponseForSelectedFields(response, expectedNumberOfFields);
     }
 
-    private void canDownloadWithSelectedFields(MediaType mediaType, int expectedNumberOfFields) throws Exception {
-        int expectedDownloadCount = 97;
+    private void canDownloadWithSelectedFields(MediaType mediaType, int expectedNumberOfFields, String[]
+            expectedFields, int expectedDownloadCount) throws Exception {
         ResultActions response = mockMvc.perform(
                 get(DOWNLOAD_SEARCH_URL)
                         .header(ACCEPT, mediaType)
-                        .param(DOWNLOAD_LIMIT_PARAM, Integer.toString(expectedDownloadCount))
-                        .param(SELECTED_FIELD_PARAM.getName(), GENE_PRODUCT_ID_FIELD_NAME_MIXED_CASE,
-                               SYMBOL_FIELD_NAME_MIXED_CASE, WITH_FROM_FIELD_NAME_MIXED_CASE));
+                        .param(SELECTED_FIELD_PARAM.getName(), expectedFields));
 
         getFieldValuesFromRepo(doc -> idFrom(doc.geneProductId), expectedDownloadCount);
 
-        checkResponseForSelectedFields(response, expectedNumberOfFields, GENE_PRODUCT_ID_FIELD_NAME_MIXED_CASE,
-                                       SYMBOL_FIELD_NAME_MIXED_CASE, WITH_FROM_FIELD_NAME_MIXED_CASE);
+        checkResponseForSelectedFields(response, expectedNumberOfFields);
     }
 
     private void checkResponse(MediaType mediaType, ResultActions response, List<String> storedIds) throws Exception {
@@ -272,13 +273,11 @@ public class AnnotationControllerDownloadIT {
                 .andExpect(content().string(stringContainsInOrder(storedIds)));
     }
 
-    private void checkResponseForSelectedFields(ResultActions response,int expectedNumberOfFields, String...
-            expectedFields) throws
-                                                                                                       Exception {
+    private void checkResponseForSelectedFields(ResultActions response,int expectedNumberOfFields) throws Exception {
         response.andExpect(request().asyncStarted())
                 .andDo(MvcResult::getAsyncResult)
                 .andDo(print())
-                .andExpect(selectedFieldsExist(expectedFields, expectedNumberOfFields));
+                .andExpect(selectedFieldsExist(expectedNumberOfFields));
     }
 
     private void canDownloadWithFilter(MediaType mediaType) throws Exception {
