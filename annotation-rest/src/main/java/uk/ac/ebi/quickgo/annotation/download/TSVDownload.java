@@ -17,6 +17,7 @@ public class TSVDownload {
     public static final String QUALIFIER_FIELD_NAME = "qualifier";
     public static final String GO_TERM_FIELD_NAME = "goid";
     public static final String GO_NAME_FIELD_NAME = "goname";
+    public static final String GO_ASPECT_FIELD_NAME = "goaspect";
     public static final String ECO_ID_FIELD_NAME = "evidencecode";
     public static final String GO_EVIDENCE_CODE_FIELD_NAME = "goevidence";
     public static final String REFERENCE_FIELD_NAME = "reference";
