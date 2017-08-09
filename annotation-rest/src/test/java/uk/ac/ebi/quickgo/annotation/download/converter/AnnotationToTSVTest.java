@@ -176,6 +176,20 @@ public class AnnotationToTSVTest {
     }
 
     @Test
+    public void nullAspect() {
+        annotation.goAspect = null;
+        String[] elements = annotationToElements(annotation);
+        assertThat(elements[NonSlimmedColumns.COL_GO_ASPECT], is(""));
+    }
+
+    @Test
+    public void emptyAspect() {
+        annotation.goAspect = "";
+        String[] elements = annotationToElements(annotation);
+        assertThat(elements[NonSlimmedColumns.COL_GO_ASPECT], is(""));
+    }
+
+    @Test
     public void nullReference() {
         annotation.reference = null;
         String[] elements = annotationToElements(annotation);
@@ -290,27 +304,7 @@ public class AnnotationToTSVTest {
         private static final int COL_DB_OBJECT_SYMBOL = 1;
         private static final int COL_QUALIFIER = 2;
         private static final int COL_GO_ID = 3;
-        private static final int COL_NAME = 4;
-        private static final int COL_ECO_ID = 5;
-        private static final int COL_GO_EVIDENCE = 6;
-        private static final int COL_REFERENCE = 7;
-        private static final int COL_WITH = 8;
-        private static final int COL_TAXON = 9;
-        private static final int COL_ASSIGNED_BY = 10;
-        private static final int COL_ANNOTATION_EXTENSION = 11;
-        private static final int COL_DATE = 12;
-        private static final int COL_TAXON_NAME = 13;
-        private static final int COL_DB_OBJECT_NAME = 14 ;
-        private static final int COL_DB_OBJECT_SYNONYM = 15;
-        private static final int COL_DB_OBJECT_TYPE = 16;
-    }
-
-    private class SlimmedColumns{
-        private static final int COL_GENE_PRODUCT = 0;
-        private static final int COL_DB_OBJECT_SYMBOL = 1;
-        private static final int COL_QUALIFIER = 2;
-        private static final int COL_GO_ID = 3;
-        private static final int COL_SLIMMED_FROM = 4;
+        private static final int COL_GO_ASPECT = 4;
         private static final int COL_NAME = 5;
         private static final int COL_ECO_ID = 6;
         private static final int COL_GO_EVIDENCE = 7;
@@ -321,8 +315,30 @@ public class AnnotationToTSVTest {
         private static final int COL_ANNOTATION_EXTENSION = 12;
         private static final int COL_DATE = 13;
         private static final int COL_TAXON_NAME = 14;
-        private static final int COL_DB_OBJECT_NAME = 15 ;
+        private static final int COL_DB_OBJECT_NAME = 15;
         private static final int COL_DB_OBJECT_SYNONYM = 16;
         private static final int COL_DB_OBJECT_TYPE = 17;
+    }
+
+    private class SlimmedColumns{
+        private static final int COL_GENE_PRODUCT = 0;
+        private static final int COL_DB_OBJECT_SYMBOL = 1;
+        private static final int COL_QUALIFIER = 2;
+        private static final int COL_GO_ID = 3;
+        private static final int COL_SLIMMED_FROM = 4;
+        private static final int COL_GO_ASPECT = 5;
+        private static final int COL_NAME = 6;
+        private static final int COL_ECO_ID = 7;
+        private static final int COL_GO_EVIDENCE = 8;
+        private static final int COL_REFERENCE = 9;
+        private static final int COL_WITH = 10;
+        private static final int COL_TAXON = 11;
+        private static final int COL_ASSIGNED_BY = 12;
+        private static final int COL_ANNOTATION_EXTENSION = 13;
+        private static final int COL_DATE = 14;
+        private static final int COL_TAXON_NAME = 15;
+        private static final int COL_DB_OBJECT_NAME = 16 ;
+        private static final int COL_DB_OBJECT_SYNONYM = 17;
+        private static final int COL_DB_OBJECT_TYPE = 18;
     }
 }
