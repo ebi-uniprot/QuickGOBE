@@ -130,7 +130,7 @@ public class AnnotationToTSVTest {
         }
 
         //Test Gene Product separately
-        String[] elements = annotationToElements(annotation, Collections.singletonList(GENE_PRODUCT_ID_FIELD_NAME));
+        String[] elements = annotationToElements(annotation, Collections.singletonList(GENE_PRODUCT_FIELD_NAME));
         assertThat(elements[0], is(DB));
         assertThat(elements[1], is(ID));
     }
@@ -160,7 +160,6 @@ public class AnnotationToTSVTest {
         String[] elements = annotationToElements(annotation);
         assertThat(elements[NonSlimmedColumns.COL_GENE_PRODUCT_DB], is(""));
         assertThat(elements[NonSlimmedColumns.COL_GENE_PRODUCT_ID], is(""));
-
     }
 
     @Test
