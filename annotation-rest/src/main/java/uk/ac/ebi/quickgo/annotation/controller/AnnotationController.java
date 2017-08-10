@@ -26,6 +26,7 @@ import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformationRequests;
 import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformerChain;
 
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -109,6 +110,7 @@ import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.createFirstCursorPa
  *         Created with IntelliJ IDEA.
  */
 @RestController
+@Api(tags = {"annotations"})
 @RequestMapping(value = "/annotation")
 public class AnnotationController {
     private static final Logger LOGGER = getLogger(AnnotationController.class);
@@ -118,7 +120,6 @@ public class AnnotationController {
     private static final String GO_USAGE_SLIM = "goUsage=slim";
 
     private final MetaDataProvider metaDataProvider;
-
     private final SearchService<Annotation> annotationSearchService;
     private final SearchServiceConfig.AnnotationCompositeRetrievalConfig annotationRetrievalConfig;
     private final DefaultSearchQueryTemplate queryTemplate;
@@ -160,7 +161,7 @@ public class AnnotationController {
         this.annotationRetrievalConfig = annotationRetrievalConfig;
         this.queryTemplate = createSearchQueryTemplate(annotationRetrievalConfig);
         this.downloadQueryTemplate = createDownloadSearchQueryTemplate(annotationRetrievalConfig);
-    
+
         this.taskExecutor = taskExecutor;
         this.headerCreatorFactory = headerCreatorFactory;
 
@@ -209,7 +210,7 @@ public class AnnotationController {
                     response = ResponseExceptionHandler.ErrorInfo.class),
             @ApiResponse(code = 400, message = "Bad request due to a validation issue encountered in one of the " +
                     "filters", response = ResponseExceptionHandler.ErrorInfo.class)})
-    @ApiOperation(value = "Generate statistic on the annotation result set obtained from applying the filters.")
+    @ApiOperation(value = "Generate statistics on the annotation result set obtained from applying the filters.")
     @RequestMapping(value = "/stats", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<StatisticsGroup>> annotationStats(
             @Valid @ModelAttribute AnnotationRequest request, BindingResult bindingResult) {
@@ -219,6 +220,8 @@ public class AnnotationController {
         return new ResponseEntity<>(stats, HttpStatus.OK);
     }
 
+    @ApiOperation(value = "Search then download all annotations matching the filter criteria provided by the client.",
+                  hidden = true)
     @RequestMapping(value = "/downloadSearch",
             method = {RequestMethod.GET}, produces = {GPAD_MEDIA_TYPE_STRING, GAF_MEDIA_TYPE_STRING, TSV_MEDIA_TYPE_STRING})
     public ResponseEntity<ResponseBodyEmitter> downloadLookup(

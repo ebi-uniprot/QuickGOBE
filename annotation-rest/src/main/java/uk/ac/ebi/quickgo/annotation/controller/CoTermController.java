@@ -7,6 +7,7 @@ import uk.ac.ebi.quickgo.rest.ParameterException;
 import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -30,10 +31,11 @@ import static uk.ac.ebi.quickgo.common.validator.OntologyIdPredicate.isValidGOTe
  * @author Tony Wardell
  */
 @RestController
+@Api(tags = {"co-occurring terms"})
 @RequestMapping(value = "/annotation/coterms")
 public class CoTermController {
 
-    public static final String LIMIT_ALL = "ALL";
+    private static final String LIMIT_ALL = "ALL";
     @Value("${coterm.default.limit:50}")
     private int defaultLimit;
     private CoTermRepository coTermRepository;
@@ -73,7 +75,8 @@ public class CoTermController {
     @ApiOperation(value = "Get co-occurring term information for a single GO Term id.")
     @RequestMapping(value = "/{id}", method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<QueryResult<CoTerm>> findCoTerms(@PathVariable(value = "id") String id,
+    public ResponseEntity<QueryResult<CoTerm>> findCoTerms(
+            @PathVariable(value = "id") String id,
             @RequestParam(value = "source", defaultValue = "ALL") String source,
             @RequestParam(value = "limit", required = false) String limit,
             @RequestParam(value = "similarityThreshold", defaultValue = "0.0") float similarityThreshold) {
@@ -81,9 +84,9 @@ public class CoTermController {
         validateGoTerm(id);
         final List<CoTerm> coTerms = coTermRepository.findCoTerms(id, toCoTermSource(source));
         return getResultsResponse(coTerms.size(), coTerms.stream()
-                                                         .filter(ct -> ct.getSimilarityRatio() >= similarityThreshold)
-                                                         .limit(workoutLimit(limit))
-                                                         .collect(Collectors.toList()));
+                .filter(ct -> ct.getSimilarityRatio() >= similarityThreshold)
+                .limit(workoutLimit(limit))
+                .collect(Collectors.toList()));
     }
 
     private int workoutLimit(String limit) {
