@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.annotation.download.converter;
 
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationMocker;
+import uk.ac.ebi.quickgo.common.model.Aspect;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,7 +37,8 @@ public class AnnotationToTSVTest {
         unSlimmedFieldNames2Data.add(new String[]{SYMBOL_FIELD_NAME,SYMBOL});
         unSlimmedFieldNames2Data.add(new String[]{QUALIFIER_FIELD_NAME,QUALIFIER});
         unSlimmedFieldNames2Data.add(new String[]{GO_TERM_FIELD_NAME,GO_ID});
-        unSlimmedFieldNames2Data.add(new String[]{GO_ASPECT_FIELD_NAME,Aspect.fromScientificName(GO_ASPECT).character});
+        unSlimmedFieldNames2Data.add(new String[]{GO_ASPECT_FIELD_NAME,
+                Aspect.fromScientificName(GO_ASPECT).get().getCharacter()});
         unSlimmedFieldNames2Data.add(new String[]{GO_NAME_FIELD_NAME,GO_NAME});
         unSlimmedFieldNames2Data.add(new String[]{ECO_ID_FIELD_NAME,ECO_ID});
         unSlimmedFieldNames2Data.add(new String[]{GO_EVIDENCE_CODE_FIELD_NAME,GO_EVIDENCE});
@@ -65,7 +67,8 @@ public class AnnotationToTSVTest {
         assertThat(elements[NonSlimmedColumns.COL_DB_OBJECT_SYMBOL], is(SYMBOL));
         assertThat(elements[NonSlimmedColumns.COL_QUALIFIER], is(QUALIFIER));
         assertThat(elements[NonSlimmedColumns.COL_GO_ID], is(GO_ID));
-        assertThat(elements[NonSlimmedColumns.COL_GO_ASPECT], is(Aspect.fromScientificName(GO_ASPECT).character));
+        assertThat(elements[NonSlimmedColumns.COL_GO_ASPECT],
+                   is(Aspect.fromScientificName(GO_ASPECT).get().getCharacter()));
         assertThat(elements[NonSlimmedColumns.COL_NAME], is(GO_NAME));
         assertThat(elements[NonSlimmedColumns.COL_ECO_ID], is(ECO_ID));
         assertThat(elements[NonSlimmedColumns.COL_GO_EVIDENCE], is(GO_EVIDENCE));
@@ -89,7 +92,8 @@ public class AnnotationToTSVTest {
         assertThat(elements[SlimmedColumns.COL_DB_OBJECT_SYMBOL], is(SYMBOL));
         assertThat(elements[SlimmedColumns.COL_QUALIFIER], is(QUALIFIER));
         assertThat(elements[SlimmedColumns.COL_GO_ID], is(SLIMMED_TO_IDS.get(0)));
-        assertThat(elements[SlimmedColumns.COL_GO_ASPECT], is(Aspect.fromScientificName(GO_ASPECT).character));
+        assertThat(elements[SlimmedColumns.COL_GO_ASPECT],
+                   is(Aspect.fromScientificName(GO_ASPECT).get().getCharacter()));
         assertThat(elements[SlimmedColumns.COL_SLIMMED_FROM], is(GO_ID));
         assertThat(elements[SlimmedColumns.COL_NAME], is(GO_NAME));
         assertThat(elements[SlimmedColumns.COL_ECO_ID], is(ECO_ID));
@@ -188,6 +192,13 @@ public class AnnotationToTSVTest {
     @Test
     public void emptyAspect() {
         annotation.goAspect = "";
+        String[] elements = annotationToElements(annotation);
+        assertThat(elements[NonSlimmedColumns.COL_GO_ASPECT], is(""));
+    }
+
+    @Test
+    public void unknownAspect() {
+        annotation.goAspect = "Dish_Washing";
         String[] elements = annotationToElements(annotation);
         assertThat(elements[NonSlimmedColumns.COL_GO_ASPECT], is(""));
     }

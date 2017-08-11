@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.annotation.download.converter;
 
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
+import uk.ac.ebi.quickgo.common.model.Aspect;
 
 import java.util.*;
 import java.util.function.BiFunction;
@@ -115,14 +116,7 @@ public class AnnotationToGAF extends AnnotationTo implements BiFunction<Annotati
     }
 
     private String aspectAsString(String goAspect) {
-        String aspectCharacter;
-        try {
-            aspectCharacter = Aspect.fromScientificName(goAspect).character;
-        } catch (IllegalArgumentException e) {
-            LOGGER.error("Unrecognized Aspect scientificName: " + goAspect, e);
-            aspectCharacter = "";
-        }
-        return aspectCharacter;
+        return Aspect.fromScientificName(goAspect).map(Aspect::getCharacter).orElse("");
     }
 
     private static class IdCanonicaliser implements Function<String, String> {

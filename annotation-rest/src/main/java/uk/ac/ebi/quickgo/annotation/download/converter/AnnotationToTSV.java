@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.annotation.download.converter;
 
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
+import uk.ac.ebi.quickgo.common.model.Aspect;
 
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -57,8 +58,10 @@ public class AnnotationToTSV extends AnnotationTo implements BiFunction<Annotati
             }
             j.add(nullToEmptyString.apply(c.annotation.goId));
         });
-        selected2Content.put(GO_ASPECT_FIELD_NAME, (c, j) -> j.add(nullToEmptyString.apply(aspectAsString(c
-                                                                                                                  .annotation.goAspect))));
+        selected2Content.put(GO_ASPECT_FIELD_NAME,
+                             (c, j) -> j.add(Aspect.fromScientificName(c.annotation.goAspect)
+                                             .map(Aspect::getCharacter)
+                                             .orElse("")));
         selected2Content.put(GO_NAME_FIELD_NAME, (c, j) -> j.add(nullToEmptyString.apply(c.annotation.goName)));
         selected2Content.put(ECO_ID_FIELD_NAME, (c, j) -> j.add(nullToEmptyString.apply(c.annotation.evidenceCode)));
         selected2Content.put(GO_EVIDENCE_CODE_FIELD_NAME,
@@ -67,8 +70,7 @@ public class AnnotationToTSV extends AnnotationTo implements BiFunction<Annotati
         selected2Content.put(WITH_FROM_FIELD_NAME, (c, j) -> j.add(withFromAsString(c.annotation.withFrom)));
         selected2Content.put(TAXON_ID_FIELD_NAME,
                              (c, j) -> j.add(c.annotation.taxonId == 0 ? "" : Integer.toString(c.annotation.taxonId)));
-        selected2Content.put(ASSIGNED_BY_FIELD_NAME,
-                             (c, j) -> j.add(nullToEmptyString.apply(c.annotation.assignedBy)));
+        selected2Content.put(ASSIGNED_BY_FIELD_NAME, (c, j) -> j.add(nullToEmptyString.apply(c.annotation.assignedBy)));
         selected2Content.put(ANNOTATION_EXTENSION_FIELD_NAME,
                              (c, j) -> j.add(extensionsAsString(c.annotation.extensions)));
         selected2Content.put(DATE_FIELD_NAME, (c, j) -> j.add(toYMD(c.annotation.date)));
@@ -78,17 +80,6 @@ public class AnnotationToTSV extends AnnotationTo implements BiFunction<Annotati
                              (c, j) -> j.add(nullToEmptyString.apply(c.annotation.synonyms)));
         selected2Content.put(GENE_PRODUCT_TYPE_FIELD_NAME,
                              (c, j) -> j.add(toGeneProductType(idToComponents(c.annotation.geneProductId)[DB])));
-    }
-
-    private String aspectAsString(String goAspect) {
-        String aspectCharacter;
-        try {
-            aspectCharacter = Aspect.fromScientificName(goAspect).character;
-        } catch (IllegalArgumentException e) {
-            LOGGER.error("Unrecognized Aspect scientificName: " + goAspect, e);
-            aspectCharacter = "";
-        }
-        return aspectCharacter;
     }
 
     private boolean isSlimmedRequest(Annotation annotation) {
