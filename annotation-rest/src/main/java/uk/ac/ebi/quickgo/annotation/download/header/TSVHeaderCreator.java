@@ -67,7 +67,7 @@ public class TSVHeaderCreator implements HeaderCreator {
             emitter.send(output(content) + "\n", MediaType.TEXT_PLAIN);
         } catch (IOException e) {
             String errorMessage = "Failed to send TSV download header";
-            HeaderCreationException headerCreationException = new HeaderCreationException(errorMessage, e);
+            IllegalStateException headerCreationException = new IllegalStateException(errorMessage, e);
             LOGGER.error(errorMessage, headerCreationException);
             throw headerCreationException;
         }

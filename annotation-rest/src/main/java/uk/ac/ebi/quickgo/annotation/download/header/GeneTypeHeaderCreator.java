@@ -24,7 +24,7 @@ public abstract class GeneTypeHeaderCreator implements HeaderCreator {
     static final String DATE = "Date downloaded from QuickGO: ";
     static final String FILTERS_INTRO = "Filtering parameters selected to generate file:";
     static final String PREFIX = "!";
-    
+
     private static final Logger LOGGER = getLogger(GeneTypeHeaderCreator.class);
     private final OntologyHeaderInfo ontology;
 
@@ -60,7 +60,7 @@ public abstract class GeneTypeHeaderCreator implements HeaderCreator {
             emitter.send(PREFIX + content + "\n", MediaType.TEXT_PLAIN);
         } catch (IOException e) {
             String errorMessage = "Failed to send TSV download header";
-            HeaderCreationException headerCreationException = new HeaderCreationException(errorMessage, e);
+            IllegalStateException headerCreationException = new IllegalStateException(errorMessage, e);
             LOGGER.error(errorMessage, headerCreationException);
             throw headerCreationException;
         }

@@ -32,7 +32,7 @@ public class TSVHeaderCreatorTest {
             "/QuickGO/services/annotation/downloadSearch?downloadLimit=7&geneProductId" +
                     "=UniProtKB:A0A000&includeFields=goName,taxonName";
     private static final List<String[]> fields2Columns = new ArrayList<>();
-    public static final String FULL_HEADER_STRING =
+    private static final String FULL_HEADER_STRING =
             GENE_PRODUCT_ID + "\t" + SYMBOL + "\t" + QUALIFIER + "\t" + GO_TERM + "\t" + GO_ASPECT + "\t" +
                     GO_NAME + "\t" + ECO_ID + "\t" + GO_EVIDENCE_CODE + "\t" + REFERENCE + "\t" + WITH_FROM + "\t" +
                     TAXON_ID + "\t" + ASSIGNED_BY + "\t" + ANNOTATION_EXTENSION + "\t" + DATE + "\t" + TAXON_NAME +
@@ -97,11 +97,9 @@ public class TSVHeaderCreatorTest {
                 + TSVHeaderCreator.GENE_PRODUCT_ID + "\n", MediaType.TEXT_PLAIN);
     }
 
-    @Test(expected = HeaderCreationException.class)
-    public void ioErrorWhenWritingHeaderCausesHeaderCreationException() throws Exception {
-        doThrow(HeaderCreationException.class).when(mockEmitter).send(anyObject(), any());
-        when(mockContent.getSelectedFields()).thenReturn(singletonList(TAXON_NAME_FIELD_NAME));
-
+    @Test(expected = IllegalStateException.class)
+    public void ioErrorWhenWritingHeaderCausesIllegalStateException() throws Exception {
+        doThrow(IllegalStateException.class).when(mockEmitter).send(anyObject(), any());
         tsvHeaderCreator.write(mockEmitter, mockContent);
     }
 
@@ -139,13 +137,6 @@ public class TSVHeaderCreatorTest {
     @Test(expected = IllegalArgumentException.class)
     public void exceptionThrownIfContentIsNull() {
         tsvHeaderCreator.write(mockEmitter, null);
-    }
-
-    @Test(expected = HeaderCreationException.class)
-    public void exceptionReceivedIfEmitterThrowsException() throws Exception{
-        doThrow(new HeaderCreationException()).when(mockEmitter).send(FULL_HEADER_STRING, MediaType.TEXT_PLAIN);
-
-        tsvHeaderCreator.write(mockEmitter, mockContent);
     }
 
     private static void initialiseFieldColumns() {
