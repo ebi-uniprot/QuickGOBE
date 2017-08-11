@@ -22,7 +22,7 @@ import static uk.ac.ebi.quickgo.annotation.download.TSVDownload.*;
  * Time: 10:09
  * Created with IntelliJ IDEA.
  */
-public class TsvHeaderCreator implements HeaderCreator {
+public class TSVHeaderCreator implements HeaderCreator {
 
     static final String GENE_PRODUCT_ID = "GENE PRODUCT ID";
     static final String SYMBOL = "SYMBOL";
@@ -44,7 +44,7 @@ public class TsvHeaderCreator implements HeaderCreator {
     static final String GENE_PRODUCT_SYNONYMS = "GENE_PRODUCT_SYNONYMS";
     static final String GENE_PRODUCT_TYPE = "GENE_PRODUCT_TYPE";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TsvHeaderCreator.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TSVHeaderCreator.class);
     private static final String OUTPUT_DELIMITER = "\t";
     private static final Map<String, BiConsumer<HeaderContent, StringJoiner>> selected2Content;
 

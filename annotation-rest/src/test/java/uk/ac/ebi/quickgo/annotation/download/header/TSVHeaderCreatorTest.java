@@ -17,7 +17,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.ac.ebi.quickgo.annotation.download.TSVDownload.*;
-import static uk.ac.ebi.quickgo.annotation.download.header.TsvHeaderCreator.*;
+import static uk.ac.ebi.quickgo.annotation.download.header.TSVHeaderCreator.*;
 
 /**
  * @author Tony Wardell
@@ -25,7 +25,7 @@ import static uk.ac.ebi.quickgo.annotation.download.header.TsvHeaderCreator.*;
  * Time: 12:10
  * Created with IntelliJ IDEA.
  */
-public class TsvHeaderCreatorTest {
+public class TSVHeaderCreatorTest {
 
     private static final String REQUEST_URI =
             "/QuickGO/services/annotation/downloadSearch?downloadLimit=7&geneProductId" +
@@ -50,7 +50,7 @@ public class TsvHeaderCreatorTest {
 
     @Test
     public void writeColumnNameForIndividualField() throws Exception {
-        TsvHeaderCreator tsvHeaderCreator = new TsvHeaderCreator();
+        TSVHeaderCreator tsvHeaderCreator = new TSVHeaderCreator();
         for (String[] field2Column : fields2Columns) {
             HeaderContent content = mock(HeaderContent.class);
             when(content.isSlimmed()).thenReturn(false);
@@ -69,13 +69,13 @@ public class TsvHeaderCreatorTest {
         when(mockContent.getSelectedFields())
                 .thenReturn(asList(GENE_PRODUCT_ID_FIELD_NAME, GO_NAME_FIELD_NAME, TAXON_NAME_FIELD_NAME));
 
-        TsvHeaderCreator tsvHeaderCreator = new TsvHeaderCreator();
+        TSVHeaderCreator tsvHeaderCreator = new TSVHeaderCreator();
 
         tsvHeaderCreator.write(mockEmitter, mockContent);
 
-        verify(mockEmitter).send(TsvHeaderCreator.GENE_PRODUCT_ID + "\t"
-                + TsvHeaderCreator.GO_NAME + "\t"
-                + TsvHeaderCreator.TAXON_NAME + "\n", MediaType.TEXT_PLAIN);
+        verify(mockEmitter).send(TSVHeaderCreator.GENE_PRODUCT_ID + "\t"
+                + TSVHeaderCreator.GO_NAME + "\t"
+                + TSVHeaderCreator.TAXON_NAME + "\n", MediaType.TEXT_PLAIN);
     }
 
     @Test
@@ -83,13 +83,13 @@ public class TsvHeaderCreatorTest {
         when(mockContent.isSlimmed()).thenReturn(false);
         when(mockContent.getSelectedFields()).thenReturn(asList(TAXON_NAME_FIELD_NAME, GO_NAME_FIELD_NAME,
                 GENE_PRODUCT_ID_FIELD_NAME));
-        TsvHeaderCreator tsvHeaderCreator = new TsvHeaderCreator();
+        TSVHeaderCreator tsvHeaderCreator = new TSVHeaderCreator();
 
         tsvHeaderCreator.write(mockEmitter, mockContent);
 
-        verify(mockEmitter).send(TsvHeaderCreator.TAXON_NAME + "\t"
-                + TsvHeaderCreator.GO_NAME + "\t"
-                + TsvHeaderCreator.GENE_PRODUCT_ID + "\n", MediaType.TEXT_PLAIN);
+        verify(mockEmitter).send(TSVHeaderCreator.TAXON_NAME + "\t"
+                + TSVHeaderCreator.GO_NAME + "\t"
+                + TSVHeaderCreator.GENE_PRODUCT_ID + "\n", MediaType.TEXT_PLAIN);
     }
 
     @Test(expected = HeaderCreationException.class)
@@ -97,7 +97,7 @@ public class TsvHeaderCreatorTest {
         doThrow(HeaderCreationException.class).when(mockEmitter).send(anyObject(), any());
         when(mockContent.getSelectedFields()).thenReturn(singletonList(TAXON_NAME_FIELD_NAME));
 
-        TsvHeaderCreator tsvHeaderCreator = new TsvHeaderCreator();
+        TSVHeaderCreator tsvHeaderCreator = new TSVHeaderCreator();
         tsvHeaderCreator.write(mockEmitter, mockContent);
     }
 
@@ -106,7 +106,7 @@ public class TsvHeaderCreatorTest {
         when(mockContent.isSlimmed()).thenReturn(false);
         when(mockContent.getSelectedFields()).thenReturn(Collections.emptyList());
 
-        TsvHeaderCreator tsvHeaderCreator = new TsvHeaderCreator();
+        TSVHeaderCreator tsvHeaderCreator = new TSVHeaderCreator();
 
         tsvHeaderCreator.write(mockEmitter, mockContent);
 
@@ -138,7 +138,7 @@ public class TsvHeaderCreatorTest {
                 GO_TERM_FIELD_NAME,
                 TAXON_NAME_FIELD_NAME));
 
-        TsvHeaderCreator tsvHeaderCreator = new TsvHeaderCreator();
+        TSVHeaderCreator tsvHeaderCreator = new TSVHeaderCreator();
 
         tsvHeaderCreator.write(mockEmitter, mockContent);
 
@@ -150,13 +150,13 @@ public class TsvHeaderCreatorTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void exceptionThrownIfEmitterIsNull() {
-        TsvHeaderCreator tsvHeaderCreator = new TsvHeaderCreator();
+        TSVHeaderCreator tsvHeaderCreator = new TSVHeaderCreator();
         tsvHeaderCreator.write(null, mockContent);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void exceptionThrownIfContentIsNull() {
-        TsvHeaderCreator tsvHeaderCreator = new TsvHeaderCreator();
+        TSVHeaderCreator tsvHeaderCreator = new TSVHeaderCreator();
         tsvHeaderCreator.write(mockEmitter, null);
     }
 
