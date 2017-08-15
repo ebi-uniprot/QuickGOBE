@@ -19,17 +19,15 @@ import static uk.ac.ebi.quickgo.common.converter.FlatFieldLeaf.newFlatFieldLeaf;
  * Created 14/12/15
  * @author Edd
  */
-public class GOTermToODocConverter implements Function<Optional<GOTerm>, Optional<OntologyDocument>> {
+public class GOTermToODocConverter implements Function<GOTerm, OntologyDocument> {
 
     private final static GenericTermToODocConverter GENERIC_TERM_TO_DOC_CONVERTER = new GenericTermToODocConverter();
 
-    @Override public Optional<OntologyDocument> apply(Optional<GOTerm> termOptional) {
-        Optional<OntologyDocument> ontologyDocument = GENERIC_TERM_TO_DOC_CONVERTER.apply(termOptional);
+    @Override public OntologyDocument apply(GOTerm termOptional) {
+        OntologyDocument ontologyDocument = GENERIC_TERM_TO_DOC_CONVERTER.apply(termOptional);
 
-        if (termOptional.isPresent() && ontologyDocument.isPresent()) {
-
-            GOTerm term = termOptional.get();
-            OntologyDocument doc = ontologyDocument.get();
+            GOTerm term = termOptional;
+            OntologyDocument doc = ontologyDocument;
 
             doc.annotationGuidelines = extractAnnGuidelines(term);
             doc.aspect = term.getAspect() == null ?
@@ -41,10 +39,7 @@ public class GOTermToODocConverter implements Function<Optional<GOTerm>, Optiona
             doc.goDiscussions = extractGoDiscussions(term);
             doc.proteinComplexes = extractProteinComplexes(term);
 
-            return Optional.of(doc);
-        } else {
-            return Optional.empty();
-        }
+            return doc;
     }
 
     private List<String> extractChildren(GOTerm goTerm) {

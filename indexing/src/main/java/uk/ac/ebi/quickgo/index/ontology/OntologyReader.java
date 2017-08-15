@@ -64,26 +64,26 @@ public class OntologyReader extends AbstractItemStreamItemReader<OntologyDocumen
      */
     @Override public OntologyDocument read() throws Exception {
         if (goTermIterator.hasNext()) {
-            Optional<OntologyDocument> optionalDoc =
-                    GO_TERM_TO_DOC_CONVERTER.apply(Optional.of((GOTerm) goTermIterator.next()));
-            return extractOntologyDocument(optionalDoc);
+            OntologyDocument optionalDoc =
+                    GO_TERM_TO_DOC_CONVERTER.apply((GOTerm) goTermIterator.next());
+            return optionalDoc;
         } else if (ecoTermIterator.hasNext()) {
-            Optional<OntologyDocument> optionalDoc =
-                    GENERIC_TERM_TO_DOC_CONVERTER.apply(Optional.of(ecoTermIterator.next()));
-            return extractOntologyDocument(optionalDoc);
+            OntologyDocument optionalDoc =
+                    GENERIC_TERM_TO_DOC_CONVERTER.apply(ecoTermIterator.next());
+            return optionalDoc;
         } else {
             return null;
         }
     }
 
-    protected OntologyDocument extractOntologyDocument(Optional<OntologyDocument> optionalDoc)
-            throws DocumentReaderException {
-        if (optionalDoc.isPresent()) {
-            return optionalDoc.get();
-        } else {
-            throw new DocumentReaderException("The converted Optional<OntologyDocument> should never be empty");
-        }
-    }
+//    protected OntologyDocument extractOntologyDocument(Optional<OntologyDocument> optionalDoc)
+//            throws DocumentReaderException {
+//        if (optionalDoc.isPresent()) {
+//            return optionalDoc.get();
+//        } else {
+//            throw new DocumentReaderException("The converted Optional<OntologyDocument> should never be empty");
+//        }
+//    }
 
     @Override public void close() {
         // no op

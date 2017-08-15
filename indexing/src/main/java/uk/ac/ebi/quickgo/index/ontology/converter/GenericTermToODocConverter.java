@@ -24,13 +24,13 @@ import static org.apache.commons.collections.CollectionUtils.isEmpty;
  * Created 14/12/15
  * @author Edd
  */
-public class GenericTermToODocConverter implements Function<Optional<? extends GenericTerm>,
-        Optional<OntologyDocument>> {
+public class GenericTermToODocConverter implements Function<GenericTerm,
+        OntologyDocument> {
 
-    @Override public Optional<OntologyDocument> apply(Optional<? extends GenericTerm> termOptional) {
-        if (termOptional.isPresent()) {
+    @Override public OntologyDocument apply(GenericTerm termOptional) {
+
             OntologyDocument doc = new OntologyDocument();
-            GenericTerm term = termOptional.get();
+            GenericTerm term = termOptional;
             doc.id = term.getId();
             doc.isObsolete = term.isObsolete();
             doc.comment = term.getComment();
@@ -50,10 +50,7 @@ public class GenericTermToODocConverter implements Function<Optional<? extends G
             doc.replacements = extractReplacements(term);
             doc.credits = extractCredits(term);
 
-            return Optional.of(doc);
-        } else {
-            return Optional.empty();
-        }
+            return doc;
     }
 
     private List<String> extractCredits(GenericTerm term) {
