@@ -2,7 +2,6 @@ package uk.ac.ebi.quickgo.annotation.download.header;
 
 import uk.ac.ebi.quickgo.annotation.download.TSVDownload;
 
-import com.google.common.base.Preconditions;
 import java.io.IOException;
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -22,7 +21,8 @@ import static uk.ac.ebi.quickgo.annotation.download.TSVDownload.*;
  * Time: 10:09
  * Created with IntelliJ IDEA.
  */
-public class TSVHeaderCreator implements HeaderCreator {
+public class TSVHeaderCreator extends AbstractHeaderCreator {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TSVHeaderCreator.class);
 
     static final String GENE_PRODUCT_ID = "GENE PRODUCT ID";
     static final String SYMBOL = "SYMBOL";
@@ -44,33 +44,12 @@ public class TSVHeaderCreator implements HeaderCreator {
     static final String GENE_PRODUCT_SYNONYMS = "GENE_PRODUCT_SYNONYMS";
     static final String GENE_PRODUCT_TYPE = "GENE_PRODUCT_TYPE";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TSVHeaderCreator.class);
     private static final String OUTPUT_DELIMITER = "\t";
     private static final Map<String, BiConsumer<HeaderContent, StringJoiner>> selected2Content;
 
     static {
         selected2Content = new HashMap<>();
         initialiseContentMappings();
-    }
-
-    /**
-     * Write the contents of the header to the ResponseBodyEmitter instance.
-     * @param emitter streams the header content to the client
-     * @param content holds values used to control or populate the header output.;
-     */
-
-    @Override public void write(ResponseBodyEmitter emitter, HeaderContent content) {
-        Preconditions.checkArgument(Objects.nonNull(emitter), "The GTypeHeaderCreator emitter must not be null");
-        Preconditions.checkArgument(Objects.nonNull(content), "The GTypeHeaderCreator content instance must not be " +
-                "null");
-        try {
-            emitter.send(output(content) + "\n", MediaType.TEXT_PLAIN);
-        } catch (IOException e) {
-            String errorMessage = "Failed to send TSV download header";
-            IllegalStateException headerCreationException = new IllegalStateException(errorMessage, e);
-            LOGGER.error(errorMessage, headerCreationException);
-            throw headerCreationException;
-        }
     }
 
     private static void initialiseContentMappings() {
@@ -99,15 +78,20 @@ public class TSVHeaderCreator implements HeaderCreator {
         selected2Content.put(GENE_PRODUCT_TYPE_FIELD_NAME, (hc, j) -> j.add(GENE_PRODUCT_TYPE));
     }
 
-    private String output(HeaderContent headerContent) {
+    /**
+     * Send the contents of the header to the ResponseBodyEmitter instance.
+     * @param emitter streams the header content to the client
+     * @param content holds values used to control or populate the header output.;
+     */
+    @Override
+    protected void output(ResponseBodyEmitter emitter, HeaderContent content) throws IOException {
         StringJoiner tsvJoiner = new StringJoiner(OUTPUT_DELIMITER);
-        List<String> selectedFields = TSVDownload.whichColumnsWillWeShow(headerContent.getSelectedFields());
-        LOGGER.debug("Requested which fields will we show from " + headerContent.getSelectedFields() + " and will show "
-                + selectedFields);
+        List<String> selectedFields = TSVDownload.whichColumnsWillWeShow(content.getSelectedFields());
+        LOGGER.debug("Requested which fields will we show from " + content.getSelectedFields() + " and will show "
+                             + selectedFields);
         for (String selectedField : selectedFields) {
-            selected2Content.get(selectedField).accept(headerContent, tsvJoiner);
+            selected2Content.get(selectedField).accept(content, tsvJoiner);
         }
-        return tsvJoiner.toString();
+        emitter.send(tsvJoiner.toString() + "\n", MediaType.TEXT_PLAIN);
     }
-
 }
