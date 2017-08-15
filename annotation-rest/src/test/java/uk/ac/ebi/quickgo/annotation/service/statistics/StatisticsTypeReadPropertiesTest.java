@@ -1,0 +1,75 @@
+package uk.ac.ebi.quickgo.annotation.service.statistics;
+
+import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
+
+import java.util.List;
+import java.util.Optional;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Profile;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+
+/**
+ * Created 14/08/17
+ * @author Edd
+ */
+@ActiveProfiles("stats-type-limit-properties-test")
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringApplicationConfiguration(classes = StatisticsTypeReadPropertiesTest.FakeApplication.class)
+public class StatisticsTypeReadPropertiesTest {
+    private static final String GO_ID = "goId";
+    private static final String TAXON_ID = "taxonId";
+
+    @Autowired
+    private StatisticsTypeConfigurer typeConfigurer;
+    private List<AnnotationRequest.StatsRequest> requests;
+
+    @Before
+    public void setUp() {
+        requests = new AnnotationRequest().createStatsRequests();
+    }
+
+    @Test
+    public void gp() {
+        System.out.println("yes");
+    }
+
+    @Test
+    public void checkLimitsReadAndSetForCorrectTypes() {
+        typeConfigurer.configureStatsRequests(requests);
+
+        for (AnnotationRequest.StatsRequest request : requests) {
+            for (AnnotationRequest.StatsRequestType type : request.getTypes()) {
+                switch (type.getName()) {
+                    case GO_ID:
+                        // value read from yml
+                        assertThat(type.getLimit(), is(Optional.of(10)));
+                        break;
+                    case TAXON_ID:
+                        // value read from yml
+                        assertThat(type.getLimit(), is(Optional.of(11)));
+                        break;
+                    default:
+                        assertThat(type.getLimit(), is(Optional.empty()));
+                        break;
+                }
+            }
+        }
+    }
+
+    @Profile("stats-type-limit-properties-test")
+    @Configuration
+    @EnableAutoConfiguration
+    @Import(StatisticsServiceConfig.class)
+    public static class FakeApplication {}
+}

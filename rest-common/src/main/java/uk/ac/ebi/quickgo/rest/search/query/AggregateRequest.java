@@ -5,7 +5,11 @@ import uk.ac.ebi.quickgo.rest.search.AggregateFunction;
 import com.google.common.base.Preconditions;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
+
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 
 /**
  * Data-source representing which supported aggregation aggregateFunctionRequests {@link AggregateFunction} should be
@@ -53,17 +57,31 @@ public class AggregateRequest {
     private final String name;
     private final Set<AggregateFunctionRequest> aggregateFunctionRequests;
     private final Set<AggregateRequest> nestedAggregateRequests;
+    private int limit = 0;
 
     public AggregateRequest(String name) {
         Preconditions.checkArgument(name != null, "Cannot create aggregate with null name");
         this.name = name;
-
         this.aggregateFunctionRequests = new HashSet<>();
         this.nestedAggregateRequests = new HashSet<>();
     }
 
     public String getName() {
         return name;
+    }
+
+    public void setLimit(int limit) {
+        // TODO: 14/08/17 test
+        Preconditions.checkArgument(limit > 0, "Cannot create aggregate with a limit <= 0");
+        this.limit = limit;
+    }
+
+    public Optional<Integer> getLimit() {
+        if (limit > 0) {
+            return of(limit);
+        } else {
+            return empty();
+        }
     }
 
     public Set<AggregateFunctionRequest> getAggregateFunctionRequests() {
@@ -83,6 +101,15 @@ public class AggregateRequest {
         nestedAggregateRequests.add(aggregate);
     }
 
+    @Override public String toString() {
+        return "AggregateRequest{" +
+                "name='" + name + '\'' +
+                ", aggregateFunctionRequests=" + aggregateFunctionRequests +
+                ", nestedAggregateRequests=" + nestedAggregateRequests +
+                ", limit=" + limit +
+                '}';
+    }
+
     @Override public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -91,30 +118,27 @@ public class AggregateRequest {
             return false;
         }
 
-        AggregateRequest aggregate = (AggregateRequest) o;
+        AggregateRequest that = (AggregateRequest) o;
 
-        if (!name.equals(aggregate.name)) {
+        if (limit != that.limit) {
             return false;
         }
-        if (!aggregateFunctionRequests.equals(aggregate.aggregateFunctionRequests)) {
+        if (name != null ? !name.equals(that.name) : that.name != null) {
             return false;
         }
-        return nestedAggregateRequests.equals(aggregate.nestedAggregateRequests);
-
+        if (aggregateFunctionRequests != null ? !aggregateFunctionRequests.equals(that.aggregateFunctionRequests) :
+                that.aggregateFunctionRequests != null) {
+            return false;
+        }
+        return nestedAggregateRequests != null ? nestedAggregateRequests.equals(that.nestedAggregateRequests) :
+                that.nestedAggregateRequests == null;
     }
 
     @Override public int hashCode() {
-        int result = name.hashCode();
-        result = 31 * result + aggregateFunctionRequests.hashCode();
-        result = 31 * result + nestedAggregateRequests.hashCode();
+        int result = name != null ? name.hashCode() : 0;
+        result = 31 * result + (aggregateFunctionRequests != null ? aggregateFunctionRequests.hashCode() : 0);
+        result = 31 * result + (nestedAggregateRequests != null ? nestedAggregateRequests.hashCode() : 0);
+        result = 31 * result + limit;
         return result;
-    }
-
-    @Override public String toString() {
-        return "AggregateRequest{" +
-                "name='" + name + '\'' +
-                ", aggregateFunctionRequests=" + aggregateFunctionRequests +
-                ", nestedAggregateRequests=" + nestedAggregateRequests +
-                '}';
     }
 }

@@ -20,6 +20,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
+import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.StatsRequestType.statsRequestType;
 import static uk.ac.ebi.quickgo.annotation.service.statistics.StatsRequestConverterImpl.DEFAULT_GLOBAL_AGGREGATE_NAME;
 
 /**
@@ -85,7 +86,8 @@ public class StatsRequestConverterImplTest {
         String type2 = "type2";
 
         useStatsRequest(
-                new AnnotationRequest.StatsRequest(group, groupField, COUNT_FUNCTION, asList(type1, type2)));
+                new AnnotationRequest.StatsRequest(group, groupField, COUNT_FUNCTION, asList(
+                        statsRequestType(type1), statsRequestType(type2))));
 
         AggregateRequest aggregate = convertStats();
 
@@ -117,9 +119,11 @@ public class StatsRequestConverterImplTest {
         String type3 = "type3";
 
         useStatsRequest(
-                new AnnotationRequest.StatsRequest(group1, groupField1, UNIQUE_FUNCTION, asList(type1, type2, type3)));
+                new AnnotationRequest.StatsRequest(group1, groupField1, UNIQUE_FUNCTION,
+                        asList(statsRequestType(type1), statsRequestType(type2), statsRequestType(type3))));
         useStatsRequest(
-                new AnnotationRequest.StatsRequest(group2, groupField2, UNIQUE_FUNCTION, asList(type1, type3)));
+                new AnnotationRequest.StatsRequest(group2, groupField2, UNIQUE_FUNCTION,
+                        asList(statsRequestType(type1), statsRequestType(type3))));
 
         AggregateRequest aggregate = convertStats();
 

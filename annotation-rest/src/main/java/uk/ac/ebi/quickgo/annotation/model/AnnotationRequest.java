@@ -12,6 +12,7 @@ import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformationReq
 
 import io.swagger.annotations.ApiModelProperty;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -19,6 +20,9 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static java.util.Arrays.asList;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static uk.ac.ebi.quickgo.annotation.common.AnnotationFields.Facetable;
 import static uk.ac.ebi.quickgo.annotation.common.AnnotationFields.Searchable;
 import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.*;
@@ -112,11 +116,11 @@ public class AnnotationRequest {
                         Facetable.ASSIGNED_BY, Facetable.GO_ASPECT);
 
         StatsRequest annotationStats = new StatsRequest("annotation", Facetable.ID, AggregateFunction
-                .COUNT.getName(), statsTypes);
+                .COUNT.getName(), initStatsRequestTypes(statsTypes));
         StatsRequest geneProductStats = new StatsRequest("geneProduct", Facetable.GENE_PRODUCT_ID,
-                AggregateFunction.UNIQUE.getName(), statsTypes);
+                AggregateFunction.UNIQUE.getName(), initStatsRequestTypes(statsTypes));
 
-        DEFAULT_STATS_REQUESTS = Collections.unmodifiableList(Arrays.asList(annotationStats, geneProductStats));
+        DEFAULT_STATS_REQUESTS = Collections.unmodifiableList(asList(annotationStats, geneProductStats));
     }
 
     @ApiModelProperty(
@@ -622,55 +626,6 @@ public class AnnotationRequest {
         return filterRequests;
     }
 
-    private Optional<FilterRequest> createSimpleFilter(String key) {
-        Optional<FilterRequest> request;
-        if (filterMap.containsKey(key)) {
-            FilterRequest.Builder requestBuilder = FilterRequest.newBuilder();
-            requestBuilder.addProperty(key, filterMap.get(key));
-            request = Optional.of(requestBuilder.build());
-        } else {
-            request = Optional.empty();
-        }
-
-        return request;
-    }
-
-    private Optional<FilterRequest> createTaxonFilter() {
-        Optional<String> field = Optional.empty();
-        if (filterMap.containsKey(TAXON_USAGE_ID)) {
-            switch (getTaxonUsage()) {
-                case DESCENDANTS_USAGE:
-                    field = Optional.of(Searchable.TAXON_ANCESTORS);
-                    break;
-                case EXACT_USAGE:
-                default:
-                    field = Optional.of(Searchable.TAXON_ID);
-                    break;
-            }
-        } else {
-            if (filterMap.containsKey(TAXON_USAGE_FIELD)) {
-                throwUsageWithoutIdException(TAXON_ID_PARAM, TAXON_USAGE_FIELD);
-            }
-        }
-        return field.map(f -> FilterRequest
-                .newBuilder()
-                .addProperty(f, filterMap.get(TAXON_USAGE_ID))
-                .build());
-    }
-
-    private void throwUsageWithoutIdException(String idParam, String usageParam) {
-        throw new ParameterException("Annotation " + usageParam + " requires '" + idParam + "' to be set.");
-    }
-
-    private Optional<FilterRequest> createGoUsageFilter() {
-        return createUsageFilter(GO_USAGE_FIELD, getGoUsage(), GO_USAGE_ID, Searchable.GO_ID, GO_USAGE_RELATIONSHIPS);
-    }
-
-    private Optional<FilterRequest> createEvidenceCodeUsageFilter() {
-        return createUsageFilter(EVIDENCE_CODE_USAGE_FIELD, getEvidenceCodeUsage(), EVIDENCE_CODE_USAGE_ID,
-                Searchable.EVIDENCE_CODE, EVIDENCE_CODE_USAGE_RELATIONSHIPS);
-    }
-
     /**
      * Create a {@link ResultTransformationRequest}s instance, indicating how the results
      * should be transformed to fulfil the initial client request. For example, this instance
@@ -683,53 +638,14 @@ public class AnnotationRequest {
         ResultTransformationRequests transformationRequests = new ResultTransformationRequests();
         if (includeFields != null && includeFields.length > 0) {
             Stream.of(includeFields)
-                  .map(ResultTransformationRequest::new)
-                  .forEach(transformationRequests::addTransformationRequest);
+                    .map(ResultTransformationRequest::new)
+                    .forEach(transformationRequests::addTransformationRequest);
         }
         return transformationRequests;
     }
 
-    private Optional<FilterRequest> createUsageFilter(String usageParam, String usageValue, String idParam, String
-            idField,
-            String relationshipsParam) {
-        Optional<FilterRequest> request;
-        FilterRequest.Builder filterBuilder = FilterRequest.newBuilder();
-
-        if (filterMap.containsKey(idField)) {
-            // term id provided
-            switch (usageValue) {
-                case SLIM_USAGE:
-                case DESCENDANTS_USAGE:
-                    request = Optional.of(filterBuilder.addProperty(usageValue)
-                            .addProperty(idParam, filterMap.get(idField))
-                            .addProperty(relationshipsParam, filterMap.get(relationshipsParam))
-                            .build());
-                    break;
-                case EXACT_USAGE:
-                default:
-                    request = Optional.of(filterBuilder.addProperty(idField, filterMap.get(idField))
-                            .build());
-                    break;
-            }
-        } else {
-            // no term id
-            if (filterMap.containsKey(usageParam)) {
-                throw new ParameterException("Annotation " + usageParam + " requires '" + idParam + "' to be set.");
-            }
-            request = Optional.empty();
-        }
-
-        return request;
-    }
-
     public List<StatsRequest> createStatsRequests() {
         return DEFAULT_STATS_REQUESTS;
-    }
-
-    private String[] createLowercasedStringArray(String... args) {
-        return Stream.of(args)
-                .map(String::toLowerCase)
-                .toArray(String[]::new);
     }
 
     @Override public String toString() {
@@ -761,6 +677,98 @@ public class AnnotationRequest {
                 '}';
     }
 
+    private Optional<FilterRequest> createSimpleFilter(String key) {
+        Optional<FilterRequest> request;
+        if (filterMap.containsKey(key)) {
+            FilterRequest.Builder requestBuilder = FilterRequest.newBuilder();
+            requestBuilder.addProperty(key, filterMap.get(key));
+            request = of(requestBuilder.build());
+        } else {
+            request = Optional.empty();
+        }
+
+        return request;
+    }
+
+    private Optional<FilterRequest> createTaxonFilter() {
+        Optional<String> field = Optional.empty();
+        if (filterMap.containsKey(TAXON_USAGE_ID)) {
+            switch (getTaxonUsage()) {
+                case DESCENDANTS_USAGE:
+                    field = of(Searchable.TAXON_ANCESTORS);
+                    break;
+                case EXACT_USAGE:
+                default:
+                    field = of(Searchable.TAXON_ID);
+                    break;
+            }
+        } else {
+            if (filterMap.containsKey(TAXON_USAGE_FIELD)) {
+                throwUsageWithoutIdException(TAXON_ID_PARAM, TAXON_USAGE_FIELD);
+            }
+        }
+        return field.map(f -> FilterRequest
+                .newBuilder()
+                .addProperty(f, filterMap.get(TAXON_USAGE_ID))
+                .build());
+    }
+
+    private void throwUsageWithoutIdException(String idParam, String usageParam) {
+        throw new ParameterException("Annotation " + usageParam + " requires '" + idParam + "' to be set.");
+    }
+
+    private Optional<FilterRequest> createGoUsageFilter() {
+        return createUsageFilter(GO_USAGE_FIELD, getGoUsage(), GO_USAGE_ID, Searchable.GO_ID, GO_USAGE_RELATIONSHIPS);
+    }
+
+    private Optional<FilterRequest> createEvidenceCodeUsageFilter() {
+        return createUsageFilter(EVIDENCE_CODE_USAGE_FIELD, getEvidenceCodeUsage(), EVIDENCE_CODE_USAGE_ID,
+                Searchable.EVIDENCE_CODE, EVIDENCE_CODE_USAGE_RELATIONSHIPS);
+    }
+
+    private Optional<FilterRequest> createUsageFilter(String usageParam, String usageValue, String idParam, String
+            idField,
+            String relationshipsParam) {
+        Optional<FilterRequest> request;
+        FilterRequest.Builder filterBuilder = FilterRequest.newBuilder();
+
+        if (filterMap.containsKey(idField)) {
+            // term id provided
+            switch (usageValue) {
+                case SLIM_USAGE:
+                case DESCENDANTS_USAGE:
+                    request = of(filterBuilder.addProperty(usageValue)
+                            .addProperty(idParam, filterMap.get(idField))
+                            .addProperty(relationshipsParam, filterMap.get(relationshipsParam))
+                            .build());
+                    break;
+                case EXACT_USAGE:
+                default:
+                    request = of(filterBuilder.addProperty(idField, filterMap.get(idField))
+                            .build());
+                    break;
+            }
+        } else {
+            // no term id
+            if (filterMap.containsKey(usageParam)) {
+                throw new ParameterException("Annotation " + usageParam + " requires '" + idParam + "' to be set.");
+            }
+            request = Optional.empty();
+        }
+
+        return request;
+    }
+    private String[] createLowercasedStringArray(String... args) {
+        return Stream.of(args)
+                .map(String::toLowerCase)
+                .toArray(String[]::new);
+    }
+
+    private static List<StatsRequestType> initStatsRequestTypes(List<String> statsTypes) {
+        return statsTypes.stream().map(StatsRequestType::new).collect
+                (Collectors.toList());
+    }
+
     /**
      * Defines which statistics the client would like to to retrieve.
      */
@@ -768,9 +776,9 @@ public class AnnotationRequest {
         private final String groupName;
         private final String groupField;
         private final String aggregateFunction;
-        private final List<String> types;
+        private final List<StatsRequestType> types;
 
-        public StatsRequest(String groupName, String groupField, String aggregateFunction, List<String> types) {
+        public StatsRequest(String groupName, String groupField, String aggregateFunction, List<StatsRequestType> types) {
             checkArgument(groupName != null && !groupName.trim().isEmpty(),
                     "Statistics group name cannot be null or empty");
             checkArgument(groupField != null && !groupName.trim().isEmpty(),
@@ -801,8 +809,49 @@ public class AnnotationRequest {
             return aggregateFunction;
         }
 
-        public Collection<String> getTypes() {
+        public Collection<StatsRequestType> getTypes() {
             return Collections.unmodifiableList(types);
+        }
+    }
+
+    public static class StatsRequestType {
+        private final String name;
+        private int limit = 0;
+
+        StatsRequestType(String name) {
+            // TODO: 14/08/17 test
+            checkArgument(name != null && !name.trim().isEmpty(),
+                    "Statistics type name cannot be null or empty");
+            this.name = name;
+        }
+
+        public static StatsRequestType statsRequestType(String name) {
+            return new StatsRequestType(name);
+        }
+
+        public static StatsRequestType statsRequestType(String name, int limit) {
+            StatsRequestType statsRequestType = new StatsRequestType(name);
+            statsRequestType.setLimit(limit);
+            return statsRequestType;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public Optional<Integer> getLimit() {
+            if (limit > 0) {
+                return of(limit);
+            } else {
+                return empty();
+            }
+        }
+
+        public void setLimit(int limit) {
+            // TODO: 14/08/17 test
+            checkArgument(limit > 0,
+                    "Statistics type name limit must be greater than 0");
+            this.limit = limit;
         }
     }
 }

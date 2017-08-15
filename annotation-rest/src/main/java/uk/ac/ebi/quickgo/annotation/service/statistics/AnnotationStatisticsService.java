@@ -1,10 +1,5 @@
 package uk.ac.ebi.quickgo.annotation.service.statistics;
 
-import com.google.common.base.Preconditions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import uk.ac.ebi.quickgo.annotation.model.*;
 import uk.ac.ebi.quickgo.rest.search.AggregateFunction;
 import uk.ac.ebi.quickgo.rest.search.DefaultSearchQueryTemplate;
@@ -25,6 +20,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * Service that collects distribution statistics of annotations and gene products throughout a given set of annotation
@@ -46,27 +47,33 @@ public class AnnotationStatisticsService implements StatisticsService {
     private final StatsRequestConverter converter;
 
     private final DefaultSearchQueryTemplate queryTemplate;
+    private final StatisticsTypeConfigurer statsConfigurer;
 
     @Autowired
     public AnnotationStatisticsService(FilterConverterFactory converterFactory,
             SearchService<Annotation> searchService,
-            StatsRequestConverter converter) {
-        Preconditions.checkArgument(converterFactory != null, "Filter factory cannot be null");
-        Preconditions.checkArgument(searchService != null, "Search service cannot be null");
-        Preconditions.checkArgument(converter != null, "Stats request converter cannot be null");
+            StatsRequestConverter converter,
+            StatisticsTypeConfigurer statsTypeConfigurer) {
+        checkArgument(converterFactory != null, "Filter factory cannot be null");
+        checkArgument(searchService != null, "Search service cannot be null");
+        checkArgument(converter != null, "Stats request converter cannot be null");
+        // TODO: 14/08/17 test
+        checkArgument(statsTypeConfigurer != null, "Stats request configurer cannot be null");
 
         this.converterFactory = converterFactory;
         this.searchService = searchService;
         this.converter = converter;
+        this.statsConfigurer = statsTypeConfigurer;
 
         queryTemplate = new DefaultSearchQueryTemplate();
     }
 
     @Override public QueryResult<StatisticsGroup> calculate(AnnotationRequest request) {
-        Preconditions.checkArgument(request != null, "Annotation request cannot be null");
+        checkArgument(request != null, "Annotation request cannot be null");
 
         List<AnnotationRequest.StatsRequest> statsRequest = request.createStatsRequests();
-        Preconditions.checkArgument(statsRequest != null, "Statistics request cannot be null");
+        checkArgument(statsRequest != null, "Statistics request cannot be null");
+        statsConfigurer.configureStatsRequests(statsRequest);
 
         QueryRequest queryRequest = buildQueryRequest(request);
 

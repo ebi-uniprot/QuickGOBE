@@ -4,6 +4,7 @@ import uk.ac.ebi.quickgo.annotation.coterms.CoTermConfig;
 import uk.ac.ebi.quickgo.annotation.download.DownloadConfig;
 import uk.ac.ebi.quickgo.annotation.metadata.MetaDataConfig;
 import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
+import uk.ac.ebi.quickgo.annotation.service.statistics.StatisticsServiceConfig;
 import uk.ac.ebi.quickgo.annotation.validation.loader.ValidationConfig;
 import uk.ac.ebi.quickgo.rest.controller.SwaggerConfig;
 
@@ -28,8 +29,8 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 @ComponentScan({"uk.ac.ebi.quickgo.annotation.controller",
         "uk.ac.ebi.quickgo.rest",
         "uk.ac.ebi.quickgo.annotation.service.statistics"})
-@Import({SearchServiceConfig.class, ValidationConfig.class, SwaggerConfig.class, DownloadConfig.class, MetaDataConfig
-        .class, CoTermConfig.class, })
+@Import({SearchServiceConfig.class, ValidationConfig.class, SwaggerConfig.class, DownloadConfig.class,
+        MetaDataConfig.class, CoTermConfig.class, StatisticsServiceConfig.class})
 public class AnnotationREST {
 
     /**

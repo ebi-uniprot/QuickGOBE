@@ -21,7 +21,7 @@ public class StatsRequestConverterImpl implements StatsRequestConverter {
     static final String DEFAULT_GLOBAL_AGGREGATE_NAME = "global";
 
     @Override public AggregateRequest convert(Collection<AnnotationRequest.StatsRequest> statsRequests) {
-        Preconditions.checkArgument(statsRequests != null && statsRequests.size() > 0,
+        Preconditions.checkArgument(statsRequests != null && !statsRequests.isEmpty(),
                 "Stats request collection cannot be null or empty");
 
         Map<String, AggregateRequest> nestedAggregateMap = new HashMap<>();
@@ -30,11 +30,13 @@ public class StatsRequestConverterImpl implements StatsRequestConverter {
         statsRequests.forEach(request -> {
             globalAggregate.addField(request.getGroupField(), AggregateFunction.typeOf(request.getAggregateFunction()));
             request.getTypes().forEach(type -> {
-                if (!nestedAggregateMap.containsKey(type)) {
-                    nestedAggregateMap.put(type, new AggregateRequest(type));
+                if (!nestedAggregateMap.containsKey(type.getName())) {
+                    AggregateRequest aggregateRequestForType = new AggregateRequest(type.getName());
+                    type.getLimit().ifPresent(aggregateRequestForType::setLimit);
+                    nestedAggregateMap.put(type.getName(), aggregateRequestForType);
                 }
 
-                AggregateRequest aggregateForType = nestedAggregateMap.get(type);
+                AggregateRequest aggregateForType = nestedAggregateMap.get(type.getName());
                 aggregateForType.addField(request.getGroupField(),
                         AggregateFunction.typeOf(request.getAggregateFunction()));
             });

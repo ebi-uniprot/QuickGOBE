@@ -35,10 +35,13 @@ public class AnnotationStatisticsServiceTest {
     @Mock
     private StatsRequestConverter statsRequestConverterMock;
 
+    @Mock
+    private StatisticsTypeConfigurer statsConfigurer;
+
     @Before
     public void setUp() throws Exception {
         statsService = new AnnotationStatisticsService(filterFactoryMock, searchServiceMock,
-                statsRequestConverterMock);
+                statsRequestConverterMock, statsConfigurer);
     }
 
     @Test
@@ -47,7 +50,7 @@ public class AnnotationStatisticsServiceTest {
         thrown.expectMessage("Filter factory cannot be null");
 
         statsService = new AnnotationStatisticsService(null, searchServiceMock,
-                statsRequestConverterMock);
+                statsRequestConverterMock, statsConfigurer);
     }
 
     @Test
@@ -56,7 +59,7 @@ public class AnnotationStatisticsServiceTest {
         thrown.expectMessage("Search service cannot be null");
 
         statsService = new AnnotationStatisticsService(filterFactoryMock, null,
-                statsRequestConverterMock);
+                statsRequestConverterMock, statsConfigurer);
     }
 
     @Test
@@ -65,7 +68,16 @@ public class AnnotationStatisticsServiceTest {
         thrown.expectMessage("Stats request converter cannot be null");
 
         statsService = new AnnotationStatisticsService(filterFactoryMock, searchServiceMock,
-                null);
+                null, statsConfigurer);
+    }
+
+    @Test
+    public void nullStatsRequestConfigurerThrowsExceptionInConstructor() throws Exception {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Stats request configurer cannot be null");
+
+        statsService = new AnnotationStatisticsService(filterFactoryMock, searchServiceMock,
+                statsRequestConverterMock, null);
     }
 
     @Test
