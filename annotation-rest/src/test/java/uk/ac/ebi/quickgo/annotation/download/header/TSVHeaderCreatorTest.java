@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.download.header;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -13,6 +14,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyObject;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -137,6 +139,13 @@ public class TSVHeaderCreatorTest {
     @Test(expected = IllegalArgumentException.class)
     public void exceptionThrownIfContentIsNull() {
         tsvHeaderCreator.write(mockEmitter, null);
+    }
+
+    @Test
+    public void noExceptionThrownIfEmitterThrowsIOException() throws Exception{
+        doThrow(new IOException("Test IOException")).when(mockEmitter).send(any(Object.class), eq(MediaType
+                                                                                                          .TEXT_PLAIN));
+        tsvHeaderCreator.write(mockEmitter, mockContent);
     }
 
     private static void initialiseFieldColumns() {

@@ -70,7 +70,6 @@ public class GeneTypeHeaderCreatorTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void exceptionThrownIfEmitterIsNull() {
-
         gTypeHeaderCreator.write(null, mockContent);
     }
 
