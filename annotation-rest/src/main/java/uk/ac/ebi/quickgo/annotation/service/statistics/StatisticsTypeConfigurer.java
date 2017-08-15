@@ -15,9 +15,8 @@ public class StatisticsTypeConfigurer {
     public StatisticsTypeConfigurer(Map<String, Integer> properties) {
         this.properties = properties;
     }
-
-    // TODO: 14/08/17 test
-    public void configureStatsRequests(List<AnnotationRequest.StatsRequest> requests) {
+    
+    void configureStatsRequests(List<AnnotationRequest.StatsRequest> requests) {
         Map<String, Integer> subFacetItems = properties;
 
         for (AnnotationRequest.StatsRequest request : requests) {

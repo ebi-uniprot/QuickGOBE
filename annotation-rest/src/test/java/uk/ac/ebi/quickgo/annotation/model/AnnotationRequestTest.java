@@ -8,6 +8,7 @@ import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformationReq
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -27,6 +28,7 @@ import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.EVIDENCE_CODE_US
 import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.GO_ID_PARAM;
 import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.GO_USAGE_RELATIONS_PARAM;
 import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.*;
+import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.StatsRequestType.statsRequestType;
 
 /**
  *
@@ -553,6 +555,53 @@ public class AnnotationRequestTest {
         List<String> requestIds =
                 requests.stream().map(ResultTransformationRequest::getId).collect(Collectors.toList());
         assertThat(requestIds, containsInAnyOrder(goName, taxonName));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void cannotCreateStatsRequestTypeWithEmptyName() {
+        statsRequestType("");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void cannotCreateStatsRequestTypeWithNullName() {
+        statsRequestType(null);
+    }
+
+    @Test
+    public void canCreateStatsRequestTypeWithName() {
+        String name = "name";
+        
+        StatsRequestType requestType = statsRequestType(name);
+
+        assertThat(requestType.getName(), is(name));
+    }
+
+    @Test
+    public void canCreateStatsRequestTypeWithPositiveLimit() {
+        StatsRequestType requestType = statsRequestType("name");
+        int limit = 1;
+        requestType.setLimit(limit);
+        
+        assertThat(requestType.getLimit(), is(Optional.of(limit)));
+    }
+
+    @Test
+    public void statsRequestTypeWithoutLimitReturnsEmptyOptionalAsLimit() {
+        StatsRequestType requestType = statsRequestType("name");
+
+        assertThat(requestType.getLimit(), is(Optional.empty()));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void statsRequestTypeWithLimitZeroIndicatesLimitNotSet() {
+        StatsRequestType requestType = statsRequestType("name");
+        requestType.setLimit(0);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void statsRequestTypeWithNegativeLimitIndicatesLimitNotSet() {
+        StatsRequestType requestType = statsRequestType("name");
+        requestType.setLimit(-1);
     }
 
     //----------------- helpers

@@ -18,11 +18,13 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
+import org.slf4j.Logger;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.slf4j.LoggerFactory.getLogger;
 import static uk.ac.ebi.quickgo.annotation.common.AnnotationFields.Facetable;
 import static uk.ac.ebi.quickgo.annotation.common.AnnotationFields.Searchable;
 import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.*;
@@ -83,6 +85,8 @@ public class AnnotationRequest {
     static final String DEFAULT_TAXON_USAGE = DESCENDANTS_USAGE;
     static final String DEFAULT_EVIDENCE_CODE_USAGE = DESCENDANTS_USAGE;
     static final String DEFAULT_GO_USAGE = DESCENDANTS_USAGE;
+
+    private static final Logger LOGGER = getLogger(AnnotationRequest.class);
 
     /**
      * indicates which fields should be looked at when creating filters
@@ -818,8 +822,7 @@ public class AnnotationRequest {
         private final String name;
         private int limit = 0;
 
-        StatsRequestType(String name) {
-            // TODO: 14/08/17 test
+        private StatsRequestType(String name) {
             checkArgument(name != null && !name.trim().isEmpty(),
                     "Statistics type name cannot be null or empty");
             this.name = name;
@@ -848,9 +851,8 @@ public class AnnotationRequest {
         }
 
         public void setLimit(int limit) {
-            // TODO: 14/08/17 test
             checkArgument(limit > 0,
-                    "Statistics type name limit must be greater than 0");
+                    "Statistics type limit must be greater than 0");
             this.limit = limit;
         }
     }

@@ -48,6 +48,7 @@ import static java.util.Optional.of;
  *         - nestedAggregateRequests: [
  *              - aggregate:
  *                  - name: order_item_id
+ *                  - limit: 20
  *                  - aggregateResults: [sum(quantity)]
  * </pre>
  *
@@ -71,7 +72,6 @@ public class AggregateRequest {
     }
 
     public void setLimit(int limit) {
-        // TODO: 14/08/17 test
         Preconditions.checkArgument(limit > 0, "Cannot create aggregate with a limit <= 0");
         this.limit = limit;
     }

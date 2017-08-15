@@ -2,15 +2,17 @@ package uk.ac.ebi.quickgo.rest.search.query;
 
 import uk.ac.ebi.quickgo.rest.search.AggregateFunction;
 
+import java.util.Optional;
 import java.util.Set;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.Assert.*;
+import static org.hamcrest.core.Is.is;
 
 /**
  * Tests the behaviour of the {@link AggregateRequest} class.
@@ -75,5 +77,28 @@ public class AggregateRequestTest {
         AggregateRequest[] expectedAggregates = {nestedAggregate1, nestedAggregate2};
 
         assertThat(retrievedAggregates, containsInAnyOrder(expectedAggregates));
+    }
+
+    @Test
+    public void canCreateAggregateWithPositiveLimit() {
+        int limit = 1;
+        aggregate.setLimit(limit);
+
+        assertThat(aggregate.getLimit(), is(Optional.of(limit)));
+    }
+
+    @Test
+    public void aggregateWithoutLimitSetIndicatesEmptyLimit() {
+        assertThat(aggregate.getLimit(), is(Optional.empty()));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void aggregateWithLimitZeroThrowsIllegalArgumentException() {
+        aggregate.setLimit(0);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void aggregateWithNegativeLimitThrowsIllegalArgumentException() {
+        aggregate.setLimit(-1);
     }
 }

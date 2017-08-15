@@ -57,7 +57,6 @@ public class AnnotationStatisticsService implements StatisticsService {
         checkArgument(converterFactory != null, "Filter factory cannot be null");
         checkArgument(searchService != null, "Search service cannot be null");
         checkArgument(converter != null, "Stats request converter cannot be null");
-        // TODO: 14/08/17 test
         checkArgument(statsTypeConfigurer != null, "Stats request configurer cannot be null");
 
         this.converterFactory = converterFactory;
