@@ -1,11 +1,11 @@
 package uk.ac.ebi.quickgo.annotation.service.statistics;
 
-import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
-
 import java.util.List;
 import java.util.Map;
 
 /**
+ * // TODO: 16/08/17  
+ * 
  * Created 14/08/17
  * @author Edd
  */
@@ -16,11 +16,11 @@ public class StatisticsTypeConfigurer {
         this.properties = properties;
     }
     
-    void configureStatsRequests(List<AnnotationRequest.StatsRequest> requests) {
+    void configureStatsRequests(List<RequiredStatistic> requests) {
         Map<String, Integer> subFacetItems = properties;
 
-        for (AnnotationRequest.StatsRequest request : requests) {
-            for (AnnotationRequest.StatsRequestType requestType : request.getTypes()) {
+        for (RequiredStatistic request : requests) {
+            for (RequiredStatisticType requestType : request.getTypes()) {
                 String requestTypeName = requestType.getName();
                 if (subFacetItems.containsKey(requestTypeName)) {
                     requestType.setLimit(subFacetItems.get(requestTypeName));

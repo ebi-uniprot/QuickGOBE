@@ -1,7 +1,5 @@
 package uk.ac.ebi.quickgo.annotation.service.statistics;
 
-import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
-
 import java.util.List;
 import java.util.Optional;
 import org.junit.Before;
@@ -18,7 +16,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static uk.ac.ebi.quickgo.annotation.service.statistics.StatisticsServiceConfig.DEFAULT_GO_TERM_LIMIT;
+import static uk.ac.ebi.quickgo.annotation.service.statistics.RequiredStatistics.DEFAULT_GO_TERM_LIMIT;
 
 /**
  * Created 14/08/17
@@ -31,20 +29,18 @@ public class StatisticsTypeDefaultPropertiesTest {
     private static final String GO_ID = "goId";
 
     @Autowired
-    private StatisticsTypeConfigurer typeConfigurer;
-    private List<AnnotationRequest.StatsRequest> requests;
+    private RequiredStatistics requiredStatistics;
+    private List<RequiredStatistic> statistics;
 
     @Before
     public void setUp() {
-        requests = new AnnotationRequest().createStatsRequests();
+        statistics = requiredStatistics.getStats();
     }
 
     @Test
     public void checkLimitsNotReadAndSetDefaultsForCorrectTypes() {
-        typeConfigurer.configureStatsRequests(requests);
-
-        for (AnnotationRequest.StatsRequest request : requests) {
-            for (AnnotationRequest.StatsRequestType type : request.getTypes()) {
+        for (RequiredStatistic request : statistics) {
+            for (RequiredStatisticType  type : request.getTypes()) {
                 switch (type.getName()) {
                     case GO_ID:
                         assertThat(type.getLimit(), is(Optional.of(DEFAULT_GO_TERM_LIMIT)));

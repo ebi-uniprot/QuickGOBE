@@ -1,7 +1,5 @@
 package uk.ac.ebi.quickgo.annotation.service.statistics;
 
-import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
-
 import java.util.List;
 import java.util.Optional;
 import org.junit.Before;
@@ -31,25 +29,18 @@ public class StatisticsTypeReadPropertiesTest {
     private static final String TAXON_ID = "taxonId";
 
     @Autowired
-    private StatisticsTypeConfigurer typeConfigurer;
-    private List<AnnotationRequest.StatsRequest> requests;
+    private RequiredStatistics requiredStatistics;
+    private List<RequiredStatistic> requests;
 
     @Before
     public void setUp() {
-        requests = new AnnotationRequest().createStatsRequests();
-    }
-
-    @Test
-    public void gp() {
-        System.out.println("yes");
+        requests = requiredStatistics.getStats();
     }
 
     @Test
     public void checkLimitsReadAndSetForCorrectTypes() {
-        typeConfigurer.configureStatsRequests(requests);
-
-        for (AnnotationRequest.StatsRequest request : requests) {
-            for (AnnotationRequest.StatsRequestType type : request.getTypes()) {
+        for (RequiredStatistic request : requests) {
+            for (RequiredStatisticType type : request.getTypes()) {
                 switch (type.getName()) {
                     case GO_ID:
                         // value read from yml

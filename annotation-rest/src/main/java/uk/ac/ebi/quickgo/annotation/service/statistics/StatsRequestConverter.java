@@ -1,6 +1,5 @@
 package uk.ac.ebi.quickgo.annotation.service.statistics;
 
-import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
 import uk.ac.ebi.quickgo.rest.search.query.AggregateRequest;
 
 import java.util.Collection;
@@ -11,6 +10,7 @@ import java.util.Collection;
  *
  * @author Ricardo Antunes
  */
+// TODO: 16/08/17 rename to statsconverter 
 public interface StatsRequestConverter {
-    AggregateRequest convert(Collection<AnnotationRequest.StatsRequest> statsRequests);
+    AggregateRequest convert(Collection<RequiredStatistic> requiredStatistics);
 }

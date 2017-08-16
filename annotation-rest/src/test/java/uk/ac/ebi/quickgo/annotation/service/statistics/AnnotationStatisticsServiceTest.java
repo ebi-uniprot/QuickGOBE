@@ -36,12 +36,12 @@ public class AnnotationStatisticsServiceTest {
     private StatsRequestConverter statsRequestConverterMock;
 
     @Mock
-    private StatisticsTypeConfigurer statsConfigurer;
+    private RequiredStatistics requiredStatistics;
 
     @Before
     public void setUp() throws Exception {
         statsService = new AnnotationStatisticsService(filterFactoryMock, searchServiceMock,
-                statsRequestConverterMock, statsConfigurer);
+                statsRequestConverterMock, requiredStatistics);
     }
 
     @Test
@@ -50,7 +50,7 @@ public class AnnotationStatisticsServiceTest {
         thrown.expectMessage("Filter factory cannot be null");
 
         statsService = new AnnotationStatisticsService(null, searchServiceMock,
-                statsRequestConverterMock, statsConfigurer);
+                statsRequestConverterMock, requiredStatistics);
     }
 
     @Test
@@ -59,22 +59,22 @@ public class AnnotationStatisticsServiceTest {
         thrown.expectMessage("Search service cannot be null");
 
         statsService = new AnnotationStatisticsService(filterFactoryMock, null,
-                statsRequestConverterMock, statsConfigurer);
+                statsRequestConverterMock, requiredStatistics);
     }
 
     @Test
-    public void nullStatsRequestConverterThrowsExceptionInConstructor() throws Exception {
+    public void nullStatsConverterThrowsExceptionInConstructor() throws Exception {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Stats request converter cannot be null");
 
         statsService = new AnnotationStatisticsService(filterFactoryMock, searchServiceMock,
-                null, statsConfigurer);
+                null, requiredStatistics);
     }
 
     @Test
-    public void nullStatsRequestConfigurerThrowsExceptionInConstructor() throws Exception {
+    public void nullRequiredStatsThrowsExceptionInConstructor() throws Exception {
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Stats request configurer cannot be null");
+        thrown.expectMessage("Required stats cannot be null");
 
         statsService = new AnnotationStatisticsService(filterFactoryMock, searchServiceMock,
                 statsRequestConverterMock, null);
@@ -89,12 +89,14 @@ public class AnnotationStatisticsServiceTest {
     }
 
     @Test
-    public void calculatingStatsForAnnotationRequestWithNullStatsRequestThrowsException() throws Exception {
+    public void calculatingStatsWithNullRequiredStatsListThrowsException() throws Exception {
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Statistics request cannot be null");
+        thrown.expectMessage("Required stats cannot be null");
 
+        when(requiredStatistics.getStats()).thenReturn(null);
+        statsService = new AnnotationStatisticsService(filterFactoryMock, searchServiceMock,
+                statsRequestConverterMock, requiredStatistics);
         AnnotationRequest request = Mockito.mock(AnnotationRequest.class);
-        when(request.createStatsRequests()).thenReturn(null);
 
         statsService.calculate(request);
     }

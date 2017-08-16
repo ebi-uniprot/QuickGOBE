@@ -47,32 +47,30 @@ public class AnnotationStatisticsService implements StatisticsService {
     private final StatsRequestConverter converter;
 
     private final DefaultSearchQueryTemplate queryTemplate;
-    private final StatisticsTypeConfigurer statsConfigurer;
+    private final List<RequiredStatistic> requiredStats;
 
     @Autowired
     public AnnotationStatisticsService(FilterConverterFactory converterFactory,
             SearchService<Annotation> searchService,
             StatsRequestConverter converter,
-            StatisticsTypeConfigurer statsTypeConfigurer) {
+            RequiredStatistics requiredStatistics) {
         checkArgument(converterFactory != null, "Filter factory cannot be null");
         checkArgument(searchService != null, "Search service cannot be null");
         checkArgument(converter != null, "Stats request converter cannot be null");
-        checkArgument(statsTypeConfigurer != null, "Stats request configurer cannot be null");
+        checkArgument(requiredStatistics != null, "Required stats cannot be null");
 
         this.converterFactory = converterFactory;
         this.searchService = searchService;
         this.converter = converter;
-        this.statsConfigurer = statsTypeConfigurer;
+        this.requiredStats = requiredStatistics.getStats();
 
         queryTemplate = new DefaultSearchQueryTemplate();
     }
 
-    @Override public QueryResult<StatisticsGroup> calculate(AnnotationRequest request) {
+    @Override
+    public QueryResult<StatisticsGroup> calculate(AnnotationRequest request) {
         checkArgument(request != null, "Annotation request cannot be null");
-
-        List<AnnotationRequest.StatsRequest> statsRequest = request.createStatsRequests();
-        checkArgument(statsRequest != null, "Statistics request cannot be null");
-        statsConfigurer.configureStatsRequests(statsRequest);
+        checkArgument(requiredStats != null, "Required stats cannot be null");
 
         QueryRequest queryRequest = buildQueryRequest(request);
 
@@ -83,7 +81,7 @@ public class AnnotationStatisticsService implements StatisticsService {
         QueryResult<StatisticsGroup> response;
 
         if(globalAggregation.isPopulated()) {
-            List<StatisticsGroup> statsGroups = statsRequest.stream()
+            List<StatisticsGroup> statsGroups = requiredStats.stream()
                     .map(req -> convertResponse(globalAggregation, req))
                     .collect(Collectors.toList());
             response = new QueryResult.Builder<>(statsGroups.size(), statsGroups).build();
@@ -102,20 +100,20 @@ public class AnnotationStatisticsService implements StatisticsService {
                         .map(ConvertedFilter::getConvertedValue)
                         .collect(Collectors.toSet()))
                 .setPage(new RegularPage(FIRST_PAGE, RESULTS_PER_PAGE))
-                .setAggregate(converter.convert(request.createStatsRequests()))
+                .setAggregate(converter.convert(requiredStats))
                 .build();
     }
 
     private StatisticsGroup convertResponse(AggregateResponse globalAggregation,
-            AnnotationRequest.StatsRequest statsRequest) {
+            RequiredStatistic requiredStatistic) {
         StatisticsConverter converter =
-                new StatisticsConverter(statsRequest.getGroupName(), statsRequest.getGroupField());
+                new StatisticsConverter(requiredStatistic.getGroupName(), requiredStatistic.getGroupField());
 
         long totalHits =
-                extractCount(globalAggregation, statsRequest.getGroupField(), statsRequest.getAggregateFunction());
+                extractCount(globalAggregation, requiredStatistic.getGroupField(), requiredStatistic.getAggregateFunction());
 
         if (totalHits == NO_COUNT_FOR_GROUP_ERROR) {
-            throw new RetrievalException("Unable to calculate statistics for group: " + statsRequest.getGroupName());
+            throw new RetrievalException("Unable to calculate statistics for group: " + requiredStatistic.getGroupName());
         }
 
         return converter.convert(globalAggregation.getNestedAggregations(), totalHits);

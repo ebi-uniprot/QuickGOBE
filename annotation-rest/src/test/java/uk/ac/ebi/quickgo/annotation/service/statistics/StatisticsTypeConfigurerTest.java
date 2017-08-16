@@ -1,20 +1,18 @@
 package uk.ac.ebi.quickgo.annotation.service.statistics;
 
-import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
-
 import java.util.*;
 import org.junit.Before;
 import org.junit.Test;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.contains;
-import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.StatsRequestType.statsRequestType;
+import static uk.ac.ebi.quickgo.annotation.service.statistics.RequiredStatisticType.statsType;
 
 /**
- * Checks that the {@link StatisticsTypeConfigurer} correctly updates the limits of {@link AnnotationRequest.StatsRequestType}
+ * Checks that the {@link StatisticsTypeConfigurer} correctly updates the limits of {@link RequiredStatisticType}
  * according to a property map.
  *
  * Created 15/08/17
@@ -26,9 +24,9 @@ public class StatisticsTypeConfigurerTest {
     private static final int GO_ID_LIMIT = 5555;
     private StatisticsTypeConfigurer typeConfigurer;
     private Map<String, Integer> typeLimitProperties;
-    private List<AnnotationRequest.StatsRequest> requests;
+    private List<RequiredStatistic> requests;
     private static final String TAXON_ID = "taxonId";
-    private static final AnnotationRequest.StatsRequestType TAXON_ID_TYPE = statsRequestType(TAXON_ID);
+    private static final RequiredStatisticType TAXON_ID_TYPE = statsType(TAXON_ID);
 
     @Before
     public void setUp() {
@@ -55,8 +53,8 @@ public class StatisticsTypeConfigurerTest {
     public void noMatchingTypeLeavesStatsRequestsUntouched() {
         // Given
         typeLimitProperties.put(GO_ID, 1111);
-        AnnotationRequest.StatsRequestType requestType = statsRequestType(TAXON_ID);
-        AnnotationRequest.StatsRequest statsReq = statsReq(requestType);
+        RequiredStatisticType requestType = statsType(TAXON_ID);
+        RequiredStatistic statsReq = statsReq(requestType);
         requests.add(statsReq);
         
         assertThat(requestType.getName(), is(TAXON_ID));
@@ -75,8 +73,8 @@ public class StatisticsTypeConfigurerTest {
     @Test
     public void emptyTypePropertiesLeavesStatsRequestsUntouched() {
         // Given
-        AnnotationRequest.StatsRequestType requestType = statsRequestType(TAXON_ID);
-        AnnotationRequest.StatsRequest statsReq = statsReq(requestType);
+        RequiredStatisticType requestType = statsType(TAXON_ID);
+        RequiredStatistic statsReq = statsReq(requestType);
         requests.add(statsReq);
 
         assertThat(requestType.getName(), is(TAXON_ID));
@@ -97,8 +95,8 @@ public class StatisticsTypeConfigurerTest {
         // Given
         typeLimitProperties.put(GO_ID, GO_ID_LIMIT);
         typeLimitProperties.put("aspectId", 20);
-        AnnotationRequest.StatsRequestType goIdType = statsRequestType(GO_ID);
-        AnnotationRequest.StatsRequest statsReq = statsReq(TAXON_ID_TYPE, goIdType);
+        RequiredStatisticType goIdType = statsType(GO_ID);
+        RequiredStatistic statsReq = statsReq(TAXON_ID_TYPE, goIdType);
         requests.add(statsReq);
 
         assertThat(TAXON_ID_TYPE.getName(), is(TAXON_ID));
@@ -118,8 +116,8 @@ public class StatisticsTypeConfigurerTest {
         assertThat(goIdType.getName(), is(GO_ID));
     }
 
-    private AnnotationRequest.StatsRequest statsReq(AnnotationRequest.StatsRequestType... types) {
-        return new AnnotationRequest.StatsRequest(
+    private RequiredStatistic statsReq(RequiredStatisticType... types) {
+        return new RequiredStatistic(
                 "fakeGroupName",
                 "fakeGroupField",
                 "fakeAggFunction",

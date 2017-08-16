@@ -5,27 +5,19 @@ import uk.ac.ebi.quickgo.annotation.validation.service.WithFromValidator;
 import uk.ac.ebi.quickgo.common.validator.GeneProductIDList;
 import uk.ac.ebi.quickgo.rest.ParameterException;
 import uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern;
-import uk.ac.ebi.quickgo.rest.search.AggregateFunction;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformationRequest;
 import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformationRequests;
 
 import io.swagger.annotations.ApiModelProperty;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
-import org.slf4j.Logger;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static java.util.Arrays.asList;
-import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static org.slf4j.LoggerFactory.getLogger;
-import static uk.ac.ebi.quickgo.annotation.common.AnnotationFields.Facetable;
 import static uk.ac.ebi.quickgo.annotation.common.AnnotationFields.Searchable;
 import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.*;
 import static uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern.Flag.CASE_INSENSITIVE;
@@ -86,8 +78,6 @@ public class AnnotationRequest {
     static final String DEFAULT_EVIDENCE_CODE_USAGE = DESCENDANTS_USAGE;
     static final String DEFAULT_GO_USAGE = DESCENDANTS_USAGE;
 
-    private static final Logger LOGGER = getLogger(AnnotationRequest.class);
-
     /**
      * indicates which fields should be looked at when creating filters
      */
@@ -104,28 +94,6 @@ public class AnnotationRequest {
             Searchable.WITH_FROM,
             Searchable.EXTENSION
     };
-
-    /**
-     * At the moment the definition of the list is hardcoded because we only have need to display annotation and
-     * gene product statistics on a subset of types.
-     * <p>
-     * Note: We can in the future change this from a hard coded implementation, to something that is decided by the
-     * client.
-     */
-    private static List<StatsRequest> DEFAULT_STATS_REQUESTS;
-
-    static {
-        List<String> statsTypes =
-                Arrays.asList(Facetable.GO_ID, Facetable.TAXON_ID, Facetable.REFERENCE, Facetable.EVIDENCE_CODE,
-                        Facetable.ASSIGNED_BY, Facetable.GO_ASPECT);
-
-        StatsRequest annotationStats = new StatsRequest("annotation", Facetable.ID, AggregateFunction
-                .COUNT.getName(), initStatsRequestTypes(statsTypes));
-        StatsRequest geneProductStats = new StatsRequest("geneProduct", Facetable.GENE_PRODUCT_ID,
-                AggregateFunction.UNIQUE.getName(), initStatsRequestTypes(statsTypes));
-
-        DEFAULT_STATS_REQUESTS = Collections.unmodifiableList(asList(annotationStats, geneProductStats));
-    }
 
     @ApiModelProperty(
             value = "Number of results per page.",
@@ -648,10 +616,6 @@ public class AnnotationRequest {
         return transformationRequests;
     }
 
-    public List<StatsRequest> createStatsRequests() {
-        return DEFAULT_STATS_REQUESTS;
-    }
-
     @Override public String toString() {
         return "AnnotationRequest{" +
                 "limit=" + limit +
@@ -762,98 +726,10 @@ public class AnnotationRequest {
 
         return request;
     }
+    
     private String[] createLowercasedStringArray(String... args) {
         return Stream.of(args)
                 .map(String::toLowerCase)
                 .toArray(String[]::new);
-    }
-
-    private static List<StatsRequestType> initStatsRequestTypes(List<String> statsTypes) {
-        return statsTypes.stream().map(StatsRequestType::new).collect
-                (Collectors.toList());
-    }
-
-    /**
-     * Defines which statistics the client would like to to retrieve.
-     */
-    public static class StatsRequest {
-        private final String groupName;
-        private final String groupField;
-        private final String aggregateFunction;
-        private final List<StatsRequestType> types;
-
-        public StatsRequest(String groupName, String groupField, String aggregateFunction, List<StatsRequestType> types) {
-            checkArgument(groupName != null && !groupName.trim().isEmpty(),
-                    "Statistics group name cannot be null or empty");
-            checkArgument(groupField != null && !groupName.trim().isEmpty(),
-                    "Statistics group field cannot be null or empty");
-            checkArgument(aggregateFunction != null && !aggregateFunction.trim().isEmpty(), "Statistics " +
-                    "aggregate function cannot be null or empty");
-
-            this.groupName = groupName;
-            this.groupField = groupField;
-            this.aggregateFunction = aggregateFunction;
-
-            if (types == null) {
-                this.types = Collections.emptyList();
-            } else {
-                this.types = types;
-            }
-        }
-
-        public String getGroupName() {
-            return groupName;
-        }
-
-        public String getGroupField() {
-            return groupField;
-        }
-
-        public String getAggregateFunction() {
-            return aggregateFunction;
-        }
-
-        public Collection<StatsRequestType> getTypes() {
-            return Collections.unmodifiableList(types);
-        }
-    }
-
-    public static class StatsRequestType {
-        private final String name;
-        private int limit = 0;
-
-        private StatsRequestType(String name) {
-            checkArgument(name != null && !name.trim().isEmpty(),
-                    "Statistics type name cannot be null or empty");
-            this.name = name;
-        }
-
-        public static StatsRequestType statsRequestType(String name) {
-            return new StatsRequestType(name);
-        }
-
-        public static StatsRequestType statsRequestType(String name, int limit) {
-            StatsRequestType statsRequestType = new StatsRequestType(name);
-            statsRequestType.setLimit(limit);
-            return statsRequestType;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public Optional<Integer> getLimit() {
-            if (limit > 0) {
-                return of(limit);
-            } else {
-                return empty();
-            }
-        }
-
-        public void setLimit(int limit) {
-            checkArgument(limit > 0,
-                    "Statistics type limit must be greater than 0");
-            this.limit = limit;
-        }
     }
 }

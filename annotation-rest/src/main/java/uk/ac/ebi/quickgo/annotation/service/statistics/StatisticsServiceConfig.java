@@ -1,7 +1,5 @@
 package uk.ac.ebi.quickgo.annotation.service.statistics;
 
-import uk.ac.ebi.quickgo.annotation.common.AnnotationFields;
-
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -17,8 +15,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties(prefix = "annotation.stats")
 public class StatisticsServiceConfig {
-    static final int DEFAULT_GO_TERM_LIMIT = 200;
-    private Map<String, Integer> typeLimits = defaultStatisticsTypeLimits();
+    private Map<String, Integer> typeLimits = new HashMap<>();
 
     public Map<String, Integer> getTypeLimits() {
         return typeLimits;
@@ -29,13 +26,12 @@ public class StatisticsServiceConfig {
     }
 
     @Bean
-    public StatisticsTypeConfigurer statsTypeConfigurer() {
-        return new StatisticsTypeConfigurer(typeLimits);
+    public RequiredStatistics requiredStatistics(StatisticsTypeConfigurer statsTypeConfigurer) {
+        return new RequiredStatistics(statsTypeConfigurer);
     }
 
-    private static Map<String, Integer> defaultStatisticsTypeLimits() {
-        HashMap<String, Integer> limits = new HashMap<>();
-        limits.put(AnnotationFields.Facetable.GO_ID, DEFAULT_GO_TERM_LIMIT);
-        return limits;
+    @Bean
+    public StatisticsTypeConfigurer statsTypeConfigurer() {
+        return new StatisticsTypeConfigurer(typeLimits);
     }
 }
