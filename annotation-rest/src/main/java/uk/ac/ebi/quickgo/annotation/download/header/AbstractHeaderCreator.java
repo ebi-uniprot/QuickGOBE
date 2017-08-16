@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 
 /**
+ * An implementation of {@link HeaderCreator} that holds logic common to all subclasses.
+ *
  * @author Tony Wardell
  * Date: 15/08/2017
  * Time: 15:59
