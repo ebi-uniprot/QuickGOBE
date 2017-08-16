@@ -54,11 +54,6 @@
             <artifactId>spring-boot-starter-batch</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework.data</groupId>
-            <artifactId>spring-data-solr</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>org.jgrapht</groupId>
             <artifactId>jgrapht-core</artifactId>
             <version>${jgrapht-core.version}</version>
