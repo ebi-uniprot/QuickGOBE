@@ -267,7 +267,7 @@ public class AnnotationRequest {
 
     @ApiModelProperty(
             value = "For TSV downloads only, fields to return.",
-            allowableValues = "geneProductId,symbol,qualifier,goId,goaspect,goName,evidenceCode,goEvidence,reference," +
+            allowableValues = "geneProductId,symbol,qualifier,goId,goAspect,goName,evidenceCode,goEvidence,reference," +
                     "withFrom,taxonId,assignedBy,extensions,date,taxonName,synonym,name,type.")
     private String[] selectedFields;
 
