@@ -16,9 +16,9 @@ import static uk.ac.ebi.quickgo.annotation.service.statistics.RequiredStatisticT
  */
 public class RequiredStatisticTest {
 
-    public static final String GROUP_NAME = "groupName";
-    public static final String GROUP_FIELD = "groupField";
-    public static final String AGG_FUNCTION = "aggFunction";
+    private static final String GROUP_NAME = "groupName";
+    private static final String GROUP_FIELD = "groupField";
+    private static final String AGG_FUNCTION = "aggFunction";
 
     @Test(expected = IllegalArgumentException.class)
     public void constructorWithNullGroupNameProducesException() {
