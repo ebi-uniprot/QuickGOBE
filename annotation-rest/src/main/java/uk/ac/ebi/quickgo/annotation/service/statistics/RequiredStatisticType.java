@@ -1,17 +1,26 @@
 package uk.ac.ebi.quickgo.annotation.service.statistics;
 
 import java.util.Optional;
+import org.slf4j.Logger;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
- * // TODO: 16/08/17
+ * Represents information about particular types within a {@link RequiredStatistic}, for example,
+ * GO terms, taxons, evidences, etc.
+ *
+ * Each {@link RequiredStatisticType} can have a {@code limit} set, indicating how many of each type to be
+ * shown once the statistics calculation has been performed. By not setting {@code limit}, a default
+ * of 10 will be displayed.
+ * 
  * Created 16/08/17
  * @author Edd
  */
 public class RequiredStatisticType {
+    private static final Logger LOGGER = getLogger(RequiredStatisticType.class);
     private final String name;
     private int limit = 0;
 
@@ -34,9 +43,11 @@ public class RequiredStatisticType {
     }
 
     public void setLimit(int limit) {
-        checkArgument(limit > 0,
-                "Statistics type limit must be greater than 0");
-        this.limit = limit;
+        if (limit <= 0) {
+            LOGGER.warn("Attempt to set RequiredStatisticType limit to {}. Value must be greater than 0.", limit);
+        } else {
+            this.limit = limit;
+        }
     }
 
     static RequiredStatisticType statsType(String name) {

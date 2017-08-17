@@ -7,9 +7,11 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import org.slf4j.Logger;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Data-source representing which supported aggregation aggregateFunctionRequests {@link AggregateFunction} should be
@@ -55,6 +57,7 @@ import static java.util.Optional.of;
  * @author Ricardo Antunes
  */
 public class AggregateRequest {
+    private static final Logger LOGGER = getLogger(AggregateRequest.class);
     private final String name;
     private final Set<AggregateFunctionRequest> aggregateFunctionRequests;
     private final Set<AggregateRequest> nestedAggregateRequests;
@@ -72,8 +75,11 @@ public class AggregateRequest {
     }
 
     public void setLimit(int limit) {
-        Preconditions.checkArgument(limit > 0, "Cannot create aggregate with a limit <= 0");
-        this.limit = limit;
+        if (limit <= 0) {
+            LOGGER.warn("Attempt to set AggregateRequest limit to {}. Value must be greater than 0.", limit);
+        } else {
+            this.limit = limit;
+        }
     }
 
     public Optional<Integer> getLimit() {

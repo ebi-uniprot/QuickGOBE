@@ -12,50 +12,54 @@ import static uk.ac.ebi.quickgo.annotation.service.statistics.RequiredStatisticT
  * @author Edd
  */
 public class RequiredStatisticTypeTest {
-        @Test(expected = IllegalArgumentException.class)
-        public void cannotCreateRequiredStatisticTypeWithEmptyName() {
-            statsType("");
-        }
+    @Test(expected = IllegalArgumentException.class)
+    public void cannotCreateRequiredStatisticTypeWithEmptyName() {
+        statsType("");
+    }
 
-        @Test(expected = IllegalArgumentException.class)
-        public void cannotCreateRequiredStatisticTypeWithNullName() {
-            statsType(null);
-        }
+    @Test(expected = IllegalArgumentException.class)
+    public void cannotCreateRequiredStatisticTypeWithNullName() {
+        statsType(null);
+    }
 
-        @Test
-        public void canCreateRequiredStatisticTypeWithName() {
-            String name = "name";
+    @Test
+    public void canCreateRequiredStatisticTypeWithName() {
+        String name = "name";
 
-            RequiredStatisticType statsType = statsType(name);
+        RequiredStatisticType statsType = statsType(name);
 
-            assertThat(statsType.getName(), is(name));
-        }
+        assertThat(statsType.getName(), is(name));
+    }
 
-        @Test
-        public void canCreateRequiredStatisticTypeWithPositiveLimit() {
-            RequiredStatisticType statsType = statsType("name");
-            int limit = 1;
-            statsType.setLimit(limit);
+    @Test
+    public void canCreateRequiredStatisticTypeWithPositiveLimit() {
+        RequiredStatisticType statsType = statsType("name");
+        int limit = 1;
+        statsType.setLimit(limit);
 
-            assertThat(statsType.getLimit(), is(Optional.of(limit)));
-        }
+        assertThat(statsType.getLimit(), is(Optional.of(limit)));
+    }
 
-        @Test
-        public void statsTypeWithoutLimitReturnsEmptyOptionalAsLimit() {
-            RequiredStatisticType statsType = statsType("name");
+    @Test
+    public void statsTypeWithoutLimitReturnsEmptyOptionalAsLimit() {
+        RequiredStatisticType statsType = statsType("name");
 
-            assertThat(statsType.getLimit(), is(Optional.empty()));
-        }
+        assertThat(statsType.getLimit(), is(Optional.empty()));
+    }
 
-        @Test(expected = IllegalArgumentException.class)
-        public void statsTypeWithLimitZeroIndicatesLimitNotSet() {
-            RequiredStatisticType statsType = statsType("name");
-            statsType.setLimit(0);
-        }
+    @Test
+    public void statsTypeWithLimitZeroIndicatesLimitNotSet() {
+        RequiredStatisticType statsType = statsType("name");
+        statsType.setLimit(0);
 
-        @Test(expected = IllegalArgumentException.class)
-        public void statsTypeWithNegativeLimitIndicatesLimitNotSet() {
-            RequiredStatisticType statsType = statsType("name");
-            statsType.setLimit(-1);
-        }
+        assertThat(statsType.getLimit(), is(Optional.empty()));
+    }
+
+    @Test
+    public void statsTypeWithNegativeLimitIndicatesLimitNotSet() {
+        RequiredStatisticType statsType = statsType("name");
+        statsType.setLimit(-1);
+
+        assertThat(statsType.getLimit(), is(Optional.empty()));
+    }
 }

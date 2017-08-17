@@ -92,13 +92,15 @@ public class AggregateRequestTest {
         assertThat(aggregate.getLimit(), is(Optional.empty()));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void aggregateWithLimitZeroThrowsIllegalArgumentException() {
         aggregate.setLimit(0);
+        assertThat(aggregate.getLimit(), is(Optional.empty()));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void aggregateWithNegativeLimitThrowsIllegalArgumentException() {
         aggregate.setLimit(-1);
+        assertThat(aggregate.getLimit(), is(Optional.empty()));
     }
 }
