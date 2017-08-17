@@ -7,7 +7,10 @@ import java.util.List;
 import static com.google.common.base.Preconditions.checkArgument;
 
 /**
- * // TODO: 16/08/17  
+ * Represents a particular statistic about the annotations that needs to be shown
+ * whenever statistics are calculated. The list of required statistics are contained
+ * within {@link RequiredStatistics}.
+ *
  * Created 16/08/17
  * @author Edd
  */

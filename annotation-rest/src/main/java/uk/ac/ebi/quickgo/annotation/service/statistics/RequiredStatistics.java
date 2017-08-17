@@ -10,7 +10,14 @@ import static java.util.Arrays.asList;
 import static uk.ac.ebi.quickgo.annotation.service.statistics.RequiredStatisticType.statsType;
 
 /**
- * // TODO: 16/08/17  
+ * Represents the required statistics that must be shown about annotations. Comprises
+ * a list of {@link RequiredStatistic} entities, each of which captures particular details
+ * of the annotations over which they have been calculated.
+ *
+ * The {@link RequiredStatistics} include statistics over annotations and gene products. Within each
+ * statistic, by default of 10 items will be displayed for each statistic type (e.g., evidences, taxons, etc.),
+ * except for GO terms, which by default displayed 200 ids.
+ *
  * Created 16/08/17
  * @author Edd
  */
