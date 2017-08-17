@@ -72,7 +72,7 @@ public class AggregateRequest {
         this.nestedAggregateRequests = new HashSet<>();
 
         if (limit <= 0) {
-            LOGGER.warn("Attempt to set RequiredStatisticType limit to {}. Value must be greater than 0.", limit);
+            LOGGER.warn("Attempt to set AggregateRequest limit to {}. Value must be greater than 0.", limit);
             this.limit = DEFAULT_AGGREGATE_LIMIT;
         } else {
             this.limit = limit;
