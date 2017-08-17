@@ -86,7 +86,7 @@ public class StatsConfigsAreAppliedIT {
     @Test
     public void goIdConfigReadAndApplied() throws Exception {
         List<AnnotationDocument> docs =
-                modifyDocs(createGenericDocs(SAVED_DOC_COUNT), (i, doc) -> doc.goId = createGOId(i));
+                createDocsAndApply((i, doc) -> doc.goId = createGOId(i));
         repository.save(docs);
 
         ResultActions response = mockMvc.perform(get(STATS_ENDPOINT));
@@ -102,7 +102,7 @@ public class StatsConfigsAreAppliedIT {
     @Test
     public void taxonIdConfigReadAndApplied() throws Exception {
         List<AnnotationDocument> docs =
-                modifyDocs(createGenericDocs(SAVED_DOC_COUNT), (i, doc) -> doc.taxonId = i);
+                createDocsAndApply((i, doc) -> doc.taxonId = i);
         repository.save(docs);
 
         ResultActions response = mockMvc.perform(get(STATS_ENDPOINT));
@@ -118,7 +118,7 @@ public class StatsConfigsAreAppliedIT {
     @Test
     public void noConfigForReferenceMeansThereAreDefaultNumber() throws Exception {
         List<AnnotationDocument> docs =
-                modifyDocs(createGenericDocs(SAVED_DOC_COUNT), (i, doc) -> doc.reference = createRef(i));
+                createDocsAndApply((i, doc) -> doc.reference = createRef(i));
         repository.save(docs);
 
         ResultActions response = mockMvc.perform(get(STATS_ENDPOINT));
@@ -135,8 +135,15 @@ public class StatsConfigsAreAppliedIT {
         return String.format(STATS_VALUES_JSON_PATH_FORMAT, statType, subType);
     }
 
-    private List<AnnotationDocument> modifyDocs(List<AnnotationDocument> docs,
-            BiConsumer<Integer, AnnotationDocument> docTransformer) {
+    /**
+     * Creates a list of {@link AnnotationDocument}s and applies a transformation to each document
+     * according to their index in this document list.
+     * 
+     * @param docTransformer the document transformation function
+     * @return a list of {@link AnnotationDocument}s
+     */
+    private List<AnnotationDocument> createDocsAndApply(BiConsumer<Integer, AnnotationDocument> docTransformer) {
+        List<AnnotationDocument> docs = createGenericDocs(SAVED_DOC_COUNT);
         for (int i = 0; i < docs.size(); i++) {
             docTransformer.accept(i, docs.get(i));
         }
