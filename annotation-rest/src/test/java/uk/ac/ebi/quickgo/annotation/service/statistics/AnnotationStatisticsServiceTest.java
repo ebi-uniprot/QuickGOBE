@@ -33,7 +33,7 @@ public class AnnotationStatisticsServiceTest {
     private SearchService<Annotation> searchServiceMock;
 
     @Mock
-    private StatsRequestConverter statsRequestConverterMock;
+    private StatsConverter statsConverterMock;
 
     @Mock
     private RequiredStatistics requiredStatistics;
@@ -41,7 +41,7 @@ public class AnnotationStatisticsServiceTest {
     @Before
     public void setUp() throws Exception {
         statsService = new AnnotationStatisticsService(filterFactoryMock, searchServiceMock,
-                statsRequestConverterMock, requiredStatistics);
+                statsConverterMock, requiredStatistics);
     }
 
     @Test
@@ -50,7 +50,7 @@ public class AnnotationStatisticsServiceTest {
         thrown.expectMessage("Filter factory cannot be null");
 
         statsService = new AnnotationStatisticsService(null, searchServiceMock,
-                statsRequestConverterMock, requiredStatistics);
+                statsConverterMock, requiredStatistics);
     }
 
     @Test
@@ -59,7 +59,7 @@ public class AnnotationStatisticsServiceTest {
         thrown.expectMessage("Search service cannot be null");
 
         statsService = new AnnotationStatisticsService(filterFactoryMock, null,
-                statsRequestConverterMock, requiredStatistics);
+                statsConverterMock, requiredStatistics);
     }
 
     @Test
@@ -77,7 +77,7 @@ public class AnnotationStatisticsServiceTest {
         thrown.expectMessage("Required stats cannot be null");
 
         statsService = new AnnotationStatisticsService(filterFactoryMock, searchServiceMock,
-                statsRequestConverterMock, null);
+                statsConverterMock, null);
     }
 
     @Test
@@ -95,7 +95,7 @@ public class AnnotationStatisticsServiceTest {
 
         when(requiredStatistics.getStats()).thenReturn(null);
         statsService = new AnnotationStatisticsService(filterFactoryMock, searchServiceMock,
-                statsRequestConverterMock, requiredStatistics);
+                statsConverterMock, requiredStatistics);
         AnnotationRequest request = Mockito.mock(AnnotationRequest.class);
 
         statsService.calculate(request);

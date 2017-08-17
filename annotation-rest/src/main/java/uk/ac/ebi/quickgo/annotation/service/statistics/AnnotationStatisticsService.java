@@ -44,7 +44,7 @@ public class AnnotationStatisticsService implements StatisticsService {
 
     private final FilterConverterFactory converterFactory;
     private final SearchService<Annotation> searchService;
-    private final StatsRequestConverter converter;
+    private final StatsConverter converter;
 
     private final DefaultSearchQueryTemplate queryTemplate;
     private final List<RequiredStatistic> requiredStats;
@@ -52,7 +52,7 @@ public class AnnotationStatisticsService implements StatisticsService {
     @Autowired
     public AnnotationStatisticsService(FilterConverterFactory converterFactory,
             SearchService<Annotation> searchService,
-            StatsRequestConverter converter,
+            StatsConverter converter,
             RequiredStatistics requiredStatistics) {
         checkArgument(converterFactory != null, "Filter factory cannot be null");
         checkArgument(searchService != null, "Search service cannot be null");
