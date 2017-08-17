@@ -29,13 +29,13 @@ public class StatsConverterImpl implements StatsConverter {
         requiredStatistics.forEach(request -> {
             globalAggregate.addField(request.getGroupField(), AggregateFunction.typeOf(request.getAggregateFunction()));
             request.getTypes().forEach(type -> {
-                if (!nestedAggregateMap.containsKey(type.getName())) {
-                    AggregateRequest aggregateRequestForType = new AggregateRequest(type.getName());
-                    type.getLimit().ifPresent(aggregateRequestForType::setLimit);
-                    nestedAggregateMap.put(type.getName(), aggregateRequestForType);
+                String typeName = type.getName();
+                if (!nestedAggregateMap.containsKey(typeName)) {
+                    AggregateRequest aggregateRequestForType = new AggregateRequest(typeName, type.getLimit());
+                    nestedAggregateMap.put(typeName, aggregateRequestForType);
                 }
 
-                AggregateRequest aggregateForType = nestedAggregateMap.get(type.getName());
+                AggregateRequest aggregateForType = nestedAggregateMap.get(typeName);
                 aggregateForType.addField(request.getGroupField(),
                         AggregateFunction.typeOf(request.getAggregateFunction()));
             });

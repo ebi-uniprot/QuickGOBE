@@ -39,24 +39,25 @@ public class RequiredStatistics {
     }
 
     private final List<RequiredStatistic> requiredStats;
+    private final List<RequiredStatisticType> configuredTypes;
 
     RequiredStatistics(StatisticsTypeConfigurer statsConfigurer) {
-        List<RequiredStatistic> requests = asList(annotationStats(), geneProductStats());
-        statsConfigurer.configureStatsRequests(requests);
-        requiredStats = Collections.unmodifiableList(requests);
+        configuredTypes = statsConfigurer.getConfiguredStatsTypes(STATS_TYPES);
+        requiredStats = Collections.unmodifiableList(
+                asList(annotationStats(), geneProductStats()));
     }
 
     public List<RequiredStatistic> getStats() {
         return requiredStats;
     }
-    
+
     private RequiredStatistic annotationStats() {
         return new RequiredStatistic(ANNOTATION, AnnotationFields.Facetable.ID, AggregateFunction
-                .COUNT.getName(), STATS_TYPES);
+                .COUNT.getName(), configuredTypes);
     }
 
     private RequiredStatistic geneProductStats() {
         return new RequiredStatistic(GENE_PRODUCT, AnnotationFields.Facetable.GENE_PRODUCT_ID,
-                AggregateFunction.UNIQUE.getName(), STATS_TYPES);
+                AggregateFunction.UNIQUE.getName(), configuredTypes);
     }
 }

@@ -1,7 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.service.statistics;
 
 import java.util.List;
-import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,6 +15,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static uk.ac.ebi.quickgo.annotation.service.statistics.RequiredStatisticType.DEFAULT_LIMIT;
 
 /**
  * Created 14/08/17
@@ -44,14 +44,14 @@ public class StatisticsTypeReadPropertiesIT {
                 switch (type.getName()) {
                     case GO_ID:
                         // value read from yml
-                        assertThat(type.getLimit(), is(Optional.of(10)));
+                        assertThat(type.getLimit(), is(18));
                         break;
                     case TAXON_ID:
                         // value read from yml
-                        assertThat(type.getLimit(), is(Optional.of(11)));
+                        assertThat(type.getLimit(), is(11));
                         break;
                     default:
-                        assertThat(type.getLimit(), is(Optional.empty()));
+                        assertThat(type.getLimit(), is(DEFAULT_LIMIT));
                         break;
                 }
             }

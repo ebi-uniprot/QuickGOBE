@@ -4,13 +4,12 @@ import java.util.*;
 import org.junit.Before;
 import org.junit.Test;
 
-import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static uk.ac.ebi.quickgo.annotation.service.statistics.RequiredStatisticType.DEFAULT_LIMIT;
 import static uk.ac.ebi.quickgo.annotation.service.statistics.RequiredStatisticType.statsType;
 
 /**
@@ -22,20 +21,20 @@ import static uk.ac.ebi.quickgo.annotation.service.statistics.RequiredStatisticT
  */
 public class StatisticsTypeConfigurerTest {
 
-    private StatisticsTypeConfigurer typeConfigurer;
-    private Map<String, Integer> typeLimitProperties;
-    private List<RequiredStatistic> requests;
+    public static final String GO_ID = "goId";
     private static final String TAXON_ID = "taxonId";
     private static final RequiredStatisticType EXPECTED_TAXON_ID_TYPE = statsType(TAXON_ID);
-    public static final String GO_ID = "goId";
     private static final int GO_ID_LIMIT = 5555;
     private static final RequiredStatisticType EXPECTED_GO_ID_TYPE = statsType(GO_ID, GO_ID_LIMIT);
+    private StatisticsTypeConfigurer typeConfigurer;
+    private Map<String, Integer> typeLimitProperties;
+    private List<RequiredStatisticType> types;
 
     @Before
     public void setUp() {
         typeLimitProperties = new HashMap<>();
         typeConfigurer = new StatisticsTypeConfigurer(typeLimitProperties);
-        requests = new ArrayList<>();
+        types = new ArrayList<>();
     }
 
     @Test
@@ -43,51 +42,47 @@ public class StatisticsTypeConfigurerTest {
         // Given
         typeLimitProperties.put(GO_ID, 1111);
 
-        assertThat(requests, is(empty()));
+        assertThat(types, is(empty()));
 
         // When
-        typeConfigurer.configureStatsRequests(requests);
+        List<RequiredStatisticType> configuredTypes = typeConfigurer.getConfiguredStatsTypes(types);
 
         // Then
-        assertThat(requests, is(empty()));
+        assertThat(configuredTypes, is(empty()));
     }
 
     @Test
     public void noMatchingTypeLeavesRequiredStatsUntouched() {
         // Given
         typeLimitProperties.put(GO_ID, 1111);
-        RequiredStatisticType requestType = statsType(TAXON_ID);
-        RequiredStatistic stat = stat(requestType);
-        requests.add(stat);
-        
-        assertThat(requestType, is(equalTo(EXPECTED_TAXON_ID_TYPE)));
+        RequiredStatisticType statsType = statsType(TAXON_ID);
+        types.add(statsType);
+
+        assertThat(statsType, is(equalTo(EXPECTED_TAXON_ID_TYPE)));
 
         // When
-        typeConfigurer.configureStatsRequests(requests);
+        List<RequiredStatisticType> configuredTypes = typeConfigurer.getConfiguredStatsTypes(types);
 
         // Then
-        assertThat(requests, contains(stat));
-        assertThat(stat.getTypes(), contains(requestType));
-        assertThat(requestType, is(equalTo(EXPECTED_TAXON_ID_TYPE)));
+        RequiredStatisticType configuredType = extractType(configuredTypes, TAXON_ID);
+        assertThat(configuredType, is(equalTo(EXPECTED_TAXON_ID_TYPE)));
     }
 
     @Test
     public void emptyTypePropertiesLeavesRequiredStatsUntouched() {
         // Given
-        RequiredStatisticType requestType = statsType(TAXON_ID);
-        RequiredStatistic stat = stat(requestType);
-        requests.add(stat);
+        RequiredStatisticType statsType = statsType(TAXON_ID);
+        types.add(statsType);
 
         assertThat(typeLimitProperties.entrySet(), is(empty()));
-        assertThat(requestType, is(equalTo(EXPECTED_TAXON_ID_TYPE)));
+        assertThat(statsType, is(equalTo(EXPECTED_TAXON_ID_TYPE)));
 
         // When
-        typeConfigurer.configureStatsRequests(requests);
+        List<RequiredStatisticType> configuredTypes = typeConfigurer.getConfiguredStatsTypes(types);
 
         // Then
-        assertThat(requests, contains(stat));
-        assertThat(stat.getTypes(), contains(requestType));
-        assertThat(requestType, is(equalTo(EXPECTED_TAXON_ID_TYPE)));
+        RequiredStatisticType configuredType = extractType(configuredTypes, TAXON_ID);
+        assertThat(configuredType, is(equalTo(EXPECTED_TAXON_ID_TYPE)));
     }
 
     @Test
@@ -96,31 +91,23 @@ public class StatisticsTypeConfigurerTest {
         typeLimitProperties.put(GO_ID, GO_ID_LIMIT);
         typeLimitProperties.put("aspectId", 20);
         RequiredStatisticType goIdType = statsType(GO_ID);
-        RequiredStatistic stat = stat(EXPECTED_TAXON_ID_TYPE, goIdType);
-        requests.add(stat);
+        types.add(goIdType);
 
         assertThat(EXPECTED_TAXON_ID_TYPE.getName(), is(TAXON_ID));
-        assertThat(EXPECTED_TAXON_ID_TYPE.getLimit(), is(Optional.empty()));
+        assertThat(EXPECTED_TAXON_ID_TYPE.getLimit(), is(DEFAULT_LIMIT));
         assertThat(goIdType.getName(), is(GO_ID));
-        assertThat(goIdType.getLimit(), is(Optional.empty()));
+        assertThat(goIdType.getLimit(), is(DEFAULT_LIMIT));
         assertThat(goIdType, is(not(equalTo(EXPECTED_GO_ID_TYPE)))); // limits differ
 
         // When
-        typeConfigurer.configureStatsRequests(requests);
+        List<RequiredStatisticType> configuredTypes = typeConfigurer.getConfiguredStatsTypes(types);
 
         // Then
-        assertThat(requests, contains(stat));
-        assertThat(stat.getTypes(), contains(EXPECTED_TAXON_ID_TYPE, goIdType));
-        assertThat(EXPECTED_TAXON_ID_TYPE.getName(), is(TAXON_ID));
-        assertThat(EXPECTED_TAXON_ID_TYPE.getLimit(), is(Optional.empty()));
-        assertThat(goIdType, is(equalTo(EXPECTED_GO_ID_TYPE))); // where limits are now equal
+        RequiredStatisticType configuredType = extractType(configuredTypes, GO_ID);
+        assertThat(configuredType, is(equalTo(EXPECTED_GO_ID_TYPE))); // where limits are now equal
     }
 
-    private RequiredStatistic stat(RequiredStatisticType... types) {
-        return new RequiredStatistic(
-                "fakeGroupName",
-                "fakeGroupField",
-                "fakeAggFunction",
-                asList(types));
+    private RequiredStatisticType extractType(List<RequiredStatisticType> types, String name) {
+        return types.stream().filter(type -> type.getName().equals(name)).findFirst().orElse(null);
     }
 }

@@ -176,7 +176,7 @@ public class AggregateToStringConverter implements AggregateConverter<String> {
         StringJoiner subFacetComponents = new StringJoiner(DECLARATION_SEPARATOR);
         subFacetComponents.add(createFacetType(FACET_TYPE_TERM))
                 .add(createFacetField(nestedAggregate.getName()));
-        nestedAggregate.getLimit().ifPresent(limit -> subFacetComponents.add(createLimitField(limit)));
+        subFacetComponents.add(createLimitField(nestedAggregate.getLimit()));
 
         if (!fields.isEmpty()) {
             subFacetComponents.add(FACET_MARKER + NAME_TO_VALUE_SEPARATOR + convert(nestedAggregate));

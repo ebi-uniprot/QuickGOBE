@@ -14,6 +14,7 @@ import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.core.IsNot.not;
+import static uk.ac.ebi.quickgo.rest.search.query.AggregateRequest.DEFAULT_AGGREGATE_LIMIT;
 import static uk.ac.ebi.quickgo.rest.search.solr.AggregateToStringConverter.convertToSolrAggregation;
 import static uk.ac.ebi.quickgo.rest.search.solr.AggregateToStringConverter.createFacetField;
 import static uk.ac.ebi.quickgo.rest.search.solr.AggregateToStringConverter.createFacetType;
@@ -175,8 +176,7 @@ public class AggregateRequestToStringConverterTest {
     @Test
     public void aggregateWithNestedAggregateAndLimitIsConvertedIntoSolrSubFacet() {
         int limit = 200;
-        AggregateRequest goIDAggregate = new AggregateRequest(GO_ID_TYPE);
-        goIDAggregate.setLimit(limit);
+        AggregateRequest goIDAggregate = new AggregateRequest(GO_ID_TYPE, limit);
 
         aggregate.addNestedAggregate(goIDAggregate);
 
@@ -199,7 +199,7 @@ public class AggregateRequestToStringConverterTest {
         assertThat(convertedAggregation, containsString(aggregatePrefixWithTypeTitle(GO_ID_TYPE)));
         assertThat(convertedAggregation, containsString(createFacetType(FACET_TYPE_TERM)));
         assertThat(convertedAggregation, containsString(createFacetField(GO_ID_TYPE)));
-        assertThat(convertedAggregation, not(containsString(LIMIT)));
+        assertThat(convertedAggregation, containsString(createLimitField(DEFAULT_AGGREGATE_LIMIT)));
     }
 
     @Test

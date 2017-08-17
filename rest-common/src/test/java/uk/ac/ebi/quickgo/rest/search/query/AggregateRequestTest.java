@@ -2,7 +2,6 @@ package uk.ac.ebi.quickgo.rest.search.query;
 
 import uk.ac.ebi.quickgo.rest.search.AggregateFunction;
 
-import java.util.Optional;
 import java.util.Set;
 import org.junit.Before;
 import org.junit.Rule;
@@ -13,6 +12,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
+import static uk.ac.ebi.quickgo.rest.search.query.AggregateRequest.DEFAULT_AGGREGATE_LIMIT;
 
 /**
  * Tests the behaviour of the {@link AggregateRequest} class.
@@ -82,25 +82,25 @@ public class AggregateRequestTest {
     @Test
     public void canCreateAggregateWithPositiveLimit() {
         int limit = 1;
-        aggregate.setLimit(limit);
+        AggregateRequest agg = new AggregateRequest("field1", limit);
 
-        assertThat(aggregate.getLimit(), is(Optional.of(limit)));
+        assertThat(agg.getLimit(), is(limit));
     }
 
     @Test
     public void aggregateWithoutLimitSetIndicatesEmptyLimit() {
-        assertThat(aggregate.getLimit(), is(Optional.empty()));
+        assertThat(aggregate.getLimit(), is(DEFAULT_AGGREGATE_LIMIT));
     }
 
     @Test
-    public void aggregateWithLimitZeroThrowsIllegalArgumentException() {
-        aggregate.setLimit(0);
-        assertThat(aggregate.getLimit(), is(Optional.empty()));
+    public void aggregateWithLimitZeroMeansUseDefaultLimit() {
+        AggregateRequest agg = new AggregateRequest("field1", 0);
+        assertThat(agg.getLimit(), is(DEFAULT_AGGREGATE_LIMIT));
     }
 
     @Test
-    public void aggregateWithNegativeLimitThrowsIllegalArgumentException() {
-        aggregate.setLimit(-1);
-        assertThat(aggregate.getLimit(), is(Optional.empty()));
+    public void aggregateWithNegativeLimitMeansUseDefaultLimit() {
+        AggregateRequest agg = new AggregateRequest("field1", -1);
+        assertThat(agg.getLimit(), is(DEFAULT_AGGREGATE_LIMIT));
     }
 }

@@ -1,7 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.service.statistics;
 
 import java.util.List;
-import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,6 +15,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static uk.ac.ebi.quickgo.annotation.service.statistics.RequiredStatisticType.DEFAULT_LIMIT;
 import static uk.ac.ebi.quickgo.annotation.service.statistics.RequiredStatistics.DEFAULT_GO_TERM_LIMIT;
 
 /**
@@ -43,10 +43,10 @@ public class StatisticsTypeDefaultPropertiesIT {
             for (RequiredStatisticType  type : request.getTypes()) {
                 switch (type.getName()) {
                     case GO_ID:
-                        assertThat(type.getLimit(), is(Optional.of(DEFAULT_GO_TERM_LIMIT)));
+                        assertThat(type.getLimit(), is(DEFAULT_GO_TERM_LIMIT));
                         break;
                     default:
-                        assertThat(type.getLimit(), is(Optional.empty()));
+                        assertThat(type.getLimit(), is(DEFAULT_LIMIT));
                         break;
                 }
             }

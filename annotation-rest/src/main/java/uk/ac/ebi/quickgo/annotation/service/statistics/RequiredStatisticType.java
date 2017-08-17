@@ -1,11 +1,8 @@
 package uk.ac.ebi.quickgo.annotation.service.statistics;
 
-import java.util.Optional;
 import org.slf4j.Logger;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
@@ -22,32 +19,33 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class RequiredStatisticType {
     private static final Logger LOGGER = getLogger(RequiredStatisticType.class);
     private final String name;
-    private int limit = 0;
+    private final int limit;
+    static final int DEFAULT_LIMIT = 10;
 
     private RequiredStatisticType(String name) {
+        this(name, DEFAULT_LIMIT);
+    }
+
+    private RequiredStatisticType(String name, int limit) {
         checkArgument(name != null && !name.trim().isEmpty(),
                 "RequiredStatisticType name cannot be null or empty");
+
         this.name = name;
+        
+        if (limit <= 0) {
+            LOGGER.warn("Attempt to set RequiredStatisticType limit to {}. Value must be greater than 0.", limit);
+            this.limit = DEFAULT_LIMIT;
+        } else {
+            this.limit = limit;
+        }
     }
 
     public String getName() {
         return name;
     }
 
-    public Optional<Integer> getLimit() {
-        if (limit > 0) {
-            return of(limit);
-        } else {
-            return empty();
-        }
-    }
-
-    public void setLimit(int limit) {
-        if (limit <= 0) {
-            LOGGER.warn("Attempt to set RequiredStatisticType limit to {}. Value must be greater than 0.", limit);
-        } else {
-            this.limit = limit;
-        }
+    public int getLimit() {
+        return limit;
     }
 
     @Override public int hashCode() {
@@ -78,8 +76,6 @@ public class RequiredStatisticType {
     }
 
     static RequiredStatisticType statsType(String name, int limit) {
-        RequiredStatisticType requiredStatisticType = new RequiredStatisticType(name);
-        requiredStatisticType.setLimit(limit);
-        return requiredStatisticType;
+        return new RequiredStatisticType(name, limit);
     }
 }

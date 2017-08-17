@@ -5,12 +5,9 @@ import uk.ac.ebi.quickgo.rest.search.AggregateFunction;
 import com.google.common.base.Preconditions;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 import org.slf4j.Logger;
 
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
@@ -57,37 +54,37 @@ import static org.slf4j.LoggerFactory.getLogger;
  * @author Ricardo Antunes
  */
 public class AggregateRequest {
+    public static final int DEFAULT_AGGREGATE_LIMIT = 10;
     private static final Logger LOGGER = getLogger(AggregateRequest.class);
     private final String name;
     private final Set<AggregateFunctionRequest> aggregateFunctionRequests;
     private final Set<AggregateRequest> nestedAggregateRequests;
-    private int limit = 0;
+    private final int limit;
 
     public AggregateRequest(String name) {
+        this(name, DEFAULT_AGGREGATE_LIMIT);
+    }
+
+    public AggregateRequest(String name, int limit) {
         Preconditions.checkArgument(name != null, "Cannot create aggregate with null name");
         this.name = name;
         this.aggregateFunctionRequests = new HashSet<>();
         this.nestedAggregateRequests = new HashSet<>();
+
+        if (limit <= 0) {
+            LOGGER.warn("Attempt to set RequiredStatisticType limit to {}. Value must be greater than 0.", limit);
+            this.limit = DEFAULT_AGGREGATE_LIMIT;
+        } else {
+            this.limit = limit;
+        }
     }
 
     public String getName() {
         return name;
     }
 
-    public void setLimit(int limit) {
-        if (limit <= 0) {
-            LOGGER.warn("Attempt to set AggregateRequest limit to {}. Value must be greater than 0.", limit);
-        } else {
-            this.limit = limit;
-        }
-    }
-
-    public Optional<Integer> getLimit() {
-        if (limit > 0) {
-            return of(limit);
-        } else {
-            return empty();
-        }
+    public int getLimit() {
+        return limit;
     }
 
     public Set<AggregateFunctionRequest> getAggregateFunctionRequests() {

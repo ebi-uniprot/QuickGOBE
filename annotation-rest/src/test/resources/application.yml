@@ -96,7 +96,7 @@ spring:
 annotation:
   stats:
     typeLimits:
-      goId: 10
+      goId: 18
       taxonId: 11
       typeDoesNotExist: 12
 
