@@ -77,6 +77,7 @@ public class StatisticsTypeConfigurerTest {
         RequiredStatistic statsReq = statsReq(requestType);
         requests.add(statsReq);
 
+        assertThat(typeLimitProperties.entrySet(), is(empty()));
         assertThat(requestType.getName(), is(TAXON_ID));
         assertThat(requestType.getLimit(), is(Optional.empty()));
 

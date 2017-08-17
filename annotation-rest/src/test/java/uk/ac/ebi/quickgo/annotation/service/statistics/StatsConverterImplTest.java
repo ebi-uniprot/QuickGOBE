@@ -20,23 +20,23 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static uk.ac.ebi.quickgo.annotation.service.statistics.RequiredStatisticType.statsType;
-import static uk.ac.ebi.quickgo.annotation.service.statistics.StatsRequestConverterImpl.DEFAULT_GLOBAL_AGGREGATE_NAME;
+import static uk.ac.ebi.quickgo.annotation.service.statistics.StatsConverterImpl.DEFAULT_GLOBAL_AGGREGATE_NAME;
 
 /**
  * Created 15/07/16
  * @author Edd
  */
-public class StatsRequestConverterImplTest {
+public class StatsConverterImplTest {
     private static final String UNIQUE_FUNCTION = AggregateFunction.UNIQUE.getName();
     private static final String COUNT_FUNCTION = AggregateFunction.COUNT.getName();
 
     private ArrayList<RequiredStatistic> statsRequests;
-    private StatsRequestConverter converter;
+    private StatsConverter converter;
 
     @Before
     public void setUp() {
         this.statsRequests = new ArrayList<>();
-        this.converter = new StatsRequestConverterImpl();
+        this.converter = new StatsConverterImpl();
     }
 
     @Test(expected = IllegalArgumentException.class)

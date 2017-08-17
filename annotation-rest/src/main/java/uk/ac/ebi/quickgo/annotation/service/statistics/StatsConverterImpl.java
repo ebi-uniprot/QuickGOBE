@@ -10,13 +10,13 @@ import java.util.Map;
 import org.springframework.stereotype.Component;
 
 /**
- * A simple implementation of the {@link StatsRequestConverter} interface.
+ * A simple implementation of the {@link StatsConverter} interface.
  *
  * @author Ricardo Antunes
  */
 @Component
 // // TODO: 16/08/17 rename to stats converter 
-public class StatsRequestConverterImpl implements StatsRequestConverter {
+public class StatsConverterImpl implements StatsConverter {
 
     static final String DEFAULT_GLOBAL_AGGREGATE_NAME = "global";
 
