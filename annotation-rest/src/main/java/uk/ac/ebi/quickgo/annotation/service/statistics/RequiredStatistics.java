@@ -6,6 +6,7 @@ import uk.ac.ebi.quickgo.rest.search.AggregateFunction;
 import java.util.Collections;
 import java.util.List;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Arrays.asList;
 import static uk.ac.ebi.quickgo.annotation.service.statistics.RequiredStatisticType.statsType;
 
@@ -23,9 +24,9 @@ import static uk.ac.ebi.quickgo.annotation.service.statistics.RequiredStatisticT
  */
 public class RequiredStatistics {
     static final int DEFAULT_GO_TERM_LIMIT = 200;
-    private static final List<RequiredStatisticType> STATS_TYPES;
-    private static final String ANNOTATION = "annotation";
-    private static final String GENE_PRODUCT = "geneProduct";
+    static final List<RequiredStatisticType> STATS_TYPES;
+    static final String ANNOTATION = "annotation";
+    static final String GENE_PRODUCT = "geneProduct";
 
     static {
         STATS_TYPES = asList(
@@ -42,6 +43,7 @@ public class RequiredStatistics {
     private final List<RequiredStatisticType> configuredTypes;
 
     RequiredStatistics(StatisticsTypeConfigurer statsConfigurer) {
+        checkArgument(statsConfigurer != null, "Stats configurer cannot be null");
         configuredTypes = statsConfigurer.getConfiguredStatsTypes(STATS_TYPES);
         requiredStats = Collections.unmodifiableList(
                 asList(annotationStats(), geneProductStats()));
@@ -52,8 +54,8 @@ public class RequiredStatistics {
     }
 
     private RequiredStatistic annotationStats() {
-        return new RequiredStatistic(ANNOTATION, AnnotationFields.Facetable.ID, AggregateFunction
-                .COUNT.getName(), configuredTypes);
+        return new RequiredStatistic(ANNOTATION, AnnotationFields.Facetable.ID,
+                AggregateFunction.COUNT.getName(), configuredTypes);
     }
 
     private RequiredStatistic geneProductStats() {

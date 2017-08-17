@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Service that collects distribution statistics of annotations and gene products throughout a given set of annotation
@@ -62,6 +63,8 @@ public class AnnotationStatisticsService implements StatisticsService {
         this.converterFactory = converterFactory;
         this.searchService = searchService;
         this.converter = converter;
+
+        checkState(requiredStatistics.getStats() != null, "Required stats list cannot be null");
         this.requiredStats = requiredStatistics.getStats();
 
         queryTemplate = new DefaultSearchQueryTemplate();
@@ -70,7 +73,6 @@ public class AnnotationStatisticsService implements StatisticsService {
     @Override
     public QueryResult<StatisticsGroup> calculate(AnnotationRequest request) {
         checkArgument(request != null, "Annotation request cannot be null");
-        checkArgument(requiredStats != null, "Required stats cannot be null");
 
         QueryRequest queryRequest = buildQueryRequest(request);
 
@@ -122,7 +124,7 @@ public class AnnotationStatisticsService implements StatisticsService {
     /**
      * Extracts the counts made on the whole data set for a given group.
      *
-     * @see AnnotationRequest.StatsRequest#getGroupName()
+     * @see RequiredStatistic#getGroupName()
      *
      * @param globalAggregation the aggregation object containing the group count values
      * @param groupField the name of the groupField the count was made upon

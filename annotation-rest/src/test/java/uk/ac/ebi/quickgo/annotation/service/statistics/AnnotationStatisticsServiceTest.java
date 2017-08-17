@@ -90,8 +90,8 @@ public class AnnotationStatisticsServiceTest {
 
     @Test
     public void calculatingStatsWithNullRequiredStatsListThrowsException() throws Exception {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Required stats cannot be null");
+        thrown.expect(IllegalStateException.class);
+        thrown.expectMessage("Required stats list cannot be null");
 
         when(requiredStatistics.getStats()).thenReturn(null);
         statsService = new AnnotationStatisticsService(filterFactoryMock, searchServiceMock,
