@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * // TODO: 16/08/17  
+ * This class configures the {@link RequiredStatisticType} values within a list of {@link RequiredStatistic}s.
  * 
  * Created 14/08/17
  * @author Edd
@@ -17,13 +17,11 @@ public class StatisticsTypeConfigurer {
     }
     
     void configureStatsRequests(List<RequiredStatistic> requests) {
-        Map<String, Integer> subFacetItems = properties;
-
         for (RequiredStatistic request : requests) {
             for (RequiredStatisticType requestType : request.getTypes()) {
                 String requestTypeName = requestType.getName();
-                if (subFacetItems.containsKey(requestTypeName)) {
-                    requestType.setLimit(subFacetItems.get(requestTypeName));
+                if (properties.containsKey(requestTypeName)) {
+                    requestType.setLimit(properties.get(requestTypeName));
                 }
             }
         }
