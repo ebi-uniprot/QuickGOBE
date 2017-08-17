@@ -23,8 +23,8 @@ import static org.hamcrest.Matchers.is;
  */
 @ActiveProfiles("stats-type-limit-properties-test")
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = StatisticsTypeReadPropertiesTest.FakeApplication.class)
-public class StatisticsTypeReadPropertiesTest {
+@SpringApplicationConfiguration(classes = StatisticsTypeReadPropertiesIT.FakeApplication.class)
+public class StatisticsTypeReadPropertiesIT {
     private static final String GO_ID = "goId";
     private static final String TAXON_ID = "taxonId";
 

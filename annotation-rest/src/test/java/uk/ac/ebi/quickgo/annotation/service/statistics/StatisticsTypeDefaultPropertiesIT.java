@@ -24,8 +24,8 @@ import static uk.ac.ebi.quickgo.annotation.service.statistics.RequiredStatistics
  */
 @ActiveProfiles("stats-no-type-limit-properties-test")
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = StatisticsTypeDefaultPropertiesTest.FakeApplication.class)
-public class StatisticsTypeDefaultPropertiesTest {
+@SpringApplicationConfiguration(classes = StatisticsTypeDefaultPropertiesIT.FakeApplication.class)
+public class StatisticsTypeDefaultPropertiesIT {
     private static final String GO_ID = "goId";
 
     @Autowired

@@ -24,8 +24,8 @@ import static uk.ac.ebi.quickgo.annotation.download.TaskExecutorProperties.*;
  * @author Edd
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = DownloadTaskExecutorDefaultPropertiesTest.FakeApplication.class)
-public class DownloadTaskExecutorDefaultPropertiesTest {
+@SpringApplicationConfiguration(classes = DownloadTaskExecutorDefaultPropertiesIT.FakeApplication.class)
+public class DownloadTaskExecutorDefaultPropertiesIT {
     @Autowired
     private ThreadPoolTaskExecutor taskExecutor;
 
