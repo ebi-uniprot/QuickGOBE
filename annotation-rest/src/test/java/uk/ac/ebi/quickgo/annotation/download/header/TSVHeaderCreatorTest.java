@@ -81,35 +81,33 @@ public class TSVHeaderCreatorTest {
             tsvHeaderCreator.write(emitter, content);
 
             verify(emitter).send(columnName, MediaType.TEXT_PLAIN);
-        }
     }
 
     @Test
     public void writeHeaderForSeveralSelectedFields() throws Exception {
         when(mockContent.isSlimmed()).thenReturn(false);
         when(mockContent.getSelectedFields())
-                .thenReturn(asList(GENE_PRODUCT_ID_FIELD_NAME, GO_NAME_FIELD_NAME, TAXON_NAME_FIELD_NAME));
+                .thenReturn(asList(GENE_PRODUCT_FIELD_NAME, GO_NAME_FIELD_NAME, TAXON_NAME_FIELD_NAME));
 
         tsvHeaderCreator.write(mockEmitter, mockContent);
 
-        verify(mockEmitter).send(TsvHeaderCreator.GENE_PRODUCT_DB + "\t"
-                + TsvHeaderCreator.GENE_PRODUCT_ID + "\t"
-                + TsvHeaderCreator.GO_NAME + "\t"
-                + TsvHeaderCreator.TAXON_NAME + "\n", MediaType.TEXT_PLAIN);
+        verify(mockEmitter).send(TSVHeaderCreator.GENE_PRODUCT_DB + "\t"
+                + TSVHeaderCreator.GENE_PRODUCT_ID + "\t"
+                + TSVHeaderCreator.GO_NAME + "\t"
+                + TSVHeaderCreator.TAXON_NAME + "\n", MediaType.TEXT_PLAIN);
     }
 
     @Test
     public void writeHeaderForSeveralSelectedFieldsInNewOrder() throws Exception {
         when(mockContent.isSlimmed()).thenReturn(false);
         when(mockContent.getSelectedFields()).thenReturn(asList(TAXON_NAME_FIELD_NAME, GO_NAME_FIELD_NAME,
-                GENE_PRODUCT_ID_FIELD_NAME));
-                                                                GENE_PRODUCT_FIELD_NAME));
+                GENE_PRODUCT_FIELD_NAME));
         tsvHeaderCreator.write(mockEmitter, mockContent);
 
-        verify(mockEmitter).send(TsvHeaderCreator.TAXON_NAME + "\t"
-                                         + TsvHeaderCreator.GO_NAME + "\t"
-                                         + TsvHeaderCreator.GENE_PRODUCT_DB + "\t"
-                                         + TsvHeaderCreator.GENE_PRODUCT_ID
+        verify(mockEmitter).send(TSVHeaderCreator.TAXON_NAME + "\t"
+                                         + TSVHeaderCreator.GO_NAME + "\t"
+                                         + TSVHeaderCreator.GENE_PRODUCT_DB + "\t"
+                                         + TSVHeaderCreator.GENE_PRODUCT_ID
                                          + "\n", MediaType.TEXT_PLAIN);
     }
 
