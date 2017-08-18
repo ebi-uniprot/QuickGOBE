@@ -334,13 +334,13 @@ public class AnnotationToTSVTest {
         private static final int COL_REFERENCE = 9;
         private static final int COL_WITH = 10;
         private static final int COL_TAXON = 11;
-        private static final int COL_ASSIGNED_BY = 13;
-        private static final int COL_ANNOTATION_EXTENSION = 14;
-        private static final int COL_DATE = 15;
-        private static final int COL_TAXON_NAME = 16;
-        private static final int COL_DB_OBJECT_NAME = 17 ;
-        private static final int COL_DB_OBJECT_SYNONYM = 18;
-        private static final int COL_DB_OBJECT_TYPE = 19;
+        private static final int COL_ASSIGNED_BY = 12;
+        private static final int COL_ANNOTATION_EXTENSION = 13;
+        private static final int COL_DATE = 14;
+        private static final int COL_TAXON_NAME = 15;
+        private static final int COL_DB_OBJECT_NAME = 16 ;
+        private static final int COL_DB_OBJECT_SYNONYM = 17;
+        private static final int COL_DB_OBJECT_TYPE = 18;
     }
 
     private class SlimmedColumns{
