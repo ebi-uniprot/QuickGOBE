@@ -24,6 +24,7 @@ import static uk.ac.ebi.quickgo.annotation.download.TSVDownload.*;
 public class TSVHeaderCreator extends AbstractHeaderCreator {
     private static final Logger LOGGER = LoggerFactory.getLogger(TSVHeaderCreator.class);
 
+    static final String GENE_PRODUCT_DB = "GENE PRODUCT DB";
     static final String GENE_PRODUCT_ID = "GENE PRODUCT ID";
     static final String SYMBOL = "SYMBOL";
     static final String QUALIFIER = "QUALIFIER";
@@ -53,7 +54,10 @@ public class TSVHeaderCreator extends AbstractHeaderCreator {
     }
 
     private static void initialiseContentMappings() {
-        selected2Content.put(GENE_PRODUCT_ID_FIELD_NAME, (hc, j) -> j.add(GENE_PRODUCT_ID));
+        selected2Content.put(GENE_PRODUCT_FIELD_NAME, (hc, j) -> {
+            j.add(GENE_PRODUCT_DB);
+            j.add(GENE_PRODUCT_ID);
+        });
         selected2Content.put(SYMBOL_FIELD_NAME, (hc, j) -> j.add(SYMBOL));
         selected2Content.put(QUALIFIER_FIELD_NAME, (hc, j) -> j.add(QUALIFIER));
         selected2Content.put(GO_TERM_FIELD_NAME, (hc, j) -> {

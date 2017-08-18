@@ -190,7 +190,8 @@ public class AnnotationControllerDownloadIT {
 
     @Test
     public void canDownloadInTSVFormat() throws Exception {
-        for(int i=1; i<=97; i++) {
+        int downloadCount = 97;
+        for(int i=1; i<=downloadCount; i++) {
             expectGoTermsHaveGoNamesViaRest(singletonList(IdGeneratorUtil.createGoId(3824)), singletonList
                     ("catalytic activity"));
         }
