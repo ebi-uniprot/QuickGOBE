@@ -251,13 +251,11 @@ public class AnnotationControllerDownloadIT {
                 get(DOWNLOAD_SEARCH_URL)
                         .header(ACCEPT, MediaTypeFactory.TSV_MEDIA_TYPE)
                         .param(DOWNLOAD_LIMIT_PARAM, Integer.toString(expectedDownloadCount))
-                        .param(SELECTED_FIELD_PARAM.getName(), GENE_PRODUCT_ID_FIELD_NAME_MIXED_CASE,
-                               SYMBOL_FIELD_NAME_MIXED_CASE, WITH_FROM_FIELD_NAME_MIXED_CASE));
+                        .param(SELECTED_FIELD_PARAM.getName(), SYMBOL_FIELD_NAME_MIXED_CASE,
+                               WITH_FROM_FIELD_NAME_MIXED_CASE));
 
         getFieldValuesFromRepo(doc -> idFrom(doc.geneProductId), expectedDownloadCount);
-
-        checkResponseForSelectedFields(response, GENE_PRODUCT_ID_FIELD_NAME_MIXED_CASE,
-                                       SYMBOL_FIELD_NAME_MIXED_CASE, WITH_FROM_FIELD_NAME_MIXED_CASE);
+        checkResponseForSelectedFields(response, SYMBOL_FIELD_NAME_MIXED_CASE, WITH_FROM_FIELD_NAME_MIXED_CASE);
     }
 
     private void checkResponse(MediaType mediaType, ResultActions response, List<String> storedIds) throws Exception {
