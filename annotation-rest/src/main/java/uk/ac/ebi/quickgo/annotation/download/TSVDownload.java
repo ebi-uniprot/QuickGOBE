@@ -12,7 +12,7 @@ import java.util.List;
  */
 public class TSVDownload {
 
-    public static final String GENE_PRODUCT_ID_FIELD_NAME = "geneproductid";
+    public static final String GENE_PRODUCT_FIELD_NAME = "geneproductid";
     public static final String SYMBOL_FIELD_NAME = "symbol";
     public static final String QUALIFIER_FIELD_NAME = "qualifier";
     public static final String GO_TERM_FIELD_NAME = "goid";
@@ -30,7 +30,7 @@ public class TSVDownload {
     public static final String GENE_PRODUCT_SYNONYMS_FIELD_NAME = "synonyms";
     public static final String GENE_PRODUCT_TYPE_FIELD_NAME = "type";
 
-    private static final List<String> FULL_FIELD_LIST = Arrays.asList(GENE_PRODUCT_ID_FIELD_NAME, SYMBOL_FIELD_NAME,
+    private static final List<String> FULL_FIELD_LIST = Arrays.asList(GENE_PRODUCT_FIELD_NAME, SYMBOL_FIELD_NAME,
                                                                       QUALIFIER_FIELD_NAME, GO_TERM_FIELD_NAME,
                                                                       GO_NAME_FIELD_NAME, ECO_ID_FIELD_NAME,
                                                                       GO_EVIDENCE_CODE_FIELD_NAME,
