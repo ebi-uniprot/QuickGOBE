@@ -43,7 +43,6 @@ import static org.hamcrest.Matchers.stringContainsInOrder;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
 import static org.springframework.http.HttpHeaders.VARY;
-import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
@@ -57,7 +56,7 @@ import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.INCLUDE_FIELD_PA
 import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.SELECTED_FIELD_PARAM;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.createGenericDocs;
 import static uk.ac.ebi.quickgo.annotation.controller.DownloadResponseVerifier.nonNullMandatoryFieldsExist;
-import static uk.ac.ebi.quickgo.annotation.controller.DownloadResponseVerifier.selectedFieldsExist;
+import static uk.ac.ebi.quickgo.annotation.controller.DownloadResponseVerifierSelectedFields.selectedFieldsExist;
 import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.*;
 
 /**
@@ -196,16 +195,12 @@ public class AnnotationControllerDownloadIT {
             expectGoTermsHaveGoNamesViaRest(singletonList(IdGeneratorUtil.createGoId(3824)), singletonList
                     ("catalytic activity"));
         }
-        canDownloadWithOptionalFields(TSV_MEDIA_TYPE, downloadCount, 18);
+        canDownloadWithOptionalFields();
     }
 
     @Test
     public void canDownloadInTSVFormatWithSelectedFieldsCaseInsensitive() throws Exception {
-        int expectedNumberOfFields = 4;
-        int downloadSize = 10;
-        String[] expectedFields = new String[] {GENE_PRODUCT_ID_FIELD_NAME_MIXED_CASE,
-                SYMBOL_FIELD_NAME_MIXED_CASE, WITH_FROM_FIELD_NAME_MIXED_CASE};
-        canDownloadWithSelectedFields(TSV_MEDIA_TYPE, expectedNumberOfFields, expectedFields, downloadSize);
+        canDownloadWithSelectedFields();
     }
 
     private List<AnnotationDocument> createDocs(int number) {
@@ -234,11 +229,11 @@ public class AnnotationControllerDownloadIT {
         checkResponse(mediaType, response, storedIds);
     }
 
-    private void canDownloadWithOptionalFields(MediaType mediaType, int expectedDownloadCount, int
-            expectedNumberOfFields) throws Exception {
+    private void canDownloadWithOptionalFields() throws Exception {
+        int expectedDownloadCount = 97;
         ResultActions response = mockMvc.perform(
                 get(DOWNLOAD_SEARCH_URL)
-                        .header(ACCEPT, mediaType)
+                        .header(ACCEPT, MediaTypeFactory.TSV_MEDIA_TYPE)
                         .param(DOWNLOAD_LIMIT_PARAM, Integer.toString(expectedDownloadCount))
                         .param(INCLUDE_FIELD_PARAM.getName(), GO_NAME_FIELD));
 
@@ -247,19 +242,20 @@ public class AnnotationControllerDownloadIT {
         perLine.add("GENE");
         //StringContainsInOrder.matchesSafely not working as expected, not finding A0A009, so cut down list.
         perLine.addAll(storedIds.subList(0,8));
-        checkResponseForSelectedFields(response, expectedNumberOfFields);
+        checkResponse(MediaTypeFactory.TSV_MEDIA_TYPE, response, perLine);
     }
 
-    private void canDownloadWithSelectedFields(MediaType mediaType, int expectedNumberOfFields, String[]
-            expectedFields, int expectedDownloadCount) throws Exception {
+    private void canDownloadWithSelectedFields() throws Exception {
+        int expectedDownloadCount = 97;
         ResultActions response = mockMvc.perform(
                 get(DOWNLOAD_SEARCH_URL)
-                        .header(ACCEPT, mediaType)
-                        .param(SELECTED_FIELD_PARAM.getName(), expectedFields));
+                        .header(ACCEPT, MediaTypeFactory.TSV_MEDIA_TYPE)
+                        .param(DOWNLOAD_LIMIT_PARAM, Integer.toString(expectedDownloadCount))
+                        .param(SELECTED_FIELD_PARAM.getName(), SYMBOL_FIELD_NAME_MIXED_CASE,
+                               WITH_FROM_FIELD_NAME_MIXED_CASE));
 
         getFieldValuesFromRepo(doc -> idFrom(doc.geneProductId), expectedDownloadCount);
-
-        checkResponseForSelectedFields(response, expectedNumberOfFields);
+        checkResponseForSelectedFields(response, SYMBOL_FIELD_NAME_MIXED_CASE, WITH_FROM_FIELD_NAME_MIXED_CASE);
     }
 
     private void checkResponse(MediaType mediaType, ResultActions response, List<String> storedIds) throws Exception {
@@ -273,11 +269,11 @@ public class AnnotationControllerDownloadIT {
                 .andExpect(content().string(stringContainsInOrder(storedIds)));
     }
 
-    private void checkResponseForSelectedFields(ResultActions response,int expectedNumberOfFields) throws Exception {
+    private void checkResponseForSelectedFields(ResultActions response, String... expectedFields) throws Exception {
         response.andExpect(request().asyncStarted())
                 .andDo(MvcResult::getAsyncResult)
                 .andDo(print())
-                .andExpect(selectedFieldsExist(expectedNumberOfFields));
+                .andExpect(selectedFieldsExist(expectedFields));
     }
 
     private void canDownloadWithFilter(MediaType mediaType) throws Exception {
@@ -287,10 +283,7 @@ public class AnnotationControllerDownloadIT {
 
         createDocs(moreThanExpectedDownloadCount)
                 .stream()
-                .map(doc -> {
-                    doc.taxonId = expectedTaxonId;
-                    return doc;
-                })
+                .peek(doc -> doc.taxonId = expectedTaxonId)
                 .forEach(this::saveToRepo);
 
         // we expect to receive fewer ids in the response than those we saved, because we will request fewer
@@ -328,10 +321,7 @@ public class AnnotationControllerDownloadIT {
 
         createDocs(actualAvailableDownloadCount)
                 .stream()
-                .map(doc -> {
-                    doc.taxonId = expectedTaxonId;
-                    return doc;
-                })
+                .peek(doc -> doc.taxonId = expectedTaxonId)
                 .forEach(this::saveToRepo);
 
         // we expect to receive fewer ids in the response than those we saved, because we will request fewer
@@ -365,9 +355,9 @@ public class AnnotationControllerDownloadIT {
                 .collect(Collectors.toList());
     }
 
-    private void expectRestCallSuccess(HttpMethod method, String url, String response) {
+    private void expectRestCallSuccess(String url, String response) {
         mockRestServiceServer.expect(requestTo(BASE_URL + url))
-                             .andExpect(method(method))
+                             .andExpect(method(HttpMethod.GET))
                              .andRespond(withSuccess(response, MediaType.APPLICATION_JSON));
     }
 
@@ -382,17 +372,15 @@ public class AnnotationControllerDownloadIT {
         for (int i = 0; i < termIds.size(); i++) {
             String termId = termIds.get(i);
             String termName = termNames.get(i);
-            expectRestCallSuccess(
-                    GET,
-                    buildResource(
-                            GO_TERM_RESOURCE_FORMAT,
-                            termId),
+            expectRestCallSuccess(buildResource(termId),
                     constructGoTermsResponseObject(singletonList(termId), singletonList(termName)));
         }
     }
 
-    private String buildResource(String format, String... arguments) {
-        int requiredArgsCount = format.length() - format.replace("%", "").length();
+    private String buildResource(String... arguments) {
+        int requiredArgsCount = AnnotationControllerDownloadIT.GO_TERM_RESOURCE_FORMAT.length() - AnnotationControllerDownloadIT.GO_TERM_RESOURCE_FORMAT
+
+                .replace("%", "").length();
         List<String> args = new ArrayList<>();
         for (int i = 0; i < requiredArgsCount; i++) {
             if (i < arguments.length) {
@@ -401,7 +389,7 @@ public class AnnotationControllerDownloadIT {
                 args.add("");
             }
         }
-        return String.format(format, args.toArray());
+        return String.format(AnnotationControllerDownloadIT.GO_TERM_RESOURCE_FORMAT, args.toArray());
     }
 
     private String constructGoTermsResponseObject(List<String> termIds, List<String> termNames) {

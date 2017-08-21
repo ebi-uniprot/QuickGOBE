@@ -3,6 +3,8 @@ package uk.ac.ebi.quickgo.annotation.download.header;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 
 /**
+ * A contract for writing {@link HeaderContent} to an instance of {@link ResponseBodyEmitter}
+ *
  * @author Tony Wardell
  * Date: 22/05/2017
  * Time: 15:36

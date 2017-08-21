@@ -32,6 +32,8 @@ class DownloadResponseVerifier {
             fieldMatcher = new GAFMandatoryFieldMatcher();
         } else if (mediaType.getSubtype().equals(MediaTypeFactory.GPAD_SUB_TYPE)) {
             fieldMatcher = new GPADMandatoryFieldMatcher();
+        } else if (mediaType.getSubtype().equals(MediaTypeFactory.TSV_SUB_TYPE)) {
+            fieldMatcher = new TSVAllFieldsMatcher();
         } else {
             throw new IllegalArgumentException("Unknown media type: " + mediaType);
         }
@@ -39,10 +41,6 @@ class DownloadResponseVerifier {
         return content().string(fieldMatcher);
     }
 
-    static ResultMatcher selectedFieldsExist(int expectedNumberOfFields) {
-        Matcher<String> fieldMatcher = new TSVSelectedFieldsMatcher(expectedNumberOfFields);
-        return content().string(fieldMatcher);
-    }
 
     static class GAFMandatoryFieldMatcher extends TypeSafeMatcher<String> {
         private static final List<Integer> MANDATORY_INDICES = asList(0, 1, 2, 4, 5, 6, 8, 11, 12, 13, 14);
@@ -100,16 +98,13 @@ class DownloadResponseVerifier {
         }
     }
 
-    static class TSVSelectedFieldsMatcher extends TypeSafeMatcher<String> {
+    static class TSVAllFieldsMatcher extends TypeSafeMatcher<String> {
+        private static final int FIELD_COUNT = 19;
         private static final String TYPE = "TSV";
-        private final int expectedNumberOfFields;
-
-        TSVSelectedFieldsMatcher(int expectedNumberOfFields) {
-            this.expectedNumberOfFields = expectedNumberOfFields;
-        }
+        private static final List<Integer> MANDATORY_INDICES = asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
 
         @Override public void describeTo(Description description) {
-            description.appendText("Expected " + expectedNumberOfFields + " to be populated.");
+            description.appendText("mandatory indices were not populated: " + MANDATORY_INDICES);
         }
 
         @Override protected boolean matchesSafely(String s) {
@@ -118,11 +113,16 @@ class DownloadResponseVerifier {
             for (String line : dataLines) {
                 if (!line.startsWith("!")) {
                     String[] components = line.split("\t");
-
-                    if (components.length != expectedNumberOfFields) {
-                        LOGGER.error(TYPE + " line should contain " + expectedNumberOfFields + " fields, but found: " +
-                                components.length);
+                    if (components.length != FIELD_COUNT) {
+                        LOGGER.error(TYPE + " line should contain " + FIELD_COUNT + " fields, but found: " + components
+                                .length);
                         return false;
+                    }
+                    for (Integer mandatoryIndex : MANDATORY_INDICES) {
+                        if (components[mandatoryIndex].isEmpty()) {
+                            LOGGER.error("Mandatory " + TYPE + " index should not be empty: " + mandatoryIndex);
+                            return false;
+                        }
                     }
                 }
             }
