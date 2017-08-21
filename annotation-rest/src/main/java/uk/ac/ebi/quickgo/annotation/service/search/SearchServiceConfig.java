@@ -120,10 +120,10 @@ public class SearchServiceConfig {
     public QueryRequestConverter<SolrQuery> annotationSolrQueryRequestConverter() {
         Set<String> unsortedFields =
                 Stream.of(fieldsThatCanBeUnsorted.split(COMMA)).collect(Collectors.toSet());
-
+        String wildCardField = "extension_search";
         return new SolrQueryConverter(
                 SOLR_ANNOTATION_QUERY_REQUEST_HANDLER,
-                new UnsortedSolrQuerySerializer(unsortedFields));
+                new UnsortedSolrQuerySerializer(unsortedFields, wildCardField));
     }
 
     /**
