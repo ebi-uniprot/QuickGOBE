@@ -20,7 +20,7 @@ public abstract class SourceInfoLoader<S extends OntologySourceFiles, T> {
     }
 
     protected abstract T newInstance();
-    public abstract Optional<T> load();
+    public abstract T load() throws Exception;
 
     private T instance;
 
