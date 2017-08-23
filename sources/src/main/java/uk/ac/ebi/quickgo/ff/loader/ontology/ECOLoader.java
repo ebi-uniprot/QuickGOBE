@@ -25,18 +25,11 @@ public class ECOLoader extends AbstractGenericOLoader<ECOSourceFiles, EvidenceCo
     }
 
     @Override
-    public Optional<EvidenceCodeOntology> load() {
-        try {
+    public EvidenceCodeOntology load() throws Exception{
             EvidenceCodeOntology eco = getInstance();
 
             // add generic ontology info
             createWithGenericOInfo(EvidenceCodeOntology.NAME_SPACE, Optional.empty());
-
-            return Optional.of(eco);
-        } catch (Exception e) {
-            LOGGER.error("Problem loading ECO information from source files: ", e);
-        }
-
-        return Optional.empty();
+            return eco;
     }
 }
