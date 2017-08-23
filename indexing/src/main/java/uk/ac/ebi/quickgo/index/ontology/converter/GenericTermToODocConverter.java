@@ -10,7 +10,6 @@ import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -27,10 +26,8 @@ import static org.apache.commons.collections.CollectionUtils.isEmpty;
 public class GenericTermToODocConverter implements Function<GenericTerm,
         OntologyDocument> {
 
-    @Override public OntologyDocument apply(GenericTerm termOptional) {
-
+    @Override public OntologyDocument apply(GenericTerm term) {
             OntologyDocument doc = new OntologyDocument();
-            GenericTerm term = termOptional;
             doc.id = term.getId();
             doc.isObsolete = term.isObsolete();
             doc.comment = term.getComment();
@@ -45,11 +42,9 @@ public class GenericTermToODocConverter implements Function<GenericTerm,
             doc.synonymNames = extractSynonymNames(term);
             doc.xrefs = extractXRefs(term);
             doc.xRelations = extractXRelationsAsList(term);
-
             doc.replaces = extractReplaces(term);
             doc.replacements = extractReplacements(term);
             doc.credits = extractCredits(term);
-
             return doc;
     }
 
