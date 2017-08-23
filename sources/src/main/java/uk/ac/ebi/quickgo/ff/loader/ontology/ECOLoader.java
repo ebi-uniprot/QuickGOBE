@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
  * Created by Edd on 11/12/2015.
  */
 public class ECOLoader extends AbstractGenericOLoader<ECOSourceFiles, EvidenceCodeOntology> {
-    private final static Logger LOGGER = LoggerFactory.getLogger(ECOLoader.class);
 
     public ECOLoader(ECOSourceFiles sourceFiles) {
         super(sourceFiles);
@@ -29,7 +28,7 @@ public class ECOLoader extends AbstractGenericOLoader<ECOSourceFiles, EvidenceCo
             EvidenceCodeOntology eco = getInstance();
 
             // add generic ontology info
-            createWithGenericOInfo(EvidenceCodeOntology.NAME_SPACE, Optional.empty());
+            createWithGenericOInfo(EvidenceCodeOntology.NAME_SPACE, null);
             return eco;
     }
 }
