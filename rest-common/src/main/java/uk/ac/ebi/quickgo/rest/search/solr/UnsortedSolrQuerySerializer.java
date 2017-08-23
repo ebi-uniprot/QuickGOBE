@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 
 import static org.slf4j.LoggerFactory.getLogger;
-import static uk.ac.ebi.quickgo.rest.search.solr.SolrQueryConverter.SOLR_FIELD_SEPARATOR;
 import static uk.ac.ebi.quickgo.rest.search.solr.UnsortedSolrQuerySerializer.TermQueryTransformationResult
         .failedTransformationResult;
 import static uk.ac.ebi.quickgo.rest.search.solr.UnsortedSolrQuerySerializer.TermQueryTransformationResult
@@ -40,9 +39,8 @@ public class UnsortedSolrQuerySerializer implements QueryVisitor<String> {
 
     private final SortedSolrQuerySerializer sortedQuerySerializer;
     private final Set<String> termsQueryCompatibleFields;
-    private final String wildCardField;
 
-    public UnsortedSolrQuerySerializer(Set<String> termsQueryCompatibleFields, String wildCardField) {
+    public UnsortedSolrQuerySerializer(Set<String> termsQueryCompatibleFields) {
         Preconditions.checkArgument(termsQueryCompatibleFields != null,
                 "The Set<String> of termsQueryCompatibleFields cannot be null");
 
@@ -54,26 +52,16 @@ public class UnsortedSolrQuerySerializer implements QueryVisitor<String> {
         this.sortedQuerySerializer = new SortedSolrQuerySerializer();
 
         this.termsQueryCompatibleFields = termsQueryCompatibleFields;
-        this.wildCardField = wildCardField;
+
     }
 
     @Override
     public String visit(FieldQuery query) {
-        if(isWildCardSearch(query)){
-            return buildWildCardQuery(query);
-        } else if (isTermsQueryCompatible(query)) {
+        if (isTermsQueryCompatible(query)) {
             return buildTermsQuery(query.field(), query.value());
         } else {
             return sortedQuerySerializer.visit(query);
         }
-    }
-
-    private boolean isWildCardSearch(FieldQuery query) {
-        return query.field().equals(wildCardField) && query.value().equals("*");
-    }
-
-    private String buildWildCardQuery(FieldQuery query) {
-        return "(" + query.field() + SOLR_FIELD_SEPARATOR + "[ '' TO *])";
     }
 
     private String buildTermsQuery(String field, String... values) {

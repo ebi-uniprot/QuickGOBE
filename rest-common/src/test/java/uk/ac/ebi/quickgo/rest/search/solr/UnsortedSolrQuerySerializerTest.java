@@ -33,7 +33,6 @@ public class UnsortedSolrQuerySerializerTest {
     private static final String TERMS_INCOMPATIBLE_FIELD_2 = "termsIncompatibleField2";
     private static final String TERMS_INCOMPATIBLE_FIELD_3 = "termsIncompatibleField3";
     private UnsortedSolrQuerySerializer serializer;
-    private final String wildCardField = null;
 
     @Before
     public void setUp() {
@@ -43,13 +42,13 @@ public class UnsortedSolrQuerySerializerTest {
                 TERMS_COMPATIBLE_FIELD_3)
                 .collect(Collectors
                         .toSet());
-        this.serializer = new UnsortedSolrQuerySerializer(termsQueryCompatibleFields, wildCardField);
+        this.serializer = new UnsortedSolrQuerySerializer(termsQueryCompatibleFields);
     }
 
     public class Initialization {
         @Test(expected = IllegalArgumentException.class)
         public void initWithNullSetOfFieldsThatAreTermsQueryCompatibleCausesIllegalArgumentException() {
-            new UnsortedSolrQuerySerializer(null, wildCardField);
+            new UnsortedSolrQuerySerializer(null);
         }
     }
 
