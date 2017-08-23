@@ -1,6 +1,5 @@
 package uk.ac.ebi.quickgo.index.ontology;
 
-import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
 import uk.ac.ebi.quickgo.model.ontology.eco.ECOTerm;
 import uk.ac.ebi.quickgo.model.ontology.eco.EvidenceCodeOntology;
 import uk.ac.ebi.quickgo.model.ontology.generic.GenericTerm;
@@ -11,7 +10,6 @@ import de.bechte.junit.runners.context.HierarchicalContextRunner;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -47,11 +45,7 @@ public class OntologyReaderTest {
 
             // set document count
             docCount += go.getTerms().size() + eco.getTerms().size();
-
-            Optional<GeneOntology> goOptional = Optional.of(go);
-            Optional<EvidenceCodeOntology> ecoOptional = Optional.of(eco);
-            ontologyReader = new OntologyReader(goOptional, ecoOptional);
-
+            ontologyReader = new OntologyReader(go, eco);
             ontologyReader.open(new ExecutionContext());
         }
 
@@ -66,36 +60,31 @@ public class OntologyReaderTest {
     }
 
     public class DocReaderAccessingInvalidOntologies {
-        private Optional<GeneOntology> validGOOptional;
-        private Optional<EvidenceCodeOntology> validECOOptional;
+        private GeneOntology validGO;
+        private EvidenceCodeOntology validECO;
 
         @Before
         public void setUp() {
-            GeneOntology go = mock(GeneOntology.class);
-            when(go.getTerms()).thenReturn(createGOTerms());
+            validGO = mock(GeneOntology.class);
+            when(validGO.getTerms()).thenReturn(createGOTerms());
 
-            EvidenceCodeOntology eco = mock(EvidenceCodeOntology.class);
-            when(eco.getTerms()).thenReturn(createECOTerms());
-
-            validGOOptional = Optional.of(go);
-            validECOOptional = Optional.of(eco);
+            validECO = mock(EvidenceCodeOntology.class);
+            when(validECO.getTerms()).thenReturn(createECOTerms());
         }
 
-        @Test(expected = DocumentReaderException.class)
+        @Test(expected = IllegalArgumentException.class)
         public void openingEmptyGOWillCauseDocumentReaderException() {
-            ontologyReader = new OntologyReader(validGOOptional, Optional.empty());
-            ontologyReader.open(new ExecutionContext());
+            ontologyReader = new OntologyReader(validGO, null);
         }
 
-        @Test(expected = DocumentReaderException.class)
+        @Test(expected = IllegalArgumentException.class)
         public void openingEmptyECOWillCauseDocumentReaderException() {
-            ontologyReader = new OntologyReader(Optional.empty(), validECOOptional);
-            ontologyReader.open(new ExecutionContext());
+            ontologyReader = new OntologyReader(null, validECO);
         }
 
         @Test
         public void opensSuccessfully() {
-            ontologyReader = new OntologyReader(validGOOptional, validECOOptional);
+            ontologyReader = new OntologyReader(validGO, validECO);
             ontologyReader.open(new ExecutionContext());
             assertThat(ontologyReader, is(not(nullValue())));
         }
@@ -119,7 +108,7 @@ public class OntologyReaderTest {
 
     @After
     public void after() {
-        ontologyReader.close();
+        if(ontologyReader != null) ontologyReader.close();
     }
 
 }
