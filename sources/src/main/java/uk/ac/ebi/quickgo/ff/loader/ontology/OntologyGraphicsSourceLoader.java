@@ -28,7 +28,7 @@ public class OntologyGraphicsSourceLoader {
     private GeneOntology geneOntology;
     private EvidenceCodeOntology evidenceCodeOntology;
 
-    public OntologyGraphicsSourceLoader(File sourceDir) {
+    public OntologyGraphicsSourceLoader(File sourceDir){
         checkArgument(sourceDir != null && sourceDir.exists(), "Source directory cannot be null and must exist");
 
         this.sourceDir = sourceDir;
@@ -37,15 +37,10 @@ public class OntologyGraphicsSourceLoader {
     }
 
     private void loadOntologies() {
-        new GOLoader(new GOSourceFiles(requireNonNull(sourceDir)))
-                .load()
-                .map(go -> this.geneOntology = go);
-
-        new ECOLoader(new ECOSourceFiles(requireNonNull(sourceDir)))
-                .load()
-                .map(eco -> evidenceCodeOntology = eco);
-
-        if (isLoaded()) {
+        try {
+            this.geneOntology = new GOLoader(new GOSourceFiles(requireNonNull(sourceDir))).load();
+            evidenceCodeOntology = new ECOLoader(new ECOSourceFiles(requireNonNull(sourceDir))).load();
+        } catch (Exception e) {
             LOGGER.warn("Could not load ontologies correctly. No graphics can be provided.");
         }
     }
