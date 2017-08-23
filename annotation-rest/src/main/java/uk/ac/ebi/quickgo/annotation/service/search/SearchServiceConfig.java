@@ -9,6 +9,7 @@ import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.Ontol
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.SlimResultsTransformer;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.TaxonomyNameInjector;
 import uk.ac.ebi.quickgo.annotation.service.converter.AnnotationDocConverterImpl;
+import uk.ac.ebi.quickgo.annotation.service.search.solr.UnsortedSolrAnnotationQuerySerializer;
 import uk.ac.ebi.quickgo.common.SearchableField;
 import uk.ac.ebi.quickgo.common.loader.DbXRefLoader;
 import uk.ac.ebi.quickgo.common.validator.DbXRefEntityValidation;
@@ -123,7 +124,7 @@ public class SearchServiceConfig {
         String wildCardField = "extension_search";
         return new SolrQueryConverter(
                 SOLR_ANNOTATION_QUERY_REQUEST_HANDLER,
-                new UnsortedSolrQuerySerializer(unsortedFields, wildCardField));
+                new UnsortedSolrAnnotationQuerySerializer(unsortedFields, wildCardField));
     }
 
     /**
