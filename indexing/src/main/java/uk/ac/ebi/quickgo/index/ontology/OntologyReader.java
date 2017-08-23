@@ -64,26 +64,15 @@ public class OntologyReader extends AbstractItemStreamItemReader<OntologyDocumen
      */
     @Override public OntologyDocument read() throws Exception {
         if (goTermIterator.hasNext()) {
-            OntologyDocument optionalDoc =
-                    GO_TERM_TO_DOC_CONVERTER.apply((GOTerm) goTermIterator.next());
-            return optionalDoc;
+            OntologyDocument doc = GO_TERM_TO_DOC_CONVERTER.apply((GOTerm) goTermIterator.next());
+            return doc;
         } else if (ecoTermIterator.hasNext()) {
-            OntologyDocument optionalDoc =
-                    GENERIC_TERM_TO_DOC_CONVERTER.apply(ecoTermIterator.next());
-            return optionalDoc;
+            OntologyDocument doc = GENERIC_TERM_TO_DOC_CONVERTER.apply(ecoTermIterator.next());
+            return doc;
         } else {
             return null;
         }
     }
-
-//    protected OntologyDocument extractOntologyDocument(Optional<OntologyDocument> optionalDoc)
-//            throws DocumentReaderException {
-//        if (optionalDoc.isPresent()) {
-//            return optionalDoc.get();
-//        } else {
-//            throw new DocumentReaderException("The converted Optional<OntologyDocument> should never be empty");
-//        }
-//    }
 
     @Override public void close() {
         // no op
