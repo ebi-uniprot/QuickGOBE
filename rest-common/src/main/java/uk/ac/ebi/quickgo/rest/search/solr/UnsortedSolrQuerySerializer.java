@@ -52,7 +52,6 @@ public class UnsortedSolrQuerySerializer implements QueryVisitor<String> {
         this.sortedQuerySerializer = new SortedSolrQuerySerializer();
 
         this.termsQueryCompatibleFields = termsQueryCompatibleFields;
-
     }
 
     @Override
