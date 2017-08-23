@@ -6,7 +6,6 @@ import uk.ac.ebi.quickgo.model.ontology.eco.EvidenceCodeOntology;
 import uk.ac.ebi.quickgo.model.ontology.generic.GenericTerm;
 import uk.ac.ebi.quickgo.model.ontology.go.GOTerm;
 import uk.ac.ebi.quickgo.model.ontology.go.GeneOntology;
-import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
 
 import de.bechte.junit.runners.context.HierarchicalContextRunner;
 import java.util.Arrays;
@@ -64,18 +63,6 @@ public class OntologyReaderTest {
             }
             assertThat(count, is(docCount));
         }
-
-//        @Test(expected = DocumentReaderException.class)
-//        public void extractingEmptyOntologyDocumentThrowsDocumentReadException() throws DocumentReaderException {
-//            ontologyReader.extractOntologyDocument(Optional.empty());
-//        }
-//
-//        @Test
-//        public void extractingNonEmptyOntologyDocumentSucceeds() throws DocumentReaderException {
-//            OntologyDocument ontologyDocument = ontologyReader.extractOntologyDocument(new OntologyDocument());
-//            assertThat(ontologyDocument, is(not(nullValue())));
-//        }
-
     }
 
     public class DocReaderAccessingInvalidOntologies {
