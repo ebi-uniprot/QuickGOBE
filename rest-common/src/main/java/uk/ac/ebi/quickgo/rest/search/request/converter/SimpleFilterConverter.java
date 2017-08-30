@@ -8,7 +8,6 @@ import com.google.common.base.Preconditions;
 import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.or;
 
@@ -56,11 +55,14 @@ class SimpleFilterConverter implements FilterConverter<FilterRequest, QuickGOQue
      * @return the corresponding {@link QuickGOQuery}
      */
     private QuickGOQuery getQuickGOQuery(FilterRequest request) {
-        Set<QuickGOQuery> queries = request.getValues().stream()
-                .flatMap(Collection::stream)
-                .map(value -> QuickGOQuery
-                        .createQuery(request.getSignature().stream().collect(Collectors.joining()), value))
-                .collect(Collectors.toSet());
+        Set<QuickGOQuery> queries = request.getValues()
+                                           .stream()
+                                           .flatMap(Collection::stream)
+                                           .map(value -> QuickGOQuery.createQuery(request.getSignature()
+                                                                                         .stream()
+                                                                                         .collect(Collectors.joining()),
+                                                                                  value))
+                                           .collect(Collectors.toSet());
 
         return or(queries.toArray(new QuickGOQuery[queries.size()]));
     }
