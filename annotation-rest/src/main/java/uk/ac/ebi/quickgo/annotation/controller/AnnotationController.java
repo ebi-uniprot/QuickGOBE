@@ -179,7 +179,7 @@ public class AnnotationController {
                     "matching annotations", response = ResponseExceptionHandler.ErrorInfo.class),
             @ApiResponse(code = 400, message = "Bad request due to a validation issue encountered in one of the " +
                     "filters", response = ResponseExceptionHandler.ErrorInfo.class)})
-    @ApiOperation(value = "Search for all annotations that match the filter criteria provided by the client.")
+    @ApiOperation(value = "Search for all annotations that match the supplied filter criteria.")
     @RequestMapping(value = "/search", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<Annotation>> annotationLookup(
             @Valid @ModelAttribute AnnotationRequest request, BindingResult bindingResult) {
@@ -210,7 +210,7 @@ public class AnnotationController {
                     response = ResponseExceptionHandler.ErrorInfo.class),
             @ApiResponse(code = 400, message = "Bad request due to a validation issue encountered in one of the " +
                     "filters", response = ResponseExceptionHandler.ErrorInfo.class)})
-    @ApiOperation(value = "Generate statistics on the annotation result set obtained from applying the filters.")
+    @ApiOperation(value = "Generate statistics for the annotation result set obtained from applying the filters.")
     @RequestMapping(value = "/stats", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<StatisticsGroup>> annotationStats(
             @Valid @ModelAttribute AnnotationRequest request, BindingResult bindingResult) {
@@ -302,8 +302,9 @@ public class AnnotationController {
      *
      * @return response with metadata information.
      */
-    @ApiOperation(value = "Get meta data information about the Annotation service",
-            notes = "Annotations creation date.")
+    @ApiOperation(value = "Get meta-data information about the Annotation service",
+            response = MetaData.class,
+            notes = "Provides the date the annotation information was created.")
     @RequestMapping(value = "/about", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<MetaData> provideMetaData() {
         return new ResponseEntity<>(metaDataProvider.lookupMetaData(), HttpStatus.OK);

@@ -72,7 +72,7 @@ public class CoTermController {
                     response = ResponseExceptionHandler.ErrorInfo.class),
             @ApiResponse(code = 400, message = "Bad request due to a validation issue with one of the request values.",
                     response = ResponseExceptionHandler.ErrorInfo.class)})
-    @ApiOperation(value = "Get co-occurring term information for a single GO Term id.")
+    @ApiOperation(value = "Get co-occurring term information for a single GO term id.")
     @RequestMapping(value = "/{id}", method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<CoTerm>> findCoTerms(
