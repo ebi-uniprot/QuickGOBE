@@ -30,6 +30,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -220,8 +221,7 @@ public class AnnotationController {
         return new ResponseEntity<>(stats, HttpStatus.OK);
     }
 
-    @ApiOperation(value = "Search then download all annotations matching the filter criteria provided by the client.",
-                  hidden = true)
+    @ApiOperation(value = "Download all annotations that match the supplied filter criteria.", response = File.class)
     @RequestMapping(value = "/downloadSearch",
             method = {RequestMethod.GET}, produces = {GPAD_MEDIA_TYPE_STRING, GAF_MEDIA_TYPE_STRING, TSV_MEDIA_TYPE_STRING})
     public ResponseEntity<ResponseBodyEmitter> downloadLookup(
