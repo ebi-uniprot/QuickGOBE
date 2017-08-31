@@ -39,7 +39,7 @@ public class SearchServiceConfig {
     private static final String COMMA = ",";
     private static final String DEFAULT_ONTOLOGY_SEARCH_RETURN_FIELDS = "id,name,ontologyType";
 
-    @Value("${wildcard.compatible.fields}")
+    @Value("${wildcard.compatible.fields:}")
     private String fieldsThatCanBeSearchedByWildCard;
 
     @Bean
