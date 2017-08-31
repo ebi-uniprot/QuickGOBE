@@ -2,26 +2,34 @@ package uk.ac.ebi.quickgo.rest.search.solr;
 
 import uk.ac.ebi.quickgo.rest.search.query.*;
 
+import java.util.HashSet;
+import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static uk.ac.ebi.quickgo.rest.TestUtil.asSet;
+import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.SELECT_ALL_WHERE_FIELD_IS_NOT_EMPTY;
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.and;
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.or;
 import static uk.ac.ebi.quickgo.rest.search.solr.SolrQueryConverter.CROSS_CORE_JOIN_SYNTAX;
+import static uk.ac.ebi.quickgo.rest.search.solr.SortedSolrQuerySerializer.RETRIEVE_ALL_NON_EMPTY;
 
 /**
  * Created 02/08/16
  * @author Edd
  */
 public class SortedSolrQuerySerializerTest {
+    public static final String FIELD_WC = "fieldWC";
     private SortedSolrQuerySerializer serializer;
+    private static Set<String> wildCardCompatibleFields = new HashSet<>();
+
 
     @Before
     public void setUp() {
-        this.serializer = new SortedSolrQuerySerializer();
+        wildCardCompatibleFields.add(FIELD_WC);
+        this.serializer = new SortedSolrQuerySerializer(wildCardCompatibleFields);
     }
 
     @Test
@@ -164,6 +172,15 @@ public class SortedSolrQuerySerializerTest {
                         query2.field(), query2.value(),
                         query3.field(), query3.value())
         ));
+    }
+
+    @Test
+    public void visitWithWildCard(){
+        AllNonEmptyFieldQuery allNonEmptyFieldQuery = new AllNonEmptyFieldQuery(FIELD_WC, SELECT_ALL_WHERE_FIELD_IS_NOT_EMPTY);
+
+        String queryString = serializer.visit(allNonEmptyFieldQuery);
+
+        assertThat(queryString, is(String.format("(%s:%s)", allNonEmptyFieldQuery.field(), RETRIEVE_ALL_NON_EMPTY )));
     }
 
     private String buildFieldQueryString(String field, String value) {

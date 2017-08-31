@@ -19,10 +19,13 @@ import static uk.ac.ebi.quickgo.rest.search.solr.SolrQueryConverter.SOLR_FIELD_S
  * @author Edd
  */
 public class SortedSolrQuerySerializer implements QueryVisitor<String> {
+    public static final String RETRIEVE_ALL_NON_EMPTY = "[ '' TO * ]";
     private final SolrQueryStringSanitizer queryStringSanitizer;
+    private final Set<String> wildCardFieldQueryCompatibleFields;
 
-    public SortedSolrQuerySerializer() {
+    public SortedSolrQuerySerializer(Set<String> wildCardFieldQueryCompatibleFields) {
         this.queryStringSanitizer = new SolrQueryStringSanitizer();
+        this.wildCardFieldQueryCompatibleFields = wildCardFieldQueryCompatibleFields;
     }
 
     @Override public String visit(FieldQuery query) {
@@ -64,5 +67,12 @@ public class SortedSolrQuerySerializer implements QueryVisitor<String> {
 
         return String.format(CROSS_CORE_JOIN_SYNTAX, query.getJoinFromAttribute(), query.getJoinToAttribute(),
                 query.getJoinFromTable(), fromFilterString);
+    }
+
+    @Override public String visit(AllNonEmptyFieldQuery query) {
+        if(wildCardFieldQueryCompatibleFields.contains(query.field())) {
+            return "(" + query.field() + SOLR_FIELD_SEPARATOR + RETRIEVE_ALL_NON_EMPTY + ")";
+        }
+        throw new IllegalArgumentException("It's invalid to search for all non-empty values of " + query.field());
     }
 }

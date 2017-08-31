@@ -17,9 +17,8 @@ import uk.ac.ebi.quickgo.rest.search.solr.SolrRequestRetrieval;
 import uk.ac.ebi.quickgo.rest.search.solr.SolrRetrievalConfig;
 import uk.ac.ebi.quickgo.rest.service.ServiceRetrievalConfig;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
@@ -52,6 +51,9 @@ public class SearchServiceConfig {
     private static final String COMMA = ",";
     private static final String DEFAULT_ONTOLOGY_SEARCH_RETURN_FIELDS = "id,name,ontologyType";
 
+    @Value("${search.wildcard.compatible.fields:}")
+    private String fieldsThatCanBeSearchedByWildCard;
+
     @Bean
     public SearchService<OntologyTerm> ontologySearchService(
             RequestRetrieval<OntologyTerm> ontologySolrRequestRetrieval) {
@@ -81,7 +83,9 @@ public class SearchServiceConfig {
 
     @Bean
     public QueryRequestConverter<SolrQuery> ontologySolrQueryRequestConverter() {
-        return new SolrQueryConverter(SOLR_ONTOLOGY_QUERY_REQUEST_HANDLER);
+        Set<String> wildCardFields =
+                Stream.of(fieldsThatCanBeSearchedByWildCard.split(COMMA)).collect(Collectors.toSet());
+        return SolrQueryConverter.createWithWildCardSupport(SOLR_ONTOLOGY_QUERY_REQUEST_HANDLER, wildCardFields);
     }
 
     @Bean

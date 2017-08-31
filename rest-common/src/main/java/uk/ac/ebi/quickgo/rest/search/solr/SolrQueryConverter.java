@@ -4,6 +4,7 @@ import uk.ac.ebi.quickgo.rest.search.query.*;
 
 import com.google.common.base.Preconditions;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.common.params.CursorMarkParams;
@@ -24,8 +25,11 @@ public class SolrQueryConverter implements QueryRequestConverter<SolrQuery> {
     private final AggregateConverter<String> aggregateConverter;
     private final SolrPageVisitor solrPageVistor;
 
-    public SolrQueryConverter(String requestHandler) {
-        this(requestHandler, new SortedSolrQuerySerializer());
+    public static SolrQueryConverter createWithWildCardSupport(String requestHandler, Set<String>
+            wildCardCompatibleFields) {
+        Preconditions.checkArgument(wildCardCompatibleFields != null,
+                                    "Wildcard compatible field list cannot be null");
+        return new SolrQueryConverter(requestHandler, new SortedSolrQuerySerializer(wildCardCompatibleFields));
     }
 
     public SolrQueryConverter(String requestHandler, QueryVisitor<String> solrQuerySerializer) {
