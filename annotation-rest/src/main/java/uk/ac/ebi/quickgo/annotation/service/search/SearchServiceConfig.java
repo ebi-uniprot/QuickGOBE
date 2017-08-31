@@ -89,7 +89,7 @@ public class SearchServiceConfig {
     @Value("${annotation.download.pageSize:" + DEFAULT_DOWNLOAD_PAGE_SIZE + "}")
     private int downloadPageSize;
 
-    @Value("${search.wildcard.compatible.fields:}")
+    @Value("${wildcard.compatible.fields:}")
     private String fieldsThatCanBeSearchedByWildCard;
 
     @Bean
