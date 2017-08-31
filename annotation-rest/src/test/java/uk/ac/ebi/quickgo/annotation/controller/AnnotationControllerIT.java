@@ -1,19 +1,5 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
-import org.apache.commons.lang.StringUtils;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
-
 import uk.ac.ebi.quickgo.annotation.AnnotationREST;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
@@ -28,6 +14,19 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import org.apache.commons.lang.StringUtils;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import static java.util.Arrays.asList;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -39,7 +38,10 @@ import static uk.ac.ebi.quickgo.annotation.IdGeneratorUtil.createGPId;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.*;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.*;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.ResponseItem.responseItem;
-import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.*;
+import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.DEFAULT_ENTRIES_PER_PAGE;
+import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.MAX_PAGE_NUMBER;
+import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.MAX_PAGE_RESULTS;
+import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.SELECT_ALL_WHERE_FIELD_IS_NOT_EMPTY;
 
 /**
  * RESTful end point for Annotations
@@ -2045,7 +2047,7 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(3));
     }
-    
+
     @Test
     public void resultsReturnedInOrderWrittenToSolrRelevancyNotUsed() throws Exception {
         // Create an Annotation with a mixture of new and existing extensions.
@@ -2069,6 +2071,39 @@ public class AnnotationControllerIT {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(4))
                 .andExpect(fieldInRowHasValue("geneProductId", 0, expected));
+    }
+
+    // ------------------------------- Wildcard searches  -------------------------------
+
+    @Test
+    public void retrieveWhereAnnotationExtensionIsNotEmpty() throws Exception {
+        int numberOfDocsWithExtensions = 3;
+        int numberOfDocsWithoutExtensions = 2;
+        repository.deleteAll();
+        List<AnnotationDocument> docsWithExtensions = createGenericDocs(numberOfDocsWithExtensions);
+        List<AnnotationDocument> docsWithoutExtensions = createGenericDocs(numberOfDocsWithoutExtensions);
+        for (AnnotationDocument doc : docsWithoutExtensions) {
+            doc.extensions = null;
+        }
+        repository.save(docsWithExtensions);
+        repository.save(docsWithoutExtensions);
+
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(EXTENSION_PARAM.getName(),
+                                                                                     SELECT_ALL_WHERE_FIELD_IS_NOT_EMPTY));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(numberOfDocsWithExtensions));
+    }
+
+    @Test
+    public void usingInvalidWildCardFieldResultsInError() throws Exception {
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(GENE_PRODUCT_ID_PARAM.getName(),
+                                                                                     SELECT_ALL_WHERE_FIELD_IS_NOT_EMPTY));
+
+        response.andDo(print())
+                .andExpect(status().isBadRequest());
     }
 
     // ------------------------------- Check date format -------------------------------
