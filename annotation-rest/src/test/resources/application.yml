@@ -68,6 +68,13 @@ model:
       goAspect: aspect
     }
 
+## ========== Co-occurring Terms ==========
+coterm:
+   manual: classpath:/coterms/CoTermsManual
+   all: classpath:/coterms/CoTermsAll
+   headerLines: 1
+   limit: 30
+
 ---
 ## ==========
 spring:
@@ -82,9 +89,14 @@ annotation:
       allowCoreThreadTimeout: false
       waitForTasksToCompleteOnShutdown: true
 
-## ========== Co-occurring Terms ==========
-coterm:
-   manual: classpath:/coterms/CoTermsManual
-   all: classpath:/coterms/CoTermsAll
-   headerLines: 1
-   limit: 30
+---
+## ==========
+spring:
+   profiles: stats-type-limit-properties-test
+annotation:
+  stats:
+    typeLimits:
+      goId: 18
+      taxonId: 11
+      typeDoesNotExist: 12
+
