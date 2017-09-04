@@ -7,10 +7,7 @@ import uk.ac.ebi.quickgo.rest.ParameterException;
 import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.*;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -76,10 +73,14 @@ public class CoTermController {
     @RequestMapping(value = "/{id}", method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<CoTerm>> findCoTerms(
-            @PathVariable(value = "id") String id,
-            @RequestParam(value = "source", defaultValue = "ALL") String source,
-            @RequestParam(value = "limit", required = false) String limit,
-            @RequestParam(value = "similarityThreshold", defaultValue = "0.0") float similarityThreshold) {
+            @ApiParam(value = "The GO term id") @PathVariable String id,
+            @ApiParam(name = "source", value = "The source from which the co-occurring terms originated. Possible " +
+                    "values: ALL / MANUAL. ALL => manual + electronic/automatically generated annotations; " +
+                    "MANUAL => only manually generated annotations", defaultValue = "ALL") @RequestParam String source,
+            @ApiParam(name = "limit", value = "The number of terms returned", required = false)
+            @RequestParam(required = false) String limit,
+            @ApiParam(name = "similarityThreshold", value = "The similarity threshold used when finding co-occurring " +
+                    "terms", defaultValue = "0.0") @RequestParam float similarityThreshold) {
 
         validateGoTerm(id);
         final List<CoTerm> coTerms = coTermRepository.findCoTerms(id, toCoTermSource(source));
