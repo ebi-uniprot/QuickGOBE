@@ -6,6 +6,8 @@ import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
 import uk.ac.ebi.quickgo.ontology.common.OntologyType;
 import uk.ac.ebi.quickgo.rest.search.SearchControllerSetup;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.apache.http.HttpStatus;
@@ -14,6 +16,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
@@ -328,7 +331,7 @@ public class OntologySearchIT extends SearchControllerSetup {
         repository.save(doc1);
         repository.save(doc2);
 
-        checkValidHighlightOnQueryResponse("function 2", "GO:0000002");
+        checkValidHighlightOnQueryResponse("function 2", "GO:0000002", "GO:0000001");
     }
 
     @Test
@@ -363,7 +366,7 @@ public class OntologySearchIT extends SearchControllerSetup {
         repository.save(doc1);
         repository.save(doc2);
 
-        checkValidHighlightOffQueryResponse("function 2", 1);
+        checkValidHighlightOffQueryResponse("go function 2", 2);
     }
 
     @Test
@@ -396,15 +399,14 @@ public class OntologySearchIT extends SearchControllerSetup {
     }
 
     private void saveToRepository(OntologyDocument... documents) {
-        for (OntologyDocument doc : documents) {
-            repository.save(doc);
-        }
+        repository.save(asList(documents));
     }
 
     private void saveNDocs(int n) {
-        IntStream.range(1, n + 1)
+        List<OntologyDocument> documents = IntStream.range(1, n + 1)
                 .mapToObj(i -> createGODoc(String.valueOf(i), "name " + n))
                 .collect(Collectors.toList());
+        repository.save(documents);
     }
 
     private OntologyDocument createGODoc(String id, String name) {
