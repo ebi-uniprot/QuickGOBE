@@ -29,10 +29,10 @@ public class ECOControllerIT extends OBOControllerIT {
     @Override
     protected List<OntologyDocument> createBasicDocs() {
         return Arrays.asList(
-                OntologyDocMocker.createECODoc(ECO_0000001, "eco doc name 1"),
-                OntologyDocMocker.createECODoc(ECO_0000002, "eco doc name 2"),
-                OntologyDocMocker.createECODoc(ECO_0000003, "eco doc name 3"),
-                OntologyDocMocker.createECODoc(ECO_0000004, "eco doc name 4"));
+                OntologyDocMocker.createECODoc(ECO_0000001, "doc name 1"),
+                OntologyDocMocker.createECODoc(ECO_0000002, "doc name 2"),
+                OntologyDocMocker.createECODoc(ECO_0000003, "doc name 3"),
+                OntologyDocMocker.createECODoc(ECO_0000004, "doc name 4"));
     }
 
     @Override protected List<OntologyDocument> createNDocs(int n) {

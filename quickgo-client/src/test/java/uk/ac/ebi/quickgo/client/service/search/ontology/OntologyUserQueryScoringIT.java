@@ -211,7 +211,7 @@ public class OntologyUserQueryScoringIT {
     }
 
     @Test
-    public void namesInEntriesDoNotCompletelyMatchMultiWordQueryReturnsNoEntries() throws Exception {
+    public void namesInEntriesDoNotMatchMultiWordQueryReturnsZeroEntries() throws Exception {
         OntologyDocument doc1 = createDoc("GO:0000001", "go1 with something");
         OntologyDocument doc2 = createDoc("GO:0000002", "go1 do something else");
         OntologyDocument doc3 = createDoc("GO:0000003", "go1 up then down");
@@ -220,7 +220,7 @@ public class OntologyUserQueryScoringIT {
         repository.save(doc2);
         repository.save(doc3);
 
-        mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "go1 and"))
+        mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "go2 or"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.results.*", hasSize(0)));
     }
@@ -271,16 +271,16 @@ public class OntologyUserQueryScoringIT {
 
     @Test
     public void termFrequencyDoesNotInfluenceScoring() throws Exception {
-        OntologyDocument doc1 = createDoc("GO:0000001", "go1 go2");
-        OntologyDocument doc2 = createDoc(
+        OntologyDocument docContainingTwoGo1s = createDoc("GO:0000001", "go1 go2", "go1");
+        OntologyDocument docContaining6Go1s = createDoc(
                 "GO:0000002",
                 "go1 go2",
                 "go1 and go1 is not go2",
                 "go1 go2 synonym",
                 "go1 or go1");
 
-        repository.save(doc1);
-        repository.save(doc2);
+        repository.save(docContainingTwoGo1s);
+        repository.save(docContaining6Go1s);
 
         mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "go1"))
                 .andExpect(status().isOk())
@@ -323,6 +323,40 @@ public class OntologyUserQueryScoringIT {
                 .andExpect(jsonPath("$.results.*", hasSize(2)))
                 .andExpect(jsonPath("$.results[0].id").value("GO:0000002"))
                 .andExpect(jsonPath("$.results[1].id").value("GO:0000001"));
+    }
+
+    @Test
+    public void hyphenatedQueryMatchesHyphenatedName() throws Exception {
+        OntologyDocument doc1 = createDoc("GO:0000001", "go1 a function", "synonym one");
+        OntologyDocument doc2 = createDoc("GO:0000002", "name-2-two", "some synonym");
+        OntologyDocument doc3 = createDoc("GO:0000003", "go3 a function");
+
+        repository.save(doc1);
+        repository.save(doc2);
+        repository.save(doc3);
+
+        mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "name-2-two"))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andExpect(jsonPath("$.results.*", hasSize(1)))
+                .andExpect(jsonPath("$.results[0].id").value("GO:0000002"));
+    }
+
+    @Test
+    public void nonHyphenatedQueryMatchesHyphenatedName() throws Exception {
+        OntologyDocument doc1 = createDoc("GO:0000001", "go1 a function", "synonym one");
+        OntologyDocument doc2 = createDoc("GO:0000002", "name-2-two", "some synonym");
+        OntologyDocument doc3 = createDoc("GO:0000003", "go3 a function");
+
+        repository.save(doc1);
+        repository.save(doc2);
+        repository.save(doc3);
+
+        mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "name 2 two"))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andExpect(jsonPath("$.results.*", hasSize(1)))
+                .andExpect(jsonPath("$.results[0].id").value("GO:0000002"));
     }
 
     private static OntologyDocument createDoc(String id, String name, String... synonyms) {

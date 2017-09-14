@@ -302,7 +302,7 @@ public class GeneProductSearchIT extends SearchControllerSetup {
 
         saveToRepository(doc1, doc2);
 
-        checkValidHighlightOnQueryResponse("process two", "A0A0F8CSS2");
+        checkValidHighlightOnQueryResponse("two", "A0A0F8CSS2");
     }
 
     @Test
@@ -333,7 +333,7 @@ public class GeneProductSearchIT extends SearchControllerSetup {
 
         saveToRepository(doc1, doc2);
 
-        checkValidHighlightOffQueryResponse("metabolic process", 1);
+        checkValidHighlightOffQueryResponse("process", 1);
     }
 
     @Test
