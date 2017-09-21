@@ -29,6 +29,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -2090,11 +2091,15 @@ public class AnnotationControllerIT {
 
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(EXTENSION_PARAM.getName(),
                                                                                      SELECT_ALL_WHERE_FIELD_IS_NOT_EMPTY));
+        List<String> geneProductsThatAppearInDocumentsThatHaveExtensions = docsWithExtensions.stream()
+                          .map(d -> d.geneProductId).collect(toList());
 
         response.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(numberOfDocsWithExtensions));
+                .andExpect(totalNumOfResults(numberOfDocsWithExtensions))
+                .andExpect(fieldsInAllResultsExist(2))
+                .andExpect(valuesOccurInField(GENEPRODUCT_ID_FIELD, geneProductsThatAppearInDocumentsThatHaveExtensions));
     }
 
     @Test
@@ -2144,7 +2149,7 @@ public class AnnotationControllerIT {
 
     // ------------------------------- Helpers -------------------------------
     private <T> List<T> transformDocs(List<AnnotationDocument> docs, Function<AnnotationDocument, T> transformation) {
-        return docs.stream().map(transformation).collect(Collectors.toList());
+        return docs.stream().map(transformation).collect(toList());
     }
 
     private <T> List<AnnotationDocument> filterDocuments(
@@ -2155,7 +2160,7 @@ public class AnnotationControllerIT {
                 .filter(doc -> Stream
                         .of(expectedValues)
                         .anyMatch(e -> e == docTransformer.apply(doc)))
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 
     private String[] asArray(List<String> list) {
@@ -2213,7 +2218,7 @@ public class AnnotationControllerIT {
     private List<AnnotationDocument> createGenericDocs(int n) {
         return IntStream.range(0, n)
                 .mapToObj(i -> AnnotationDocMocker.createAnnotationDoc("UniProtKB:"+ createGPId(i))).collect
-                        (Collectors.toList());
+                        (toList());
     }
 
     private int totalPages(int totalEntries, int resultsPerPage) {
