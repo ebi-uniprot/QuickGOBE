@@ -32,6 +32,10 @@ public class SolrQueryConverter implements QueryRequestConverter<SolrQuery> {
         return new SolrQueryConverter(requestHandler, new SortedSolrQuerySerializer(wildCardCompatibleFields));
     }
 
+    public static SolrQueryConverter create(String requestHandler) {
+        return new SolrQueryConverter(requestHandler, new SortedSolrQuerySerializer());
+    }
+
     public SolrQueryConverter(String requestHandler, QueryVisitor<String> solrQuerySerializer) {
         Preconditions.checkArgument(requestHandler != null && !requestHandler.trim().isEmpty(),
                 "Request handler name cannot be null or empty");
