@@ -47,8 +47,8 @@ public class SearchServiceConfig {
 
     private static final String COMMA = ",";
     private static final String DEFAULT_GENE_PRODUCT_SEARCH_RETURN_FIELDS = "id,name,synonym,symbol";
-    @Value("${wildcard.compatible.fields:}")
-    private String fieldsThatCanBeSearchedByWildCard;
+//    @Value("${search.wildcard.fields:}")
+//    private String fieldsThatCanBeSearchedByWildCard;
 
     @Bean
     public SearchService<GeneProduct> geneProductSearchService(RequestRetrieval<GeneProduct>
@@ -103,9 +103,7 @@ public class SearchServiceConfig {
 
     @Bean
     public QueryRequestConverter<SolrQuery> geneProductSolrQueryRequestConverter() {
-        Set<String> wildCardFields =
-                Stream.of(fieldsThatCanBeSearchedByWildCard.split(COMMA)).collect(Collectors.toSet());
-        return SolrQueryConverter.createWithWildCardSupport(SOLR_GENE_PRODUCT_QUERY_REQUEST_HANDLER, wildCardFields);
+        return SolrQueryConverter.create(SOLR_GENE_PRODUCT_QUERY_REQUEST_HANDLER);
     }
 
     @Bean

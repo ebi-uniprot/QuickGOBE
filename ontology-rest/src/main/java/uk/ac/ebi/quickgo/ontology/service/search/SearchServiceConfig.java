@@ -39,9 +39,6 @@ public class SearchServiceConfig {
     private static final String COMMA = ",";
     private static final String DEFAULT_ONTOLOGY_SEARCH_RETURN_FIELDS = "id,name,ontologyType";
 
-    @Value("${wildcard.compatible.fields:}")
-    private String fieldsThatCanBeSearchedByWildCard;
-
     @Bean
     public SearchService<OBOTerm> ontologySearchService(RequestRetrieval<OBOTerm> ontologySolrRequestRetrieval) {
         return new SearchServiceImpl(ontologySolrRequestRetrieval);
@@ -68,9 +65,7 @@ public class SearchServiceConfig {
     }
 
     @Bean public QueryRequestConverter<SolrQuery> ontologySolrQueryRequestConverter() {
-        Set<String> wildCardFields =
-                Stream.of(fieldsThatCanBeSearchedByWildCard.split(COMMA)).collect(Collectors.toSet());
-        return SolrQueryConverter.createWithWildCardSupport(SOLR_ONTOLOGY_QUERY_REQUEST_HANDLER, wildCardFields);
+        return SolrQueryConverter.create(SOLR_ONTOLOGY_QUERY_REQUEST_HANDLER);
     }
 
     @Bean
