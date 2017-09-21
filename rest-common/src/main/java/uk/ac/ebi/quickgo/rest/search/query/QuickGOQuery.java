@@ -80,6 +80,8 @@ public abstract class QuickGOQuery {
         return new JoinQuery(joinFromTable, joinFromAttribute, joinToTable, joinToAttribute, filter);
     }
 
+    public abstract <T> T accept(QueryVisitor<T> visitor);
+
     private static <T> boolean arrayHasNoNullElements(T[] array) {
         for (T element : array) {
             if (element == null) {
@@ -89,6 +91,4 @@ public abstract class QuickGOQuery {
 
         return true;
     }
-
-    public abstract <T> T accept(QueryVisitor<T> visitor);
 }
