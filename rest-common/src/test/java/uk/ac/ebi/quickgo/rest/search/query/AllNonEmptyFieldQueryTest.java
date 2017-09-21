@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.verify;
 
@@ -64,6 +65,20 @@ public class AllNonEmptyFieldQueryTest {
         MatcherAssert.assertThat(query.field(), is(equalTo(field)));
         MatcherAssert.assertThat(query.value(), is(equalTo(value)));
     }
+
+    @Test
+    public void equalsAndHashcodeComparisonBetweenFieldQueryAndAllNonEmptyFieldQueryDoNotMatch() throws Exception {
+        String field = "field";
+        String value = "myName";
+
+        AllNonEmptyFieldQuery allNonEmptyFieldQuery = new AllNonEmptyFieldQuery(field, value);
+        FieldQuery fieldQuery = new FieldQuery(field, value);
+
+        MatcherAssert.assertThat(allNonEmptyFieldQuery, is(not(equalTo(fieldQuery))));
+        MatcherAssert.assertThat(fieldQuery, is(not(equalTo(allNonEmptyFieldQuery))));
+        MatcherAssert.assertThat(allNonEmptyFieldQuery.hashCode(), is(not(equalTo(fieldQuery.hashCode()))));
+    }
+
 
     @Test
     public void visitorIsCalledCorrectly() throws Exception {
