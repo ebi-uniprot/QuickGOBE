@@ -4,9 +4,11 @@ import uk.ac.ebi.quickgo.rest.search.SolrQueryStringSanitizer;
 import uk.ac.ebi.quickgo.rest.search.query.*;
 
 import java.util.Collections;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static uk.ac.ebi.quickgo.rest.search.solr.SolrQueryConverter.CROSS_CORE_JOIN_SYNTAX;
 import static uk.ac.ebi.quickgo.rest.search.solr.SolrQueryConverter.SOLR_FIELD_SEPARATOR;
 
@@ -20,16 +22,19 @@ import static uk.ac.ebi.quickgo.rest.search.solr.SolrQueryConverter.SOLR_FIELD_S
  * @author Edd
  */
 public class SortedSolrQuerySerializer implements QueryVisitor<String> {
-    public static final String RETRIEVE_ALL_NON_EMPTY = "[ '' TO * ]";
+    static final String RETRIEVE_ALL_NON_EMPTY = "[ '' TO * ]";
     private final SolrQueryStringSanitizer queryStringSanitizer;
     private final Set<String> wildCardFieldQueryCompatibleFields;
 
-    public SortedSolrQuerySerializer(Set<String> wildCardFieldQueryCompatibleFields) {
+    SortedSolrQuerySerializer(Set<String> wildCardFieldQueryCompatibleFields) {
+        checkArgument(Objects.nonNull(wildCardFieldQueryCompatibleFields), "If passed to the " +
+                "SortedSolrQuerySerializer, the list of wildcard compatible fields should not be null, use an empty " +
+                "set or the no-argument constructor");
         this.queryStringSanitizer = new SolrQueryStringSanitizer();
         this.wildCardFieldQueryCompatibleFields = wildCardFieldQueryCompatibleFields;
     }
 
-    public SortedSolrQuerySerializer() {
+    SortedSolrQuerySerializer() {
         this.queryStringSanitizer = new SolrQueryStringSanitizer();
         this.wildCardFieldQueryCompatibleFields = Collections.emptySet();
     }
