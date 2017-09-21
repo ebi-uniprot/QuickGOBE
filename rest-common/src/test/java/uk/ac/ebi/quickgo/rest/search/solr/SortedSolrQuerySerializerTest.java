@@ -21,12 +21,12 @@ import static uk.ac.ebi.quickgo.rest.search.solr.SortedSolrQuerySerializer.RETRI
  * @author Edd
  */
 public class SortedSolrQuerySerializerTest {
-    public static final String FIELD_WC = "fieldWC";
+    private static final String FIELD_WILDCARD = "fieldWC";
     private SortedSolrQuerySerializer serializer;
     private static Set<String> wildCardCompatibleFields = new HashSet<>();
 
     static {
-        wildCardCompatibleFields.add(FIELD_WC);
+        wildCardCompatibleFields.add(FIELD_WILDCARD);
     }
 
     @Before
@@ -179,11 +179,16 @@ public class SortedSolrQuerySerializerTest {
     @Test
     public void visitWithWildCard(){
         SortedSolrQuerySerializer serializerWithWildCard = new SortedSolrQuerySerializer(wildCardCompatibleFields);
-        AllNonEmptyFieldQuery allNonEmptyFieldQuery = new AllNonEmptyFieldQuery(FIELD_WC, SELECT_ALL_WHERE_FIELD_IS_NOT_EMPTY);
+        AllNonEmptyFieldQuery allNonEmptyFieldQuery = new AllNonEmptyFieldQuery(FIELD_WILDCARD, SELECT_ALL_WHERE_FIELD_IS_NOT_EMPTY);
 
         String queryString = serializerWithWildCard.visit(allNonEmptyFieldQuery);
 
         assertThat(queryString, is(String.format("(%s:%s)", allNonEmptyFieldQuery.field(), RETRIEVE_ALL_NON_EMPTY )));
+    }
+
+    @Test (expected = IllegalArgumentException.class)
+    public void passingNullWildcardCompatibleSetThrowsException(){
+        new SortedSolrQuerySerializer(null);
     }
 
     private String buildFieldQueryString(String field, String value) {
