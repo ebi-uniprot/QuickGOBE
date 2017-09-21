@@ -25,11 +25,13 @@ public class SortedSolrQuerySerializerTest {
     private SortedSolrQuerySerializer serializer;
     private static Set<String> wildCardCompatibleFields = new HashSet<>();
 
+    static {
+        wildCardCompatibleFields.add(FIELD_WC);
+    }
 
     @Before
     public void setUp() {
-        wildCardCompatibleFields.add(FIELD_WC);
-        this.serializer = new SortedSolrQuerySerializer(wildCardCompatibleFields);
+        this.serializer = new SortedSolrQuerySerializer();
     }
 
     @Test
@@ -176,9 +178,10 @@ public class SortedSolrQuerySerializerTest {
 
     @Test
     public void visitWithWildCard(){
+        SortedSolrQuerySerializer serializerWithWildCard = new SortedSolrQuerySerializer(wildCardCompatibleFields);
         AllNonEmptyFieldQuery allNonEmptyFieldQuery = new AllNonEmptyFieldQuery(FIELD_WC, SELECT_ALL_WHERE_FIELD_IS_NOT_EMPTY);
 
-        String queryString = serializer.visit(allNonEmptyFieldQuery);
+        String queryString = serializerWithWildCard.visit(allNonEmptyFieldQuery);
 
         assertThat(queryString, is(String.format("(%s:%s)", allNonEmptyFieldQuery.field(), RETRIEVE_ALL_NON_EMPTY )));
     }
