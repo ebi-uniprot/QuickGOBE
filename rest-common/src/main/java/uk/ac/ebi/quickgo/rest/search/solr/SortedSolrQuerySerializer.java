@@ -3,6 +3,7 @@ package uk.ac.ebi.quickgo.rest.search.solr;
 import uk.ac.ebi.quickgo.rest.search.SolrQueryStringSanitizer;
 import uk.ac.ebi.quickgo.rest.search.query.*;
 
+import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -26,6 +27,11 @@ public class SortedSolrQuerySerializer implements QueryVisitor<String> {
     public SortedSolrQuerySerializer(Set<String> wildCardFieldQueryCompatibleFields) {
         this.queryStringSanitizer = new SolrQueryStringSanitizer();
         this.wildCardFieldQueryCompatibleFields = wildCardFieldQueryCompatibleFields;
+    }
+
+    public SortedSolrQuerySerializer() {
+        this.queryStringSanitizer = new SolrQueryStringSanitizer();
+        this.wildCardFieldQueryCompatibleFields = Collections.emptySet();
     }
 
     @Override public String visit(FieldQuery query) {
