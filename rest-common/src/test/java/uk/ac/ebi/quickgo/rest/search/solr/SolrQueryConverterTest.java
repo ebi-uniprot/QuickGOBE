@@ -30,7 +30,7 @@ public class SolrQueryConverterTest {
 
     @Before
     public void setUp() throws Exception {
-        converter = SolrQueryConverter.createWithWildCardSupport(REQUEST_HANDLER_NAME, WILDCARD_COMPATIBLE_FIELDS);
+        converter = SolrQueryConverter.create(REQUEST_HANDLER_NAME);
     }
 
     @Test(expected = IllegalArgumentException.class)
