@@ -3,6 +3,7 @@ package uk.ac.ebi.quickgo.rest.search.solr;
 import uk.ac.ebi.quickgo.rest.search.query.*;
 
 import de.bechte.junit.runners.context.HierarchicalContextRunner;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
@@ -33,22 +34,28 @@ public class UnsortedSolrQuerySerializerTest {
     private static final String TERMS_INCOMPATIBLE_FIELD_2 = "termsIncompatibleField2";
     private static final String TERMS_INCOMPATIBLE_FIELD_3 = "termsIncompatibleField3";
     private UnsortedSolrQuerySerializer serializer;
-
+    private Set<String> nonEmptyFieldQueryCompatibleFields = new HashSet<>();
+    private Set<String> termsQueryCompatibleFields;
     @Before
     public void setUp() {
-        Set<String> termsQueryCompatibleFields = Stream.of(
+        termsQueryCompatibleFields = Stream.of(
                 TERMS_COMPATIBLE_FIELD_1,
                 TERMS_COMPATIBLE_FIELD_2,
                 TERMS_COMPATIBLE_FIELD_3)
                 .collect(Collectors
                         .toSet());
-        this.serializer = new UnsortedSolrQuerySerializer(termsQueryCompatibleFields);
+        this.serializer = new UnsortedSolrQuerySerializer(termsQueryCompatibleFields, nonEmptyFieldQueryCompatibleFields);
     }
 
     public class Initialization {
         @Test(expected = IllegalArgumentException.class)
         public void initWithNullSetOfFieldsThatAreTermsQueryCompatibleCausesIllegalArgumentException() {
-            new UnsortedSolrQuerySerializer(null);
+            new UnsortedSolrQuerySerializer(null, nonEmptyFieldQueryCompatibleFields);
+        }
+
+        @Test(expected = IllegalArgumentException.class)
+        public void initWithNullSetOfFieldsThatAreWildCardCompatibleCausesIllegalArgumentException() {
+            new UnsortedSolrQuerySerializer(termsQueryCompatibleFields, null);
         }
     }
 
