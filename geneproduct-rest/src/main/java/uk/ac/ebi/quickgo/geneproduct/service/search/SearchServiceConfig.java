@@ -47,8 +47,6 @@ public class SearchServiceConfig {
 
     private static final String COMMA = ",";
     private static final String DEFAULT_GENE_PRODUCT_SEARCH_RETURN_FIELDS = "id,name,synonym,symbol";
-//    @Value("${search.wildcard.fields:}")
-//    private String fieldsThatCanBeSearchedByWildCard;
 
     @Bean
     public SearchService<GeneProduct> geneProductSearchService(RequestRetrieval<GeneProduct>
