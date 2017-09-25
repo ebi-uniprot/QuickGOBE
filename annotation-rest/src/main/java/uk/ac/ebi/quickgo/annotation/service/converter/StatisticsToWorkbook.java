@@ -4,60 +4,85 @@ import uk.ac.ebi.quickgo.annotation.model.StatisticsByType;
 import uk.ac.ebi.quickgo.annotation.model.StatisticsGroup;
 import uk.ac.ebi.quickgo.annotation.model.StatisticsValue;
 
+import com.google.common.base.Preconditions;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 
 /**
+ * Populate an Excel Workbook instance with statistics data (a list of {@link StatisticsGroup} instances).
+ * Provide a sheet for each {@link StatisticsByType}.
+ *
  * @author Tony Wardell
  * Date: 22/09/2017
  * Time: 11:11
  * Created with IntelliJ IDEA.
  */
 public class StatisticsToWorkbook {
-    static Map<String, SheetLayout> sheetLayoutMap = new HashMap<>();
+    private static final Map<String, SheetLayout> SHEET_LAYOUT_MAP = new HashMap<>();
 
     static {
-        sheetLayoutMap.put("goId", new SheetLayout("goid", "GO IDs (by annotation)", 0, "GO IDs (by protein)", 10));
-        //                   new SheetLayout("aspect",)
-        //                   new SheetLayout("evidence",)
-        //                   new SheetLayout("reference",)
-        //                   new SheetLayout("taxon",)
-        //                   new SheetLayout("assigned")};
-
+        SHEET_LAYOUT_MAP.put("goId", new SheetLayout("goid", "GO IDs (by annotation)", "GO IDs (by protein)"));
+        SHEET_LAYOUT_MAP.put("aspect", new SheetLayout("aspect", "Aspects (by annotation)", "Aspects (by protein)"));
+        SHEET_LAYOUT_MAP.put("evidenceCode",
+                             new SheetLayout("evidence",
+                                             "Evidence Codes (by annotation)",
+                                             "Evidence Codes (by protein)"));
+        SHEET_LAYOUT_MAP.put("reference",
+                             new SheetLayout("reference",
+                                             "References (by annotation)",
+                                             "References " + "(by protein)"));
+        SHEET_LAYOUT_MAP.put("taxonId",
+                             new SheetLayout("taxon", "Taxon IDs (by annotation)", "Taxon IDs " + "(by protein)"));
+        SHEET_LAYOUT_MAP.put("assignedBy",
+                             new SheetLayout("assigned", "Sources (by annotation)", "Sources " + "(by protein)"));
     }
-    //    static SheetLayout[] SHEETS = new String[] {
 
     public Workbook convert(List<StatisticsGroup> statisticsGroups) {
 
         Workbook wb = new HSSFWorkbook();
-        CreationHelper helper = wb.getCreationHelper();
+        //        CreationHelper helper = wb.getCreationHelper();
 
         CellStyle fixedDecimalPlaces = wb.createCellStyle();
         fixedDecimalPlaces.setDataFormat(wb.createDataFormat().getFormat("0.00"));
 
         Sheet summarySheet = wb.createSheet("summary");
         populateSummarySheet(summarySheet, statisticsGroups);
-        populateDetailSheets(wb, statisticsGroups.get(0), statisticsGroups.get(1), fixedDecimalPlaces);
+
+        StatisticsGroup groupByAnnotation = null;
+        StatisticsGroup groupByProtein = null;
+        for (StatisticsGroup statisticsGroup : statisticsGroups) {
+            if (statisticsGroup.getGroupName().equals("annotation")) {
+                groupByAnnotation = statisticsGroup;
+            }
+            if (statisticsGroup.getGroupName().equals("geneProduct")) {
+                groupByProtein = statisticsGroup;
+            }
+        }
+        populateDetailSheets(wb, groupByAnnotation, groupByProtein, fixedDecimalPlaces);
         return wb;
     }
 
     private void populateDetailSheets(Workbook wb, StatisticsGroup statisticsGroupByAnnotation,
             StatisticsGroup statisticsGroupByProtein, CellStyle fixedDecimalPlaces) {
+        Preconditions.checkState(Objects.nonNull(statisticsGroupByAnnotation),
+                                 "The statistics by annotation are " + "null");
+        Preconditions.checkState(Objects.nonNull(statisticsGroupByProtein), "The statistics by gene product are null");
 
         List<StatisticsByType> statisticsByAnnotation = statisticsGroupByAnnotation.getTypes();
         List<StatisticsByType> statisticsByProtein = statisticsGroupByProtein.getTypes();
 
-        for (int i = 0; i < statisticsByAnnotation.size(); i++) {
+        for (StatisticsByType statisticsByAnnotationForType : statisticsByAnnotation) {
 
-            StatisticsByType statisticsByAnnotationForType = statisticsByAnnotation.get(i);
+            final String type = statisticsByAnnotationForType.getType();
             StatisticsByType statisticsByProteinForType =
-                    matchingStatisticsByProteinForType(statisticsByProtein, statisticsByAnnotationForType);
+                    matchedStatisticsType(type, statisticsByProtein);
 
             //Find sheet to populate
-            final SheetLayout sheetLayout = sheetLayoutMap.get(statisticsByAnnotationForType.getType());
+            final SheetLayout sheetLayout = SHEET_LAYOUT_MAP.get(type);
             if (sheetLayout == null) {
                 continue;
             }
@@ -67,39 +92,52 @@ public class StatisticsToWorkbook {
             }
 
             //Populate Sheet
-            int rowCounter = 1;
-
-            //Headers
-            Row headerRow = sheet.createRow(rowCounter);
-            headerRow.createCell(sheetLayout.headerACol).setCellValue(sheetLayout.headerA);
-            headerRow.createCell(sheetLayout.headerBCol).setCellValue(sheetLayout.headerB);
-
-            //Column header Row
-            Row colNamesRow = sheet.createRow(++rowCounter);
-            populateHeader(sheetLayout.headerACol, colNamesRow);
-            populateHeader(sheetLayout.headerBCol, colNamesRow);
-
-            //Detail Rows
-            final List<StatisticsValue> valuesByAnnotation = statisticsByAnnotationForType.getValues();
-            final List<StatisticsValue> valuesByProtein = statisticsByProteinForType.getValues();
-
-            for (int j = 0; j < valuesByAnnotation.size(); j++) {
-                Row detailRow = sheet.createRow(++rowCounter);
-                populateSection(sheetLayout.headerACol, valuesByAnnotation.get(j), detailRow, fixedDecimalPlaces);
-                populateSection(sheetLayout.headerBCol, valuesByProtein.get(j), detailRow, fixedDecimalPlaces);
-            }
+            populateSheet(fixedDecimalPlaces,
+                          statisticsByAnnotationForType,
+                          statisticsByProteinForType,
+                          sheetLayout,
+                          sheet);
         }
     }
 
-    private StatisticsByType matchingStatisticsByProteinForType(List<StatisticsByType> statisticsByProtein,
-            StatisticsByType statisticsByAnnotationForType) {
-        //Get the matching StatisticsByType from the second group
-        for (StatisticsByType aStatisticsByProtein : statisticsByProtein) {
-            if (statisticsByAnnotationForType.getType().equals(aStatisticsByProtein.getType())) {
-                return aStatisticsByProtein;
+    private void populateSheet(CellStyle fixedDecimalPlaces, StatisticsByType statisticsByAnnotationForType,
+            StatisticsByType statisticsByProteinForType, SheetLayout sheetLayout, Sheet sheet) {
+        int rowCounter = 1;
+
+        //Headers
+        Row headerRow = sheet.createRow(rowCounter);
+        headerRow.createCell(SheetLayout.BY_ANNOTATION_STARTING_COLUMN).setCellValue(sheetLayout.headerByAnnotation);
+        headerRow.createCell(SheetLayout.BY_PROTEIN_STARTING_COLUMN).setCellValue(sheetLayout.headerByProtein);
+
+        //Column header Row
+        Row colNamesRow = sheet.createRow(++rowCounter);
+        populateHeader(SheetLayout.BY_ANNOTATION_STARTING_COLUMN, colNamesRow);
+        populateHeader(SheetLayout.BY_PROTEIN_STARTING_COLUMN, colNamesRow);
+
+        //Detail Rows
+        final List<StatisticsValue> valuesByAnnotation = statisticsByAnnotationForType.getValues();
+        final List<StatisticsValue> valuesByProtein = statisticsByProteinForType.getValues();
+
+        for (int j = 0; j < valuesByAnnotation.size(); j++) {
+            Row detailRow = sheet.createRow(++rowCounter);
+            populateSection(SheetLayout.BY_ANNOTATION_STARTING_COLUMN,
+                            valuesByAnnotation.get(j),
+                            detailRow,
+                            fixedDecimalPlaces);
+            populateSection(SheetLayout.BY_PROTEIN_STARTING_COLUMN,
+                            valuesByProtein.get(j),
+                            detailRow,
+                            fixedDecimalPlaces);
+        }
+    }
+
+    private StatisticsByType matchedStatisticsType(String statisticsType, List<StatisticsByType> statisticsByType) {
+        for (StatisticsByType statisticByType : statisticsByType) {
+            if (statisticsType.equals(statisticByType.getType())) {
+                return statisticByType;
             }
         }
-        throw new IllegalStateException("All types should match");
+        throw new IllegalStateException("Failed to find statistics for type " + statisticsByType);
     }
 
     private void populateHeader(int startCounter, Row colNamesRow) {
@@ -125,41 +163,33 @@ public class StatisticsToWorkbook {
 
     private void populateSummarySheet(Sheet sheet, List<StatisticsGroup> statisticsGroups) {
 
-        for (int i = 0; i < statisticsGroups.size(); i++) {
-            StatisticsGroup statisticsGroup = statisticsGroups.get(i);
-            if (statisticsGroup.getGroupName().equals("annotation")) {
-                Row row1 = sheet.createRow(1);
-                row1.createCell(0).setCellValue("Summary");
-                Row row2 = sheet.createRow(2);
-                row2.createCell(0).setCellValue("Number of annotations:" + statisticsGroup.getTotalHits());
-            }
-        }
+        statisticsGroups.stream()
+                        .filter(statisticsGroup -> statisticsGroup.getGroupName().equals("annotation"))
+                        .forEach(statisticsGroup -> {
+                            Row row1 = sheet.createRow(1);
+                            row1.createCell(0).setCellValue("Summary");
+                            Row row2 = sheet.createRow(2);
+                            row2.createCell(0).setCellValue("Number of annotations:" + statisticsGroup.getTotalHits());
+                        });
     }
 
-    static class SheetLayout {
+    private static class SheetLayout {
+        private static final int BY_ANNOTATION_STARTING_COLUMN = 0;
+        private static final int BY_PROTEIN_STARTING_COLUMN = 10;
         String displayName;
-        String headerA;
-        int headerACol;
-        String headerB;
-        int headerBCol;
+        String headerByAnnotation;
+        String headerByProtein;
 
-        public SheetLayout(String displayName, String headerA, int headerACol, String headerB, int headerBCol) {
+        SheetLayout(String displayName, String headerByAnnotation, String headerByProtein) {
             this.displayName = displayName;
-            this.headerA = headerA;
-            this.headerACol = headerACol;
-            this.headerB = headerB;
-            this.headerBCol = headerBCol;
+            this.headerByAnnotation = headerByAnnotation;
+            this.headerByProtein = headerByProtein;
 
         }
     }
 
-    static class SectionHeaderLayout {
+    private static class SectionHeaderLayout {
         private static final String[] SECTION_COL_HEADINGS = new String[]{"Code", "Percentage", "Count"};
-        int startingColumn;
-
-        public SectionHeaderLayout(int startingColumn) {
-            this.startingColumn = startingColumn;
-        }
     }
 
 }
