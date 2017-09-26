@@ -8,6 +8,8 @@ import uk.ac.ebi.quickgo.annotation.download.model.DownloadContent;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
 import uk.ac.ebi.quickgo.annotation.model.StatisticsGroup;
+import uk.ac.ebi.quickgo.annotation.service.converter.StatisticsToWorkbook;
+import uk.ac.ebi.quickgo.annotation.service.converter.StatisticsWorkBookLayout;
 import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.annotation.service.statistics.StatisticsService;
 import uk.ac.ebi.quickgo.rest.ParameterBindingException;
@@ -35,7 +37,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Stream;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
@@ -52,6 +56,7 @@ import static java.util.stream.Collectors.toList;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.HttpHeaders.VARY;
+import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.EXCEL_MEDIA_TYPE_STRING;
 import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.GAF_MEDIA_TYPE_STRING;
 import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.GPAD_MEDIA_TYPE_STRING;
 import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.TSV_MEDIA_TYPE_STRING;
@@ -160,7 +165,7 @@ public class AnnotationController {
         this.annotationRetrievalConfig = annotationRetrievalConfig;
         this.queryTemplate = createSearchQueryTemplate(annotationRetrievalConfig);
         this.downloadQueryTemplate = createDownloadSearchQueryTemplate(annotationRetrievalConfig);
-    
+
         this.taskExecutor = taskExecutor;
         this.headerCreatorFactory = headerCreatorFactory;
 
@@ -258,6 +263,29 @@ public class AnnotationController {
                 .headers(createHttpDownloadHeader(mediaTypeAcceptHeader))
                 .body(emitter);
     }
+
+    @RequestMapping(value = "/downloadStats",
+            method = {RequestMethod.GET}, produces = {EXCEL_MEDIA_TYPE_STRING})
+    public void  downloadStats(
+            @Valid @ModelAttribute AnnotationRequest request,
+            BindingResult bindingResult,
+            HttpServletResponse response) throws IOException {
+        checkBindingErrors(bindingResult);
+        QueryResult<StatisticsGroup> stats = statsService.calculate(request);
+
+        StatisticsToWorkbook statisticsToWorkbook = new StatisticsToWorkbook(StatisticsWorkBookLayout.SECTION_TYPES,
+                                                                             StatisticsWorkBookLayout.SHEET_LAYOUT_MAP);
+
+        Workbook workbook = statisticsToWorkbook.convert(stats.getResults());
+
+        // Set the content type and attachment header.
+        response.addHeader("Content-disposition", "attachment;filename=annotation_statistics.xlsx");
+        response.setContentType(EXCEL_MEDIA_TYPE_STRING);
+
+        workbook.write(response.getOutputStream());
+        response.flushBuffer();
+    }
+
 
     private HeaderContent buildHeaderContent(HttpServletRequest servletRequest, List<String> selectedFields) {
         HeaderContent.Builder contentBuilder = new HeaderContent.Builder();
