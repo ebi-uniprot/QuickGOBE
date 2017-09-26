@@ -11,14 +11,14 @@ import java.util.Map;
  * Time: 10:52
  * Created with IntelliJ IDEA.
  */
-class StatisticsWorkBookLayout {
+public class StatisticsWorkBookLayout {
 
-    static final Map<String, StatisticsToWorkbook.SheetLayout> SHEET_LAYOUT_MAP = new HashMap<>();
+    public static final Map<String, StatisticsToWorkbook.SheetLayout> SHEET_LAYOUT_MAP = new HashMap<>();
 
     private static final String ANNOTATION = "annotation";
     private static final String GENE_PRODUCT = "geneProduct";
 
-    static final String[] SECTION_TYPES = new String[]{ANNOTATION, GENE_PRODUCT};
+    public static final String[] SECTION_TYPES = new String[]{ANNOTATION, GENE_PRODUCT};
 
     private static final AnnotationSectionLayout SL_ANNOTATION_REFERENCES =
             new AnnotationSectionLayout("References (by annotation)");
