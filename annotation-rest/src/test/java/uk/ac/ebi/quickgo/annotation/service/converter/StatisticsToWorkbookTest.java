@@ -41,11 +41,11 @@ public class StatisticsToWorkbookTest {
         annotationStatisticsGroup.addStatsType(statisticsByAnnotationTypeGoId);
 
         StatisticsByType statisticsByGeneProductTypeGoId = new StatisticsByType("goId");
-        statisticsByGeneProductTypeGoId.addValue(new StatisticsValue("GO:0003824",1, 5L));
-        statisticsByGeneProductTypeGoId.addValue(new StatisticsValue("GO:0003870",1, 5L));
-        statisticsByGeneProductTypeGoId.addValue(new StatisticsValue("GO:0009058",1, 5L));
-        statisticsByGeneProductTypeGoId.addValue(new StatisticsValue("GO:0030170",1, 5L));
-        statisticsByGeneProductTypeGoId.addValue(new StatisticsValue("GO:0033014",1, 5L));
+        statisticsByGeneProductTypeGoId.addValue(new StatisticsValue("GO:0003824",1, 1L));
+        statisticsByGeneProductTypeGoId.addValue(new StatisticsValue("GO:0003870",1, 1L));
+        statisticsByGeneProductTypeGoId.addValue(new StatisticsValue("GO:0009058",1, 1L));
+        statisticsByGeneProductTypeGoId.addValue(new StatisticsValue("GO:0030170",1, 1L));
+        statisticsByGeneProductTypeGoId.addValue(new StatisticsValue("GO:0033014",1, 1L));
         geneProductStatisticsGroup.addStatsType(statisticsByGeneProductTypeGoId);
 
         //aspect
@@ -100,7 +100,8 @@ public class StatisticsToWorkbookTest {
     @Test
     public void createWorkBook(){
 
-        StatisticsToWorkbook statisticsToWorkbook = new StatisticsToWorkbook();
+        StatisticsToWorkbook statisticsToWorkbook = new StatisticsToWorkbook(StatisticsWorkBookLayout.SECTION_TYPES,
+                                                                             StatisticsWorkBookLayout.SHEET_LAYOUT_MAP);
         Workbook workbook = statisticsToWorkbook.convert(statisticsGroups);
         File outputFile = new File("C:\\Users\\twardell\\someName.xls");
         try (FileOutputStream outputStream = new FileOutputStream(outputFile)) {
