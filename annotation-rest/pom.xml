@@ -50,6 +50,13 @@
             <artifactId>springfox-swagger-ui</artifactId>
         </dependency>
 
+        <!-- Conversion into Microsoft Office formats -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>3.17</version>
+        </dependency>
+
         <!--Test dependencies-->
         <dependency>
             <groupId>uk.ac.ebi.quickgo</groupId>
