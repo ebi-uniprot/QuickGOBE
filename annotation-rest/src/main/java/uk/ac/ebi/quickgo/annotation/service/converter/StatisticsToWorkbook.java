@@ -15,7 +15,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Populate an Excel Workbook instance with statistics data (a list of {@link StatisticsGroup} instances).
- * Provide a sheet for each {@link StatisticsByType}.
+ * Provide a sheet for each {@link StatisticsByType} where a format definition is available.
  *
  * @author Tony Wardell
  * Date: 22/09/2017
@@ -50,7 +50,6 @@ public class StatisticsToWorkbook {
                 }
             }
         }
-
         return wb;
     }
 
