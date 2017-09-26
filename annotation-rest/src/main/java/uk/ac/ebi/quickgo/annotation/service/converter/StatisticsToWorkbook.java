@@ -27,7 +27,7 @@ public class StatisticsToWorkbook {
     private final String[] sectionTypes;
     private final Map<String, SheetLayout> sheetLayoutMap;
 
-    StatisticsToWorkbook(String[] sectionTypes, Map<String, SheetLayout> sheetLayoutMap) {
+    public StatisticsToWorkbook(String[] sectionTypes, Map<String, SheetLayout> sheetLayoutMap) {
         this.sectionTypes = checkNotNull(sectionTypes);
         this.sheetLayoutMap = checkNotNull(sheetLayoutMap);
     }
