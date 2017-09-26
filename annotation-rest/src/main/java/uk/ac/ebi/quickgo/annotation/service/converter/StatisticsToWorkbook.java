@@ -4,13 +4,14 @@ import uk.ac.ebi.quickgo.annotation.model.StatisticsByType;
 import uk.ac.ebi.quickgo.annotation.model.StatisticsGroup;
 import uk.ac.ebi.quickgo.annotation.model.StatisticsValue;
 
-import com.google.common.base.Preconditions;
-import java.util.HashMap;
+
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Populate an Excel Workbook instance with statistics data (a list of {@link StatisticsGroup} instances).
@@ -22,23 +23,13 @@ import org.apache.poi.ss.usermodel.*;
  * Created with IntelliJ IDEA.
  */
 public class StatisticsToWorkbook {
-    private static final Map<String, SheetLayout> SHEET_LAYOUT_MAP = new HashMap<>();
 
-    static {
-        SHEET_LAYOUT_MAP.put("goId", new SheetLayout("goid", "GO IDs (by annotation)", "GO IDs (by protein)"));
-        SHEET_LAYOUT_MAP.put("aspect", new SheetLayout("aspect", "Aspects (by annotation)", "Aspects (by protein)"));
-        SHEET_LAYOUT_MAP.put("evidenceCode",
-                             new SheetLayout("evidence",
-                                             "Evidence Codes (by annotation)",
-                                             "Evidence Codes (by protein)"));
-        SHEET_LAYOUT_MAP.put("reference",
-                             new SheetLayout("reference",
-                                             "References (by annotation)",
-                                             "References " + "(by protein)"));
-        SHEET_LAYOUT_MAP.put("taxonId",
-                             new SheetLayout("taxon", "Taxon IDs (by annotation)", "Taxon IDs " + "(by protein)"));
-        SHEET_LAYOUT_MAP.put("assignedBy",
-                             new SheetLayout("assigned", "Sources (by annotation)", "Sources " + "(by protein)"));
+    private final String[] sectionTypes;
+    private final Map<String, SheetLayout> sheetLayoutMap;
+
+    StatisticsToWorkbook(String[] sectionTypes, Map<String, SheetLayout> sheetLayoutMap) {
+        this.sectionTypes = checkNotNull(sectionTypes);
+        this.sheetLayoutMap = checkNotNull(sheetLayoutMap);
     }
 
     public Workbook convert(List<StatisticsGroup> statisticsGroups) {
@@ -52,107 +43,85 @@ public class StatisticsToWorkbook {
         Sheet summarySheet = wb.createSheet("summary");
         populateSummarySheet(summarySheet, statisticsGroups);
 
-        StatisticsGroup groupByAnnotation = null;
-        StatisticsGroup groupByProtein = null;
         for (StatisticsGroup statisticsGroup : statisticsGroups) {
-            if (statisticsGroup.getGroupName().equals("annotation")) {
-                groupByAnnotation = statisticsGroup;
-            }
-            if (statisticsGroup.getGroupName().equals("geneProduct")) {
-                groupByProtein = statisticsGroup;
+            for (String sectionType : sectionTypes) {
+                if (statisticsGroup.getGroupName().equalsIgnoreCase(sectionType)) {
+                    populateDetailSheetsForGroup(statisticsGroup, wb, fixedDecimalPlaces);
+                }
             }
         }
-        populateDetailSheets(wb, groupByAnnotation, groupByProtein, fixedDecimalPlaces);
+
         return wb;
     }
 
-    private void populateDetailSheets(Workbook wb, StatisticsGroup statisticsGroupByAnnotation,
-            StatisticsGroup statisticsGroupByProtein, CellStyle fixedDecimalPlaces) {
-        Preconditions.checkState(Objects.nonNull(statisticsGroupByAnnotation),
-                                 "The statistics by annotation are " + "null");
-        Preconditions.checkState(Objects.nonNull(statisticsGroupByProtein), "The statistics by gene product are null");
+    private void populateDetailSheetsForGroup(StatisticsGroup statisticsGroup, Workbook wb, CellStyle fixedDecimalPlaces) {
 
-        List<StatisticsByType> statisticsByAnnotation = statisticsGroupByAnnotation.getTypes();
-        List<StatisticsByType> statisticsByProtein = statisticsGroupByProtein.getTypes();
+        for (StatisticsByType statisticsByType : statisticsGroup.getTypes()) {
 
-        for (StatisticsByType statisticsByAnnotationForType : statisticsByAnnotation) {
-
-            final String type = statisticsByAnnotationForType.getType();
-            StatisticsByType statisticsByProteinForType =
-                    matchedStatisticsType(type, statisticsByProtein);
-
-            //Find sheet to populate
-            final SheetLayout sheetLayout = SHEET_LAYOUT_MAP.get(type);
+            final SheetLayout sheetLayout = sheetLayoutMap.get(statisticsByType.getType());
             if (sheetLayout == null) {
                 continue;
             }
-            Sheet sheet = wb.getSheet(sheetLayout.displayName);
-            if (sheet == null) {
-                sheet = wb.createSheet(sheetLayout.displayName);
-            }
 
-            //Populate Sheet
-            populateSheet(fixedDecimalPlaces,
-                          statisticsByAnnotationForType,
-                          statisticsByProteinForType,
-                          sheetLayout,
-                          sheet);
+            final Sheet sheet = wb.getSheet(sheetLayout.displayName) != null ? wb.getSheet(sheetLayout.displayName)
+                    : wb.createSheet(sheetLayout.displayName);
+
+            sheetLayout.sectionLayouts.stream()
+                                      .filter(sectionLayout -> sectionLayout.type.equals(statisticsGroup.getGroupName()))
+                                      .forEach(sectionLayout -> populateSectionLayout(sheet,
+                                                                                      sectionLayout,
+                                                                                      statisticsByType,
+                                                                                      fixedDecimalPlaces));
         }
     }
 
-    private void populateSheet(CellStyle fixedDecimalPlaces, StatisticsByType statisticsByAnnotationForType,
-            StatisticsByType statisticsByProteinForType, SheetLayout sheetLayout, Sheet sheet) {
-        int rowCounter = 1;
-
-        //Headers
-        Row headerRow = sheet.createRow(rowCounter);
-        headerRow.createCell(SheetLayout.BY_ANNOTATION_STARTING_COLUMN).setCellValue(sheetLayout.headerByAnnotation);
-        headerRow.createCell(SheetLayout.BY_PROTEIN_STARTING_COLUMN).setCellValue(sheetLayout.headerByProtein);
-
-        //Column header Row
-        Row colNamesRow = sheet.createRow(++rowCounter);
-        populateHeader(SheetLayout.BY_ANNOTATION_STARTING_COLUMN, colNamesRow);
-        populateHeader(SheetLayout.BY_PROTEIN_STARTING_COLUMN, colNamesRow);
-
-        //Detail Rows
-        final List<StatisticsValue> valuesByAnnotation = statisticsByAnnotationForType.getValues();
-        final List<StatisticsValue> valuesByProtein = statisticsByProteinForType.getValues();
-
-        for (int j = 0; j < valuesByAnnotation.size(); j++) {
-            Row detailRow = sheet.createRow(++rowCounter);
-            populateSection(SheetLayout.BY_ANNOTATION_STARTING_COLUMN,
-                            valuesByAnnotation.get(j),
-                            detailRow,
-                            fixedDecimalPlaces);
-            populateSection(SheetLayout.BY_PROTEIN_STARTING_COLUMN,
-                            valuesByProtein.get(j),
-                            detailRow,
-                            fixedDecimalPlaces);
-        }
-    }
-
-    private StatisticsByType matchedStatisticsType(String statisticsType, List<StatisticsByType> statisticsByType) {
-        for (StatisticsByType statisticByType : statisticsByType) {
-            if (statisticsType.equals(statisticByType.getType())) {
-                return statisticByType;
-            }
-        }
-        throw new IllegalStateException("Failed to find statistics for type " + statisticsByType);
-    }
-
-    private void populateHeader(int startCounter, Row colNamesRow) {
-        int colCounter = startCounter;
-        for (int i = 0; i < SectionHeaderLayout.SECTION_COL_HEADINGS.length; i++) {
-            colNamesRow.createCell(colCounter++).setCellValue(SectionHeaderLayout.SECTION_COL_HEADINGS[i]);
-        }
-    }
-
-    private void populateSection(int startingCounter, StatisticsValue statisticsValue, Row detailRow,
+    private void populateSectionLayout(Sheet sheet, SectionLayout sectionLayout, StatisticsByType statisticsByType,
             CellStyle fixedDecimalPlaces) {
-        int colCounter = startingCounter;
-        detailRow.createCell(colCounter).setCellValue(statisticsValue.getKey());
-        populatePercentageCell(detailRow.createCell(++colCounter), statisticsValue, fixedDecimalPlaces);
-        detailRow.createCell(++colCounter).setCellValue(statisticsValue.getHits());
+        AtomicInteger rowCounter = new AtomicInteger(1);
+
+        populateSectionHeader(sheet, sectionLayout, rowCounter);
+        populateSectionColumnNames(sheet, sectionLayout, rowCounter);
+        populateSectionDetail(sheet, sectionLayout, rowCounter, statisticsByType, fixedDecimalPlaces);
+    }
+
+    private void populateSectionHeader(Sheet sheet, SectionLayout sectionLayout, AtomicInteger rowCounter) {
+        rowCounter.incrementAndGet();
+        Row sectionHeaderRow = getRow(sheet, rowCounter);
+        sectionHeaderRow.createCell(sectionLayout.startingColumn).setCellValue(sectionLayout.header);
+    }
+
+    private void populateSectionColumnNames(Sheet sheet, SectionLayout sectionLayout, AtomicInteger rowCounter) {
+        rowCounter.incrementAndGet();
+        Row sectionColumnNames = getRow(sheet, rowCounter);
+
+        int colCounter = sectionLayout.startingColumn;
+        for (int i = 0; i < SectionLayout.SECTION_COL_HEADINGS.length; i++) {
+            sectionColumnNames.createCell(colCounter++).setCellValue(SectionLayout.SECTION_COL_HEADINGS[i]);
+        }
+    }
+
+    private void populateSectionDetail(Sheet sheet, SectionLayout sectionLayout, AtomicInteger rowCounter,
+            StatisticsByType statisticsByType, CellStyle fixedDecimalPlaces) {
+
+        final List<StatisticsValue> values = statisticsByType.getValues();
+        for (StatisticsValue value : values) {
+
+            rowCounter.incrementAndGet();
+            Row detailRow = getRow(sheet, rowCounter);
+
+            int colCounter = sectionLayout.startingColumn;
+            detailRow.createCell(colCounter).setCellValue(value.getKey());
+            populatePercentageCell(detailRow.createCell(++colCounter), value, fixedDecimalPlaces);
+            detailRow.createCell(++colCounter).setCellValue(value.getHits());
+        }
+    }
+
+    private Row getRow(Sheet sheet, AtomicInteger rowCounter) {
+        Row detailRow = sheet.getRow(rowCounter.get());
+        if (detailRow == null) {
+            detailRow = sheet.createRow(rowCounter.get());
+        }
+        return detailRow;
     }
 
     private void populatePercentageCell(Cell targetCell, StatisticsValue statisticsValue, CellStyle cellStyle) {
@@ -173,23 +142,26 @@ public class StatisticsToWorkbook {
                         });
     }
 
-    private static class SheetLayout {
-        private static final int BY_ANNOTATION_STARTING_COLUMN = 0;
-        private static final int BY_PROTEIN_STARTING_COLUMN = 10;
-        String displayName;
-        String headerByAnnotation;
-        String headerByProtein;
+    static class SheetLayout {
+        final String displayName;
+        final List<SectionLayout> sectionLayouts;
 
-        SheetLayout(String displayName, String headerByAnnotation, String headerByProtein) {
+        SheetLayout(String displayName, List<SectionLayout> sectionLayouts) {
             this.displayName = displayName;
-            this.headerByAnnotation = headerByAnnotation;
-            this.headerByProtein = headerByProtein;
-
+            this.sectionLayouts = sectionLayouts;
         }
     }
 
-    private static class SectionHeaderLayout {
+    static class SectionLayout {
         private static final String[] SECTION_COL_HEADINGS = new String[]{"Code", "Percentage", "Count"};
-    }
+        final String type;
+        private final String header;
+        private final int startingColumn;
 
+        SectionLayout(String type, String header, int startingColumn) {
+            this.type = type;
+            this.header = header;
+            this.startingColumn = startingColumn;
+        }
+    }
 }
