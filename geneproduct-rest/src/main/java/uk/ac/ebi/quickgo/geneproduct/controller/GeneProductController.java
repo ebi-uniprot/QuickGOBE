@@ -1,14 +1,5 @@
 package uk.ac.ebi.quickgo.geneproduct.controller;
 
-import io.swagger.annotations.ApiOperation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
 import uk.ac.ebi.quickgo.geneproduct.model.GeneProduct;
 import uk.ac.ebi.quickgo.geneproduct.model.GeneProductRequest;
 import uk.ac.ebi.quickgo.geneproduct.service.GeneProductService;
@@ -26,12 +17,22 @@ import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
 import uk.ac.ebi.quickgo.rest.search.request.converter.FilterConverterFactory;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
-import javax.validation.Valid;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import javax.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.search;
@@ -46,6 +47,7 @@ import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.search;
  * Created with IntelliJ IDEA.
  */
 @RestController
+@Api(tags = {"gene products"})
 @RequestMapping(value = "/geneproduct")
 public class GeneProductController {
     private static final Logger LOGGER = LoggerFactory.getLogger(GeneProductController.class);

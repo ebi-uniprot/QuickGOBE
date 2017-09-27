@@ -69,25 +69,27 @@ public class CoTermController {
                     response = ResponseExceptionHandler.ErrorInfo.class),
             @ApiResponse(code = 400, message = "Bad request due to a validation issue with one of the request values.",
                     response = ResponseExceptionHandler.ErrorInfo.class)})
-    @ApiOperation(value = "Get co-occurring term information for a single GO term id.")
+    @ApiOperation(value = "Get co-occurring term information for a single GO Term id.")
     @RequestMapping(value = "/{id}", method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<CoTerm>> findCoTerms(
-            @ApiParam(value = "The GO term id") @PathVariable String id,
-            @ApiParam(name = "source", value = "The source from which the co-occurring terms originated. Possible " +
+            @ApiParam(value = "The GO term id") @PathVariable(value = "id") String id,
+            @ApiParam(value = "The source from which the co-occurring terms originated. Possible " +
                     "values: ALL / MANUAL. ALL => manual + electronic/automatically generated annotations; " +
-                    "MANUAL => only manually generated annotations", defaultValue = "ALL") @RequestParam String source,
+                    "MANUAL => only manually generated annotations", defaultValue = "ALL")
+            @RequestParam(value = "source", defaultValue = "ALL") String source,
             @ApiParam(name = "limit", value = "The number of terms returned", required = false)
-            @RequestParam(required = false) String limit,
+            @RequestParam(value = "limit", required = false) String limit,
             @ApiParam(name = "similarityThreshold", value = "The similarity threshold used when finding co-occurring " +
-                    "terms", defaultValue = "0.0") @RequestParam float similarityThreshold) {
+                    "terms", defaultValue = "0.0")
+            @RequestParam(value = "similarityThreshold", defaultValue = "0.0") float similarityThreshold) {
 
         validateGoTerm(id);
         final List<CoTerm> coTerms = coTermRepository.findCoTerms(id, toCoTermSource(source));
         return getResultsResponse(coTerms.size(), coTerms.stream()
-                .filter(ct -> ct.getSimilarityRatio() >= similarityThreshold)
-                .limit(workoutLimit(limit))
-                .collect(Collectors.toList()));
+                                                         .filter(ct -> ct.getSimilarityRatio() >= similarityThreshold)
+                                                         .limit(workoutLimit(limit))
+                                                         .collect(Collectors.toList()));
     }
 
     private int workoutLimit(String limit) {

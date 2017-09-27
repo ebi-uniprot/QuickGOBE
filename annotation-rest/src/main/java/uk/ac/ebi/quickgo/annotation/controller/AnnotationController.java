@@ -5,6 +5,7 @@ import uk.ac.ebi.quickgo.annotation.download.header.HeaderCreator;
 import uk.ac.ebi.quickgo.annotation.download.header.HeaderCreatorFactory;
 import uk.ac.ebi.quickgo.annotation.download.header.HeaderUri;
 import uk.ac.ebi.quickgo.annotation.download.model.DownloadContent;
+import uk.ac.ebi.quickgo.annotation.model.About;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
 import uk.ac.ebi.quickgo.annotation.model.StatisticsGroup;
@@ -211,7 +212,8 @@ public class AnnotationController {
                     response = ResponseExceptionHandler.ErrorInfo.class),
             @ApiResponse(code = 400, message = "Bad request due to a validation issue encountered in one of the " +
                     "filters", response = ResponseExceptionHandler.ErrorInfo.class)})
-    @ApiOperation(value = "Generate statistics for the annotation result set obtained from applying the filters.")
+    @ApiOperation(value = "Generate statistics for the annotation result set obtained from applying the filters.",
+            hidden = true)
     @RequestMapping(value = "/stats", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<StatisticsGroup>> annotationStats(
             @Valid @ModelAttribute AnnotationRequest request, BindingResult bindingResult) {
@@ -221,7 +223,9 @@ public class AnnotationController {
         return new ResponseEntity<>(stats, HttpStatus.OK);
     }
 
-    @ApiOperation(value = "Download all annotations that match the supplied filter criteria.", response = File.class)
+    @ApiOperation(value = "Download all annotations that match the supplied filter criteria.",
+            hidden = true,
+            response = File.class)
     @RequestMapping(value = "/downloadSearch",
             method = {RequestMethod.GET}, produces = {GPAD_MEDIA_TYPE_STRING, GAF_MEDIA_TYPE_STRING, TSV_MEDIA_TYPE_STRING})
     public ResponseEntity<ResponseBodyEmitter> downloadLookup(
@@ -302,8 +306,8 @@ public class AnnotationController {
      *
      * @return response with metadata information.
      */
-    @ApiOperation(value = "Get meta-data information about the Annotation service",
-            response = MetaData.class,
+    @ApiOperation(value = "Get meta-data information about the annotation service",
+            response = About.class,
             notes = "Provides the date the annotation information was created.")
     @RequestMapping(value = "/about", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<MetaData> provideMetaData() {
