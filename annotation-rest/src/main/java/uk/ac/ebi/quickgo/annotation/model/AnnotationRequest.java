@@ -208,7 +208,7 @@ public class AnnotationRequest {
             value = "The relationship between the provided 'evidenceCode' identifiers. " +
                     "Allows comma separated values. E.g., is_a,part_of",
             allowableValues = "is_a,part_of,occurs_in,regulates")
-    private String evidenceCodeUsageRelationships;
+    private String ecoUsageRelationships;
 
     @ApiModelProperty(
             value = "The type of gene product. Accepts comma separated values. E.g., protein,RNA",
@@ -229,9 +229,8 @@ public class AnnotationRequest {
                     "separated values. E.g., EXP,IDA")
     private String goIdEvidence;
 
-    @ApiModelProperty(value = "Extensions to annotations. Format: EXTENSION(DB:ID) / EXTENSION(DB) / EXTENSION. " +
-            "E.g., occurs_in(CL:0000032),transports_or_maintains_localization_of(UniProtKB:P10288)|" +
-                    "results_in_formation_of(UBERON:0003070)")
+    @ApiModelProperty(value = "Extensions to annotations, where each extension can be: " +
+            "EXTENSION(DB:ID) / EXTENSION(DB) / EXTENSION. ")
     private String extension;
 
     @ApiModelProperty(
@@ -730,7 +729,7 @@ public class AnnotationRequest {
                 ", goUsage='" + goUsage + '\'' +
                 ", goUsageRelationships='" + goUsageRelationships + '\'' +
                 ", evidenceCodeUsage='" + evidenceCodeUsage + '\'' +
-                ", evidenceCodeUsageRelationships='" + evidenceCodeUsageRelationships + '\'' +
+                ", ecoUsageRelationships='" + ecoUsageRelationships + '\'' +
                 ", geneProductType='" + geneProductType + '\'' +
                 ", targetSet='" + targetSet + '\'' +
                 ", geneProductSubset='" + geneProductSubset + '\'' +
