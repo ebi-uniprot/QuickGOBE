@@ -18,16 +18,18 @@ public class MediaTypeFactory {
     public static final String TSV_SUB_TYPE = "tsv";
     public static final String GAF_SUB_TYPE = "gaf";
     public static final String GPAD_SUB_TYPE = "gpad";
-    private static final String EXCEL_SUB_TYPE = "vnd.ms-excel";
+    public static final String EXCEL_SUB_TYPE = "vnd.ms-excel";
+    public static final String JSON_SUB_TYPE = "json";
 
     public static final String TSV_MEDIA_TYPE_STRING = TEXT_TYPE + "/" + TSV_SUB_TYPE;
     public static final String GAF_MEDIA_TYPE_STRING = TEXT_TYPE + "/" + GAF_SUB_TYPE;
     public static final String GPAD_MEDIA_TYPE_STRING = TEXT_TYPE + "/" + GPAD_SUB_TYPE;
     public static final String EXCEL_MEDIA_TYPE_STRING = APPLICATION_TYPE + "/" + EXCEL_SUB_TYPE;
+    public static final String JSON_MEDIA_TYPE_STRING = APPLICATION_TYPE + "/" + JSON_SUB_TYPE;
 
     public static final MediaType TSV_MEDIA_TYPE = new MediaType(TEXT_TYPE, TSV_SUB_TYPE, DEFAULT_CHARSET);
     public static final MediaType GAF_MEDIA_TYPE = new MediaType(TEXT_TYPE, GAF_SUB_TYPE, DEFAULT_CHARSET);
     public static final MediaType GPAD_MEDIA_TYPE = new MediaType(TEXT_TYPE, GPAD_SUB_TYPE, DEFAULT_CHARSET);
 
-    public static final MediaType EXCEL_MEDIA_TYPE = new MediaType(APPLICATION_TYPE, EXCEL_SUB_TYPE, DEFAULT_CHARSET);
+    public static final MediaType EXCEL_MEDIA_TYPE = new MediaType(APPLICATION_TYPE, EXCEL_SUB_TYPE);
 }
