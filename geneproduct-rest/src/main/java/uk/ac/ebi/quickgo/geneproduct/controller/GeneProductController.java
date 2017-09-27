@@ -90,7 +90,7 @@ public class GeneProductController {
      *
      * @return a 400 response
      */
-    @ApiOperation(value = "Catches any bad requests and returns an error response with a 400 status")
+    @ApiOperation(value = "Catches any bad requests and returns an error response with a 400 status", hidden = true)
     @RequestMapping(value = "/*", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<ResponseExceptionHandler.ErrorInfo> emptyId() {
         throw new ParameterException("The requested end-point does not exist.");
