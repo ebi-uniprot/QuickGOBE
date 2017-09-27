@@ -117,7 +117,7 @@ public class AnnotationRequest {
 
     @ApiModelProperty(value = "The database from which this annotation originates. Accepts comma separated values." +
             "E.g., BHF-UCL,Ensembl")
-    private String assignedBy;
+    private String[] assignedBy;
 
     @ApiModelProperty(
             value = "Literature id / database reference / database type. " +
@@ -171,10 +171,9 @@ public class AnnotationRequest {
             allowableValues = "is_a,part_of,occurs_in,regulates")
     private String goUsageRelationships;
 
-    //todo
     @ApiModelProperty(
             value = "Indicates how the evidence code terms within the annotations should be used. Is used in " +
-                    "conjunction with 'evidenceCodeUsageRelationships' filter. E.g., descendants",
+                    "conjunction with 'ecoUsageRelationships' filter. E.g., descendants",
             allowableValues = "descendants,exact")
     private String evidenceCodeUsage;
 
@@ -216,7 +215,7 @@ public class AnnotationRequest {
     @ApiModelProperty(
             value = "Optional fields retrieved from external services. Accepts comma separated values. E.g., goName.",
             allowableValues = "goName,taxonName,name,synonyms")
-    private String includeFields;
+    private String[] includeFields;
 
     @ApiModelProperty(
             value = "For TSV downloads only: fields downloaded.",
@@ -610,7 +609,7 @@ public class AnnotationRequest {
                 ", goUsage='" + goUsage + '\'' +
                 ", goUsageRelationships='" + goUsageRelationships + '\'' +
                 ", evidenceCodeUsage='" + evidenceCodeUsage + '\'' +
-                ", evidenceCodeUsageRelationships='" + evidenceCodeUsageRelationships + '\'' +
+                ", ecoUsageRelationships='" + ecoUsageRelationships + '\'' +
                 ", geneProductType='" + geneProductType + '\'' +
                 ", targetSet='" + targetSet + '\'' +
                 ", geneProductSubset='" + geneProductSubset + '\'' +
@@ -618,6 +617,7 @@ public class AnnotationRequest {
                 ", extension='" + extension + '\'' +
                 ", downloadLimit=" + downloadLimit +
                 ", includeFields=" + Arrays.toString(includeFields) +
+                ", selectedFields=" + Arrays.toString(selectedFields) +
                 ", filterMap=" + filterMap +
                 '}';
     }
