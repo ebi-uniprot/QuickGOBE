@@ -5,7 +5,6 @@ import uk.ac.ebi.quickgo.annotation.validation.service.WithFromValidator;
 import uk.ac.ebi.quickgo.common.validator.GeneProductIDList;
 import uk.ac.ebi.quickgo.rest.ParameterException;
 import uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern;
-import uk.ac.ebi.quickgo.rest.search.AggregateFunction;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformationRequest;
 import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformationRequests;
@@ -18,8 +17,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static uk.ac.ebi.quickgo.annotation.common.AnnotationFields.Facetable;
+import static java.util.Optional.of;
 import static uk.ac.ebi.quickgo.annotation.common.AnnotationFields.Searchable;
 import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.*;
 import static uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern.Flag.CASE_INSENSITIVE;
@@ -97,31 +95,6 @@ public class AnnotationRequest {
             Searchable.EXTENSION
     };
 
-    private static final String INCLUDE_FIELDS = "includeFields";
-    private static final String SELECTED_FIELDS = "selectedFields";
-
-    /**
-     * At the moment the definition of the list is hardcoded because we only have need to display annotation and
-     * gene product statistics on a subset of types.
-     * <p>
-     * Note: We can in the future change this from a hard coded implementation, to something that is decided by the
-     * client.
-     */
-    private static List<StatsRequest> DEFAULT_STATS_REQUESTS;
-
-    static {
-        List<String> statsTypes =
-                Arrays.asList(Facetable.GO_ID, Facetable.TAXON_ID, Facetable.REFERENCE, Facetable.EVIDENCE_CODE,
-                        Facetable.ASSIGNED_BY, Facetable.GO_ASPECT);
-
-        StatsRequest annotationStats = new StatsRequest("annotation", Facetable.ID, AggregateFunction
-                .COUNT.getName(), statsTypes);
-        StatsRequest geneProductStats = new StatsRequest("geneProduct", Facetable.GENE_PRODUCT_ID,
-                AggregateFunction.UNIQUE.getName(), statsTypes);
-
-        DEFAULT_STATS_REQUESTS = Collections.unmodifiableList(Arrays.asList(annotationStats, geneProductStats));
-    }
-
     @ApiModelProperty(
             value = "Number of results per page (" + MIN_ENTRIES_PER_PAGE + "-" + MAX_ENTRIES_PER_PAGE + ")",
             allowableValues = "range[" + MIN_ENTRIES_PER_PAGE + "," + MAX_ENTRIES_PER_PAGE + "]")
@@ -198,6 +171,7 @@ public class AnnotationRequest {
             allowableValues = "is_a,part_of,occurs_in,regulates")
     private String goUsageRelationships;
 
+    //todo
     @ApiModelProperty(
             value = "Indicates how the evidence code terms within the annotations should be used. Is used in " +
                     "conjunction with 'evidenceCodeUsageRelationships' filter. E.g., descendants",
@@ -245,10 +219,10 @@ public class AnnotationRequest {
     private String includeFields;
 
     @ApiModelProperty(
-            value = "TSV downloads only: fields downloaded.",
-            allowableValues = "geneProductId,symbol,qualifier,goId,goName,evidenceCode,goEvidence,reference,withFrom," +
-                    "taxonId,assignedBy,extensions,date,taxonName,synonym,name,type")
-    private String selectedFields;
+            value = "For TSV downloads only: fields downloaded.",
+            allowableValues = "geneProductId,symbol,qualifier,goId,goAspect,goName,evidenceCode,goEvidence,reference," +
+                    "withFrom,taxonId,assignedBy,extensions,date,taxonName,synonym,name,type.")
+    private String[] selectedFields;
 
     private final Map<String, String[]> filterMap = new HashMap<>();
 
@@ -547,7 +521,7 @@ public class AnnotationRequest {
      * @param includeFields a vararg of fields to include
      */
     public void setIncludeFields(String... includeFields) {
-        filterMap.put(INCLUDE_FIELDS, includeFields);
+        this.includeFields = includeFields;
     }
 
     /**
@@ -557,7 +531,7 @@ public class AnnotationRequest {
     @ArrayPattern(regexp = "^goName|taxonName|name|synonyms$", flags = CASE_INSENSITIVE, paramName =
             INCLUDE_FIELD_PARAM)
     public String[] getIncludeFields() {
-        return filterMap.get(INCLUDE_FIELDS);
+        return this.includeFields;
     }
 
     /**
@@ -565,19 +539,19 @@ public class AnnotationRequest {
      * @param selectedFields a vararg of fields to include
      */
     public void setSelectedFields(String... selectedFields) {
-        filterMap.put(SELECTED_FIELDS, selectedFields);
+        this.selectedFields = selectedFields;
     }
 
     /**
      * An array of fields whose values will appear in the TSV download
      * @return the array of fields from external resources to include in the response
      */
-    @ArrayPattern(regexp = "^geneProductId|symbol|qualifier|goId|goName|evidenceCode|goEvidence|reference|withFrom" +
-            "|taxonId|taxonName|assignedBy|extensions|date|name|synonyms|type$", flags = CASE_INSENSITIVE,
+    @ArrayPattern(regexp = "^geneProductId|symbol|qualifier|goId|goAspect|goName|evidenceCode|goEvidence|reference" +
+            "|withFrom|taxonId|taxonName|assignedBy|extensions|date|name|synonyms|type$", flags = CASE_INSENSITIVE,
             paramName =
             SELECT_FIELD_PARAM)
     public String[] getSelectedFields() {
-        return filterMap.get(SELECTED_FIELDS);
+        return this.selectedFields;
     }
 
     /**
@@ -601,12 +575,59 @@ public class AnnotationRequest {
         return filterRequests;
     }
 
+    /**
+     * Create a {@link ResultTransformationRequest}s instance, indicating how the results
+     * should be transformed to fulfil the initial client request. For example, this instance
+     * would include a {@link ResultTransformationRequest} instance for each field in "includeFields=goName".
+     *
+     * @return a {@link ResultTransformationRequests} instance indicating how the request's results
+     * should be transformed
+     */
+    public ResultTransformationRequests createResultTransformationRequests() {
+        ResultTransformationRequests transformationRequests = new ResultTransformationRequests();
+        if (includeFields != null && includeFields.length > 0) {
+            Stream.of(includeFields)
+                    .map(ResultTransformationRequest::new)
+                    .forEach(transformationRequests::addTransformationRequest);
+        }
+        return transformationRequests;
+    }
+
+    @Override public String toString() {
+        return "AnnotationRequest{" +
+                "limit=" + limit +
+                ", page=" + page +
+                ", aspect='" + aspect + '\'' +
+                ", assignedBy=" + Arrays.toString(assignedBy) +
+                ", reference='" + reference + '\'' +
+                ", geneProductId='" + geneProductId + '\'' +
+                ", evidenceCode='" + evidenceCode + '\'' +
+                ", goId='" + goId + '\'' +
+                ", qualifier='" + qualifier + '\'' +
+                ", withFrom='" + withFrom + '\'' +
+                ", taxonId='" + taxonId + '\'' +
+                ", taxonUsage='" + taxonUsage + '\'' +
+                ", goUsage='" + goUsage + '\'' +
+                ", goUsageRelationships='" + goUsageRelationships + '\'' +
+                ", evidenceCodeUsage='" + evidenceCodeUsage + '\'' +
+                ", evidenceCodeUsageRelationships='" + evidenceCodeUsageRelationships + '\'' +
+                ", geneProductType='" + geneProductType + '\'' +
+                ", targetSet='" + targetSet + '\'' +
+                ", geneProductSubset='" + geneProductSubset + '\'' +
+                ", goIdEvidence='" + goIdEvidence + '\'' +
+                ", extension='" + extension + '\'' +
+                ", downloadLimit=" + downloadLimit +
+                ", includeFields=" + Arrays.toString(includeFields) +
+                ", filterMap=" + filterMap +
+                '}';
+    }
+
     private Optional<FilterRequest> createSimpleFilter(String key) {
         Optional<FilterRequest> request;
         if (filterMap.containsKey(key)) {
             FilterRequest.Builder requestBuilder = FilterRequest.newBuilder();
             requestBuilder.addProperty(key, filterMap.get(key));
-            request = Optional.of(requestBuilder.build());
+            request = of(requestBuilder.build());
         } else {
             request = Optional.empty();
         }
@@ -619,11 +640,11 @@ public class AnnotationRequest {
         if (filterMap.containsKey(TAXON_USAGE_ID)) {
             switch (getTaxonUsage()) {
                 case DESCENDANTS_USAGE:
-                    field = Optional.of(Searchable.TAXON_ANCESTORS);
+                    field = of(Searchable.TAXON_ANCESTORS);
                     break;
                 case EXACT_USAGE:
                 default:
-                    field = Optional.of(Searchable.TAXON_ID);
+                    field = of(Searchable.TAXON_ID);
                     break;
             }
         } else {
@@ -650,25 +671,6 @@ public class AnnotationRequest {
                 Searchable.EVIDENCE_CODE, EVIDENCE_CODE_USAGE_RELATIONSHIPS);
     }
 
-    /**
-     * Create a {@link ResultTransformationRequest}s instance, indicating how the results
-     * should be transformed to fulfil the initial client request. For example, this instance
-     * would include a {@link ResultTransformationRequest} instance for each field in "includeFields=goName".
-     *
-     * @return a {@link ResultTransformationRequests} instance indicating how the request's results
-     * should be transformed
-     */
-    public ResultTransformationRequests createResultTransformationRequests() {
-        ResultTransformationRequests transformationRequests = new ResultTransformationRequests();
-        String[] fieldsToInclude = getIncludeFields();
-        if (fieldsToInclude != null && fieldsToInclude.length > 0) {
-            Stream.of(fieldsToInclude)
-                  .map(ResultTransformationRequest::new)
-                  .forEach(transformationRequests::addTransformationRequest);
-        }
-        return transformationRequests;
-    }
-
     private Optional<FilterRequest> createUsageFilter(String usageParam, String usageValue, String idParam, String
             idField,
             String relationshipsParam) {
@@ -680,14 +682,14 @@ public class AnnotationRequest {
             switch (usageValue) {
                 case SLIM_USAGE:
                 case DESCENDANTS_USAGE:
-                    request = Optional.of(filterBuilder.addProperty(usageValue)
+                    request = of(filterBuilder.addProperty(usageValue)
                             .addProperty(idParam, filterMap.get(idField))
                             .addProperty(relationshipsParam, filterMap.get(relationshipsParam))
                             .build());
                     break;
                 case EXACT_USAGE:
                 default:
-                    request = Optional.of(filterBuilder.addProperty(idField, filterMap.get(idField))
+                    request = of(filterBuilder.addProperty(idField, filterMap.get(idField))
                             .build());
                     break;
             }
@@ -702,87 +704,9 @@ public class AnnotationRequest {
         return request;
     }
 
-    public List<StatsRequest> createStatsRequests() {
-        return DEFAULT_STATS_REQUESTS;
-    }
-
     private String[] createLowercasedStringArray(String... args) {
         return Stream.of(args)
                 .map(String::toLowerCase)
                 .toArray(String[]::new);
-    }
-
-    @Override public String toString() {
-        return "AnnotationRequest{" +
-                "limit=" + limit +
-                ", page=" + page +
-                ", aspect='" + aspect + '\'' +
-                ", assignedBy=" + assignedBy +
-                ", reference='" + reference + '\'' +
-                ", geneProductId='" + geneProductId + '\'' +
-                ", evidenceCode='" + evidenceCode + '\'' +
-                ", goId='" + goId + '\'' +
-                ", qualifier='" + qualifier + '\'' +
-                ", withFrom='" + withFrom + '\'' +
-                ", taxonId='" + taxonId + '\'' +
-                ", taxonUsage='" + taxonUsage + '\'' +
-                ", goUsage='" + goUsage + '\'' +
-                ", goUsageRelationships='" + goUsageRelationships + '\'' +
-                ", evidenceCodeUsage='" + evidenceCodeUsage + '\'' +
-                ", ecoUsageRelationships='" + ecoUsageRelationships + '\'' +
-                ", geneProductType='" + geneProductType + '\'' +
-                ", targetSet='" + targetSet + '\'' +
-                ", geneProductSubset='" + geneProductSubset + '\'' +
-                ", goIdEvidence='" + goIdEvidence + '\'' +
-                ", extension='" + extension + '\'' +
-                ", downloadLimit=" + downloadLimit +
-                ", includeFields=" + includeFields +
-                ", filterMap=" + filterMap +
-                '}';
-    }
-
-    /**
-     * Defines which statistics the client would like to to retrieve.
-     */
-    public static class StatsRequest {
-        private final String groupName;
-        private final String groupField;
-        private final String aggregateFunction;
-        private final List<String> types;
-
-        public StatsRequest(String groupName, String groupField, String aggregateFunction, List<String> types) {
-            checkArgument(groupName != null && !groupName.trim().isEmpty(),
-                    "Statistics group name cannot be null or empty");
-            checkArgument(groupField != null && !groupName.trim().isEmpty(),
-                    "Statistics group field cannot be null or empty");
-            checkArgument(aggregateFunction != null && !aggregateFunction.trim().isEmpty(), "Statistics " +
-                    "aggregate function cannot be null or empty");
-
-            this.groupName = groupName;
-            this.groupField = groupField;
-            this.aggregateFunction = aggregateFunction;
-
-            if (types == null) {
-                this.types = Collections.emptyList();
-            } else {
-                this.types = types;
-            }
-        }
-
-        public String getGroupName() {
-            return groupName;
-        }
-
-        public String getGroupField() {
-            return groupField;
-        }
-
-        public String getAggregateFunction() {
-            return aggregateFunction;
-        }
-
-        public Collection<String> getTypes() {
-            return Collections.unmodifiableList(types);
-        }
     }
 }

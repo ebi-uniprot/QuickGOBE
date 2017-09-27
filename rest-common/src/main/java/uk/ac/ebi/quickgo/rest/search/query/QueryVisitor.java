@@ -13,4 +13,6 @@ public interface QueryVisitor<T> {
     T visit(AllQuery query);
 
     T visit(JoinQuery query);
+
+    T visit(AllNonEmptyFieldQuery query);
 }

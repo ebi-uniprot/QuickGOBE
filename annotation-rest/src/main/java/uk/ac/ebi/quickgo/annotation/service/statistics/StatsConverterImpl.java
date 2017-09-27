@@ -1,6 +1,5 @@
 package uk.ac.ebi.quickgo.annotation.service.statistics;
 
-import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
 import uk.ac.ebi.quickgo.rest.search.AggregateFunction;
 import uk.ac.ebi.quickgo.rest.search.query.AggregateRequest;
 
@@ -11,30 +10,32 @@ import java.util.Map;
 import org.springframework.stereotype.Component;
 
 /**
- * A simple implementation of the {@link StatsRequestConverter} interface.
+ * A simple implementation of the {@link StatsConverter} interface.
  *
  * @author Ricardo Antunes
  */
 @Component
-public class StatsRequestConverterImpl implements StatsRequestConverter {
+public class StatsConverterImpl implements StatsConverter {
 
     static final String DEFAULT_GLOBAL_AGGREGATE_NAME = "global";
 
-    @Override public AggregateRequest convert(Collection<AnnotationRequest.StatsRequest> statsRequests) {
-        Preconditions.checkArgument(statsRequests != null && statsRequests.size() > 0,
+    @Override public AggregateRequest convert(Collection<RequiredStatistic> requiredStatistics) {
+        Preconditions.checkArgument(requiredStatistics != null && !requiredStatistics.isEmpty(),
                 "Stats request collection cannot be null or empty");
 
         Map<String, AggregateRequest> nestedAggregateMap = new HashMap<>();
         AggregateRequest globalAggregate = new AggregateRequest(DEFAULT_GLOBAL_AGGREGATE_NAME);
 
-        statsRequests.forEach(request -> {
+        requiredStatistics.forEach(request -> {
             globalAggregate.addField(request.getGroupField(), AggregateFunction.typeOf(request.getAggregateFunction()));
             request.getTypes().forEach(type -> {
-                if (!nestedAggregateMap.containsKey(type)) {
-                    nestedAggregateMap.put(type, new AggregateRequest(type));
+                String typeName = type.getName();
+                if (!nestedAggregateMap.containsKey(typeName)) {
+                    AggregateRequest aggregateRequestForType = new AggregateRequest(typeName, type.getLimit());
+                    nestedAggregateMap.put(typeName, aggregateRequestForType);
                 }
 
-                AggregateRequest aggregateForType = nestedAggregateMap.get(type);
+                AggregateRequest aggregateForType = nestedAggregateMap.get(typeName);
                 aggregateForType.addField(request.getGroupField(),
                         AggregateFunction.typeOf(request.getAggregateFunction()));
             });

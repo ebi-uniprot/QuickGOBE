@@ -30,6 +30,7 @@ import uk.ac.ebi.quickgo.rest.search.solr.SolrRetrievalConfig;
 import uk.ac.ebi.quickgo.rest.search.solr.UnsortedSolrQuerySerializer;
 import uk.ac.ebi.quickgo.rest.service.ServiceRetrievalConfig;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -38,6 +39,7 @@ import java.util.stream.Stream;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.data.solr.core.SolrTemplate;
@@ -87,6 +89,9 @@ public class SearchServiceConfig {
     @Value("${annotation.download.pageSize:" + DEFAULT_DOWNLOAD_PAGE_SIZE + "}")
     private int downloadPageSize;
 
+    @Value("${search.wildcard.fields:}")
+    private String fieldsThatCanBeSearchedByWildCard;
+
     @Bean
     public SearchService<Annotation> annotationSearchService(
             RequestRetrieval<Annotation> annotationSolrRequestRetrieval) {
@@ -120,10 +125,11 @@ public class SearchServiceConfig {
     public QueryRequestConverter<SolrQuery> annotationSolrQueryRequestConverter() {
         Set<String> unsortedFields =
                 Stream.of(fieldsThatCanBeUnsorted.split(COMMA)).collect(Collectors.toSet());
-
+        Set<String> wildCardFields =
+                Stream.of(fieldsThatCanBeSearchedByWildCard.split(COMMA)).collect(Collectors.toSet());
         return new SolrQueryConverter(
                 SOLR_ANNOTATION_QUERY_REQUEST_HANDLER,
-                new UnsortedSolrQuerySerializer(unsortedFields));
+                new UnsortedSolrQuerySerializer(unsortedFields, wildCardFields));
     }
 
     /**

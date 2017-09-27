@@ -212,7 +212,8 @@ public class GeneProductUserQueryScoringIT {
     }
 
     @Test
-    public void queryExactMatchesSymbolInEntry2ExactMatchesNameInEntry3AndReturnsEntries23() throws Exception {
+    public void
+    queryExactMatchesSymbolInEntry2ExactMatchesNameInEntry3PartialMatchesTaxonInEntry1AndReturnsEntries231() throws Exception {
         GeneProductDocument doc1 =
                 createDoc(VALID_ID_1, "glycine metabolic process", "symbol 1", "tax 1", "synonym 1");
         GeneProductDocument doc2 =
@@ -229,7 +230,8 @@ public class GeneProductUserQueryScoringIT {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.results[0].id").value(VALID_ID_2))
                 .andExpect(jsonPath("$.results[1].id").value(VALID_ID_3))
-                .andExpect(jsonPath("$.results.*", hasSize(2)));
+                .andExpect(jsonPath("$.results[2].id").value(VALID_ID_1))
+                .andExpect(jsonPath("$.results.*", hasSize(3)));
     }
 
     @Test
@@ -254,7 +256,10 @@ public class GeneProductUserQueryScoringIT {
     }
 
     @Test
-    public void queryExactMatchesTaxonNameInEntry3ExactMatchesSynonymInEntry2AndReturnsEntries32() throws Exception {
+    public void
+    queryExactMatchesTaxonNameInEntry3ExactMatchesSynonymInEntry2PartialMatchesTaxonInEntry1AndReturnsEntries321()
+            throws
+                                                                                                       Exception {
         GeneProductDocument doc1 =
                 createDoc(VALID_ID_1, "glycine metabolic process", "symbol 1", "tax 1", "synonym 1");
         GeneProductDocument doc2 =
@@ -271,7 +276,8 @@ public class GeneProductUserQueryScoringIT {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.results[0].id").value(VALID_ID_3))
                 .andExpect(jsonPath("$.results[1].id").value(VALID_ID_2))
-                .andExpect(jsonPath("$.results.*", hasSize(2)));
+                .andExpect(jsonPath("$.results[2].id").value(VALID_ID_1))
+                .andExpect(jsonPath("$.results.*", hasSize(3)));
     }
 
     // Exact match against word match always wins -------------------------------------------------------------------

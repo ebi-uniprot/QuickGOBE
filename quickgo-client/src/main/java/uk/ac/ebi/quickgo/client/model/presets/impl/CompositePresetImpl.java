@@ -3,6 +3,7 @@ package uk.ac.ebi.quickgo.client.model.presets.impl;
 import uk.ac.ebi.quickgo.client.model.presets.CompositePreset;
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
 import uk.ac.ebi.quickgo.client.model.presets.PresetType;
+import uk.ac.ebi.quickgo.common.model.Aspect;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -204,9 +205,9 @@ public class CompositePresetImpl implements CompositePreset {
                             item.getProperty(PresetItem.Property.NAME)));
         }
 
-        StaticAspects.Aspect.findByAbbrev(presetItem.getProperty(PresetItem.Property.DESCRIPTION))
+        Aspect.fromCharacter(presetItem.getProperty(PresetItem.Property.DESCRIPTION))
                 .ifPresent(
-                        aspect -> presetItemBuilder.withProperty(SlimAdditionalProperty.ASPECT.getKey(), aspect.scientificName));
+                        aspect -> presetItemBuilder.withProperty(SlimAdditionalProperty.ASPECT.getKey(), aspect.getScientificName()));
 
         return presetItemBuilder.build();
     }
@@ -232,33 +233,6 @@ public class CompositePresetImpl implements CompositePreset {
 
     private static class StaticAspects {
 
-        private enum Aspect {
-            FUNCTION("Molecular Function", "function", "molecular_function", "F"),
-            PROCESS("Biological Process", "process", "biological_process", "P"),
-            COMPONENT("Cellular Component", "component", "cellular_component", "C");
-
-            private final String name;
-            private final String shortName;
-            private final String scientificName;
-            private final String abbrev;
-
-            Aspect(String name, String shortName, String scientificName, String abbrev) {
-                this.name = name;
-                this.shortName = shortName;
-                this.scientificName = scientificName;
-                this.abbrev = abbrev;
-            }
-
-            private static Optional<Aspect> findByAbbrev(String abbrev) {
-                for (Aspect aspect : Aspect.values()) {
-                    if (aspect.abbrev.equals(abbrev)) {
-                        return Optional.of(aspect);
-                    }
-                }
-                return Optional.empty();
-            }
-        }
-
         static Set<PresetItem> createAspects() {
             Set<PresetItem> presetAspects = new HashSet<>();
             Arrays.stream(Aspect.values())
@@ -268,8 +242,8 @@ public class CompositePresetImpl implements CompositePreset {
 
         private static void insertAspect(Set<PresetItem> presets, Aspect aspect) {
             presets.add(PresetItem
-                    .createWithName(aspect.name)
-                    .withProperty(PresetItem.Property.ID.getKey(), aspect.scientificName).build());
+                    .createWithName(aspect.getFullName())
+                    .withProperty(PresetItem.Property.ID.getKey(), aspect.getScientificName()).build());
         }
     }
 

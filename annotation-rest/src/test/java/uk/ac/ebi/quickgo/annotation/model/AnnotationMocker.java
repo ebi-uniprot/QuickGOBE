@@ -51,7 +51,7 @@ public class AnnotationMocker {
             asList(OCCURS_IN_CL_2, OCCURS_IN_CL_3));
     private static final String GENE_PRODUCT_ID = "IntAct:EBI-10043081";
     private static final String ASSIGNED_BY = "IntAct";
-    private static final String GO_ASPECT = "molecular_function";
+    public static final String GO_ASPECT = "molecular_function";
     private static final Date DATE = Date.from(
             LocalDate.of(2012, 10, 2).atStartOfDay(ZoneId.systemDefault()).toInstant());
     public static final String SYNONYMS = "A0A000_9ACTN,moeA5";

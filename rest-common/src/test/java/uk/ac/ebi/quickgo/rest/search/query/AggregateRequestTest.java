@@ -8,9 +8,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.Assert.*;
+import static org.hamcrest.core.Is.is;
+import static uk.ac.ebi.quickgo.rest.search.query.AggregateRequest.DEFAULT_AGGREGATE_LIMIT;
 
 /**
  * Tests the behaviour of the {@link AggregateRequest} class.
@@ -75,5 +77,30 @@ public class AggregateRequestTest {
         AggregateRequest[] expectedAggregates = {nestedAggregate1, nestedAggregate2};
 
         assertThat(retrievedAggregates, containsInAnyOrder(expectedAggregates));
+    }
+
+    @Test
+    public void canCreateAggregateWithPositiveLimit() {
+        int limit = 1;
+        AggregateRequest agg = new AggregateRequest("field1", limit);
+
+        assertThat(agg.getLimit(), is(limit));
+    }
+
+    @Test
+    public void aggregateWithoutLimitSetIndicatesEmptyLimit() {
+        assertThat(aggregate.getLimit(), is(DEFAULT_AGGREGATE_LIMIT));
+    }
+
+    @Test
+    public void aggregateWithLimitZeroMeansUseDefaultLimit() {
+        AggregateRequest agg = new AggregateRequest("field1", 0);
+        assertThat(agg.getLimit(), is(DEFAULT_AGGREGATE_LIMIT));
+    }
+
+    @Test
+    public void aggregateWithNegativeLimitMeansUseDefaultLimit() {
+        AggregateRequest agg = new AggregateRequest("field1", -1);
+        assertThat(agg.getLimit(), is(DEFAULT_AGGREGATE_LIMIT));
     }
 }

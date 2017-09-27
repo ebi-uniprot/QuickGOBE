@@ -1,6 +1,5 @@
 package uk.ac.ebi.quickgo.annotation.service.statistics;
 
-import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
 import uk.ac.ebi.quickgo.rest.search.AggregateFunction;
 import uk.ac.ebi.quickgo.rest.search.query.AggregateFunctionRequest;
 import uk.ac.ebi.quickgo.rest.search.query.AggregateRequest;
@@ -20,23 +19,24 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
-import static uk.ac.ebi.quickgo.annotation.service.statistics.StatsRequestConverterImpl.DEFAULT_GLOBAL_AGGREGATE_NAME;
+import static uk.ac.ebi.quickgo.annotation.service.statistics.RequiredStatisticType.statsType;
+import static uk.ac.ebi.quickgo.annotation.service.statistics.StatsConverterImpl.DEFAULT_GLOBAL_AGGREGATE_NAME;
 
 /**
  * Created 15/07/16
  * @author Edd
  */
-public class StatsRequestConverterImplTest {
+public class StatsConverterImplTest {
     private static final String UNIQUE_FUNCTION = AggregateFunction.UNIQUE.getName();
     private static final String COUNT_FUNCTION = AggregateFunction.COUNT.getName();
 
-    private ArrayList<AnnotationRequest.StatsRequest> statsRequests;
-    private StatsRequestConverter converter;
+    private ArrayList<RequiredStatistic> statsRequests;
+    private StatsConverter converter;
 
     @Before
     public void setUp() {
         this.statsRequests = new ArrayList<>();
-        this.converter = new StatsRequestConverterImpl();
+        this.converter = new StatsConverterImpl();
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -52,7 +52,7 @@ public class StatsRequestConverterImplTest {
     @Test
     public void oneStatsRequestWithNoTypesMakeGlobalAggregateWithOneField() {
         useStatsRequest(
-                new AnnotationRequest.StatsRequest("group1", "groupField1", UNIQUE_FUNCTION, Collections.emptyList()));
+                new RequiredStatistic("group1", "groupField1", UNIQUE_FUNCTION, Collections.emptyList()));
 
         AggregateRequest aggregate = convertStats();
 
@@ -64,9 +64,9 @@ public class StatsRequestConverterImplTest {
     @Test
     public void twoStatsRequestWithNoTypesMakeGlobalAggregateWithTwoFields() {
         useStatsRequest(
-                new AnnotationRequest.StatsRequest("group1", "groupField1", UNIQUE_FUNCTION, Collections.emptyList()));
+                new RequiredStatistic("group1", "groupField1", UNIQUE_FUNCTION, Collections.emptyList()));
         useStatsRequest(
-                new AnnotationRequest.StatsRequest("group2", "groupField2", COUNT_FUNCTION, Collections.emptyList()));
+                new RequiredStatistic("group2", "groupField2", COUNT_FUNCTION, Collections.emptyList()));
 
         AggregateRequest aggregate = convertStats();
 
@@ -85,7 +85,8 @@ public class StatsRequestConverterImplTest {
         String type2 = "type2";
 
         useStatsRequest(
-                new AnnotationRequest.StatsRequest(group, groupField, COUNT_FUNCTION, asList(type1, type2)));
+                new RequiredStatistic(group, groupField, COUNT_FUNCTION, asList(
+                        statsType(type1), statsType(type2))));
 
         AggregateRequest aggregate = convertStats();
 
@@ -117,9 +118,11 @@ public class StatsRequestConverterImplTest {
         String type3 = "type3";
 
         useStatsRequest(
-                new AnnotationRequest.StatsRequest(group1, groupField1, UNIQUE_FUNCTION, asList(type1, type2, type3)));
+                new RequiredStatistic(group1, groupField1, UNIQUE_FUNCTION,
+                        asList(statsType(type1), statsType(type2), statsType(type3))));
         useStatsRequest(
-                new AnnotationRequest.StatsRequest(group2, groupField2, UNIQUE_FUNCTION, asList(type1, type3)));
+                new RequiredStatistic(group2, groupField2, UNIQUE_FUNCTION,
+                        asList(statsType(type1), statsType(type3))));
 
         AggregateRequest aggregate = convertStats();
 
@@ -158,7 +161,7 @@ public class StatsRequestConverterImplTest {
 
     private AggregateRequest convertStats() {return converter.convert(statsRequests);}
 
-    private void useStatsRequest(AnnotationRequest.StatsRequest statsRequest) {
+    private void useStatsRequest(RequiredStatistic statsRequest) {
         this.statsRequests.add(statsRequest);
     }
 }

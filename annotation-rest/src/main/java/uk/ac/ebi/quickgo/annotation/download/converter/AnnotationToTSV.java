@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.annotation.download.converter;
 
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
+import uk.ac.ebi.quickgo.common.model.Aspect;
 
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -41,14 +42,23 @@ public class AnnotationToTSV extends AnnotationTo implements BiFunction<Annotati
             return Collections.singletonList(output(new OutputContent(annotation, columns, null)));
         } else {
             return annotation.slimmedIds.stream()
-                    .map(goId -> output(new OutputContent(annotation, columns, goId)))
-                    .collect(toList());
+                                        .map(goId -> output(new OutputContent(annotation, columns, goId)))
+                                        .collect(toList());
         }
     }
 
     private void initialiseContentMappings() {
-        selected2Content.put(GENE_PRODUCT_ID_FIELD_NAME,
-                (c, j) -> j.add(nullToEmptyString.apply(c.annotation.geneProductId)));
+        selected2Content.put(GENE_PRODUCT_FIELD_NAME,
+                             (c, j) -> {
+                                 String[] elements = nullToEmptyString.apply(c.annotation.geneProductId).split(":");
+                                 if (elements.length == 2) {
+                                     j.add(elements[0]);
+                                     j.add(elements[1]);
+                                 } else {
+                                     j.add("");
+                                     j.add("");
+                                 }
+                             });
         selected2Content.put(SYMBOL_FIELD_NAME, (c, j) -> j.add(nullToEmptyString.apply(c.annotation.symbol)));
         selected2Content.put(QUALIFIER_FIELD_NAME, (c, j) -> j.add(nullToEmptyString.apply(c.annotation.qualifier)));
         selected2Content.put(GO_TERM_FIELD_NAME, (c, j) -> {
@@ -57,25 +67,28 @@ public class AnnotationToTSV extends AnnotationTo implements BiFunction<Annotati
             }
             j.add(nullToEmptyString.apply(c.annotation.goId));
         });
+        selected2Content.put(GO_ASPECT_FIELD_NAME,
+                             (c, j) -> j.add(Aspect.fromScientificName(c.annotation.goAspect)
+                                             .map(Aspect::getCharacter)
+                                             .orElse("")));
         selected2Content.put(GO_NAME_FIELD_NAME, (c, j) -> j.add(nullToEmptyString.apply(c.annotation.goName)));
         selected2Content.put(ECO_ID_FIELD_NAME, (c, j) -> j.add(nullToEmptyString.apply(c.annotation.evidenceCode)));
         selected2Content.put(GO_EVIDENCE_CODE_FIELD_NAME,
-                (c, j) -> j.add(nullToEmptyString.apply(c.annotation.goEvidence)));
+                             (c, j) -> j.add(nullToEmptyString.apply(c.annotation.goEvidence)));
         selected2Content.put(REFERENCE_FIELD_NAME, (c, j) -> j.add(nullToEmptyString.apply(c.annotation.reference)));
         selected2Content.put(WITH_FROM_FIELD_NAME, (c, j) -> j.add(withFromAsString(c.annotation.withFrom)));
         selected2Content.put(TAXON_ID_FIELD_NAME,
-                (c, j) -> j.add(c.annotation.taxonId == 0 ? "" : Integer.toString(c.annotation.taxonId)));
-        selected2Content.put(ASSIGNED_BY_FIELD_NAME,
-                (c, j) -> j.add(nullToEmptyString.apply(c.annotation.assignedBy)));
+                             (c, j) -> j.add(c.annotation.taxonId == 0 ? "" : Integer.toString(c.annotation.taxonId)));
+        selected2Content.put(ASSIGNED_BY_FIELD_NAME, (c, j) -> j.add(nullToEmptyString.apply(c.annotation.assignedBy)));
         selected2Content.put(ANNOTATION_EXTENSION_FIELD_NAME,
-                (c, j) -> j.add(extensionsAsString(c.annotation.extensions)));
+                             (c, j) -> j.add(extensionsAsString(c.annotation.extensions)));
         selected2Content.put(DATE_FIELD_NAME, (c, j) -> j.add(toYMD(c.annotation.date)));
         selected2Content.put(TAXON_NAME_FIELD_NAME, (c, j) -> j.add(nullToEmptyString.apply(c.annotation.taxonName)));
         selected2Content.put(GENE_PRODUCT_NAME_FIELD_NAME, (c, j) -> j.add(nullToEmptyString.apply(c.annotation.name)));
         selected2Content.put(GENE_PRODUCT_SYNONYMS_FIELD_NAME,
-                (c, j) -> j.add(nullToEmptyString.apply(c.annotation.synonyms)));
+                             (c, j) -> j.add(nullToEmptyString.apply(c.annotation.synonyms)));
         selected2Content.put(GENE_PRODUCT_TYPE_FIELD_NAME,
-                (c, j) -> j.add(toGeneProductType(idToComponents(c.annotation.geneProductId)[DB])));
+                             (c, j) -> j.add(toGeneProductType(idToComponents(c.annotation.geneProductId)[DB])));
     }
 
     private boolean isSlimmedRequest(Annotation annotation) {
