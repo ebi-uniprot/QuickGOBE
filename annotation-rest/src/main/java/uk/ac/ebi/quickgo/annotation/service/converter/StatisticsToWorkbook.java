@@ -8,6 +8,7 @@ import uk.ac.ebi.quickgo.annotation.model.StatisticsValue;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 
@@ -24,6 +25,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class StatisticsToWorkbook {
 
+    public static final String PERCENTAGE_CELL_FORMAT = "0.00";
     private final String[] sectionTypes;
     private final Map<String, SheetLayout> sheetLayoutMap;
 
@@ -32,13 +34,12 @@ public class StatisticsToWorkbook {
         this.sheetLayoutMap = checkNotNull(sheetLayoutMap);
     }
 
-    public Workbook convert(List<StatisticsGroup> statisticsGroups) {
-
+    public Workbook convert(List<StatisticsGroup> statisticsGroups, int downloadLimit) {
         Workbook wb = new HSSFWorkbook();
         //        CreationHelper helper = wb.getCreationHelper();
 
-        CellStyle fixedDecimalPlaces = wb.createCellStyle();
-        fixedDecimalPlaces.setDataFormat(wb.createDataFormat().getFormat("0.00"));
+        CellStyle percentageCellFormat = wb.createCellStyle();
+        percentageCellFormat.setDataFormat(wb.createDataFormat().getFormat(PERCENTAGE_CELL_FORMAT));
 
         Sheet summarySheet = wb.createSheet("summary");
         populateSummarySheet(summarySheet, statisticsGroups);
@@ -46,14 +47,15 @@ public class StatisticsToWorkbook {
         for (StatisticsGroup statisticsGroup : statisticsGroups) {
             for (String sectionType : sectionTypes) {
                 if (statisticsGroup.getGroupName().equalsIgnoreCase(sectionType)) {
-                    populateDetailSheetsForGroup(statisticsGroup, wb, fixedDecimalPlaces);
+                    populateDetailSheetsForGroup(statisticsGroup, wb, percentageCellFormat, downloadLimit);
                 }
             }
         }
         return wb;
     }
 
-    private void populateDetailSheetsForGroup(StatisticsGroup statisticsGroup, Workbook wb, CellStyle fixedDecimalPlaces) {
+    private void populateDetailSheetsForGroup(StatisticsGroup statisticsGroup, Workbook wb,
+            CellStyle fixedDecimalPlaces, int downloadLimit) {
 
         for (StatisticsByType statisticsByType : statisticsGroup.getTypes()) {
 
@@ -70,17 +72,18 @@ public class StatisticsToWorkbook {
                                       .forEach(sectionLayout -> populateSectionLayout(sheet,
                                                                                       sectionLayout,
                                                                                       statisticsByType,
-                                                                                      fixedDecimalPlaces));
+                                                                                      fixedDecimalPlaces,
+                                                                                      downloadLimit));
         }
     }
 
     private void populateSectionLayout(Sheet sheet, SectionLayout sectionLayout, StatisticsByType statisticsByType,
-            CellStyle fixedDecimalPlaces) {
+            CellStyle fixedDecimalPlaces, int downloadLimit) {
         AtomicInteger rowCounter = new AtomicInteger(1);
 
         populateSectionHeader(sheet, sectionLayout, rowCounter);
         populateSectionColumnNames(sheet, sectionLayout, rowCounter);
-        populateSectionDetail(sheet, sectionLayout, rowCounter, statisticsByType, fixedDecimalPlaces);
+        populateSectionDetail(sheet, sectionLayout, rowCounter, statisticsByType, fixedDecimalPlaces,downloadLimit);
     }
 
     private void populateSectionHeader(Sheet sheet, SectionLayout sectionLayout, AtomicInteger rowCounter) {
@@ -100,10 +103,15 @@ public class StatisticsToWorkbook {
     }
 
     private void populateSectionDetail(Sheet sheet, SectionLayout sectionLayout, AtomicInteger rowCounter,
-            StatisticsByType statisticsByType, CellStyle fixedDecimalPlaces) {
+            StatisticsByType statisticsByType, CellStyle fixedDecimalPlaces, int downloadLimit) {
 
+        int detailLineCount = 0;
         final List<StatisticsValue> values = statisticsByType.getValues();
         for (StatisticsValue value : values) {
+
+            if(downloadLimit > 0 && detailLineCount++ == downloadLimit){
+                break;
+            }
 
             rowCounter.incrementAndGet();
             Row detailRow = getRow(sheet, rowCounter);

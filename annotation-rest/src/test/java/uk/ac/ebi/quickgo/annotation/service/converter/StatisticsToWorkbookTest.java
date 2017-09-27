@@ -102,7 +102,7 @@ public class StatisticsToWorkbookTest {
 
         StatisticsToWorkbook statisticsToWorkbook = new StatisticsToWorkbook(StatisticsWorkBookLayout.SECTION_TYPES,
                                                                              StatisticsWorkBookLayout.SHEET_LAYOUT_MAP);
-        Workbook workbook = statisticsToWorkbook.convert(statisticsGroups);
+        Workbook workbook = statisticsToWorkbook.convert(statisticsGroups,50000);
         File outputFile = new File("C:\\Users\\twardell\\someName.xls");
         try (FileOutputStream outputStream = new FileOutputStream(outputFile)) {
             workbook.write(outputStream);
