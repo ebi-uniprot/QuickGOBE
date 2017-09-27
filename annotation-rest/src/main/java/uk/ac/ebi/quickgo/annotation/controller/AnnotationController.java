@@ -28,6 +28,7 @@ import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformationRequests;
 import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformerChain;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -56,10 +57,7 @@ import static java.util.stream.Collectors.toList;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.HttpHeaders.VARY;
-import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.EXCEL_MEDIA_TYPE_STRING;
-import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.GAF_MEDIA_TYPE_STRING;
-import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.GPAD_MEDIA_TYPE_STRING;
-import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.TSV_MEDIA_TYPE_STRING;
+import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.*;
 import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.searchAndTransform;
 import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.streamSearchResults;
 import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.createFirstCursorPage;
@@ -133,8 +131,8 @@ public class AnnotationController {
     private final StatisticsService statsService;
     private final TaskExecutor taskExecutor;
     private final HeaderCreatorFactory headerCreatorFactory;
-    public static final StatisticsToWorkbook STATISTICS_TO_WORKBOOK = new StatisticsToWorkbook(StatisticsWorkBookLayout.SECTION_TYPES,
-                                                                                               StatisticsWorkBookLayout.SHEET_LAYOUT_MAP);
+    private static final StatisticsToWorkbook STATISTICS_TO_WORKBOOK = new StatisticsToWorkbook(StatisticsWorkBookLayout.SECTION_TYPES,
+                                                                                                StatisticsWorkBookLayout.SHEET_LAYOUT_MAP);
 
     @Autowired
     public AnnotationController(SearchService<Annotation> annotationSearchService,
@@ -267,22 +265,35 @@ public class AnnotationController {
     }
 
     @RequestMapping(value = "/downloadStats",
-            method = {RequestMethod.GET}, produces = {EXCEL_MEDIA_TYPE_STRING})
-    public void  downloadStats(
+            method = {RequestMethod.GET}, produces = {EXCEL_MEDIA_TYPE_STRING,JSON_MEDIA_TYPE_STRING})
+    public void downloadStats(
             @Valid @ModelAttribute AnnotationRequest request,
             BindingResult bindingResult,
+            @RequestHeader(ACCEPT) MediaType mediaTypeAcceptHeader,
             HttpServletResponse response) throws IOException {
         checkBindingErrors(bindingResult);
         QueryResult<StatisticsGroup> stats = statsService.calculate(request);
 
-        Workbook workbook = STATISTICS_TO_WORKBOOK.convert(stats.getResults(), request.getDownloadLimit());
+        if(mediaTypeAcceptHeader.equals(EXCEL_MEDIA_TYPE)) {
 
-        // Set the content type and attachment header.
-        response.addHeader("Content-disposition", "attachment;filename=annotation_statistics.xlsx");
-        response.setContentType(EXCEL_MEDIA_TYPE_STRING);
+            Workbook workbook = STATISTICS_TO_WORKBOOK.convert(stats.getResults(), request.getDownloadLimit());
 
-        workbook.write(response.getOutputStream());
-        response.flushBuffer();
+            // Set the content type and attachment header.
+            response.addHeader("Content-disposition", "attachment;filename=annotation_statistics.xlsx");
+            response.setContentType(EXCEL_MEDIA_TYPE_STRING);
+
+            workbook.write(response.getOutputStream());
+            response.flushBuffer();
+        }else{
+
+            // Set the content type and attachment header.
+            response.addHeader("Content-disposition", "attachment;filename=annotation_statistics.json");
+            response.setContentType(JSON_MEDIA_TYPE_STRING);
+
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.writeValue(response.getOutputStream(), stats);
+            response.flushBuffer();
+        }
     }
 
 
