@@ -133,6 +133,8 @@ public class AnnotationController {
     private final StatisticsService statsService;
     private final TaskExecutor taskExecutor;
     private final HeaderCreatorFactory headerCreatorFactory;
+    public static final StatisticsToWorkbook STATISTICS_TO_WORKBOOK = new StatisticsToWorkbook(StatisticsWorkBookLayout.SECTION_TYPES,
+                                                                                               StatisticsWorkBookLayout.SHEET_LAYOUT_MAP);
 
     @Autowired
     public AnnotationController(SearchService<Annotation> annotationSearchService,
@@ -273,10 +275,7 @@ public class AnnotationController {
         checkBindingErrors(bindingResult);
         QueryResult<StatisticsGroup> stats = statsService.calculate(request);
 
-        StatisticsToWorkbook statisticsToWorkbook = new StatisticsToWorkbook(StatisticsWorkBookLayout.SECTION_TYPES,
-                                                                             StatisticsWorkBookLayout.SHEET_LAYOUT_MAP);
-
-        Workbook workbook = statisticsToWorkbook.convert(stats.getResults());
+        Workbook workbook = STATISTICS_TO_WORKBOOK.convert(stats.getResults(), request.getDownloadLimit());
 
         // Set the content type and attachment header.
         response.addHeader("Content-disposition", "attachment;filename=annotation_statistics.xlsx");
