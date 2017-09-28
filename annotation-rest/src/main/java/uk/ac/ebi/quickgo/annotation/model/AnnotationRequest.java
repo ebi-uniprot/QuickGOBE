@@ -173,7 +173,7 @@ public class AnnotationRequest {
 
     @ApiModelProperty(
             value = "Indicates how the evidence code terms within the annotations should be used. Is used in " +
-                    "conjunction with 'ecoUsageRelationships' filter. E.g., descendants",
+                    "conjunction with 'evidenceCodeUsageRelationships' filter. E.g., descendants",
             allowableValues = "descendants,exact")
     private String evidenceCodeUsage;
 
@@ -181,7 +181,7 @@ public class AnnotationRequest {
             value = "The relationship between the provided 'evidenceCode' identifiers. " +
                     "Allows comma separated values. E.g., is_a,part_of",
             allowableValues = "is_a,part_of,occurs_in,regulates")
-    private String ecoUsageRelationships;
+    private String evidenceCodeUsageRelationships;
 
     @ApiModelProperty(
             value = "The type of gene product. Accepts comma separated values. E.g., protein,RNA",
@@ -209,7 +209,8 @@ public class AnnotationRequest {
     @ApiModelProperty(
             value = "The number of annotations to download ("+MIN_DOWNLOAD_NUMBER+"-"+MAX_DOWNLOAD_NUMBER+"). Note, " +
                     "the page size parameter 'limit' will be ignored when downloading results. ",
-            allowableValues = "range[" + MIN_DOWNLOAD_NUMBER + "," + MAX_DOWNLOAD_NUMBER + "]")
+            allowableValues = "range[" + MIN_DOWNLOAD_NUMBER + "," + MAX_DOWNLOAD_NUMBER + "]",
+            hidden = true)
     private int downloadLimit = DEFAULT_DOWNLOAD_LIMIT;
 
     @ApiModelProperty(
@@ -610,7 +611,7 @@ public class AnnotationRequest {
                 ", goUsage='" + goUsage + '\'' +
                 ", goUsageRelationships='" + goUsageRelationships + '\'' +
                 ", evidenceCodeUsage='" + evidenceCodeUsage + '\'' +
-                ", ecoUsageRelationships='" + ecoUsageRelationships + '\'' +
+                ", evidenceCodeUsageRelationships='" + evidenceCodeUsageRelationships + '\'' +
                 ", geneProductType='" + geneProductType + '\'' +
                 ", targetSet='" + targetSet + '\'' +
                 ", geneProductSubset='" + geneProductSubset + '\'' +
