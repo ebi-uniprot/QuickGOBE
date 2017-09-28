@@ -8,8 +8,6 @@ import uk.ac.ebi.quickgo.annotation.download.model.DownloadContent;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
 import uk.ac.ebi.quickgo.annotation.model.StatisticsGroup;
-import uk.ac.ebi.quickgo.annotation.service.converter.StatisticsToWorkbook;
-import uk.ac.ebi.quickgo.annotation.service.converter.StatisticsWorkBookLayout;
 import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.annotation.service.statistics.StatisticsService;
 import uk.ac.ebi.quickgo.rest.ParameterBindingException;
@@ -28,7 +26,6 @@ import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformationRequests;
 import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformerChain;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -38,9 +35,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Stream;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
@@ -119,6 +114,7 @@ public class AnnotationController {
             DateTimeFormatter.ofPattern("-N-yyyyMMdd");
     private static final String DOWNLOAD_FILE_NAME_PREFIX = "QuickGO-annotations";
     private static final String GO_USAGE_SLIM = "goUsage=slim";
+    private static final String DOWNLOAD_STATISTICS_FILE_NAME = "annotation_statistics";
 
     private final MetaDataProvider metaDataProvider;
 
@@ -131,8 +127,6 @@ public class AnnotationController {
     private final StatisticsService statsService;
     private final TaskExecutor taskExecutor;
     private final HeaderCreatorFactory headerCreatorFactory;
-    private static final StatisticsToWorkbook STATISTICS_TO_WORKBOOK = new StatisticsToWorkbook(StatisticsWorkBookLayout.SECTION_TYPES,
-                                                                                                StatisticsWorkBookLayout.SHEET_LAYOUT_MAP);
 
     @Autowired
     public AnnotationController(SearchService<Annotation> annotationSearchService,
@@ -260,42 +254,49 @@ public class AnnotationController {
 
         return ResponseEntity
                 .ok()
-                .headers(createHttpDownloadHeader(mediaTypeAcceptHeader))
+                .headers(addHttpFileAttachmentHeader(mediaTypeAcceptHeader, downloadFileName(mediaTypeAcceptHeader)))
                 .body(emitter);
     }
 
     @RequestMapping(value = "/downloadStats",
             method = {RequestMethod.GET}, produces = {EXCEL_MEDIA_TYPE_STRING,JSON_MEDIA_TYPE_STRING})
-    public void downloadStats(
+    public ResponseEntity<ResponseBodyEmitter> downloadStats(
             @Valid @ModelAttribute AnnotationRequest request,
             BindingResult bindingResult,
-            @RequestHeader(ACCEPT) MediaType mediaTypeAcceptHeader,
-            HttpServletResponse response) throws IOException {
+            @RequestHeader(ACCEPT) MediaType mediaTypeAcceptHeader) throws IOException {
         checkBindingErrors(bindingResult);
         QueryResult<StatisticsGroup> stats = statsService.calculate(request);
+        ResponseBodyEmitter emitter = new ResponseBodyEmitter();
 
-        if(mediaTypeAcceptHeader.equals(EXCEL_MEDIA_TYPE)) {
-
-            Workbook workbook = STATISTICS_TO_WORKBOOK.convert(stats.getResults(), request.getDownloadLimit());
-
-            // Set the content type and attachment header.
-            response.addHeader("Content-disposition", "attachment;filename=annotation_statistics.xlsx");
-            response.setContentType(EXCEL_MEDIA_TYPE_STRING);
-
-            workbook.write(response.getOutputStream());
-            response.flushBuffer();
-        }else{
-
-            // Set the content type and attachment header.
-            response.addHeader("Content-disposition", "attachment;filename=annotation_statistics.json");
-            response.setContentType(JSON_MEDIA_TYPE_STRING);
-
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.writeValue(response.getOutputStream(), stats);
-            response.flushBuffer();
+        try {
+            emitter.send(stats, mediaTypeAcceptHeader);
+        } catch (IOException e) {
+            LOGGER.error("Failed to stream annotation results", e);
+            emitter.completeWithError(e);
         }
+
+        emitter.complete();
+        LOGGER.info("Emitted response stream -- which will be written by the HTTP message converter for: " +
+                            mediaTypeAcceptHeader);
+
+        return ResponseEntity
+                .ok()
+                .headers(addHttpFileAttachmentHeader(mediaTypeAcceptHeader, downloadStatisticsFileName(mediaTypeAcceptHeader)))
+                .body(emitter);
     }
 
+    private String downloadFileName(@RequestHeader(ACCEPT) MediaType mediaType) {
+        return String.format("%s%s.%s", DOWNLOAD_FILE_NAME_PREFIX, formattedDateStringForNow(), mediaType.getSubtype());
+    }
+
+    private String downloadStatisticsFileName(@RequestHeader(ACCEPT) MediaType mediaType) {
+        return String.format("%s.%s", DOWNLOAD_STATISTICS_FILE_NAME, mediaType.getSubtype());
+    }
+
+    private String formattedDateStringForNow() {
+        LocalDateTime now = LocalDateTime.now();
+        return now.format(DOWNLOAD_FILE_NAME_DATE_FORMATTER);
+    }
 
     private HeaderContent buildHeaderContent(HttpServletRequest servletRequest, List<String> selectedFields) {
         HeaderContent.Builder contentBuilder = new HeaderContent.Builder();
@@ -419,11 +420,8 @@ public class AnnotationController {
         }
     }
 
-    private HttpHeaders createHttpDownloadHeader(MediaType mediaType) {
+    private HttpHeaders addHttpFileAttachmentHeader(MediaType mediaType, String fileName) {
         HttpHeaders httpHeaders = new HttpHeaders();
-        LocalDateTime now = LocalDateTime.now();
-        String extension = "." + mediaType.getSubtype();
-        String fileName = DOWNLOAD_FILE_NAME_PREFIX + now.format(DOWNLOAD_FILE_NAME_DATE_FORMATTER) + extension;
         httpHeaders.setContentDispositionFormData("attachment", fileName);
         httpHeaders.setContentType(mediaType);
         httpHeaders.add(VARY, ACCEPT);
