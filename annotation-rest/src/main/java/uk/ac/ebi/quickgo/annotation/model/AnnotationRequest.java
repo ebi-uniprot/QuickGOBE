@@ -213,14 +213,15 @@ public class AnnotationRequest {
     private int downloadLimit = DEFAULT_DOWNLOAD_LIMIT;
 
     @ApiModelProperty(
-            value = "Optional fields retrieved from external services. Accepts comma separated values. E.g., goName.",
+            value = "Optional fields retrieved from external services. Accepts comma separated values.",
             allowableValues = "goName,taxonName,name,synonyms")
     private String[] includeFields;
 
     @ApiModelProperty(
-            value = "For TSV downloads only: fields downloaded.",
+            value = "For TSV downloads only: fields to be downloaded. Accepts comma separated values.",
             allowableValues = "geneProductId,symbol,qualifier,goId,goAspect,goName,evidenceCode,goEvidence,reference," +
-                    "withFrom,taxonId,assignedBy,extensions,date,taxonName,synonym,name,type.")
+                    "withFrom,taxonId,assignedBy,extensions,date,taxonName,synonym,name,type",
+            hidden = true)
     private String[] selectedFields;
 
     private final Map<String, String[]> filterMap = new HashMap<>();
