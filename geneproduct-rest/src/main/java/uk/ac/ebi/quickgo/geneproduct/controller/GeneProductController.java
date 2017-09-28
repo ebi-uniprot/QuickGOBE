@@ -107,7 +107,7 @@ public class GeneProductController {
      *     <li>any id is of the an invalid format: response returns 400</li>
      * </ul>
      */
-    @ApiOperation(value = "Retrieves core information about a list of gene product IDs specified in CSV format")
+    @ApiOperation(value = "Retrieves details about a list of gene product IDs specified in CSV format")
     @RequestMapping(value = "/{ids}", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<GeneProduct>> findById(@PathVariable String ids) {
         return getGeneProductResponse(geneProductService.findById(controllerValidationHelper.validateCSVIds(ids)));
