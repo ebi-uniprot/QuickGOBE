@@ -4,10 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+
 import uk.ac.ebi.quickgo.annotation.download.converter.AnnotationToGAF;
 import uk.ac.ebi.quickgo.annotation.download.converter.AnnotationToGPAD;
 import uk.ac.ebi.quickgo.annotation.download.converter.AnnotationToTSV;
 import uk.ac.ebi.quickgo.annotation.download.http.*;
+import uk.ac.ebi.quickgo.annotation.service.converter.StatisticsToWorkbook;
 import uk.ac.ebi.quickgo.rest.controller.response.NoFacetNoHighlightNoAggregateQueryResult;
 import uk.ac.ebi.quickgo.rest.controller.response.NoNextCursorPageInfo;
 import uk.ac.ebi.quickgo.rest.search.results.PageInfo;
@@ -17,6 +19,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.*;
+import static uk.ac.ebi.quickgo.annotation.service.converter.StatisticsWorkBookLayout.SECTION_TYPES;
+import static uk.ac.ebi.quickgo.annotation.service.converter.StatisticsWorkBookLayout.SHEET_LAYOUT_MAP;
 
 /**
  * Configures how the response to the client should be handled.
@@ -41,7 +45,7 @@ import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.*;
     }
 
     private DispatchWriter gpadDispatchWriter() {
-        return new DispatchWriter(new AnnotationToGPAD(), GPAD_MEDIA_TYPE);
+        return new AnnotationDispatchWriter(new AnnotationToGPAD(), GPAD_MEDIA_TYPE);
     }
 
     @Bean
@@ -50,7 +54,7 @@ import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.*;
     }
 
     private DispatchWriter gafDispatchWriter() {
-        return new DispatchWriter(new AnnotationToGAF(), GAF_MEDIA_TYPE);
+        return new AnnotationDispatchWriter(new AnnotationToGAF(), GAF_MEDIA_TYPE);
     }
 
     @Bean
@@ -59,6 +63,16 @@ import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.*;
     }
 
     private DispatchWriter tsvDispatchWriter() {
-        return new DispatchWriter(new AnnotationToTSV(), TSV_MEDIA_TYPE);
+        return new AnnotationDispatchWriter(new AnnotationToTSV(), TSV_MEDIA_TYPE);
+    }
+
+    @Bean
+    public HttpMessageConverter excelHttpMessageConverter(){
+        return new HttpMessageConverter(statsDispatchWriter(), EXCEL_MEDIA_TYPE);
+    }
+
+    private DispatchWriter statsDispatchWriter() {
+        final StatisticsToWorkbook statisticsToWorkbook = new StatisticsToWorkbook(SECTION_TYPES, SHEET_LAYOUT_MAP);
+        return new StatsExcelDispatchWriter(statisticsToWorkbook);
     }
 }
