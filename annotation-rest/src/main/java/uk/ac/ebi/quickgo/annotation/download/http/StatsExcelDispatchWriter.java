@@ -1,6 +1,4 @@
-package uk.ac.ebi.quickgo.annotation.downloadstats.http;
-
-import uk.ac.ebi.quickgo.annotation.download.DispatchWriter;
+package uk.ac.ebi.quickgo.annotation.download.http;
 
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.model.StatisticsGroup;
