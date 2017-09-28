@@ -73,7 +73,7 @@ public class CoTermController {
     @RequestMapping(value = "/{id}", method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<CoTerm>> findCoTerms(
-            @ApiParam(value = "The GO term id") @PathVariable(value = "id") String id,
+            @ApiParam(value = "The GO term id", required = true) @PathVariable(value = "id") String id,
             @ApiParam(value = "The source from which the co-occurring terms originated. Possible " +
                     "values: ALL / MANUAL. ALL => manual + electronic/automatically generated annotations; " +
                     "MANUAL => only manually generated annotations", defaultValue = "ALL")

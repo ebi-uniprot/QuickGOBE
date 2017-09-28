@@ -165,7 +165,7 @@ public abstract class OBOController<T extends OBOTerm> {
     @RequestMapping(value = TERMS_RESOURCE + "/{ids}", method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsCoreAttr(
-            @ApiParam(value = "Comma-separated term IDs") @PathVariable(value = "ids") String ids) {
+            @ApiParam(value = "Comma-separated term IDs", required = true) @PathVariable(value = "ids") String ids) {
         return getResultsResponse(ontologyService.findCoreInfoByOntologyId(validationHelper.validateCSVIds(ids)));
     }
 
@@ -185,7 +185,7 @@ public abstract class OBOController<T extends OBOTerm> {
     @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + COMPLETE_SUB_RESOURCE, method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsComplete(
-            @ApiParam(value = "Comma-separated term IDs") @PathVariable(value = "ids") String ids) {
+            @ApiParam(value = "Comma-separated term IDs", required = true) @PathVariable(value = "ids") String ids) {
         return getResultsResponse(
                 ontologyService.findCompleteInfoByOntologyId(validationHelper.validateCSVIds(ids)));
     }
@@ -206,7 +206,7 @@ public abstract class OBOController<T extends OBOTerm> {
     @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + HISTORY_SUB_RESOURCE, method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsHistory(
-            @ApiParam(value = "Comma-separated term IDs") @PathVariable(value = "ids") String ids) {
+            @ApiParam(value = "Comma-separated term IDs", required = true) @PathVariable(value = "ids") String ids) {
 
         return getResultsResponse(
                 ontologyService.findHistoryInfoByOntologyId(validationHelper.validateCSVIds(ids)));
@@ -228,7 +228,7 @@ public abstract class OBOController<T extends OBOTerm> {
     @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + XREFS_SUB_RESOURCE, method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsXRefs(
-            @ApiParam(value = "Comma-separated term IDs") @PathVariable(value = "ids") String ids) {
+            @ApiParam(value = "Comma-separated term IDs", required = true) @PathVariable(value = "ids") String ids) {
         return getResultsResponse(
                 ontologyService.findXRefsInfoByOntologyId(validationHelper.validateCSVIds(ids)));
     }
@@ -250,7 +250,7 @@ public abstract class OBOController<T extends OBOTerm> {
     @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + CONSTRAINTS_SUB_RESOURCE, method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsTaxonConstraints(
-            @ApiParam(value = "Comma-separated term IDs") @PathVariable(value = "ids") String ids) {
+            @ApiParam(value = "Comma-separated term IDs", required = true) @PathVariable(value = "ids") String ids) {
         return getResultsResponse(
                 ontologyService.findTaxonConstraintsInfoByOntologyId(validationHelper.validateCSVIds(ids)));
     }
@@ -271,7 +271,7 @@ public abstract class OBOController<T extends OBOTerm> {
     @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + XRELATIONS_SUB_RESOURCE, method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsXOntologyRelations(
-            @ApiParam(value = "Comma-separated term IDs") @PathVariable(value = "ids") String ids) {
+            @ApiParam(value = "Comma-separated term IDs", required = true) @PathVariable(value = "ids") String ids) {
         return getResultsResponse(
                 ontologyService.findXORelationsInfoByOntologyId(validationHelper.validateCSVIds(ids)));
     }
@@ -293,7 +293,7 @@ public abstract class OBOController<T extends OBOTerm> {
     @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + GUIDELINES_SUB_RESOURCE, method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsAnnotationGuideLines(
-            @ApiParam(value = "Comma-separated term IDs") @PathVariable(value = "ids") String ids) {
+            @ApiParam(value = "Comma-separated term IDs", required = true) @PathVariable(value = "ids") String ids) {
         return getResultsResponse(ontologyService
                 .findAnnotationGuideLinesInfoByOntologyId(validationHelper.validateCSVIds
                         (ids)));
@@ -339,7 +339,7 @@ public abstract class OBOController<T extends OBOTerm> {
     @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + ANCESTORS_SUB_RESOURCE, method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findAncestors(
-            @ApiParam(value = "Comma-separated term IDs") @PathVariable(value = "ids") String ids,
+            @ApiParam(value = "Comma-separated term IDs", required = true) @PathVariable(value = "ids") String ids,
             @ApiParam(value = "Comma-separated ontology relationships")
             @RequestParam(value = "relations", defaultValue = DEFAULT_TRAVERSAL_TYPES_CSV) String relations) {
         return getResultsResponse(
@@ -358,7 +358,7 @@ public abstract class OBOController<T extends OBOTerm> {
     @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + DESCENDANTS_SUB_RESOURCE, method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findDescendants(
-            @ApiParam(value = "Comma-separated term IDs") @PathVariable(value = "ids") String ids,
+            @ApiParam(value = "Comma-separated term IDs", required = true) @PathVariable(value = "ids") String ids,
             @ApiParam(value = "Comma-separated ontology relationships")
             @RequestParam(value = "relations", defaultValue = DEFAULT_TRAVERSAL_TYPES_CSV) String relations) {
         return getResultsResponse(
@@ -401,7 +401,7 @@ public abstract class OBOController<T extends OBOTerm> {
     @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + CHART_SUB_RESOURCE, method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.IMAGE_PNG_VALUE})
     public ResponseEntity<InputStreamResource> getChart(
-            @ApiParam(value = "Comma-separated term IDs") @PathVariable(value = "ids") String ids) {
+            @ApiParam(value = "Comma-separated term IDs", required = true) @PathVariable(value = "ids") String ids) {
         try {
             return createChartResponseEntity(validationHelper.validateCSVIds(ids));
         } catch (IOException | RenderingGraphException e) {
@@ -421,7 +421,7 @@ public abstract class OBOController<T extends OBOTerm> {
             method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<GraphImageLayout> getChartCoordinates(
-            @ApiParam(value = "Comma-separated term IDs") @PathVariable(value = "ids") String ids) {
+            @ApiParam(value = "Comma-separated term IDs", required = true) @PathVariable(value = "ids") String ids) {
         try {
             GraphImageLayout layout = graphImageService
                     .createChart(validationHelper.validateCSVIds(ids), ontologyType.name()).getLayout();
