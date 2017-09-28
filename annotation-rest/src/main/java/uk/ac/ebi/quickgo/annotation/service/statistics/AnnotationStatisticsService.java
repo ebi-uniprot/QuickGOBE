@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.annotation.service.statistics;
 
 import uk.ac.ebi.quickgo.annotation.model.*;
+import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.rest.search.AggregateFunction;
 import uk.ac.ebi.quickgo.rest.search.DefaultSearchQueryTemplate;
 import uk.ac.ebi.quickgo.rest.search.RetrievalException;
@@ -20,8 +21,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -41,28 +40,30 @@ public class AnnotationStatisticsService implements StatisticsService {
     private static final int FIRST_PAGE = 1;
     private static final int RESULTS_PER_PAGE = 0;
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
     private final FilterConverterFactory converterFactory;
     private final SearchService<Annotation> searchService;
     private final StatsConverter converter;
 
     private final DefaultSearchQueryTemplate queryTemplate;
     private final List<RequiredStatistic> requiredStats;
+    private final SearchServiceConfig.StatisticsSearchConfig statisticsConfig;
 
     @Autowired
     public AnnotationStatisticsService(FilterConverterFactory converterFactory,
             SearchService<Annotation> searchService,
             StatsConverter converter,
-            RequiredStatistics requiredStatistics) {
-        checkArgument(converterFactory != null, "Filter factory cannot be null");
-        checkArgument(searchService != null, "Search service cannot be null");
-        checkArgument(converter != null, "Stats request converter cannot be null");
-        checkArgument(requiredStatistics != null, "Required stats cannot be null");
+            RequiredStatistics requiredStatistics,
+            SearchServiceConfig.StatisticsSearchConfig statisticsConfig) {
+        checkArgument(converterFactory != null, "Filter factory cannot be null.");
+        checkArgument(searchService != null, "Search service cannot be null.");
+        checkArgument(converter != null, "Stats request converter cannot be null.");
+        checkArgument(requiredStatistics != null, "Required stats cannot be null.");
+        checkArgument(statisticsConfig != null, "Statistics configuration cannot be null.");
 
         this.converterFactory = converterFactory;
         this.searchService = searchService;
         this.converter = converter;
+        this.statisticsConfig = statisticsConfig;
 
         checkState(requiredStatistics.getStats() != null, "Required stats list cannot be null");
         this.requiredStats = requiredStatistics.getStats();
@@ -73,6 +74,7 @@ public class AnnotationStatisticsService implements StatisticsService {
     @Override
     public QueryResult<StatisticsGroup> calculate(AnnotationRequest request) {
         checkArgument(request != null, "Annotation request cannot be null");
+        long recordLimit =  request.getDownloadLimit() > 0L? request.getDownloadLimit() : statisticsConfig.defaultDownloadLimit();
 
         QueryRequest queryRequest = buildQueryRequest(request);
 
@@ -84,7 +86,7 @@ public class AnnotationStatisticsService implements StatisticsService {
 
         if(globalAggregation.isPopulated()) {
             List<StatisticsGroup> statsGroups = requiredStats.stream()
-                    .map(req -> convertResponse(globalAggregation, req))
+                    .map(req -> convertResponse(globalAggregation, req, recordLimit))
                     .collect(Collectors.toList());
             response = new QueryResult.Builder<>(statsGroups.size(), statsGroups).build();
         } else {
@@ -107,7 +109,7 @@ public class AnnotationStatisticsService implements StatisticsService {
     }
 
     private StatisticsGroup convertResponse(AggregateResponse globalAggregation,
-            RequiredStatistic requiredStatistic) {
+            RequiredStatistic requiredStatistic, long limit) {
         StatisticsConverter converter =
                 new StatisticsConverter(requiredStatistic.getGroupName(), requiredStatistic.getGroupField());
 
@@ -118,7 +120,7 @@ public class AnnotationStatisticsService implements StatisticsService {
             throw new RetrievalException("Unable to calculate statistics for group: " + requiredStatistic.getGroupName());
         }
 
-        return converter.convert(globalAggregation.getNestedAggregations(), totalHits);
+        return converter.convert(globalAggregation.getNestedAggregations(), totalHits, limit);
     }
 
     /**
@@ -140,7 +142,7 @@ public class AnnotationStatisticsService implements StatisticsService {
      * {@link StatisticsGroup}, that can be presented to the client.
      * </p>
      * This class is capable of creating a single {@link StatisticsGroup} per call to the
-     * {@link StatisticsConverter#convert(Collection, long)} method.
+     * {@link StatisticsConverter#convert(Collection, long, long)} method.
      */
     private class StatisticsConverter {
         private final String groupField;
@@ -151,23 +153,24 @@ public class AnnotationStatisticsService implements StatisticsService {
             this.groupField = groupField;
         }
 
-        StatisticsGroup convert(Collection<AggregateResponse> aggregations, long totalHits) {
+        StatisticsGroup convert(Collection<AggregateResponse> aggregations, long totalHits, long limit) {
             StatisticsGroup statsGroup = new StatisticsGroup(groupName, totalHits);
 
             aggregations.stream()
-                    .map(agg -> createStatsType(agg, totalHits))
+                    .map(agg -> createStatsType(agg, totalHits, limit))
                     .forEach(statsGroup::addStatsType);
 
             return statsGroup;
         }
 
-        private StatisticsByType createStatsType(AggregateResponse aggregation, long totalHits) {
+        private StatisticsByType createStatsType(AggregateResponse aggregation, long totalHits, long limit) {
             StatisticsByType type = new StatisticsByType(aggregation.getName());
 
             Set<AggregationBucket> buckets = aggregation.getBuckets();
 
             buckets.stream()
                     .map(bucket -> createStatsValues(bucket, totalHits))
+                   .limit(limit)
                     .flatMap(Collection::stream)
                     .forEach(type::addValue);
 
@@ -178,8 +181,8 @@ public class AnnotationStatisticsService implements StatisticsService {
             Set<AggregationResult> resultOpt = bucket.getAggregationResults(groupField);
 
             return resultOpt.stream()
-                    .map(aggResult -> new StatisticsValue(bucket.getValue(), (long) aggResult.getResult(), totalHits))
-                    .collect(Collectors.toSet());
+                            .map(aggResult -> new StatisticsValue(bucket.getValue(), (long) aggResult.getResult(), totalHits))
+                            .collect(Collectors.toSet());
         }
     }
 }
