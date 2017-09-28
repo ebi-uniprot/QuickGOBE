@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.annotation.download;
+package uk.ac.ebi.quickgo.annotation.download.http;
 
 import java.io.IOException;
 import java.io.OutputStream;
