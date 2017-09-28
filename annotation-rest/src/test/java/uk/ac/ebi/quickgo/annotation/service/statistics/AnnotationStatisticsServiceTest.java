@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.annotation.service.statistics;
 
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
+import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
 import uk.ac.ebi.quickgo.rest.search.request.converter.FilterConverterFactory;
 
@@ -38,10 +39,13 @@ public class AnnotationStatisticsServiceTest {
     @Mock
     private RequiredStatistics requiredStatistics;
 
+    @Mock
+    private SearchServiceConfig.StatisticsSearchConfig statisticsSearchConfig;
+
     @Before
     public void setUp() throws Exception {
         statsService = new AnnotationStatisticsService(filterFactoryMock, searchServiceMock,
-                statsConverterMock, requiredStatistics);
+                statsConverterMock, requiredStatistics, statisticsSearchConfig);
     }
 
     @Test
@@ -50,7 +54,7 @@ public class AnnotationStatisticsServiceTest {
         thrown.expectMessage("Filter factory cannot be null");
 
         statsService = new AnnotationStatisticsService(null, searchServiceMock,
-                statsConverterMock, requiredStatistics);
+                statsConverterMock, requiredStatistics, statisticsSearchConfig);
     }
 
     @Test
@@ -59,7 +63,7 @@ public class AnnotationStatisticsServiceTest {
         thrown.expectMessage("Search service cannot be null");
 
         statsService = new AnnotationStatisticsService(filterFactoryMock, null,
-                statsConverterMock, requiredStatistics);
+                statsConverterMock, requiredStatistics, statisticsSearchConfig);
     }
 
     @Test
@@ -68,7 +72,7 @@ public class AnnotationStatisticsServiceTest {
         thrown.expectMessage("Stats request converter cannot be null");
 
         statsService = new AnnotationStatisticsService(filterFactoryMock, searchServiceMock,
-                null, requiredStatistics);
+                null, requiredStatistics, statisticsSearchConfig);
     }
 
     @Test
@@ -77,7 +81,16 @@ public class AnnotationStatisticsServiceTest {
         thrown.expectMessage("Required stats cannot be null");
 
         statsService = new AnnotationStatisticsService(filterFactoryMock, searchServiceMock,
-                statsConverterMock, null);
+                statsConverterMock, null, statisticsSearchConfig);
+    }
+
+    @Test
+    public void nullStatisticsConfigThrowsExceptionInConstructor() throws Exception {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Statistics configuration cannot be null.");
+
+        statsService = new AnnotationStatisticsService(filterFactoryMock, searchServiceMock,
+                                                       statsConverterMock, requiredStatistics, null);
     }
 
     @Test
@@ -95,9 +108,10 @@ public class AnnotationStatisticsServiceTest {
 
         when(requiredStatistics.getStats()).thenReturn(null);
         statsService = new AnnotationStatisticsService(filterFactoryMock, searchServiceMock,
-                statsConverterMock, requiredStatistics);
+                statsConverterMock, requiredStatistics, statisticsSearchConfig);
         AnnotationRequest request = Mockito.mock(AnnotationRequest.class);
 
         statsService.calculate(request);
     }
+
 }
