@@ -107,6 +107,7 @@ public class GeneProductController {
      *     <li>any id is of the an invalid format: response returns 400</li>
      * </ul>
      */
+    @ApiOperation(value = "Retrieves core information about a list of gene product IDs specified in CSV format")
     @RequestMapping(value = "/{ids}", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<GeneProduct>> findById(@PathVariable String ids) {
         return getGeneProductResponse(geneProductService.findById(controllerValidationHelper.validateCSVIds(ids)));
@@ -118,6 +119,7 @@ public class GeneProductController {
      * @param request an object that wraps all possible configurations for this endpoint
      * @return the search results
      */
+    @ApiOperation(value = "Searches the gene product data-set for a specified value")
     @RequestMapping(value = "/search", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<GeneProduct>> geneProductSearch(
             @Valid @ModelAttribute GeneProductRequest request,
@@ -150,6 +152,7 @@ public class GeneProductController {
      * @param name name of target set
      * @return lookup results
      */
+    @ApiOperation(value = "Retrieves gene products associated with a specified target set")
     @RequestMapping(value = "/targetset/{name}", method = {RequestMethod.GET}, produces = {MediaType
             .APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<GeneProduct>> findByTargetSet(@PathVariable String name) {
