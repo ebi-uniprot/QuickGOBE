@@ -1,6 +1,5 @@
 package uk.ac.ebi.quickgo.annotation.download.http;
 
-import uk.ac.ebi.quickgo.annotation.download.DispatchWriter;
 import uk.ac.ebi.quickgo.annotation.download.model.DownloadContent;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
