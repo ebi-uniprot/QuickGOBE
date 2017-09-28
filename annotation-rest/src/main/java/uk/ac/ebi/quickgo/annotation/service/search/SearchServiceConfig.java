@@ -58,7 +58,7 @@ import static java.util.Arrays.asList;
 @PropertySource("classpath:search.properties")
 public class SearchServiceConfig {
 
-    public static final int MAX_PAGE_RESULTS = 100;
+    private static final int MAX_PAGE_RESULTS = 100;
 
     private static final boolean DEFAULT_XREF_VALIDATION_IS_CASE_SENSITIVE = true;
     private static final String COMMA = ",";
@@ -72,6 +72,7 @@ public class SearchServiceConfig {
     private static final String SOLR_ANNOTATION_QUERY_REQUEST_HANDLER = "/query";
     private static final String DEFAULT_DOWNLOAD_SORT_FIELDS = "rowNumber,id";
     private static final int DEFAULT_DOWNLOAD_PAGE_SIZE = 500;
+    private static final int DEFAULT_STATISTICS_LIMIT = 50000;
 
     @Value("${geneproduct.db.xref.valid.regexes}")
     String xrefValidationRegexFile;
@@ -86,6 +87,9 @@ public class SearchServiceConfig {
 
     @Value("${annotation.download.pageSize:" + DEFAULT_DOWNLOAD_PAGE_SIZE + "}")
     private int downloadPageSize;
+
+    @Value("${annotation.statistics.limit:" + DEFAULT_STATISTICS_LIMIT + "}")
+    private int statisticsLimit;
 
     @Bean
     public SearchService<Annotation> annotationSearchService(
@@ -230,6 +234,11 @@ public class SearchServiceConfig {
         };
     }
 
+    @Bean
+    public StatisticsSearchConfig statisticsDownloadConfig() {
+        return () -> statisticsLimit;
+    }
+
     private DbXRefLoader geneProductLoader() {
         return new DbXRefLoader(this.xrefValidationRegexFile, xrefValidationCaseSensitive);
     }
@@ -237,5 +246,9 @@ public class SearchServiceConfig {
     public interface AnnotationCompositeRetrievalConfig extends SolrRetrievalConfig, ServiceRetrievalConfig {
         List<SortCriterion> getDownloadSortCriteria();
         int getDownloadPageSize();
+    }
+
+    public interface StatisticsSearchConfig {
+        long defaultDownloadLimit();
     }
 }
