@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.download.http;
 
+import uk.ac.ebi.quickgo.annotation.download.DispatchWriter;
 import uk.ac.ebi.quickgo.annotation.download.model.DownloadContent;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
@@ -24,20 +25,20 @@ import org.springframework.http.MediaType;
  * Time: 14:49
  * Created with IntelliJ IDEA.
  */
-public class DispatchWriter {
+public class AnnotationDispatchWriter implements DispatchWriter {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DispatchWriter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AnnotationDispatchWriter.class);
     private static final int FLUSH_INTERVAL = 500;
     private final BiFunction<Annotation, List<String>, List<String>> converter;
     private final MediaType type;
 
-    public DispatchWriter(BiFunction<Annotation, List<String>, List<String>> converter, MediaType mediaType) {
+    public AnnotationDispatchWriter(BiFunction<Annotation, List<String>, List<String>> converter, MediaType mediaType) {
         this.converter = converter;
         this.type = mediaType;
     }
 
-    @SuppressWarnings("unchecked")
-    void write(Object object, OutputStream out) throws IOException {
+    @Override
+    @SuppressWarnings("unchecked") public void write(Object object, OutputStream out) throws IOException {
         if (object instanceof ResponseExceptionHandler.ErrorInfo) {
             writeError(out, (ResponseExceptionHandler.ErrorInfo) object);
         } else {
