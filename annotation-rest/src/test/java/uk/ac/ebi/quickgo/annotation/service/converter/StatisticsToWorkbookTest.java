@@ -22,7 +22,7 @@ import static uk.ac.ebi.quickgo.annotation.service.converter.StatisticsWorkBookL
  */
 public class StatisticsToWorkbookTest {
 
-    List<StatisticsGroup> statisticsGroups;
+    private List<StatisticsGroup> statisticsGroups;
     private static final Map<String, StatisticsToWorkbook.SheetLayout> SHEET_LAYOUT_MAP = new HashMap<>();
 
     @Before
