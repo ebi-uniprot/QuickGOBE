@@ -4,16 +4,16 @@ import uk.ac.ebi.quickgo.annotation.model.StatisticsByType;
 import uk.ac.ebi.quickgo.annotation.model.StatisticsGroup;
 import uk.ac.ebi.quickgo.annotation.model.StatisticsValue;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+
 /**
+ * Test the creation of a worksheet for a known data set.
  * @author Tony Wardell
  * Date: 22/09/2017
  * Time: 12:20
@@ -22,9 +22,56 @@ import org.junit.Test;
 public class StatisticsToWorkbookTest {
 
     List<StatisticsGroup> statisticsGroups;
+    private static final Map<String, StatisticsToWorkbook.SheetLayout> SHEET_LAYOUT_MAP = new HashMap<>();
 
     @Before
     public void setup(){
+        buildStatisticGroups();
+    }
+
+    @Test
+    public void workbookMatchesInputData(){
+        StatisticsToWorkbook statisticsToWorkbook = new StatisticsToWorkbook(StatisticsWorkBookLayout.SECTION_TYPES,
+                                                                             SHEET_LAYOUT_MAP);
+
+        Workbook workbook = statisticsToWorkbook.convert(statisticsGroups);
+
+        assertThat(workbook.getNumberOfSheets(), is(3));
+        assertThat(workbook.getSheetAt(0).getSheetName(), is("summary"));
+        assertThat(workbook.getSheetAt(0).getPhysicalNumberOfRows(), is(2));
+
+        assertThat(workbook.getSheetAt(1).getSheetName(), is("goid"));
+        assertThat(workbook.getSheetAt(1).getPhysicalNumberOfRows(), is(5));
+
+        testColumnHeaders(workbook, 0);
+        testColumnHeaders(workbook, 10);
+
+        // test goid sheet contents
+        //by annotation
+        assertThat(workbook.getSheetAt(1).getRow(3).getCell(0).getStringCellValue(),is("GO:0003824"));
+        assertThat(workbook.getSheetAt(1).getRow(3).getCell(1).getNumericCellValue(),is(20.00d));
+        assertThat(workbook.getSheetAt(1).getRow(3).getCell(2).getNumericCellValue(),is(1d));
+        assertThat(workbook.getSheetAt(1).getRow(5).getCell(0).getStringCellValue(),is("GO:0009058"));
+        assertThat(workbook.getSheetAt(1).getRow(5).getCell(1).getNumericCellValue(),is(20.00d));
+        assertThat(workbook.getSheetAt(1).getRow(5).getCell(2).getNumericCellValue(),is(1d));
+
+        //by gene product
+        assertThat(workbook.getSheetAt(1).getRow(5).getCell(10).getStringCellValue(),is("GO:0009058"));
+        assertThat(workbook.getSheetAt(1).getRow(5).getCell(11).getNumericCellValue(),is(100.00d));
+        assertThat(workbook.getSheetAt(1).getRow(5).getCell(12).getNumericCellValue(),is(1d));
+
+        //Check some details for the aspect sheet.
+        assertThat(workbook.getSheetAt(2).getSheetName(), is("aspect"));
+        assertThat(workbook.getSheetAt(2).getPhysicalNumberOfRows(), is(4));
+    }
+
+    private void testColumnHeaders(Workbook workbook, int startingCol) {
+        assertThat(workbook.getSheetAt(1).getRow(2).getCell(startingCol).getStringCellValue(), is("Code"));
+        assertThat(workbook.getSheetAt(1).getRow(2).getCell(++startingCol).getStringCellValue(), is("Percentage"));
+        assertThat(workbook.getSheetAt(1).getRow(2).getCell(++startingCol).getStringCellValue(), is("Count"));
+    }
+
+    private void buildStatisticGroups() {
         statisticsGroups = new ArrayList<>();
         StatisticsGroup annotationStatisticsGroup = new StatisticsGroup("annotation", 5);
         statisticsGroups.add(annotationStatisticsGroup);
@@ -33,19 +80,15 @@ public class StatisticsToWorkbookTest {
 
         //GoId
         StatisticsByType statisticsByAnnotationTypeGoId = new StatisticsByType("goId");
-        statisticsByAnnotationTypeGoId.addValue(new StatisticsValue("GO:0003824",1, 5L));
+        statisticsByAnnotationTypeGoId.addValue(new StatisticsValue("GO:0003824", 1, 5L));
         statisticsByAnnotationTypeGoId.addValue(new StatisticsValue("GO:0003870",1, 5L));
         statisticsByAnnotationTypeGoId.addValue(new StatisticsValue("GO:0009058",1, 5L));
-        statisticsByAnnotationTypeGoId.addValue(new StatisticsValue("GO:0030170",1, 5L));
-        statisticsByAnnotationTypeGoId.addValue(new StatisticsValue("GO:0033014",1, 5L));
         annotationStatisticsGroup.addStatsType(statisticsByAnnotationTypeGoId);
 
         StatisticsByType statisticsByGeneProductTypeGoId = new StatisticsByType("goId");
         statisticsByGeneProductTypeGoId.addValue(new StatisticsValue("GO:0003824",1, 1L));
         statisticsByGeneProductTypeGoId.addValue(new StatisticsValue("GO:0003870",1, 1L));
         statisticsByGeneProductTypeGoId.addValue(new StatisticsValue("GO:0009058",1, 1L));
-        statisticsByGeneProductTypeGoId.addValue(new StatisticsValue("GO:0030170",1, 1L));
-        statisticsByGeneProductTypeGoId.addValue(new StatisticsValue("GO:0033014",1, 1L));
         geneProductStatisticsGroup.addStatsType(statisticsByGeneProductTypeGoId);
 
         //aspect
@@ -58,56 +101,27 @@ public class StatisticsToWorkbookTest {
         statisticsByGeneProductTypeAspect.addValue(new StatisticsValue("molecular_function",1, 1L));
         statisticsByGeneProductTypeAspect.addValue(new StatisticsValue("biological_process",1, 1L));
         geneProductStatisticsGroup.addStatsType(statisticsByGeneProductTypeAspect);
-
-        //evidence
-        StatisticsByType statisticsByAnnotationTypeEvidenceCode = new StatisticsByType("evidenceCode");
-        statisticsByAnnotationTypeEvidenceCode.addValue(new StatisticsValue("ECO:0000256",5, 5L));
-        annotationStatisticsGroup.addStatsType(statisticsByAnnotationTypeEvidenceCode);
-
-        StatisticsByType statisticsByGeneProductTypeEvidenceCode = new StatisticsByType("evidenceCode");
-        statisticsByGeneProductTypeEvidenceCode.addValue(new StatisticsValue("ECO:0000256",1, 1L));
-        geneProductStatisticsGroup.addStatsType(statisticsByGeneProductTypeEvidenceCode);
-
-        //reference
-        StatisticsByType statisticsByAnnotationTypeReference = new StatisticsByType("reference");
-        statisticsByAnnotationTypeReference.addValue(new StatisticsValue("GO_REF:0000002",5, 5L));
-        annotationStatisticsGroup.addStatsType(statisticsByAnnotationTypeReference);
-
-        StatisticsByType statisticsByGeneProductTypeReference = new StatisticsByType("reference");
-        statisticsByGeneProductTypeReference.addValue(new StatisticsValue("GO_REF:0000002",1, 1L));
-        geneProductStatisticsGroup.addStatsType(statisticsByGeneProductTypeReference);
-
-        //taxonId
-        StatisticsByType statisticsByAnnotationTypeTaxon = new StatisticsByType("taxonId");
-        statisticsByAnnotationTypeTaxon.addValue(new StatisticsValue("35758",5, 5L));
-        annotationStatisticsGroup.addStatsType(statisticsByAnnotationTypeTaxon);
-
-        StatisticsByType statisticsByGeneProductTypeTaxon = new StatisticsByType("taxonId");
-        statisticsByGeneProductTypeTaxon.addValue(new StatisticsValue("35758",1, 1L));
-        geneProductStatisticsGroup.addStatsType(statisticsByGeneProductTypeTaxon);
-
-        //assignedBy
-        StatisticsByType statisticsByAnnotationTypeAssignedBy = new StatisticsByType("assignedBy");
-        statisticsByAnnotationTypeAssignedBy.addValue(new StatisticsValue("InterPro",5, 5L));
-        annotationStatisticsGroup.addStatsType(statisticsByAnnotationTypeAssignedBy);
-
-        StatisticsByType statisticsByGeneProductTypeAssignedBy = new StatisticsByType("assignedBy");
-        statisticsByGeneProductTypeAssignedBy.addValue(new StatisticsValue("InterPro",1, 1L));
-        geneProductStatisticsGroup.addStatsType(statisticsByGeneProductTypeAssignedBy);
-
     }
 
-    @Test
-    public void createWorkBook(){
+    private static final StatisticsWorkBookLayout.AnnotationSectionLayout SL_ANNOTATION_GOID =
+            new StatisticsWorkBookLayout.AnnotationSectionLayout("GO IDs (by annotation)");
+    private static final StatisticsWorkBookLayout.AnnotationSectionLayout SL_ANNOTATION_ASPECT =
+            new StatisticsWorkBookLayout.AnnotationSectionLayout("Aspects (by annotation)");
 
-        StatisticsToWorkbook statisticsToWorkbook = new StatisticsToWorkbook(StatisticsWorkBookLayout.SECTION_TYPES,
-                                                                             StatisticsWorkBookLayout.SHEET_LAYOUT_MAP);
-        Workbook workbook = statisticsToWorkbook.convert(statisticsGroups);
-        File outputFile = new File("C:\\Users\\twardell\\someName.xls");
-        try (FileOutputStream outputStream = new FileOutputStream(outputFile)) {
-            workbook.write(outputStream);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    private static final StatisticsWorkBookLayout.GeneProductSectionLayout SL_GENE_PRODUCT_GOID =
+            new StatisticsWorkBookLayout.GeneProductSectionLayout("GO IDs (by protein)");
+    private static final StatisticsWorkBookLayout.GeneProductSectionLayout SL_GENE_PRODUCT_ASPECT =
+            new StatisticsWorkBookLayout.GeneProductSectionLayout("Aspects (by protein)");
+
+    static {
+        SHEET_LAYOUT_MAP.put("goId",
+                             new StatisticsToWorkbook.SheetLayout("goid",
+                                                                  Arrays.asList(SL_ANNOTATION_GOID,
+                                                                                SL_GENE_PRODUCT_GOID)));
+
+        SHEET_LAYOUT_MAP.put("aspect",
+                             new StatisticsToWorkbook.SheetLayout("aspect",
+                                                                  Arrays.asList(SL_ANNOTATION_ASPECT,
+                                                                                SL_GENE_PRODUCT_ASPECT)));
     }
 }
