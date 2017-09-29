@@ -30,7 +30,6 @@ import uk.ac.ebi.quickgo.rest.search.solr.SolrRetrievalConfig;
 import uk.ac.ebi.quickgo.rest.search.solr.UnsortedSolrQuerySerializer;
 import uk.ac.ebi.quickgo.rest.service.ServiceRetrievalConfig;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -39,7 +38,6 @@ import java.util.stream.Stream;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.data.solr.core.SolrTemplate;
