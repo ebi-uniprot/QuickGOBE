@@ -15,8 +15,8 @@ public class StatisticsWorkBookLayout {
 
     public static final Map<String, StatisticsToWorkbook.SheetLayout> SHEET_LAYOUT_MAP = new HashMap<>();
 
-    private static final String ANNOTATION = "annotation";
-    private static final String GENE_PRODUCT = "geneProduct";
+    static final String ANNOTATION = "annotation";
+    static final String GENE_PRODUCT = "geneProduct";
 
     public static final String[] SECTION_TYPES = new String[]{ANNOTATION, GENE_PRODUCT};
 
