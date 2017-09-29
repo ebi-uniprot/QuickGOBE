@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static uk.ac.ebi.quickgo.annotation.service.converter.StatisticsWorkBookLayout.SECTION_TYPES;
 
 /**
  * Test the creation of a worksheet for a known data set.
@@ -31,8 +32,7 @@ public class StatisticsToWorkbookTest {
 
     @Test
     public void workbookMatchesInputData(){
-        StatisticsToWorkbook statisticsToWorkbook = new StatisticsToWorkbook(StatisticsWorkBookLayout.SECTION_TYPES,
-                                                                             SHEET_LAYOUT_MAP);
+        StatisticsToWorkbook statisticsToWorkbook = new StatisticsToWorkbook(SECTION_TYPES, SHEET_LAYOUT_MAP);
 
         Workbook workbook = statisticsToWorkbook.convert(statisticsGroups);
 
@@ -63,6 +63,17 @@ public class StatisticsToWorkbookTest {
         //Check some details for the aspect sheet.
         assertThat(workbook.getSheetAt(2).getSheetName(), is("aspect"));
         assertThat(workbook.getSheetAt(2).getPhysicalNumberOfRows(), is(4));
+    }
+
+
+    @Test (expected = IllegalArgumentException.class)
+    public void creatingStatisticsToWorkbookWithNullSectionTypesThrowsException() {
+        new StatisticsToWorkbook(null, SHEET_LAYOUT_MAP);
+    }
+
+    @Test (expected = IllegalArgumentException.class)
+    public void creatingStatisticsToWorkbookWithNullLayoutMapThrowsException() {
+        new StatisticsToWorkbook(SECTION_TYPES, null);
     }
 
     private void testColumnHeaders(Workbook workbook, int startingCol) {
