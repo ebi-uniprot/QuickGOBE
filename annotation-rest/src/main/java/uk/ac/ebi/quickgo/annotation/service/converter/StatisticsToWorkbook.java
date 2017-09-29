@@ -40,26 +40,45 @@ public class StatisticsToWorkbook {
 
     public Workbook convert(List<StatisticsGroup> statisticsGroups) {
         Workbook wb = new HSSFWorkbook();
-        //        CreationHelper helper = wb.getCreationHelper();
-
-        CellStyle percentageCellFormat = wb.createCellStyle();
-        percentageCellFormat.setDataFormat(wb.createDataFormat().getFormat(PERCENTAGE_CELL_FORMAT));
-
-        Sheet summarySheet = wb.createSheet("summary");
-        populateSummarySheet(summarySheet, statisticsGroups);
-
-        for (StatisticsGroup statisticsGroup : statisticsGroups) {
-            for (String sectionType : sectionTypes) {
-                if (statisticsGroup.getGroupName().equalsIgnoreCase(sectionType)) {
-                    populateDetailSheetsForGroup(statisticsGroup, wb, percentageCellFormat);
-                }
-            }
-        }
+        CellStyle percentageCellFormat = createPercentageCellFormat(wb);
+        CellStyle boldCellFormat = createBoldCellFormat(wb);
+        createSummarySheet(statisticsGroups, wb, boldCellFormat);
+        createDetailSheets(statisticsGroups, wb, percentageCellFormat, boldCellFormat);
         return wb;
     }
 
+    private void createDetailSheets(List<StatisticsGroup> statisticsGroups, Workbook wb, CellStyle percentageCellFormat,
+            CellStyle boldCellFormat) {
+        for (StatisticsGroup statisticsGroup : statisticsGroups) {
+            for (String sectionType : sectionTypes) {
+                if (statisticsGroup.getGroupName().equalsIgnoreCase(sectionType)) {
+                    populateDetailSheetsForGroup(statisticsGroup, wb, percentageCellFormat, boldCellFormat);
+                }
+            }
+        }
+    }
+
+    private void createSummarySheet(List<StatisticsGroup> statisticsGroups, Workbook wb, CellStyle boldCellFormat) {
+        Sheet summarySheet = wb.createSheet("summary");
+        populateSummarySheet(summarySheet, statisticsGroups, boldCellFormat);
+    }
+
+    private CellStyle createPercentageCellFormat(Workbook wb) {
+        CellStyle percentageCellFormat = wb.createCellStyle();
+        percentageCellFormat.setDataFormat(wb.createDataFormat().getFormat(PERCENTAGE_CELL_FORMAT));
+        return percentageCellFormat;
+    }
+
+    private CellStyle createBoldCellFormat(Workbook wb) {
+        CellStyle boldCellFormat = wb.createCellStyle();
+        Font font = wb.createFont();
+        font.setBold(true);
+        boldCellFormat.setFont(font);
+        return boldCellFormat;
+    }
+
     private void populateDetailSheetsForGroup(StatisticsGroup statisticsGroup, Workbook wb,
-            CellStyle fixedDecimalPlaces) {
+            CellStyle fixedDecimalPlaces, CellStyle boldCellFormat) {
 
         for (StatisticsByType statisticsByType : statisticsGroup.getTypes()) {
 
@@ -76,20 +95,23 @@ public class StatisticsToWorkbook {
                                       .forEach(sectionLayout -> populateSectionLayout(sheet,
                                                                                       sectionLayout,
                                                                                       statisticsByType,
-                                                                                      fixedDecimalPlaces));
+                                                                                      fixedDecimalPlaces,
+                                                                                      boldCellFormat));
         }
     }
 
     private void populateSectionLayout(Sheet sheet, SectionLayout sectionLayout, StatisticsByType statisticsByType,
-            CellStyle fixedDecimalPlaces) {
-        populateSectionHeader(sheet, sectionLayout);
+            CellStyle fixedDecimalPlaces, CellStyle boldCellFormat) {
+        populateSectionHeader(sheet, sectionLayout, boldCellFormat);
         populateSectionColumnNames(sheet, sectionLayout);
         populateSectionDetail(sheet, sectionLayout, statisticsByType, fixedDecimalPlaces);
     }
 
-    private void populateSectionHeader(Sheet sheet, SectionLayout sectionLayout) {
+    private void populateSectionHeader(Sheet sheet, SectionLayout sectionLayout, CellStyle boldCellFormat) {
         Row sectionHeaderRow = getRow(sheet, HEADER_ROW);
-        sectionHeaderRow.createCell(sectionLayout.startingColumn).setCellValue(sectionLayout.header);
+        final Cell cell = sectionHeaderRow.createCell(sectionLayout.startingColumn);
+        cell.setCellStyle(boldCellFormat);
+        cell.setCellValue(sectionLayout.header);
     }
 
     private void populateSectionColumnNames(Sheet sheet, SectionLayout sectionLayout) {
@@ -130,13 +152,15 @@ public class StatisticsToWorkbook {
         targetCell.setCellStyle(cellStyle);
     }
 
-    private void populateSummarySheet(Sheet sheet, List<StatisticsGroup> statisticsGroups) {
+    private void populateSummarySheet(Sheet sheet, List<StatisticsGroup> statisticsGroups, CellStyle boldCellFormat) {
 
         statisticsGroups.stream()
                         .filter(statisticsGroup -> statisticsGroup.getGroupName().equals("annotation"))
                         .forEach(statisticsGroup -> {
                             Row row1 = sheet.createRow(1);
-                            row1.createCell(0).setCellValue("Summary");
+                            final Cell header = row1.createCell(0);
+                            header.setCellStyle(boldCellFormat);
+                            header.setCellValue("Summary");
                             Row row2 = sheet.createRow(2);
                             row2.createCell(0).setCellValue("Number of annotations:" + statisticsGroup.getTotalHits());
                         });
