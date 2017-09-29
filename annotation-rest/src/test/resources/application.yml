@@ -61,6 +61,8 @@ search:
           responseClass: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.BasicTaxonomyNode",
           responseConverter: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.BasicTaxonomyNodeIdentityFilterConverter"
         }
+  wildcard:
+    fields: extension_search
 model:
   repo2domainFieldNameTransformations:
     transformations: {

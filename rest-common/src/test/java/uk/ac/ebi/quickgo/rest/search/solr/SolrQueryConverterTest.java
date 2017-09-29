@@ -2,6 +2,8 @@ package uk.ac.ebi.quickgo.rest.search.solr;
 
 import uk.ac.ebi.quickgo.rest.search.query.*;
 
+import java.util.HashSet;
+import java.util.Set;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.common.params.CursorMarkParams;
 import org.junit.Before;
@@ -22,22 +24,28 @@ import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.createFirstCursorPa
  */
 public class SolrQueryConverterTest {
     private static final String REQUEST_HANDLER_NAME = "/select";
+    private static final Set<String> WILDCARD_COMPATIBLE_FIELDS = new HashSet<>();
 
     private SolrQueryConverter converter;
 
     @Before
     public void setUp() throws Exception {
-        converter = new SolrQueryConverter(REQUEST_HANDLER_NAME);
+        converter = SolrQueryConverter.create(REQUEST_HANDLER_NAME);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void nullRequestHandlerArgumentInConstructorThrowsException() throws Exception {
-        converter = new SolrQueryConverter(null);
+        converter = SolrQueryConverter.createWithWildCardSupport(null, WILDCARD_COMPATIBLE_FIELDS);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void emptyRequestHandlerArgumentInConstructorThrowsException() throws Exception {
-        converter = new SolrQueryConverter("");
+        converter = SolrQueryConverter.createWithWildCardSupport("", WILDCARD_COMPATIBLE_FIELDS);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void nullWildCardListPassedToInstantiatingMethodThrowsException() throws Exception {
+        converter = SolrQueryConverter.createWithWildCardSupport("validValue", null);
     }
 
     @Test(expected = IllegalArgumentException.class)

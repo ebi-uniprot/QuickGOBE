@@ -40,16 +40,19 @@ public class UnsortedSolrQuerySerializer implements QueryVisitor<String> {
     private final SortedSolrQuerySerializer sortedQuerySerializer;
     private final Set<String> termsQueryCompatibleFields;
 
-    public UnsortedSolrQuerySerializer(Set<String> termsQueryCompatibleFields) {
+    public UnsortedSolrQuerySerializer(Set<String> termsQueryCompatibleFields, Set<String>
+            nonEmptyFieldQueryCompatibleFields) {
         Preconditions.checkArgument(termsQueryCompatibleFields != null,
                 "The Set<String> of termsQueryCompatibleFields cannot be null");
+        Preconditions.checkArgument(nonEmptyFieldQueryCompatibleFields != null,
+                                    "The Set<String> of nonEmptyFieldQueryCompatibleFields cannot be null");
 
         if (termsQueryCompatibleFields.isEmpty()) {
             LOGGER.warn("The Set<String> of termsQueryCompatibleFields is empty: " +
                     "no Solr Terms Queries, e.g., {!terms f=field}fieldValue, will be created");
         }
 
-        this.sortedQuerySerializer = new SortedSolrQuerySerializer();
+        this.sortedQuerySerializer = new SortedSolrQuerySerializer(nonEmptyFieldQueryCompatibleFields);
 
         this.termsQueryCompatibleFields = termsQueryCompatibleFields;
     }
@@ -135,6 +138,10 @@ public class UnsortedSolrQuerySerializer implements QueryVisitor<String> {
         public TermQueryTransformationResult visit(JoinQuery query) {
             return failedTransformationResult();
         }
+
+        @Override public TermQueryTransformationResult visit(AllNonEmptyFieldQuery query) {
+            return failedTransformationResult();
+        }
     }
 
     /**
@@ -210,6 +217,10 @@ public class UnsortedSolrQuerySerializer implements QueryVisitor<String> {
 
     @Override
     public String visit(JoinQuery query) {
+        return sortedQuerySerializer.visit(query);
+    }
+
+    @Override public String visit(AllNonEmptyFieldQuery query) {
         return sortedQuerySerializer.visit(query);
     }
 }
