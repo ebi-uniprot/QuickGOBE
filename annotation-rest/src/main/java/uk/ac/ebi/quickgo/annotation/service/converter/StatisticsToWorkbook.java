@@ -6,11 +6,12 @@ import uk.ac.ebi.quickgo.annotation.model.StatisticsValue;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * Populate an Excel Workbook instance with statistics data (a list of {@link StatisticsGroup} instances).
@@ -31,8 +32,10 @@ public class StatisticsToWorkbook {
     private final Map<String, SheetLayout> sheetLayoutMap;
 
     public StatisticsToWorkbook(String[] sectionTypes, Map<String, SheetLayout> sheetLayoutMap) {
-        this.sectionTypes = checkNotNull(sectionTypes);
-        this.sheetLayoutMap = checkNotNull(sheetLayoutMap);
+        checkArgument(Objects.nonNull(sectionTypes), "SectionTypes should not be null.");
+        checkArgument(Objects.nonNull(sheetLayoutMap), "Sheet layout map should not be null.");
+        this.sectionTypes = sectionTypes;
+        this.sheetLayoutMap = sheetLayoutMap;
     }
 
     public Workbook convert(List<StatisticsGroup> statisticsGroups) {
