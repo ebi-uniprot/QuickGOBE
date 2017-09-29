@@ -24,6 +24,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class StatisticsToWorkbook {
 
     private static final String PERCENTAGE_CELL_FORMAT = "0.00";
+    private static final int HEADER_ROW = 1;
+    private static final int COLUMN_NAMES_ROW = 2;
+    private static final int DETAIL_ROW_INITIAL_VALUE = 3;
     private final String[] sectionTypes;
     private final Map<String, SheetLayout> sheetLayoutMap;
 
@@ -76,22 +79,18 @@ public class StatisticsToWorkbook {
 
     private void populateSectionLayout(Sheet sheet, SectionLayout sectionLayout, StatisticsByType statisticsByType,
             CellStyle fixedDecimalPlaces) {
-        AtomicInteger rowCounter = new AtomicInteger(1);
-
-        populateSectionHeader(sheet, sectionLayout, rowCounter);
-        populateSectionColumnNames(sheet, sectionLayout, rowCounter);
-        populateSectionDetail(sheet, sectionLayout, rowCounter, statisticsByType, fixedDecimalPlaces);
+        populateSectionHeader(sheet, sectionLayout);
+        populateSectionColumnNames(sheet, sectionLayout);
+        populateSectionDetail(sheet, sectionLayout, statisticsByType, fixedDecimalPlaces);
     }
 
-    private void populateSectionHeader(Sheet sheet, SectionLayout sectionLayout, AtomicInteger rowCounter) {
-        rowCounter.incrementAndGet();
-        Row sectionHeaderRow = getRow(sheet, rowCounter);
+    private void populateSectionHeader(Sheet sheet, SectionLayout sectionLayout) {
+        Row sectionHeaderRow = getRow(sheet, HEADER_ROW);
         sectionHeaderRow.createCell(sectionLayout.startingColumn).setCellValue(sectionLayout.header);
     }
 
-    private void populateSectionColumnNames(Sheet sheet, SectionLayout sectionLayout, AtomicInteger rowCounter) {
-        rowCounter.incrementAndGet();
-        Row sectionColumnNames = getRow(sheet, rowCounter);
+    private void populateSectionColumnNames(Sheet sheet, SectionLayout sectionLayout) {
+        Row sectionColumnNames = getRow(sheet, COLUMN_NAMES_ROW);
 
         int colCounter = sectionLayout.startingColumn;
         for (int i = 0; i < SectionLayout.SECTION_COL_HEADINGS.length; i++) {
@@ -99,14 +98,13 @@ public class StatisticsToWorkbook {
         }
     }
 
-    private void populateSectionDetail(Sheet sheet, SectionLayout sectionLayout, AtomicInteger rowCounter,
-            StatisticsByType statisticsByType, CellStyle fixedDecimalPlaces) {
-
+    private void populateSectionDetail(Sheet sheet, SectionLayout sectionLayout, StatisticsByType statisticsByType,
+            CellStyle fixedDecimalPlaces) {
+        AtomicInteger rowCounter = new AtomicInteger(DETAIL_ROW_INITIAL_VALUE);
         final List<StatisticsValue> values = statisticsByType.getValues();
         for (StatisticsValue value : values) {
 
-            rowCounter.incrementAndGet();
-            Row detailRow = getRow(sheet, rowCounter);
+            Row detailRow = getRow(sheet, rowCounter.getAndIncrement());
 
             int colCounter = sectionLayout.startingColumn;
             detailRow.createCell(colCounter).setCellValue(value.getKey());
@@ -115,10 +113,10 @@ public class StatisticsToWorkbook {
         }
     }
 
-    private Row getRow(Sheet sheet, AtomicInteger rowCounter) {
-        Row detailRow = sheet.getRow(rowCounter.get());
+    private Row getRow(Sheet sheet, int rowCounter) {
+        Row detailRow = sheet.getRow(rowCounter);
         if (detailRow == null) {
-            detailRow = sheet.createRow(rowCounter.get());
+            detailRow = sheet.createRow(rowCounter);
         }
         return detailRow;
     }
