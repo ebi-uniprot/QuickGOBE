@@ -85,7 +85,6 @@ public class AnnotationControllerStatisticsDownloadIT {
 
         List<AnnotationDocument> genericDocs = createDocs(NUMBER_OF_GENERIC_DOCS);
         savedDocs = new ArrayList<>();
-
         saveToRepo(genericDocs);
     }
 
