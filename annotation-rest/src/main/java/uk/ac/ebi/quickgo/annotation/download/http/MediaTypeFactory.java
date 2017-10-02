@@ -32,4 +32,6 @@ public class MediaTypeFactory {
     public static final MediaType GPAD_MEDIA_TYPE = new MediaType(TEXT_TYPE, GPAD_SUB_TYPE, DEFAULT_CHARSET);
 
     public static final MediaType EXCEL_MEDIA_TYPE = new MediaType(APPLICATION_TYPE, EXCEL_SUB_TYPE);
+    public static final MediaType JSON_MEDIA_TYPE = new MediaType(APPLICATION_TYPE, JSON_SUB_TYPE);
+
 }
