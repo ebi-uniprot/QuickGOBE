@@ -36,7 +36,7 @@ public class MediaTypeFactory {
     public static final MediaType EXCEL_MEDIA_TYPE = new MediaType(APPLICATION_TYPE, EXCEL_SUB_TYPE);
     public static final MediaType JSON_MEDIA_TYPE = new MediaType(APPLICATION_TYPE, JSON_SUB_TYPE);
 
-    public static Map<MediaType, String> MEDIA_TYPE_TO_FILE_EXTENSIONS = new HashMap<>();
+    private static Map<MediaType, String> MEDIA_TYPE_TO_FILE_EXTENSIONS = new HashMap<>();
 
     static {
         MEDIA_TYPE_TO_FILE_EXTENSIONS.put(TSV_MEDIA_TYPE, TSV_SUB_TYPE);
@@ -44,6 +44,10 @@ public class MediaTypeFactory {
         MEDIA_TYPE_TO_FILE_EXTENSIONS.put(GPAD_MEDIA_TYPE, GPAD_SUB_TYPE);
         MEDIA_TYPE_TO_FILE_EXTENSIONS.put(EXCEL_MEDIA_TYPE, "xls");
         MEDIA_TYPE_TO_FILE_EXTENSIONS.put(JSON_MEDIA_TYPE, JSON_SUB_TYPE);
+    }
+
+    public static String fileExtension(MediaType mediaType){
+        return MEDIA_TYPE_TO_FILE_EXTENSIONS.get(mediaType);
     }
 
 }
