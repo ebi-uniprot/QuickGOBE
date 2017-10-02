@@ -120,13 +120,11 @@ public class AnnotationController {
 
     private static final Function<MediaType, String> TO_DOWNLOAD_STATISTICS_FILENAME = mt -> String.format("%s.%s",
                                                                                                            DOWNLOAD_STATISTICS_FILE_NAME,
-                                                                                                           MediaTypeFactory.MEDIA_TYPE_TO_FILE_EXTENSIONS
-                                                                                                                   .get(mt));
+                                                                                                           fileExtension(mt));
     private static final Function<MediaType, String> TO_DOWNLOAD_FILENAME = mt -> String.format("%s%s.%s",
                                                                                                 DOWNLOAD_FILE_NAME_PREFIX,
                                                                                                 formattedDateStringForNow(),
-                                                                                                MediaTypeFactory.MEDIA_TYPE_TO_FILE_EXTENSIONS
-                                                                                                        .get(mt));
+                                                                                                fileExtension(mt));
 
     private final MetaDataProvider metaDataProvider;
 
