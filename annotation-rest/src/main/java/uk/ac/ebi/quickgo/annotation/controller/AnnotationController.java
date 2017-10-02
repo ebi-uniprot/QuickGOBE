@@ -4,6 +4,7 @@ import uk.ac.ebi.quickgo.annotation.download.header.HeaderContent;
 import uk.ac.ebi.quickgo.annotation.download.header.HeaderCreator;
 import uk.ac.ebi.quickgo.annotation.download.header.HeaderCreatorFactory;
 import uk.ac.ebi.quickgo.annotation.download.header.HeaderUri;
+import uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory;
 import uk.ac.ebi.quickgo.annotation.download.model.DownloadContent;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
@@ -33,6 +34,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Stream;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -115,6 +117,16 @@ public class AnnotationController {
     private static final String DOWNLOAD_FILE_NAME_PREFIX = "QuickGO-annotations";
     private static final String GO_USAGE_SLIM = "goUsage=slim";
     private static final String DOWNLOAD_STATISTICS_FILE_NAME = "annotation_statistics";
+
+    private static final Function<MediaType, String> TO_DOWNLOAD_STATISTICS_FILENAME = mt -> String.format("%s.%s",
+                                                                                                           DOWNLOAD_STATISTICS_FILE_NAME,
+                                                                                                           MediaTypeFactory.MEDIA_TYPE_TO_FILE_EXTENSIONS
+                                                                                                                   .get(mt));
+    private static final Function<MediaType, String> TO_DOWNLOAD_FILENAME = mt -> String.format("%s%s.%s",
+                                                                                                DOWNLOAD_FILE_NAME_PREFIX,
+                                                                                                formattedDateStringForNow(),
+                                                                                                MediaTypeFactory.MEDIA_TYPE_TO_FILE_EXTENSIONS
+                                                                                                        .get(mt));
 
     private final MetaDataProvider metaDataProvider;
 
@@ -254,7 +266,7 @@ public class AnnotationController {
 
         return ResponseEntity
                 .ok()
-                .headers(addHttpFileAttachmentHeader(mediaTypeAcceptHeader, downloadFileName(mediaTypeAcceptHeader)))
+                .headers(addHttpFileAttachmentHeader(mediaTypeAcceptHeader, TO_DOWNLOAD_FILENAME))
                 .body(emitter);
     }
 
@@ -281,19 +293,11 @@ public class AnnotationController {
 
         return ResponseEntity
                 .ok()
-                .headers(addHttpFileAttachmentHeader(mediaTypeAcceptHeader, downloadStatisticsFileName(mediaTypeAcceptHeader)))
+                .headers(addHttpFileAttachmentHeader(mediaTypeAcceptHeader, TO_DOWNLOAD_STATISTICS_FILENAME))
                 .body(emitter);
     }
 
-    private String downloadFileName(@RequestHeader(ACCEPT) MediaType mediaType) {
-        return String.format("%s%s.%s", DOWNLOAD_FILE_NAME_PREFIX, formattedDateStringForNow(), mediaType.getSubtype());
-    }
-
-    private String downloadStatisticsFileName(@RequestHeader(ACCEPT) MediaType mediaType) {
-        return String.format("%s.%s", DOWNLOAD_STATISTICS_FILE_NAME, mediaType.getSubtype());
-    }
-
-    private String formattedDateStringForNow() {
+    private static String formattedDateStringForNow() {
         LocalDateTime now = LocalDateTime.now();
         return now.format(DOWNLOAD_FILE_NAME_DATE_FORMATTER);
     }
@@ -420,9 +424,9 @@ public class AnnotationController {
         }
     }
 
-    private HttpHeaders addHttpFileAttachmentHeader(MediaType mediaType, String fileName) {
+    private HttpHeaders addHttpFileAttachmentHeader(MediaType mediaType, Function<MediaType, String> toFileName) {
         HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentDispositionFormData("attachment", fileName);
+        httpHeaders.setContentDispositionFormData("attachment", toFileName.apply(mediaType));
         httpHeaders.setContentType(mediaType);
         httpHeaders.add(VARY, ACCEPT);
         return httpHeaders;
