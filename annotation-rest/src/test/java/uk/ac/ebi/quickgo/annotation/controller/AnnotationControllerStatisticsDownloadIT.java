@@ -4,7 +4,6 @@ import uk.ac.ebi.quickgo.annotation.AnnotationREST;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker;
-import uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory;
 import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 
 import java.util.ArrayList;
@@ -39,6 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.createGenericDocs;
 import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.EXCEL_MEDIA_TYPE;
 import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.JSON_MEDIA_TYPE;
+import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.fileExtension;
 
 /**
  * Tests whether the downloading functionality of the {@link AnnotationController} works as expected.
@@ -124,8 +124,6 @@ public class AnnotationControllerStatisticsDownloadIT {
                 .andExpect(status().isBadRequest());
     }
 
-
-
     private List<AnnotationDocument> createDocs(int number) {
         return createGenericDocs(number, AnnotationDocMocker::createUniProtGPID);
     }
@@ -141,23 +139,12 @@ public class AnnotationControllerStatisticsDownloadIT {
         checkResponse(mediaType, response);
     }
 
-
     private void checkResponse(MediaType mediaType, ResultActions response) throws Exception {
         response.andExpect(request().asyncStarted())
                 .andDo(MvcResult::getAsyncResult)
                 .andDo(print())
                 .andExpect(header().string(VARY, is(ACCEPT)))
-                .andExpect(header().string(CONTENT_DISPOSITION, endsWith(getFileNameEndingFor(mediaType))))
+                .andExpect(header().string(CONTENT_DISPOSITION, endsWith("." + fileExtension(mediaType) + "\"")))
                 .andExpect(content().contentType(mediaType));
-    }
-
-    private String getFileNameEndingFor(MediaType mediaType) {
-        switch (mediaType.getSubtype()) {
-            case MediaTypeFactory.JSON_SUB_TYPE:
-            case MediaTypeFactory.EXCEL_SUB_TYPE:
-                return "." + mediaType.getSubtype() + "\"";
-            default:
-                throw new IllegalArgumentException("Unknown media type: " + mediaType);
-        }
     }
 }
