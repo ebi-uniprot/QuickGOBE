@@ -33,11 +33,13 @@ class RESTFilterConverter<T> implements FilterConverter<FilterRequest, T> {
     static final String TIMEOUT = "timeout";
     static final String RESPONSE_CLASS = "responseClass";
     static final String RESPONSE_CONVERTER_CLASS = "responseConverter";
+    static final String HTTPS_PROTOCOL = "https://";
+    static final String HTTP_PROTOCOL = "http://";
 
     private static final Logger LOGGER = getLogger(RESTFilterConverter.class);
     private static final String COMMA = ",";
-    private static final String HTTP_HOST_PREFIX = "http://";
     private static final String FORWARD_SLASH = "/";
+    private static final String HTTP_HOST_PREFIX = "http(s)?://";
 
     private static final Pattern IP_REGEX = Pattern.compile(
             HTTP_HOST_PREFIX + "(?:[0-9]{1,3}\\.){3}[0-9]{1,3}(:[0-9]+)?");
@@ -103,8 +105,13 @@ class RESTFilterConverter<T> implements FilterConverter<FilterRequest, T> {
     private static String retrieveHostProperty(FilterConfig config) {
         String host = config.getProperties().get(HOST).trim();
 
-        if (!host.startsWith(HTTP_HOST_PREFIX)) {
-            host = HTTP_HOST_PREFIX + host;
+
+        if (!host.startsWith(HTTPS_PROTOCOL)) {
+            if (host.startsWith(HTTP_PROTOCOL)) {
+                host = HTTPS_PROTOCOL + host.substring(HTTP_PROTOCOL.length());
+            } else {
+                host = HTTPS_PROTOCOL + host;
+            }
         }
         if (host.endsWith(FORWARD_SLASH)) {
             host = host.substring(0, host.length() - 1);
