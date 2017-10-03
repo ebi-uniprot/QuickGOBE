@@ -250,7 +250,7 @@ public class RESTFilterConverterTest {
             config.setProperties(configMap);
 
             String resourceTemplate = buildResourceTemplate(config);
-            assertThat(resourceTemplate, is(HTTPS_PROTOCOL + DEFAULT_HOST + DEFAULT_RESOURCE));
+            assertThat(resourceTemplate, is(DEFAULT_PROTOCOL + DEFAULT_HOST + DEFAULT_RESOURCE));
         }
 
         @Test
@@ -262,7 +262,7 @@ public class RESTFilterConverterTest {
             config.setProperties(configMap);
 
             String resourceTemplate = buildResourceTemplate(config);
-            assertThat(resourceTemplate, is(HTTPS_PROTOCOL + DEFAULT_HOST + DEFAULT_RESOURCE));
+            assertThat(resourceTemplate, is(DEFAULT_PROTOCOL + DEFAULT_HOST + DEFAULT_RESOURCE));
         }
 
         @Test
@@ -274,7 +274,7 @@ public class RESTFilterConverterTest {
             config.setProperties(configMap);
 
             String resourceTemplate = buildResourceTemplate(config);
-            assertThat(resourceTemplate, is(HTTPS_PROTOCOL + DEFAULT_HOST + DEFAULT_RESOURCE));
+            assertThat(resourceTemplate, is(DEFAULT_PROTOCOL + DEFAULT_HOST + DEFAULT_RESOURCE));
         }
 
         @Test
@@ -286,7 +286,7 @@ public class RESTFilterConverterTest {
             config.setProperties(configMap);
 
             String resourceTemplate = buildResourceTemplate(config);
-            assertThat(resourceTemplate, is(HTTPS_PROTOCOL + DEFAULT_HOST + DEFAULT_RESOURCE));
+            assertThat(resourceTemplate, is("https://" + DEFAULT_HOST + DEFAULT_RESOURCE));
         }
 
         @Test(expected = InvalidHostNameException.class)
