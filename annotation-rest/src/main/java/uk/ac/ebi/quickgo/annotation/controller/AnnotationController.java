@@ -4,7 +4,6 @@ import uk.ac.ebi.quickgo.annotation.download.header.HeaderContent;
 import uk.ac.ebi.quickgo.annotation.download.header.HeaderCreator;
 import uk.ac.ebi.quickgo.annotation.download.header.HeaderCreatorFactory;
 import uk.ac.ebi.quickgo.annotation.download.header.HeaderUri;
-import uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory;
 import uk.ac.ebi.quickgo.annotation.download.model.DownloadContent;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
