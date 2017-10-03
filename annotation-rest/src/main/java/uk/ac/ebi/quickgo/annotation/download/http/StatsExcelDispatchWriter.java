@@ -2,13 +2,15 @@ package uk.ac.ebi.quickgo.annotation.download.http;
 
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.model.StatisticsGroup;
-import uk.ac.ebi.quickgo.annotation.service.converter.StatisticsToWorkbook;
+import uk.ac.ebi.quickgo.annotation.service.converter.StatisticsConverter;
 import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
+import com.google.common.base.Preconditions;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import java.util.Objects;
 import java.util.stream.Collectors;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
@@ -26,9 +28,11 @@ import org.slf4j.LoggerFactory;
 public class StatsExcelDispatchWriter implements DispatchWriter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StatsExcelDispatchWriter.class);
-    private final StatisticsToWorkbook converter;
+    private final StatisticsConverter converter;
 
-    public StatsExcelDispatchWriter(final StatisticsToWorkbook converter) {
+    public StatsExcelDispatchWriter(final StatisticsConverter converter) {
+        Preconditions.checkArgument(Objects.nonNull(converter), "The statistics converter instance should not be " +
+                "null");
         this.converter = converter;
     }
 
