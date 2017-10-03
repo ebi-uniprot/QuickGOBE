@@ -22,7 +22,7 @@ import static com.google.common.base.Preconditions.checkArgument;
  * Time: 11:11
  * Created with IntelliJ IDEA.
  */
-public class StatisticsToWorkbook {
+public class StatisticsToWorkbook implements StatisticsConverter{
 
     private static final String PERCENTAGE_CELL_FORMAT = "0.00";
     private static final int HEADER_ROW = 1;
