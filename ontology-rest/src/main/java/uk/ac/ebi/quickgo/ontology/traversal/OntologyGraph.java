@@ -1,17 +1,17 @@
 package uk.ac.ebi.quickgo.ontology.traversal;
 
-import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
-import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
-
 import com.google.common.base.Preconditions;
-import java.util.*;
-import java.util.stream.Collectors;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.AllDirectedPaths;
 import org.jgrapht.graph.ClassBasedEdgeFactory;
 import org.jgrapht.graph.DirectedMultigraph;
+import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
+import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This class represents an ontology graph whose vertices are ontology terms,
@@ -25,6 +25,10 @@ public class OntologyGraph implements OntologyGraphTraversal {
     static final String MOLECULAR_FUNCTION_STOP_NODE = "GO:0003674";
     static final String BIOLOGICAL_PROCESS_STOP_NODE = "GO:0008150";
     static final String CELLULAR_COMPONENT_STOP_NODE = "GO:0005575";
+
+    // Map<Namespace, List<String>> vertexMap
+    // Map<Namespace, Matcher> namespaceMatchers
+    // when adding vertices, for each namespace, test matcher matches namespace and if so add to vertexMap
 
     private static final List<String> STOP_NODES =
             Arrays.asList(MOLECULAR_FUNCTION_STOP_NODE,
@@ -230,6 +234,61 @@ public class OntologyGraph implements OntologyGraphTraversal {
             ancestorEdgesMap.put(vertex, ancestorEdgesOfV);
         }
         return ancestorEdgesMap.get(vertex);
+    }
+
+    public BitSet getAncestorsBitSet(String vertex, List<String> range, OntologyRelationType... requestedRelations) {
+        // TODO: 04/10/2017
+        /**
+         * BitSet results = new BitSet();
+         List<GenericTerm> anc = getFilteredAncestors(relations);
+         for (int i = 0; i < terms.length; i++) {
+         if (anc.contains(terms[i])) {
+         results.set(i);
+         }
+         }
+         return results;
+         */
+        BitSet results = new BitSet();
+        Set<String> filteredAncestors = getFilteredAncestors(vertex, requestedRelations);
+        for(int i = 0; i < range.size(); i++) {
+            if (filteredAncestors.contains(range.get(i))) {
+                results.set(i);
+            }
+        }
+
+        return results;
+    }
+
+    private Set<String> getFilteredAncestors(String vertex, OntologyRelationType... requestedRelations) {
+        /**
+         * if (types == null) {
+         types = EnumSet.of(RelationType.UNDEFINED);
+         }
+
+         Set<GenericTerm> results = new HashSet<>();
+         for (TermRelation relation : getAncestors()) {
+         if (relation.ofAnyType(types)) {
+         results.add(relation.parent);
+         }
+         }
+         return new ArrayList<>(results);
+         */
+        OntologyRelationType[] relations;
+        if (requestedRelations.length == 0) {
+            relations = new OntologyRelationType[] {OntologyRelationType.UNDEFINED};
+        } else {
+            relations = requestedRelations;
+        }
+
+        Set<String> results = new HashSet<>();
+        for (OntologyRelationship ancestorRel : getAncestorEdges(vertex)) {
+            if (ancestorRel.relationship.hasTransitiveType(relations)) {
+                results.add(ancestorRel.parent);
+            }
+        }
+
+
+        return results;
     }
 
     private boolean isNotStopNode(String id) {

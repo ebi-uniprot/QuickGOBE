@@ -4,7 +4,6 @@
 package uk.ac.ebi.quickgo.model.ontology.go;
 
 import uk.ac.ebi.quickgo.model.ontology.generic.AuditRecord;
-import uk.ac.ebi.quickgo.model.ontology.generic.GenericTerm;
 import uk.ac.ebi.quickgo.model.ontology.generic.TermOntologyHistory;
 
 import java.util.ArrayList;
@@ -16,7 +15,7 @@ import java.util.Map;
  *
  * @author tonys
  */
-public class GOTerm extends GenericTerm {
+public class GOTerm externalnds GenericTerm {
     public GOTerm() {
         super();
     }
