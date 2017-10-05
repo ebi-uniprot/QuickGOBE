@@ -125,33 +125,33 @@ public class AnnotationRequest {
     private String reference;
 
     @ApiModelProperty(
-            value = "Gene product id present within an annotation. Accepts comma separated values. " +
-                    "E.g., P99999,URS00000064B1_559292")
+            value = "The id of the gene product annotated with the GO term. Accepts comma separated values." +
+                    "E.g., URS00000064B1_559292")
     private String geneProductId;
 
     @ApiModelProperty(
             value = "Evidence code indicating how the annotation is supported. Accepts comma separated values. " +
-                    "E.g., ECO:0000255,ECO:0000305")
+                    "E.g., ECO:0000255")
     private String evidenceCode;
 
     @ApiModelProperty(
             value = "The GO id of an annotation. Accepts comma separated values. " +
-                    "E.g., GO:0030533,GO:0070125")
+                    "E.g., GO:0070125")
     private String goId;
 
     @ApiModelProperty(
-            value = "Flags that modify the interpretation of an annotation. Accepts comma separated values. " +
+            value = "Aids the interpretation of an annotation. Accepts comma separated values. " +
                     "E.g., enables,involved_in")
     private String qualifier;
 
     @ApiModelProperty(
             value = "Additional ids for an annotation. Accepts comma separated values. " +
-                    "E.g., GO:0030533,P63328")
+                    "E.g., P63328")
     private String withFrom;
 
     @ApiModelProperty(
             value = "The taxonomic id of the species encoding the gene product associated to an annotation. " +
-                    "Accepts comma separated values. E.g., 35758,1310605")
+                    "Accepts comma separated values. E.g., 1310605")
     private String taxonId;
 
     @ApiModelProperty(
@@ -194,7 +194,8 @@ public class AnnotationRequest {
     private String targetSet;
 
     @ApiModelProperty(
-            value = "Database name specific to gene products. Accepts comma separated values. E.g., TrEMBL")
+            value = "A database that provides a set of gene products. Accepts comma separated " +
+                    "values. E.g., TrEMBL")
     private String geneProductSubset;
 
     @ApiModelProperty(
