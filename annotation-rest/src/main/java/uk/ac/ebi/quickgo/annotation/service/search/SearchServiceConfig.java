@@ -45,6 +45,7 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.data.solr.core.SolrTemplate;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 
 /**
  * Spring Configuration facilitating Annotation search functionality.
@@ -245,33 +246,6 @@ public class SearchServiceConfig {
         return () -> statisticsLimit;
     }
 
-    // Add go names to StatisticsGroup
-//    @Bean
-//    public ResultTransformerChain<QueryResult<StatisticsGroup>> statisticsGoIdTransformerChain(
-//            ExternalServiceResultsTransformer<StatisticsGroup> statisticsOntologyTransformer) {
-//        ResultTransformerChain<QueryResult<StatisticsGroup>> transformerChain = new ResultTransformerChain<>();
-//        transformerChain.addTransformer(statisticsOntologyTransformer);
-//        return transformerChain;
-//    }
-
-    // Add go names to StatisticsGroup
-//    @Bean
-//    public ResultTransformerChain<StatisticsValue> statisticsGoIdTransformerChain(
-//            ExternalServiceResultsNotQueryResultTransformer<StatisticsValue> statisticsOntologyTransformer) {
-//        ResultTransformerChain<StatisticsValue> transformerChain = new ResultTransformerChain<>();
-//        transformerChain.addTransformer(statisticsOntologyTransformer);
-//        return transformerChain;
-//    }
-//
-//    // Add taxonName to StatisticsValue
-//    @Bean
-//    public ResultTransformerChain<StatisticsValue> statisticsTaxonTransformerChain(
-//            ExternalServiceResultsNotQueryResultTransformer<StatisticsValue> statisticsTaxonNameTransformer) {
-//        ResultTransformerChain<StatisticsValue> transformerChain = new ResultTransformerChain<>();
-//        transformerChain.addTransformer(statisticsTaxonNameTransformer);
-//        return transformerChain;
-//    }
-
     @Bean
     public ResultTransformerChain<StatisticsValue> statisticsTransformerChain(
             ExternalServiceResultsNotQueryResultTransformer<StatisticsValue> statisticsOntologyNameTransformer,
@@ -282,32 +256,13 @@ public class SearchServiceConfig {
         return transformerChain;
     }
 
-//    @Bean
-//    public ExternalServiceResultsTransformer<StatisticsGroup> statisticsOntologyTransformer
-//            (RESTFilterConverterFactory
-//            restFilterConverterFactory) {
-//        List<ResponseValueInjector<StatisticsGroup>> responseValueInjectors = asList(
-//                new OntologyNameForGroupInjector(),
-//                new TaxonomyNameForGroupInjector());
-//        return new ExternalServiceResultsTransformer<>(restFilterConverterFactory, responseValueInjectors);
-//    }
-
-//    @Bean
-//    public ExternalServiceResultsTransformer<StatisticsGroup> statisticsOntologyNameTransformer
-//            (RESTFilterConverterFactory
-//                    restFilterConverterFactory) {
-//        List<ResponseValueInjector<StatisticsGroup>> responseValueInjectors = asList(
-//                new OntologyNameForGroupInjector());
-//        return new ExternalServiceResultsTransformer<>(restFilterConverterFactory, responseValueInjectors);
-//    }
-
     @Bean
     public ExternalServiceResultsNotQueryResultTransformer<StatisticsValue> statisticsOntologyNameTransformer
             (RESTFilterConverterFactory
                     restFilterConverterFactory) {
-        List<ResponseValueInjector<StatisticsValue>> responseValueInjectors = asList(
-                new uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.statistics
-                        .OntologyNameInjector());
+        List<ResponseValueInjector<StatisticsValue>> responseValueInjectors =
+                singletonList(new uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer
+                        .statistics.OntologyNameInjector());
         return new ExternalServiceResultsNotQueryResultTransformer<>(restFilterConverterFactory, responseValueInjectors);
     }
 
@@ -315,7 +270,7 @@ public class SearchServiceConfig {
     public ExternalServiceResultsNotQueryResultTransformer<StatisticsValue> statisticsTaxonNameTransformer
             (RESTFilterConverterFactory
                     restFilterConverterFactory) {
-        List<ResponseValueInjector<StatisticsValue>> responseValueInjectors = asList(
+        List<ResponseValueInjector<StatisticsValue>> responseValueInjectors = singletonList(
                 new uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.statistics
                         .TaxonomyNameInjector());
         return new ExternalServiceResultsNotQueryResultTransformer<>(restFilterConverterFactory, responseValueInjectors);
