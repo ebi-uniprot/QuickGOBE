@@ -8,6 +8,7 @@ import uk.ac.ebi.quickgo.annotation.download.model.DownloadContent;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
 import uk.ac.ebi.quickgo.annotation.model.StatisticsGroup;
+import uk.ac.ebi.quickgo.annotation.model.StatisticsValue;
 import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.annotation.service.statistics.StatisticsService;
 import uk.ac.ebi.quickgo.rest.ParameterBindingException;
@@ -23,6 +24,7 @@ import uk.ac.ebi.quickgo.rest.search.query.RegularPage;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 import uk.ac.ebi.quickgo.rest.search.request.converter.FilterConverterFactory;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
+import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformationRequest;
 import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformationRequests;
 import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformerChain;
 
@@ -133,6 +135,8 @@ public class AnnotationController {
     private final DefaultSearchQueryTemplate downloadQueryTemplate;
     private final FilterConverterFactory converterFactory;
     private final ResultTransformerChain<QueryResult<Annotation>> resultTransformerChain;
+    private final ResultTransformerChain<QueryResult<StatisticsGroup>> statisticsGoIdTransformerChain;
+    private final ResultTransformerChain<StatisticsValue> statisticsTaxonTransformerChain;
     private final StatisticsService statsService;
     private final TaskExecutor taskExecutor;
     private final HeaderCreatorFactory headerCreatorFactory;
@@ -145,7 +149,9 @@ public class AnnotationController {
             StatisticsService statsService,
             TaskExecutor taskExecutor,
             HeaderCreatorFactory headerCreatorFactory,
-            MetaDataProvider metaDataProvider) {
+            MetaDataProvider metaDataProvider,
+            ResultTransformerChain<QueryResult<StatisticsGroup>> statisticsGoIdTransformerChain,
+            ResultTransformerChain<StatisticsValue> statisticsTaxonTransformerChain) {
         checkArgument(annotationSearchService != null, "The SearchService<Annotation> instance passed " +
                 "to the constructor of AnnotationController should not be null.");
         checkArgument(annotationRetrievalConfig != null, "The SearchServiceConfig" +
@@ -173,6 +179,8 @@ public class AnnotationController {
         this.headerCreatorFactory = headerCreatorFactory;
 
         this.metaDataProvider = metaDataProvider;
+        this.statisticsGoIdTransformerChain = statisticsGoIdTransformerChain;
+        this.statisticsTaxonTransformerChain = statisticsTaxonTransformerChain;
     }
 
     /**
@@ -267,18 +275,31 @@ public class AnnotationController {
                 .body(emitter);
     }
 
-    @RequestMapping(value = "/downloadStats",
-            method = {RequestMethod.GET}, produces = {EXCEL_MEDIA_TYPE_STRING,JSON_MEDIA_TYPE_STRING})
-    public ResponseEntity<ResponseBodyEmitter> downloadStats(
-            @Valid @ModelAttribute AnnotationRequest request,
-            BindingResult bindingResult,
-            @RequestHeader(ACCEPT) MediaType mediaTypeAcceptHeader) throws IOException {
+    @RequestMapping(value = "/downloadStats", method = {RequestMethod.GET},
+            produces = {EXCEL_MEDIA_TYPE_STRING, JSON_MEDIA_TYPE_STRING})
+    public ResponseEntity<ResponseBodyEmitter> downloadStats(@Valid @ModelAttribute AnnotationRequest request,
+            BindingResult bindingResult, @RequestHeader(ACCEPT) MediaType mediaTypeAcceptHeader) throws IOException {
         checkBindingErrors(bindingResult);
         QueryResult<StatisticsGroup> stats = statsService.calculate(request);
+
+        // Add go names
+        QueryResult<StatisticsGroup> transformedStats =
+                statisticsGoIdTransformerChain.applyTransformations(stats, statisticsFilterContext());
+
+        //Add taxon names
+        transformedStats.getResults()
+                        .stream()
+                        .flatMap(statisticsGroup -> statisticsGroup.getTypes().stream())
+                        .filter(statisticsByType -> statisticsByType.getType().equals("taxonId"))
+                        .flatMap(statisticsByType -> statisticsByType.getValues().stream())
+                        .forEach(statisticsValue ->statisticsTaxonTransformerChain.applyTransformations
+                                (statisticsValue, statisticsFilterContext()));
+
+        //Send
         ResponseBodyEmitter emitter = new ResponseBodyEmitter();
 
         try {
-            emitter.send(stats, mediaTypeAcceptHeader);
+            emitter.send(transformedStats, mediaTypeAcceptHeader);
         } catch (IOException e) {
             LOGGER.error("Failed to stream annotation results", e);
             emitter.completeWithError(e);
@@ -288,10 +309,10 @@ public class AnnotationController {
         LOGGER.info("Emitted response stream -- which will be written by the HTTP message converter for: " +
                             mediaTypeAcceptHeader);
 
-        return ResponseEntity
-                .ok()
-                .headers(addHttpFileAttachmentHeader(mediaTypeAcceptHeader, TO_DOWNLOAD_STATISTICS_FILENAME))
-                .body(emitter);
+        return ResponseEntity.ok()
+                             .headers(addHttpFileAttachmentHeader(mediaTypeAcceptHeader,
+                                                                  TO_DOWNLOAD_STATISTICS_FILENAME))
+                             .body(emitter);
     }
 
     private static String formattedDateStringForNow() {
@@ -413,6 +434,17 @@ public class AnnotationController {
             transformationContext.save(ResultTransformationRequests.class, transformationRequests);
             filterContexts.add(transformationContext);
         }
+    }
+
+    private static FilterContext statisticsFilterContext() {
+        FilterContext filterContext = new FilterContext();
+        ResultTransformationRequests transformationRequests = new ResultTransformationRequests();
+//        transformationRequests.addTransformationRequest(new ResultTransformationRequest(AnnotationRequest.GO_USAGE_ID));
+//        transformationRequests.addTransformationRequest(new ResultTransformationRequest(AnnotationRequest.TAXON_USAGE_ID));
+        transformationRequests.addTransformationRequest(new ResultTransformationRequest("goName"));
+        transformationRequests.addTransformationRequest(new ResultTransformationRequest("taxonName"));
+        filterContext.save(ResultTransformationRequests.class, transformationRequests);
+        return filterContext;
     }
 
     private void checkBindingErrors(BindingResult bindingResult) {
