@@ -135,8 +135,6 @@ public class AnnotationController {
     private final DefaultSearchQueryTemplate downloadQueryTemplate;
     private final FilterConverterFactory converterFactory;
     private final ResultTransformerChain<QueryResult<Annotation>> resultTransformerChain;
-//    private final ResultTransformerChain<QueryResult<StatisticsGroup>> statisticsGoIdTransformerChain;
-//    private final ResultTransformerChain<StatisticsValue> statisticsTaxonTransformerChain;
     private final ResultTransformerChain<StatisticsValue> statisticsTransformerChain;
     private final StatisticsService statsService;
     private final TaskExecutor taskExecutor;
@@ -179,8 +177,6 @@ public class AnnotationController {
         this.headerCreatorFactory = headerCreatorFactory;
 
         this.metaDataProvider = metaDataProvider;
-//        this.statisticsGoIdTransformerChain = statisticsGoIdTransformerChain;
-//        this.statisticsTaxonTransformerChain = statisticsTaxonTransformerChain;
         this.statisticsTransformerChain = statisticsTransformerChain;
     }
 
@@ -282,41 +278,13 @@ public class AnnotationController {
             BindingResult bindingResult, @RequestHeader(ACCEPT) MediaType mediaTypeAcceptHeader) throws IOException {
         checkBindingErrors(bindingResult);
         QueryResult<StatisticsGroup> stats = statsService.calculate(request);
-
-        // Add go names
-//        QueryResult<StatisticsGroup> transformedStats =
-//                statisticsGoIdTransformerChain.applyTransformations(stats, statisticsFilterContext());
-        stats.getResults()
-             .stream()
-             .flatMap(statisticsGroup -> statisticsGroup.getTypes().stream())
-             .filter(statisticsByType -> statisticsByType.getType().equals("goId"))
-             .flatMap(statisticsByType -> statisticsByType.getValues().stream())
-             .forEach(statisticsValue ->statisticsTransformerChain.applyTransformations
-                     (statisticsValue, statisticsFilterContextForGoName()));
-
-        //Add taxon names
-//        transformedStats.getResults()
-//                        .stream()
-//                        .flatMap(statisticsGroup -> statisticsGroup.getTypes().stream())
-//                        .filter(statisticsByType -> statisticsByType.getType().equals("taxonId"))
-//                        .flatMap(statisticsByType -> statisticsByType.getValues().stream())
-//                        .forEach(statisticsValue ->statisticsTaxonTransformerChain.applyTransformations
-//                                (statisticsValue, statisticsFilterContext()));
-
-        stats.getResults()
-                        .stream()
-                        .flatMap(statisticsGroup -> statisticsGroup.getTypes().stream())
-                        .filter(statisticsByType -> statisticsByType.getType().equals("taxonId"))
-                        .flatMap(statisticsByType -> statisticsByType.getValues().stream())
-                        .forEach(statisticsValue ->statisticsTransformerChain.applyTransformations
-                                (statisticsValue, statisticsFilterContextForTaxonName()));
-
+        addGoNamesToGoIdStatisticsValues(stats);
+        addTaxonNamesToStatisticsValues(stats);
 
         //Send
         ResponseBodyEmitter emitter = new ResponseBodyEmitter();
 
         try {
-//            emitter.send(transformedStats, mediaTypeAcceptHeader);
             emitter.send(stats, mediaTypeAcceptHeader);
         } catch (IOException e) {
             LOGGER.error("Failed to stream annotation results", e);
@@ -331,6 +299,26 @@ public class AnnotationController {
                              .headers(addHttpFileAttachmentHeader(mediaTypeAcceptHeader,
                                                                   TO_DOWNLOAD_STATISTICS_FILENAME))
                              .body(emitter);
+    }
+
+    private void addTaxonNamesToStatisticsValues(QueryResult<StatisticsGroup> stats) {
+        stats.getResults()
+                        .stream()
+                        .flatMap(statisticsGroup -> statisticsGroup.getTypes().stream())
+                        .filter(statisticsByType -> statisticsByType.getType().equals("taxonId"))
+                        .flatMap(statisticsByType -> statisticsByType.getValues().stream())
+                        .forEach(statisticsValue ->statisticsTransformerChain.applyTransformations
+                                (statisticsValue, statisticsFilterContextForTaxonName()));
+    }
+
+    private void addGoNamesToGoIdStatisticsValues(QueryResult<StatisticsGroup> stats) {
+        stats.getResults()
+             .stream()
+             .flatMap(statisticsGroup -> statisticsGroup.getTypes().stream())
+             .filter(statisticsByType -> statisticsByType.getType().equals("goId"))
+             .flatMap(statisticsByType -> statisticsByType.getValues().stream())
+             .forEach(statisticsValue ->statisticsTransformerChain.applyTransformations
+                     (statisticsValue, statisticsFilterContextForGoName()));
     }
 
     private static String formattedDateStringForNow() {
@@ -453,17 +441,6 @@ public class AnnotationController {
             filterContexts.add(transformationContext);
         }
     }
-
-//    private static FilterContext statisticsFilterContext() {
-//        FilterContext filterContext = new FilterContext();
-//        ResultTransformationRequests transformationRequests = new ResultTransformationRequests();
-////        transformationRequests.addTransformationRequest(new ResultTransformationRequest(AnnotationRequest.GO_USAGE_ID));
-////        transformationRequests.addTransformationRequest(new ResultTransformationRequest(AnnotationRequest.TAXON_USAGE_ID));
-//        transformationRequests.addTransformationRequest(new ResultTransformationRequest("goName"));
-//        transformationRequests.addTransformationRequest(new ResultTransformationRequest("taxonName"));
-//        filterContext.save(ResultTransformationRequests.class, transformationRequests);
-//        return filterContext;
-//    }
 
     private static FilterContext statisticsFilterContextForGoName() {
         FilterContext filterContext = new FilterContext();
