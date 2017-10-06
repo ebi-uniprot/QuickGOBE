@@ -33,16 +33,18 @@ class RESTFilterConverter<T> implements FilterConverter<FilterRequest, T> {
     static final String TIMEOUT = "timeout";
     static final String RESPONSE_CLASS = "responseClass";
     static final String RESPONSE_CONVERTER_CLASS = "responseConverter";
+    static final String DEFAULT_PROTOCOL = "http://";
 
     private static final Logger LOGGER = getLogger(RESTFilterConverter.class);
     private static final String COMMA = ",";
-    private static final String HTTP_HOST_PREFIX = "http://";
     private static final String FORWARD_SLASH = "/";
+    private static final String PROTOCOL_FORMAT = "^[a-zA-Z][a-zA-Z+.-]*://";
 
     private static final Pattern IP_REGEX = Pattern.compile(
-            HTTP_HOST_PREFIX + "(?:[0-9]{1,3}\\.){3}[0-9]{1,3}(:[0-9]+)?");
+            PROTOCOL_FORMAT + "(?:[0-9]{1,3}\\.){3}[0-9]{1,3}(:[0-9]+)?");
     private static final Pattern HOSTNAME_REGEX = Pattern.compile(
-            HTTP_HOST_PREFIX + "([a-zA-Z0-9](?:(?:[a-zA-Z0-9-]*|(?<!-)\\.(?![-.]))*[a-zA-Z0-9]+)?)(:[0-9]+)?");
+            PROTOCOL_FORMAT + "([a-zA-Z0-9](?:(?:[a-zA-Z0-9-]*|(?<!-)\\.(?![-.]))*[a-zA-Z0-9]+)?)(:[0-9]+)?");
+    private static final Pattern PROTOCOL_REGEX = Pattern.compile(PROTOCOL_FORMAT);
     private static final String FAILED_REST_FETCH_PREFIX = "Failed to fetch REST response";
     private static final int DEFAULT_TIMEOUT_MILLIS = 2000;
 
@@ -100,12 +102,18 @@ class RESTFilterConverter<T> implements FilterConverter<FilterRequest, T> {
         return resourceFormat;
     }
 
+    private static boolean usesProtocol(String uri) {
+        return PROTOCOL_REGEX.matcher(uri).find();
+    }
+
     private static String retrieveHostProperty(FilterConfig config) {
         String host = config.getProperties().get(HOST).trim();
 
-        if (!host.startsWith(HTTP_HOST_PREFIX)) {
-            host = HTTP_HOST_PREFIX + host;
+        if (!usesProtocol(host)) {
+            // default protocol over REST
+            host = DEFAULT_PROTOCOL + host;
         }
+
         if (host.endsWith(FORWARD_SLASH)) {
             host = host.substring(0, host.length() - 1);
         }

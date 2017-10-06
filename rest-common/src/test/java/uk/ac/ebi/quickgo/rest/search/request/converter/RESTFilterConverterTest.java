@@ -238,6 +238,7 @@ public class RESTFilterConverterTest {
 
     public static class BuildingResourceTemplates {
 
+        private static final String HTTPS = "https://";
         private final String DEFAULT_RESOURCE = "/QuickGO";
         private String DEFAULT_HOST = "abc-def-ghi:8080";
 
@@ -250,7 +251,7 @@ public class RESTFilterConverterTest {
             config.setProperties(configMap);
 
             String resourceTemplate = buildResourceTemplate(config);
-            assertThat(resourceTemplate, is("http://" + DEFAULT_HOST + DEFAULT_RESOURCE));
+            assertThat(resourceTemplate, is(DEFAULT_PROTOCOL + DEFAULT_HOST + DEFAULT_RESOURCE));
         }
 
         @Test
@@ -262,7 +263,7 @@ public class RESTFilterConverterTest {
             config.setProperties(configMap);
 
             String resourceTemplate = buildResourceTemplate(config);
-            assertThat(resourceTemplate, is("http://" + DEFAULT_HOST + DEFAULT_RESOURCE));
+            assertThat(resourceTemplate, is(DEFAULT_PROTOCOL + DEFAULT_HOST + DEFAULT_RESOURCE));
         }
 
         @Test
@@ -274,7 +275,19 @@ public class RESTFilterConverterTest {
             config.setProperties(configMap);
 
             String resourceTemplate = buildResourceTemplate(config);
-            assertThat(resourceTemplate, is("http://" + DEFAULT_HOST + DEFAULT_RESOURCE));
+            assertThat(resourceTemplate, is(DEFAULT_PROTOCOL + DEFAULT_HOST + DEFAULT_RESOURCE));
+        }
+
+        @Test
+        public void buildsResourceTemplateWithHttpsHostNameAndResourceOnly() {
+            FilterConfig config = createRestFilterConfig();
+            Map<String, String> configMap = createValidConfigMap();
+            configMap.put(HOST, HTTPS + DEFAULT_HOST + "/");
+            configMap.put(RESOURCE_FORMAT, DEFAULT_RESOURCE);
+            config.setProperties(configMap);
+
+            String resourceTemplate = buildResourceTemplate(config);
+            assertThat(resourceTemplate, is(HTTPS + DEFAULT_HOST + DEFAULT_RESOURCE));
         }
 
         @Test(expected = InvalidHostNameException.class)

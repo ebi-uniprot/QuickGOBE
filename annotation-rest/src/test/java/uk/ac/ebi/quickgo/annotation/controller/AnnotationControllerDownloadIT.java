@@ -83,7 +83,7 @@ public class AnnotationControllerDownloadIT {
     private static final String EXACT = "exact";
     private static final String GO_NAME_FIELD = "goName";
     private static final String GO_TERM_RESOURCE_FORMAT = "/ontology/go/terms/%s";
-    private static final String BASE_URL = "http://localhost";
+    private static final String BASE_URL = "https://localhost";
     private static final String GENE_PRODUCT_ID_FIELD_NAME_MIXED_CASE = "geneproDuctid";
     private static final String SYMBOL_FIELD_NAME_MIXED_CASE = "sYmbol";
     private static final String WITH_FROM_FIELD_NAME_MIXED_CASE = "withfrOm";

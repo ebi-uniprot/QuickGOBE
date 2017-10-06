@@ -7,9 +7,7 @@ import uk.ac.ebi.quickgo.rest.ParameterException;
 import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.*;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,10 +28,11 @@ import static uk.ac.ebi.quickgo.common.validator.OntologyIdPredicate.isValidGOTe
  * @author Tony Wardell
  */
 @RestController
+@Api(tags = {"co-occurring terms"})
 @RequestMapping(value = "/annotation/coterms")
 public class CoTermController {
 
-    public static final String LIMIT_ALL = "ALL";
+    private static final String LIMIT_ALL = "ALL";
     @Value("${coterm.default.limit:50}")
     private int defaultLimit;
     private CoTermRepository coTermRepository;
@@ -73,9 +72,16 @@ public class CoTermController {
     @ApiOperation(value = "Get co-occurring term information for a single GO Term id.")
     @RequestMapping(value = "/{id}", method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<QueryResult<CoTerm>> findCoTerms(@PathVariable(value = "id") String id,
+    public ResponseEntity<QueryResult<CoTerm>> findCoTerms(
+            @ApiParam(value = "The GO term id", required = true) @PathVariable(value = "id") String id,
+            @ApiParam(value = "The source from which the co-occurring terms originated. Possible " +
+                    "values: ALL / MANUAL. ALL => manual + electronic/automatically generated annotations; " +
+                    "MANUAL => only manually generated annotations", defaultValue = "ALL")
             @RequestParam(value = "source", defaultValue = "ALL") String source,
+            @ApiParam(name = "limit", value = "The number of terms returned", required = false)
             @RequestParam(value = "limit", required = false) String limit,
+            @ApiParam(name = "similarityThreshold", value = "The similarity threshold used when finding co-occurring " +
+                    "terms", defaultValue = "0.0")
             @RequestParam(value = "similarityThreshold", defaultValue = "0.0") float similarityThreshold) {
 
         validateGoTerm(id);
