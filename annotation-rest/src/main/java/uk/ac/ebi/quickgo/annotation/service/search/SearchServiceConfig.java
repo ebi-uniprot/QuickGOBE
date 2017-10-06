@@ -3,11 +3,14 @@ package uk.ac.ebi.quickgo.annotation.service.search;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationFields;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepoConfig;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
+import uk.ac.ebi.quickgo.annotation.model.StatisticsGroup;
+import uk.ac.ebi.quickgo.annotation.model.StatisticsValue;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.geneproduct.transformer.GeneProductNameInjector;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.geneproduct.transformer.GeneProductSynonymsInjector;
-import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.OntologyNameInjector;
-import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.SlimResultsTransformer;
-import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.TaxonomyNameInjector;
+import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.annotation.OntologyNameInjector;
+import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.annotation.SlimResultsTransformer;
+import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.annotation.TaxonomyNameInjector;
+import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.statistics.OntologyNameForGroupInjector;
 import uk.ac.ebi.quickgo.annotation.service.converter.AnnotationDocConverterImpl;
 import uk.ac.ebi.quickgo.common.SearchableField;
 import uk.ac.ebi.quickgo.common.loader.DbXRefLoader;
@@ -21,6 +24,7 @@ import uk.ac.ebi.quickgo.rest.search.query.SortCriterion;
 import uk.ac.ebi.quickgo.rest.search.request.converter.RESTFilterConverterFactory;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 import uk.ac.ebi.quickgo.rest.search.results.config.FieldNameTransformer;
+import uk.ac.ebi.quickgo.rest.search.results.transformer.ExternalServiceResultsNotQueryResultTransformer;
 import uk.ac.ebi.quickgo.rest.search.results.transformer.ExternalServiceResultsTransformer;
 import uk.ac.ebi.quickgo.rest.search.results.transformer.ResponseValueInjector;
 import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformerChain;
@@ -241,6 +245,53 @@ public class SearchServiceConfig {
     @Bean
     public StatisticsSearchConfig statisticsDownloadConfig() {
         return () -> statisticsLimit;
+    }
+
+    // Add go names to StatisticsGroup
+    @Bean
+    public ResultTransformerChain<QueryResult<StatisticsGroup>> statisticsGoIdTransformerChain(
+            ExternalServiceResultsTransformer<StatisticsGroup> statisticsOntologyTransformer) {
+        ResultTransformerChain<QueryResult<StatisticsGroup>> transformerChain = new ResultTransformerChain<>();
+        transformerChain.addTransformer(statisticsOntologyTransformer);
+        return transformerChain;
+    }
+
+    // Add taxonName to StatisticsValue
+    @Bean
+    public ResultTransformerChain<StatisticsValue> statisticsTaxonTransformerChain(
+            ExternalServiceResultsNotQueryResultTransformer<StatisticsValue> statisticsTaxonNameTransformer) {
+        ResultTransformerChain<StatisticsValue> transformerChain = new ResultTransformerChain<>();
+        transformerChain.addTransformer(statisticsTaxonNameTransformer);
+        return transformerChain;
+    }
+
+//    @Bean
+//    public ExternalServiceResultsTransformer<StatisticsGroup> statisticsOntologyTransformer
+//            (RESTFilterConverterFactory
+//            restFilterConverterFactory) {
+//        List<ResponseValueInjector<StatisticsGroup>> responseValueInjectors = asList(
+//                new OntologyNameForGroupInjector(),
+//                new TaxonomyNameForGroupInjector());
+//        return new ExternalServiceResultsTransformer<>(restFilterConverterFactory, responseValueInjectors);
+//    }
+
+    @Bean
+    public ExternalServiceResultsTransformer<StatisticsGroup> statisticsOntologyNameTransformer
+            (RESTFilterConverterFactory
+                    restFilterConverterFactory) {
+        List<ResponseValueInjector<StatisticsGroup>> responseValueInjectors = asList(
+                new OntologyNameForGroupInjector());
+        return new ExternalServiceResultsTransformer<>(restFilterConverterFactory, responseValueInjectors);
+    }
+
+    @Bean
+    public ExternalServiceResultsNotQueryResultTransformer<StatisticsValue> statisticsTaxonNameTransformer
+            (RESTFilterConverterFactory
+                    restFilterConverterFactory) {
+        List<ResponseValueInjector<StatisticsValue>> responseValueInjectors = asList(
+                new uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.statistics
+                        .TaxonomyNameInjector());
+        return new ExternalServiceResultsNotQueryResultTransformer<>(restFilterConverterFactory, responseValueInjectors);
     }
 
     private DbXRefLoader geneProductLoader() {
