@@ -133,6 +133,7 @@ public class StatisticsToWorkbook implements StatisticsConverter{
 
             int colCounter = sectionLayout.startingColumn;
             detailRow.createCell(colCounter).setCellValue(value.getKey());
+            detailRow.createCell(++colCounter).setCellValue(value.getName());
             populatePercentageCell(detailRow.createCell(++colCounter), value, fixedDecimalPlaces);
             detailRow.createCell(++colCounter).setCellValue(value.getHits());
         }
@@ -177,7 +178,7 @@ public class StatisticsToWorkbook implements StatisticsConverter{
     }
 
     static class SectionLayout {
-        private static final String[] SECTION_COL_HEADINGS = new String[]{"Code", "Percentage", "Count"};
+        private static final String[] SECTION_COL_HEADINGS = new String[]{"Code", "Name", "Percentage", "Count"};
         final String type;
         private final String header;
         private final int startingColumn;
