@@ -21,8 +21,9 @@ public class ConvertedFilter<V> {
     }
 
     public ConvertedFilter(V convertedValue, FilterContext filterContext) {
-        Preconditions.checkArgument(convertedValue != null, "Cannot create a ConvertedFilter without supplying a " +
-                "non-null value");
+        //this check is at odds with the single argument constructor
+//        Preconditions.checkArgument(convertedValue != null, "Cannot create a ConvertedFilter without supplying a " +
+//                "non-null value");
 
         this.convertedValue = convertedValue;
         this.filterContext = filterContext;
