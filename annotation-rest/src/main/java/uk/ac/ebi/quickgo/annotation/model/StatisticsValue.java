@@ -20,6 +20,12 @@ public class StatisticsValue {
      */
     private final long hits;
 
+    public String getName() {
+        return name;
+    }
+
+    private String name;
+
     public StatisticsValue(String key, long hits, long total) {
         Preconditions.checkArgument(key != null && !key.isEmpty(), "Stats key cannot be null or empty");
         Preconditions.checkArgument(hits >= 0, "Stats hits cannot be a negative value: " + hits);
@@ -44,6 +50,10 @@ public class StatisticsValue {
         return hits;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     @Override public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -60,24 +70,25 @@ public class StatisticsValue {
         if (hits != that.hits) {
             return false;
         }
-        return key.equals(that.key);
+        if (key != null ? !key.equals(that.key) : that.key != null) {
+            return false;
+        }
+        return name != null ? name.equals(that.name) : that.name == null;
     }
 
     @Override public int hashCode() {
         int result;
         long temp;
-        result = key.hashCode();
+        result = key != null ? key.hashCode() : 0;
         temp = Double.doubleToLongBits(percentage);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         result = 31 * result + (int) (hits ^ (hits >>> 32));
+        result = 31 * result + (name != null ? name.hashCode() : 0);
         return result;
     }
 
     @Override public String toString() {
-        return "StatisticsValue{" +
-                "key='" + key + '\'' +
-                ", percentage=" + percentage +
-                ", hits=" + hits +
-                '}';
+        return "StatisticsValue{" + "key='" + key + '\'' + ", percentage=" + percentage + ", hits=" + hits +
+                ", name='" + name + '\'' + '}';
     }
 }
