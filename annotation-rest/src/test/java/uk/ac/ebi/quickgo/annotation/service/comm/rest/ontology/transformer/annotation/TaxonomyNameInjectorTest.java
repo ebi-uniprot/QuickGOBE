@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer;
+package uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.annotation;
 
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.BasicTaxonomyNode;
@@ -15,8 +15,8 @@ import static org.hamcrest.collection.IsMapContaining.hasEntry;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.nullValue;
-import static uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.TaxonomyNameInjector.TAXON_ID;
-import static uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.TaxonomyNameInjector.TAXON_NAME;
+import static uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.annotation.TaxonomyNameInjector.TAXON_ID;
+import static uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.annotation.TaxonomyNameInjector.TAXON_NAME;
 
 /**
  * Created 12/04/17
