@@ -135,8 +135,9 @@ public class AnnotationController {
     private final DefaultSearchQueryTemplate downloadQueryTemplate;
     private final FilterConverterFactory converterFactory;
     private final ResultTransformerChain<QueryResult<Annotation>> resultTransformerChain;
-    private final ResultTransformerChain<QueryResult<StatisticsGroup>> statisticsGoIdTransformerChain;
-    private final ResultTransformerChain<StatisticsValue> statisticsTaxonTransformerChain;
+//    private final ResultTransformerChain<QueryResult<StatisticsGroup>> statisticsGoIdTransformerChain;
+//    private final ResultTransformerChain<StatisticsValue> statisticsTaxonTransformerChain;
+    private final ResultTransformerChain<StatisticsValue> statisticsTransformerChain;
     private final StatisticsService statsService;
     private final TaskExecutor taskExecutor;
     private final HeaderCreatorFactory headerCreatorFactory;
@@ -150,8 +151,7 @@ public class AnnotationController {
             TaskExecutor taskExecutor,
             HeaderCreatorFactory headerCreatorFactory,
             MetaDataProvider metaDataProvider,
-            ResultTransformerChain<QueryResult<StatisticsGroup>> statisticsGoIdTransformerChain,
-            ResultTransformerChain<StatisticsValue> statisticsTaxonTransformerChain) {
+            ResultTransformerChain<StatisticsValue> statisticsTransformerChain) {
         checkArgument(annotationSearchService != null, "The SearchService<Annotation> instance passed " +
                 "to the constructor of AnnotationController should not be null.");
         checkArgument(annotationRetrievalConfig != null, "The SearchServiceConfig" +
@@ -179,8 +179,9 @@ public class AnnotationController {
         this.headerCreatorFactory = headerCreatorFactory;
 
         this.metaDataProvider = metaDataProvider;
-        this.statisticsGoIdTransformerChain = statisticsGoIdTransformerChain;
-        this.statisticsTaxonTransformerChain = statisticsTaxonTransformerChain;
+//        this.statisticsGoIdTransformerChain = statisticsGoIdTransformerChain;
+//        this.statisticsTaxonTransformerChain = statisticsTaxonTransformerChain;
+        this.statisticsTransformerChain = statisticsTransformerChain;
     }
 
     /**
@@ -283,23 +284,40 @@ public class AnnotationController {
         QueryResult<StatisticsGroup> stats = statsService.calculate(request);
 
         // Add go names
-        QueryResult<StatisticsGroup> transformedStats =
-                statisticsGoIdTransformerChain.applyTransformations(stats, statisticsFilterContext());
+//        QueryResult<StatisticsGroup> transformedStats =
+//                statisticsGoIdTransformerChain.applyTransformations(stats, statisticsFilterContext());
+        stats.getResults()
+             .stream()
+             .flatMap(statisticsGroup -> statisticsGroup.getTypes().stream())
+             .filter(statisticsByType -> statisticsByType.getType().equals("goId"))
+             .flatMap(statisticsByType -> statisticsByType.getValues().stream())
+             .forEach(statisticsValue ->statisticsTransformerChain.applyTransformations
+                     (statisticsValue, statisticsFilterContextForGoName()));
 
         //Add taxon names
-        transformedStats.getResults()
+//        transformedStats.getResults()
+//                        .stream()
+//                        .flatMap(statisticsGroup -> statisticsGroup.getTypes().stream())
+//                        .filter(statisticsByType -> statisticsByType.getType().equals("taxonId"))
+//                        .flatMap(statisticsByType -> statisticsByType.getValues().stream())
+//                        .forEach(statisticsValue ->statisticsTaxonTransformerChain.applyTransformations
+//                                (statisticsValue, statisticsFilterContext()));
+
+        stats.getResults()
                         .stream()
                         .flatMap(statisticsGroup -> statisticsGroup.getTypes().stream())
                         .filter(statisticsByType -> statisticsByType.getType().equals("taxonId"))
                         .flatMap(statisticsByType -> statisticsByType.getValues().stream())
-                        .forEach(statisticsValue ->statisticsTaxonTransformerChain.applyTransformations
-                                (statisticsValue, statisticsFilterContext()));
+                        .forEach(statisticsValue ->statisticsTransformerChain.applyTransformations
+                                (statisticsValue, statisticsFilterContextForTaxonName()));
+
 
         //Send
         ResponseBodyEmitter emitter = new ResponseBodyEmitter();
 
         try {
-            emitter.send(transformedStats, mediaTypeAcceptHeader);
+//            emitter.send(transformedStats, mediaTypeAcceptHeader);
+            emitter.send(stats, mediaTypeAcceptHeader);
         } catch (IOException e) {
             LOGGER.error("Failed to stream annotation results", e);
             emitter.completeWithError(e);
@@ -436,12 +454,28 @@ public class AnnotationController {
         }
     }
 
-    private static FilterContext statisticsFilterContext() {
+//    private static FilterContext statisticsFilterContext() {
+//        FilterContext filterContext = new FilterContext();
+//        ResultTransformationRequests transformationRequests = new ResultTransformationRequests();
+////        transformationRequests.addTransformationRequest(new ResultTransformationRequest(AnnotationRequest.GO_USAGE_ID));
+////        transformationRequests.addTransformationRequest(new ResultTransformationRequest(AnnotationRequest.TAXON_USAGE_ID));
+//        transformationRequests.addTransformationRequest(new ResultTransformationRequest("goName"));
+//        transformationRequests.addTransformationRequest(new ResultTransformationRequest("taxonName"));
+//        filterContext.save(ResultTransformationRequests.class, transformationRequests);
+//        return filterContext;
+//    }
+
+    private static FilterContext statisticsFilterContextForGoName() {
         FilterContext filterContext = new FilterContext();
         ResultTransformationRequests transformationRequests = new ResultTransformationRequests();
-//        transformationRequests.addTransformationRequest(new ResultTransformationRequest(AnnotationRequest.GO_USAGE_ID));
-//        transformationRequests.addTransformationRequest(new ResultTransformationRequest(AnnotationRequest.TAXON_USAGE_ID));
         transformationRequests.addTransformationRequest(new ResultTransformationRequest("goName"));
+        filterContext.save(ResultTransformationRequests.class, transformationRequests);
+        return filterContext;
+    }
+
+    private static FilterContext statisticsFilterContextForTaxonName() {
+        FilterContext filterContext = new FilterContext();
+        ResultTransformationRequests transformationRequests = new ResultTransformationRequests();
         transformationRequests.addTransformationRequest(new ResultTransformationRequest("taxonName"));
         filterContext.save(ResultTransformationRequests.class, transformationRequests);
         return filterContext;
