@@ -96,7 +96,7 @@ public class AnnotationRequest {
     };
 
     @ApiModelProperty(
-            value = "Number of results per page.",
+            value = "Number of results per page (" + MIN_ENTRIES_PER_PAGE + "-" + MAX_ENTRIES_PER_PAGE + ")",
             allowableValues = "range[" + MIN_ENTRIES_PER_PAGE + "," + MAX_ENTRIES_PER_PAGE + "]")
     protected int limit = DEFAULT_ENTRIES_PER_PAGE;
 
@@ -110,141 +110,121 @@ public class AnnotationRequest {
      * When the fix is in place we can move the @ApiModelProperty definitions to the getters
      */
     @ApiModelProperty(
-            value = "Filter annotation by the ontology to which the associated GO term belongs. Accepts comma " +
-                    "separated values. Accepts comma separated values.",
-            allowableValues = "biological_process,molecular_function,cellular_component",
-            example = "biological_process,molecular_function")
+            value = "The ontology to which associated GO terms belong. " +
+                    "Accepts comma separated values. E.g., 'biological_process,molecular_function'.",
+            allowableValues = "biological_process,molecular_function,cellular_component")
     private String aspect;
 
-    @ApiModelProperty(value = "The database which made the annotation. Accepts comma separated values.",
-            example = "BHF-UCL,Ensembl")
+    @ApiModelProperty(value = "The database from which this annotation originates. Accepts comma separated values." +
+            "E.g., BHF-UCL,Ensembl")
     private String[] assignedBy;
 
     @ApiModelProperty(
-            value = "Identifier of a literature or database reference, cited as an authority " +
-                    "for the attribution of the GO ID. It is also possible to filter just by the database type. " +
-                    "Format: DB:Reference. Accepts comma separated values.",
-            example = "PMID:2676709")
+            value = "Literature id / database reference / database type. " +
+                    "Format: DB:Reference or just DB. Accepts comma separated values. E.g., PMID:2676709 or PMID")
     private String reference;
 
     @ApiModelProperty(
-            value = "Unique identifier of a gene product present within an annotation. Accepts comma separated " +
-                    "values.", example = "P99999,URS00000064B1_559292")
+            value = "The id of the gene product annotated with the GO term. Accepts comma separated values." +
+                    "E.g., URS00000064B1_559292")
     private String geneProductId;
 
     @ApiModelProperty(
-            value = "Evidence code used to indicate how the annotation is supported. Accepts comma separated values.",
-            example = "ECO:0000255,ECO:0000305")
+            value = "Evidence code indicating how the annotation is supported. Accepts comma separated values. " +
+                    "E.g., ECO:0000255")
     private String evidenceCode;
 
     @ApiModelProperty(
-            value = "The GO identifier attributed to an annotation. Accepts comma separated values.",
-            example = "GO:0030533,GO:0070125")
+            value = "The GO id of an annotation. Accepts comma separated values. " +
+                    "E.g., GO:0070125")
     private String goId;
 
     @ApiModelProperty(
-            value = "Flags that modify the interpretation of an annotation. Accepts comma separated values.",
-            example = "enables,involved_in")
+            value = "Aids the interpretation of an annotation. Accepts comma separated values. " +
+                    "E.g., enables,involved_in")
     private String qualifier;
 
     @ApiModelProperty(
-            value = "Holds additional identifiers for an annotation. Accepts comma separated values.",
-            example = "GO:0030533,P63328")
+            value = "Additional ids for an annotation. Accepts comma separated values. " +
+                    "E.g., P63328")
     private String withFrom;
 
     @ApiModelProperty(
-            value = "The taxonomic identifier of the species encoding the gene product associated to an annotation. " +
-                    "Accepts comma separated values.",
-            example = "35758,1310605")
+            value = "The taxonomic id of the species encoding the gene product associated to an annotation. " +
+                    "Accepts comma separated values. E.g., 1310605")
     private String taxonId;
 
     @ApiModelProperty(
-            value = "Indicates how the taxonomic identifier within the annotations should be used.",
-            allowableValues = "descendants,exact",
-            example = "exact")
+            value = "Indicates how the taxonomic ids within the annotations should be used. E.g., exact",
+            allowableValues = "descendants,exact")
     private String taxonUsage;
 
     @ApiModelProperty(
-            value = "Indicates how the GO terms within the annotations should be used. Is used in conjunction with " +
-                    "'goUsageRelationships'.",
-            allowableValues = "descendants,exact,slim",
-            example = "descendants")
+            value = "Indicates how the GO terms within the annotations should be used. Used in conjunction with " +
+                    "'goUsageRelationships' filter. E.g., descendants",
+            allowableValues = "descendants,exact,slim")
     private String goUsage;
 
     @ApiModelProperty(
-            value = "The relationship between the provided 'goId' (GO) identifiers " +
-                    "found within the annotations. If the relationship is fulfilled, " +
-                    "the annotation is selected. Allows comma separated values.",
-            allowableValues = "is_a,part_of,occurs_in,regulates",
-            example = "is_a,part_of")
+            value = "The relationship between the 'goId' values " +
+                    "found within the annotations. Allows comma separated values. E.g., is_a,part_of",
+            allowableValues = "is_a,part_of,occurs_in,regulates")
     private String goUsageRelationships;
 
     @ApiModelProperty(
             value = "Indicates how the evidence code terms within the annotations should be used. Is used in " +
-                    "conjunction with 'evidenceCodeUsageRelationships'.",
-            allowableValues = "descendants,exact",
-            example = "descendants")
+                    "conjunction with 'evidenceCodeUsageRelationships' filter. E.g., descendants",
+            allowableValues = "descendants,exact")
     private String evidenceCodeUsage;
 
     @ApiModelProperty(
-            value = "The relationship between the provided 'evidenceCode' identifiers " +
-                    "found within the annotations. If the relationship is fulfilled, " +
-                    "the annotation is selected. Allows comma separated values.",
-            allowableValues = "is_a,part_of,occurs_in,regulates",
-            example = "is_a,part_of")
+            value = "The relationship between the provided 'evidenceCode' identifiers. " +
+                    "Allows comma separated values. E.g., is_a,part_of",
+            allowableValues = "is_a,part_of,occurs_in,regulates")
     private String evidenceCodeUsageRelationships;
 
     @ApiModelProperty(
-            value = "The type of gene product found within an annotation. Accepts comma separated values.",
-            allowableValues = "protein,RNA,complex.",
-            example = "protein,RNA")
+            value = "The type of gene product. Accepts comma separated values. E.g., protein,RNA",
+            allowableValues = "protein,RNA,complex")
     private String geneProductType;
 
     @ApiModelProperty(
-            value = "A set of gene products that have been identified as being of interest to a certain group. " +
-                    "Accepts comma separated values.",
-            example = "KRUK,BHF-UCL,Exosome")
+            value = "Gene product set. " +
+                    "Accepts comma separated values. E.g., KRUK,BHF-UCL,Exosome")
     private String targetSet;
 
     @ApiModelProperty(
-            value = "The name of a database specific to gene products. Accepts comma separated values.",
-            example = "TrEMBL"
-    )
+            value = "A database that provides a set of gene products. Accepts comma separated " +
+                    "values. E.g., TrEMBL")
     private String geneProductSubset;
 
     @ApiModelProperty(
             value = "Gene ontology evidence codes of the 'goId's found within the annotations. Accepts comma " +
-                    "separated values.",
-            example = "EXP,IDA")
+                    "separated values. E.g., EXP,IDA",
+            hidden = true)
     private String goIdEvidence;
 
-    @ApiModelProperty(value = "An annotation extension is used to extend " +
-            "(i.e., add more specificity to) the GO term used in an annotation; the combination of the GO term plus " +
-            "the" +
-            " extension is equivalent to a more specific GO term. " +
-            "An annotation extension is stored in the database, and transmitted in annotation files, as a single " +
-            "string, structured as a pipe-separated list of comma-separated lists of components.",
-            example = "occurs_in(CL:0000032),transports_or_maintains_localization_of(UniProtKB:P10288)|" +
-                    "results_in_formation_of(UBERON:0003070),occurs_in(CL:0000032),occurs_in(CL:0000008)," +
-                    "results_in_formation_of(UBERON:0001675)")
+    @ApiModelProperty(value = "Extensions to annotations, where each extension can be: " +
+            "EXTENSION(DB:ID) / EXTENSION(DB) / EXTENSION. ")
     private String extension;
 
     @ApiModelProperty(
-            value = "The number of annotations to download. Note, the page size parameter [limit] will be ignored " +
-                    "when downloading results.",
-            allowableValues = "range[" + MIN_DOWNLOAD_NUMBER + "," + MAX_DOWNLOAD_NUMBER + "]")
+            value = "The number of annotations to download ("+MIN_DOWNLOAD_NUMBER+"-"+MAX_DOWNLOAD_NUMBER+"). Note, " +
+                    "the page size parameter 'limit' will be ignored when downloading results. ",
+            allowableValues = "range[" + MIN_DOWNLOAD_NUMBER + "," + MAX_DOWNLOAD_NUMBER + "]",
+            hidden = true)
     private int downloadLimit = DEFAULT_DOWNLOAD_LIMIT;
 
     @ApiModelProperty(
-            value = "Optional fields to include in the response.",
-            allowableValues = "goName",
-            example = "goName")
+            value = "Optional fields retrieved from external services. Accepts comma separated values.",
+            allowableValues = "goName,taxonName,name,synonyms")
     private String[] includeFields;
 
     @ApiModelProperty(
-            value = "For TSV downloads only, fields to return.",
+            value = "For TSV downloads only: fields to be downloaded. Accepts comma separated values.",
             allowableValues = "geneProductId,symbol,qualifier,goId,goAspect,goName,evidenceCode,goEvidence,reference," +
-                    "withFrom,taxonId,assignedBy,extensions,date,taxonName,synonym,name,type.")
+                    "withFrom,taxonId,assignedBy,extensions,date,taxonName,synonym,name,type",
+            hidden = true)
     private String[] selectedFields;
 
     private final Map<String, String[]> filterMap = new HashMap<>();
@@ -641,6 +621,7 @@ public class AnnotationRequest {
                 ", extension='" + extension + '\'' +
                 ", downloadLimit=" + downloadLimit +
                 ", includeFields=" + Arrays.toString(includeFields) +
+                ", selectedFields=" + Arrays.toString(selectedFields) +
                 ", filterMap=" + filterMap +
                 '}';
     }
@@ -726,7 +707,7 @@ public class AnnotationRequest {
 
         return request;
     }
-    
+
     private String[] createLowercasedStringArray(String... args) {
         return Stream.of(args)
                 .map(String::toLowerCase)
