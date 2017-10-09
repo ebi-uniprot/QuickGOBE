@@ -36,26 +36,36 @@ public class ExternalServiceResultsTransformer<R> implements ResultTransformer<Q
     }
 
     @Override public QueryResult<R> transform(QueryResult<R> result, FilterContext filterContext) {
-        ResultTransformationRequests transformationRequests = filterContext.get(ResultTransformationRequests.class)
-                .orElse(EMPTY_TRANSFORMATION_REQUESTS);
+        ResultTransformationRequests transformationRequests =
+                filterContext.get(ResultTransformationRequests.class)
+                             .orElse(EMPTY_TRANSFORMATION_REQUESTS);
 
-        Set<String> requiredRequests = transformationRequests.getRequests()
-                .stream()
-                .map(ResultTransformationRequest::getId)
-                .collect(Collectors.toSet());
-        requiredRequests.retainAll(fieldsToAdd);
+        Set<String> requiredRequests = requiredRequests(transformationRequests);
         if (!requiredRequests.isEmpty()) {
-            List<ResponseValueInjector<R>> requiredInjectors =
-                    fieldInjectors.stream()
-                            .filter(injector -> requiredRequests.contains(injector.getId()))
-                            .collect(Collectors.toList());
+            List<ResponseValueInjector<R>> requiredInjectors = requiredInjectors(requiredRequests);
 
-            result.getResults().forEach(annotation ->
-                    requiredInjectors.forEach(valueInjector ->
-                            valueInjector.inject(restFilterConverterFactory, annotation))
-            );
+            result.getResults()
+                  .forEach(annotation -> requiredInjectors.forEach(valueInjector -> valueInjector.inject(
+                          restFilterConverterFactory,
+                          annotation)));
         }
         return result;
+    }
+
+    private List<ResponseValueInjector<R>> requiredInjectors(Set<String> requiredRequests) {
+        return fieldInjectors.stream()
+                                                                                 .filter(injector -> requiredRequests
+                                                                                         .contains(injector.getId()))
+                                                                                 .collect(Collectors.toList());
+    }
+
+    private Set<String> requiredRequests(ResultTransformationRequests transformationRequests) {
+        Set<String> requiredRequests = transformationRequests.getRequests()
+                                                             .stream()
+                                                             .map(ResultTransformationRequest::getId)
+                                                             .collect(Collectors.toSet());
+        requiredRequests.retainAll(fieldsToAdd);
+        return requiredRequests;
     }
 
     @Override public String toString() {
