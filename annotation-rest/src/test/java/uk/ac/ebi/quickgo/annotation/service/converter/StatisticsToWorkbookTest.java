@@ -49,16 +49,16 @@ public class StatisticsToWorkbookTest {
         // test goid sheet contents
         //by annotation
         assertThat(workbook.getSheetAt(1).getRow(3).getCell(0).getStringCellValue(),is("GO:0003824"));
-        assertThat(workbook.getSheetAt(1).getRow(3).getCell(1).getNumericCellValue(),is(20.00d));
-        assertThat(workbook.getSheetAt(1).getRow(3).getCell(2).getNumericCellValue(),is(1d));
+        assertThat(workbook.getSheetAt(1).getRow(3).getCell(2).getNumericCellValue(),is(20.00d));
+        assertThat(workbook.getSheetAt(1).getRow(3).getCell(3).getNumericCellValue(),is(1d));
         assertThat(workbook.getSheetAt(1).getRow(5).getCell(0).getStringCellValue(),is("GO:0009058"));
-        assertThat(workbook.getSheetAt(1).getRow(5).getCell(1).getNumericCellValue(),is(20.00d));
-        assertThat(workbook.getSheetAt(1).getRow(5).getCell(2).getNumericCellValue(),is(1d));
+        assertThat(workbook.getSheetAt(1).getRow(5).getCell(2).getNumericCellValue(),is(20.00d));
+        assertThat(workbook.getSheetAt(1).getRow(5).getCell(3).getNumericCellValue(),is(1d));
 
         //by gene product
         assertThat(workbook.getSheetAt(1).getRow(5).getCell(10).getStringCellValue(),is("GO:0009058"));
-        assertThat(workbook.getSheetAt(1).getRow(5).getCell(11).getNumericCellValue(),is(100.00d));
-        assertThat(workbook.getSheetAt(1).getRow(5).getCell(12).getNumericCellValue(),is(1d));
+        assertThat(workbook.getSheetAt(1).getRow(5).getCell(12).getNumericCellValue(),is(100.00d));
+        assertThat(workbook.getSheetAt(1).getRow(5).getCell(13).getNumericCellValue(),is(1d));
 
         //Check some details for the aspect sheet.
         assertThat(workbook.getSheetAt(2).getSheetName(), is("aspect"));
@@ -78,6 +78,7 @@ public class StatisticsToWorkbookTest {
 
     private void testColumnHeaders(Workbook workbook, int startingCol) {
         assertThat(workbook.getSheetAt(1).getRow(2).getCell(startingCol).getStringCellValue(), is("Code"));
+        assertThat(workbook.getSheetAt(1).getRow(2).getCell(++startingCol).getStringCellValue(), is("Name"));
         assertThat(workbook.getSheetAt(1).getRow(2).getCell(++startingCol).getStringCellValue(), is("Percentage"));
         assertThat(workbook.getSheetAt(1).getRow(2).getCell(++startingCol).getStringCellValue(), is("Count"));
     }
