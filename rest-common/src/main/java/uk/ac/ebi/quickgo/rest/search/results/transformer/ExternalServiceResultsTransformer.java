@@ -44,11 +44,6 @@ public class ExternalServiceResultsTransformer<R, M> implements ResultTransforme
         return results;
     }
 
-    @Override public String toString() {
-        return "ExternalServiceResultsTransformer{" + "fieldInjectors=" + fieldInjectors + ", fieldsToAdd=" +
-                fieldsToAdd + ", resultMutator=" + resultMutator + '}';
-    }
-
     private List<ResponseValueInjector<M>> requiredInjectors(Set<String> requiredRequests) {
         return fieldInjectors.stream()
                              .filter(injector -> requiredRequests.contains(injector.getId()))
@@ -62,5 +57,10 @@ public class ExternalServiceResultsTransformer<R, M> implements ResultTransforme
                                                              .collect(Collectors.toSet());
         requiredRequests.retainAll(fieldsToAdd);
         return requiredRequests;
+    }
+
+    @Override public String toString() {
+        return "ExternalServiceResultsTransformer{" + "fieldInjectors=" + fieldInjectors + ", fieldsToAdd=" +
+                fieldsToAdd + ", resultMutator=" + resultMutator + '}';
     }
 }
