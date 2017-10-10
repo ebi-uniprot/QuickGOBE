@@ -29,7 +29,7 @@ public class OntologyGraph implements OntologyGraphTraversal {
     static final String BIOLOGICAL_PROCESS_STOP_NODE = "GO:0008150";
     static final String CELLULAR_COMPONENT_STOP_NODE = "GO:0005575";
 
-    private static final Map<OntologyType, Matcher> ONTOLOGY_TYPE_PATTERN_MAP = new HashMap<>();
+    private static final EnumMap<OntologyType, Matcher> ONTOLOGY_TYPE_PATTERN_MAP = new EnumMap<>(OntologyType.class);
     private static final List<String> STOP_NODES =
             Arrays.asList(MOLECULAR_FUNCTION_STOP_NODE,
                     BIOLOGICAL_PROCESS_STOP_NODE,
