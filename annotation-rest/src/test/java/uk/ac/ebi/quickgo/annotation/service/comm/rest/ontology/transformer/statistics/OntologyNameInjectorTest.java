@@ -9,12 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 import org.hamcrest.core.Is;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
-import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsMapContaining.hasEntry;
 import static org.hamcrest.core.IsNot.not;
@@ -30,12 +28,6 @@ import static uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transforme
  * Created with IntelliJ IDEA.
  */
 public class OntologyNameInjectorTest {
-
-    @Test
-    @Ignore
-    public void test(){
-        assertThat(true, is(false));
-    }
 
     private OntologyNameInjector nameInjector;
 
