@@ -37,15 +37,11 @@ import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.numOfResu
 import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.EXCEL_MEDIA_TYPE;
 import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.JSON_MEDIA_TYPE;
 import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.fileExtension;
-
 /**
- * Tests whether the downloading functionality of the {@link AnnotationController} works as expected.
- * The functional tests relating to the filtering of results are covered by {@link AnnotationControllerIT} since the
- * search results found used by the download functionality is unchanged.
- * <p>
- * Created 24/01/17
- *
- * @author Edd
+ * @author Tony Wardell
+ * Date: 10/10/2017
+ * Time: 13:41
+ * Created with IntelliJ IDEA.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = {AnnotationREST.class})
@@ -75,20 +71,20 @@ public class AnnotationControllerStatisticsDownloadIT {
         repository.deleteAll();
 
         mockMvc = MockMvcBuilders.
-                webAppContextSetup(webApplicationContext)
-                .build();
+                                         webAppContextSetup(webApplicationContext)
+                                 .build();
 
         List<AnnotationDocument> genericDocs = createDocs(NUMBER_OF_GENERIC_DOCS);
         saveToRepo(genericDocs);
     }
 
     @Test
-    public void canDownloadInExcelFormat() throws Exception {
+    public void canDownloadInExcelFormatAfterFailedToLoadGONamesAndTaxonNames() throws Exception {
         canDownload(EXCEL_MEDIA_TYPE);
     }
 
     @Test
-    public void canDownloadWithInJsonFormat() throws Exception {
+    public void canDownloadWithInJsonFormatAfterFailedToLoadGONamesAndTaxonNames() throws Exception {
         canDownload(JSON_MEDIA_TYPE,50);
     }
 
@@ -147,7 +143,7 @@ public class AnnotationControllerStatisticsDownloadIT {
         ResultActions response = mockMvc.perform(
                 get(DOWNLOAD_STATISTICS_SEARCH_URL)
                         .header(ACCEPT, mediaType)
-        .param(DOWNLOAD_LIMIT_PARAM, Integer.toString(limit)));
+                        .param(DOWNLOAD_LIMIT_PARAM, Integer.toString(limit)));
         checkResponse(mediaType, response, limit);
     }
 
