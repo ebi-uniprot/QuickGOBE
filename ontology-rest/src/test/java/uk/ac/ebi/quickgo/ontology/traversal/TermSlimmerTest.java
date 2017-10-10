@@ -31,6 +31,7 @@ import static uk.ac.ebi.quickgo.ontology.traversal.TermSlimmer.DEFAULT_RELATION_
  */
 @RunWith(MockitoJUnitRunner.class)
 public class TermSlimmerTest {
+    public static final String GO = "GO";
     private static final String CELLULAR_COMPONENT = "GO:0005575";
     private static final String CELL = "GO:0005623";
     private static final String MEMBRANE = "GO:0016020";
@@ -40,14 +41,11 @@ public class TermSlimmerTest {
     private static final String PLASMA_MEMBRANE = "GO:0005886";
     private static final String PLASMA_MEMBRANE_PART = "GO:0044459";
     private static final String LATERAL_PLASMA_MEMBRANE = "GO:0016328";
-
+    
     @Mock
     private OntologyGraphTraversal mockOntologyGraph;
-
     @Mock
     private List<String> mockSlimSet;
-
-    public static final String GO = "GO";
     private OntologyGraphTraversal ontology;
 
     @Before
