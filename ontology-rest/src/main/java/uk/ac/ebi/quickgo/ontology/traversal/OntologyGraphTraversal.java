@@ -1,8 +1,10 @@
 package uk.ac.ebi.quickgo.ontology.traversal;
 
+import uk.ac.ebi.quickgo.ontology.common.OntologyType;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
 
+import java.util.BitSet;
 import java.util.List;
 import java.util.Set;
 
@@ -75,4 +77,23 @@ public interface OntologyGraphTraversal {
      * @throws IllegalArgumentException if the {@code topVertex} is null, empty or does not exist in the graph
      */
     Set<OntologyRelationship> children(String topVertex, OntologyRelationType... relations);
+
+    /**
+     * Finds all vertices in the graph associated with the given {@link OntologyType}
+     * @param ontologyType the ontology whose vertices are wanted
+     * @return the vertices associated with the specified {@link OntologyType}
+     */
+    Set<String> getVertices(OntologyType ontologyType);
+
+    /**
+     * Finds the ancestors of a specified {@code vertex}, which will be a subset of a given {@code range} of
+     * vertices. These ancestors are reachable only via the {@code requestedRelations}. Results are provided
+     * as a {@link BitSet}, for efficient result processing.
+     *
+     * @param vertex the vertex whose ancestors are needed
+     * @param range a list of vertices that are permissible in as ancestors, i.e., the ancestors will be a subset
+     * @param requestedRelations the relationships over which ancestors can be computed
+     * @return a {@link BitSet} representing the ancestors
+     */
+    BitSet getAncestorsBitSet(String vertex, List<String> range, OntologyRelationType... requestedRelations);
 }
