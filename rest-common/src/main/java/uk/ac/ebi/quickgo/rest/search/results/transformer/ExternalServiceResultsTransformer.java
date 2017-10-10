@@ -1,7 +1,6 @@
 package uk.ac.ebi.quickgo.rest.search.results.transformer;
 
 import uk.ac.ebi.quickgo.rest.comm.FilterContext;
-import uk.ac.ebi.quickgo.rest.search.request.converter.RESTFilterConverterFactory;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import java.util.List;
@@ -17,46 +16,43 @@ import static com.google.common.base.Preconditions.checkArgument;
  * Created 06/04/17
  * @author Edd
  */
-public class ExternalServiceResultsTransformer<R> implements ResultTransformer<QueryResult<R>> {
+public class ExternalServiceResultsTransformer<R, M> implements ResultTransformer<R> {
     private static final ResultTransformationRequests EMPTY_TRANSFORMATION_REQUESTS =
             new ResultTransformationRequests();
-    private final RESTFilterConverterFactory restFilterConverterFactory;
-    private final List<ResponseValueInjector<R>> fieldInjectors;
+    private final List<ResponseValueInjector<M>> fieldInjectors;
     private final List<String> fieldsToAdd;
+    private final ResultMutator<R, M> resultMutator;
 
-    public ExternalServiceResultsTransformer(RESTFilterConverterFactory restFilterConverterFactory,
-            List<ResponseValueInjector<R>> fieldInjectors) {
-        checkArgument(restFilterConverterFactory != null,
-                "RESTFilterConverterFactory cannot be null");
+    public ExternalServiceResultsTransformer(List<ResponseValueInjector<M>> fieldInjectors,
+            ResultMutator<R, M> resultMutator) {
         checkArgument(fieldInjectors != null, "Supplied list of ResponseValueInjectors cannot be null");
-
-        this.restFilterConverterFactory = restFilterConverterFactory;
+        checkArgument(resultMutator != null, "Supplied ResultMutator cannot be null");
         this.fieldInjectors = fieldInjectors;
         this.fieldsToAdd = fieldInjectors.stream().map(ResponseValueInjector::getId).collect(Collectors.toList());
+        this.resultMutator = resultMutator;
     }
 
-    @Override public QueryResult<R> transform(QueryResult<R> results, FilterContext filterContext) {
+    @Override public R transform(R results, FilterContext filterContext) {
         ResultTransformationRequests transformationRequests =
-                filterContext.get(ResultTransformationRequests.class)
-                             .orElse(EMPTY_TRANSFORMATION_REQUESTS);
+                filterContext.get(ResultTransformationRequests.class).orElse(EMPTY_TRANSFORMATION_REQUESTS);
 
         Set<String> requiredRequests = requiredRequests(transformationRequests);
         if (!requiredRequests.isEmpty()) {
-            List<ResponseValueInjector<R>> requiredInjectors = requiredInjectors(requiredRequests);
+            this.resultMutator.mutate(results, requiredInjectors(requiredRequests));
 
-            results.getResults()
-                  .forEach(result -> requiredInjectors.forEach(valueInjector -> valueInjector.inject(
-                          restFilterConverterFactory,
-                          result)));
         }
         return results;
     }
 
-    private List<ResponseValueInjector<R>> requiredInjectors(Set<String> requiredRequests) {
+    @Override public String toString() {
+        return "ExternalServiceResultsTransformer{" + "fieldInjectors=" + fieldInjectors + ", fieldsToAdd=" +
+                fieldsToAdd + ", resultMutator=" + resultMutator + '}';
+    }
+
+    private List<ResponseValueInjector<M>> requiredInjectors(Set<String> requiredRequests) {
         return fieldInjectors.stream()
-                                                                                 .filter(injector -> requiredRequests
-                                                                                         .contains(injector.getId()))
-                                                                                 .collect(Collectors.toList());
+                             .filter(injector -> requiredRequests.contains(injector.getId()))
+                             .collect(Collectors.toList());
     }
 
     private Set<String> requiredRequests(ResultTransformationRequests transformationRequests) {
@@ -66,13 +62,5 @@ public class ExternalServiceResultsTransformer<R> implements ResultTransformer<Q
                                                              .collect(Collectors.toSet());
         requiredRequests.retainAll(fieldsToAdd);
         return requiredRequests;
-    }
-
-    @Override public String toString() {
-        return "ExternalServiceResultsTransformer{" +
-                "restFilterConverterFactory=" + restFilterConverterFactory +
-                ", fieldInjectors=" + fieldInjectors +
-                ", fieldsToAdd=" + fieldsToAdd +
-                '}';
     }
 }
