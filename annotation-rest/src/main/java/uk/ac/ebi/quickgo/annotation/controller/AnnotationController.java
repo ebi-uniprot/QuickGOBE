@@ -302,23 +302,31 @@ public class AnnotationController {
     }
 
     private void addTaxonNamesToStatisticsValues(QueryResult<StatisticsGroup> stats) {
-        stats.getResults()
-                        .stream()
-                        .flatMap(statisticsGroup -> statisticsGroup.getTypes().stream())
-                        .filter(statisticsByType -> statisticsByType.getType().equals("taxonId"))
-                        .flatMap(statisticsByType -> statisticsByType.getValues().stream())
-                        .forEach(statisticsValue ->statisticsTransformerChain.applyTransformations
-                                (statisticsValue, statisticsFilterContextForTaxonName()));
+        try {
+            stats.getResults()
+                            .stream()
+                            .flatMap(statisticsGroup -> statisticsGroup.getTypes().stream())
+                            .filter(statisticsByType -> statisticsByType.getType().equals("taxonId"))
+                            .flatMap(statisticsByType -> statisticsByType.getValues().stream())
+                            .forEach(statisticsValue ->statisticsTransformerChain.applyTransformations
+                                    (statisticsValue, statisticsFilterContextForTaxonName()));
+        } catch (Exception e) {
+            LOGGER.error("Failed to retrieve taxon names for StatisticsDownloadRequest", e);
+        }
     }
 
     private void addGoNamesToGoIdStatisticsValues(QueryResult<StatisticsGroup> stats) {
-        stats.getResults()
-             .stream()
-             .flatMap(statisticsGroup -> statisticsGroup.getTypes().stream())
-             .filter(statisticsByType -> statisticsByType.getType().equals("goId"))
-             .flatMap(statisticsByType -> statisticsByType.getValues().stream())
-             .forEach(statisticsValue ->statisticsTransformerChain.applyTransformations
-                     (statisticsValue, statisticsFilterContextForGoName()));
+        try {
+            stats.getResults()
+                 .stream()
+                 .flatMap(statisticsGroup -> statisticsGroup.getTypes().stream())
+                 .filter(statisticsByType -> statisticsByType.getType().equals("goId"))
+                 .flatMap(statisticsByType -> statisticsByType.getValues().stream())
+                 .forEach(statisticsValue ->statisticsTransformerChain.applyTransformations
+                         (statisticsValue, statisticsFilterContextForGoName()));
+        } catch (Exception e) {
+            LOGGER.error("Failed to retrieve GO names for StatisticsDownloadRequest", e);
+        }
     }
 
     private static String formattedDateStringForNow() {
