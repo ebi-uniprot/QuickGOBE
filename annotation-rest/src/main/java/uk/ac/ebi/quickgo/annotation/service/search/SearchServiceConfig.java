@@ -22,10 +22,7 @@ import uk.ac.ebi.quickgo.rest.search.query.SortCriterion;
 import uk.ac.ebi.quickgo.rest.search.request.converter.RESTFilterConverterFactory;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 import uk.ac.ebi.quickgo.rest.search.results.config.FieldNameTransformer;
-import uk.ac.ebi.quickgo.rest.search.results.transformer.ExternalServiceResultsNotQueryResultTransformer;
-import uk.ac.ebi.quickgo.rest.search.results.transformer.ExternalServiceResultsTransformer;
-import uk.ac.ebi.quickgo.rest.search.results.transformer.ResponseValueInjector;
-import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformerChain;
+import uk.ac.ebi.quickgo.rest.search.results.transformer.*;
 import uk.ac.ebi.quickgo.rest.search.solr.SolrQueryConverter;
 import uk.ac.ebi.quickgo.rest.search.solr.SolrRequestRetrieval;
 import uk.ac.ebi.quickgo.rest.search.solr.SolrRetrievalConfig;
@@ -194,8 +191,8 @@ public class SearchServiceConfig {
 
     @Bean
     public ResultTransformerChain<QueryResult<Annotation>> resultTransformerChain(
-            ExternalServiceResultsTransformer<Annotation> ontologyResultsTransformer,
-            ExternalServiceResultsTransformer<Annotation> geneProductResultsTransformer) {
+            ExternalServiceResultsTransformer<QueryResult<Annotation>,Annotation> ontologyResultsTransformer,
+            ExternalServiceResultsTransformer<QueryResult<Annotation>,Annotation> geneProductResultsTransformer) {
         ResultTransformerChain<QueryResult<Annotation>> transformerChain = new ResultTransformerChain<>();
         transformerChain.addTransformer(new SlimResultsTransformer());
         transformerChain.addTransformer(ontologyResultsTransformer);
@@ -204,21 +201,26 @@ public class SearchServiceConfig {
     }
 
     @Bean
-    public ExternalServiceResultsTransformer<Annotation> ontologyResultsTransformer(RESTFilterConverterFactory
-    restFilterConverterFactory) {
+    public ExternalServiceResultsTransformer<QueryResult<Annotation>,Annotation> ontologyResultsTransformer
+            (RESTFilterConverterFactory converterFactory) {
         List<ResponseValueInjector<Annotation>> responseValueInjectors = asList(
                 new OntologyNameInjector(),
                 new TaxonomyNameInjector());
-        return new ExternalServiceResultsTransformer<>(restFilterConverterFactory, responseValueInjectors);
+        return new ExternalServiceResultsTransformer<>(responseValueInjectors,queryResultMutator(converterFactory));
     }
 
     @Bean
-    public ExternalServiceResultsTransformer<Annotation> geneProductResultsTransformer(RESTFilterConverterFactory
-            restFilterConverterFactory) {
+    public ExternalServiceResultsTransformer<QueryResult<Annotation>,Annotation> geneProductResultsTransformer
+            (RESTFilterConverterFactory converterFactory) {
         List<ResponseValueInjector<Annotation>> responseValueInjectors = asList(
                 new GeneProductNameInjector(),
                 new GeneProductSynonymsInjector());
-        return new ExternalServiceResultsTransformer<>(restFilterConverterFactory, responseValueInjectors);
+        return new ExternalServiceResultsTransformer<>(responseValueInjectors, queryResultMutator(converterFactory));
+    }
+
+    private ValueInjectionToQueryResults<Annotation> queryResultMutator(
+            RESTFilterConverterFactory converterFactory) {
+        return new ValueInjectionToQueryResults<>(converterFactory);
     }
 
     @Bean
@@ -248,8 +250,8 @@ public class SearchServiceConfig {
 
     @Bean
     public ResultTransformerChain<StatisticsValue> statisticsTransformerChain(
-            ExternalServiceResultsNotQueryResultTransformer<StatisticsValue> statisticsOntologyNameTransformer,
-            ExternalServiceResultsNotQueryResultTransformer<StatisticsValue> statisticsTaxonNameTransformer) {
+            ExternalServiceResultsTransformer<StatisticsValue,StatisticsValue> statisticsOntologyNameTransformer,
+            ExternalServiceResultsTransformer<StatisticsValue,StatisticsValue> statisticsTaxonNameTransformer) {
         ResultTransformerChain<StatisticsValue> transformerChain = new ResultTransformerChain<>();
         transformerChain.addTransformer(statisticsOntologyNameTransformer);
         transformerChain.addTransformer(statisticsTaxonNameTransformer);
@@ -257,23 +259,27 @@ public class SearchServiceConfig {
     }
 
     @Bean
-    public ExternalServiceResultsNotQueryResultTransformer<StatisticsValue> statisticsOntologyNameTransformer
-            (RESTFilterConverterFactory
-                    restFilterConverterFactory) {
+    public ExternalServiceResultsTransformer<StatisticsValue,StatisticsValue> statisticsOntologyNameTransformer
+            (RESTFilterConverterFactory converterFactory) {
         List<ResponseValueInjector<StatisticsValue>> responseValueInjectors =
                 singletonList(new uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer
                         .statistics.OntologyNameInjector());
-        return new ExternalServiceResultsNotQueryResultTransformer<>(restFilterConverterFactory, responseValueInjectors);
+        return new ExternalServiceResultsTransformer<>(responseValueInjectors, statisticsValueResultMutator(converterFactory));
     }
 
     @Bean
-    public ExternalServiceResultsNotQueryResultTransformer<StatisticsValue> statisticsTaxonNameTransformer
-            (RESTFilterConverterFactory
-                    restFilterConverterFactory) {
+    public ExternalServiceResultsTransformer<StatisticsValue,StatisticsValue> statisticsTaxonNameTransformer
+            (RESTFilterConverterFactory converterFactory) {
         List<ResponseValueInjector<StatisticsValue>> responseValueInjectors = singletonList(
                 new uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.statistics
                         .TaxonomyNameInjector());
-        return new ExternalServiceResultsNotQueryResultTransformer<>(restFilterConverterFactory, responseValueInjectors);
+        return new ExternalServiceResultsTransformer<>(responseValueInjectors, statisticsValueResultMutator(converterFactory));
+    }
+
+    @Bean
+    public ValueInjectionToSingleResult<StatisticsValue> statisticsValueResultMutator(
+            RESTFilterConverterFactory converterFactory) {
+        return new ValueInjectionToSingleResult(converterFactory);
     }
 
     private DbXRefLoader geneProductLoader() {
