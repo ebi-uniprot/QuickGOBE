@@ -8,6 +8,7 @@ import java.util.*;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
+import static java.util.Collections.unmodifiableMap;
 import static uk.ac.ebi.quickgo.ontology.common.OntologyType.GO;
 
 /**
@@ -17,12 +18,14 @@ import static uk.ac.ebi.quickgo.ontology.common.OntologyType.GO;
  * Created by Edd on 04/10/2017.
  */
 public class TermSlimmer {
+    // replace with uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.DEFAULT_SLIM_TRAVERSAL_TYPES
     static final OntologyRelationType[] DEFAULT_RELATION_TYPES = new OntologyRelationType[]{
             OntologyRelationType.IS_A, OntologyRelationType.PART_OF, OntologyRelationType.OCCURS_IN};
-    private final Map<String, List<String>> slimTranslate;
+    private Map<String, List<String>> slimTranslate;
     private OntologyRelationType[] relationTypes;
+
     private TermSlimmer() {
-        slimTranslate = new HashMap<>();
+        // hide default constructor from outside world; users must create via factory method
     }
 
     /**
@@ -65,6 +68,8 @@ public class TermSlimmer {
             exclude[i].clear(i);
         }
 
+        Map<String, List<String>> slimTranslationMap = new HashMap<>();
+
         for (String id : ontology.getVertices(ontologyType)) {
             // determine which slim terms (if any) are in the ancestry of this term
             //      if bit i is set in the BitSet, that means that slimTermsArr[i] is an ancestor of the term
@@ -82,13 +87,15 @@ public class TermSlimmer {
                 for (int i = 0; (i = slimTermsBitSet.nextSetBit(i)) >= 0; i++) {
                     mappedTerms.add(slimTermsArr[i]);
                 }
-                termSlimmer.slimTranslate.put(id, mappedTerms);
+                slimTranslationMap.put(id, mappedTerms);
             } else if (slimTerms.contains(id)) {
                 // the term is in the slim-set but it has no ancestors for the specified relation
-                termSlimmer.slimTranslate.put(id, singletonList(id));
+                slimTranslationMap.put(id, singletonList(id));
             }
             // else: none of this term's ancestors are in the slim-set, so there's nothing more to be done
         }
+
+        termSlimmer.slimTranslate = unmodifiableMap(slimTranslationMap);
 
         return termSlimmer;
     }
@@ -114,5 +121,13 @@ public class TermSlimmer {
         } else {
             return emptyList();
         }
+    }
+
+    /**
+     * Get the map of ontology terms to slimmed equivalent terms.
+     * @return a map of ontology terms to slimmed equivalent terms.
+     */
+    public Map<String, List<String>> getSlimmedTermsMap() {
+        return slimTranslate;
     }
 }
