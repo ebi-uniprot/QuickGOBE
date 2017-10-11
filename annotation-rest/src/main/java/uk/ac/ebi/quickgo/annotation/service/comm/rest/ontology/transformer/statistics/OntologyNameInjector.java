@@ -17,7 +17,7 @@ import java.util.List;
  */
 public class OntologyNameInjector extends AbstractValueInjector<BasicOntology, StatisticsValue> {
 
-    static final String GO_ID = "goId";
+    public static final String GO_ID = "goId";
     static final String GO_NAME = "goName";
 
     @Override
