@@ -9,6 +9,8 @@ import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
 import uk.ac.ebi.quickgo.annotation.model.StatisticsGroup;
 import uk.ac.ebi.quickgo.annotation.model.StatisticsValue;
+import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.statistics.OntologyNameInjector;
+import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.statistics.TaxonomyNameInjector;
 import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.annotation.service.statistics.StatisticsService;
 import uk.ac.ebi.quickgo.rest.ParameterBindingException;
@@ -306,7 +308,7 @@ public class AnnotationController {
             stats.getResults()
                             .stream()
                             .flatMap(statisticsGroup -> statisticsGroup.getTypes().stream())
-                            .filter(statisticsByType -> statisticsByType.getType().equals("taxonId"))
+                            .filter(statisticsByType -> statisticsByType.getType().equals(TaxonomyNameInjector.TAXON_ID))
                             .flatMap(statisticsByType -> statisticsByType.getValues().stream())
                             .forEach(statisticsValue ->statisticsTransformerChain.applyTransformations
                                     (statisticsValue, statisticsFilterContextForTaxonName()));
@@ -320,7 +322,7 @@ public class AnnotationController {
             stats.getResults()
                  .stream()
                  .flatMap(statisticsGroup -> statisticsGroup.getTypes().stream())
-                 .filter(statisticsByType -> statisticsByType.getType().equals("goId"))
+                 .filter(statisticsByType -> statisticsByType.getType().equals(OntologyNameInjector.GO_ID))
                  .flatMap(statisticsByType -> statisticsByType.getValues().stream())
                  .forEach(statisticsValue ->statisticsTransformerChain.applyTransformations
                          (statisticsValue, statisticsFilterContextForGoName()));
