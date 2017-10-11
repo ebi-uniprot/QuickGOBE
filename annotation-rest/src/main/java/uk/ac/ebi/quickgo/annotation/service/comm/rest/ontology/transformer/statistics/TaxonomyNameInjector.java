@@ -15,8 +15,8 @@ import uk.ac.ebi.quickgo.rest.search.results.transformer.AbstractValueInjector;
  */
 public class TaxonomyNameInjector extends AbstractValueInjector<BasicTaxonomyNode, StatisticsValue> {
 
+    public static final String TAXON_ID = "taxonId";
     static final String TAXON_NAME = "taxonName";
-    static final String TAXON_ID = "taxonId";
 
     @Override
     public String getId() {
