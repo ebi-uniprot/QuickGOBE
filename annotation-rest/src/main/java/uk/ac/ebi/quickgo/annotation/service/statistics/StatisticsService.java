@@ -13,11 +13,21 @@ public interface StatisticsService {
 
     /**
      * Calculates the statistics based on the results returned by
-     * an {@link AnnotationRequest}.
+     * an {@link AnnotationRequest}. For use by restful services.
      *
      * @param request the {@link AnnotationRequest} whose results will have statistics calculated
      * @return a {@link QueryResult} containing a {@link StatisticsGroup}, representing the
      * statistics corresponding to the annotation data-set
      */
     QueryResult<StatisticsGroup> calculate(AnnotationRequest request);
+
+    /**
+     * Calculates the statistics based on the results returned by
+     * an {@link AnnotationRequest}. For use by download services.
+     *
+     * @param request the {@link AnnotationRequest} whose results will have statistics calculated
+     * @return a {@link QueryResult} containing a {@link StatisticsGroup}, representing the
+     * statistics corresponding to the annotation data-set
+     */
+    QueryResult<StatisticsGroup> calculateDownload(AnnotationRequest request);
 }
