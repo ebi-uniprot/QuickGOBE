@@ -29,12 +29,12 @@ public class StatisticsTypeDefaultPropertiesIT {
     private static final String GO_ID = "goId";
 
     @Autowired
-    private RequiredStatistics requiredStatistics;
+    private RequiredStatistics listStatistics;
     private List<RequiredStatistic> statistics;
 
     @Before
     public void setUp() {
-        statistics = requiredStatistics.getStats();
+        statistics = listStatistics.getStats();
     }
 
     @Test
