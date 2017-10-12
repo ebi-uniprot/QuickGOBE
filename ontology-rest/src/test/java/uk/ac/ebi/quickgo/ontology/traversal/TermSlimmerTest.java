@@ -17,6 +17,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static uk.ac.ebi.quickgo.ontology.common.OntologyType.ECO;
 import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.*;
@@ -108,6 +109,12 @@ public class TermSlimmerTest {
         TermSlimmer termSlimmer = TermSlimmer.createSlims(OntologyType.GO, ontology, slimSetAllVertices);
         assertThat(termSlimmer.findSlims(LATERAL_PLASMA_MEMBRANE), contains(PLASMA_MEMBRANE_PART));
         assertThat(termSlimmer.findSlims(PLASMA_MEMBRANE_PART), contains(PLASMA_MEMBRANE_PART));
+    }
+
+    @Test
+    public void termOutsideOfInitialSlimSetSlimsToNothing() {
+        TermSlimmer termSlimmer = TermSlimmer.createSlims(OntologyType.GO, ontology, singletonList(CELLULAR_COMPONENT));
+        assertThat(termSlimmer.findSlims("XXXXXX"), is(empty()));
     }
 
     /**

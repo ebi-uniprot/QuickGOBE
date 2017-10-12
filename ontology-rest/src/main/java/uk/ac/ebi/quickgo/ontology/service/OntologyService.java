@@ -5,6 +5,7 @@ import uk.ac.ebi.quickgo.ontology.common.OntologyType;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
+import uk.ac.ebi.quickgo.ontology.model.SlimTerm;
 import uk.ac.ebi.quickgo.rest.search.query.RegularPage;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
@@ -123,4 +124,13 @@ public interface OntologyService<T extends OBOTerm> {
      */
     List<T> findDescendantsInfoByOntologyId(List<String> ids, OntologyRelationType... relations);
 
+    /**
+     * Maps ids to their equivalent, slimmed ids. The results are presented as a list of {@link SlimTerm} instances,
+     * each of which contains a term id, and which shows the ids to which this term slims to.
+     *
+     * @param slimTerms the terms to which we want to find term ids that map "up" to.
+     * @param relationTypes the relationships over which the slimming calculation will traverse
+     * @return a list of {@link SlimTerm} objects that provide the slimming information
+     */
+    List<SlimTerm> findSlimmedInfoForSlimmedTerms(List<String> slimTerms, OntologyRelationType... relationTypes);
 }

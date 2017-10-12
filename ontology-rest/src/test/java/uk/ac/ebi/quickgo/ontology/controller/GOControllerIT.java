@@ -78,6 +78,12 @@ public class GOControllerIT extends OBOControllerIT {
                 .andExpect(jsonPath("$.go.timestamp").value(expectedTimestamp));
     }
 
+    // todo add slimming tests
+    @Test
+    public void slimTest() {
+
+    }
+
     /*
      * GO produces two more attributes in its response (aspect and usage), when compared
      * to the standard OBO response.

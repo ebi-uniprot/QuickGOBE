@@ -10,6 +10,8 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.unmodifiableMap;
 import static uk.ac.ebi.quickgo.ontology.common.OntologyType.GO;
+import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.DEFAULT_SLIM_TRAVERSAL_TYPES;
+import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.DEFAULT_TRAVERSAL_TYPES;
 
 /**
  * An instance of this class is used to find, for a given term, the equivalent "slimmed" terms. The slimming algorithm
@@ -18,15 +20,15 @@ import static uk.ac.ebi.quickgo.ontology.common.OntologyType.GO;
  * Created by Edd on 04/10/2017.
  */
 public class TermSlimmer {
-    // replace with uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.DEFAULT_SLIM_TRAVERSAL_TYPES
-    static final OntologyRelationType[] DEFAULT_RELATION_TYPES = new OntologyRelationType[]{
-            OntologyRelationType.IS_A, OntologyRelationType.PART_OF, OntologyRelationType.OCCURS_IN};
+    static final OntologyRelationType[] DEFAULT_RELATION_TYPES =
+            DEFAULT_SLIM_TRAVERSAL_TYPES.toArray(new OntologyRelationType[DEFAULT_TRAVERSAL_TYPES.size()]);
     private Map<String, List<String>> slimTranslate;
     private OntologyRelationType[] relationTypes;
 
-    private TermSlimmer() {
-        // hide default constructor from outside world; users must create via factory method
-    }
+    /**
+     * Hide default constructor from outside world; users must create via {@link #createSlims}.
+     */
+    private TermSlimmer() {}
 
     /**
      * Factory method for creating a {@link TermSlimmer} for a given {@link OntologyType}, {@link OntologyGraph},
