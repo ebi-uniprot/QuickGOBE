@@ -1,12 +1,12 @@
 package uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter;
 
-import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.OntologyDescendants;
+import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.OntologyRelatives;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
 
 import java.util.Set;
-import java.util.function.Consumer;
 
+import static java.util.Objects.nonNull;
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.or;
 
 /**
@@ -17,13 +17,18 @@ import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.or;
  * Created 09/08/16
  * @author Edd
  */
-public class DescendantsFilterConverter extends AbstractDescendantFilterConverter {
-    @Override protected Consumer<String> processDescendant(
-            OntologyDescendants.Result result, Set<QuickGOQuery> queries) {
-        return desc -> queries.add(createQueryForOntologyId(desc));
+public class DescendantsFilterConverter extends AbstractOntologyFilterConverter {
+    @Override protected boolean validResult(OntologyRelatives.Result result) {
+        return nonNull(result.getDescendants());
     }
 
-    @Override protected ConvertedFilter<QuickGOQuery> createFilterForAllDescendants(Set<QuickGOQuery> queries) {
+    @Override protected void processResult(OntologyRelatives.Result result, Set<QuickGOQuery> queries) {
+        result.getDescendants().stream()
+                .filter(AbstractOntologyFilterConverter::notNullOrEmpty)
+                .forEach(desc -> queries.add(createQueryForOntologyId(desc)));
+    }
+
+    @Override protected ConvertedFilter<QuickGOQuery> createFilter(Set<QuickGOQuery> queries) {
         if (!queries.isEmpty()) {
             return new ConvertedFilter<>(or(queries.toArray(new QuickGOQuery[queries.size()])));
         } else {

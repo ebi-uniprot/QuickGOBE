@@ -3,7 +3,7 @@ package uk.ac.ebi.quickgo.annotation.controller;
 import uk.ac.ebi.quickgo.annotation.AnnotationREST;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
-import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.OntologyDescendants;
+import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.OntologyRelatives;
 import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepoConfig;
 
@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.StringJoiner;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 import org.junit.After;
 import org.junit.Before;
@@ -68,22 +69,20 @@ public abstract class AbstractFilterAnnotationByOntologyRESTIT {
     static final String FAILED_REST_FETCH_PREFIX = "Failed to fetch REST response due to: ";
     static final String IS_A = "is_a";
     static final String SLIM_USAGE = "slim";
-    static final String NO_DESCENDANTS_PREFIX = "No descendants found for IDs, ";
     static final String SEARCH_RESOURCE = "/annotation" + "/search";
-
+    static final String COMMA = ",";
+    private static final String NO_CONVERTIBLE_RESULTS_PREFIX = "No convertible results found for IDs, ";
     private static final String BASE_URL = "https://localhost";
     private static final String DELIMITER = ", ";
-    private static final String COMMA = ",";
     private static final String DESCENDANTS_USAGE = "descendants";
 
+    @Autowired
+    protected AnnotationRepository annotationRepository;
     MockMvc mockMvc;
     String resourceFormat;
     String usageParam;
     String idParam;
     String usageRelations;
-
-    @Autowired
-    protected AnnotationRepository annotationRepository;
     @Autowired
     private WebApplicationContext webApplicationContext;
     @Autowired
@@ -285,7 +284,7 @@ public abstract class AbstractFilterAnnotationByOntologyRESTIT {
                 .andExpect(status().is5xxServerError())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(valuesOccurInErrorMessage(
-                        failedRESTResponseErrorMessage(NO_DESCENDANTS_PREFIX + ontologyId(1))));
+                        failedRESTResponseErrorMessage(NO_CONVERTIBLE_RESULTS_PREFIX + ontologyId(1))));
     }
 
     @Test
@@ -306,7 +305,7 @@ public abstract class AbstractFilterAnnotationByOntologyRESTIT {
                 .andExpect(status().is5xxServerError())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(valuesOccurInErrorMessage(
-                        failedRESTResponseErrorMessage(NO_DESCENDANTS_PREFIX + ontologyId(2))));
+                        failedRESTResponseErrorMessage(NO_CONVERTIBLE_RESULTS_PREFIX + ontologyId(2))));
     }
 
     @Test
@@ -328,7 +327,7 @@ public abstract class AbstractFilterAnnotationByOntologyRESTIT {
                 .andExpect(status().is5xxServerError())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(valuesOccurInErrorMessage(
-                        failedRESTResponseErrorMessage(NO_DESCENDANTS_PREFIX + csv(ontologyId(2),
+                        failedRESTResponseErrorMessage(NO_CONVERTIBLE_RESULTS_PREFIX + csv(ontologyId(2),
                                 ontologyId(3)))));
     }
 
@@ -440,26 +439,6 @@ public abstract class AbstractFilterAnnotationByOntologyRESTIT {
         return joiner.toString();
     }
 
-    String failedRESTResponseErrorMessage(String suffix) {
-        return FAILED_REST_FETCH_PREFIX + suffix;
-    }
-
-    void expectRestCallHasDescendants(
-            List<String> termIds,
-            List<String> usageRelations,
-            List<List<String>> descendants) {
-        String termIdsCSV = termIds.stream().collect(Collectors.joining(COMMA));
-        String relationsCSV = usageRelations.stream().collect(Collectors.joining(COMMA));
-
-        expectRestCallSuccess(
-                GET,
-                buildResource(
-                        resourceFormat,
-                        termIdsCSV,
-                        relationsCSV),
-                constructResponseObject(termIds, descendants));
-    }
-
     String buildResource(String format, String... arguments) {
         int requiredArgsCount = format.length() - format.replace("%", "").length();
         List<String> args = new ArrayList<>();
@@ -480,20 +459,22 @@ public abstract class AbstractFilterAnnotationByOntologyRESTIT {
                 .andRespond(response);
     }
 
-    private String constructResponseObject(List<String> termIds, List<List<String>> descendants) {
+    String constructResponseObject(List<String> termIds, List<List<String>> values,
+            BiConsumer<OntologyRelatives.Result, List<String>> resultValueUpdater) {
         checkArgument(termIds != null, "termIds cannot be null");
-        checkArgument(descendants != null, "descendants cannot be null");
-        checkArgument(termIds.size() == descendants.size(), "Term ID list and the (list of lists) of their " +
-                "descendants should be the same size");
+        checkArgument(values != null, "values cannot be null");
+        checkArgument(termIds.size() == values.size(), "Term ID list and the (list of lists) of their " +
+                "values should be the same size");
+        checkArgument(resultValueUpdater != null, "resultsValueUpdater cannot be null");
 
-        OntologyDescendants response = new OntologyDescendants();
-        List<OntologyDescendants.Result> results = new ArrayList<>();
+        OntologyRelatives response = new OntologyRelatives();
+        List<OntologyRelatives.Result> results = new ArrayList<>();
 
-        Iterator<List<String>> descendantListsIterator = descendants.iterator();
+        Iterator<List<String>> valuesListsIterator = values.iterator();
         termIds.forEach(t -> {
-            OntologyDescendants.Result result = new OntologyDescendants.Result();
+            OntologyRelatives.Result result = new OntologyRelatives.Result();
             result.setId(t);
-            result.setDescendants(descendantListsIterator.next());
+            resultValueUpdater.accept(result, valuesListsIterator.next());
             results.add(result);
         });
 
@@ -505,10 +486,31 @@ public abstract class AbstractFilterAnnotationByOntologyRESTIT {
         }
     }
 
-    private void expectRestCallSuccess(HttpMethod method, String url, String response) {
+    void expectRestCallSuccess(HttpMethod method, String url, String response) {
         mockRestServiceServer.expect(
                 requestTo(BASE_URL + url))
                 .andExpect(method(method))
                 .andRespond(withSuccess(response, MediaType.APPLICATION_JSON));
+    }
+
+    private String failedRESTResponseErrorMessage(String suffix) {
+        return FAILED_REST_FETCH_PREFIX + suffix;
+    }
+
+    private void expectRestCallHasDescendants(
+            List<String> termIds,
+            List<String> usageRelations,
+            List<List<String>> descendants) {
+
+        String termIdsCSV = termIds.stream().collect(Collectors.joining(COMMA));
+        String relationsCSV = usageRelations.stream().collect(Collectors.joining(COMMA));
+
+        expectRestCallSuccess(
+                GET,
+                buildResource(
+                        resourceFormat,
+                        termIdsCSV,
+                        relationsCSV),
+                constructResponseObject(termIds, descendants, OntologyRelatives.Result::setDescendants));
     }
 }
