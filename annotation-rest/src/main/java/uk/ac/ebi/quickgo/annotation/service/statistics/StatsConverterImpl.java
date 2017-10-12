@@ -14,37 +14,48 @@ import org.springframework.stereotype.Component;
  *
  * @author Ricardo Antunes
  */
-@Component
-public class StatsConverterImpl implements StatsConverter {
+@Component public class StatsConverterImpl implements StatsConverter {
 
     static final String DEFAULT_GLOBAL_AGGREGATE_NAME = "global";
 
     @Override public AggregateRequest convert(Collection<RequiredStatistic> requiredStatistics) {
         Preconditions.checkArgument(requiredStatistics != null && !requiredStatistics.isEmpty(),
-                "Stats request collection cannot be null or empty");
+                                    "Stats request collection cannot be null or empty");
 
-        Map<String, AggregateRequest> nestedAggregateMap = new HashMap<>();
         AggregateRequest globalAggregate = new AggregateRequest(DEFAULT_GLOBAL_AGGREGATE_NAME);
+        Map<RequiredStatisticType, AggregateRequest> nestedAggregateMap = new HashMap<>();
 
-        requiredStatistics.forEach(request -> {
-            globalAggregate.addField(request.getGroupField(), AggregateFunction.typeOf(request.getAggregateFunction()));
-            request.getTypes().forEach(type -> {
-                String typeName = type.getName();
-                if (!nestedAggregateMap.containsKey(typeName)) {
-                    AggregateRequest aggregateRequestForType = new AggregateRequest(typeName, type.getLimit());
-                    nestedAggregateMap.put(typeName, aggregateRequestForType);
-                }
-
-                AggregateRequest aggregateForType = nestedAggregateMap.get(typeName);
-                aggregateForType.addField(request.getGroupField(),
-                        AggregateFunction.typeOf(request.getAggregateFunction()));
-            });
-        });
+        requiredStatistics.forEach(statistic -> buildAggregation(statistic, nestedAggregateMap, globalAggregate));
 
         // add all values of map as nested aggregates to global aggregate
-        nestedAggregateMap.values().forEach(globalAggregate::addNestedAggregate);
-
+        combineGlobalAndNestedAggregates(globalAggregate, nestedAggregateMap);
         return globalAggregate;
     }
 
+    private void buildAggregation(RequiredStatistic statistic,
+            Map<RequiredStatisticType, AggregateRequest> nestedAggregateMap, AggregateRequest globalAggregate) {
+        populateAggregate(statistic, globalAggregate);
+        populateNestedAggregationWithRequiredStatisticTypes(statistic, nestedAggregateMap);
+    }
+
+    private void populateNestedAggregationWithRequiredStatisticTypes(RequiredStatistic statistic,
+            Map<RequiredStatisticType, AggregateRequest> nestedAggregateMap) {
+        statistic.getTypes()
+                 .stream()
+                 .map(type -> nestedAggregateMap.computeIfAbsent(type, StatsConverterImpl::createRequest))
+                 .forEach(aggregateRequestForType -> populateAggregate(statistic, aggregateRequestForType));
+    }
+
+    private void populateAggregate(RequiredStatistic request, AggregateRequest aggregate) {
+        aggregate.addField(request.getGroupField(), AggregateFunction.typeOf(request.getAggregateFunction()));
+    }
+
+    private void combineGlobalAndNestedAggregates(AggregateRequest globalAggregate,
+            Map<RequiredStatisticType, AggregateRequest> nestedAggregateMap) {
+        nestedAggregateMap.values().forEach(globalAggregate::addNestedAggregate);
+    }
+
+    private static AggregateRequest createRequest(RequiredStatisticType k) {
+        return new AggregateRequest(k.getName(), k.getLimit());
+    }
 }
