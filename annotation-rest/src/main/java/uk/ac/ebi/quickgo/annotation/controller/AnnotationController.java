@@ -279,7 +279,7 @@ public class AnnotationController {
     public ResponseEntity<ResponseBodyEmitter> downloadStats(@Valid @ModelAttribute AnnotationRequest request,
             BindingResult bindingResult, @RequestHeader(ACCEPT) MediaType mediaTypeAcceptHeader) throws IOException {
         checkBindingErrors(bindingResult);
-        QueryResult<StatisticsGroup> stats = statsService.calculate(request);
+        QueryResult<StatisticsGroup> stats = statsService.calculateDownload(request);
         addGoNamesToGoIdStatisticsValues(stats);
         addTaxonNamesToStatisticsValues(stats);
 
