@@ -16,22 +16,41 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "annotation.stats")
 public class StatisticsServiceConfig {
     private Map<String, Integer> typeLimits = new HashMap<>();
+    private Map<String, Integer> typeLimitsForDownload = new HashMap<>();
 
     public Map<String, Integer> getTypeLimits() {
         return typeLimits;
+    }
+
+    public Map<String, Integer> getTypeLimitsForDownload() {
+        return typeLimitsForDownload;
     }
 
     public void setTypeLimits(Map<String, Integer> typeLimits) {
         this.typeLimits = typeLimits;
     }
 
-    @Bean
-    public RequiredStatistics requiredStatistics(StatisticsTypeConfigurer statsTypeConfigurer) {
-        return new RequiredStatistics(statsTypeConfigurer);
+    public void setTypeLimitsForDownload(Map<String, Integer> typeLimitsForDownload) {
+        this.typeLimitsForDownload = typeLimitsForDownload;
     }
 
     @Bean
-    public StatisticsTypeConfigurer statsTypeConfigurer() {
+    public RequiredStatistics listStatistics(StatisticsTypeConfigurer statsTypeConfigurerForList) {
+        return new RequiredStatistics(statsTypeConfigurerForList);
+    }
+
+    @Bean
+    public RequiredStatistics downloadStatistics(StatisticsTypeConfigurer statsTypeConfigurerForDownload) {
+        return new RequiredStatistics(statsTypeConfigurerForDownload);
+    }
+
+    @Bean
+    public StatisticsTypeConfigurer statsTypeConfigurerForList() {
         return new StatisticsTypeConfigurer(typeLimits);
+    }
+
+    @Bean
+    public StatisticsTypeConfigurer statsTypeConfigurerForDownload() {
+        return new StatisticsTypeConfigurer(typeLimitsForDownload);
     }
 }
