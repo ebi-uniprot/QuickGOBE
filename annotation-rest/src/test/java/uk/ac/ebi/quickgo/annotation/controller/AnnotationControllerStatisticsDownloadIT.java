@@ -31,7 +31,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.createGenericDocsChangingGoId;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.numOfResults;
 import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.EXCEL_MEDIA_TYPE;
@@ -52,10 +51,7 @@ public class AnnotationControllerStatisticsDownloadIT {
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
     private static final int NUMBER_OF_GENERIC_DOCS = 50;
     private static final String DOWNLOAD_STATISTICS_SEARCH_URL = "/annotation/downloadStats";
-    private static final String DOWNLOAD_LIMIT_PARAM = "downloadLimit";
-    private static final int MIN_DOWNLOAD_NUMBER = 1;
-    private static final int MAX_DOWNLOAD_NUMBER = 50000;
-    public static final String NUMBER_OF_GO_ID_RESULTS_FOR_ANNOTATIONS =
+    private static final String NUMBER_OF_GO_ID_RESULTS_FOR_ANNOTATIONS =
             "$.results[0].types.[?(@.type == 'goId')].values.length()";
 
     private MockMvc mockMvc;
@@ -85,36 +81,7 @@ public class AnnotationControllerStatisticsDownloadIT {
 
     @Test
     public void canDownloadWithInJsonFormatAfterFailedToLoadGONamesAndTaxonNames() throws Exception {
-        canDownload(JSON_MEDIA_TYPE,50);
-    }
-
-    @Test
-    public void downloadLimitIsObeyed() throws Exception {
-        canDownloadWithLimit(JSON_MEDIA_TYPE, 11);
-    }
-
-    @Test
-    public void downloadLimitTooLargeCausesBadRequest() throws Exception {
-        ResultActions response = mockMvc.perform(
-                get(DOWNLOAD_STATISTICS_SEARCH_URL)
-                        .header(ACCEPT, EXCEL_MEDIA_TYPE)
-                        .param(DOWNLOAD_LIMIT_PARAM, Integer.toString(MAX_DOWNLOAD_NUMBER + 1)));
-
-        response
-                .andDo(print())
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    public void downloadLimitTooSmallCausesBadRequest() throws Exception {
-        ResultActions response = mockMvc.perform(
-                get(DOWNLOAD_STATISTICS_SEARCH_URL)
-                        .header(ACCEPT, EXCEL_MEDIA_TYPE)
-                        .param(DOWNLOAD_LIMIT_PARAM, Integer.toString(MIN_DOWNLOAD_NUMBER - 1)));
-
-        response
-                .andDo(print())
-                .andExpect(status().isBadRequest());
+        canDownload(JSON_MEDIA_TYPE,6);
     }
 
     private List<AnnotationDocument> createDocs(int number) {
@@ -137,14 +104,6 @@ public class AnnotationControllerStatisticsDownloadIT {
                 get(DOWNLOAD_STATISTICS_SEARCH_URL)
                         .header(ACCEPT, mediaType));
         checkResponse(mediaType, response, expectedSize);
-    }
-
-    private void canDownloadWithLimit(MediaType mediaType, int limit) throws Exception {
-        ResultActions response = mockMvc.perform(
-                get(DOWNLOAD_STATISTICS_SEARCH_URL)
-                        .header(ACCEPT, mediaType)
-                        .param(DOWNLOAD_LIMIT_PARAM, Integer.toString(limit)));
-        checkResponse(mediaType, response, limit);
     }
 
     private void checkResponse(MediaType mediaType, ResultActions response) throws Exception {
