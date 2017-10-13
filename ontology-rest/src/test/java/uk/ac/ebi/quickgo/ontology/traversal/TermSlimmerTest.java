@@ -97,16 +97,16 @@ public class TermSlimmerTest {
 
     @Test
     public void termsSlimToMultipleTerms() {
-        List<String> slimSetAllVertices = asList(CELL_PART, MEMBRANE_PART);
-        TermSlimmer termSlimmer = TermSlimmer.createSlims(OntologyType.GO, ontology, slimSetAllVertices);
+        List<String> slimSetVertices = asList(CELL_PART, MEMBRANE_PART);
+        TermSlimmer termSlimmer = TermSlimmer.createSlims(OntologyType.GO, ontology, slimSetVertices);
         assertThat(termSlimmer.findSlims(PLASMA_MEMBRANE_PART), contains(CELL_PART, MEMBRANE_PART));
         assertThat(termSlimmer.findSlims(LATERAL_PLASMA_MEMBRANE), contains(CELL_PART, MEMBRANE_PART));
     }
 
     @Test
     public void slimmedTermsAreHidden() {
-        List<String> slimSetAllVertices = asList(CELL_PART, MEMBRANE_PART, PLASMA_MEMBRANE_PART);
-        TermSlimmer termSlimmer = TermSlimmer.createSlims(OntologyType.GO, ontology, slimSetAllVertices);
+        List<String> slimSetVertices = asList(CELL_PART, MEMBRANE_PART, PLASMA_MEMBRANE_PART);
+        TermSlimmer termSlimmer = TermSlimmer.createSlims(OntologyType.GO, ontology, slimSetVertices);
         assertThat(termSlimmer.findSlims(LATERAL_PLASMA_MEMBRANE), contains(PLASMA_MEMBRANE_PART));
         assertThat(termSlimmer.findSlims(PLASMA_MEMBRANE_PART), contains(PLASMA_MEMBRANE_PART));
     }
