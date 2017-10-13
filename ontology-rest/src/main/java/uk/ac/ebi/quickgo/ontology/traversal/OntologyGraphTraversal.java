@@ -91,7 +91,7 @@ public interface OntologyGraphTraversal {
      * as a {@link BitSet}, for efficient result processing.
      *
      * @param vertex the vertex whose ancestors are needed
-     * @param range a list of vertices that are permissible in as ancestors, i.e., the ancestors will be a subset
+     * @param range a list of vertices that are permissible as ancestors, i.e., the ancestors will be a subset
      * @param requestedRelations the relationships over which ancestors can be computed
      * @return a {@link BitSet} representing the ancestors
      */
