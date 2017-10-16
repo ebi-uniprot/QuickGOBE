@@ -28,15 +28,14 @@ public class OBOControllerValidationHelperImpl
     }
 
     @Override public List<OntologyRelationType> validateRelationTypes(String relationTypesCSV) {
-        relationTypesCSV = relationTypesCSV.toLowerCase();
-
         List<String> relationTypeStrList = csvToList(relationTypesCSV);
 
         List<OntologyRelationType> relationTypes = new ArrayList<>();
         for (String relationTypeStr : relationTypeStrList) {
             OntologyRelationType relationType;
             try {
-                relationType = OntologyRelationType.getByLongName(relationTypeStr);
+                String relationTypeStrLowerCase = relationTypeStr.toLowerCase();
+                relationType = OntologyRelationType.getByLongName(relationTypeStrLowerCase);
             } catch (IllegalArgumentException e) {
                 LOGGER.error(e.getMessage());
                 throw new ParameterException("Unknown relationship requested: '" + relationTypeStr + "'");

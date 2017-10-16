@@ -17,6 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -76,8 +77,8 @@ public class GOControllerIT extends OBOControllerIT {
         relationships.add(createSlimRelationship(GO_SLIM_CHILD4, GO_SLIM4));
         relationships.add(createSlimRelationship(GO_SLIM_CHILD5, GO_SLIM5));
         relationships.add(createSlimRelationship(GO_SLIM_CHILD5, GO_SLIM6));
+        relationships.add(createSlimRelationship(GO_SLIM_CHILD6, GO_SLIM5));
         relationships.add(createSlimRelationship(GO_SLIM_CHILD6, GO_SLIM6));
-        relationships.add(createSlimRelationship(GO_SLIM_CHILD6, GO_SLIM7));
 
         relationships.add(createSlimRelationship(GO_SLIM1, STOP_NODE));
         relationships.add(createSlimRelationship(GO_SLIM2, STOP_NODE));
@@ -96,6 +97,7 @@ public class GOControllerIT extends OBOControllerIT {
         return new OntologyRelationship(term, slimmedUpTerm, OntologyRelationType.IS_A);
     }
 
+    // GO specific data  ------------------
     @Test
     public void canRetrieveBlacklistByIds() throws Exception {
         ResultActions response = mockMvc.perform(get(
@@ -127,6 +129,7 @@ public class GOControllerIT extends OBOControllerIT {
                 .andExpect(status().isOk());
     }
 
+    // meta-data ------------------
     @Test
     public void about() throws Exception {
         ResultActions response = mockMvc.perform(get(getResourceURL() + "/about"));
@@ -137,12 +140,14 @@ public class GOControllerIT extends OBOControllerIT {
                 .andExpect(jsonPath("$.go.timestamp").value(expectedTimestamp));
     }
 
+    // slimming ------------------
     @Test
     public void oneIdHasOneSlim() throws Exception {
         ResultActions response = mockMvc.perform(get(getSlimURL())
                 .param(SLIM_IDS_PARAM, GO_SLIM1));
 
         response.andDo(print())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.numberOfHits").value(1))
                 .andExpect(jsonPath("$.results.*.id", contains(GO_SLIM_CHILD1)));
     }
@@ -153,6 +158,7 @@ public class GOControllerIT extends OBOControllerIT {
                 .param(SLIM_IDS_PARAM, GO_SLIM2));
 
         response.andDo(print())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.numberOfHits").value(1))
                 .andExpect(jsonPath("$.results.*.id", contains(GO_SLIM_CHILD2)));
 
@@ -160,28 +166,53 @@ public class GOControllerIT extends OBOControllerIT {
                 .param(SLIM_IDS_PARAM, GO_SLIM3));
 
         response.andDo(print())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.numberOfHits").value(1))
                 .andExpect(jsonPath("$.results.*.id", contains(GO_SLIM_CHILD2)));
     }
 
     @Test
-    public void twoIdsHave1Slim() {
-        // TODO: 13/10/17
+    public void twoIdsHave1Slim() throws Exception {
+        ResultActions response = mockMvc.perform(get(getSlimURL())
+                .param(SLIM_IDS_PARAM, GO_SLIM4));
+
+        response.andDo(print())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.numberOfHits").value(2))
+                .andExpect(jsonPath("$.results.*.id", containsInAnyOrder(GO_SLIM_CHILD3, GO_SLIM_CHILD4)));
     }
 
     @Test
-    public void twoIdsHave2Slims() {
-        // TODO: 13/10/17
+    public void twoIdsHave2Slims() throws Exception {
+        ResultActions response = mockMvc.perform(get(getSlimURL())
+                .param(SLIM_IDS_PARAM, toCSV(GO_SLIM5, GO_SLIM6)));
+
+        response.andDo(print())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.numberOfHits").value(2))
+                .andExpect(jsonPath("$.results.*.id", containsInAnyOrder(GO_SLIM_CHILD5, GO_SLIM_CHILD6)));
     }
 
     @Test
-    public void slimmingOverInvalidRelationshipCauses400() {
-        // TODO: 13/10/17
+    public void slimmingOverInvalidRelationshipCauses400() throws Exception {
+        String invalidRelation = "XXXX";
+        ResultActions response = mockMvc.perform(get(getSlimURL())
+                .param(SLIM_IDS_PARAM, GO_SLIM1)
+                .param(SLIM_RELATIONS_PARAM, invalidRelation));
+
+        expectInvalidRelationError(response, invalidRelation);
     }
 
     @Test
-    public void slimmingOverRelationshipNotInGraphReturnsEmptyResponse() {
-        // TODO: 13/10/17
+    public void slimmingOverRelationshipNotInGraphReturnsEmptyResponse() throws Exception {
+        String nonExistentGraphRelationship = "occurs_in";
+        ResultActions response = mockMvc.perform(get(getSlimURL())
+                .param(SLIM_IDS_PARAM, GO_SLIM1)
+                .param(SLIM_RELATIONS_PARAM, nonExistentGraphRelationship));
+
+        response.andDo(print())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.numberOfHits").value(0));
     }
 
     /*
