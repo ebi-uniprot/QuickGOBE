@@ -20,7 +20,10 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static uk.ac.ebi.quickgo.ontology.common.OntologyType.ECO;
-import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.*;
+import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.CAPABLE_OF_PART_OF;
+import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.HAS_PART;
+import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.IS_A;
+import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.PART_OF;
 import static uk.ac.ebi.quickgo.ontology.traversal.TermSlimmer.DEFAULT_RELATION_TYPES;
 
 /**
@@ -96,9 +99,26 @@ public class TermSlimmerTest {
     }
 
     @Test
+    public void termsSlimToSingleTerm() {
+        List<String> slimSetVertices = singletonList(MEMBRANE);
+        TermSlimmer termSlimmer = TermSlimmer.createSlims(OntologyType.GO, ontology, slimSetVertices);
+        assertThat(termSlimmer.getSlimmedTermsMap().size(), is(5));
+        assertThat(termSlimmer.findSlims(MEMBRANE), contains(MEMBRANE));
+        assertThat(termSlimmer.findSlims(MEMBRANE_PART), contains(MEMBRANE));
+        assertThat(termSlimmer.findSlims(PLASMA_MEMBRANE), contains(MEMBRANE));
+        assertThat(termSlimmer.findSlims(PLASMA_MEMBRANE_PART), contains(MEMBRANE));
+        assertThat(termSlimmer.findSlims(LATERAL_PLASMA_MEMBRANE), contains(MEMBRANE));
+    }
+
+    @Test
     public void termsSlimToMultipleTerms() {
         List<String> slimSetVertices = asList(CELL_PART, MEMBRANE_PART);
         TermSlimmer termSlimmer = TermSlimmer.createSlims(OntologyType.GO, ontology, slimSetVertices);
+        assertThat(termSlimmer.getSlimmedTermsMap().size(), is(6));
+        assertThat(termSlimmer.findSlims(CELL_PART), contains(CELL_PART));
+        assertThat(termSlimmer.findSlims(MEMBRANE_PART), contains(MEMBRANE_PART));
+        assertThat(termSlimmer.findSlims(CELL_PERIPHERY), contains(CELL_PART));
+        assertThat(termSlimmer.findSlims(PLASMA_MEMBRANE), contains(CELL_PART));
         assertThat(termSlimmer.findSlims(PLASMA_MEMBRANE_PART), contains(CELL_PART, MEMBRANE_PART));
         assertThat(termSlimmer.findSlims(LATERAL_PLASMA_MEMBRANE), contains(CELL_PART, MEMBRANE_PART));
     }
@@ -107,8 +127,13 @@ public class TermSlimmerTest {
     public void slimmedTermsAreHidden() {
         List<String> slimSetVertices = asList(CELL_PART, MEMBRANE_PART, PLASMA_MEMBRANE_PART);
         TermSlimmer termSlimmer = TermSlimmer.createSlims(OntologyType.GO, ontology, slimSetVertices);
-        assertThat(termSlimmer.findSlims(LATERAL_PLASMA_MEMBRANE), contains(PLASMA_MEMBRANE_PART));
+        assertThat(termSlimmer.getSlimmedTermsMap().size(), is(6));
+        assertThat(termSlimmer.findSlims(CELL_PART), contains(CELL_PART));
+        assertThat(termSlimmer.findSlims(MEMBRANE_PART), contains(MEMBRANE_PART));
+        assertThat(termSlimmer.findSlims(CELL_PERIPHERY), contains(CELL_PART));
+        assertThat(termSlimmer.findSlims(PLASMA_MEMBRANE), contains(CELL_PART));
         assertThat(termSlimmer.findSlims(PLASMA_MEMBRANE_PART), contains(PLASMA_MEMBRANE_PART));
+        assertThat(termSlimmer.findSlims(LATERAL_PLASMA_MEMBRANE), contains(PLASMA_MEMBRANE_PART));
     }
 
     @Test
