@@ -279,23 +279,14 @@ public class AnnotationController {
     public ResponseEntity<ResponseBodyEmitter> downloadStats(@Valid @ModelAttribute AnnotationRequest request,
             BindingResult bindingResult, @RequestHeader(ACCEPT) MediaType mediaTypeAcceptHeader) throws IOException {
         checkBindingErrors(bindingResult);
-        QueryResult<StatisticsGroup> stats = statsService.calculateDownload(request);
-        addGoNamesToGoIdStatisticsValues(stats);
-        addTaxonNamesToStatisticsValues(stats);
-
-        //Send
         ResponseBodyEmitter emitter = new ResponseBodyEmitter();
 
-        try {
-            emitter.send(stats, mediaTypeAcceptHeader);
-        } catch (IOException e) {
-            LOGGER.error("Failed to stream annotation results", e);
-            emitter.completeWithError(e);
-        }
-
-        emitter.complete();
-        LOGGER.info("Emitted response stream -- which will be written by the HTTP message converter for: " +
-                            mediaTypeAcceptHeader);
+        taskExecutor.execute(() -> {
+            QueryResult<StatisticsGroup> stats = statsService.calculateDownload(request);
+            addGoNamesToGoIdStatisticsValues(stats);
+            addTaxonNamesToStatisticsValues(stats);
+            emitStatisticsDownloadWithMediaType(emitter, stats, mediaTypeAcceptHeader);
+        });
 
         return ResponseEntity.ok()
                              .headers(addHttpFileAttachmentHeader(mediaTypeAcceptHeader,
@@ -496,7 +487,21 @@ public class AnnotationController {
         LOGGER.info("Emitted response stream -- which will be written by the HTTP message converter for: " + mediaType);
     }
 
+    private void emitStatisticsDownloadWithMediaType(ResponseBodyEmitter emitter, QueryResult<StatisticsGroup> stats,
+            @RequestHeader(ACCEPT) MediaType mediaTypeAcceptHeader) {
+        try {
+            emitter.send(stats, mediaTypeAcceptHeader);
+        } catch (IOException e) {
+            LOGGER.error("Failed to stream annotation results", e);
+            emitter.completeWithError(e);
+        }
+
+        emitter.complete();
+        LOGGER.info("Emitted response stream -- which will be written by the HTTP message converter for: " +
+                            mediaTypeAcceptHeader);
+    }
     private interface FilterQueryInfo {
+
         Set<QuickGOQuery> getFilterQueries();
 
         FilterContext getFilterContext();
