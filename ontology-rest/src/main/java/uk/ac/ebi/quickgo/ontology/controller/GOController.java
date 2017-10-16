@@ -12,6 +12,7 @@ import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.ontology.model.SlimTerm;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;
 import uk.ac.ebi.quickgo.ontology.service.search.SearchServiceConfig;
+import uk.ac.ebi.quickgo.rest.ParameterException;
 import uk.ac.ebi.quickgo.rest.headers.HttpHeadersProvider;
 import uk.ac.ebi.quickgo.rest.metadata.MetaData;
 import uk.ac.ebi.quickgo.rest.metadata.MetaDataProvider;
@@ -49,17 +50,19 @@ import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.DEFAULT_SLIM
 @EnableConfigurationProperties(OntologyRestProperties.class)
 public class GOController extends OBOController<GOTerm> {
 
+    static final String MISSING_SLIM_SET_ERROR_MESSAGE =
+            "Please enter slim-set request parameter: 'ids=<GO_TERM>'";
     private final MetaDataProvider metaDataProvider;
 
     @Autowired
     public GOController(OntologyService<GOTerm> goOntologyService,
-                        SearchService<OBOTerm> ontologySearchService,
-                        SearchableField searchableField,
-                        SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig,
-                        GraphImageService graphImageService,
-                        OBOControllerValidationHelper goValidationHelper,
-                        OntologyRestConfig.OntologyPagingConfig ontologyPagingConfig,
-                        MetaDataProvider metaDataProvider,
+            SearchService<OBOTerm> ontologySearchService,
+            SearchableField searchableField,
+            SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig,
+            GraphImageService graphImageService,
+            OBOControllerValidationHelper goValidationHelper,
+            OntologyRestConfig.OntologyPagingConfig ontologyPagingConfig,
+            MetaDataProvider metaDataProvider,
             HttpHeadersProvider httpHeadersProvider) {
         super(goOntologyService, ontologySearchService, searchableField, ontologyRetrievalConfig, graphImageService,
                 goValidationHelper, ontologyPagingConfig, OntologyType.GO, httpHeadersProvider);
@@ -92,11 +95,19 @@ public class GOController extends OBOController<GOTerm> {
             .APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<SlimTerm>> findSlims(
             @ApiParam(value = "Comma-separated term IDs forming the 'slim-set'", required = true)
-            @RequestParam(value = "ids") String ids,
+            @RequestParam(value = "ids", required = false) String ids,
             @ApiParam(value = "The relationships over which the slimming information is computed")
             @RequestParam(value = "relations", defaultValue = DEFAULT_SLIM_TRAVERSAL_TYPES_CSV) String relations) {
+
+        checkSlimSetIsSet(ids);
         return getResultsResponse(ontologyService.findSlimmedInfoForSlimmedTerms(
                 validationHelper.validateCSVIds(ids),
                 asOntologyRelationTypeArray(validationHelper.validateRelationTypes(relations))));
+    }
+
+    private void checkSlimSetIsSet(String ids) {
+        if (ids == null || ids.isEmpty()) {
+            throw new ParameterException(MISSING_SLIM_SET_ERROR_MESSAGE);
+        }
     }
 }

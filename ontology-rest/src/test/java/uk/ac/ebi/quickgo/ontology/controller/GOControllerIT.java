@@ -25,6 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.ac.ebi.quickgo.common.converter.HelpfulConverter.toCSV;
+import static uk.ac.ebi.quickgo.ontology.controller.GOController.MISSING_SLIM_SET_ERROR_MESSAGE;
 import static uk.ac.ebi.quickgo.ontology.controller.OBOController.COMPLETE_SUB_RESOURCE;
 import static uk.ac.ebi.quickgo.ontology.controller.OBOController.CONSTRAINTS_SUB_RESOURCE;
 
@@ -107,6 +108,7 @@ public class GOControllerIT extends OBOControllerIT {
         final String expectedVersion = "http://purl.obolibrary.org/obo/go/releases/2017-01-12/go.owl";
         final String expectedTimestamp = "2017-01-13 02:19";
         response.andDo(print())
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.go.version").value(expectedVersion))
                 .andExpect(jsonPath("$.go.timestamp").value(expectedTimestamp));
     }
@@ -118,6 +120,7 @@ public class GOControllerIT extends OBOControllerIT {
                 .param(SLIM_IDS_PARAM, GO_SLIM1));
 
         response.andDo(print())
+                .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.numberOfHits").value(1))
                 .andExpect(jsonPath("$.results.*.id", contains(GO_SLIM_CHILD1)));
@@ -129,6 +132,7 @@ public class GOControllerIT extends OBOControllerIT {
                 .param(SLIM_IDS_PARAM, GO_SLIM2));
 
         response.andDo(print())
+                .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.numberOfHits").value(1))
                 .andExpect(jsonPath("$.results.*.id", contains(GO_SLIM_CHILD2)));
@@ -137,6 +141,7 @@ public class GOControllerIT extends OBOControllerIT {
                 .param(SLIM_IDS_PARAM, GO_SLIM3));
 
         response.andDo(print())
+                .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.numberOfHits").value(1))
                 .andExpect(jsonPath("$.results.*.id", contains(GO_SLIM_CHILD2)));
@@ -148,6 +153,7 @@ public class GOControllerIT extends OBOControllerIT {
                 .param(SLIM_IDS_PARAM, GO_SLIM4));
 
         response.andDo(print())
+                .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.numberOfHits").value(2))
                 .andExpect(jsonPath("$.results.*.id", containsInAnyOrder(GO_SLIM_CHILD3, GO_SLIM_CHILD4)));
@@ -159,9 +165,19 @@ public class GOControllerIT extends OBOControllerIT {
                 .param(SLIM_IDS_PARAM, toCSV(GO_SLIM5, GO_SLIM6)));
 
         response.andDo(print())
+                .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.numberOfHits").value(2))
                 .andExpect(jsonPath("$.results.*.id", containsInAnyOrder(GO_SLIM_CHILD5, GO_SLIM_CHILD6)));
+    }
+
+    @Test
+    public void slimmingWithEmptyIDsCausesCauses400() throws Exception {
+        ResultActions response = mockMvc.perform(get(getSlimURL())
+                .param(SLIM_IDS_PARAM, ""));
+
+        expectChartCreationError(response, MISSING_SLIM_SET_ERROR_MESSAGE)
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -171,7 +187,8 @@ public class GOControllerIT extends OBOControllerIT {
                 .param(SLIM_IDS_PARAM, GO_SLIM1)
                 .param(SLIM_RELATIONS_PARAM, invalidRelation));
 
-        expectInvalidRelationError(response, invalidRelation);
+        expectInvalidRelationError(response, invalidRelation)
+            .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -182,6 +199,7 @@ public class GOControllerIT extends OBOControllerIT {
                 .param(SLIM_RELATIONS_PARAM, nonExistentGraphRelationship));
 
         response.andDo(print())
+                .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.numberOfHits").value(0));
     }
