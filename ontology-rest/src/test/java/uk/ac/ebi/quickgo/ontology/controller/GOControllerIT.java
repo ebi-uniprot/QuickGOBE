@@ -42,9 +42,6 @@ public class GOControllerIT extends OBOControllerIT {
     private static final String GO_0000002 = "GO:0000002";
     private static final String GO_0000003 = "GO:0000003";
     private static final String GO_0000004 = "GO:0000004";
-    private static final String GO_0000005 = "GO:0000005";
-    private static final String GO_0000006 = "GO:0000006";
-
 
     private static final String GO_SLIM_CHILD1 = "GO:9000001";
     private static final String GO_SLIM_CHILD2 = "GO:9000002";
@@ -68,33 +65,7 @@ public class GOControllerIT extends OBOControllerIT {
 
     @Before
     public void setUp() {
-        List<OntologyRelationship> relationships = new ArrayList<>();
-
-        relationships.add(createSlimRelationship(GO_SLIM_CHILD1, GO_SLIM1));
-        relationships.add(createSlimRelationship(GO_SLIM_CHILD2, GO_SLIM2));
-        relationships.add(createSlimRelationship(GO_SLIM_CHILD2, GO_SLIM3));
-        relationships.add(createSlimRelationship(GO_SLIM_CHILD3, GO_SLIM4));
-        relationships.add(createSlimRelationship(GO_SLIM_CHILD4, GO_SLIM4));
-        relationships.add(createSlimRelationship(GO_SLIM_CHILD5, GO_SLIM5));
-        relationships.add(createSlimRelationship(GO_SLIM_CHILD5, GO_SLIM6));
-        relationships.add(createSlimRelationship(GO_SLIM_CHILD6, GO_SLIM5));
-        relationships.add(createSlimRelationship(GO_SLIM_CHILD6, GO_SLIM6));
-
-        relationships.add(createSlimRelationship(GO_SLIM1, STOP_NODE));
-        relationships.add(createSlimRelationship(GO_SLIM2, STOP_NODE));
-        relationships.add(createSlimRelationship(GO_SLIM3, STOP_NODE));
-        relationships.add(createSlimRelationship(GO_SLIM4, STOP_NODE));
-        relationships.add(createSlimRelationship(GO_SLIM4, STOP_NODE));
-        relationships.add(createSlimRelationship(GO_SLIM5, STOP_NODE));
-        relationships.add(createSlimRelationship(GO_SLIM6, STOP_NODE));
-        relationships.add(createSlimRelationship(GO_SLIM6, STOP_NODE));
-        relationships.add(createSlimRelationship(GO_SLIM7, STOP_NODE));
-
-        ontologyGraph.addRelationships(relationships);
-    }
-
-    private OntologyRelationship createSlimRelationship(String term, String slimmedUpTerm) {
-        return new OntologyRelationship(term, slimmedUpTerm, OntologyRelationType.IS_A);
+        setupOntologyForSimTests();
     }
 
     // GO specific data  ------------------
@@ -215,31 +186,13 @@ public class GOControllerIT extends OBOControllerIT {
                 .andExpect(jsonPath("$.numberOfHits").value(0));
     }
 
-    /*
-     * GO produces two more attributes in its response (aspect and usage), when compared
-     * to the standard OBO response.
-     */
     @Override
-    protected ResultActions expectCoreFields(ResultActions result, String id) throws Exception {
-        return super
-                .expectCoreFields(result, id)
-                .andExpect(jsonPath("$.aspect").value("Biological Process"))
-                .andExpect(jsonPath("$.usage").value("Unrestricted"));
+    protected String getResourceURL() {
+        return RESOURCE_URL;
     }
 
     @Override protected OntologyDocument createBasicDoc(String id, String name) {
         return OntologyDocMocker.createGODoc(id, name);
-    }
-
-    @Override protected List<OntologyDocument> createNDocs(int n) {
-        return IntStream.range(1, n + 1)
-                .mapToObj(i -> OntologyDocMocker.createGODoc(createId(i), "go doc name " + i)).collect
-                        (Collectors.toList());
-    }
-
-    @Override
-    protected String createId(int idNum) {
-        return String.format("GO:%07d", idNum);
     }
 
     @Override
@@ -249,6 +202,12 @@ public class GOControllerIT extends OBOControllerIT {
                 OntologyDocMocker.createGODoc(GO_0000002, "doc name 2"),
                 OntologyDocMocker.createGODoc(GO_0000003, "doc name 3"),
                 OntologyDocMocker.createGODoc(GO_0000004, "doc name 4"));
+    }
+
+    @Override protected List<OntologyDocument> createNDocs(int n) {
+        return IntStream.range(1, n + 1)
+                .mapToObj(i -> OntologyDocMocker.createGODoc(createId(i), "go doc name " + i)).collect
+                        (Collectors.toList());
     }
 
     @Override
@@ -262,8 +221,52 @@ public class GOControllerIT extends OBOControllerIT {
     }
 
     @Override
-    protected String getResourceURL() {
-        return RESOURCE_URL;
+    protected String createId(int idNum) {
+        return String.format("GO:%07d", idNum);
+    }
+
+    /*
+     * GO produces two more attributes in its response (aspect and usage), when compared
+     * to the standard OBO response.
+     */
+    @Override
+    protected ResultActions expectCoreFields(ResultActions result, String id) throws Exception {
+        return super
+                .expectCoreFields(result, id)
+                .andExpect(jsonPath("$.aspect").value("Biological Process"))
+                .andExpect(jsonPath("$.usage").value("Unrestricted"));
+    }
+
+    /**
+     * Adds to the gene ontology graph several GO term relationships that are used in testing the
+     * behaviour of the slimming resource.
+     */
+    private void setupOntologyForSimTests() {
+        List<OntologyRelationship> relationships = new ArrayList<>();
+
+        relationships.add(createSlimRelationship(GO_SLIM_CHILD1, GO_SLIM1));
+        relationships.add(createSlimRelationship(GO_SLIM_CHILD2, GO_SLIM2));
+        relationships.add(createSlimRelationship(GO_SLIM_CHILD2, GO_SLIM3));
+        relationships.add(createSlimRelationship(GO_SLIM_CHILD3, GO_SLIM4));
+        relationships.add(createSlimRelationship(GO_SLIM_CHILD4, GO_SLIM4));
+        relationships.add(createSlimRelationship(GO_SLIM_CHILD5, GO_SLIM5));
+        relationships.add(createSlimRelationship(GO_SLIM_CHILD5, GO_SLIM6));
+        relationships.add(createSlimRelationship(GO_SLIM_CHILD6, GO_SLIM5));
+        relationships.add(createSlimRelationship(GO_SLIM_CHILD6, GO_SLIM6));
+
+        relationships.add(createSlimRelationship(GO_SLIM1, STOP_NODE));
+        relationships.add(createSlimRelationship(GO_SLIM2, STOP_NODE));
+        relationships.add(createSlimRelationship(GO_SLIM3, STOP_NODE));
+        relationships.add(createSlimRelationship(GO_SLIM4, STOP_NODE));
+        relationships.add(createSlimRelationship(GO_SLIM5, STOP_NODE));
+        relationships.add(createSlimRelationship(GO_SLIM6, STOP_NODE));
+        relationships.add(createSlimRelationship(GO_SLIM7, STOP_NODE));
+
+        ontologyGraph.addRelationships(relationships);
+    }
+
+    private OntologyRelationship createSlimRelationship(String term, String slimmedUpTerm) {
+        return new OntologyRelationship(term, slimmedUpTerm, OntologyRelationType.IS_A);
     }
 
     private String getSlimURL() {
