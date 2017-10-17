@@ -506,7 +506,7 @@ public abstract class OBOController<T extends OBOTerm> {
         InputStream is;
         if (base64) {
             ImageIO.write(renderedImage, PNG, Base64.getMimeEncoder().wrap(os));
-            is = new ByteArrayInputStream(Base64.getMimeEncoder().encode(os.toByteArray()));
+            is = new ByteArrayInputStream(os.toByteArray());
 
             return responseBodyBuilder
                     .contentLength(os.size())
