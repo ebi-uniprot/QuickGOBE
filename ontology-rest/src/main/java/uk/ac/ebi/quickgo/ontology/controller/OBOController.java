@@ -45,6 +45,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static org.apache.http.HttpHeaders.CONTENT_ENCODING;
 import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.DEFAULT_TRAVERSAL_TYPES_CSV;
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.and;
 
@@ -70,14 +71,13 @@ public abstract class OBOController<T extends OBOTerm> {
     static final String PATHS_SUB_RESOURCE = "paths";
     static final String CHART_SUB_RESOURCE = "chart";
     static final String CHART_COORDINATES_SUB_RESOURCE = CHART_SUB_RESOURCE + "/coords";
+    static final String BASE_64_CONTENT_ENCODING = "base64";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OBOController.class);
     private static final String COLON = ":";
     private static final String DEFAULT_ENTRIES_PER_PAGE = "25";
     private static final String DEFAULT_PAGE_NUMBER = "1";
     private static final String PNG = "png";
-    private static final String CONTENT_ENCODING = "Content-Encoding";
-    private static final String BASE_64_CONTENT_ENCODING = "base64";
 
     private final OntologyService<T> ontologyService;
     private final SearchService<OBOTerm> ontologySearchService;
@@ -405,8 +405,8 @@ public abstract class OBOController<T extends OBOTerm> {
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.IMAGE_PNG_VALUE})
     public ResponseEntity<InputStreamResource> getChart(
             @ApiParam(value = "Comma-separated term IDs", required = true) @PathVariable(value = "ids") String ids,
-            @ApiParam(value = "Whether or not to encode the image as base64", defaultValue = "true") @RequestParam
-                    (value = "base64", defaultValue = "true", required = false) boolean base64) {
+            @ApiParam(value = "Whether or not to encode the image as base64", defaultValue = "false")
+            @RequestParam(value = "base64", defaultValue = "false", required = false) boolean base64) {
         try {
             return createChartResponseEntity(validationHelper.validateCSVIds(ids), base64);
         } catch (IOException | RenderingGraphException e) {

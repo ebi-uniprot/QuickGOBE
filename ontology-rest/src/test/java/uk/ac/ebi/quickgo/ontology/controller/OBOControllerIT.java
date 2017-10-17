@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+
 import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 import uk.ac.ebi.quickgo.graphics.model.GraphImageLayout;
 import uk.ac.ebi.quickgo.graphics.ontology.GraphImage;
@@ -36,6 +37,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static java.util.Collections.singletonList;
+import static org.apache.http.HttpHeaders.CONTENT_TYPE;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -67,6 +69,7 @@ public abstract class OBOControllerIT {
     private static final String PAGE_PARAM = "page";
     private static final String LIMIT_PARAM = "limit";
     private static final String RELATIONS_PARAM = "relations";
+    private static final String BASE64_PARAM = "base64";
 
     private static final int RELATIONSHIP_CHAIN_LENGTH = 10;
     public static final int WAIT_PERIOD = 10;
@@ -107,7 +110,7 @@ public abstract class OBOControllerIT {
     @Before
     public void setup() {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
-                                 .build();
+                .build();
 
         resourceUrl = getResourceURL();
 
@@ -240,7 +243,8 @@ public abstract class OBOControllerIT {
 
     @Test
     public void canRetrieveCompleteByTwoIds() throws Exception {
-        ResultActions response = mockMvc.perform(get(buildTermsURLWithSubResource(validIdsShortCSV, COMPLETE_SUB_RESOURCE)));
+        ResultActions response =
+                mockMvc.perform(get(buildTermsURLWithSubResource(validIdsShortCSV, COMPLETE_SUB_RESOURCE)));
 
         expectCompleteFieldsInResults(response, validIdShortList)
                 .andExpect(jsonPath("$.results.*.history", hasSize(2)))
@@ -260,7 +264,8 @@ public abstract class OBOControllerIT {
 
     @Test
     public void canRetrieveHistoryByTwoIds() throws Exception {
-        ResultActions response = mockMvc.perform(get(buildTermsURLWithSubResource(validIdsShortCSV, HISTORY_SUB_RESOURCE)));
+        ResultActions response =
+                mockMvc.perform(get(buildTermsURLWithSubResource(validIdsShortCSV, HISTORY_SUB_RESOURCE)));
 
         expectBasicFieldsInResults(response, validIdShortList)
                 .andExpect(jsonPath("$.results.*.history", hasSize(2)))
@@ -280,7 +285,8 @@ public abstract class OBOControllerIT {
 
     @Test
     public void canRetrieveXRefsByTwoIds() throws Exception {
-        ResultActions response = mockMvc.perform(get(buildTermsURLWithSubResource(validIdsShortCSV, XREFS_SUB_RESOURCE)));
+        ResultActions response =
+                mockMvc.perform(get(buildTermsURLWithSubResource(validIdsShortCSV, XREFS_SUB_RESOURCE)));
 
         expectBasicFieldsInResults(response, validIdShortList)
                 .andExpect(jsonPath("$.results.*.xRefs", hasSize(2)))
@@ -354,29 +360,29 @@ public abstract class OBOControllerIT {
     @Test
     public void finds400IfUrlIsEmpty() throws Exception {
         mockMvc.perform(get(resourceUrl + "/"))
-               .andDo(print())
-               .andExpect(status().isBadRequest());
+                .andDo(print())
+                .andExpect(status().isBadRequest());
     }
 
     @Test
     public void finds400IfUrlIsJustWrong() throws Exception {
         mockMvc.perform(get(resourceUrl + "/thisIsAnEndPointThatDoesNotExist"))
-               .andDo(print())
-               .andExpect(status().isBadRequest());
+                .andDo(print())
+                .andExpect(status().isBadRequest());
     }
 
     @Test
     public void finds200IfNoResultsBecauseIdsDoNotExist() throws Exception {
         mockMvc.perform(get(buildTermsURL(idMissingInRepository())))
-               .andDo(print())
-               .andExpect(status().isOk());
+                .andDo(print())
+                .andExpect(status().isOk());
     }
 
     @Test
     public void finds400OnInvalidId() throws Exception {
         ResultActions response = mockMvc.perform(get(buildTermsURL(invalidId())))
-                                        .andDo(print())
-                                        .andExpect(status().isBadRequest());
+                .andDo(print())
+                .andExpect(status().isBadRequest());
 
         expectInvalidIdError(response, invalidId());
     }
@@ -435,8 +441,8 @@ public abstract class OBOControllerIT {
         mockMvc.perform(
                 get(buildTermsURL())
                         .param(PAGE_PARAM, "-1"))
-               .andDo(print())
-               .andExpect(status().isBadRequest());
+                .andDo(print())
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -449,8 +455,8 @@ public abstract class OBOControllerIT {
         mockMvc.perform(
                 get(buildTermsURL())
                         .param(PAGE_PARAM, String.valueOf(existingPages + 1)))
-               .andDo(print())
-               .andExpect(status().isBadRequest());
+                .andDo(print())
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -540,8 +546,8 @@ public abstract class OBOControllerIT {
         ontologyRepository.deleteAll();
         List<OntologyDocument> nDocs = createAndSaveDocs(maxPageSize);
         List<String> ids = nDocs.stream()
-                                .map(doc -> doc.id)
-                                .collect(Collectors.toList());
+                .map(doc -> doc.id)
+                .collect(Collectors.toList());
         ResultActions response = mockMvc.perform(get(buildTermsURL(ids)));
         expectBasicFieldsInResults(response, ids)
                 .andDo(print())
@@ -550,14 +556,13 @@ public abstract class OBOControllerIT {
                 .andExpect(jsonPath("$.results", hasSize(maxPageSize)));
     }
 
-
     @Test
     public void numberOfTermsRequestedGreaterThanTermLimitReturns400() throws Exception {
         ontologyRepository.deleteAll();
-        List<OntologyDocument> nDocs = createAndSaveDocs(maxPageSize+1);
+        List<OntologyDocument> nDocs = createAndSaveDocs(maxPageSize + 1);
         List<String> ids = nDocs.stream()
-                                .map(doc -> doc.id)
-                                .collect(Collectors.toList());
+                .map(doc -> doc.id)
+                .collect(Collectors.toList());
         ResultActions response = mockMvc.perform(get(buildTermsURL(ids)));
         response.andExpect(status().isBadRequest());
     }
@@ -786,13 +791,50 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canLoadChartIfSourcesWereLoaded() throws Exception {
+    public void canLoadDefaultChartImageIfSourcesWereLoaded() throws Exception {
         requestToChartServiceReturnsValidImage();
 
         ResultActions response = mockMvc.perform(
                 get(buildTermsURLWithSubResource(validId, CHART_SUB_RESOURCE)));
 
-        response.andExpect(status().isOk());
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.IMAGE_PNG_VALUE))
+                .andExpect(header().doesNotExist(HttpHeaders.CONTENT_ENCODING));
+
+        MvcResult result = response.andReturn();
+        assertThat(result.getResponse().getContentLength(), is(greaterThan(0)));
+    }
+
+    @Test
+    public void canLoadChartImageIfSourcesWereLoaded() throws Exception {
+        requestToChartServiceReturnsValidImage();
+
+        ResultActions response = mockMvc.perform(
+                get(buildTermsURLWithSubResource(validId, CHART_SUB_RESOURCE))
+                        .param(BASE64_PARAM, "false"));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.IMAGE_PNG_VALUE))
+                .andExpect(header().doesNotExist(HttpHeaders.CONTENT_ENCODING));
+
+        MvcResult result = response.andReturn();
+        assertThat(result.getResponse().getContentLength(), is(greaterThan(0)));
+    }
+
+    @Test
+    public void canLoadBase64EncodedChartIfSourcesWereLoaded() throws Exception {
+        requestToChartServiceReturnsValidImage();
+
+        ResultActions response = mockMvc.perform(
+                get(buildTermsURLWithSubResource(validId, CHART_SUB_RESOURCE))
+                        .param("base64", "true"));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.IMAGE_PNG_VALUE))
+                .andExpect(header().string(HttpHeaders.CONTENT_ENCODING, BASE_64_CONTENT_ENCODING));
 
         MvcResult result = response.andReturn();
         assertThat(result.getResponse().getContentLength(), is(greaterThan(0)));
@@ -860,7 +902,6 @@ public abstract class OBOControllerIT {
 
         expectInvalidIdError(response, invalidId());
     }
-
 
     //-----------------------  Check Http Header for Cache-Control content ------------------------------------------
 
