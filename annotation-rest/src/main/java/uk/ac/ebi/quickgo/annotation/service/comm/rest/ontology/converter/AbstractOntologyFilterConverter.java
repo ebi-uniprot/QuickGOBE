@@ -1,18 +1,20 @@
 package uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter;
 
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.OntologyRelatives;
-import uk.ac.ebi.quickgo.common.validator.OntologyIdPredicate;
 import uk.ac.ebi.quickgo.rest.search.RetrievalException;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
 import uk.ac.ebi.quickgo.rest.search.request.converter.FilterConverter;
 
+import com.google.common.base.Strings;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.StringJoiner;
 
 import static java.util.Objects.nonNull;
 import static uk.ac.ebi.quickgo.annotation.common.AnnotationFields.Searchable;
+import static uk.ac.ebi.quickgo.common.validator.OntologyIdPredicate.isValidECOTermId;
+import static uk.ac.ebi.quickgo.common.validator.OntologyIdPredicate.isValidGOTermId;
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.not;
 
 /**
@@ -31,11 +33,13 @@ abstract class AbstractOntologyFilterConverter
     private static final String DELIMITER = ", ";
     private static final String UNKNOWN_ID_FORMAT =
             "Unknown ID encountered: %s. Expected either GO/ECO term.";
+    private final StringJoiner idsWithNoRelatives;
 
     private ConvertedFilter<QuickGOQuery> convertedFilter;
 
     AbstractOntologyFilterConverter() {
         convertedFilter = FILTER_EVERYTHING;
+        idsWithNoRelatives = new StringJoiner(DELIMITER);
     }
 
     /**
@@ -49,8 +53,6 @@ abstract class AbstractOntologyFilterConverter
      * @return a {@link ConvertedFilter} over {@link QuickGOQuery} instances
      */
     @Override public ConvertedFilter<QuickGOQuery> transform(OntologyRelatives response) {
-        StringJoiner idsWithNoRelatives = new StringJoiner(DELIMITER);
-
         if (nonNull(response.getResults())) {
             Set<QuickGOQuery> queries = new HashSet<>();
 
@@ -58,7 +60,7 @@ abstract class AbstractOntologyFilterConverter
                 if (validResult(result)) {
                     processResult(result, queries);
                 } else {
-                    addToJoiner(idsWithNoRelatives, result.getId());
+                    addIdWithNoRelative(result.getId());
                 }
             }
 
@@ -78,6 +80,12 @@ abstract class AbstractOntologyFilterConverter
      */
     protected abstract boolean validResult(OntologyRelatives.Result result);
 
+    /**
+     * The implementation of how to process a {@link OntologyRelatives.Result} and insert corresponding
+     * {@link QuickGOQuery}s into an existing set of {@link QuickGOQuery}s.
+     * @param result the result to process
+     * @param queries the queries to to update
+     */
     protected abstract void processResult(OntologyRelatives.Result result, Set<QuickGOQuery> queries);
 
     /**
@@ -86,6 +94,23 @@ abstract class AbstractOntologyFilterConverter
      * @return the {@link ConvertedFilter} over {@link QuickGOQuery} instances.
      */
     protected abstract ConvertedFilter<QuickGOQuery> createFilter(Set<QuickGOQuery> queries);
+
+    /**
+     * Creates a {@link QuickGOQuery} based on a supplied ontology id.
+     * @param id the identifier of the ontology for which to create a {@link QuickGOQuery}
+     * @return the {@link QuickGOQuery} corresponding to the supplied ontology id
+     */
+    protected QuickGOQuery createQueryForOntologyId(String id) {
+        String field;
+        if (isValidGOTermId().test(id)) {
+            return QuickGOQuery.createQuery(Searchable.GO_ID, id);
+        } else if (isValidECOTermId().test(id)) {
+            field = Searchable.EVIDENCE_CODE;
+            return QuickGOQuery.createQuery(field, id);
+        } else {
+            throw new RetrievalException(String.format(UNKNOWN_ID_FORMAT, id));
+        }
+    }
 
     /**
      * Checks whether the {@code invalidIds} has recorded any IDs.
@@ -99,42 +124,14 @@ abstract class AbstractOntologyFilterConverter
                     String.format(ERROR_MESSAGE_ON_INVALID_IDS, invalidIds.toString()));
         }
     }
-
+    
     /**
-     * Adds a value to a {@link StringJoiner} if the value is not null or empty
-     * @param joiner the joiner to add to
-     * @param value the value to add
+     * Capture an additional ID that has no relative.
+     * @param id the value to add
      */
-    private static void addToJoiner(StringJoiner joiner, String value) {
-        if (notNullOrEmpty(value)) {
-            joiner.add(value);
+    private void addIdWithNoRelative(String id) {
+        if (!Strings.isNullOrEmpty(id)) {
+            idsWithNoRelatives.add(id);
         }
-    }
-
-    /**
-     * Checks whether a value is not null or empty
-     * @param value the value to check
-     * @return whether the value is not null or empty
-     */
-    static boolean notNullOrEmpty(String value) {
-        return value != null && !value.trim().isEmpty();
-    }
-
-    /**
-     * Creates a {@link QuickGOQuery} based on a supplied ontology id.
-     * @param id the identifier of the ontology for which to create a {@link QuickGOQuery}
-     * @return the {@link QuickGOQuery} corresponding to the supplied ontology id
-     */
-    static QuickGOQuery createQueryForOntologyId(String id) {
-        String field;
-        if (OntologyIdPredicate.isValidGOTermId().test(id)) {
-            field = Searchable.GO_ID;
-        } else if (OntologyIdPredicate.isValidECOTermId().test(id)) {
-            field = Searchable.EVIDENCE_CODE;
-        } else {
-            throw new RetrievalException(String.format(UNKNOWN_ID_FORMAT, id));
-        }
-
-        return QuickGOQuery.createQuery(field, id);
     }
 }

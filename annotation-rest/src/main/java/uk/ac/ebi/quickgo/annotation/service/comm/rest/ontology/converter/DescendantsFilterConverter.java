@@ -4,6 +4,7 @@ import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.OntologyRel
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
 
+import com.google.common.base.Strings;
 import java.util.Set;
 
 import static java.util.Objects.nonNull;
@@ -24,7 +25,7 @@ public class DescendantsFilterConverter extends AbstractOntologyFilterConverter 
 
     @Override protected void processResult(OntologyRelatives.Result result, Set<QuickGOQuery> queries) {
         result.getDescendants().stream()
-                .filter(AbstractOntologyFilterConverter::notNullOrEmpty)
+                .filter(desc -> !Strings.isNullOrEmpty(desc))
                 .forEach(desc -> queries.add(createQueryForOntologyId(desc)));
     }
 

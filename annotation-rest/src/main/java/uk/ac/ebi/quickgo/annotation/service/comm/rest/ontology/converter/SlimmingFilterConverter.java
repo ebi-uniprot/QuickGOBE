@@ -5,6 +5,7 @@ import uk.ac.ebi.quickgo.rest.comm.FilterContext;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
 
+import com.google.common.base.Strings;
 import java.util.Set;
 
 import static java.util.Objects.nonNull;
@@ -34,7 +35,7 @@ public class SlimmingFilterConverter extends AbstractOntologyFilterConverter {
     @Override protected void processResult(OntologyRelatives.Result result, Set<QuickGOQuery> queries) {
         queries.add(createQueryForOntologyId(result.getId()));
         result.getSlimsTo().stream()
-                .filter(AbstractOntologyFilterConverter::notNullOrEmpty)
+                .filter(slim -> !Strings.isNullOrEmpty(slim))
                 .forEach(slimId -> conversionInfo.addOriginal2SlimmedGOIdMapping(result.getId(), slimId)
                 );
     }
