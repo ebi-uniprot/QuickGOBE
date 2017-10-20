@@ -36,6 +36,7 @@ import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.numOfResu
 import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.EXCEL_MEDIA_TYPE;
 import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.JSON_MEDIA_TYPE;
 import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.fileExtension;
+
 /**
  * @author Tony Wardell
  * Date: 10/10/2017
@@ -67,21 +68,11 @@ public class AnnotationControllerStatisticsDownloadIT {
         repository.deleteAll();
 
         mockMvc = MockMvcBuilders.
-                                         webAppContextSetup(webApplicationContext)
-                                 .build();
+                webAppContextSetup(webApplicationContext)
+                .build();
 
         List<AnnotationDocument> genericDocs = createDocs(NUMBER_OF_GENERIC_DOCS);
         saveToRepo(genericDocs);
-    }
-
-    @Test
-    public void canDownloadInExcelFormatAfterFailedToLoadGONamesAndTaxonNames() throws Exception {
-        canDownload(EXCEL_MEDIA_TYPE);
-    }
-
-    @Test
-    public void canDownloadWithInJsonFormatAfterFailedToLoadGONamesAndTaxonNames() throws Exception {
-        canDownload(JSON_MEDIA_TYPE,6);
     }
 
     private List<AnnotationDocument> createDocs(int number) {
@@ -92,18 +83,16 @@ public class AnnotationControllerStatisticsDownloadIT {
         repository.save(docsToSave);
     }
 
+    @Test
+    public void canDownloadInExcelFormatAfterFailedToLoadGONamesAndTaxonNames() throws Exception {
+        canDownload(EXCEL_MEDIA_TYPE);
+    }
+
     private void canDownload(MediaType mediaType) throws Exception {
         ResultActions response = mockMvc.perform(
                 get(DOWNLOAD_STATISTICS_SEARCH_URL)
                         .header(ACCEPT, mediaType));
         checkResponse(mediaType, response);
-    }
-
-    private void canDownload(MediaType mediaType, int expectedSize) throws Exception {
-        ResultActions response = mockMvc.perform(
-                get(DOWNLOAD_STATISTICS_SEARCH_URL)
-                        .header(ACCEPT, mediaType));
-        checkResponse(mediaType, response, expectedSize);
     }
 
     private void checkResponse(MediaType mediaType, ResultActions response) throws Exception {
@@ -113,6 +102,18 @@ public class AnnotationControllerStatisticsDownloadIT {
                 .andExpect(header().string(VARY, is(ACCEPT)))
                 .andExpect(header().string(CONTENT_DISPOSITION, endsWith("." + fileExtension(mediaType) + "\"")))
                 .andExpect(content().contentType(mediaType));
+    }
+
+    @Test
+    public void canDownloadWithInJsonFormatAfterFailedToLoadGONamesAndTaxonNames() throws Exception {
+        canDownload(JSON_MEDIA_TYPE, 6);
+    }
+
+    private void canDownload(MediaType mediaType, int expectedSize) throws Exception {
+        ResultActions response = mockMvc.perform(
+                get(DOWNLOAD_STATISTICS_SEARCH_URL)
+                        .header(ACCEPT, mediaType));
+        checkResponse(mediaType, response, expectedSize);
     }
 
     private void checkResponse(MediaType mediaType, ResultActions response, int expectedSize) throws Exception {
