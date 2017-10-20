@@ -420,8 +420,8 @@ public class AnnotationController {
 
         taskExecutor.execute(() -> {
             QueryResult<StatisticsGroup> stats = statsService.calculateDownload(request);
-            addGoNamesToGoIdStatisticsValues(stats);
-            addTaxonNamesToStatisticsValues(stats);
+            addNamesToGoIdStatisticsValues(stats, statisticsFilterContextForGoName(), OntologyNameInjector.GO_ID);
+            addNamesToGoIdStatisticsValues(stats, statisticsFilterContextForTaxonName(), TaxonomyNameInjector.TAXON_ID);
             emitStatisticsDownloadWithMediaType(emitter, stats, mediaTypeAcceptHeader);
         });
 
@@ -431,31 +431,18 @@ public class AnnotationController {
                              .body(emitter);
     }
 
-    private void addGoNamesToGoIdStatisticsValues(QueryResult<StatisticsGroup> stats) {
+    private void addNamesToGoIdStatisticsValues(QueryResult<StatisticsGroup> stats, FilterContext filterContext,
+            String typeName) {
         try {
             stats.getResults()
                  .stream()
                  .flatMap(statisticsGroup -> statisticsGroup.getTypes().stream())
-                 .filter(statisticsByType -> statisticsByType.getType().equals(OntologyNameInjector.GO_ID))
+                 .filter(statisticsByType -> statisticsByType.getType().equals(typeName))
                  .flatMap(statisticsByType -> statisticsByType.getValues().stream())
                  .forEach(statisticsValue ->statisticsTransformerChain.applyTransformations
-                         (statisticsValue, statisticsFilterContextForGoName()));
+                         (statisticsValue, filterContext));
         } catch (Exception e) {
             LOGGER.error("Failed to retrieve GO names for StatisticsDownloadRequest", e);
-        }
-    }
-
-    private void addTaxonNamesToStatisticsValues(QueryResult<StatisticsGroup> stats) {
-        try {
-            stats.getResults()
-                            .stream()
-                            .flatMap(statisticsGroup -> statisticsGroup.getTypes().stream())
-                            .filter(statisticsByType -> statisticsByType.getType().equals(TaxonomyNameInjector.TAXON_ID))
-                            .flatMap(statisticsByType -> statisticsByType.getValues().stream())
-                            .forEach(statisticsValue ->statisticsTransformerChain.applyTransformations
-                                    (statisticsValue, statisticsFilterContextForTaxonName()));
-        } catch (Exception e) {
-            LOGGER.error("Failed to retrieve taxon names for StatisticsDownloadRequest", e);
         }
     }
 
