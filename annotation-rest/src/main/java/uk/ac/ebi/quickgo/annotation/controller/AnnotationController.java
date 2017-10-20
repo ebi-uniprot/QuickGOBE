@@ -182,6 +182,29 @@ public class AnnotationController {
         this.statisticsTransformerChain = statisticsTransformerChain;
     }
 
+    private DefaultSearchQueryTemplate createSearchQueryTemplate(
+            SearchServiceConfig.AnnotationCompositeRetrievalConfig retrievalConfig) {
+        DefaultSearchQueryTemplate template = new DefaultSearchQueryTemplate();
+        template.setReturnedFields(retrievalConfig.getSearchReturnedFields());
+        return template;
+    }
+
+    private DefaultSearchQueryTemplate createDownloadSearchQueryTemplate(
+            SearchServiceConfig.AnnotationCompositeRetrievalConfig retrievalConfig) {
+        DefaultSearchQueryTemplate template = new DefaultSearchQueryTemplate();
+        template.setReturnedFields(retrievalConfig.getSearchReturnedFields());
+        template.setPage(createFirstCursorPage(retrievalConfig.getDownloadPageSize()));
+        retrievalConfig.getDownloadSortCriteria()
+                .forEach(criterion ->
+                        template.addSortCriterion(criterion.getSortField().getField(), criterion.getSortOrder()));
+        return template;
+    }
+
+    private static String formattedDateStringForNow() {
+        LocalDateTime now = LocalDateTime.now();
+        return now.format(DOWNLOAD_FILE_NAME_DATE_FORMATTER);
+    }
+
     /**
      * Search for an Annotations based on their attributes
      * @return a {@link QueryResult} instance containing the results of the search
@@ -209,6 +232,63 @@ public class AnnotationController {
 
         return searchAndTransform(queryRequest, annotationSearchService, resultTransformerChain,
                 filterQueryInfo.getFilterContext());
+    }
+
+    private void checkBindingErrors(BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            throw new ParameterBindingException(bindingResult);
+        }
+    }
+
+    private FilterQueryInfo extractFilterQueryInfo(AnnotationRequest request) {
+        Set<QuickGOQuery> filterQueries = new HashSet<>();
+        Set<FilterContext> filterContexts = new HashSet<>();
+
+        convertFilterRequests(request, filterQueries, filterContexts);
+        convertResultTransformationRequests(request, filterContexts);
+
+        return new FilterQueryInfo() {
+            @Override public Set<QuickGOQuery> getFilterQueries() {
+                return filterQueries;
+            }
+
+            @Override public FilterContext getFilterContext() {
+                return filterContexts.stream().reduce(new FilterContext(), FilterContext::merge);
+            }
+        };
+    }
+
+    /**
+     * Processes the list of {@link FilterRequest}s from the {@link AnnotationRequest} and
+     * adds corresponding {@link QuickGOQuery}s to the {@code filterQueries}, and {@link FilterContext}s
+     * to the {@code filterContext}s.
+     * @param request the annotation request
+     * @param filterQueries the {@link QuickGOQuery} list to append to
+     * @param filterContexts the {@link FilterContext} list to append to
+     */
+    private void convertFilterRequests(AnnotationRequest request, Set<QuickGOQuery> filterQueries,
+            Set<FilterContext> filterContexts) {
+        request.createFilterRequests().stream()
+                .map(converterFactory::convert)
+                .forEach(convertedFilter -> {
+                    filterQueries.add(convertedFilter.getConvertedValue());
+                    convertedFilter.getFilterContext().ifPresent(filterContexts::add);
+                });
+    }
+
+    /**
+     * Processes the {@link ResultTransformationRequests} instance from the {@link AnnotationRequest} and
+     * adds corresponding {@link FilterContext}s to the {@code filterContext}s.
+     * @param request the annotation request
+     * @param filterContexts the {@link FilterContext} list to append to
+     */
+    private void convertResultTransformationRequests( AnnotationRequest request, Set<FilterContext> filterContexts) {
+        ResultTransformationRequests transformationRequests = request.createResultTransformationRequests();
+        if (!transformationRequests.getRequests().isEmpty()) {
+            FilterContext transformationContext = new FilterContext();
+            transformationContext.save(ResultTransformationRequests.class, transformationRequests);
+            filterContexts.add(transformationContext);
+        }
     }
 
     /**
@@ -274,6 +354,63 @@ public class AnnotationController {
                 .body(emitter);
     }
 
+    private List<String> selectedFieldList(AnnotationRequest annotationRequest) {
+        if(annotationRequest.getSelectedFields() != null){
+            return Arrays.stream(annotationRequest.getSelectedFields())
+                         .map(String::toLowerCase)
+                         .collect(toList());
+        }
+        return Collections.emptyList();
+    }
+
+    private HeaderContent buildHeaderContent(HttpServletRequest servletRequest, List<String> selectedFields) {
+        HeaderContent.Builder contentBuilder = new HeaderContent.Builder();
+        return contentBuilder.setIsSlimmed(isSlimmed(servletRequest))
+                             .setUri(HeaderUri.uri(servletRequest))
+                             .setDate(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE))
+                             .setSelectedFields(selectedFields)
+                             .build();
+    }
+
+    private Stream<QueryResult<Annotation>> getQueryResultStream(@Valid @ModelAttribute AnnotationRequest request,
+            FilterQueryInfo filterQueryInfo, QueryRequest queryRequest) {
+        LOGGER.info("Creating stream of search results. With limit " + request.getDownloadLimit());
+        Stream<QueryResult<Annotation>> resultStream = streamSearchResults(queryRequest,
+                            queryTemplate,
+                            annotationSearchService,
+                            resultTransformerChain,
+                            filterQueryInfo.getFilterContext(),
+                            request.getDownloadLimit());
+        LOGGER.info("Finished creating stream of search results.");
+        return resultStream;
+    }
+
+    private void emitDownloadWithMediaType(
+            ResponseBodyEmitter emitter,
+            DownloadContent downloadContent,
+            MediaType mediaType) {
+        try {
+            emitter.send(downloadContent, mediaType);
+        } catch (IOException e) {
+            LOGGER.error("Failed to stream annotation results", e);
+            emitter.completeWithError(e);
+        }
+        emitter.complete();
+        LOGGER.info("Emitted response stream -- which will be written by the HTTP message converter for: " + mediaType);
+    }
+
+    private HttpHeaders addHttpFileAttachmentHeader(MediaType mediaType, Function<MediaType, String> toFileName) {
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentDispositionFormData("attachment", toFileName.apply(mediaType));
+        httpHeaders.setContentType(mediaType);
+        httpHeaders.add(VARY, ACCEPT);
+        return httpHeaders;
+    }
+
+    private boolean isSlimmed(HttpServletRequest servletRequest) {
+        return Objects.nonNull(servletRequest.getQueryString()) && servletRequest.getQueryString().contains(GO_USAGE_SLIM);
+    }
+
     @RequestMapping(value = "/downloadStats", method = {RequestMethod.GET},
             produces = {EXCEL_MEDIA_TYPE_STRING, JSON_MEDIA_TYPE_STRING})
     public ResponseEntity<ResponseBodyEmitter> downloadStats(@Valid @ModelAttribute AnnotationRequest request,
@@ -294,20 +431,6 @@ public class AnnotationController {
                              .body(emitter);
     }
 
-    private void addTaxonNamesToStatisticsValues(QueryResult<StatisticsGroup> stats) {
-        try {
-            stats.getResults()
-                            .stream()
-                            .flatMap(statisticsGroup -> statisticsGroup.getTypes().stream())
-                            .filter(statisticsByType -> statisticsByType.getType().equals(TaxonomyNameInjector.TAXON_ID))
-                            .flatMap(statisticsByType -> statisticsByType.getValues().stream())
-                            .forEach(statisticsValue ->statisticsTransformerChain.applyTransformations
-                                    (statisticsValue, statisticsFilterContextForTaxonName()));
-        } catch (Exception e) {
-            LOGGER.error("Failed to retrieve taxon names for StatisticsDownloadRequest", e);
-        }
-    }
-
     private void addGoNamesToGoIdStatisticsValues(QueryResult<StatisticsGroup> stats) {
         try {
             stats.getResults()
@@ -322,125 +445,32 @@ public class AnnotationController {
         }
     }
 
-    private static String formattedDateStringForNow() {
-        LocalDateTime now = LocalDateTime.now();
-        return now.format(DOWNLOAD_FILE_NAME_DATE_FORMATTER);
-    }
-
-    private HeaderContent buildHeaderContent(HttpServletRequest servletRequest, List<String> selectedFields) {
-        HeaderContent.Builder contentBuilder = new HeaderContent.Builder();
-        return contentBuilder.setIsSlimmed(isSlimmed(servletRequest))
-                             .setUri(HeaderUri.uri(servletRequest))
-                             .setDate(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE))
-                             .setSelectedFields(selectedFields)
-                             .build();
-    }
-
-    private List<String> selectedFieldList(AnnotationRequest annotationRequest) {
-        if(annotationRequest.getSelectedFields() != null){
-            return Arrays.stream(annotationRequest.getSelectedFields())
-                         .map(String::toLowerCase)
-                         .collect(toList());
+    private void addTaxonNamesToStatisticsValues(QueryResult<StatisticsGroup> stats) {
+        try {
+            stats.getResults()
+                            .stream()
+                            .flatMap(statisticsGroup -> statisticsGroup.getTypes().stream())
+                            .filter(statisticsByType -> statisticsByType.getType().equals(TaxonomyNameInjector.TAXON_ID))
+                            .flatMap(statisticsByType -> statisticsByType.getValues().stream())
+                            .forEach(statisticsValue ->statisticsTransformerChain.applyTransformations
+                                    (statisticsValue, statisticsFilterContextForTaxonName()));
+        } catch (Exception e) {
+            LOGGER.error("Failed to retrieve taxon names for StatisticsDownloadRequest", e);
         }
-        return Collections.emptyList();
     }
 
-    private boolean isSlimmed(HttpServletRequest servletRequest) {
-        return Objects.nonNull(servletRequest.getQueryString()) && servletRequest.getQueryString().contains(GO_USAGE_SLIM);
-    }
-
-    private Stream<QueryResult<Annotation>> getQueryResultStream(@Valid @ModelAttribute AnnotationRequest request,
-            FilterQueryInfo filterQueryInfo, QueryRequest queryRequest) {
-        LOGGER.info("Creating stream of search results. With limit " + request.getDownloadLimit());
-        Stream<QueryResult<Annotation>> resultStream = streamSearchResults(queryRequest,
-                            queryTemplate,
-                            annotationSearchService,
-                            resultTransformerChain,
-                            filterQueryInfo.getFilterContext(),
-                            request.getDownloadLimit());
-        LOGGER.info("Finished creating stream of search results.");
-        return resultStream;
-    }
-
-    /**
-     * Get meta data information about the Annotation service
-     *
-     * @return response with metadata information.
-     */
-    @ApiOperation(value = "Get meta data information about the Annotation service",
-            notes = "Annotations creation date.")
-    @RequestMapping(value = "/about", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<MetaData> provideMetaData() {
-        return new ResponseEntity<>(metaDataProvider.lookupMetaData(), HttpStatus.OK);
-    }
-
-    private DefaultSearchQueryTemplate createSearchQueryTemplate(
-            SearchServiceConfig.AnnotationCompositeRetrievalConfig retrievalConfig) {
-        DefaultSearchQueryTemplate template = new DefaultSearchQueryTemplate();
-        template.setReturnedFields(retrievalConfig.getSearchReturnedFields());
-        return template;
-    }
-
-    private DefaultSearchQueryTemplate createDownloadSearchQueryTemplate(
-            SearchServiceConfig.AnnotationCompositeRetrievalConfig retrievalConfig) {
-        DefaultSearchQueryTemplate template = new DefaultSearchQueryTemplate();
-        template.setReturnedFields(retrievalConfig.getSearchReturnedFields());
-        template.setPage(createFirstCursorPage(retrievalConfig.getDownloadPageSize()));
-        retrievalConfig.getDownloadSortCriteria()
-                .forEach(criterion ->
-                        template.addSortCriterion(criterion.getSortField().getField(), criterion.getSortOrder()));
-        return template;
-    }
-
-    private FilterQueryInfo extractFilterQueryInfo(AnnotationRequest request) {
-        Set<QuickGOQuery> filterQueries = new HashSet<>();
-        Set<FilterContext> filterContexts = new HashSet<>();
-
-        convertFilterRequests(request, filterQueries, filterContexts);
-        convertResultTransformationRequests(request, filterContexts);
-
-        return new FilterQueryInfo() {
-            @Override public Set<QuickGOQuery> getFilterQueries() {
-                return filterQueries;
-            }
-
-            @Override public FilterContext getFilterContext() {
-                return filterContexts.stream().reduce(new FilterContext(), FilterContext::merge);
-            }
-        };
-    }
-
-    /**
-     * Processes the list of {@link FilterRequest}s from the {@link AnnotationRequest} and
-     * adds corresponding {@link QuickGOQuery}s to the {@code filterQueries}, and {@link FilterContext}s
-     * to the {@code filterContext}s.
-     * @param request the annotation request
-     * @param filterQueries the {@link QuickGOQuery} list to append to
-     * @param filterContexts the {@link FilterContext} list to append to
-     */
-    private void convertFilterRequests(AnnotationRequest request, Set<QuickGOQuery> filterQueries,
-            Set<FilterContext> filterContexts) {
-        request.createFilterRequests().stream()
-                .map(converterFactory::convert)
-                .forEach(convertedFilter -> {
-                    filterQueries.add(convertedFilter.getConvertedValue());
-                    convertedFilter.getFilterContext().ifPresent(filterContexts::add);
-                });
-    }
-
-    /**
-     * Processes the {@link ResultTransformationRequests} instance from the {@link AnnotationRequest} and
-     * adds corresponding {@link FilterContext}s to the {@code filterContext}s.
-     * @param request the annotation request
-     * @param filterContexts the {@link FilterContext} list to append to
-     */
-    private void convertResultTransformationRequests( AnnotationRequest request, Set<FilterContext> filterContexts) {
-        ResultTransformationRequests transformationRequests = request.createResultTransformationRequests();
-        if (!transformationRequests.getRequests().isEmpty()) {
-            FilterContext transformationContext = new FilterContext();
-            transformationContext.save(ResultTransformationRequests.class, transformationRequests);
-            filterContexts.add(transformationContext);
+    private void emitStatisticsDownloadWithMediaType(ResponseBodyEmitter emitter, QueryResult<StatisticsGroup> stats,
+            @RequestHeader(ACCEPT) MediaType mediaTypeAcceptHeader) {
+        try {
+            emitter.send(stats, mediaTypeAcceptHeader);
+        } catch (IOException e) {
+            LOGGER.error("Failed to stream annotation results", e);
+            emitter.completeWithError(e);
         }
+
+        emitter.complete();
+        LOGGER.info("Emitted response stream -- which will be written by the HTTP message converter for: " +
+                            mediaTypeAcceptHeader);
     }
 
     private static FilterContext statisticsFilterContextForGoName() {
@@ -459,46 +489,16 @@ public class AnnotationController {
         return filterContext;
     }
 
-    private void checkBindingErrors(BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            throw new ParameterBindingException(bindingResult);
-        }
-    }
-
-    private HttpHeaders addHttpFileAttachmentHeader(MediaType mediaType, Function<MediaType, String> toFileName) {
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentDispositionFormData("attachment", toFileName.apply(mediaType));
-        httpHeaders.setContentType(mediaType);
-        httpHeaders.add(VARY, ACCEPT);
-        return httpHeaders;
-    }
-
-    private void emitDownloadWithMediaType(
-            ResponseBodyEmitter emitter,
-            DownloadContent downloadContent,
-            MediaType mediaType) {
-        try {
-            emitter.send(downloadContent, mediaType);
-        } catch (IOException e) {
-            LOGGER.error("Failed to stream annotation results", e);
-            emitter.completeWithError(e);
-        }
-        emitter.complete();
-        LOGGER.info("Emitted response stream -- which will be written by the HTTP message converter for: " + mediaType);
-    }
-
-    private void emitStatisticsDownloadWithMediaType(ResponseBodyEmitter emitter, QueryResult<StatisticsGroup> stats,
-            @RequestHeader(ACCEPT) MediaType mediaTypeAcceptHeader) {
-        try {
-            emitter.send(stats, mediaTypeAcceptHeader);
-        } catch (IOException e) {
-            LOGGER.error("Failed to stream annotation results", e);
-            emitter.completeWithError(e);
-        }
-
-        emitter.complete();
-        LOGGER.info("Emitted response stream -- which will be written by the HTTP message converter for: " +
-                            mediaTypeAcceptHeader);
+    /**
+     * Get meta data information about the Annotation service
+     *
+     * @return response with metadata information.
+     */
+    @ApiOperation(value = "Get meta data information about the Annotation service",
+            notes = "Annotations creation date.")
+    @RequestMapping(value = "/about", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<MetaData> provideMetaData() {
+        return new ResponseEntity<>(metaDataProvider.lookupMetaData(), HttpStatus.OK);
     }
     private interface FilterQueryInfo {
 
