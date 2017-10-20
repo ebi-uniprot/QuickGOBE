@@ -122,12 +122,12 @@ public class AnnotationController {
     private static final String DOWNLOAD_STATISTICS_FILE_NAME = "annotation_statistics";
 
     private static final Function<MediaType, String> TO_DOWNLOAD_STATISTICS_FILENAME = mt -> String.format("%s.%s",
-                                                                                                           DOWNLOAD_STATISTICS_FILE_NAME,
-                                                                                                           fileExtension(mt));
+            DOWNLOAD_STATISTICS_FILE_NAME,
+            fileExtension(mt));
     private static final Function<MediaType, String> TO_DOWNLOAD_FILENAME = mt -> String.format("%s%s.%s",
-                                                                                                DOWNLOAD_FILE_NAME_PREFIX,
-                                                                                                formattedDateStringForNow(),
-                                                                                                fileExtension(mt));
+            DOWNLOAD_FILE_NAME_PREFIX,
+            formattedDateStringForNow(),
+            fileExtension(mt));
     private static final String GO_NAME = "goName";
     private static final String TAXON_NAME = "taxonName";
 
@@ -284,7 +284,7 @@ public class AnnotationController {
      * @param request the annotation request
      * @param filterContexts the {@link FilterContext} list to append to
      */
-    private void convertResultTransformationRequests( AnnotationRequest request, Set<FilterContext> filterContexts) {
+    private void convertResultTransformationRequests(AnnotationRequest request, Set<FilterContext> filterContexts) {
         ResultTransformationRequests transformationRequests = request.createResultTransformationRequests();
         if (!transformationRequests.getRequests().isEmpty()) {
             FilterContext transformationContext = new FilterContext();
@@ -317,7 +317,8 @@ public class AnnotationController {
     }
 
     @RequestMapping(value = "/downloadSearch",
-            method = {RequestMethod.GET}, produces = {GPAD_MEDIA_TYPE_STRING, GAF_MEDIA_TYPE_STRING, TSV_MEDIA_TYPE_STRING})
+            method = {RequestMethod.GET},
+            produces = {GPAD_MEDIA_TYPE_STRING, GAF_MEDIA_TYPE_STRING, TSV_MEDIA_TYPE_STRING})
     public ResponseEntity<ResponseBodyEmitter> downloadLookup(
             @Valid @ModelAttribute AnnotationRequest request,
             BindingResult bindingResult,
@@ -328,13 +329,13 @@ public class AnnotationController {
         checkBindingErrors(bindingResult);
         FilterQueryInfo filterQueryInfo = extractFilterQueryInfo(request);
 
-        final int pageLimit = request.getDownloadLimit() < this.annotationRetrievalConfig.getDownloadPageSize()?
+        final int pageLimit = request.getDownloadLimit() < this.annotationRetrievalConfig.getDownloadPageSize() ?
                 request.getDownloadLimit() : this.annotationRetrievalConfig.getDownloadPageSize();
         QueryRequest queryRequest = downloadQueryTemplate.newBuilder()
-                                                         .setQuery(QuickGOQuery.createAllQuery())
-                                                         .addFilters(filterQueryInfo.getFilterQueries())
-                                                         .setPage(createFirstCursorPage(pageLimit))
-                                                         .build();
+                .setQuery(QuickGOQuery.createAllQuery())
+                .addFilters(filterQueryInfo.getFilterQueries())
+                .setPage(createFirstCursorPage(pageLimit))
+                .build();
 
         ResponseBodyEmitter emitter = new ResponseBodyEmitter();
 
@@ -357,10 +358,10 @@ public class AnnotationController {
     }
 
     private List<String> selectedFieldList(AnnotationRequest annotationRequest) {
-        if(annotationRequest.getSelectedFields() != null){
+        if (annotationRequest.getSelectedFields() != null) {
             return Arrays.stream(annotationRequest.getSelectedFields())
-                         .map(String::toLowerCase)
-                         .collect(toList());
+                    .map(String::toLowerCase)
+                    .collect(toList());
         }
         return Collections.emptyList();
     }
@@ -368,31 +369,31 @@ public class AnnotationController {
     private HeaderContent buildHeaderContent(HttpServletRequest servletRequest, List<String> selectedFields) {
         HeaderContent.Builder contentBuilder = new HeaderContent.Builder();
         return contentBuilder.setIsSlimmed(isSlimmed(servletRequest))
-                             .setUri(HeaderUri.uri(servletRequest))
-                             .setDate(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE))
-                             .setSelectedFields(selectedFields)
-                             .build();
+                .setUri(HeaderUri.uri(servletRequest))
+                .setDate(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE))
+                .setSelectedFields(selectedFields)
+                .build();
     }
 
     private Stream<QueryResult<Annotation>> getQueryResultStream(@Valid @ModelAttribute AnnotationRequest request,
             FilterQueryInfo filterQueryInfo, QueryRequest queryRequest) {
         LOGGER.info("Creating stream of search results. With limit " + request.getDownloadLimit());
         Stream<QueryResult<Annotation>> resultStream = streamSearchResults(queryRequest,
-                            queryTemplate,
-                            annotationSearchService,
-                            resultTransformerChain,
-                            filterQueryInfo.getFilterContext(),
-                            request.getDownloadLimit());
+                queryTemplate,
+                annotationSearchService,
+                resultTransformerChain,
+                filterQueryInfo.getFilterContext(),
+                request.getDownloadLimit());
         LOGGER.info("Finished creating stream of search results.");
         return resultStream;
     }
 
-    private void emitDownloadWithMediaType(
+    private <C> void emitDownloadWithMediaType(
             ResponseBodyEmitter emitter,
-            DownloadContent downloadContent,
+            C content,
             MediaType mediaType) {
         try {
-            emitter.send(downloadContent, mediaType);
+            emitter.send(content, mediaType);
         } catch (IOException e) {
             LOGGER.error("Failed to stream annotation results", e);
             emitter.completeWithError(e);
@@ -410,7 +411,8 @@ public class AnnotationController {
     }
 
     private boolean isSlimmed(HttpServletRequest servletRequest) {
-        return Objects.nonNull(servletRequest.getQueryString()) && servletRequest.getQueryString().contains(GO_USAGE_SLIM);
+        return Objects.nonNull(servletRequest.getQueryString()) &&
+                servletRequest.getQueryString().contains(GO_USAGE_SLIM);
     }
 
     @RequestMapping(value = "/downloadStats", method = {RequestMethod.GET},
@@ -424,42 +426,28 @@ public class AnnotationController {
             QueryResult<StatisticsGroup> stats = statsService.calculateDownload(request);
             addNamesToStatisticsValues(stats, createFilterContextForName(GO_NAME), OntologyNameInjector.GO_ID);
             addNamesToStatisticsValues(stats, createFilterContextForName(TAXON_NAME), TaxonomyNameInjector.TAXON_ID);
-            emitStatisticsDownloadWithMediaType(emitter, stats, mediaTypeAcceptHeader);
+            emitDownloadWithMediaType(emitter, stats, mediaTypeAcceptHeader);
         });
 
         return ResponseEntity.ok()
-                             .headers(createHttpDownloadHeader(mediaTypeAcceptHeader,
-                                                                  TO_DOWNLOAD_STATISTICS_FILENAME))
-                             .body(emitter);
+                .headers(createHttpDownloadHeader(mediaTypeAcceptHeader,
+                        TO_DOWNLOAD_STATISTICS_FILENAME))
+                .body(emitter);
     }
 
     private void addNamesToStatisticsValues(QueryResult<StatisticsGroup> stats, FilterContext filterContext,
             String typeName) {
         try {
             stats.getResults()
-                 .stream()
-                 .flatMap(statisticsGroup -> statisticsGroup.getTypes().stream())
-                 .filter(statisticsByType -> statisticsByType.getType().equals(typeName))
-                 .flatMap(statisticsByType -> statisticsByType.getValues().stream())
-                 .forEach(statisticsValue ->statisticsTransformerChain.applyTransformations
-                         (statisticsValue, filterContext));
+                    .stream()
+                    .flatMap(statisticsGroup -> statisticsGroup.getTypes().stream())
+                    .filter(statisticsByType -> statisticsByType.getType().equals(typeName))
+                    .flatMap(statisticsByType -> statisticsByType.getValues().stream())
+                    .forEach(statisticsValue -> statisticsTransformerChain.applyTransformations
+                            (statisticsValue, filterContext));
         } catch (Exception e) {
             LOGGER.error("Failed to retrieve GO names for StatisticsDownloadRequest", e);
         }
-    }
-
-    private void emitStatisticsDownloadWithMediaType(ResponseBodyEmitter emitter, QueryResult<StatisticsGroup> stats,
-            @RequestHeader(ACCEPT) MediaType mediaTypeAcceptHeader) {
-        try {
-            emitter.send(stats, mediaTypeAcceptHeader);
-        } catch (IOException e) {
-            LOGGER.error("Failed to stream annotation results", e);
-            emitter.completeWithError(e);
-        }
-
-        emitter.complete();
-        LOGGER.info("Emitted response stream -- which will be written by the HTTP message converter for: " +
-                            mediaTypeAcceptHeader);
     }
 
     private static FilterContext createFilterContextForName(String targetName) {
@@ -481,6 +469,7 @@ public class AnnotationController {
     public ResponseEntity<MetaData> provideMetaData() {
         return new ResponseEntity<>(metaDataProvider.lookupMetaData(), HttpStatus.OK);
     }
+
     private interface FilterQueryInfo {
 
         Set<QuickGOQuery> getFilterQueries();
