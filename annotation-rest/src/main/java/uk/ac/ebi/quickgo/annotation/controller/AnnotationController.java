@@ -420,8 +420,8 @@ public class AnnotationController {
 
         taskExecutor.execute(() -> {
             QueryResult<StatisticsGroup> stats = statsService.calculateDownload(request);
-            addNamesToGoIdStatisticsValues(stats, statisticsFilterContextForGoName(), OntologyNameInjector.GO_ID);
-            addNamesToGoIdStatisticsValues(stats, statisticsFilterContextForTaxonName(), TaxonomyNameInjector.TAXON_ID);
+            addNamesToStatisticsValues(stats, statisticsFilterContextForGoName(), OntologyNameInjector.GO_ID);
+            addNamesToStatisticsValues(stats, statisticsFilterContextForTaxonName(), TaxonomyNameInjector.TAXON_ID);
             emitStatisticsDownloadWithMediaType(emitter, stats, mediaTypeAcceptHeader);
         });
 
@@ -431,7 +431,7 @@ public class AnnotationController {
                              .body(emitter);
     }
 
-    private void addNamesToGoIdStatisticsValues(QueryResult<StatisticsGroup> stats, FilterContext filterContext,
+    private void addNamesToStatisticsValues(QueryResult<StatisticsGroup> stats, FilterContext filterContext,
             String typeName) {
         try {
             stats.getResults()
