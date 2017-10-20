@@ -12,6 +12,7 @@ import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.annot
 import uk.ac.ebi.quickgo.annotation.service.converter.AnnotationDocConverterImpl;
 import uk.ac.ebi.quickgo.common.SearchableField;
 import uk.ac.ebi.quickgo.common.loader.DbXRefLoader;
+import uk.ac.ebi.quickgo.common.model.CompletableValue;
 import uk.ac.ebi.quickgo.common.validator.DbXRefEntityValidation;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl;
@@ -293,5 +294,39 @@ public class SearchServiceConfig {
 
     public interface StatisticsSearchConfig {
         long defaultDownloadLimit();
+    }
+
+    @Bean
+    public ResultTransformerChain<CompletableValue> completableValueResultTransformerChain(
+            ExternalServiceResultsTransformer<CompletableValue,CompletableValue> completableValueOntologyNameTransformer,
+            ExternalServiceResultsTransformer<CompletableValue,CompletableValue> completableValueTaxonNameTransformer) {
+        ResultTransformerChain<CompletableValue> transformerChain = new ResultTransformerChain<>();
+        transformerChain.addTransformer(completableValueOntologyNameTransformer);
+        transformerChain.addTransformer(completableValueTaxonNameTransformer);
+        return transformerChain;
+    }
+
+    @Bean
+    public ExternalServiceResultsTransformer<CompletableValue,CompletableValue> completableValueOntologyNameTransformer
+            (RESTFilterConverterFactory converterFactory) {
+        List<ResponseValueInjector<CompletableValue>> responseValueInjectors =
+                singletonList(new uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer
+                        .completablevalue.OntologyNameInjector());
+        return new ExternalServiceResultsTransformer<>(responseValueInjectors, completeableValueResultMutator(converterFactory));
+    }
+
+    @Bean
+    public ExternalServiceResultsTransformer<CompletableValue,CompletableValue> completableValueTaxonNameTransformer
+            (RESTFilterConverterFactory converterFactory) {
+        List<ResponseValueInjector<CompletableValue>> responseValueInjectors = singletonList(
+                new uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.completablevalue
+                        .TaxonomyNameInjector());
+        return new ExternalServiceResultsTransformer<>(responseValueInjectors, completeableValueResultMutator(converterFactory));
+    }
+
+    @Bean
+    public ValueInjectionToSingleResult<CompletableValue> completeableValueResultMutator(
+            RESTFilterConverterFactory converterFactory) {
+        return new ValueInjectionToSingleResult(converterFactory);
     }
 }
