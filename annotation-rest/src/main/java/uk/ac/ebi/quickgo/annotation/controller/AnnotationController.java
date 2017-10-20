@@ -352,7 +352,7 @@ public class AnnotationController {
 
         return ResponseEntity
                 .ok()
-                .headers(addHttpFileAttachmentHeader(mediaTypeAcceptHeader, TO_DOWNLOAD_FILENAME))
+                .headers(createHttpDownloadHeader(mediaTypeAcceptHeader, TO_DOWNLOAD_FILENAME))
                 .body(emitter);
     }
 
@@ -401,7 +401,7 @@ public class AnnotationController {
         LOGGER.info("Emitted response stream -- which will be written by the HTTP message converter for: " + mediaType);
     }
 
-    private HttpHeaders addHttpFileAttachmentHeader(MediaType mediaType, Function<MediaType, String> toFileName) {
+    private HttpHeaders createHttpDownloadHeader(MediaType mediaType, Function<MediaType, String> toFileName) {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentDispositionFormData("attachment", toFileName.apply(mediaType));
         httpHeaders.setContentType(mediaType);
@@ -428,7 +428,7 @@ public class AnnotationController {
         });
 
         return ResponseEntity.ok()
-                             .headers(addHttpFileAttachmentHeader(mediaTypeAcceptHeader,
+                             .headers(createHttpDownloadHeader(mediaTypeAcceptHeader,
                                                                   TO_DOWNLOAD_STATISTICS_FILENAME))
                              .body(emitter);
     }
