@@ -128,6 +128,8 @@ public class AnnotationController {
                                                                                                 DOWNLOAD_FILE_NAME_PREFIX,
                                                                                                 formattedDateStringForNow(),
                                                                                                 fileExtension(mt));
+    public static final String GO_NAME = "goName";
+    public static final String TAXON_NAME = "taxonName";
 
     private final MetaDataProvider metaDataProvider;
 
@@ -420,8 +422,8 @@ public class AnnotationController {
 
         taskExecutor.execute(() -> {
             QueryResult<StatisticsGroup> stats = statsService.calculateDownload(request);
-            addNamesToStatisticsValues(stats, statisticsFilterContextForGoName(), OntologyNameInjector.GO_ID);
-            addNamesToStatisticsValues(stats, statisticsFilterContextForTaxonName(), TaxonomyNameInjector.TAXON_ID);
+            addNamesToStatisticsValues(stats, createFilterContextForName(GO_NAME), OntologyNameInjector.GO_ID);
+            addNamesToStatisticsValues(stats, createFilterContextForName(TAXON_NAME), TaxonomyNameInjector.TAXON_ID);
             emitStatisticsDownloadWithMediaType(emitter, stats, mediaTypeAcceptHeader);
         });
 
@@ -460,18 +462,10 @@ public class AnnotationController {
                             mediaTypeAcceptHeader);
     }
 
-    private static FilterContext statisticsFilterContextForGoName() {
+    private static FilterContext createFilterContextForName(String targetName) {
         FilterContext filterContext = new FilterContext();
         ResultTransformationRequests transformationRequests = new ResultTransformationRequests();
-        transformationRequests.addTransformationRequest(new ResultTransformationRequest("goName"));
-        filterContext.save(ResultTransformationRequests.class, transformationRequests);
-        return filterContext;
-    }
-
-    private static FilterContext statisticsFilterContextForTaxonName() {
-        FilterContext filterContext = new FilterContext();
-        ResultTransformationRequests transformationRequests = new ResultTransformationRequests();
-        transformationRequests.addTransformationRequest(new ResultTransformationRequest("taxonName"));
+        transformationRequests.addTransformationRequest(new ResultTransformationRequest(targetName));
         filterContext.save(ResultTransformationRequests.class, transformationRequests);
         return filterContext;
     }
