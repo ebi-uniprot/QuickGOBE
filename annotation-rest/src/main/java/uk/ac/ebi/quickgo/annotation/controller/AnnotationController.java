@@ -128,8 +128,8 @@ public class AnnotationController {
                                                                                                 DOWNLOAD_FILE_NAME_PREFIX,
                                                                                                 formattedDateStringForNow(),
                                                                                                 fileExtension(mt));
-    public static final String GO_NAME = "goName";
-    public static final String TAXON_NAME = "taxonName";
+    private static final String GO_NAME = "goName";
+    private static final String TAXON_NAME = "taxonName";
 
     private final MetaDataProvider metaDataProvider;
 
