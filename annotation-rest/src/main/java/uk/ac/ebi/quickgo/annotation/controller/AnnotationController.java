@@ -13,6 +13,7 @@ import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.stati
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.statistics.TaxonomyNameInjector;
 import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.annotation.service.statistics.StatisticsService;
+import uk.ac.ebi.quickgo.common.model.CompletableValue;
 import uk.ac.ebi.quickgo.rest.ParameterBindingException;
 import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
 import uk.ac.ebi.quickgo.rest.comm.FilterContext;
@@ -43,6 +44,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -111,6 +114,7 @@ import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.createFirstCursorPa
  *         Time: 11:26
  *         Created with IntelliJ IDEA.
  */
+@EnableCaching
 @RestController
 @RequestMapping(value = "/annotation")
 public class AnnotationController {
@@ -144,6 +148,8 @@ public class AnnotationController {
     private final TaskExecutor taskExecutor;
     private final HeaderCreatorFactory headerCreatorFactory;
 
+    private final ResultTransformerChain<CompletableValue> completeableValueTransformerChain;
+
     @Autowired
     public AnnotationController(SearchService<Annotation> annotationSearchService,
             SearchServiceConfig.AnnotationCompositeRetrievalConfig annotationRetrievalConfig,
@@ -153,7 +159,8 @@ public class AnnotationController {
             TaskExecutor taskExecutor,
             HeaderCreatorFactory headerCreatorFactory,
             MetaDataProvider metaDataProvider,
-            ResultTransformerChain<StatisticsValue> statisticsTransformerChain) {
+            ResultTransformerChain<StatisticsValue> statisticsTransformerChain,
+            ResultTransformerChain<CompletableValue> completableValueResultTransformerChain) {
         checkArgument(annotationSearchService != null, "The SearchService<Annotation> instance passed " +
                 "to the constructor of AnnotationController should not be null.");
         checkArgument(annotationRetrievalConfig != null, "The SearchServiceConfig" +
@@ -166,6 +173,8 @@ public class AnnotationController {
         checkArgument(taskExecutor != null, "TaskExecutor cannot be null.");
         checkArgument(headerCreatorFactory != null, "HeaderCreatorFactory cannot be null.");
         checkArgument(metaDataProvider != null, "Metadata provider cannot be null.");
+        checkArgument(completableValueResultTransformerChain != null,
+                "The ResultTransformerChain<CompletableValue> cannot be null.");
 
         this.annotationSearchService = annotationSearchService;
         this.converterFactory = converterFactory;
@@ -182,6 +191,7 @@ public class AnnotationController {
 
         this.metaDataProvider = metaDataProvider;
         this.statisticsTransformerChain = statisticsTransformerChain;
+        this.completeableValueTransformerChain = completableValueResultTransformerChain;
     }
 
     private DefaultSearchQueryTemplate createSearchQueryTemplate(
@@ -443,11 +453,22 @@ public class AnnotationController {
                     .flatMap(statisticsGroup -> statisticsGroup.getTypes().stream())
                     .filter(statisticsByType -> statisticsByType.getType().equals(typeName))
                     .flatMap(statisticsByType -> statisticsByType.getValues().stream())
-                    .forEach(statisticsValue -> statisticsTransformerChain.applyTransformations
-                            (statisticsValue, filterContext));
+                    .forEach(statisticsValue -> {
+                        CompletableValue completableValue = populateName(filterContext, statisticsValue.getKey());
+                        statisticsValue.setName(completableValue.getName());
+                    });
         } catch (Exception e) {
             LOGGER.error("Failed to retrieve GO names for StatisticsDownloadRequest", e);
         }
+    }
+
+    @Cacheable("statisticsNames")
+    public CompletableValue populateName(FilterContext filterContext, String key) {
+        LOGGER.info("Looking for key " + key);
+        //return statisticsTransformerChain.applyTransformations(statisticsValue, filterContext);
+        CompletableValue completableValue = new CompletableValue(key);
+        return completeableValueTransformerChain.applyTransformations(completableValue, filterContext);
+
     }
 
     private static FilterContext createFilterContextForName(String targetName) {
