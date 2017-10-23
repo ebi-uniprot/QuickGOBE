@@ -1,5 +1,9 @@
 package uk.ac.ebi.quickgo.ontology.controller;
 
+import org.junit.Before;
+import org.junit.Test;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.ResultActions;
 import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocMocker;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
@@ -11,19 +15,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import org.junit.Before;
-import org.junit.Test;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.ResultActions;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static uk.ac.ebi.quickgo.common.converter.HelpfulConverter.toCSV;
 import static uk.ac.ebi.quickgo.ontology.controller.GOController.MISSING_SLIM_SET_ERROR_MESSAGE;
 import static uk.ac.ebi.quickgo.ontology.controller.OBOController.COMPLETE_SUB_RESOURCE;
@@ -66,7 +62,7 @@ public class GOControllerIT extends OBOControllerIT {
 
     @Before
     public void setUp() {
-        setupOntologyForSimTests();
+        setupGOForSlimTests();
     }
 
     // GO specific data  ------------------
@@ -259,7 +255,7 @@ public class GOControllerIT extends OBOControllerIT {
      * Adds to the gene ontology graph several GO term relationships that are used in testing the
      * behaviour of the slimming resource.
      */
-    private void setupOntologyForSimTests() {
+    private void setupGOForSlimTests() {
         List<OntologyRelationship> relationships = new ArrayList<>();
 
         relationships.add(createSlimRelationship(GO_SLIM_CHILD1, GO_SLIM1));
