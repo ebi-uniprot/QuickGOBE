@@ -137,7 +137,13 @@ public class TermSlimmerTest {
     }
 
     @Test
-    public void termOutsideOfInitialSlimSetSlimsToNothing() {
+    public void termInOntologySlimsToNothing() {
+        TermSlimmer termSlimmer = TermSlimmer.createSlims(OntologyType.GO, ontology, singletonList(CELL));
+        assertThat(termSlimmer.findSlims(CELLULAR_COMPONENT), is(empty()));
+    }
+
+    @Test
+    public void termNotInOntologySlimsToNothing() {
         TermSlimmer termSlimmer = TermSlimmer.createSlims(OntologyType.GO, ontology, singletonList(CELLULAR_COMPONENT));
         assertThat(termSlimmer.findSlims("XXXXXX"), is(empty()));
     }
