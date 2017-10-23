@@ -28,9 +28,8 @@ public class StatisticsToWorkbook implements StatisticsConverter{
     private static final int HEADER_ROW = 1;
     private static final int COLUMN_NAMES_ROW = 2;
     private static final int DETAIL_ROW_INITIAL_VALUE = 3;
-    public static final int SUMMARY_HEADER_ROWNUM = 1;
-    public static final int FIRST_COLUMN = 0;
-    public static final int SUMMARY_DETAIL_ROWNUM = 2;
+    private static final int FIRST_COLUMN = 0;
+    private static final int SUMMARY_DETAIL_ROW = 2;
     private final String[] sectionTypes;
     private final Map<String, SheetLayout> sheetLayoutMap;
 
@@ -162,11 +161,11 @@ public class StatisticsToWorkbook implements StatisticsConverter{
         statisticsGroups.stream()
                         .filter(statisticsGroup -> statisticsGroup.getGroupName().equals("annotation"))
                         .forEach(statisticsGroup -> {
-                            Row row1 = sheet.createRow(SUMMARY_HEADER_ROWNUM);
+                            Row row1 = sheet.createRow(HEADER_ROW);
                             final Cell header = row1.createCell(FIRST_COLUMN);
                             header.setCellStyle(boldCellFormat);
                             header.setCellValue("Summary");
-                            Row row2 = sheet.createRow(SUMMARY_DETAIL_ROWNUM);
+                            Row row2 = sheet.createRow(SUMMARY_DETAIL_ROW);
                             row2.createCell(FIRST_COLUMN).setCellValue("Number of annotations:" + statisticsGroup.getTotalHits());
                         });
     }
