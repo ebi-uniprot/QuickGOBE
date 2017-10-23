@@ -13,7 +13,7 @@ import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.stati
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.statistics.TaxonomyNameInjector;
 import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.annotation.service.statistics.StatisticsService;
-import uk.ac.ebi.quickgo.common.model.CompletableValue;
+import uk.ac.ebi.quickgo.rest.model.CompletableValue;
 import uk.ac.ebi.quickgo.rest.ParameterBindingException;
 import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
 import uk.ac.ebi.quickgo.rest.comm.FilterContext;
