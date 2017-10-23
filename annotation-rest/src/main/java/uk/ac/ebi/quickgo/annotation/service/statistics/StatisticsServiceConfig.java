@@ -35,8 +35,8 @@ public class StatisticsServiceConfig {
     }
 
     @Bean
-    public RequiredStatistics listStatistics(StatisticsTypeConfigurer statsTypeConfigurerForList) {
-        return new RequiredStatistics(statsTypeConfigurerForList);
+    public RequiredStatistics restStats(StatisticsTypeConfigurer statsTypeConfigurerForRest) {
+        return new RequiredStatistics(statsTypeConfigurerForRest);
     }
 
     @Bean
@@ -45,7 +45,7 @@ public class StatisticsServiceConfig {
     }
 
     @Bean
-    public StatisticsTypeConfigurer statsTypeConfigurerForList() {
+    public StatisticsTypeConfigurer statsTypeConfigurerForRest() {
         return new StatisticsTypeConfigurer(typeLimits);
     }
 
