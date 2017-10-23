@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.completablevalue;
 
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.BasicTaxonomyNode;
-import uk.ac.ebi.quickgo.common.model.CompletableValue;
+import uk.ac.ebi.quickgo.rest.model.CompletableValue;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
 import uk.ac.ebi.quickgo.rest.search.results.transformer.AbstractValueInjector;
