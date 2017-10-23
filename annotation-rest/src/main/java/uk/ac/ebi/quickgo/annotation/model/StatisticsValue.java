@@ -20,10 +20,9 @@ public class StatisticsValue {
      */
     private final long hits;
 
-    public String getName() {
-        return name;
-    }
-
+    /**
+     * The name of the entity referable by the key
+     */
     private String name;
 
     public StatisticsValue(String key, long hits, long total) {
@@ -52,6 +51,10 @@ public class StatisticsValue {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getName() {
+        return name;
     }
 
     @Override public boolean equals(Object o) {
