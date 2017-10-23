@@ -13,12 +13,12 @@ import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.stati
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.statistics.TaxonomyNameInjector;
 import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.annotation.service.statistics.StatisticsService;
-import uk.ac.ebi.quickgo.rest.model.CompletableValue;
 import uk.ac.ebi.quickgo.rest.ParameterBindingException;
 import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
 import uk.ac.ebi.quickgo.rest.comm.FilterContext;
 import uk.ac.ebi.quickgo.rest.metadata.MetaData;
 import uk.ac.ebi.quickgo.rest.metadata.MetaDataProvider;
+import uk.ac.ebi.quickgo.rest.model.CompletableValue;
 import uk.ac.ebi.quickgo.rest.search.DefaultSearchQueryTemplate;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
@@ -322,7 +322,7 @@ public class AnnotationController {
             @Valid @ModelAttribute AnnotationRequest request, BindingResult bindingResult) {
         checkBindingErrors(bindingResult);
 
-        QueryResult<StatisticsGroup> stats = statsService.calculate(request);
+        QueryResult<StatisticsGroup> stats = statsService.calculateForStandardUsage(request);
         return new ResponseEntity<>(stats, HttpStatus.OK);
     }
 
@@ -433,7 +433,7 @@ public class AnnotationController {
         ResponseBodyEmitter emitter = new ResponseBodyEmitter();
 
         taskExecutor.execute(() -> {
-            QueryResult<StatisticsGroup> stats = statsService.calculateDownload(request);
+            QueryResult<StatisticsGroup> stats = statsService.calculateForDownloadUsage(request);
             addNamesToStatisticsValues(stats, createFilterContextForName(GO_NAME), OntologyNameInjector.GO_ID);
             addNamesToStatisticsValues(stats, createFilterContextForName(TAXON_NAME), TaxonomyNameInjector.TAXON_ID);
             emitDownloadWithMediaType(emitter, stats, mediaTypeAcceptHeader);

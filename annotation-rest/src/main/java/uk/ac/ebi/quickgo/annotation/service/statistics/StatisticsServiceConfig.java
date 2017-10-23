@@ -15,19 +15,19 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties(prefix = "annotation.stats")
 public class StatisticsServiceConfig {
-    private Map<String, Integer> typeLimits = new HashMap<>();
+    private Map<String, Integer> typeLimitsForStandardUsage = new HashMap<>();
     private Map<String, Integer> typeLimitsForDownload = new HashMap<>();
 
-    public Map<String, Integer> getTypeLimits() {
-        return typeLimits;
+    public Map<String, Integer> getTypeLimitsForStandardUsage() {
+        return typeLimitsForStandardUsage;
+    }
+
+    public void setTypeLimitsForStandardUsage(Map<String, Integer> typeLimitsForStandardUsage) {
+        this.typeLimitsForStandardUsage = typeLimitsForStandardUsage;
     }
 
     public Map<String, Integer> getTypeLimitsForDownload() {
         return typeLimitsForDownload;
-    }
-
-    public void setTypeLimits(Map<String, Integer> typeLimits) {
-        this.typeLimits = typeLimits;
     }
 
     public void setTypeLimitsForDownload(Map<String, Integer> typeLimitsForDownload) {
@@ -35,22 +35,24 @@ public class StatisticsServiceConfig {
     }
 
     @Bean
-    public RequiredStatistics restStats(StatisticsTypeConfigurer statsTypeConfigurerForRest) {
-        return new RequiredStatistics(statsTypeConfigurerForRest);
+    public RequiredStatistics requiredStatisticsForStandardUsage(
+            StatisticsTypeConfigurer statsTypeConfigurerForStandardUsage) {
+        return new RequiredStatistics(statsTypeConfigurerForStandardUsage);
     }
 
     @Bean
-    public RequiredStatistics downloadStatistics(StatisticsTypeConfigurer statsTypeConfigurerForDownload) {
-        return new RequiredStatistics(statsTypeConfigurerForDownload);
+    public RequiredStatistics requiredStatisticsForDownloadUsage(
+            StatisticsTypeConfigurer statsTypeConfigurerForDownloadUsage) {
+        return new RequiredStatistics(statsTypeConfigurerForDownloadUsage);
     }
 
     @Bean
-    public StatisticsTypeConfigurer statsTypeConfigurerForRest() {
-        return new StatisticsTypeConfigurer(typeLimits);
+    public StatisticsTypeConfigurer statsTypeConfigurerForStandardUsage() {
+        return new StatisticsTypeConfigurer(typeLimitsForStandardUsage);
     }
 
     @Bean
-    public StatisticsTypeConfigurer statsTypeConfigurerForDownload() {
+    public StatisticsTypeConfigurer statsTypeConfigurerForDownloadUsage() {
         return new StatisticsTypeConfigurer(typeLimitsForDownload);
     }
 }

@@ -97,7 +97,7 @@ public class AnnotationStatisticsServiceTest {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Annotation request cannot be null");
 
-        statsService.calculate(null);
+        statsService.calculateForStandardUsage(null);
     }
 
     @Test
@@ -110,7 +110,7 @@ public class AnnotationStatisticsServiceTest {
                                                        statsConverterMock, listStatistics, downloadStatistics);
         AnnotationRequest request = Mockito.mock(AnnotationRequest.class);
 
-        statsService.calculate(request);
+        statsService.calculateForStandardUsage(request);
     }
 
     @Test
@@ -123,7 +123,7 @@ public class AnnotationStatisticsServiceTest {
                                                        statsConverterMock, listStatistics, downloadStatistics);
         AnnotationRequest request = Mockito.mock(AnnotationRequest.class);
 
-        statsService.calculate(request);
+        statsService.calculateForStandardUsage(request);
     }
 
 }

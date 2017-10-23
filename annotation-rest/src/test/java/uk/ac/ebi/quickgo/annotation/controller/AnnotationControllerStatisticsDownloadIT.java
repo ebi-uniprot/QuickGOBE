@@ -71,7 +71,7 @@ public class AnnotationControllerStatisticsDownloadIT {
     @ClassRule
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
     private static final int NUMBER_OF_GENERIC_DOCS = 5;
-    private static final String DOWNLOAD_STATISTICS_SEARCH_URL = "/annotation/downloadStats";
+    private static final String DOWNLOAD_STATISTICS_SEARCH_URL = "/annotation/requiredStatisticsForDownloadUsage";
     private static final String NUMBER_OF_GO_ID_RESULTS_FOR_ANNOTATIONS =
             "$.results[0].types.[?(@.type == 'goId')].values.length()";
     private static final String ALL_GO_TERM_NAMES = "$.results[0].types.[?(@.type == 'goId')].values.*.name";
