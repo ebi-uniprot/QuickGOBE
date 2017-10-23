@@ -72,7 +72,6 @@ import static uk.ac.ebi.quickgo.annotation.service.converter.StatisticsWorkBookL
     }
 
     private DispatchWriter statsDispatchWriter() {
-        final StatisticsToWorkbook statisticsToWorkbook = new StatisticsToWorkbook(SECTION_TYPES, SHEET_LAYOUT_MAP);
-        return new StatsExcelDispatchWriter(statisticsToWorkbook);
+        return new StatsExcelDispatchWriter(new StatisticsToWorkbook(SECTION_TYPES, SHEET_LAYOUT_MAP));
     }
 }
