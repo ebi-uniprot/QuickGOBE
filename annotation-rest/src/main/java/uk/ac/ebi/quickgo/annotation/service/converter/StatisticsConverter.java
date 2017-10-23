@@ -6,7 +6,7 @@ import java.util.List;
 import org.apache.poi.ss.usermodel.Workbook;
 
 /**
- * Defines the method(s) to convert from a list of statistics objects to an Excel Workbook.
+ * Defines the method(s) to generate an Excel Workbook from a list of {@link StatisticsGroup}.
  * @author Tony Wardell
  * Date: 03/10/2017
  * Time: 13:53
@@ -14,5 +14,10 @@ import org.apache.poi.ss.usermodel.Workbook;
  */
 public interface StatisticsConverter {
 
+    /**
+     * Generate an Excel Workbook from a list of {@link StatisticsGroup} to an Excel Workbook.
+     * @param statisticsGroups source statistics data.
+     * @return Excel workbook instance.
+     */
     Workbook convert(List<StatisticsGroup> statisticsGroups);
 }
