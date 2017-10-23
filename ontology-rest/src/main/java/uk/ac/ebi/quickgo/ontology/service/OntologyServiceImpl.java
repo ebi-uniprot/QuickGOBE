@@ -1,5 +1,9 @@
 package uk.ac.ebi.quickgo.ontology.service;
 
+import com.google.common.base.Preconditions;
+import org.slf4j.Logger;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
 import uk.ac.ebi.quickgo.ontology.common.OntologyType;
@@ -15,14 +19,10 @@ import uk.ac.ebi.quickgo.rest.search.query.RegularPage;
 import uk.ac.ebi.quickgo.rest.search.results.PageInfo;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
-import com.google.common.base.Preconditions;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.slf4j.Logger;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 
 import static java.util.Collections.singleton;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -148,15 +148,9 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
                 .createSlims(OntologyType.valueOf(ontologyType), ontologyTraversal, slimTerms, relationTypes);
 
         return slimmer.getSlimmedTermsMap().entrySet().stream()
-                .filter(entry -> entry.getValue().size() > 1 ||
-                        (entry.getValue().size() == 1 && !entry.getKey().equals(entry.getValue().get(0))))
+                .filter(this::doesNotSlimToOnlyItself)
                 .map(Map.Entry::getKey)
-                .map(id -> {
-                    SlimTerm slimTerm = new SlimTerm();
-                    slimTerm.id = id;
-                    slimTerm.slimsTo = slimmer.findSlims(id);
-                    return slimTerm;
-                })
+                .map(id -> new SlimTerm(id, slimmer.findSlims(id)))
                 .collect(Collectors.toList());
     }
 
@@ -164,6 +158,17 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
         Preconditions.checkArgument(ids != null, "List of IDs cannot be null");
 
         return ids.stream().map(queryStringSanitizer::sanitize).collect(Collectors.toList());
+    }
+
+    /**
+     * Determines whether a slim term maps to only itself and no other slim terms.
+     * @param slimTermMapping a slim-term and the terms to which it maps
+     * @return whether or not the slim-term maps only to itself
+     */
+    private boolean doesNotSlimToOnlyItself(Map.Entry<String, List<String>> slimTermMapping) {
+        return slimTermMapping.getValue().size() > 1 ||
+                (slimTermMapping.getValue().size() == 1 &&
+                        !slimTermMapping.getKey().equals(slimTermMapping.getValue().get(0)));
     }
 
     /**

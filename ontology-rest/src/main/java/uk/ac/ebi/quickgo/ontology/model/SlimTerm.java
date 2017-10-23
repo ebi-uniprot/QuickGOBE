@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.ontology.model;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -10,6 +11,11 @@ import java.util.List;
  * @author Edd
  */
 public class SlimTerm {
-    public String id;
-    public List<String> slimsTo;
+    public SlimTerm(String id, List<String> slimmedTerms) {
+        this.id = id;
+        this.slimsTo = Collections.unmodifiableList(slimmedTerms);
+    }
+
+    public final String id;
+    public final List<String> slimsTo;
 }
