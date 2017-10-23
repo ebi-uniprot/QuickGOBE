@@ -6,9 +6,7 @@ import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
 import java.util.*;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
-import static java.util.Collections.unmodifiableMap;
+import static java.util.Collections.*;
 import static uk.ac.ebi.quickgo.ontology.common.OntologyType.GO;
 import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.DEFAULT_SLIM_TRAVERSAL_TYPES;
 import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.DEFAULT_TRAVERSAL_TYPES;
@@ -22,13 +20,13 @@ import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.DEFAULT_TRAV
 public class TermSlimmer {
     static final OntologyRelationType[] DEFAULT_RELATION_TYPES =
             DEFAULT_SLIM_TRAVERSAL_TYPES.toArray(new OntologyRelationType[DEFAULT_TRAVERSAL_TYPES.size()]);
-    private Map<String, List<String>> slimTranslate;
-    private OntologyRelationType[] relationTypes;
+    private final Map<String, List<String>> slimTranslate;
+    private final OntologyRelationType[] relationTypes;
 
-    /**
-     * Hide default constructor from outside world; users must create via {@link #createSlims}.
-     */
-    private TermSlimmer() {}
+    private TermSlimmer(OntologyRelationType[] relationTypes, Map<String, List<String>> slimTranslate) {
+        this.relationTypes = relationTypes;
+        this.slimTranslate = slimTranslate;
+    }
 
     /**
      * Factory method for creating a {@link TermSlimmer} for a given {@link OntologyType}, {@link OntologyGraph},
@@ -49,23 +47,22 @@ public class TermSlimmer {
         checkArgument(ontology != null, "Ontology cannot be null");
         checkArgument(slimTerms != null && !slimTerms.isEmpty(), "Slim-set cannot be null or empty");
 
-        TermSlimmer termSlimmer = new TermSlimmer();
-
+        OntologyRelationType[] relationTypes;
         if (requestedRelationTypes.length == 0) {
-            termSlimmer.relationTypes = DEFAULT_RELATION_TYPES;
+            relationTypes = DEFAULT_RELATION_TYPES;
         } else {
-            termSlimmer.relationTypes = requestedRelationTypes;
+            relationTypes = requestedRelationTypes;
         }
 
         // convert term IDs into an array for faster access
         String[] slimTermsArr = slimTerms.toArray(new String[slimTerms.size()]);
 
-        // slim terms which exclude other slim terms
+        // slim terms which exclude/hide other slim terms
         BitSet[] exclude = new BitSet[slimTerms.size()];
 
         for (int i = 0; i < slimTermsArr.length; i++) {
             // a term excludes all its ancestors from being used as slim terms
-            exclude[i] = ontology.getAncestorsBitSet(slimTermsArr[i], slimTerms, termSlimmer.relationTypes);
+            exclude[i] = ontology.getAncestorsBitSet(slimTermsArr[i], slimTerms, relationTypes);
             // a term does not exclude itself from a slim
             exclude[i].clear(i);
         }
@@ -97,9 +94,7 @@ public class TermSlimmer {
             // else: none of this term's ancestors are in the slim-set, so there's nothing more to be done
         }
 
-        termSlimmer.slimTranslate = unmodifiableMap(slimTranslationMap);
-
-        return termSlimmer;
+        return new TermSlimmer(relationTypes, unmodifiableMap(slimTranslationMap));
     }
 
     /**
