@@ -14,7 +14,7 @@ import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.DEFAULT_TRAV
 /**
  * An instance of this class is used to find, for a given term, the equivalent "slimmed" terms. The slimming algorithm
  * is documented here: https://www.ebi.ac.uk/seqdb/confluence/display/GOA/GO+Slimming+-+an+executive+summary.
- *
+ * <p>
  * Created by Edd on 04/10/2017.
  */
 public class TermSlimmer {
@@ -31,9 +31,10 @@ public class TermSlimmer {
     /**
      * Factory method for creating a {@link TermSlimmer} for a given {@link OntologyType}, {@link OntologyGraph},
      * set of slimmed-terms and where slimmed ancestors will only be computed via given relationships.
-     * @param ontologyType the ontology type
-     * @param ontology the ontology
-     * @param slimTerms the slimmed-terms
+     *
+     * @param ontologyType           the ontology type
+     * @param ontology               the ontology
+     * @param slimTerms              the slimmed-terms
      * @param requestedRelationTypes the relationships over which slimmed ancestors will be computed
      * @return a {@link TermSlimmer}
      */
@@ -48,25 +49,13 @@ public class TermSlimmer {
         checkArgument(slimTerms != null && !slimTerms.isEmpty(), "Slim-set cannot be null or empty");
         checkArgument(requestedRelationTypes != null, "Requested relation types cannot be null");
 
-        OntologyRelationType[] relationTypes;
-        if (requestedRelationTypes.length == 0) {
-            relationTypes = DEFAULT_RELATION_TYPES;
-        } else {
-            relationTypes = requestedRelationTypes;
-        }
+        OntologyRelationType[] relationTypes = getOntologyRelationTypes(requestedRelationTypes);
 
         // convert term IDs into an array for faster access
         String[] slimTermsArr = slimTerms.toArray(new String[slimTerms.size()]);
 
         // slim terms which exclude/hide other slim terms
-        BitSet[] exclude = new BitSet[slimTerms.size()];
-
-        for (int i = 0; i < slimTermsArr.length; i++) {
-            // a term excludes all its ancestors from being used as slim terms
-            exclude[i] = ontology.getAncestorsBitSet(slimTermsArr[i], slimTerms, relationTypes);
-            // a term does not exclude itself from a slim
-            exclude[i].clear(i);
-        }
+        BitSet[] exclude = findExclusionBitSet(ontology, slimTerms, slimTermsArr, relationTypes);
 
         Map<String, List<String>> slimTranslationMap = new HashMap<>();
 
@@ -77,17 +66,10 @@ public class TermSlimmer {
 
             if (ancestorsBitSet.cardinality() > 0) {
                 // modify the ancestry to exclude any of the slim terms that are hidden by more specific ones
-                BitSet slimTermsBitSet = (BitSet) ancestorsBitSet.clone();
-                for (int i = 0; (i = ancestorsBitSet.nextSetBit(i)) >= 0; i++) {
-                    slimTermsBitSet.andNot(exclude[i]);
-                }
+                BitSet slimTermsBitSet = excludeHiddenSlimTerms(exclude, ancestorsBitSet);
 
                 // create a map entry that translates this term to slim term(s)
-                List<String> mappedTerms = new ArrayList<>(slimTermsBitSet.cardinality());
-                for (int i = 0; (i = slimTermsBitSet.nextSetBit(i)) >= 0; i++) {
-                    mappedTerms.add(slimTermsArr[i]);
-                }
-                slimTranslationMap.put(id, mappedTerms);
+                slimTranslationMap.put(id, transformBitSetSlims(slimTermsArr, slimTermsBitSet));
             } else if (slimTerms.contains(id)) {
                 // the term is in the slim-set but it has no ancestors for the specified relation
                 slimTranslationMap.put(id, singletonList(id));
@@ -110,6 +92,7 @@ public class TermSlimmer {
 
     /**
      * Finds the terms within the original slim-set to which this term slims up to.
+     *
      * @param id the identifier of the term to map
      * @return a list of terms within the original slim-set to which this term slims up to.
      */
@@ -119,9 +102,81 @@ public class TermSlimmer {
 
     /**
      * Get the map of ontology terms to slimmed equivalent terms.
+     *
      * @return a map of ontology terms to slimmed equivalent terms.
      */
     public Map<String, List<String>> getSlimmedTermsMap() {
         return slimTranslate;
+    }
+
+    /**
+     * Transform a {@link BitSet} of slimming information into a {@link List} of slimmed term ids.
+     *
+     * @param slimTermsArr    array of term ids
+     * @param slimTermsBitSet a bit-set of term id indices, that are part of the slim-set
+     * @return a list of term ids corresponding to the bit-set of term id indices
+     */
+    private static List<String> transformBitSetSlims(String[] slimTermsArr, BitSet slimTermsBitSet) {
+        List<String> mappedTerms = new ArrayList<>(slimTermsBitSet.cardinality());
+        for (int i = 0; (i = slimTermsBitSet.nextSetBit(i)) >= 0; i++) {
+            mappedTerms.add(slimTermsArr[i]);
+        }
+        return mappedTerms;
+    }
+
+    /**
+     * Compute a {@link BitSet} array representing a mapping of terms, and the terms they hide.
+     *
+     * @param ontology      the ontology
+     * @param slimTerms     the terms for which to compute slims for
+     * @param relationTypes the relations over which to traverse when computing the slims
+     * @param slimTermsArr  array of terms for which to compute slims for
+     * @return a bit-set array that maps terms to the terms they hide
+     */
+    private static BitSet[] findExclusionBitSet(OntologyGraphTraversal ontology,
+                                                List<String> slimTerms,
+                                                String[] slimTermsArr,
+                                                OntologyRelationType[] relationTypes) {
+        BitSet[] exclude = new BitSet[slimTerms.size()];
+
+        for (int i = 0; i < slimTermsArr.length; i++) {
+            // a term excludes all its ancestors from being used as slim terms
+            exclude[i] = ontology.getAncestorsBitSet(slimTermsArr[i], slimTerms, relationTypes);
+            // a term does not exclude itself from a slim
+            exclude[i].clear(i);
+        }
+        return exclude;
+    }
+
+    /**
+     * Given a {@link BitSet} of ancestor term ids, create a corresponding {@link BitSet} where
+     * terms may be hidden. Hiding/exclusion information is produced by
+     * {@link #findExclusionBitSet(OntologyGraphTraversal, List, String[], OntologyRelationType[])}.
+     * @param exclude a mapping of term id indices, to the indices of terms that they hide
+     * @param ancestorsBitSet a representation of ancestors
+     * @return a {@link BitSet} representing slimmed terms
+     */
+    private static BitSet excludeHiddenSlimTerms(BitSet[] exclude, BitSet ancestorsBitSet) {
+        BitSet slimTermsBitSet = (BitSet) ancestorsBitSet.clone();
+        for (int i = 0; (i = ancestorsBitSet.nextSetBit(i)) >= 0; i++) {
+            slimTermsBitSet.andNot(exclude[i]);
+        }
+        return slimTermsBitSet;
+    }
+
+    /**
+     * Given an array of requested relation types, get a corresponding array of relation types. If zero
+     * relation types are requested, a default array is used, see {@link #DEFAULT_RELATION_TYPES}.
+     * @param requestedRelationTypes the requested relation types
+     * @return relation types over which slimming takes place
+     */
+    private static OntologyRelationType[] getOntologyRelationTypes(OntologyRelationType[] requestedRelationTypes) {
+        OntologyRelationType[] relationTypes;
+        if (requestedRelationTypes.length == 0) {
+            relationTypes = DEFAULT_RELATION_TYPES;
+        } else {
+            relationTypes = requestedRelationTypes;
+        }
+        return relationTypes;
     }
 }
