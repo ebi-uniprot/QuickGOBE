@@ -113,11 +113,7 @@ public class TermSlimmer {
      * @return a list of terms within the original slim-set to which this term slims up to.
      */
     public List<String> findSlims(String id) {
-        if (slimTranslate.containsKey(id)) {
-            return slimTranslate.get(id);
-        } else {
-            return emptyList();
-        }
+        return slimTranslate.getOrDefault(id, emptyList());
     }
 
     /**
