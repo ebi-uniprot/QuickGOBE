@@ -1,20 +1,20 @@
 package uk.ac.ebi.quickgo.ontology.traversal;
 
-import uk.ac.ebi.quickgo.ontology.common.OntologyType;
-import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
-import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
-
 import com.google.common.base.Preconditions;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.AllDirectedPaths;
 import org.jgrapht.graph.ClassBasedEdgeFactory;
 import org.jgrapht.graph.DirectedMultigraph;
+import uk.ac.ebi.quickgo.ontology.common.OntologyType;
+import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
+import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
+
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * This class represents an ontology graph whose vertices are ontology terms,
@@ -41,11 +41,11 @@ public class OntologyGraph implements OntologyGraphTraversal {
 
     private final DirectedGraph<String, OntologyRelationship> ontology;
     private final Map<String, Set<OntologyRelationship>> ancestorEdgesMap = new HashMap<>();
-    private final EnumMap<OntologyType, Set<String>> vertexMap;
+    private final EnumMap<OntologyType, Set<String>> typeToVertexMap;
 
     public OntologyGraph() {
         ontology = new DirectedMultigraph<>(new ClassBasedEdgeFactory<>(OntologyRelationship.class));
-        vertexMap = new EnumMap<>(OntologyType.class);
+        typeToVertexMap = new EnumMap<>(OntologyType.class);
     }
 
     public Set<OntologyRelationship> getEdges() {
@@ -182,8 +182,8 @@ public class OntologyGraph implements OntologyGraphTraversal {
 
     @Override
     public Set<String> getVertices(OntologyType ontologyType) {
-        if (vertexMap.containsKey(ontologyType)) {
-            return vertexMap.get(ontologyType);
+        if (typeToVertexMap.containsKey(ontologyType)) {
+            return typeToVertexMap.get(ontologyType);
         } else {
             throw new IllegalArgumentException("Terms of OntologyType "+ontologyType.name()+" were not stored, so cannot " +
                     "provide them. Please update OntologyGraph configuration");
@@ -250,10 +250,9 @@ public class OntologyGraph implements OntologyGraphTraversal {
         for (Map.Entry<OntologyType, Matcher> entry : ONTOLOGY_TYPE_PATTERN_MAP.entrySet()) {
             Matcher ontologyTypeMatcher = entry.getValue().reset(vertex);
             if (ontologyTypeMatcher.matches()) {
-                if (!vertexMap.containsKey(entry.getKey())) {
-                    vertexMap.put(entry.getKey(), new HashSet<>());
-                }
-                vertexMap.get(entry.getKey()).add(vertex);
+                typeToVertexMap
+                        .computeIfAbsent(entry.getKey(), key -> new HashSet<>())
+                        .add(vertex);
             }
         }
     }
