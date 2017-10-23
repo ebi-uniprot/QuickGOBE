@@ -454,7 +454,7 @@ public class AnnotationController {
                     .filter(statisticsByType -> statisticsByType.getType().equals(typeName))
                     .flatMap(statisticsByType -> statisticsByType.getValues().stream())
                     .forEach(statisticsValue -> {
-                        CompletableValue completableValue = populateName(filterContext, statisticsValue.getKey());
+                        CompletableValue completableValue = completeValue(filterContext, statisticsValue.getKey());
                         statisticsValue.setName(completableValue.getName());
                     });
         } catch (Exception e) {
@@ -463,9 +463,7 @@ public class AnnotationController {
     }
 
     @Cacheable("statisticsNames")
-    public CompletableValue populateName(FilterContext filterContext, String key) {
-        LOGGER.info("Looking for key " + key);
-        //return statisticsTransformerChain.applyTransformations(statisticsValue, filterContext);
+    public CompletableValue completeValue(FilterContext filterContext, String key) {
         CompletableValue completableValue = new CompletableValue(key);
         return completeableValueTransformerChain.applyTransformations(completableValue, filterContext);
 
