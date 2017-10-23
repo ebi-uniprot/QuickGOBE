@@ -21,7 +21,7 @@ import static org.mockito.Mockito.*;
  * Time: 13:41
  * Created with IntelliJ IDEA.
  */
-public class StatsExcelDispatchWriterTest {
+public class StatsExcelOutputStreamWriterTest {
 
     @Rule
     public ExpectedException exception = ExpectedException.none();

@@ -24,7 +24,7 @@ import org.springframework.http.MediaType;
  * Time: 14:49
  * Created with IntelliJ IDEA.
  */
-public class AnnotationDispatchWriter implements DispatchWriter {
+public class AnnotationDispatchWriter implements OutputStreamWriter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AnnotationDispatchWriter.class);
     private static final int FLUSH_INTERVAL = 500;

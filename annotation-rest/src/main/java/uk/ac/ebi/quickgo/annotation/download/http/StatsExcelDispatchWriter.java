@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
  * Time: 14:49
  * Created with IntelliJ IDEA.
  */
-public class StatsExcelDispatchWriter implements DispatchWriter {
+public class StatsExcelDispatchWriter implements OutputStreamWriter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StatsExcelDispatchWriter.class);
     private final StatisticsConverter converter;

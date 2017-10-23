@@ -44,7 +44,7 @@ import static uk.ac.ebi.quickgo.annotation.service.converter.StatisticsWorkBookL
         return new HttpMessageConverter(gpadDispatchWriter(), GPAD_MEDIA_TYPE);
     }
 
-    private DispatchWriter gpadDispatchWriter() {
+    private OutputStreamWriter gpadDispatchWriter() {
         return new AnnotationDispatchWriter(new AnnotationToGPAD(), GPAD_MEDIA_TYPE);
     }
 
@@ -53,7 +53,7 @@ import static uk.ac.ebi.quickgo.annotation.service.converter.StatisticsWorkBookL
         return new HttpMessageConverter(gafDispatchWriter(),GAF_MEDIA_TYPE);
     }
 
-    private DispatchWriter gafDispatchWriter() {
+    private OutputStreamWriter gafDispatchWriter() {
         return new AnnotationDispatchWriter(new AnnotationToGAF(), GAF_MEDIA_TYPE);
     }
 
@@ -62,7 +62,7 @@ import static uk.ac.ebi.quickgo.annotation.service.converter.StatisticsWorkBookL
         return new HttpMessageConverter(tsvDispatchWriter(), TSV_MEDIA_TYPE);
     }
 
-    private DispatchWriter tsvDispatchWriter() {
+    private OutputStreamWriter tsvDispatchWriter() {
         return new AnnotationDispatchWriter(new AnnotationToTSV(), TSV_MEDIA_TYPE);
     }
 
@@ -71,7 +71,7 @@ import static uk.ac.ebi.quickgo.annotation.service.converter.StatisticsWorkBookL
         return new HttpMessageConverter(statsDispatchWriter(), EXCEL_MEDIA_TYPE);
     }
 
-    private DispatchWriter statsDispatchWriter() {
+    private OutputStreamWriter statsDispatchWriter() {
         return new StatsExcelDispatchWriter(new StatisticsToWorkbook(SECTION_TYPES, SHEET_LAYOUT_MAP));
     }
 }

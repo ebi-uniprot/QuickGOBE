@@ -4,14 +4,14 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * Define how to dispatch an object.
+ * Define dispatching an object to an OutputStream.
  *
  * @author Tony Wardell
  * Date: 27/09/2017
  * Time: 14:19
  * Created with IntelliJ IDEA.
  */
-public interface DispatchWriter {
+public interface OutputStreamWriter {
 
     void write(Object object, OutputStream out) throws IOException;
 }
