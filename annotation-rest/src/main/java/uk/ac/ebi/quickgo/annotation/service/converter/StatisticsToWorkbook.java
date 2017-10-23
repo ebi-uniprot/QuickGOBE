@@ -28,6 +28,9 @@ public class StatisticsToWorkbook implements StatisticsConverter{
     private static final int HEADER_ROW = 1;
     private static final int COLUMN_NAMES_ROW = 2;
     private static final int DETAIL_ROW_INITIAL_VALUE = 3;
+    public static final int SUMMARY_HEADER_ROWNUM = 1;
+    public static final int FIRST_COLUMN = 0;
+    public static final int SUMMARY_DETAIL_ROWNUM = 2;
     private final String[] sectionTypes;
     private final Map<String, SheetLayout> sheetLayoutMap;
 
@@ -79,16 +82,13 @@ public class StatisticsToWorkbook implements StatisticsConverter{
 
     private void populateDetailSheetsForGroup(StatisticsGroup statisticsGroup, Workbook wb,
             CellStyle fixedDecimalPlaces, CellStyle boldCellFormat) {
-
         for (StatisticsByType statisticsByType : statisticsGroup.getTypes()) {
-
             final SheetLayout sheetLayout = sheetLayoutMap.get(statisticsByType.getType());
             if (sheetLayout == null) {
                 continue;
             }
 
-            final Sheet sheet = wb.getSheet(sheetLayout.displayName) != null ? wb.getSheet(sheetLayout.displayName)
-                    : wb.createSheet(sheetLayout.displayName);
+            final Sheet sheet = retrieveOrCreateSheet(wb, sheetLayout);
 
             sheetLayout.sectionLayouts.stream()
                                       .filter(sectionLayout -> sectionLayout.type.equals(statisticsGroup.getGroupName()))
@@ -98,6 +98,11 @@ public class StatisticsToWorkbook implements StatisticsConverter{
                                                                                       fixedDecimalPlaces,
                                                                                       boldCellFormat));
         }
+    }
+
+    private Sheet retrieveOrCreateSheet(Workbook wb, SheetLayout sheetLayout) {
+        return wb.getSheet(sheetLayout.displayName) != null ? wb.getSheet(sheetLayout.displayName)
+                : wb.createSheet(sheetLayout.displayName);
     }
 
     private void populateSectionLayout(Sheet sheet, SectionLayout sectionLayout, StatisticsByType statisticsByType,
@@ -154,16 +159,15 @@ public class StatisticsToWorkbook implements StatisticsConverter{
     }
 
     private void populateSummarySheet(Sheet sheet, List<StatisticsGroup> statisticsGroups, CellStyle boldCellFormat) {
-
         statisticsGroups.stream()
                         .filter(statisticsGroup -> statisticsGroup.getGroupName().equals("annotation"))
                         .forEach(statisticsGroup -> {
-                            Row row1 = sheet.createRow(1);
-                            final Cell header = row1.createCell(0);
+                            Row row1 = sheet.createRow(SUMMARY_HEADER_ROWNUM);
+                            final Cell header = row1.createCell(FIRST_COLUMN);
                             header.setCellStyle(boldCellFormat);
                             header.setCellValue("Summary");
-                            Row row2 = sheet.createRow(2);
-                            row2.createCell(0).setCellValue("Number of annotations:" + statisticsGroup.getTotalHits());
+                            Row row2 = sheet.createRow(SUMMARY_DETAIL_ROWNUM);
+                            row2.createCell(FIRST_COLUMN).setCellValue("Number of annotations:" + statisticsGroup.getTotalHits());
                         });
     }
 
