@@ -100,7 +100,7 @@ final class ResponseVerifier {
                                            .addMatcher(jsonPath(path + "extensions").exists());
     }
 
-    static ResultMatcher fieldsInAllResultsExist(int numResults) throws Exception {
+    static ResultMatcher fieldsInAllResultsExist(int numResults) {
         CompositeResultMatcher matcher = new CompositeResultMatcher();
 
         for (int i = 0; i < numResults; i++) {
@@ -110,13 +110,13 @@ final class ResponseVerifier {
         return matcher;
     }
 
-    static ResultMatcher fieldInRowHasValue(String fieldName, int index, String value) throws Exception {
+    static ResultMatcher fieldInRowHasValue(String fieldName, int index, String value) {
         String path = String.format(RESULTS_CONTENT_BY_INDEX, index);
         return new CompositeResultMatcher().addMatcher(jsonPath(path + fieldName, is(value)));
 
     }
 
-    static ResultMatcher resultsInPage(int numResults) throws Exception {
+    static ResultMatcher resultsInPage(int numResults) {
         return jsonPath("$.results", hasSize(numResults));
     }
 
@@ -127,14 +127,14 @@ final class ResponseVerifier {
                                            .addMatcher(jsonPath("$.pageInfo.current").value(pageNumber));
     }
 
-    static ResultMatcher pageInfoExists() throws Exception {
+    static ResultMatcher pageInfoExists() {
         return new CompositeResultMatcher().addMatcher(jsonPath("$.pageInfo").exists())
                                            .addMatcher(jsonPath("$.pageInfo.resultsPerPage").exists())
                                            .addMatcher(jsonPath("$.pageInfo.total").exists())
                                            .addMatcher(jsonPath("$.pageInfo.current").exists());
     }
 
-    static ResultMatcher contentTypeToBeJson() throws Exception {
+    static ResultMatcher contentTypeToBeJson() {
         return content().contentType(MediaType.APPLICATION_JSON_VALUE);
     }
 
@@ -144,6 +144,10 @@ final class ResponseVerifier {
 
     static ResultMatcher numOfResults(String path, int numResults) {
         return jsonPath(path).value(numResults);
+    }
+
+    static ResultMatcher expectedValues(String path, List<String> expectedValues) {
+        return jsonPath(path).value(is(expectedValues));
     }
 
     static TimeoutResponseCreator withTimeout() {
