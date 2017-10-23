@@ -28,7 +28,9 @@ import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Service that collects distribution statistics of annotations and gene products throughout a given set of annotation
- * fields.
+ * fields. This class provides statistics for two different request types: restStatistics defines the statistics
+ * required for presentation by the front end of QuickGO, available as a restful service, while downloadStatistics
+ * defines statistics that will be downloaded as a file to the client.
  *
  * @author Ricardo Antunes
  */
@@ -44,29 +46,29 @@ public class AnnotationStatisticsService implements StatisticsService {
     private final StatsConverter converter;
 
     private final DefaultSearchQueryTemplate queryTemplate;
-    private final List<RequiredStatistic> listStats;
+    private final List<RequiredStatistic> restStatistics;
     private final List<RequiredStatistic> downloadStats;
 
     @Autowired
     public AnnotationStatisticsService(FilterConverterFactory converterFactory,
             SearchService<Annotation> searchService,
             StatsConverter converter,
-            RequiredStatistics listStatistics,
+            RequiredStatistics restStatistics,
             RequiredStatistics downloadStatistics) {
         checkArgument(converterFactory != null, "Filter factory cannot be null.");
         checkArgument(searchService != null, "Search service cannot be null.");
         checkArgument(converter != null, "Stats request converter cannot be null.");
-        checkArgument(listStatistics != null, "Required stats list cannot be null.");
+        checkArgument(restStatistics != null, "Required stats list cannot be null.");
         checkArgument(downloadStatistics != null, "Required stats download cannot be null.");
 
         this.converterFactory = converterFactory;
         this.searchService = searchService;
         this.converter = converter;
 
-        checkState(listStatistics.getStats() != null, "Required stats list for list cannot be null.");
+        checkState(restStatistics.getStats() != null, "Required stats list for list cannot be null.");
         checkState(downloadStatistics.getStats() != null, "Required stats list for download cannot be null.");
 
-        this.listStats = listStatistics.getStats();
+        this.restStatistics = restStatistics.getStats();
         this.downloadStats = downloadStatistics.getStats();
 
         queryTemplate = new DefaultSearchQueryTemplate();
@@ -79,7 +81,7 @@ public class AnnotationStatisticsService implements StatisticsService {
 
     @Override
     public QueryResult<StatisticsGroup> calculate(AnnotationRequest request) {
-        return calculateForRequiredStatistics(request, listStats);
+        return calculateForRequiredStatistics(request, restStatistics);
     }
 
     private QueryResult<StatisticsGroup> calculateForRequiredStatistics(AnnotationRequest request,
