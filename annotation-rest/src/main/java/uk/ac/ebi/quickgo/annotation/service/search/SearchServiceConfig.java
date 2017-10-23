@@ -271,7 +271,7 @@ public class SearchServiceConfig {
     @Bean
     public ValueInjectionToSingleResult<StatisticsValue> statisticsValueResultMutator(
             RESTFilterConverterFactory converterFactory) {
-        return new ValueInjectionToSingleResult(converterFactory);
+        return new ValueInjectionToSingleResult<>(converterFactory);
     }
 
     private DbXRefLoader geneProductLoader() {
@@ -299,7 +299,7 @@ public class SearchServiceConfig {
         List<ResponseValueInjector<CompletableValue>> responseValueInjectors =
                 singletonList(new uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer
                         .completablevalue.OntologyNameInjector());
-        return new ExternalServiceResultsTransformer<>(responseValueInjectors, completeableValueResultMutator(converterFactory));
+        return new ExternalServiceResultsTransformer<>(responseValueInjectors, completableValueResultMutator(converterFactory));
     }
 
     @Bean
@@ -308,12 +308,12 @@ public class SearchServiceConfig {
         List<ResponseValueInjector<CompletableValue>> responseValueInjectors = singletonList(
                 new uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.completablevalue
                         .TaxonomyNameInjector());
-        return new ExternalServiceResultsTransformer<>(responseValueInjectors, completeableValueResultMutator(converterFactory));
+        return new ExternalServiceResultsTransformer<>(responseValueInjectors, completableValueResultMutator(converterFactory));
     }
 
     @Bean
-    public ValueInjectionToSingleResult<CompletableValue> completeableValueResultMutator(
+    public ValueInjectionToSingleResult<CompletableValue> completableValueResultMutator(
             RESTFilterConverterFactory converterFactory) {
-        return new ValueInjectionToSingleResult(converterFactory);
+        return new ValueInjectionToSingleResult<>(converterFactory);
     }
 }
