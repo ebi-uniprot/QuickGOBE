@@ -12,7 +12,7 @@ import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.annot
 import uk.ac.ebi.quickgo.annotation.service.converter.AnnotationDocConverterImpl;
 import uk.ac.ebi.quickgo.common.SearchableField;
 import uk.ac.ebi.quickgo.common.loader.DbXRefLoader;
-import uk.ac.ebi.quickgo.common.model.CompletableValue;
+import uk.ac.ebi.quickgo.rest.model.CompletableValue;
 import uk.ac.ebi.quickgo.common.validator.DbXRefEntityValidation;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl;
@@ -73,7 +73,6 @@ public class SearchServiceConfig {
     private static final String SOLR_ANNOTATION_QUERY_REQUEST_HANDLER = "/query";
     private static final String DEFAULT_DOWNLOAD_SORT_FIELDS = "rowNumber,id";
     private static final int DEFAULT_DOWNLOAD_PAGE_SIZE = 500;
-    private static final int DEFAULT_STATISTICS_LIMIT = 50000;
 
     @Value("${geneproduct.db.xref.valid.regexes}")
     String xrefValidationRegexFile;
@@ -91,9 +90,6 @@ public class SearchServiceConfig {
 
     @Value("${search.wildcard.fields:}")
     private String fieldsThatCanBeSearchedByWildCard;
-
-    @Value("${annotation.statistics.limit:" + DEFAULT_STATISTICS_LIMIT + "}")
-    private int statisticsLimit;
 
     @Bean
     public SearchService<Annotation> annotationSearchService(
@@ -245,11 +241,6 @@ public class SearchServiceConfig {
     }
 
     @Bean
-    public StatisticsSearchConfig statisticsDownloadConfig() {
-        return () -> statisticsLimit;
-    }
-
-    @Bean
     public ResultTransformerChain<StatisticsValue> statisticsTransformerChain(
             ExternalServiceResultsTransformer<StatisticsValue,StatisticsValue> statisticsOntologyNameTransformer,
             ExternalServiceResultsTransformer<StatisticsValue,StatisticsValue> statisticsTaxonNameTransformer) {
@@ -290,10 +281,6 @@ public class SearchServiceConfig {
     public interface AnnotationCompositeRetrievalConfig extends SolrRetrievalConfig, ServiceRetrievalConfig {
         List<SortCriterion> getDownloadSortCriteria();
         int getDownloadPageSize();
-    }
-
-    public interface StatisticsSearchConfig {
-        long defaultDownloadLimit();
     }
 
     @Bean
