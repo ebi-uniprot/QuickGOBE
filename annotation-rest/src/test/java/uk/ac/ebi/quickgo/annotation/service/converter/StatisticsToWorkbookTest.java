@@ -21,9 +21,29 @@ import static uk.ac.ebi.quickgo.annotation.service.converter.StatisticsWorkBookL
  * Created with IntelliJ IDEA.
  */
 public class StatisticsToWorkbookTest {
-
     private List<StatisticsGroup> statisticsGroups;
     private static final Map<String, StatisticsToWorkbook.SheetLayout> SHEET_LAYOUT_MAP = new HashMap<>();
+    private static final StatisticsWorkBookLayout.AnnotationSectionLayout SL_ANNOTATION_GOID =
+            new StatisticsWorkBookLayout.AnnotationSectionLayout("GO IDs (by annotation)");
+    private static final StatisticsWorkBookLayout.AnnotationSectionLayout SL_ANNOTATION_ASPECT =
+            new StatisticsWorkBookLayout.AnnotationSectionLayout("Aspects (by annotation)");
+
+    private static final StatisticsWorkBookLayout.GeneProductSectionLayout SL_GENE_PRODUCT_GOID =
+            new StatisticsWorkBookLayout.GeneProductSectionLayout("GO IDs (by protein)");
+    private static final StatisticsWorkBookLayout.GeneProductSectionLayout SL_GENE_PRODUCT_ASPECT =
+            new StatisticsWorkBookLayout.GeneProductSectionLayout("Aspects (by protein)");
+    static {
+        SHEET_LAYOUT_MAP.put("TEST_GO_ID",
+                new StatisticsToWorkbook.SheetLayout("goid",
+                        Arrays.asList(SL_ANNOTATION_GOID,
+                                SL_GENE_PRODUCT_GOID)));
+
+        SHEET_LAYOUT_MAP.put("aspect",
+                new StatisticsToWorkbook.SheetLayout("aspect",
+                        Arrays.asList(SL_ANNOTATION_ASPECT,
+                                SL_GENE_PRODUCT_ASPECT)));
+    }
+
 
     @Before
     public void setup(){
@@ -113,27 +133,5 @@ public class StatisticsToWorkbookTest {
         statisticsByGeneProductTypeAspect.addValue(new StatisticsValue("molecular_function",1, 1L));
         statisticsByGeneProductTypeAspect.addValue(new StatisticsValue("biological_process",1, 1L));
         geneProductStatisticsGroup.addStatsType(statisticsByGeneProductTypeAspect);
-    }
-
-    private static final StatisticsWorkBookLayout.AnnotationSectionLayout SL_ANNOTATION_GOID =
-            new StatisticsWorkBookLayout.AnnotationSectionLayout("GO IDs (by annotation)");
-    private static final StatisticsWorkBookLayout.AnnotationSectionLayout SL_ANNOTATION_ASPECT =
-            new StatisticsWorkBookLayout.AnnotationSectionLayout("Aspects (by annotation)");
-
-    private static final StatisticsWorkBookLayout.GeneProductSectionLayout SL_GENE_PRODUCT_GOID =
-            new StatisticsWorkBookLayout.GeneProductSectionLayout("GO IDs (by protein)");
-    private static final StatisticsWorkBookLayout.GeneProductSectionLayout SL_GENE_PRODUCT_ASPECT =
-            new StatisticsWorkBookLayout.GeneProductSectionLayout("Aspects (by protein)");
-
-    static {
-        SHEET_LAYOUT_MAP.put("TEST_GO_ID",
-                             new StatisticsToWorkbook.SheetLayout("goid",
-                                                                  Arrays.asList(SL_ANNOTATION_GOID,
-                                                                                SL_GENE_PRODUCT_GOID)));
-
-        SHEET_LAYOUT_MAP.put("aspect",
-                             new StatisticsToWorkbook.SheetLayout("aspect",
-                                                                  Arrays.asList(SL_ANNOTATION_ASPECT,
-                                                                                SL_GENE_PRODUCT_ASPECT)));
     }
 }
