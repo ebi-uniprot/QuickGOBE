@@ -88,7 +88,7 @@ public class AnnotationControllerStatisticsDownloadIT {
     @Autowired
     private AnnotationRepository annotationRepository;
     @Autowired
-    private RestOperations     restOperations;
+    private RestOperations restOperations;
     private MockRestServiceServer mockRestServiceServer;
     private ObjectMapper dtoMapper;
     private List<String> populatedGoNames;
@@ -96,94 +96,41 @@ public class AnnotationControllerStatisticsDownloadIT {
     @Before
     public void setup() {
         annotationRepository.deleteAll();
-
-        mockMvc = MockMvcBuilders.
-                webAppContextSetup(webApplicationContext)
-                .build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
         mockRestServiceServer = MockRestServiceServer.createServer((RestTemplate) restOperations);
         dtoMapper = new ObjectMapper();
-
         List<AnnotationDocument> genericDocs = createGenericDocsChangingGoId(NUMBER_OF_GENERIC_DOCS);
         annotationRepository.save(genericDocs);
-
         populatedGoNames = new ArrayList<>(NUMBER_OF_GENERIC_DOCS);
         for (int j = 0; j < NUMBER_OF_GENERIC_DOCS; j++) {
             populatedGoNames.add(goName(j));
         }
     }
 
+    private String goName(int id) {
+        return IdGeneratorUtil.createGoId(id) + " name";
+    }
+
     @Test
     public void canDownloadInExcelFormat() throws Exception {
         setExpectationsForSuccessfulOntologyServiceRestResponse();
         setExpectationsForSuccessfulTaxonomyServiceRestResponse();
-        ResultActions response = mockMvc.perform( get(DOWNLOAD_STATISTICS_SEARCH_URL).header(ACCEPT, EXCEL_MEDIA_TYPE));
+        ResultActions response = mockMvc.perform(get(DOWNLOAD_STATISTICS_SEARCH_URL).header(ACCEPT, EXCEL_MEDIA_TYPE));
 
         checkResponse(EXCEL_MEDIA_TYPE, response);
     }
 
-    @Test
-    public void canDownloadInJsonFormat() throws Exception {
-        setExpectationsForSuccessfulOntologyServiceRestResponse();
-        setExpectationsForSuccessfulTaxonomyServiceRestResponse();
-        ResultActions response = mockMvc.perform(get(DOWNLOAD_STATISTICS_SEARCH_URL).header(ACCEPT, JSON_MEDIA_TYPE));
-
-        checkResponse(response, NUMBER_OF_GENERIC_DOCS);
-
-        response.andExpect(expectedValues(ALL_GO_TERM_NAMES, populatedGoNames));
-        response.andExpect(expectedValues(ALL_TAXON_NAMES, singletonList(String.valueOf(taxonName()))));
-    }
-
-    @Test
-    public void downloadStatisticsSuccessfulAfterFailedToRetrieveGONames() throws Exception {
-        setExpectationsForUnsuccessfulOntologyServiceRestResponse();
-        setExpectationsForSuccessfulTaxonomyServiceRestResponse();
-
-        ResultActions response = mockMvc.perform( get(DOWNLOAD_STATISTICS_SEARCH_URL).header(ACCEPT, JSON_MEDIA_TYPE));
-
-        checkResponse(JSON_MEDIA_TYPE, response);
-        response.andExpect(expectedValues(ALL_GO_TERM_NAMES, Arrays.asList(null, null, null, null, null)));
-        response.andExpect(expectedValues(ALL_TAXON_NAMES, singletonList(String.valueOf(taxonName()))));
-    }
-
-    @Test
-    public void downloadStatisticsSuccessfulAfterFailedToRetrieveTaxonNames() throws Exception {
-        setExpectationsForSuccessfulOntologyServiceRestResponse();
-        setExpectationsForUnsuccessfulTaxonomyServiceRestResponse();
-
-        ResultActions response = mockMvc.perform( get(DOWNLOAD_STATISTICS_SEARCH_URL).header(ACCEPT, JSON_MEDIA_TYPE));
-
-        checkResponse(JSON_MEDIA_TYPE, response);
-        response.andExpect(expectedValues(ALL_GO_TERM_NAMES, populatedGoNames));
-        response.andExpect(expectedValues(ALL_TAXON_NAMES, singletonList(null)));
-    }
-
     private void setExpectationsForSuccessfulOntologyServiceRestResponse() {
-        for(int k=0; k < NO_OF_STATISTICS_GROUPS; k++){
+        for (int k = 0; k < NO_OF_STATISTICS_GROUPS; k++) {
             for (int j = 0; j < NUMBER_OF_GENERIC_DOCS; j++) {
                 expectGoTermsHaveGoNamesViaRest(singletonList(goId(j)), singletonList(goName(j)));
             }
         }
     }
 
-    private void setExpectationsForUnsuccessfulOntologyServiceRestResponse() {
-        for(int k=0; k < NO_OF_STATISTICS_GROUPS; k++){
-            for (int j = 0; j < NUMBER_OF_GENERIC_DOCS; j++) {
-                expectRestCallResponse(buildResource(GO_TERM_RESOURCE_FORMAT, goId(j)), withStatus(HttpStatus
-                        .NOT_FOUND));
-            }
-        }
-    }
-
     private void setExpectationsForSuccessfulTaxonomyServiceRestResponse() {
-        for(int i=0; i < NO_OF_STATISTICS_GROUPS; i++) {
+        for (int i = 0; i < NO_OF_STATISTICS_GROUPS; i++) {
             expectTaxonIdHasGivenTaxonNameViaRest(taxonId(), taxonName());
-        }
-    }
-
-    private void setExpectationsForUnsuccessfulTaxonomyServiceRestResponse() {
-        for(int i=0; i < NO_OF_STATISTICS_GROUPS; i++) {
-            expectRestCallResponse(buildResource(TAXONOMY_ID_NODE_RESOURCE_FORMAT, String.valueOf(taxonId()
-            )), withStatus(HttpStatus.NOT_FOUND));
         }
     }
 
@@ -194,11 +141,6 @@ public class AnnotationControllerStatisticsDownloadIT {
                 .andExpect(header().string(VARY, is(ACCEPT)))
                 .andExpect(header().string(CONTENT_DISPOSITION, endsWith("." + fileExtension(mediaType) + "\"")))
                 .andExpect(content().contentType(mediaType));
-    }
-
-    private void checkResponse(ResultActions response, int expectedSize) throws Exception {
-        checkResponse(JSON_MEDIA_TYPE, response);
-        response.andExpect(numOfResults(NUMBER_OF_GO_ID_RESULTS_FOR_ANNOTATIONS, expectedSize));
     }
 
     private void expectGoTermsHaveGoNamesViaRest(List<String> termIds, List<String> termNames) {
@@ -216,6 +158,10 @@ public class AnnotationControllerStatisticsDownloadIT {
         }
     }
 
+    private String goId(int id) {
+        return IdGeneratorUtil.createGoId(id);
+    }
+
     private void expectTaxonIdHasGivenTaxonNameViaRest(int taxonId, String taxonName) {
         checkArgument(taxonName != null && !taxonName.isEmpty(), "taxonName cannot be null or empty");
 
@@ -228,6 +174,34 @@ public class AnnotationControllerStatisticsDownloadIT {
                         TAXONOMY_ID_NODE_RESOURCE_FORMAT,
                         String.valueOf(taxonId)),
                 responseAsString);
+    }
+
+    private int taxonId() {
+        return 12345;
+    }
+
+    private String taxonName() {
+        return "taxon name: " + 12345;
+    }
+
+    private void expectRestCallSuccess(String url, String response) {
+        mockRestServiceServer.expect(
+                requestTo(BASE_URL + url))
+                .andExpect(method(HttpMethod.GET))
+                .andRespond(withSuccess(response, MediaType.APPLICATION_JSON));
+    }
+
+    private String buildResource(String format, String... arguments) {
+        int requiredArgsCount = format.length() - format.replace("%", "").length();
+        List<String> args = new ArrayList<>();
+        for (int i = 0; i < requiredArgsCount; i++) {
+            if (i < arguments.length) {
+                args.add(arguments[i]);
+            } else {
+                args.add("");
+            }
+        }
+        return String.format(format, args.toArray());
     }
 
     private String constructGoTermsResponseObject(List<String> termIds, List<String> termNames) {
@@ -258,40 +232,42 @@ public class AnnotationControllerStatisticsDownloadIT {
         }
     }
 
-    private void expectRestCallSuccess(String url, String response) {
-        mockRestServiceServer.expect(
-                requestTo(BASE_URL + url))
-                .andExpect(method(HttpMethod.GET))
-                .andRespond(withSuccess(response, MediaType.APPLICATION_JSON));
+    @Test
+    public void canDownloadInJsonFormat() throws Exception {
+        setExpectationsForSuccessfulOntologyServiceRestResponse();
+        setExpectationsForSuccessfulTaxonomyServiceRestResponse();
+        ResultActions response = mockMvc.perform(get(DOWNLOAD_STATISTICS_SEARCH_URL).header(ACCEPT, JSON_MEDIA_TYPE));
+
+        checkResponse(response, NUMBER_OF_GENERIC_DOCS);
+
+        response.andExpect(expectedValues(ALL_GO_TERM_NAMES, populatedGoNames));
+        response.andExpect(expectedValues(ALL_TAXON_NAMES, singletonList(String.valueOf(taxonName()))));
     }
 
-    private String buildResource(String format, String... arguments) {
-        int requiredArgsCount = format.length() - format.replace("%", "").length();
-        List<String> args = new ArrayList<>();
-        for (int i = 0; i < requiredArgsCount; i++) {
-            if (i < arguments.length) {
-                args.add(arguments[i]);
-            } else {
-                args.add("");
+    private void checkResponse(ResultActions response, int expectedSize) throws Exception {
+        checkResponse(JSON_MEDIA_TYPE, response);
+        response.andExpect(numOfResults(NUMBER_OF_GO_ID_RESULTS_FOR_ANNOTATIONS, expectedSize));
+    }
+
+    @Test
+    public void downloadStatisticsSuccessfulAfterFailedToRetrieveGONames() throws Exception {
+        setExpectationsForUnsuccessfulOntologyServiceRestResponse();
+        setExpectationsForSuccessfulTaxonomyServiceRestResponse();
+
+        ResultActions response = mockMvc.perform(get(DOWNLOAD_STATISTICS_SEARCH_URL).header(ACCEPT, JSON_MEDIA_TYPE));
+
+        checkResponse(JSON_MEDIA_TYPE, response);
+        response.andExpect(expectedValues(ALL_GO_TERM_NAMES, Arrays.asList(null, null, null, null, null)));
+        response.andExpect(expectedValues(ALL_TAXON_NAMES, singletonList(String.valueOf(taxonName()))));
+    }
+
+    private void setExpectationsForUnsuccessfulOntologyServiceRestResponse() {
+        for (int k = 0; k < NO_OF_STATISTICS_GROUPS; k++) {
+            for (int j = 0; j < NUMBER_OF_GENERIC_DOCS; j++) {
+                expectRestCallResponse(buildResource(GO_TERM_RESOURCE_FORMAT, goId(j)), withStatus(HttpStatus
+                        .NOT_FOUND));
             }
         }
-        return String.format(format, args.toArray());
-    }
-
-    private String goId(int id) {
-        return IdGeneratorUtil.createGoId(id);
-    }
-
-    private String goName(int id) {
-        return IdGeneratorUtil.createGoId(id) + " name";
-    }
-
-    private int taxonId() {
-        return 12345;
-    }
-
-    private String taxonName() {
-        return "taxon name: " + 12345;
     }
 
     private void expectRestCallResponse(String url, ResponseCreator response) {
@@ -299,5 +275,24 @@ public class AnnotationControllerStatisticsDownloadIT {
                 requestTo(BASE_URL + url))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(response);
+    }
+
+    @Test
+    public void downloadStatisticsSuccessfulAfterFailedToRetrieveTaxonNames() throws Exception {
+        setExpectationsForSuccessfulOntologyServiceRestResponse();
+        setExpectationsForUnsuccessfulTaxonomyServiceRestResponse();
+
+        ResultActions response = mockMvc.perform(get(DOWNLOAD_STATISTICS_SEARCH_URL).header(ACCEPT, JSON_MEDIA_TYPE));
+
+        checkResponse(JSON_MEDIA_TYPE, response);
+        response.andExpect(expectedValues(ALL_GO_TERM_NAMES, populatedGoNames));
+        response.andExpect(expectedValues(ALL_TAXON_NAMES, singletonList(null)));
+    }
+
+    private void setExpectationsForUnsuccessfulTaxonomyServiceRestResponse() {
+        for (int i = 0; i < NO_OF_STATISTICS_GROUPS; i++) {
+            expectRestCallResponse(buildResource(TAXONOMY_ID_NODE_RESOURCE_FORMAT, String.valueOf(taxonId()
+            )), withStatus(HttpStatus.NOT_FOUND));
+        }
     }
 }
