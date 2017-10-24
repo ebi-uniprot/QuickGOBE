@@ -41,8 +41,8 @@ public class AnnotationStatisticsService implements StatisticsService {
 
     private static final int FIRST_PAGE = 1;
     private static final int RESULTS_PER_PAGE = 0;
-    public final List<RequiredStatistic> requiredStatisticsForStandardUsage;
-    public final List<RequiredStatistic> requiredStatisticsForDownloadUsage;
+    private final List<RequiredStatistic> requiredStatisticsForStandardUsage;
+    private final List<RequiredStatistic> requiredStatisticsForDownloadUsage;
     private final FilterConverterFactory converterFactory;
     private final SearchService<Annotation> searchService;
     private final StatsConverter converter;
