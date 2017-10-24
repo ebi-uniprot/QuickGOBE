@@ -30,16 +30,16 @@ public class StatisticsTypeReadPropertiesIT {
 
     @Autowired
     private RequiredStatistics requiredStatisticsForStandardUsage;
-    private List<RequiredStatistic> requests;
+    private List<RequiredStatistic> statistics;
 
     @Before
     public void setUp() {
-        requests = requiredStatisticsForStandardUsage.getStats();
+        statistics = requiredStatisticsForStandardUsage.getStats();
     }
 
     @Test
     public void checkLimitsReadAndSetForCorrectTypes() {
-        for (RequiredStatistic request : requests) {
+        for (RequiredStatistic request : statistics) {
             for (RequiredStatisticType type : request.getTypes()) {
                 switch (type.getName()) {
                     case GO_ID:
