@@ -11,7 +11,8 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * The purpose of this class is to insert information available externally via
- * RESTful services, into a {@link QueryResult} of where the results have type, {@link R}.
+ * RESTful services, into a {@link QueryResult} of where the results have type, {@link R}, and the object to be
+ * transformed with the results has type {@link M}
  *
  * Created 06/04/17
  * @author Edd
