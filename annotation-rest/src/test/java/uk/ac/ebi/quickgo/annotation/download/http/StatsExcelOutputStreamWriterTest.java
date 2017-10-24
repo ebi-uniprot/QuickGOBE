@@ -40,7 +40,6 @@ public class StatsExcelOutputStreamWriterTest {
         dispatchWriter = new StatsExcelDispatchWriter(mockConverter);
         inputObject =  new QueryResult.Builder<String>(0, Collections.emptyList()).build();
         when(mockConverter.convert(Collections.emptyList())).thenReturn(mockWorkbook);
-
     }
 
     @Test
@@ -49,11 +48,10 @@ public class StatsExcelOutputStreamWriterTest {
 
         verify(mockWorkbook).write(mockOutputStream);
         verify(mockOutputStream).flush();
-
     }
 
     @Test
-    public void exceptionFromWorkBookWriteIsNotPropogated() throws Exception{
+    public void exceptionFromWorkBookWriteIsNotPropagated() throws Exception{
         doThrow(new IOException()).when(mockWorkbook).write(mockOutputStream);
 
         dispatchWriter.write(inputObject, mockOutputStream);
