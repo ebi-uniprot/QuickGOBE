@@ -91,13 +91,13 @@ public class StatisticsToWorkbookTest {
         statisticsGroups.add(geneProductStatisticsGroup);
 
         //GoId
-        StatisticsByType statisticsByAnnotationTypeGoId = new StatisticsByType("goId");
+        StatisticsByType statisticsByAnnotationTypeGoId = new StatisticsByType("TEST_GO_ID");
         statisticsByAnnotationTypeGoId.addValue(new StatisticsValue("GO:0003824", 1, 5L));
         statisticsByAnnotationTypeGoId.addValue(new StatisticsValue("GO:0003870",1, 5L));
         statisticsByAnnotationTypeGoId.addValue(new StatisticsValue("GO:0009058",1, 5L));
         annotationStatisticsGroup.addStatsType(statisticsByAnnotationTypeGoId);
 
-        StatisticsByType statisticsByGeneProductTypeGoId = new StatisticsByType("goId");
+        StatisticsByType statisticsByGeneProductTypeGoId = new StatisticsByType("TEST_GO_ID");
         statisticsByGeneProductTypeGoId.addValue(new StatisticsValue("GO:0003824",1, 1L));
         statisticsByGeneProductTypeGoId.addValue(new StatisticsValue("GO:0003870",1, 1L));
         statisticsByGeneProductTypeGoId.addValue(new StatisticsValue("GO:0009058",1, 1L));
@@ -126,7 +126,7 @@ public class StatisticsToWorkbookTest {
             new StatisticsWorkBookLayout.GeneProductSectionLayout("Aspects (by protein)");
 
     static {
-        SHEET_LAYOUT_MAP.put("goId",
+        SHEET_LAYOUT_MAP.put("TEST_GO_ID",
                              new StatisticsToWorkbook.SheetLayout("goid",
                                                                   Arrays.asList(SL_ANNOTATION_GOID,
                                                                                 SL_GENE_PRODUCT_GOID)));
