@@ -18,7 +18,8 @@ import org.springframework.stereotype.Component;
 
     static final String DEFAULT_GLOBAL_AGGREGATE_NAME = "global";
 
-    @Override public AggregateRequest convert(Collection<RequiredStatistic> requiredStatistics) {
+    @Override
+    public AggregateRequest convert(Collection<RequiredStatistic> requiredStatistics) {
         Preconditions.checkArgument(requiredStatistics != null && !requiredStatistics.isEmpty(),
                                     "Stats request collection cannot be null or empty");
 
@@ -55,7 +56,7 @@ import org.springframework.stereotype.Component;
         nestedAggregateMap.values().forEach(globalAggregate::addNestedAggregate);
     }
 
-    private static AggregateRequest createRequest(RequiredStatisticType k) {
-        return new AggregateRequest(k.getName(), k.getLimit());
+    private static AggregateRequest createRequest(RequiredStatisticType requiredStatisticType) {
+        return new AggregateRequest(requiredStatisticType.getName(), requiredStatisticType.getLimit());
     }
 }
