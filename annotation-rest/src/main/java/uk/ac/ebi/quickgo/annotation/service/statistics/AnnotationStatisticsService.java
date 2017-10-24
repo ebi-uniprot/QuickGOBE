@@ -65,7 +65,8 @@ public class AnnotationStatisticsService implements StatisticsService {
         this.searchService = searchService;
         this.converter = converter;
 
-        checkState(requiredStatisticsForStandardUsage.getStats() != null, "Required statistics for display via REST cannot be null.");
+        checkState(requiredStatisticsForStandardUsage.getStats() != null, "Required statistics for standard usage " +
+                "cannot be null.");
         checkState(requiredStatisticsForDownloadUsage.getStats() != null, "Required statistics for download cannot be null.");
 
         this.requiredStatisticsForStandardUsage = requiredStatisticsForStandardUsage.getStats();
