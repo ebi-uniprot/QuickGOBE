@@ -58,9 +58,9 @@ public class AnnotationStatisticsService implements StatisticsService {
         checkArgument(searchService != null, "Search service cannot be null.");
         checkArgument(converter != null, "Stats request converter cannot be null.");
         checkArgument(requiredStatisticsForStandardUsage != null,
-                "Required stats list cannot be null.");
+                "Required statistics for standard usage cannot be null.");
         checkArgument(requiredStatisticsForDownloadUsage != null,
-                "Required stats download cannot be null.");
+                "Required statistics for download usage cannot be null.");
 
         this.converterFactory = converterFactory;
         this.searchService = searchService;
