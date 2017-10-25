@@ -5,6 +5,7 @@ import uk.ac.ebi.quickgo.annotation.download.header.HeaderCreator;
 import uk.ac.ebi.quickgo.annotation.download.header.HeaderCreatorFactory;
 import uk.ac.ebi.quickgo.annotation.download.header.HeaderUri;
 import uk.ac.ebi.quickgo.annotation.download.model.DownloadContent;
+import uk.ac.ebi.quickgo.annotation.model.About;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
 import uk.ac.ebi.quickgo.annotation.model.StatisticsGroup;
@@ -30,9 +31,11 @@ import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformationReq
 import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformationRequests;
 import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformerChain;
 
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -115,6 +118,7 @@ import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.createFirstCursorPa
  */
 @EnableCaching
 @RestController
+@Api(tags = {"annotations"})
 @RequestMapping(value = "/annotation")
 public class AnnotationController {
     private static final Logger LOGGER = getLogger(AnnotationController.class);
@@ -220,7 +224,7 @@ public class AnnotationController {
                     "matching annotations", response = ResponseExceptionHandler.ErrorInfo.class),
             @ApiResponse(code = 400, message = "Bad request due to a validation issue encountered in one of the " +
                     "filters", response = ResponseExceptionHandler.ErrorInfo.class)})
-    @ApiOperation(value = "Search for all annotations that match the filter criteria provided by the client.")
+    @ApiOperation(value = "Search for all annotations that match the supplied filter criteria.")
     @RequestMapping(value = "/search", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<Annotation>> annotationLookup(
             @Valid @ModelAttribute AnnotationRequest request, BindingResult bindingResult) {
@@ -308,7 +312,8 @@ public class AnnotationController {
                     response = ResponseExceptionHandler.ErrorInfo.class),
             @ApiResponse(code = 400, message = "Bad request due to a validation issue encountered in one of the " +
                     "filters", response = ResponseExceptionHandler.ErrorInfo.class)})
-    @ApiOperation(value = "Generate statistic on the annotation result set obtained from applying the filters.")
+    @ApiOperation(value = "Generate statistics for the annotation result set obtained from applying the filters.",
+            hidden = true)
     @RequestMapping(value = "/stats", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<StatisticsGroup>> annotationStats(
             @Valid @ModelAttribute AnnotationRequest request, BindingResult bindingResult) {
@@ -318,9 +323,11 @@ public class AnnotationController {
         return new ResponseEntity<>(stats, HttpStatus.OK);
     }
 
+    @ApiOperation(value = "Download all annotations that match the supplied filter criteria.",
+            hidden = true,
+            response = File.class)
     @RequestMapping(value = "/downloadSearch",
-            method = {RequestMethod.GET},
-            produces = {GPAD_MEDIA_TYPE_STRING, GAF_MEDIA_TYPE_STRING, TSV_MEDIA_TYPE_STRING})
+            method = {RequestMethod.GET}, produces = {GPAD_MEDIA_TYPE_STRING, GAF_MEDIA_TYPE_STRING, TSV_MEDIA_TYPE_STRING})
     public ResponseEntity<ResponseBodyEmitter> downloadLookup(
             @Valid @ModelAttribute AnnotationRequest request,
             BindingResult bindingResult,
@@ -331,13 +338,13 @@ public class AnnotationController {
         checkBindingErrors(bindingResult);
         FilterQueryInfo filterQueryInfo = extractFilterQueryInfo(request);
 
-        final int pageLimit = request.getDownloadLimit() < this.annotationRetrievalConfig.getDownloadPageSize() ?
+        final int pageLimit = request.getDownloadLimit() < this.annotationRetrievalConfig.getDownloadPageSize()?
                 request.getDownloadLimit() : this.annotationRetrievalConfig.getDownloadPageSize();
         QueryRequest queryRequest = downloadQueryTemplate.newBuilder()
-                .setQuery(QuickGOQuery.createAllQuery())
-                .addFilters(filterQueryInfo.getFilterQueries())
-                .setPage(createFirstCursorPage(pageLimit))
-                .build();
+                                                         .setQuery(QuickGOQuery.createAllQuery())
+                                                         .addFilters(filterQueryInfo.getFilterQueries())
+                                                         .setPage(createFirstCursorPage(pageLimit))
+                                                         .build();
 
         ResponseBodyEmitter emitter = new ResponseBodyEmitter();
 
@@ -371,23 +378,122 @@ public class AnnotationController {
     private HeaderContent buildHeaderContent(HttpServletRequest servletRequest, List<String> selectedFields) {
         HeaderContent.Builder contentBuilder = new HeaderContent.Builder();
         return contentBuilder.setIsSlimmed(isSlimmed(servletRequest))
-                .setUri(HeaderUri.uri(servletRequest))
-                .setDate(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE))
-                .setSelectedFields(selectedFields)
-                .build();
+                             .setUri(HeaderUri.uri(servletRequest))
+                             .setDate(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE))
+                             .setSelectedFields(selectedFields)
+                             .build();
     }
 
     private Stream<QueryResult<Annotation>> getQueryResultStream(@Valid @ModelAttribute AnnotationRequest request,
             FilterQueryInfo filterQueryInfo, QueryRequest queryRequest) {
         LOGGER.info("Creating stream of search results. With limit " + request.getDownloadLimit());
         Stream<QueryResult<Annotation>> resultStream = streamSearchResults(queryRequest,
-                queryTemplate,
-                annotationSearchService,
-                resultTransformerChain,
-                filterQueryInfo.getFilterContext(),
-                request.getDownloadLimit());
+                            queryTemplate,
+                            annotationSearchService,
+                            resultTransformerChain,
+                            filterQueryInfo.getFilterContext(),
+                            request.getDownloadLimit());
         LOGGER.info("Finished creating stream of search results.");
         return resultStream;
+    }
+
+    /**
+     * Get meta data information about the Annotation service
+     *
+     * @return response with metadata information.
+     */
+    @ApiOperation(value = "Get meta-data information about the annotation service",
+            response = About.class,
+            notes = "Provides the date the annotation information was created.")
+    @RequestMapping(value = "/about", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<MetaData> provideMetaData() {
+        return new ResponseEntity<>(metaDataProvider.lookupMetaData(), HttpStatus.OK);
+    }
+
+    private DefaultSearchQueryTemplate createSearchQueryTemplate(
+            SearchServiceConfig.AnnotationCompositeRetrievalConfig retrievalConfig) {
+        DefaultSearchQueryTemplate template = new DefaultSearchQueryTemplate();
+        template.setReturnedFields(retrievalConfig.getSearchReturnedFields());
+        return template;
+    }
+
+    private DefaultSearchQueryTemplate createDownloadSearchQueryTemplate(
+            SearchServiceConfig.AnnotationCompositeRetrievalConfig retrievalConfig) {
+        DefaultSearchQueryTemplate template = new DefaultSearchQueryTemplate();
+        template.setReturnedFields(retrievalConfig.getSearchReturnedFields());
+        template.setPage(createFirstCursorPage(retrievalConfig.getDownloadPageSize()));
+        retrievalConfig.getDownloadSortCriteria()
+                .forEach(criterion ->
+                        template.addSortCriterion(criterion.getSortField().getField(), criterion.getSortOrder()));
+        return template;
+    }
+
+    private FilterQueryInfo extractFilterQueryInfo(AnnotationRequest request) {
+        Set<QuickGOQuery> filterQueries = new HashSet<>();
+        Set<FilterContext> filterContexts = new HashSet<>();
+
+        convertFilterRequests(request, filterQueries, filterContexts);
+        convertResultTransformationRequests(request, filterContexts);
+
+        return new FilterQueryInfo() {
+            @Override public Set<QuickGOQuery> getFilterQueries() {
+                return filterQueries;
+            }
+
+            @Override public FilterContext getFilterContext() {
+                return filterContexts.stream().reduce(new FilterContext(), FilterContext::merge);
+            }
+        };
+    }
+
+    /**
+     * Processes the list of {@link FilterRequest}s from the {@link AnnotationRequest} and
+     * adds corresponding {@link QuickGOQuery}s to the {@code filterQueries}, and {@link FilterContext}s
+     * to the {@code filterContext}s.
+     * @param request the annotation request
+     * @param filterQueries the {@link QuickGOQuery} list to append to
+     * @param filterContexts the {@link FilterContext} list to append to
+     */
+    private void convertFilterRequests(AnnotationRequest request, Set<QuickGOQuery> filterQueries,
+            Set<FilterContext> filterContexts) {
+        request.createFilterRequests().stream()
+                .map(converterFactory::convert)
+                .forEach(convertedFilter -> {
+                    filterQueries.add(convertedFilter.getConvertedValue());
+                    convertedFilter.getFilterContext().ifPresent(filterContexts::add);
+                });
+    }
+
+    /**
+     * Processes the {@link ResultTransformationRequests} instance from the {@link AnnotationRequest} and
+     * adds corresponding {@link FilterContext}s to the {@code filterContext}s.
+     * @param request the annotation request
+     * @param filterContexts the {@link FilterContext} list to append to
+     */
+    private void convertResultTransformationRequests( AnnotationRequest request, Set<FilterContext> filterContexts) {
+        ResultTransformationRequests transformationRequests = request.createResultTransformationRequests();
+        if (!transformationRequests.getRequests().isEmpty()) {
+            FilterContext transformationContext = new FilterContext();
+            transformationContext.save(ResultTransformationRequests.class, transformationRequests);
+            filterContexts.add(transformationContext);
+        }
+    }
+
+    private void checkBindingErrors(BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            throw new ParameterBindingException(bindingResult);
+        }
+    }
+
+    private HttpHeaders createHttpDownloadHeader(MediaType mediaType) {
+        HttpHeaders httpHeaders = new HttpHeaders();
+        LocalDateTime now = LocalDateTime.now();
+        String extension = "." + mediaType.getSubtype();
+        String fileName = DOWNLOAD_FILE_NAME_PREFIX + now.format(DOWNLOAD_FILE_NAME_DATE_FORMATTER) + extension;
+        httpHeaders.setContentDispositionFormData("attachment", fileName);
+        httpHeaders.setContentType(mediaType);
+        httpHeaders.add(VARY, ACCEPT);
+        return httpHeaders;
     }
 
     private <C> void emitDownloadWithMediaType(
@@ -482,7 +588,6 @@ public class AnnotationController {
     }
 
     private interface FilterQueryInfo {
-
         Set<QuickGOQuery> getFilterQueries();
 
         FilterContext getFilterContext();

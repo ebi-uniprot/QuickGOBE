@@ -32,7 +32,7 @@ public class GeneProductRequest {
             GeneProductFields.Searchable.TAXON_ID,
             GeneProductFields.Searchable.DATABASE_SUBSET};
 
-    @ApiModelProperty(value = "Indicates whether the result set should be highlighted")
+    @ApiModelProperty(value = "Indicates whether the result set should be highlighted", hidden = true)
     private boolean highlighting = false;
 
     @ApiModelProperty(value = "Page number of the result set to display.",
@@ -43,7 +43,7 @@ public class GeneProductRequest {
             allowableValues = "range[" + MIN_ENTRIES_PER_PAGE + "," + MAX_ENTRIES_PER_PAGE + "]")
     private int limit = DEFAULT_ENTRIES_PER_PAGE;
 
-    @ApiModelProperty(value = "Fields to generate facet from", example = "taxonId, type")
+    @ApiModelProperty(value = "Fields to generate facet from", example = "taxonId, type", hidden = true)
     private String[] facet;
 
     @ApiModelProperty(value = "The query used to filter the gene products", example = "kinase", required = true)

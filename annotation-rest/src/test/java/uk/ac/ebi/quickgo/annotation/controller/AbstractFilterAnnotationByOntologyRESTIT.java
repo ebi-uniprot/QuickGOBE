@@ -71,7 +71,7 @@ public abstract class AbstractFilterAnnotationByOntologyRESTIT {
     static final String NO_DESCENDANTS_PREFIX = "No descendants found for IDs, ";
     static final String SEARCH_RESOURCE = "/annotation" + "/search";
 
-    private static final String BASE_URL = "http://localhost";
+    private static final String BASE_URL = "https://localhost";
     private static final String DELIMITER = ", ";
     private static final String COMMA = ",";
     private static final String DESCENDANTS_USAGE = "descendants";
