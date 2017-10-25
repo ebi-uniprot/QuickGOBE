@@ -12,8 +12,12 @@ import org.apache.poi.ss.usermodel.Workbook;
  * Time: 13:53
  * Created with IntelliJ IDEA.
  */
-@FunctionalInterface
 public interface WorkbookFromStatistics {
 
+    /**
+     * Generate an Excel workbook from a list of StatisticGroups
+     * @param statisticsGroups input
+     * @return workbook
+     */
     Workbook generate(List<StatisticsGroup> statisticsGroups);
 }
