@@ -10,13 +10,12 @@ import java.util.List;
  * @author Tony Wardell
  */
 @FunctionalInterface
-
-public interface ResultMutator<I, T> {
+public interface ValueMutator<I, T> {
 
     /**
      * Update the result using the list of supplied value injectors.
-     * @param result model(s) to update.
+     * @param value model(s) to update.
      * @param requiredInjectors the provide the updates.
      */
-    void mutate(I result, List<ResponseValueInjector<T>> requiredInjectors);
+    void mutate(I value, List<ResponseValueInjector<T>> requiredInjectors);
 }
