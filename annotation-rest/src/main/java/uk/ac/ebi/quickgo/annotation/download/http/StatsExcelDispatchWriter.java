@@ -2,7 +2,7 @@ package uk.ac.ebi.quickgo.annotation.download.http;
 
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.model.StatisticsGroup;
-import uk.ac.ebi.quickgo.annotation.service.converter.StatisticsConverter;
+import uk.ac.ebi.quickgo.annotation.service.converter.WorkbookFromStatistics;
 import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
@@ -28,9 +28,9 @@ import org.slf4j.LoggerFactory;
 public class StatsExcelDispatchWriter implements OutputStreamWriter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StatsExcelDispatchWriter.class);
-    private final StatisticsConverter converter;
+    private final WorkbookFromStatistics converter;
 
-    public StatsExcelDispatchWriter(final StatisticsConverter converter) {
+    public StatsExcelDispatchWriter(final WorkbookFromStatistics converter) {
         Preconditions.checkArgument(Objects.nonNull(converter), "The statistics converter instance should not be " +
                 "null");
         this.converter = converter;
@@ -55,7 +55,7 @@ public class StatsExcelDispatchWriter implements OutputStreamWriter {
     }
 
     private void writeDetail(OutputStream out, QueryResult<StatisticsGroup> stats) {
-        Workbook workbook = converter.convert(stats.getResults());
+        Workbook workbook = converter.generate(stats.getResults());
         try {
             workbook.write(out);
             out.flush();

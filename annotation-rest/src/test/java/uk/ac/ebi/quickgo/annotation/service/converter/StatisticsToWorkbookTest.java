@@ -54,7 +54,7 @@ public class StatisticsToWorkbookTest {
     public void workbookMatchesInputData(){
         StatisticsToWorkbook statisticsToWorkbook = new StatisticsToWorkbook(SECTION_TYPES, SHEET_LAYOUT_MAP);
 
-        Workbook workbook = statisticsToWorkbook.convert(statisticsGroups);
+        Workbook workbook = statisticsToWorkbook.generate(statisticsGroups);
 
         assertThat(workbook.getNumberOfSheets(), is(3));
         assertThat(workbook.getSheetAt(0).getSheetName(), is("summary"));

@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.download.http;
 
-import uk.ac.ebi.quickgo.annotation.service.converter.StatisticsConverter;
+import uk.ac.ebi.quickgo.annotation.service.converter.WorkbookFromStatistics;
 import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
@@ -34,12 +34,12 @@ public class StatsExcelOutputStreamWriterTest {
 
     @Before
     public void setup(){
-        StatisticsConverter mockConverter = mock(StatisticsConverter.class);
+        WorkbookFromStatistics mockConverter = mock(WorkbookFromStatistics.class);
         mockWorkbook = mock(Workbook.class);
         mockOutputStream = mock(OutputStream.class);
         dispatchWriter = new StatsExcelDispatchWriter(mockConverter);
         inputObject =  new QueryResult.Builder<String>(0, Collections.emptyList()).build();
-        when(mockConverter.convert(Collections.emptyList())).thenReturn(mockWorkbook);
+        when(mockConverter.generate(Collections.emptyList())).thenReturn(mockWorkbook);
     }
 
     @Test

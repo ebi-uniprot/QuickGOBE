@@ -22,7 +22,7 @@ import static com.google.common.base.Preconditions.checkArgument;
  * Time: 11:11
  * Created with IntelliJ IDEA.
  */
-public class StatisticsToWorkbook implements StatisticsConverter{
+public class StatisticsToWorkbook implements WorkbookFromStatistics {
 
     private static final String PERCENTAGE_CELL_FORMAT = "0.00";
     private static final int HEADER_ROW = 1;
@@ -40,7 +40,7 @@ public class StatisticsToWorkbook implements StatisticsConverter{
         this.sheetLayoutMap = sheetLayoutMap;
     }
 
-    public Workbook convert(List<StatisticsGroup> statisticsGroups) {
+    public Workbook generate(List<StatisticsGroup> statisticsGroups) {
         Workbook wb = new HSSFWorkbook();
         CellStyle percentageCellFormat = createPercentageCellFormat(wb);
         CellStyle boldCellFormat = createBoldCellFormat(wb);
