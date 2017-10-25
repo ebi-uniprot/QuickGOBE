@@ -12,7 +12,7 @@ import java.util.Map;
  * Created with IntelliJ IDEA.
  */
 public class StatisticsWorkBookLayout {
-    public static final Map<String, StatisticsToWorkbook.SheetLayout> SHEET_LAYOUT_MAP = new HashMap<>();
+    public static final Map<String, WorkbookFromStatisticsImpl.SheetLayout> SHEET_LAYOUT_MAP = new HashMap<>();
     static final String ANNOTATION = "annotation";
     static final String GENE_PRODUCT = "geneProduct";
 
@@ -48,32 +48,32 @@ public class StatisticsWorkBookLayout {
 
     static {
         SHEET_LAYOUT_MAP.put("goId",
-                new StatisticsToWorkbook.SheetLayout("goid",
+                new WorkbookFromStatisticsImpl.SheetLayout("goid",
                         Arrays.asList(SL_ANNOTATION_GOID,
                                 SL_GENE_PRODUCT_GOID)));
         SHEET_LAYOUT_MAP.put("aspect",
-                new StatisticsToWorkbook.SheetLayout("aspect",
+                new WorkbookFromStatisticsImpl.SheetLayout("aspect",
                         Arrays.asList(SL_ANNOTATION_ASPECT,
                                 SL_GENE_PRODUCT_ASPECT)));
         SHEET_LAYOUT_MAP.put("evidenceCode",
-                new StatisticsToWorkbook.SheetLayout("evidence",
+                new WorkbookFromStatisticsImpl.SheetLayout("evidence",
                         Arrays.asList(SL_ANNOTATION_EVIDENCE_CODE,
                                 SL_GENE_PRODUCT_EVIDENCE_CODE)));
         SHEET_LAYOUT_MAP.put("reference",
-                new StatisticsToWorkbook.SheetLayout("reference",
+                new WorkbookFromStatisticsImpl.SheetLayout("reference",
                         Arrays.asList(SL_ANNOTATION_REFERENCES,
                                 SL_GENE_PRODUCT_REFERENCES)));
         SHEET_LAYOUT_MAP.put("taxonId",
-                new StatisticsToWorkbook.SheetLayout("taxon",
+                new WorkbookFromStatisticsImpl.SheetLayout("taxon",
                         Arrays.asList(SL_ANNOTATION_TAXON,
                                 SL_GENE_PRODUCT_TAXON)));
         SHEET_LAYOUT_MAP.put("assignedBy",
-                new StatisticsToWorkbook.SheetLayout("assigned",
+                new WorkbookFromStatisticsImpl.SheetLayout("assigned",
                         Arrays.asList(SL_ANNOTATION_ASSIGNED,
                                 SL_GENE_PRODUCT_ASSIGNED)));
     }
 
-    static class AnnotationSectionLayout extends StatisticsToWorkbook.SectionLayout {
+    static class AnnotationSectionLayout extends WorkbookFromStatisticsImpl.SectionLayout {
         private static final int BY_ANNOTATION_STARTING_COLUMN = 0;
 
         AnnotationSectionLayout(String header) {
@@ -81,7 +81,7 @@ public class StatisticsWorkBookLayout {
         }
     }
 
-    static class GeneProductSectionLayout extends StatisticsToWorkbook.SectionLayout {
+    static class GeneProductSectionLayout extends WorkbookFromStatisticsImpl.SectionLayout {
         private static final int BY_PROTEIN_STARTING_COLUMN = 10;
 
         GeneProductSectionLayout(String header) {
