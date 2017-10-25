@@ -124,7 +124,6 @@ public class AnnotationController {
     private static final String DOWNLOAD_FILE_NAME_PREFIX = "QuickGO-annotations";
     private static final String GO_USAGE_SLIM = "goUsage=slim";
     private static final String DOWNLOAD_STATISTICS_FILE_NAME = "annotation_statistics";
-
     private static final Function<MediaType, String> TO_DOWNLOAD_STATISTICS_FILENAME = mt -> String.format("%s.%s",
             DOWNLOAD_STATISTICS_FILE_NAME,
             fileExtension(mt));
@@ -134,9 +133,7 @@ public class AnnotationController {
             fileExtension(mt));
     private static final String GO_NAME = "goName";
     private static final String TAXON_NAME = "taxonName";
-
     private final MetaDataProvider metaDataProvider;
-
     private final SearchService<Annotation> annotationSearchService;
     private final SearchServiceConfig.AnnotationCompositeRetrievalConfig annotationRetrievalConfig;
     private final DefaultSearchQueryTemplate queryTemplate;
@@ -147,7 +144,6 @@ public class AnnotationController {
     private final StatisticsService statsService;
     private final TaskExecutor taskExecutor;
     private final HeaderCreatorFactory headerCreatorFactory;
-
     private final ResultTransformerChain<CompletableValue> completeableValueTransformerChain;
 
     @Autowired
