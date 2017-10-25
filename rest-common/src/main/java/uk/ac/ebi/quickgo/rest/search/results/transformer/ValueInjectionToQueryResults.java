@@ -14,7 +14,7 @@ import static com.google.common.base.Preconditions.checkArgument;
  * Time: 10:33
  * Created with IntelliJ IDEA.
  */
-public class ValueInjectionToQueryResults<R> implements ResultMutator<QueryResult<R>, R> {
+public class ValueInjectionToQueryResults<R> implements ValueMutator<QueryResult<R>, R> {
 
     private final RESTFilterConverterFactory restFilterConverterFactory;
 

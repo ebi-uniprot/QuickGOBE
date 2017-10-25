@@ -13,7 +13,7 @@ import static com.google.common.base.Preconditions.checkArgument;
  * Time: 10:33
  * Created with IntelliJ IDEA.
  */
-public class ValueInjectionToSingleResult<R> implements ResultMutator<R, R> {
+public class ValueInjectionToSingleResult<R> implements ValueMutator<R, R> {
 
     private final RESTFilterConverterFactory restFilterConverterFactory;
 

@@ -53,7 +53,7 @@ public class ExternalServiceResultsTransformerTest {
 
     private ExternalServiceResultsTransformer<QueryResult<FakeResponseModel>,FakeResponseModel> resultsTransformer;
 
-    private ResultMutator<QueryResult<FakeResponseModel>,FakeResponseModel> resultMutator;
+    private ValueMutator<QueryResult<FakeResponseModel>,FakeResponseModel> resultMutator;
 
     @Before
     public void setUp() {

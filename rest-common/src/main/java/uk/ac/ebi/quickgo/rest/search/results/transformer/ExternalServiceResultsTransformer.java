@@ -22,10 +22,10 @@ public class ExternalServiceResultsTransformer<R, M> implements ResultTransforme
             new ResultTransformationRequests();
     private final List<ResponseValueInjector<M>> fieldInjectors;
     private final List<String> fieldsToAdd;
-    private final ResultMutator<R, M> resultMutator;
+    private final ValueMutator<R, M> resultMutator;
 
     public ExternalServiceResultsTransformer(List<ResponseValueInjector<M>> fieldInjectors,
-            ResultMutator<R, M> resultMutator) {
+            ValueMutator<R, M> resultMutator) {
         checkArgument(fieldInjectors != null, "Supplied list of ResponseValueInjectors cannot be null");
         checkArgument(resultMutator != null, "Supplied ResultMutator cannot be null");
         this.fieldInjectors = fieldInjectors;
