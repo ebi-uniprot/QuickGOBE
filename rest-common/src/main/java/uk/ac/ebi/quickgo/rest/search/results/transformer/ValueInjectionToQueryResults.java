@@ -23,10 +23,11 @@ public class ValueInjectionToQueryResults<R> implements ValueMutator<QueryResult
         this.restFilterConverterFactory = restFilterConverterFactory;
     }
 
-    @Override public void mutate(QueryResult<R> results, List<ResponseValueInjector<R>> requiredInjectors) {
+    @Override
+    public void mutate(QueryResult<R> results, List<ResponseValueInjector<R>> requiredInjectors) {
         results.getResults()
-               .forEach(result -> requiredInjectors.forEach(valueInjector -> valueInjector.inject(
-                       restFilterConverterFactory,
-                       result)));
-            }
+                .forEach(result -> requiredInjectors.forEach(valueInjector -> valueInjector.inject(
+                        restFilterConverterFactory,
+                        result)));
+    }
 }
