@@ -14,7 +14,8 @@ import org.springframework.stereotype.Component;
  *
  * @author Ricardo Antunes
  */
-@Component public class StatsConverterImpl implements StatsConverter {
+@Component
+public class StatsConverterImpl implements StatsConverter {
 
     static final String DEFAULT_GLOBAL_AGGREGATE_NAME = "global";
 
