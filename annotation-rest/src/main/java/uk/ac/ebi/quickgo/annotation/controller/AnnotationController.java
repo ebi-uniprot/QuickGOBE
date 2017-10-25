@@ -8,9 +8,8 @@ import uk.ac.ebi.quickgo.annotation.download.model.DownloadContent;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
 import uk.ac.ebi.quickgo.annotation.model.StatisticsGroup;
-import uk.ac.ebi.quickgo.annotation.model.StatisticsValue;
-import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.statistics.OntologyNameInjector;
-import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.statistics.TaxonomyNameInjector;
+import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.completablevalue.OntologyNameInjector;
+import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.completablevalue.TaxonomyNameInjector;
 import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.annotation.service.statistics.StatisticsService;
 import uk.ac.ebi.quickgo.rest.ParameterBindingException;
@@ -140,11 +139,10 @@ public class AnnotationController {
     private final DefaultSearchQueryTemplate downloadQueryTemplate;
     private final FilterConverterFactory converterFactory;
     private final ResultTransformerChain<QueryResult<Annotation>> resultTransformerChain;
-    private final ResultTransformerChain<StatisticsValue> statisticsTransformerChain;
     private final StatisticsService statsService;
     private final TaskExecutor taskExecutor;
     private final HeaderCreatorFactory headerCreatorFactory;
-    private final ResultTransformerChain<CompletableValue> completeableValueTransformerChain;
+    private final ResultTransformerChain<CompletableValue> completableValueTransformerChain;
 
     @Autowired
     public AnnotationController(SearchService<Annotation> annotationSearchService,
@@ -155,7 +153,6 @@ public class AnnotationController {
             TaskExecutor taskExecutor,
             HeaderCreatorFactory headerCreatorFactory,
             MetaDataProvider metaDataProvider,
-            ResultTransformerChain<StatisticsValue> statisticsTransformerChain,
             ResultTransformerChain<CompletableValue> completableValueResultTransformerChain) {
         checkArgument(annotationSearchService != null, "The SearchService<Annotation> instance passed " +
                 "to the constructor of AnnotationController should not be null.");
@@ -186,8 +183,7 @@ public class AnnotationController {
         this.headerCreatorFactory = headerCreatorFactory;
 
         this.metaDataProvider = metaDataProvider;
-        this.statisticsTransformerChain = statisticsTransformerChain;
-        this.completeableValueTransformerChain = completableValueResultTransformerChain;
+        this.completableValueTransformerChain = completableValueResultTransformerChain;
     }
 
     private DefaultSearchQueryTemplate createSearchQueryTemplate(
@@ -461,7 +457,7 @@ public class AnnotationController {
     @Cacheable("statisticsNames")
     public CompletableValue completeValue(FilterContext filterContext, String key) {
         CompletableValue completableValue = new CompletableValue(key);
-        return completeableValueTransformerChain.applyTransformations(completableValue, filterContext);
+        return completableValueTransformerChain.applyTransformations(completableValue, filterContext);
 
     }
 

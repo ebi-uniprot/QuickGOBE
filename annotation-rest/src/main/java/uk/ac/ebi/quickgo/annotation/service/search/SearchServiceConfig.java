@@ -3,7 +3,6 @@ package uk.ac.ebi.quickgo.annotation.service.search;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationFields;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepoConfig;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
-import uk.ac.ebi.quickgo.annotation.model.StatisticsValue;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.geneproduct.transformer.GeneProductNameInjector;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.geneproduct.transformer.GeneProductSynonymsInjector;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.annotation.OntologyNameInjector;
@@ -238,40 +237,6 @@ public class SearchServiceConfig {
                 return AnnotationFields.Searchable.searchableFields().stream();
             }
         };
-    }
-
-    @Bean
-    public ResultTransformerChain<StatisticsValue> statisticsTransformerChain(
-            ExternalServiceResultsTransformer<StatisticsValue,StatisticsValue> statisticsOntologyNameTransformer,
-            ExternalServiceResultsTransformer<StatisticsValue,StatisticsValue> statisticsTaxonNameTransformer) {
-        ResultTransformerChain<StatisticsValue> transformerChain = new ResultTransformerChain<>();
-        transformerChain.addTransformer(statisticsOntologyNameTransformer);
-        transformerChain.addTransformer(statisticsTaxonNameTransformer);
-        return transformerChain;
-    }
-
-    @Bean
-    public ExternalServiceResultsTransformer<StatisticsValue,StatisticsValue> statisticsOntologyNameTransformer
-            (RESTFilterConverterFactory converterFactory) {
-        List<ResponseValueInjector<StatisticsValue>> responseValueInjectors =
-                singletonList(new uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer
-                        .statistics.OntologyNameInjector());
-        return new ExternalServiceResultsTransformer<>(responseValueInjectors, statisticsValueResultMutator(converterFactory));
-    }
-
-    @Bean
-    public ExternalServiceResultsTransformer<StatisticsValue,StatisticsValue> statisticsTaxonNameTransformer
-            (RESTFilterConverterFactory converterFactory) {
-        List<ResponseValueInjector<StatisticsValue>> responseValueInjectors = singletonList(
-                new uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.statistics
-                        .TaxonomyNameInjector());
-        return new ExternalServiceResultsTransformer<>(responseValueInjectors, statisticsValueResultMutator(converterFactory));
-    }
-
-    @Bean
-    public ValueInjectionToSingleResult<StatisticsValue> statisticsValueResultMutator(
-            RESTFilterConverterFactory converterFactory) {
-        return new ValueInjectionToSingleResult<>(converterFactory);
     }
 
     private DbXRefLoader geneProductLoader() {
