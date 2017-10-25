@@ -76,7 +76,7 @@ public class AnnotationControllerStatisticsDownloadIT {
             "$.results[0].types.[?(@.type == 'goId')].values.length()";
     private static final String ALL_GO_TERM_NAMES = "$.results[0].types.[?(@.type == 'goId')].values.*.name";
     private static final String ALL_TAXON_NAMES = "$.results[0].types.[?(@.type == 'taxonId')].values.*.name";
-    private static final String BASE_URL = "http://localhost";
+    private static final String BASE_URL = "https://localhost";
     private static final String GO_TERM_RESOURCE_FORMAT = "/ontology/go/terms/%s";
     private static final String TAXONOMY_ID_NODE_RESOURCE_FORMAT = "/proteins/api/taxonomy/id/%s/node";
     private static final int NO_OF_STATISTICS_GROUPS = 2;
