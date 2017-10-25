@@ -20,9 +20,9 @@ import static uk.ac.ebi.quickgo.annotation.service.converter.StatisticsWorkBookL
  * Time: 12:20
  * Created with IntelliJ IDEA.
  */
-public class StatisticsToWorkbookTest {
+public class WorkbookFromStatisticsImplTest {
     private List<StatisticsGroup> statisticsGroups;
-    private static final Map<String, StatisticsToWorkbook.SheetLayout> SHEET_LAYOUT_MAP = new HashMap<>();
+    private static final Map<String, WorkbookFromStatisticsImpl.SheetLayout> SHEET_LAYOUT_MAP = new HashMap<>();
     private static final StatisticsWorkBookLayout.AnnotationSectionLayout SL_ANNOTATION_GOID =
             new StatisticsWorkBookLayout.AnnotationSectionLayout("GO IDs (by annotation)");
     private static final StatisticsWorkBookLayout.AnnotationSectionLayout SL_ANNOTATION_ASPECT =
@@ -34,12 +34,12 @@ public class StatisticsToWorkbookTest {
             new StatisticsWorkBookLayout.GeneProductSectionLayout("Aspects (by protein)");
     static {
         SHEET_LAYOUT_MAP.put("TEST_GO_ID",
-                new StatisticsToWorkbook.SheetLayout("goid",
+                new WorkbookFromStatisticsImpl.SheetLayout("goid",
                         Arrays.asList(SL_ANNOTATION_GOID,
                                 SL_GENE_PRODUCT_GOID)));
 
         SHEET_LAYOUT_MAP.put("aspect",
-                new StatisticsToWorkbook.SheetLayout("aspect",
+                new WorkbookFromStatisticsImpl.SheetLayout("aspect",
                         Arrays.asList(SL_ANNOTATION_ASPECT,
                                 SL_GENE_PRODUCT_ASPECT)));
     }
@@ -52,7 +52,7 @@ public class StatisticsToWorkbookTest {
 
     @Test
     public void workbookMatchesInputData(){
-        StatisticsToWorkbook statisticsToWorkbook = new StatisticsToWorkbook(SECTION_TYPES, SHEET_LAYOUT_MAP);
+        WorkbookFromStatisticsImpl statisticsToWorkbook = new WorkbookFromStatisticsImpl(SECTION_TYPES, SHEET_LAYOUT_MAP);
 
         Workbook workbook = statisticsToWorkbook.generate(statisticsGroups);
 
@@ -88,12 +88,12 @@ public class StatisticsToWorkbookTest {
 
     @Test (expected = IllegalArgumentException.class)
     public void creatingStatisticsToWorkbookWithNullSectionTypesThrowsException() {
-        new StatisticsToWorkbook(null, SHEET_LAYOUT_MAP);
+        new WorkbookFromStatisticsImpl(null, SHEET_LAYOUT_MAP);
     }
 
     @Test (expected = IllegalArgumentException.class)
     public void creatingStatisticsToWorkbookWithNullLayoutMapThrowsException() {
-        new StatisticsToWorkbook(SECTION_TYPES, null);
+        new WorkbookFromStatisticsImpl(SECTION_TYPES, null);
     }
 
     private void testColumnHeaders(Workbook workbook, int startingCol) {

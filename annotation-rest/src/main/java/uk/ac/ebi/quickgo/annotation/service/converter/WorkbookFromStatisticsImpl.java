@@ -22,7 +22,7 @@ import static com.google.common.base.Preconditions.checkArgument;
  * Time: 11:11
  * Created with IntelliJ IDEA.
  */
-public class StatisticsToWorkbook implements WorkbookFromStatistics {
+public class WorkbookFromStatisticsImpl implements WorkbookFromStatistics {
 
     private static final String PERCENTAGE_CELL_FORMAT = "0.00";
     private static final int HEADER_ROW = 1;
@@ -33,7 +33,7 @@ public class StatisticsToWorkbook implements WorkbookFromStatistics {
     private final String[] sectionTypes;
     private final Map<String, SheetLayout> sheetLayoutMap;
 
-    public StatisticsToWorkbook(String[] sectionTypes, Map<String, SheetLayout> sheetLayoutMap) {
+    public WorkbookFromStatisticsImpl(String[] sectionTypes, Map<String, SheetLayout> sheetLayoutMap) {
         checkArgument(Objects.nonNull(sectionTypes), "SectionTypes should not be null.");
         checkArgument(Objects.nonNull(sheetLayoutMap), "Sheet layout map should not be null.");
         this.sectionTypes = sectionTypes;

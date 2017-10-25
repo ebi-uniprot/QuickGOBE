@@ -9,7 +9,7 @@ import uk.ac.ebi.quickgo.annotation.download.converter.AnnotationToGAF;
 import uk.ac.ebi.quickgo.annotation.download.converter.AnnotationToGPAD;
 import uk.ac.ebi.quickgo.annotation.download.converter.AnnotationToTSV;
 import uk.ac.ebi.quickgo.annotation.download.http.*;
-import uk.ac.ebi.quickgo.annotation.service.converter.StatisticsToWorkbook;
+import uk.ac.ebi.quickgo.annotation.service.converter.WorkbookFromStatisticsImpl;
 import uk.ac.ebi.quickgo.rest.controller.response.NoFacetNoHighlightNoAggregateQueryResult;
 import uk.ac.ebi.quickgo.rest.controller.response.NoNextCursorPageInfo;
 import uk.ac.ebi.quickgo.rest.search.results.PageInfo;
@@ -72,6 +72,6 @@ import static uk.ac.ebi.quickgo.annotation.service.converter.StatisticsWorkBookL
     }
 
     private OutputStreamWriter statsDispatchWriter() {
-        return new StatsExcelDispatchWriter(new StatisticsToWorkbook(SECTION_TYPES, SHEET_LAYOUT_MAP));
+        return new StatsExcelDispatchWriter(new WorkbookFromStatisticsImpl(SECTION_TYPES, SHEET_LAYOUT_MAP));
     }
 }
