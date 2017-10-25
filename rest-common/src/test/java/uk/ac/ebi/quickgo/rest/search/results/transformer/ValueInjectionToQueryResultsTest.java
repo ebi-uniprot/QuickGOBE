@@ -25,18 +25,21 @@ import static org.mockito.Mockito.when;
  * Time: 15:54
  * Created with IntelliJ IDEA.
  */
-@RunWith(MockitoJUnitRunner.class) public class ValueInjectionToQueryResultsTest {
-
+@RunWith(MockitoJUnitRunner.class)
+public class ValueInjectionToQueryResultsTest {
     private static final String GO_NAME_REQUEST = "goName";
     private static final String TAXON_NAME_REQUEST = "taxonName";
     private final List<ResponseValueInjector<FakeResponseModel>> requiredInjectors = new ArrayList<>();
-    @Mock private RESTFilterConverterFactory mockRestFetcher;
-    @Mock private FakeValueInjector mockGoNameInjector;
-    @Mock private FakeValueInjector mockTaxonNameInjector;
+    @Mock
+    private RESTFilterConverterFactory mockRestFetcher;
+    @Mock
+    private FakeValueInjector mockGoNameInjector;
+    @Mock
+    private FakeValueInjector mockTaxonNameInjector;
     private QueryResult<FakeResponseModel> results;
 
-    @Before public void setup() {
-
+    @Before
+    public void setup() {
         when(mockGoNameInjector.getId()).thenReturn(GO_NAME_REQUEST);
         when(mockTaxonNameInjector.getId()).thenReturn(TAXON_NAME_REQUEST);
         requiredInjectors.add(mockGoNameInjector);
@@ -49,7 +52,8 @@ import static org.mockito.Mockito.when;
         new ValueInjectionToQueryResults(null);
     }
 
-    @Test public void everyInjectorUsedForEveryModel() {
+    @Test
+    public void everyInjectorUsedForEveryModel() {
         ValueInjectionToQueryResults<FakeResponseModel> resultMutator =
                 new ValueInjectionToQueryResults<>(mockRestFetcher);
 
@@ -61,7 +65,8 @@ import static org.mockito.Mockito.when;
         });
     }
 
-    @Test public void emptyModelListDoesNotGetUpdated() {
+    @Test
+    public void emptyModelListDoesNotGetUpdated() {
         ValueInjectionToQueryResults<FakeResponseModel> resultMutator =
                 new ValueInjectionToQueryResults<>(mockRestFetcher);
         QueryResult<FakeResponseModel> emptyResults = createMockedAnnotationList(0);
