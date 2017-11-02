@@ -5,19 +5,19 @@ import uk.ac.ebi.quickgo.client.model.presets.PresetType;
 import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
 import uk.ac.ebi.quickgo.client.service.loader.presets.LogStepListener;
 import uk.ac.ebi.quickgo.client.service.loader.presets.PresetsCommonConfig;
-import uk.ac.ebi.quickgo.client.service.loader.presets.ff.*;
+import uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPreset;
+import uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPresetValidator;
+import uk.ac.ebi.quickgo.client.service.loader.presets.ff.SourceColumnsFactory;
+import uk.ac.ebi.quickgo.client.service.loader.presets.ff.StringToRawNamedPresetMapper;
 import uk.ac.ebi.quickgo.rest.search.RetrievalException;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 import uk.ac.ebi.quickgo.rest.search.request.config.FilterConfigRetrieval;
 import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
 import uk.ac.ebi.quickgo.rest.search.request.converter.RESTFilterConverterFactory;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
@@ -49,7 +49,6 @@ import static uk.ac.ebi.quickgo.client.service.loader.presets.ff.SourceColumnsFa
 @Import({PresetsCommonConfig.class})
 public class AssignedByPresetsConfig {
     public static final String ASSIGNED_BY_LOADING_STEP_NAME = "AssignedByReadingStep";
-    public static final String ASSIGNED_BY_DEFAULTS = "AgBase,BHF-UCL,CACAO,CGD,EcoCyc,UniProtKB";
     public static final String ASSIGNED_BY = "assignedBy";
 
     private static final Logger LOGGER = getLogger(AssignedByPresetsConfig.class);
@@ -58,8 +57,7 @@ public class AssignedByPresetsConfig {
     private Resource[] assignedByResources;
     @Value("${assignedBy.preset.header.lines:1}")
     private int assignedByHeaderLines;
-    @Value("#{'${assignedBy.preset.defaults:" + ASSIGNED_BY_DEFAULTS + "}'.split(',')}")
-    private String[] assignedByDefaults;
+    private Set<String> duplicatePrevent = new HashSet<>();
 
     @Bean
     public Step assignedByStep(
@@ -70,7 +68,7 @@ public class AssignedByPresetsConfig {
             RestOperations restOperations) {
 
         RESTFilterConverterFactory converterFactory = assignedByConverterFactory(externalFilterConfigRetrieval,
-                restOperations);
+                                                                                 restOperations);
 
         FlatFileItemReader<RawNamedPreset> itemReader = fileReader(rawAssignedByPresetFieldSetMapper());
         itemReader.setLinesToSkip(assignedByHeaderLines);
@@ -81,7 +79,8 @@ public class AssignedByPresetsConfig {
                 .<RawNamedPreset>reader(rawPresetMultiFileReader(assignedByResources, itemReader))
                 .processor(compositeItemProcessor(
                         assignedByValidator(),
-                        assignedByRelevancyFetcher(converterFactory)))
+                        assignedByFilter(converterFactory),
+                        duplicateChecker()))
                 .writer(rawPresetWriter(presets))
                 .listener(new LogStepListener())
                 .build();
@@ -99,13 +98,13 @@ public class AssignedByPresetsConfig {
      */
     private ItemWriter<RawNamedPreset> rawPresetWriter(CompositePresetImpl presets) {
         return rawItemList ->
-            rawItemList.forEach(rawItem ->
-                presets.addPreset(PresetType.ASSIGNED_BY,
-                        PresetItem.createWithName(rawItem.name)
-                                .withProperty(PresetItem.Property.DESCRIPTION.getKey(), rawItem.description)
-                                .withRelevancy(rawItem.relevancy)
-                                .build())
-            );
+                rawItemList.forEach(rawItem ->
+                                            presets.addPreset(PresetType.ASSIGNED_BY,
+                                                              PresetItem.createWithName(rawItem.name)
+                                                                        .withProperty(PresetItem.Property.DESCRIPTION.getKey(), rawItem.description)
+                                                                        .withRelevancy(rawItem.relevancy)
+                                                                        .build())
+                );
     }
 
     private FieldSetMapper<RawNamedPreset> rawAssignedByPresetFieldSetMapper() {
@@ -116,18 +115,22 @@ public class AssignedByPresetsConfig {
         return new RawNamedPresetValidator();
     }
 
-    private ItemProcessor<RawNamedPreset, RawNamedPreset> assignedByRelevancyFetcher(
+    private ItemProcessor<RawNamedPreset, RawNamedPreset> assignedByFilter(
             RESTFilterConverterFactory converterFactory) {
         FilterRequest assignedByRequest = FilterRequest.newBuilder().addProperty(ASSIGNED_BY).build();
 
-        Set<String> relevantAssignedByPresets =
-                Stream.of(assignedByDefaults).collect(Collectors.toCollection(LinkedHashSet::new));
         try {
             ConvertedFilter<List<String>> convertedFilter = converterFactory.convert(assignedByRequest);
-            relevantAssignedByPresets.addAll(convertedFilter.getConvertedValue());
+            final List<String> convertedValues = convertedFilter.getConvertedValue();
+            final Set<String> validValues  = new HashSet<>(convertedValues);
+            return rawNamedPreset -> validValues.contains(rawNamedPreset.name)? rawNamedPreset : null;
         } catch (RetrievalException | IllegalStateException e) {
             LOGGER.error("Failed to retrieve via REST call the relevant 'assignedBy' values: ", e);
         }
-        return new RawNamedPresetRelevanceChecker(new ArrayList<>(relevantAssignedByPresets));
+        return  rawNamedPreset -> rawNamedPreset;
+    }
+
+    ItemProcessor<RawNamedPreset, RawNamedPreset> duplicateChecker() {
+        return rawNamedPreset -> duplicatePrevent.add(rawNamedPreset.name.toLowerCase())? rawNamedPreset : null;
     }
 }

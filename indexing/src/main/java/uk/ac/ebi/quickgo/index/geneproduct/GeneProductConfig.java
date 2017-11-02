@@ -1,19 +1,19 @@
 package uk.ac.ebi.quickgo.index.geneproduct;
 
+import uk.ac.ebi.quickgo.common.QuickGODocument;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductDocument;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepoConfig;
-import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepository;
-import uk.ac.ebi.quickgo.index.common.SolrCrudRepoWriter;
+import uk.ac.ebi.quickgo.index.common.SolrServerWriter;
+import uk.ac.ebi.quickgo.index.common.listener.ItemRateWriterListener;
 import uk.ac.ebi.quickgo.index.common.listener.LogJobListener;
+import uk.ac.ebi.quickgo.index.common.listener.LogStepListener;
 import uk.ac.ebi.quickgo.index.common.listener.SkipLoggerListener;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecutionListener;
-import org.springframework.batch.core.SkipListener;
-import org.springframework.batch.core.Step;
+import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
@@ -37,6 +37,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.Resource;
+import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.retry.backoff.BackOffPolicy;
 import org.springframework.retry.backoff.ExponentialBackOffPolicy;
 
@@ -83,13 +84,21 @@ public class GeneProductConfig {
     private int retryLimit;
 
     @Autowired
-    private GeneProductRepository geneProductRepository;
+    private SolrTemplate geneProductTemplate;
 
     @Bean
     public Job geneProductJob() {
         return jobBuilders.get(GENE_PRODUCT_INDEXING_JOB_NAME)
                 .start(geneProductIndexingStep())
                 .listener(logJobListener())
+                // commit the documents to the solr server
+                .listener(new JobExecutionListener() {
+                    @Override public void beforeJob(JobExecution jobExecution) {}
+
+                    @Override public void afterJob(JobExecution jobExecution) {
+                        geneProductTemplate.commit();
+                    }
+                })
                 .build();
     }
 
@@ -108,6 +117,8 @@ public class GeneProductConfig {
                 .<GeneProduct>reader(geneProductMultiFileReader())
                 .processor(geneProductCompositeProcessor())
                 .writer(geneProductRepositoryWriter())
+                .listener(logWriteRateListener())
+                .listener(logStepListener())
                 .build();
     }
 
@@ -184,7 +195,7 @@ public class GeneProductConfig {
 
     @Bean
     ItemWriter<GeneProductDocument> geneProductRepositoryWriter() {
-        return new SolrCrudRepoWriter<>(geneProductRepository);
+        return new SolrServerWriter<>(geneProductTemplate.getSolrClient());
     }
 
     private JobExecutionListener logJobListener() {
@@ -200,5 +211,13 @@ public class GeneProductConfig {
         backOffPolicy.setInitialInterval(initialBackOffInterval);
         backOffPolicy.setMaxInterval(maxBackOffInterval);
         return backOffPolicy;
+    }
+
+    private ItemWriteListener<QuickGODocument> logWriteRateListener() {
+        return new ItemRateWriterListener<>(Instant.now());
+    }
+
+    private StepExecutionListener logStepListener() {
+        return new LogStepListener();
     }
 }

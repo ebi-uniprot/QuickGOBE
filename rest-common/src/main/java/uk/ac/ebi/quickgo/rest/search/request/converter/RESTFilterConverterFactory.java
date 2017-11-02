@@ -27,7 +27,6 @@ import org.springframework.web.client.RestOperations;
 @Component
 @Import(FilterRequestConfig.class)
 public class RESTFilterConverterFactory {
-
     private final FilterConfigRetrieval filterConfigRetrieval;
     private final RestOperations restOperations;
 
@@ -59,5 +58,12 @@ public class RESTFilterConverterFactory {
             throw new IllegalStateException(
                     "Could not find signature (" + request.getSignature() + ") in " + filterConfigRetrieval);
         }
+    }
+
+    @Override public String toString() {
+        return "RESTFilterConverterFactory{" +
+                "filterConfigRetrieval=" + filterConfigRetrieval +
+                ", restOperations=" + restOperations +
+                '}';
     }
 }

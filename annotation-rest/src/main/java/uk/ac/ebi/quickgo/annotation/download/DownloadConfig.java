@@ -1,8 +1,12 @@
 package uk.ac.ebi.quickgo.annotation.download;
 
+import uk.ac.ebi.quickgo.annotation.download.header.*;
+
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,6 +15,10 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.servlet.config.annotation.AsyncSupportConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+
+import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.GAF_SUB_TYPE;
+import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.GPAD_SUB_TYPE;
+import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.TSV_SUB_TYPE;
 
 /**
  * Configuration beans and details used for annotation downloads.
@@ -22,7 +30,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 @EnableScheduling
 @ConfigurationProperties(prefix = "annotation.download")
 public class DownloadConfig {
-    private static final int DEFAULT_DOWNLOAD_EMITTER_TIMEOUT_MILLIS = 5 * 60 * 1000;
+    private static final int DEFAULT_DOWNLOAD_EMITTER_TIMEOUT_MILLIS = 40 * 60 * 1000;
     private static final Path DEFAULT_ONTOLOGY_PATH = Paths.get("ONTOLOGY_IRI.dat.gz");
 
     private TaskExecutorProperties taskExecutor = new TaskExecutorProperties();
@@ -57,9 +65,18 @@ public class DownloadConfig {
     }
 
     @Bean
-    public AnnotationDownloadFileHeader downloadFileHeader() throws IOException {
+    public HeaderCreatorFactory headerCreatorFactory(OntologyHeaderInfo ontology) throws IOException {
+        Map<String, HeaderCreator> headerCreatorMap = new HashMap<>();
+        headerCreatorMap.put(GAF_SUB_TYPE, new GafHeaderCreator(ontology));
+        headerCreatorMap.put(GPAD_SUB_TYPE, new GpadHeaderCreator(ontology));
+        headerCreatorMap.put(TSV_SUB_TYPE, new TSVHeaderCreator());
+        return new HeaderCreatorFactory(headerCreatorMap);
+    }
+
+    @Bean
+    OntologyHeaderInfo ontology() throws IOException {
         Path osPath = ontologySource != null ? Paths.get(ontologySource.getURI()) : DEFAULT_ONTOLOGY_PATH;
-        return new AnnotationDownloadFileHeader(osPath);
+        return new OntologyHeaderInfo(osPath);
     }
 
     public TaskExecutorProperties getTaskExecutor() {

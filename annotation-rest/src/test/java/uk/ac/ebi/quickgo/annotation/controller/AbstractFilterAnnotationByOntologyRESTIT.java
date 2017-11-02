@@ -3,7 +3,7 @@ package uk.ac.ebi.quickgo.annotation.controller;
 import uk.ac.ebi.quickgo.annotation.AnnotationREST;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
-import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.ConvertedOntologyFilter;
+import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.OntologyDescendants;
 import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepoConfig;
 
@@ -71,7 +71,7 @@ public abstract class AbstractFilterAnnotationByOntologyRESTIT {
     static final String NO_DESCENDANTS_PREFIX = "No descendants found for IDs, ";
     static final String SEARCH_RESOURCE = "/annotation" + "/search";
 
-    private static final String BASE_URL = "http://localhost";
+    private static final String BASE_URL = "https://localhost";
     private static final String DELIMITER = ", ";
     private static final String COMMA = ",";
     private static final String DESCENDANTS_USAGE = "descendants";
@@ -486,12 +486,12 @@ public abstract class AbstractFilterAnnotationByOntologyRESTIT {
         checkArgument(termIds.size() == descendants.size(), "Term ID list and the (list of lists) of their " +
                 "descendants should be the same size");
 
-        ConvertedOntologyFilter response = new ConvertedOntologyFilter();
-        List<ConvertedOntologyFilter.Result> results = new ArrayList<>();
+        OntologyDescendants response = new OntologyDescendants();
+        List<OntologyDescendants.Result> results = new ArrayList<>();
 
         Iterator<List<String>> descendantListsIterator = descendants.iterator();
         termIds.forEach(t -> {
-            ConvertedOntologyFilter.Result result = new ConvertedOntologyFilter.Result();
+            OntologyDescendants.Result result = new OntologyDescendants.Result();
             result.setId(t);
             result.setDescendants(descendantListsIterator.next());
             results.add(result);

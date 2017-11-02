@@ -276,8 +276,12 @@
     -->
     <fieldType name="extension_ignorecase" class="solr.TextField" positionIncrementGap="100">
         <analyzer type="index">
-            <tokenizer class="solr.KeywordTokenizerFactory"/>
-            <filter class="solr.PatternCaptureGroupFilterFactory" pattern="(([\w_]+)\((([^,]+):([^,]+))\))"
+            <charFilter class="solr.PatternReplaceCharFilterFactory"
+                        pattern="([\w_]+)\((([^,]+?):[^,]+)\)" replacement="$1($2)~~~~~~$1($3)"/>
+            <tokenizer class="solr.PatternTokenizerFactory" pattern="~~~~~~"/>
+            <filter class="solr.PatternCaptureGroupFilterFactory" pattern="((.*))"
+                    preserve_original="true"/>
+            <filter class="solr.PatternCaptureGroupFilterFactory" pattern="(([\w_]+)\((([^,]+?):([^,]+))\))"
                     preserve_original="false"/>
             <filter class="solr.LowerCaseFilterFactory"/>
         </analyzer>

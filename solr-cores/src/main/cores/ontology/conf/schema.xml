@@ -60,9 +60,9 @@
     <field name="synonym_edge" type="text_edge" indexed="true" stored="true" multiValued="true"/>
     <copyField source="synonymName" dest="synonym_edge"/>
 
-    <field name="name_exact" type="exact_lower" indexed="true" stored="true" multiValued="false"/>
+    <field name="name_exact" type="text_ignorecase" indexed="true" stored="true" multiValued="false"/>
     <copyField source="name" dest="name_exact"/>
-    <field name="synonym_exact" type="exact_lower" indexed="true" stored="true" multiValued="true"/>
+    <field name="synonym_exact" type="text_ignorecase" indexed="true" stored="true" multiValued="true"/>
     <copyField source="synonymName" dest="synonym_exact"/>
 
     <!-- Other search fields -->

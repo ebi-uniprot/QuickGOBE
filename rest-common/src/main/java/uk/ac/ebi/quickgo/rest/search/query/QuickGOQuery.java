@@ -11,6 +11,8 @@ import static uk.ac.ebi.quickgo.rest.search.query.CompositeQuery.QueryOp;
  * Representation of a domain Query.
  */
 public abstract class QuickGOQuery {
+    public static final String SELECT_ALL_WHERE_FIELD_IS_NOT_EMPTY = "*";
+
     /**
      * Performs a generalised disjunction (OR) over the supplied queries.
      *
@@ -19,7 +21,7 @@ public abstract class QuickGOQuery {
      */
     public static QuickGOQuery or(QuickGOQuery... queries) {
         Preconditions.checkArgument(queries != null && arrayHasNoNullElements(queries),
-                "Queries to compose cannot be null");
+                                    "Queries to compose cannot be null");
         if (queries.length == 1) {
             return queries[0];
         } else {
@@ -37,7 +39,7 @@ public abstract class QuickGOQuery {
      */
     public static QuickGOQuery and(QuickGOQuery... queries) {
         Preconditions.checkArgument(queries != null && arrayHasNoNullElements(queries),
-                "Queries to compose cannot be null");
+                                    "Queries to compose cannot be null");
         if (queries.length == 1) {
             return queries[0];
         } else {
@@ -54,6 +56,9 @@ public abstract class QuickGOQuery {
     }
 
     public static QuickGOQuery createQuery(String field, String value) {
+        if (value.equals(SELECT_ALL_WHERE_FIELD_IS_NOT_EMPTY)) {
+            return new AllNonEmptyFieldQuery(field, value);
+        }
         return new FieldQuery(field, value);
     }
 

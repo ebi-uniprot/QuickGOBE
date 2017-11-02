@@ -1,14 +1,5 @@
 package uk.ac.ebi.quickgo.geneproduct.controller;
 
-import io.swagger.annotations.ApiOperation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
 import uk.ac.ebi.quickgo.geneproduct.model.GeneProduct;
 import uk.ac.ebi.quickgo.geneproduct.model.GeneProductRequest;
 import uk.ac.ebi.quickgo.geneproduct.service.GeneProductService;
@@ -26,12 +17,22 @@ import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
 import uk.ac.ebi.quickgo.rest.search.request.converter.FilterConverterFactory;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
-import javax.validation.Valid;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import javax.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.search;
@@ -46,6 +47,7 @@ import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.search;
  * Created with IntelliJ IDEA.
  */
 @RestController
+@Api(tags = {"gene products"})
 @RequestMapping(value = "/geneproduct")
 public class GeneProductController {
     private static final Logger LOGGER = LoggerFactory.getLogger(GeneProductController.class);
@@ -88,7 +90,7 @@ public class GeneProductController {
      *
      * @return a 400 response
      */
-    @ApiOperation(value = "Catches any bad requests and returns an error response with a 400 status")
+    @ApiOperation(value = "Catches any bad requests and returns an error response with a 400 status", hidden = true)
     @RequestMapping(value = "/*", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<ResponseExceptionHandler.ErrorInfo> emptyId() {
         throw new ParameterException("The requested end-point does not exist.");
@@ -105,6 +107,7 @@ public class GeneProductController {
      *     <li>any id is of the an invalid format: response returns 400</li>
      * </ul>
      */
+    @ApiOperation(value = "Retrieves details about a list of gene product IDs specified in CSV format")
     @RequestMapping(value = "/{ids}", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<GeneProduct>> findById(@PathVariable String ids) {
         return getGeneProductResponse(geneProductService.findById(controllerValidationHelper.validateCSVIds(ids)));
@@ -116,6 +119,7 @@ public class GeneProductController {
      * @param request an object that wraps all possible configurations for this endpoint
      * @return the search results
      */
+    @ApiOperation(value = "Searches the gene product data-set for a specified value")
     @RequestMapping(value = "/search", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<GeneProduct>> geneProductSearch(
             @Valid @ModelAttribute GeneProductRequest request,
@@ -148,6 +152,7 @@ public class GeneProductController {
      * @param name name of target set
      * @return lookup results
      */
+    @ApiOperation(value = "Retrieves gene products associated with a specified target set")
     @RequestMapping(value = "/targetset/{name}", method = {RequestMethod.GET}, produces = {MediaType
             .APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<GeneProduct>> findByTargetSet(@PathVariable String name) {

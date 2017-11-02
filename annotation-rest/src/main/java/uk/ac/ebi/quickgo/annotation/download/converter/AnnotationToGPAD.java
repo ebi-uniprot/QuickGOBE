@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 import static java.util.stream.Collectors.toList;
 
@@ -28,12 +28,12 @@ import static java.util.stream.Collectors.toList;
  * Time: 11:24
  * Created with IntelliJ IDEA.
  */
-public class AnnotationToGPAD extends AnnotationTo implements Function<Annotation, List<String>> {
+public class AnnotationToGPAD extends AnnotationTo implements BiFunction<Annotation, List<String>, List<String>> {
 
     private static final String GO_EVIDENCE = "goEvidence=";
 
     @Override
-    public List<String> apply(Annotation annotation) {
+    public List<String> apply(Annotation annotation, List<String> selectedFields) {
         if (Objects.isNull(annotation.slimmedIds) || annotation.slimmedIds.isEmpty()) {
             return Collections.singletonList(toOutputRecord(annotation, annotation.goId));
         } else {
@@ -53,7 +53,7 @@ public class AnnotationToGPAD extends AnnotationTo implements Function<Annotatio
                         .add(nullToEmptyString.apply(annotation.reference))
                         .add(nullToEmptyString.apply(annotation.evidenceCode))
                         .add(withFromAsString(annotation.withFrom))
-                        .add(Integer.toString(annotation.interactingTaxonId))
+                        .add(taxonIdAsString(annotation.interactingTaxonId))
                         .add(toYMD(annotation.date))
                         .add(nullToEmptyString.apply(annotation.assignedBy))
                         .add(extensionsAsString(annotation.extensions))

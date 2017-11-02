@@ -3,6 +3,8 @@ package uk.ac.ebi.quickgo.rest.search.request.config;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 
 import com.google.common.base.Preconditions;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import org.slf4j.Logger;
@@ -18,8 +20,9 @@ import org.springframework.stereotype.Component;
  * @author Ricardo Antunes
  */
 @Component class GlobalFilterConfigRetrieval implements FilterConfigRetrieval {
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    final Map<Set<String>, Optional<FilterConfig>> configCache;
 
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final InternalFilterConfigRetrieval internalExecutionConfig;
     private final ExternalFilterConfigRetrieval externalExecutionConfig;
 
@@ -32,6 +35,7 @@ import org.springframework.stereotype.Component;
 
         this.internalExecutionConfig = internalExecutionConfig;
         this.externalExecutionConfig = externalExecutionConfig;
+        this.configCache = new HashMap<>();
     }
 
     /**
@@ -48,6 +52,16 @@ import org.springframework.stereotype.Component;
         Preconditions.checkArgument(signature != null && !signature.isEmpty(),
                 "Signature cannot be null or empty");
 
+        if (configCache.containsKey(signature)) {
+            return configCache.get(signature);
+        } else {
+            Optional<FilterConfig> filterConfig = fetchFilterConfig(signature);
+            configCache.put(signature, filterConfig);
+            return filterConfig;
+        }
+    }
+
+    private Optional<FilterConfig> fetchFilterConfig(Set<String> signature) {
         Optional<FilterConfig> internalConfig = internalExecutionConfig.getBySignature(signature);
         Optional<FilterConfig> externalConfig = externalExecutionConfig.getBySignature(signature);
 
@@ -65,5 +79,13 @@ import org.springframework.stereotype.Component;
         }
 
         return config;
+    }
+
+    @Override public String toString() {
+        return "GlobalFilterConfigRetrieval{" +
+                "configCache=" + configCache +
+                ", internalExecutionConfig=" + internalExecutionConfig +
+                ", externalExecutionConfig=" + externalExecutionConfig +
+                '}';
     }
 }

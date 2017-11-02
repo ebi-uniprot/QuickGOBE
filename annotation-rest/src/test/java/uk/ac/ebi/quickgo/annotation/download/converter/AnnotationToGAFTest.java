@@ -4,12 +4,12 @@ import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationMocker;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -61,7 +61,7 @@ public class AnnotationToGAFTest {
         assertThat(elements[COL_QUALIFIER], is(QUALIFIER));
         assertThat(elements[COL_GO_ID], is(GO_ID));
         assertThat(elements[COL_REFERENCE], is(REFERENCE));
-        assertThat(elements[COL_EVIDENCE], is(EVIDENCE_CODE));
+        assertThat(elements[COL_EVIDENCE], is(ECO_ID));
         assertThat(elements[COL_WITH], equalTo(WITH_FROM_AS_STRING));
         assertThat(elements[COL_ASPECT], is("F"));
         assertThat(elements[COL_DB_OBJECT_NAME], is(""));        //name
@@ -90,7 +90,7 @@ public class AnnotationToGAFTest {
         assertThat(elements[COL_QUALIFIER], is(QUALIFIER));
         assertThat(elements[COL_GO_ID], is(GO_ID));
         assertThat(elements[COL_REFERENCE], is(REFERENCE));
-        assertThat(elements[COL_EVIDENCE], is(EVIDENCE_CODE));
+        assertThat(elements[COL_EVIDENCE], is(ECO_ID));
         assertThat(elements[COL_WITH], equalTo(WITH_FROM_AS_STRING));
         assertThat(elements[COL_ASPECT], is("F"));
         assertThat(elements[COL_DB_OBJECT_NAME], is(""));        //name
@@ -120,7 +120,7 @@ public class AnnotationToGAFTest {
         assertThat(elements[COL_QUALIFIER], is(QUALIFIER));
         assertThat(elements[COL_GO_ID], is(GO_ID));
         assertThat(elements[COL_REFERENCE], is(REFERENCE));
-        assertThat(elements[COL_EVIDENCE], is(EVIDENCE_CODE));
+        assertThat(elements[COL_EVIDENCE], is(ECO_ID));
         assertThat(elements[COL_WITH], equalTo(WITH_FROM_AS_STRING));
         assertThat(elements[COL_ASPECT], is("F"));
         assertThat(elements[COL_DB_OBJECT_NAME], is(""));        //name
@@ -147,7 +147,7 @@ public class AnnotationToGAFTest {
         assertThat(elements[COL_QUALIFIER], is(QUALIFIER));
         assertThat(elements[COL_GO_ID], is(GO_ID));
         assertThat(elements[COL_REFERENCE], is(REFERENCE));
-        assertThat(elements[COL_EVIDENCE], is(EVIDENCE_CODE));
+        assertThat(elements[COL_EVIDENCE], is(ECO_ID));
         assertThat(elements[COL_WITH], equalTo(WITH_FROM_AS_STRING));
         assertThat(elements[COL_ASPECT], is("F"));
         assertThat(elements[COL_DB_OBJECT_NAME], is(""));        //name
@@ -158,6 +158,45 @@ public class AnnotationToGAFTest {
         assertThat(elements[COL_ASSIGNED_BY], equalTo(DB));
         assertThat(elements[COL_ANNOTATION_EXTENSION], is(EXTENSIONS_AS_STRING));
         assertThat(elements[COL_GENE_PRODUCT_FORM_ID], is(""));
+    }
+
+    @Test
+    public void createGAFStringWithEmptyQualifier() {
+        String emptyGafQualifier = "";
+
+        List<String> qualifiersToBeEmptyForGaf = asList("enables", "part_of", "involved_in", "spurious_value");
+
+        for (String qualifierToBeEmptyInGaf : qualifiersToBeEmptyForGaf) {
+            annotation.qualifier = qualifierToBeEmptyInGaf;
+            String[] elements = annotationToElements(annotation);
+            assertThat(elements[COL_QUALIFIER], is(emptyGafQualifier));
+        }
+    }
+
+    @Test
+    public void createGAFQualifierNOTAppropriately() {
+        String notQualifier = "NOT";
+
+        List<String> qualifiersToBeEmptyForGaf = asList("NOT|enables", "NOT|part_of", "NOT|involved_in");
+
+        for (String qualifierToBeEmptyInGaf : qualifiersToBeEmptyForGaf) {
+            annotation.qualifier = qualifierToBeEmptyInGaf;
+            String[] elements = annotationToElements(annotation);
+            assertThat(elements[COL_QUALIFIER], is(notQualifier));
+        }
+    }
+
+    @Test
+    public void createValidGAFQualifiers() {
+        List<String> qualifiersToBeSetForGaf = asList(
+                "contributes_to", "NOT|contributes_to",
+                "colocalizes_with", "NOT|colocalizes_with");
+
+        for (String qualifier : qualifiersToBeSetForGaf) {
+            annotation.qualifier = qualifier;
+            String[] elements = annotationToElements(annotation);
+            assertThat(elements[COL_QUALIFIER], is(qualifier));
+        }
     }
 
     @Test
@@ -188,8 +227,8 @@ public class AnnotationToGAFTest {
         final String slimmedToGoId0 = "GO:0005524";
         final String slimmedToGoId1 = "GO:1005524";
         final String slimmedToGoId2 = "GO:2005524";
-        annotation.slimmedIds = Arrays.asList(slimmedToGoId0, slimmedToGoId1, slimmedToGoId2);
-        List<String> converted = annotationToGAF.apply(annotation);
+        annotation.slimmedIds = asList(slimmedToGoId0, slimmedToGoId1, slimmedToGoId2);
+        List<String> converted = annotationToGAF.apply(annotation, null);
         assertThat(converted, hasSize(annotation.slimmedIds.size()));
         checkReturned(slimmedToGoId0, converted.get(0));
         checkReturned(slimmedToGoId1, converted.get(1));
@@ -314,7 +353,7 @@ public class AnnotationToGAFTest {
     }
 
     private String[] annotationToElements(Annotation annotation) {
-        return annotationToGAF.apply(annotation).get(0)
+        return annotationToGAF.apply(annotation, null).get(0)
                 .split(AnnotationToGAF.OUTPUT_DELIMITER, -1);
     }
 }

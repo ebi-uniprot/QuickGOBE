@@ -5,8 +5,9 @@ import uk.ac.ebi.quickgo.annotation.validation.service.WithFromValidator;
 import uk.ac.ebi.quickgo.common.validator.GeneProductIDList;
 import uk.ac.ebi.quickgo.rest.ParameterException;
 import uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern;
-import uk.ac.ebi.quickgo.rest.search.AggregateFunction;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
+import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformationRequest;
+import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformationRequests;
 
 import io.swagger.annotations.ApiModelProperty;
 import java.util.*;
@@ -16,8 +17,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static uk.ac.ebi.quickgo.annotation.common.AnnotationFields.Facetable;
+import static java.util.Optional.of;
 import static uk.ac.ebi.quickgo.annotation.common.AnnotationFields.Searchable;
 import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.*;
 import static uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern.Flag.CASE_INSENSITIVE;
@@ -55,8 +55,10 @@ public class AnnotationRequest {
     static final String GENE_PRODUCT_SUBSET_PARAM = "Gene Product Subset identifier";
     static final String GENE_PRODUCT_PARAM = "Gene Product ID";
     static final String REFERENCE_PARAM = "Reference";
+    static final String INCLUDE_FIELD_PARAM = "Optional fields";
+    static final String SELECT_FIELD_PARAM = "Selectable fields";
 
-    static final String QUALIFIER_PARAM = "Qualifer";
+    static final String QUALIFIER_PARAM = "Qualifier";
     static final String TAXON_USAGE_ID = "taxonId";
 
     static final String TAXON_USAGE_FIELD = "taxonUsage";
@@ -93,30 +95,8 @@ public class AnnotationRequest {
             Searchable.EXTENSION
     };
 
-    /**
-     * At the moment the definition of the list is hardcoded because we only have need to display annotation and
-     * gene product statistics on a subset of types.
-     * <p>
-     * Note: We can in the future change this from a hard coded implementation, to something that is decided by the
-     * client.
-     */
-    private static List<StatsRequest> DEFAULT_STATS_REQUESTS;
-
-    static {
-        List<String> statsTypes =
-                Arrays.asList(Facetable.GO_ID, Facetable.TAXON_ID, Facetable.REFERENCE, Facetable.EVIDENCE_CODE,
-                        Facetable.ASSIGNED_BY, Facetable.GO_ASPECT);
-
-        StatsRequest annotationStats = new StatsRequest("annotation", Facetable.ID, AggregateFunction
-                .COUNT.getName(), statsTypes);
-        StatsRequest geneProductStats = new StatsRequest("geneProduct", Facetable.GENE_PRODUCT_ID,
-                AggregateFunction.UNIQUE.getName(), statsTypes);
-
-        DEFAULT_STATS_REQUESTS = Collections.unmodifiableList(Arrays.asList(annotationStats, geneProductStats));
-    }
-
     @ApiModelProperty(
-            value = "Number of results per page.",
+            value = "Number of results per page (" + MIN_ENTRIES_PER_PAGE + "-" + MAX_ENTRIES_PER_PAGE + ")",
             allowableValues = "range[" + MIN_ENTRIES_PER_PAGE + "," + MAX_ENTRIES_PER_PAGE + "]")
     protected int limit = DEFAULT_ENTRIES_PER_PAGE;
 
@@ -130,129 +110,122 @@ public class AnnotationRequest {
      * When the fix is in place we can move the @ApiModelProperty definitions to the getters
      */
     @ApiModelProperty(
-            value = "Filter annotation by the ontology to which the associated GO term belongs. Accepts comma " +
-                    "separated values. Accepts comma separated values.",
-            allowableValues = "biological_process,molecular_function,cellular_component",
-            example = "biological_process,molecular_function")
+            value = "The ontology to which associated GO terms belong. " +
+                    "Accepts comma separated values. E.g., 'biological_process,molecular_function'.",
+            allowableValues = "biological_process,molecular_function,cellular_component")
     private String aspect;
 
-    @ApiModelProperty(value = "The database which made the annotation. Accepts comma separated values.",
-            example = "BHF-UCL,Ensembl")
+    @ApiModelProperty(value = "The database from which this annotation originates. Accepts comma separated values." +
+            "E.g., BHF-UCL,Ensembl")
     private String[] assignedBy;
 
     @ApiModelProperty(
-            value = "Identifier of a literature or database reference, cited as an authority " +
-                    "for the attribution of the GO ID. It is also possible to filter just by the database type. " +
-                    "Format: DB:Reference. Accepts comma separated values.",
-            example = "PMID:2676709")
+            value = "Literature id / database reference / database type. " +
+                    "Format: DB:Reference or just DB. Accepts comma separated values. E.g., PMID:2676709 or PMID")
     private String reference;
 
     @ApiModelProperty(
-            value = "Unique identifier of a gene product present within an annotation. Accepts comma separated " +
-                    "values.", example = "P99999,URS00000064B1_559292")
+            value = "The id of the gene product annotated with the GO term. Accepts comma separated values." +
+                    "E.g., URS00000064B1_559292")
     private String geneProductId;
 
     @ApiModelProperty(
-            value = "Evidence code used to indicate how the annotation is supported. Accepts comma separated values.",
-            example = "ECO:0000255,ECO:0000305")
+            value = "Evidence code indicating how the annotation is supported. Accepts comma separated values. " +
+                    "E.g., ECO:0000255")
     private String evidenceCode;
 
     @ApiModelProperty(
-            value = "The GO identifier attributed to an annotation. Accepts comma separated values.",
-            example = "GO:0030533,GO:0070125")
+            value = "The GO id of an annotation. Accepts comma separated values. " +
+                    "E.g., GO:0070125")
     private String goId;
 
     @ApiModelProperty(
-            value = "Flags that modify the interpretation of an annotation. Accepts comma separated values.",
-            example = "enables,involved_in")
+            value = "Aids the interpretation of an annotation. Accepts comma separated values. " +
+                    "E.g., enables,involved_in")
     private String qualifier;
 
     @ApiModelProperty(
-            value = "Holds additional identifiers for an annotation. Accepts comma separated values.",
-            example = "GO:0030533,P63328")
+            value = "Additional ids for an annotation. Accepts comma separated values. " +
+                    "E.g., P63328")
     private String withFrom;
 
     @ApiModelProperty(
-            value = "The taxonomic identifier of the species encoding the gene product associated to an annotation. " +
-                    "Accepts comma separated values.",
-            example = "35758,1310605")
+            value = "The taxonomic id of the species encoding the gene product associated to an annotation. " +
+                    "Accepts comma separated values. E.g., 1310605")
     private String taxonId;
 
     @ApiModelProperty(
-            value = "Indicates how the taxonomic identifier within the annotations should be used.",
-            allowableValues = "descendants,exact",
-            example = "exact")
+            value = "Indicates how the taxonomic ids within the annotations should be used. E.g., exact",
+            allowableValues = "descendants,exact")
     private String taxonUsage;
 
     @ApiModelProperty(
-            value = "Indicates how the GO terms within the annotations should be used. Is used in conjunction with " +
-                    "'goUsageRelationships'.",
-            allowableValues = "descendants,exact,slim",
-            example = "descendants")
+            value = "Indicates how the GO terms within the annotations should be used. Used in conjunction with " +
+                    "'goUsageRelationships' filter. E.g., descendants",
+            allowableValues = "descendants,exact,slim")
     private String goUsage;
 
     @ApiModelProperty(
-            value = "The relationship between the provided 'goId' (GO) identifiers " +
-                    "found within the annotations. If the relationship is fulfilled, " +
-                    "the annotation is selected. Allows comma separated values.",
-            allowableValues = "is_a,part_of,occurs_in,regulates",
-            example = "is_a,part_of")
+            value = "The relationship between the 'goId' values " +
+                    "found within the annotations. Allows comma separated values. E.g., is_a,part_of",
+            allowableValues = "is_a,part_of,occurs_in,regulates")
     private String goUsageRelationships;
 
     @ApiModelProperty(
             value = "Indicates how the evidence code terms within the annotations should be used. Is used in " +
-                    "conjunction with 'evidenceCodeUsageRelationships'.",
-            allowableValues = "descendants,exact",
-            example = "descendants")
+                    "conjunction with 'evidenceCodeUsageRelationships' filter. E.g., descendants",
+            allowableValues = "descendants,exact")
     private String evidenceCodeUsage;
 
     @ApiModelProperty(
-            value = "The relationship between the provided 'evidenceCode' identifiers " +
-                    "found within the annotations. If the relationship is fulfilled, " +
-                    "the annotation is selected. Allows comma separated values.",
-            allowableValues = "is_a,part_of,occurs_in,regulates",
-            example = "is_a,part_of")
+            value = "The relationship between the provided 'evidenceCode' identifiers. " +
+                    "Allows comma separated values. E.g., is_a,part_of",
+            allowableValues = "is_a,part_of,occurs_in,regulates")
     private String evidenceCodeUsageRelationships;
 
     @ApiModelProperty(
-            value = "The type of gene product found within an annotation. Accepts comma separated values.",
-            allowableValues = "protein,RNA,complex.",
-            example = "protein,RNA")
+            value = "The type of gene product. Accepts comma separated values. E.g., protein,RNA",
+            allowableValues = "protein,RNA,complex")
     private String geneProductType;
 
     @ApiModelProperty(
-            value = "A set of gene products that have been identified as being of interest to a certain group. " +
-                    "Accepts comma separated values.",
-            example = "KRUK,BHF-UCL,Exosome")
+            value = "Gene product set. " +
+                    "Accepts comma separated values. E.g., KRUK,BHF-UCL,Exosome")
     private String targetSet;
 
     @ApiModelProperty(
-            value = "The name of a database specific to gene products. Accepts comma separated values.",
-            example = "TrEMBL"
-    )
+            value = "A database that provides a set of gene products. Accepts comma separated " +
+                    "values. E.g., TrEMBL")
     private String geneProductSubset;
 
     @ApiModelProperty(
             value = "Gene ontology evidence codes of the 'goId's found within the annotations. Accepts comma " +
-                    "separated values.",
-            example = "EXP,IDA")
+                    "separated values. E.g., EXP,IDA",
+            hidden = true)
     private String goIdEvidence;
 
-    @ApiModelProperty(value = "An annotation extension is used to extend " +
-            "(i.e., add more specificity to) the GO term used in an annotation; the combination of the GO term plus the" +
-            " extension is equivalent to a more specific GO term. " +
-            "An annotation extension is stored in the database, and transmitted in annotation files, as a single " +
-            "string, structured as a pipe-separated list of comma-separated lists of components.",
-            example = "occurs_in(CL:0000032),transports_or_maintains_localization_of(UniProtKB:P10288)|" +
-                    "results_in_formation_of(UBERON:0003070),occurs_in(CL:0000032),occurs_in(CL:0000008)," +
-                    "results_in_formation_of(UBERON:0001675)")
+    @ApiModelProperty(value = "Extensions to annotations, where each extension can be: " +
+            "EXTENSION(DB:ID) / EXTENSION(DB) / EXTENSION. ")
     private String extension;
 
     @ApiModelProperty(
-            value = "The number of annotations to download. Note, the page size parameter [limit] will be ignored " +
-                    "when downloading results.",
-            allowableValues = "range[" + MIN_DOWNLOAD_NUMBER + "," + MAX_DOWNLOAD_NUMBER + "]")
+            value = "The number of annotations to download ("+MIN_DOWNLOAD_NUMBER+"-"+MAX_DOWNLOAD_NUMBER+"). Note, " +
+                    "the page size parameter 'limit' will be ignored when downloading results. ",
+            allowableValues = "range[" + MIN_DOWNLOAD_NUMBER + "," + MAX_DOWNLOAD_NUMBER + "]",
+            hidden = true)
     private int downloadLimit = DEFAULT_DOWNLOAD_LIMIT;
+
+    @ApiModelProperty(
+            value = "Optional fields retrieved from external services. Accepts comma separated values.",
+            allowableValues = "goName,taxonName,name,synonyms")
+    private String[] includeFields;
+
+    @ApiModelProperty(
+            value = "For TSV downloads only: fields to be downloaded. Accepts comma separated values.",
+            allowableValues = "geneProductId,symbol,qualifier,goId,goAspect,goName,evidenceCode,goEvidence,reference," +
+                    "withFrom,taxonId,assignedBy,extensions,date,taxonName,synonym,name,type",
+            hidden = true)
+    private String[] selectedFields;
 
     private final Map<String, String[]> filterMap = new HashMap<>();
 
@@ -380,7 +353,8 @@ public class AnnotationRequest {
         }
     }
 
-    @Pattern(regexp = "^exact|descendants$", message = "Invalid taxonUsage: ${validatedValue}", flags = {Pattern.Flag.CASE_INSENSITIVE})
+    @Pattern(regexp = "^exact|descendants$", message = "Invalid taxonUsage: ${validatedValue}",
+            flags = {Pattern.Flag.CASE_INSENSITIVE})
     public String getTaxonUsage() {
         return filterMap.get(TAXON_USAGE_FIELD) == null ? DEFAULT_TAXON_USAGE : filterMap.get(TAXON_USAGE_FIELD)[0];
     }
@@ -546,6 +520,44 @@ public class AnnotationRequest {
     }
 
     /**
+     * Include fields whose values derive from external resources
+     * @param includeFields a vararg of fields to include
+     */
+    public void setIncludeFields(String... includeFields) {
+        this.includeFields = includeFields;
+    }
+
+    /**
+     * An array of fields whose values derive from external resources, which are to be included in the response
+     * @return the array of fields from external resources to include in the response
+     */
+    @ArrayPattern(regexp = "^goName|taxonName|name|synonyms$", flags = CASE_INSENSITIVE, paramName =
+            INCLUDE_FIELD_PARAM)
+    public String[] getIncludeFields() {
+        return this.includeFields;
+    }
+
+    /**
+     * Select which fields will appear in the TSV download
+     * @param selectedFields a vararg of fields to include
+     */
+    public void setSelectedFields(String... selectedFields) {
+        this.selectedFields = selectedFields;
+    }
+
+    /**
+     * An array of fields whose values will appear in the TSV download
+     * @return the array of fields from external resources to include in the response
+     */
+    @ArrayPattern(regexp = "^geneProductId|symbol|qualifier|goId|goAspect|goName|evidenceCode|goEvidence|reference" +
+            "|withFrom|taxonId|taxonName|assignedBy|extensions|date|name|synonyms|type$", flags = CASE_INSENSITIVE,
+            paramName =
+            SELECT_FIELD_PARAM)
+    public String[] getSelectedFields() {
+        return this.selectedFields;
+    }
+
+    /**
      * Produces a set of {@link FilterRequest} objects given the filter attributes provided by the user.
      *
      * @return a list of {@link FilterRequest}
@@ -566,12 +578,60 @@ public class AnnotationRequest {
         return filterRequests;
     }
 
+    /**
+     * Create a {@link ResultTransformationRequest}s instance, indicating how the results
+     * should be transformed to fulfil the initial client request. For example, this instance
+     * would include a {@link ResultTransformationRequest} instance for each field in "includeFields=goName".
+     *
+     * @return a {@link ResultTransformationRequests} instance indicating how the request's results
+     * should be transformed
+     */
+    public ResultTransformationRequests createResultTransformationRequests() {
+        ResultTransformationRequests transformationRequests = new ResultTransformationRequests();
+        if (includeFields != null && includeFields.length > 0) {
+            Stream.of(includeFields)
+                    .map(ResultTransformationRequest::new)
+                    .forEach(transformationRequests::addTransformationRequest);
+        }
+        return transformationRequests;
+    }
+
+    @Override public String toString() {
+        return "AnnotationRequest{" +
+                "limit=" + limit +
+                ", page=" + page +
+                ", aspect='" + aspect + '\'' +
+                ", assignedBy=" + Arrays.toString(assignedBy) +
+                ", reference='" + reference + '\'' +
+                ", geneProductId='" + geneProductId + '\'' +
+                ", evidenceCode='" + evidenceCode + '\'' +
+                ", goId='" + goId + '\'' +
+                ", qualifier='" + qualifier + '\'' +
+                ", withFrom='" + withFrom + '\'' +
+                ", taxonId='" + taxonId + '\'' +
+                ", taxonUsage='" + taxonUsage + '\'' +
+                ", goUsage='" + goUsage + '\'' +
+                ", goUsageRelationships='" + goUsageRelationships + '\'' +
+                ", evidenceCodeUsage='" + evidenceCodeUsage + '\'' +
+                ", evidenceCodeUsageRelationships='" + evidenceCodeUsageRelationships + '\'' +
+                ", geneProductType='" + geneProductType + '\'' +
+                ", targetSet='" + targetSet + '\'' +
+                ", geneProductSubset='" + geneProductSubset + '\'' +
+                ", goIdEvidence='" + goIdEvidence + '\'' +
+                ", extension='" + extension + '\'' +
+                ", downloadLimit=" + downloadLimit +
+                ", includeFields=" + Arrays.toString(includeFields) +
+                ", selectedFields=" + Arrays.toString(selectedFields) +
+                ", filterMap=" + filterMap +
+                '}';
+    }
+
     private Optional<FilterRequest> createSimpleFilter(String key) {
         Optional<FilterRequest> request;
         if (filterMap.containsKey(key)) {
             FilterRequest.Builder requestBuilder = FilterRequest.newBuilder();
             requestBuilder.addProperty(key, filterMap.get(key));
-            request = Optional.of(requestBuilder.build());
+            request = of(requestBuilder.build());
         } else {
             request = Optional.empty();
         }
@@ -584,11 +644,11 @@ public class AnnotationRequest {
         if (filterMap.containsKey(TAXON_USAGE_ID)) {
             switch (getTaxonUsage()) {
                 case DESCENDANTS_USAGE:
-                    field = Optional.of(Searchable.TAXON_ANCESTORS);
+                    field = of(Searchable.TAXON_ANCESTORS);
                     break;
                 case EXACT_USAGE:
                 default:
-                    field = Optional.of(Searchable.TAXON_ID);
+                    field = of(Searchable.TAXON_ID);
                     break;
             }
         } else {
@@ -626,14 +686,14 @@ public class AnnotationRequest {
             switch (usageValue) {
                 case SLIM_USAGE:
                 case DESCENDANTS_USAGE:
-                    request = Optional.of(filterBuilder.addProperty(usageValue)
+                    request = of(filterBuilder.addProperty(usageValue)
                             .addProperty(idParam, filterMap.get(idField))
                             .addProperty(relationshipsParam, filterMap.get(relationshipsParam))
                             .build());
                     break;
                 case EXACT_USAGE:
                 default:
-                    request = Optional.of(filterBuilder.addProperty(idField, filterMap.get(idField))
+                    request = of(filterBuilder.addProperty(idField, filterMap.get(idField))
                             .build());
                     break;
             }
@@ -648,58 +708,9 @@ public class AnnotationRequest {
         return request;
     }
 
-    public List<StatsRequest> createStatsRequests() {
-        return DEFAULT_STATS_REQUESTS;
-    }
-
     private String[] createLowercasedStringArray(String... args) {
         return Stream.of(args)
                 .map(String::toLowerCase)
                 .toArray(String[]::new);
-    }
-
-    /**
-     * Defines which statistics the client would like to to retrieve.
-     */
-    public static class StatsRequest {
-        private final String groupName;
-        private final String groupField;
-        private final String aggregateFunction;
-        private final List<String> types;
-
-        public StatsRequest(String groupName, String groupField, String aggregateFunction, List<String> types) {
-            checkArgument(groupName != null && !groupName.trim().isEmpty(),
-                    "Statistics group name cannot be null or empty");
-            checkArgument(groupField != null && !groupName.trim().isEmpty(),
-                    "Statistics group field cannot be null or empty");
-            checkArgument(aggregateFunction != null && !aggregateFunction.trim().isEmpty(), "Statistics " +
-                    "aggregate function cannot be null or empty");
-
-            this.groupName = groupName;
-            this.groupField = groupField;
-            this.aggregateFunction = aggregateFunction;
-
-            if (types == null) {
-                this.types = Collections.emptyList();
-            } else {
-                this.types = types;
-            }
-        }
-
-        public String getGroupName() {
-            return groupName;
-        }
-
-        public String getGroupField() {
-            return groupField;
-        }
-
-        public String getAggregateFunction() {
-            return aggregateFunction;
-        }
-
-        public Collection<String> getTypes() {
-            return Collections.unmodifiableList(types);
-        }
     }
 }

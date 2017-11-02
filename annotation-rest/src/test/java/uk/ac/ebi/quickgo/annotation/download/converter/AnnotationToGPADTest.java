@@ -54,7 +54,7 @@ public class AnnotationToGPADTest {
         assertThat(elements[COL_QUALIFIER], is(QUALIFIER));
         assertThat(elements[COL_GO_ID], is(GO_ID));
         assertThat(elements[COL_REFERENCE], is(REFERENCE));
-        assertThat(elements[COL_EVIDENCE], is(EVIDENCE_CODE));
+        assertThat(elements[COL_EVIDENCE], is(ECO_ID));
         assertThat(elements[COL_WITH], equalTo(WITH_FROM_AS_STRING));
         assertThat(elements[COL_INTERACTING_DB], is(Integer.toString(INTERACTING_TAXON_ID)));
         assertThat(elements[COL_DATE], equalTo(DATE_AS_STRING));
@@ -125,7 +125,14 @@ public class AnnotationToGPADTest {
     public void emptyInteractingTaxonId() {
         annotation.interactingTaxonId = 0;
         String[] elements = annotationToElements(annotation);
-        assertThat(elements[COL_INTERACTING_DB], is("0"));
+        assertThat(elements[COL_INTERACTING_DB], is(""));
+    }
+
+    @Test
+    public void lowestInteractingTaxonIdIsPopulatedCorrectly() {
+        annotation.interactingTaxonId = 1;
+        String[] elements = annotationToElements(annotation);
+        assertThat(elements[COL_INTERACTING_DB], is("1"));
     }
 
     @Test
@@ -169,7 +176,7 @@ public class AnnotationToGPADTest {
         final String slimmedToGoId1 = "GO:1005524";
         final String slimmedToGoId2 = "GO:2005524";
         annotation.slimmedIds = Arrays.asList(slimmedToGoId0, slimmedToGoId1, slimmedToGoId2);
-        List<String> converted = annotationToGPAD.apply(annotation);
+        List<String> converted = annotationToGPAD.apply(annotation, null);
         assertThat(converted, hasSize(annotation.slimmedIds.size()));
         checkReturned(slimmedToGoId0, converted.get(0));
         checkReturned(slimmedToGoId1, converted.get(1));
@@ -182,7 +189,7 @@ public class AnnotationToGPADTest {
     }
 
     private String[] annotationToElements(Annotation annotation) {
-        return annotationToGPAD.apply(annotation)
+        return annotationToGPAD.apply(annotation, null)
                 .get(0)
                 .split(AnnotationToGAF.OUTPUT_DELIMITER, -1);
     }

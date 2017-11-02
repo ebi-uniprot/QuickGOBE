@@ -4,8 +4,12 @@ import uk.ac.ebi.quickgo.annotation.AnnotationParameters;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationFields;
 import uk.ac.ebi.quickgo.rest.ParameterException;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
+import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformationRequest;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.Before;
 import org.junit.Rule;
@@ -15,6 +19,8 @@ import org.junit.rules.ExpectedException;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayContaining;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.EVIDENCE_CODE_USAGE_RELATIONS_PARAM;
@@ -187,10 +193,9 @@ public class AnnotationRequestTest {
     @Test
     public void canCreateExactFilterWithGoIds() {
         String goId = "GO:0000001";
-        String usage = EXACT_USAGE;
 
         annotationRequest.setGoId(goId);
-        annotationRequest.setGoUsage(usage);
+        annotationRequest.setGoUsage(EXACT_USAGE);
 
         FilterRequest request = FilterRequest.newBuilder()
                 .addProperty(AnnotationFields.Searchable.GO_ID, goId.toUpperCase())
@@ -202,11 +207,10 @@ public class AnnotationRequestTest {
     @Test
     public void canCreateExactFilterWithGoIdsAndUnusedGoUsageRelationships() {
         String goId = "GO:0000001";
-        String usage = EXACT_USAGE;
         String relationships = "is_A";
 
         annotationRequest.setGoId(goId);
-        annotationRequest.setGoUsage(usage);
+        annotationRequest.setGoUsage(EXACT_USAGE);
         annotationRequest.setGoUsageRelationships(relationships);
 
         FilterRequest request = FilterRequest.newBuilder()
@@ -401,10 +405,9 @@ public class AnnotationRequestTest {
     @Test
     public void canCreateExactFilterWithEcoIds() {
         String ecoId = "ECO:0000001";
-        String usage = EXACT_USAGE;
 
         annotationRequest.setEvidenceCode(ecoId);
-        annotationRequest.setEvidenceCodeUsage(usage);
+        annotationRequest.setEvidenceCodeUsage(EXACT_USAGE);
 
         FilterRequest request = FilterRequest.newBuilder()
                 .addProperty(AnnotationFields.Searchable.EVIDENCE_CODE, ecoId.toUpperCase())
@@ -416,11 +419,10 @@ public class AnnotationRequestTest {
     @Test
     public void canCreateExactFilterWithECOIdsAndUnusedECOUsageRelationships() {
         String ecoId = "ECO:0000001";
-        String usage = EXACT_USAGE;
         String relationships = "is_A";
 
         annotationRequest.setEvidenceCode(ecoId);
-        annotationRequest.setEvidenceCodeUsage(usage);
+        annotationRequest.setEvidenceCodeUsage(EXACT_USAGE);
         annotationRequest.setEvidenceCodeUsageRelationships(relationships);
 
         FilterRequest request = FilterRequest.newBuilder()
@@ -501,6 +503,59 @@ public class AnnotationRequestTest {
         assertThat(annotationRequest.getDownloadLimit(), is(limit));
     }
 
+    //-----------------
+    @Test
+    public void setAndGetIncludeFields() {
+        String field = "goName";
+        annotationRequest.setIncludeFields(field);
+        assertThat(annotationRequest.getIncludeFields(), arrayContaining(field));
+    }
+
+    @Test
+    public void setAndGetSelectedFields() {
+        List<String> selectedFields = Arrays.asList("geneProductId", "symbol", "qualifier", "goId", "goName",
+                                               "evidenceCode", "goEvidence","reference","withFrom","taxonId",
+                                                    "taxonName", "assignedBy", "extensions", "date", "name", "synonyms",
+                                                    "type");
+        for (String field : selectedFields) {
+            annotationRequest.setSelectedFields(field);
+            assertThat(annotationRequest.getSelectedFields(), arrayContaining(field));
+        }
+    }
+
+    @Test
+    public void zeroIncludedFieldResultsInZeroResultTransformationRequest() {
+        assertThat(annotationRequest.createResultTransformationRequests().getRequests(), hasSize(0));
+    }
+
+    @Test
+    public void oneIncludedFieldResultsInOneResultTransformationRequest() {
+        String field = "goName";
+        annotationRequest.setIncludeFields(field);
+
+        Set<ResultTransformationRequest> requests =
+                annotationRequest.createResultTransformationRequests().getRequests();
+        assertThat(requests, hasSize(1));
+        assertThat(requests.iterator().next().getId(), is(field));
+    }
+
+    @Test
+    public void twoIncludedFieldResultsInTwoResultTransformationRequests() {
+        String goName = "goName";
+        String taxonName = "taxonName";
+        String[] fields = {goName, taxonName};
+        annotationRequest.setIncludeFields(fields);
+
+        Set<ResultTransformationRequest> requests =
+                annotationRequest.createResultTransformationRequests().getRequests();
+        assertThat(requests, hasSize(2));
+
+        List<String> requestIds =
+                requests.stream().map(ResultTransformationRequest::getId).collect(Collectors.toList());
+        assertThat(requestIds, containsInAnyOrder(goName, taxonName));
+    }
+
+    //----------------- helpers
     private String getDefaultTaxonSearchField() {
         String field;
         switch (AnnotationRequest.DEFAULT_TAXON_USAGE) {

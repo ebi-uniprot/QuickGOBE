@@ -56,6 +56,7 @@ public class AnnotationDocConverterImplTest {
     private static final String GO_ASPECT = "cellular_component";
     private static final Date DATE = Date.from(
             LocalDate.of(2012, 10, 2).atStartOfDay(ZoneId.systemDefault()).toInstant());
+    private static final String GENE_PRODUCT_TYPE = "protein";
     private static final AnnotationDocument DOCUMENT = createStubDocument();
     private AnnotationDocConverter docConverter;
 
@@ -213,6 +214,7 @@ public class AnnotationDocConverterImplTest {
         doc.symbol = SYMBOL;
         doc.goAspect = GO_ASPECT;
         doc.date = DATE;
+        doc.geneProductType = GENE_PRODUCT_TYPE;
 
         return doc;
     }

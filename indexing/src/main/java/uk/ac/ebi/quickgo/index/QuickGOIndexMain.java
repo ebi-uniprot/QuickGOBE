@@ -6,6 +6,7 @@ import uk.ac.ebi.quickgo.index.ontology.OntologyConfig;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Import;
 
 /**
@@ -27,7 +28,12 @@ import org.springframework.context.annotation.Import;
 @Import({OntologyConfig.class, GeneProductConfig.class, AnnotationConfig.class})
 @SpringBootApplication
 public class QuickGOIndexMain {
+    static <T> int run(Class<T> type, String[] args) {
+        ConfigurableApplicationContext applicationContext = SpringApplication.run(type, args);
+        return SpringApplication.exit(applicationContext);
+    }
+
     public static void main(String[] args) {
-        SpringApplication.run(QuickGOIndexMain.class, args);
+        System.exit(QuickGOIndexMain.run(QuickGOIndexMain.class, args));
     }
 }

@@ -50,4 +50,10 @@ import org.springframework.stereotype.Component;
 
         return config;
     }
+
+    @Override public String toString() {
+        return "InternalFilterConfigRetrieval{" +
+                "executionConfigs=" + executionConfigs +
+                '}';
+    }
 }

@@ -9,7 +9,7 @@ search:
         properties: {
           ip: "http://ves-hx-c2:8082",
           resourceFormat: "/ontology/eco/terms/{evidenceCode}/descendants?relations={evidenceCodeUsageRelationships}",
-          responseClass: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.ConvertedOntologyFilter",
+          responseClass: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.OntologyDescendants",
           responseConverter: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.DescendantsFilterConverter"
         }
       - signature: descendants,goId,goUsageRelationships
@@ -17,7 +17,7 @@ search:
         properties: {
           ip: "http://ves-hx-c2:8082",
           resourceFormat: "/QuickGO/services/go/terms/{goId}/descendants?relations={goUsageRelationships}",
-          responseClass: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.ConvertedOntologyFilter",
+          responseClass: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.OntologyDescendants",
           responseConverter: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.DescendantsFilterConverter"
         }
       - signature: goId,goUsageRelationships,slim
@@ -25,7 +25,7 @@ search:
         properties: {
           ip: "http://ves-hx-c2:8082",
           resourceFormat: "/QuickGO/services/go/terms/{goId}/descendants?relations={goUsageRelationships}",
-          responseClass: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.ConvertedOntologyFilter",
+          responseClass: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.OntologyDescendants",
           responseConverter: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.SlimmingFilterConverter"
         }
 model:

@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.ConfigFileApplicationContextInitializer;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
 import uk.ac.ebi.quickgo.annotation.IdGeneratorUtil;
 import uk.ac.ebi.quickgo.annotation.validation.loader.ValidationConfig;
 import uk.ac.ebi.quickgo.annotation.validation.service.JobTestRunnerConfig;
@@ -30,7 +31,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static uk.ac.ebi.quickgo.annotation.IdGeneratorUtil.generateValues;
 import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.*;
-import static uk.ac.ebi.quickgo.annotation.validation.loader.ValidationConfig.LOAD_ANNOTATION_DBX_REF_ENTITIES_STEP_NAME;
+import static uk.ac.ebi.quickgo.annotation.validation.loader.ValidationConfig
+        .LOAD_ANNOTATION_DBX_REF_ENTITIES_STEP_NAME;
 import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.*;
 
 /**
@@ -286,7 +288,7 @@ public class AnnotationRequestValidationIT {
                 containsString("Invalid " + TAXON_USAGE_FIELD + ": " + usage + ""));
     }
 
-    //GENE PRODUCT ID
+    // GENE PRODUCT ID
     @Test
     public void allGeneProductValuesAreValid() {
         annotationRequest.setGeneProductId(VALID_GENE_PRODUCT_ID);
@@ -333,7 +335,7 @@ public class AnnotationRequestValidationIT {
                 is(createMaxSizeErrorMessage(GENE_PRODUCT_PARAM, MAX_GENE_PRODUCT_IDS)));
     }
 
-    //GO ID PARAMETER
+    // GO ID PARAMETER
     @Test
     public void goIdIsValid() {
         String[] goIds = {"GO:0003824", "GO:0009999", "GO:0003333"};
@@ -391,7 +393,7 @@ public class AnnotationRequestValidationIT {
         assertThat(violations.iterator().next().getMessage(), is(createMaxSizeErrorMessage(GO_ID_PARAM, MAX_GO_IDS)));
     }
 
-    //EVIDENCE CODE PARAMETER
+    // EVIDENCE CODE PARAMETER
     @Test
     public void evidenceCodeIsValid() {
         String[] ecoIds = {"ECO:0000256", "ECO:0000888", "ECO:0000777"};
@@ -438,7 +440,7 @@ public class AnnotationRequestValidationIT {
                 is(createMaxSizeErrorMessage(EVIDENCE_CODE_PARAM, MAX_EVIDENCE_CODE)));
     }
 
-    //GENE PRODUCT TYPE PARAMETER
+    // GENE PRODUCT TYPE PARAMETER
     @Test
     public void validGeneProductTypeValuesDontCauseAnError() {
         String[] gpTypes = {"complex", "miRNA", "protein"};
@@ -469,7 +471,7 @@ public class AnnotationRequestValidationIT {
                 is(createRegexErrorMessage(GENE_PRODUCT_TYPE_PARAM, invalidGPTypes)));
     }
 
-    //GENE PRODUCT SUBSET PARAMETER
+    // GENE PRODUCT SUBSET PARAMETER
     @Test
     public void setGpSubsetSuccessfully() {
         String[] gpSubsets = {"BHF-UCL", "Exosome", "KRUK", "ParkinsonsUK-UCL", "ReferenceGenome"};
@@ -491,7 +493,7 @@ public class AnnotationRequestValidationIT {
                 is(createRegexErrorMessage(GENE_PRODUCT_SUBSET_PARAM, invalidSubsets)));
     }
 
-    //PAGE PARAMETER
+    // PAGE PARAMETER
     @Test
     public void negativePageValueIsInvalid() {
         int invalidPage = -1;
@@ -519,7 +521,7 @@ public class AnnotationRequestValidationIT {
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
-    //LIMIT PARAMETER
+    // LIMIT PARAMETER
     @Test
     public void negativeLimitValueIsInvalid() {
         int invalidEntriesPerPage = -1;
@@ -569,7 +571,7 @@ public class AnnotationRequestValidationIT {
         assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
     }
 
-    //GO USAGE PARAMETERS
+    // GO USAGE PARAMETERS
     @Test
     public void descendantsGoUsageIsValid() {
         annotationRequest.setGoUsage("descendants");
@@ -626,7 +628,7 @@ public class AnnotationRequestValidationIT {
     }
 
     //---------------------------------------
-    //ECO USAGE PARAMETERS
+    // ECO USAGE PARAMETERS
     @Test
     public void descendantsEcoUsageIsValid() {
         annotationRequest.setEvidenceCodeUsage("descendants");
@@ -681,10 +683,9 @@ public class AnnotationRequestValidationIT {
 
         annotationRequest.createFilterRequests();
     }
+
     //---------------------------------------
-
-
-    //WITH/FROM PARAMETER
+    // WITH/FROM PARAMETER
     @Test
     public void withFromIsValid() {
         setupDbXrefValidationData();
@@ -703,7 +704,7 @@ public class AnnotationRequestValidationIT {
         assertThat(violations, hasSize(1));
     }
 
-    //REFERENCE PARAMETER
+    // REFERENCE PARAMETER
     @Test
     public void exceedingMaximumNumberOfReferencesSendsError() {
         setupDbXrefValidationData();
@@ -812,6 +813,57 @@ public class AnnotationRequestValidationIT {
         assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
     }
 
+    // OPTIONALLY INCLUDED RESPONSE FIELDS
+    @Test
+    public void goNameAsIncludedFieldIsValid() {
+        annotationRequest.setIncludeFields("goName");
+        assertThat(validator.validate(annotationRequest), is(empty()));
+    }
+
+    @Test
+    public void taxonNameAsIncludedFieldIsValid() {
+        annotationRequest.setIncludeFields("taxonName");
+        assertThat(validator.validate(annotationRequest), is(empty()));
+    }
+
+    @Test
+    public void multipleValidIncludedFieldsAreValid() {
+        annotationRequest.setIncludeFields("goName", "taxonName");
+        assertThat(validator.validate(annotationRequest), is(empty()));
+    }
+
+    @Test
+    public void invalidIncludedFieldProducesValidationError() {
+        annotationRequest.setIncludeFields("XXXXXXXXX");
+        assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
+    }
+
+    // SELECTED FIELDS
+    @Test
+    public void validSelectedFieldsAreAllValidatedCorrectly() {
+        String[] validSelectedFields =
+                ("geneProductId|symbol|qualifier|goId|goAspect|goName|evidenceCode|goEvidence|reference" +
+                "|withFrom|taxonId|taxonName|assignedBy|extensions|date|name|synonyms|type").split("\\|");
+
+        for (String validSelectedField : validSelectedFields) {
+            annotationRequest.setSelectedFields(validSelectedField);
+            assertThat(validator.validate(annotationRequest), is(empty()));
+        }
+    }
+
+    @Test
+    public void multipleValidSelectedFieldsAreValid() {
+        annotationRequest.setSelectedFields("geneProductId", "symbol");
+        assertThat(validator.validate(annotationRequest), is(empty()));
+    }
+
+    @Test
+    public void invalidSelectedFieldProducesValidationError() {
+        annotationRequest.setSelectedFields("XXXXXXXXXX");
+        assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
+    }
+
+    // Helpers
     private String createRegexErrorMessage(String paramName, String... invalidItems) {
         String csvInvalidItems = Stream.of(invalidItems).collect(Collectors.joining(", "));
         return String.format(ArrayPattern.DEFAULT_ERROR_MSG, paramName, csvInvalidItems);

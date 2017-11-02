@@ -1,8 +1,5 @@
 package uk.ac.ebi.quickgo.ontology.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import uk.ac.ebi.quickgo.common.SearchableField;
 import uk.ac.ebi.quickgo.graphics.service.GraphImageService;
 import uk.ac.ebi.quickgo.ontology.OntologyRestConfig;
@@ -16,6 +13,10 @@ import uk.ac.ebi.quickgo.ontology.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.rest.headers.HttpHeadersProvider;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
 
+import io.swagger.annotations.Api;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.ECO_GRAPH_TRAVERSAL_TYPES;
 
 /**
@@ -28,6 +29,7 @@ import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.ECO_GRAPH_TR
  * @author Edd
  */
 @RestController
+@Api(tags = {"evidence & conclusion ontology"})
 @RequestMapping(value = "/ontology/eco")
 public class ECOController extends OBOController<ECOTerm> {
 

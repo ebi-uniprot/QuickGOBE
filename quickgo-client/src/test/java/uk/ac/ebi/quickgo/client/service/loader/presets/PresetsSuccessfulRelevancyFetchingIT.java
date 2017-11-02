@@ -65,7 +65,7 @@ public class PresetsSuccessfulRelevancyFetchingIT {
         assertThat(status, is(BatchStatus.COMPLETED));
         assertThat(
                 extractPresetValues(presets.getAssignedBy(), p -> p.getProperty(NAME)),
-                IsIterableContainingInOrder.contains(MockPresetDataConfig.UNIPROT_KB, MockPresetDataConfig.ENSEMBL));
+                IsIterableContainingInOrder.contains(MockPresetDataConfig.ENSEMBL, MockPresetDataConfig.UNIPROT_KB));
     }
 
     @Test
@@ -167,7 +167,7 @@ public class PresetsSuccessfulRelevancyFetchingIT {
         assertThat(status, is(BatchStatus.COMPLETED));
         assertThat(presets.getGoSlimSets(), hasSize(4));
 
-        List<PresetItem> presetItems = extractPresets(presets.getGoSlimSets());
+        List<PresetItem> presetItems = presets.getGoSlimSets();
         assertThat(presetItems.get(0), is(equalTo(MockPresetDataConfig.PRESET_GO_SLIM_ASPERGILLUS)));
         assertThat(presetItems.get(1), is(equalTo(MockPresetDataConfig.PRESET_GO_SLIM_METAGENOMICS)));
         assertThat(presetItems.get(2), is(equalTo(MockPresetDataConfig.PRESET_GO_SLIM_POMBE)));
@@ -183,7 +183,7 @@ public class PresetsSuccessfulRelevancyFetchingIT {
         BatchStatus status = jobExecution.getStatus();
 
         assertThat(status, is(BatchStatus.COMPLETED));
-        final List<PresetItem> presetItems = extractPresets(presets.getTaxons());
+        final List<PresetItem> presetItems = presets.getTaxons();
         assertThat(presetItems.get(0), is(equalTo(MockPresetDataConfig.PRESET_TAXON_ARABIDOPSIS)));
         assertThat(presetItems.get(1), is(equalTo(MockPresetDataConfig.PRESET_TAXON_DROSOPHILA)));
     }
@@ -205,10 +205,6 @@ public class PresetsSuccessfulRelevancyFetchingIT {
 
     private <T> List<T> extractPresetValues(List<PresetItem> presets, Function<PresetItem, T> extractor) {
         return presets.stream().map(extractor).collect(Collectors.toList());
-    }
-
-    private List<PresetItem> extractPresets(List<PresetItem> presets) {
-        return presets.stream().collect(Collectors.toList());
     }
 
     private PresetItem extractFirstPreset(List<PresetItem> presets) {

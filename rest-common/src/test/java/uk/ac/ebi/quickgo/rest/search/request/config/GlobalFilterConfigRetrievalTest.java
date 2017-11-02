@@ -13,7 +13,11 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.ac.ebi.quickgo.rest.search.request.FilterUtil.asSet;
 import static uk.ac.ebi.quickgo.rest.search.request.config.FilterConfig.ExecutionType;
@@ -35,12 +39,12 @@ public class GlobalFilterConfigRetrievalTest {
     private InternalFilterConfigRetrieval internalConfigMock;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         config = new GlobalFilterConfigRetrieval(internalConfigMock, externalConfigMock);
     }
 
     @Test
-    public void nullInternalExecutionConfigThrowsException() throws Exception {
+    public void nullInternalExecutionConfigThrowsException() {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("InternalExecutionConfiguration cannot be null.");
 
@@ -48,7 +52,7 @@ public class GlobalFilterConfigRetrievalTest {
     }
 
     @Test
-    public void nullExternalExecutionConfigThrowsException() throws Exception {
+    public void nullExternalExecutionConfigThrowsException() {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("ExternalExecutionConfiguration cannot be null.");
 
@@ -56,7 +60,7 @@ public class GlobalFilterConfigRetrievalTest {
     }
 
     @Test
-    public void nullSearchableFieldThrowsException() throws Exception {
+    public void nullSearchableFieldThrowsException() {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Signature cannot be null or empty");
 
@@ -64,7 +68,7 @@ public class GlobalFilterConfigRetrievalTest {
     }
 
     @Test
-    public void emptySignatureThrowsException() throws Exception {
+    public void emptySignatureThrowsException() {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Signature cannot be null or empty");
 
@@ -72,7 +76,7 @@ public class GlobalFilterConfigRetrievalTest {
     }
 
     @Test
-    public void searchableFieldNameKnownToInternalConfigReturnsPopulatedOptional() throws Exception {
+    public void searchableFieldNameKnownToInternalConfigReturnsPopulatedOptional() {
         String internalFieldName = "field";
         Set<String> internalFieldSet = asSet(internalFieldName);
 
@@ -89,11 +93,9 @@ public class GlobalFilterConfigRetrievalTest {
     }
 
     @Test
-    public void searchableFieldNameKnownToExternalConfigReturnsPopulatedOptional() throws Exception {
+    public void searchableFieldNameKnownToExternalConfigReturnsPopulatedOptional() {
         String externalFieldName = "field";
         Set<String> externalFieldSet = asSet(externalFieldName);
-
-        when(internalConfigMock.getBySignature(externalFieldSet)).thenReturn(Optional.empty());
 
         Optional<FilterConfig> expectedFieldConfigOpt = Optional.of(
                 FilterUtil.createExecutionConfig(externalFieldName, ExecutionType.SIMPLE)
@@ -108,7 +110,7 @@ public class GlobalFilterConfigRetrievalTest {
     }
 
     @Test
-    public void unknownSearchableFieldNameReturnsEmptyOptional() throws Exception {
+    public void unknownSearchableFieldNameReturnsEmptyOptional() {
         String unknownFieldName = "unknown";
         Set<String> unknownFieldSet = asSet(unknownFieldName);
 
@@ -121,7 +123,7 @@ public class GlobalFilterConfigRetrievalTest {
     }
 
     @Test
-    public void searchableFieldExistsInInternalAndExternalExecutionConfigSoInternalTakesPrecedence() throws Exception {
+    public void searchableFieldExistsInInternalAndExternalExecutionConfigSoInternalTakesPrecedence() {
         String searchableField = "field";
         Set<String> searchableFieldSet = asSet(searchableField);
 
@@ -142,5 +144,49 @@ public class GlobalFilterConfigRetrievalTest {
 
         assertThat(retrievedField.getSignature(), is(asSet(searchableField)));
         assertThat(retrievedField.getExecution(), is(ExecutionType.SIMPLE));
+    }
+
+    @Test
+    public void checkConfigCacheIsPopulatedWhenSignatureIsFetched() {
+        String externalFieldName = "field";
+        Set<String> signature = asSet(externalFieldName);
+
+        Optional<FilterConfig> expectedFieldConfigOpt = Optional.of(
+                FilterUtil.createExecutionConfig(externalFieldName, ExecutionType.SIMPLE)
+        );
+
+        when(internalConfigMock.getBySignature(signature)).thenReturn(Optional.empty());
+        when(externalConfigMock.getBySignature(signature)).thenReturn(expectedFieldConfigOpt);
+
+        assertThat(config.configCache.entrySet(), is(empty()));
+
+        Optional<FilterConfig> fieldConfigOpt = config.getBySignature(signature);
+
+        assertThat(fieldConfigOpt, is(expectedFieldConfigOpt));
+        assertThat(config.configCache, hasEntry(signature, fieldConfigOpt));
+    }
+
+    @Test
+    public void checkConfigCacheIsUsedWhenFetchingSameSignatureMultipleTimes() {
+        String externalFieldName = "field";
+        Set<String> signature = asSet(externalFieldName);
+
+        Optional<FilterConfig> expectedFieldConfigOpt = Optional.of(
+                FilterUtil.createExecutionConfig(externalFieldName, ExecutionType.SIMPLE)
+        );
+
+        when(internalConfigMock.getBySignature(signature)).thenReturn(Optional.empty());
+        when(externalConfigMock.getBySignature(signature)).thenReturn(expectedFieldConfigOpt);
+
+        Optional<FilterConfig> configOptOnFirstCall = config.getBySignature(signature);
+        assertThat(configOptOnFirstCall, is(expectedFieldConfigOpt));
+
+        verify(externalConfigMock, times(1)).getBySignature(signature);
+
+        Optional<FilterConfig> configOptOnSecondCall = config.getBySignature(signature);
+        assertThat(configOptOnSecondCall, is(expectedFieldConfigOpt));
+
+        verify(externalConfigMock, times(1)).getBySignature(signature);
+
     }
 }

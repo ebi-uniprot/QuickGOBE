@@ -116,10 +116,10 @@ public class GOControllerIT extends OBOControllerIT {
     @Override
     protected List<OntologyDocument> createBasicDocs() {
         return Arrays.asList(
-                OntologyDocMocker.createGODoc(GO_0000001, "go name 1"),
-                OntologyDocMocker.createGODoc(GO_0000002, "go name 2"),
-                OntologyDocMocker.createGODoc(GO_0000003, "go name 3"),
-                OntologyDocMocker.createGODoc(GO_0000004, "go name 4"));
+                OntologyDocMocker.createGODoc(GO_0000001, "doc name 1"),
+                OntologyDocMocker.createGODoc(GO_0000002, "doc name 2"),
+                OntologyDocMocker.createGODoc(GO_0000003, "doc name 3"),
+                OntologyDocMocker.createGODoc(GO_0000004, "doc name 4"));
     }
 
     @Override

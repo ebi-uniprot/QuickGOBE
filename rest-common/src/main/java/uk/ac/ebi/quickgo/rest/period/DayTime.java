@@ -4,6 +4,8 @@ import com.google.common.base.Preconditions;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.temporal.TemporalAdjuster;
+import java.time.temporal.TemporalAdjusters;
 import java.util.Objects;
 
 /**
@@ -15,9 +17,9 @@ import java.util.Objects;
  * Time: 16:15
  * Created with IntelliJ IDEA.
  */
-class DayTime implements DateModifier {
+class DayTime {
 
-    private final DayOfWeek dayOfWeek;
+    final DayOfWeek dayOfWeek;
     private final LocalTime time;
 
     /**
@@ -35,16 +37,21 @@ class DayTime implements DateModifier {
         this.time = time;
     }
 
-    /**
-     * Modify the targetTime to be an instant defined by the values held in this instance.
-     * @param target to modify.
-     * @return a particular instant in time.
-     */
-    @Override
-    public LocalDateTime modify(LocalDateTime target) {
+    private LocalDateTime modify(LocalDateTime target, TemporalAdjuster toDay) {
         Preconditions.checkArgument(Objects.nonNull(target), "A target LocalDateTime cannot be null");
-        LocalDateTime comparedDate = target.with(this.dayOfWeek);
-        return comparedDate.with(this.time);
+        LocalDateTime comparedDate = target.with(toDay);
+        comparedDate = comparedDate.with(this.time);
+        return comparedDate;
+    }
+
+    LocalDateTime modifyToPrevious(LocalDateTime target) {
+        TemporalAdjuster toDay = TemporalAdjusters.previousOrSame(this.dayOfWeek);
+        return modify(target, toDay);
+    }
+
+    LocalDateTime modifyToNext(LocalDateTime target) {
+        TemporalAdjuster toDay = TemporalAdjusters.nextOrSame(this.dayOfWeek);
+        return modify(target, toDay);
     }
 
     @Override public boolean equals(Object o) {

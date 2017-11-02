@@ -81,4 +81,12 @@ public class RESTRequesterImpl implements RESTRequester {
             Preconditions.checkArgument(url != null && !url.trim().isEmpty(), "URL cannot be null or empty");
         }
     }
+
+    @Override public String toString() {
+        return "RESTRequesterImpl{" +
+                "url='" + url + '\'' +
+                ", restOperations=" + restOperations +
+                ", requestParameters=" + requestParameters +
+                '}';
+    }
 }

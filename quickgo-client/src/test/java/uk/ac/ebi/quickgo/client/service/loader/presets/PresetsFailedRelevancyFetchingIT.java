@@ -4,7 +4,6 @@ import uk.ac.ebi.quickgo.client.model.presets.CompositePreset;
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
 import uk.ac.ebi.quickgo.client.service.loader.presets.assignedby.AssignedByPresetsConfig;
 import uk.ac.ebi.quickgo.client.service.loader.presets.qualifier.QualifierPresetsConfig;
-import uk.ac.ebi.quickgo.client.service.loader.presets.taxon.TaxonPresetsConfig;
 
 import java.util.List;
 import java.util.function.Function;
@@ -58,7 +57,7 @@ public class PresetsFailedRelevancyFetchingIT {
         assertThat(status, is(BatchStatus.COMPLETED));
         assertThat(
                 extractPresetValues(presets.getAssignedBy(), p -> p.getProperty(PresetItem.Property.NAME.getKey())),
-                IsIterableContainingInOrder.contains(MockPresetDataConfig.UNIPROT_KB));
+                hasSize(24));
     }
 
     @Test

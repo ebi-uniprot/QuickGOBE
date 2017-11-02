@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.annotation.model;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.function.Supplier;
@@ -25,69 +26,69 @@ import static uk.ac.ebi.quickgo.annotation.model.AnnotationMocker.FakeWithFromIt
  */
 public class AnnotationMocker {
 
-    private static final String COMMA = ",";
-    private static final List<List<Supplier<Annotation.SimpleXRef>>> WITH_FROM = asList(
-            singletonList(IPR_1), asList(IPR_2, IPR_3));
     public static final String WITH_FROM_AS_STRING = IPR_1 + "|" + IPR_2 + "," + IPR_3;
-    private static final List<List<Supplier<Annotation.QualifiedXref>>> EXTENSIONS = asList(
-            singletonList(OCCURS_IN_CL_1),
-            asList(OCCURS_IN_CL_2, OCCURS_IN_CL_3));
     public static final String EXTENSIONS_AS_STRING = OCCURS_IN_CL_1 + "|" + OCCURS_IN_CL_2 + "," + OCCURS_IN_CL_3;
     public static final String SYMBOL = "atf4-creb1_mouse";
-    public static final String QUALIFIER = "enables";
+    public static final String QUALIFIER = "contributes_to";
     public static final String REFERENCE = "PMID:12871976";
-    private static final String GENE_PRODUCT_ID = "IntAct:EBI-10043081";
-    public static final String EVIDENCE_CODE = "ECO:0000353";
-    private static final String ASSIGNED_BY = "IntAct";
+    public static final String ECO_ID = "ECO:0000353";
     public static final String GO_EVIDENCE = "IPI";
-    private static final String GO_ASPECT = "molecular_function";
     public static final int TAXON_ID = 12345;
+    public static final String TAXON_NAME = "Hipdedipdiflorous";
     public static final int INTERACTING_TAXON_ID = 54321;
     public static final String DB = "IntAct";
     public static final String ID = "EBI-10043081";
     public static final String GO_ID = "GO:0003824";
+    public static final String GO_NAME = "catalytic activity";
+    public static final String DATE_AS_STRING = "20121002";
+    private static final String SLIMMED_FROM_GO_ID = "GO:0071840";
+    public static final List<String> SLIMMED_TO_IDS = Collections.singletonList(SLIMMED_FROM_GO_ID);
+    private static final String COMMA = ",";
+    private static final List<List<Supplier<Annotation.SimpleXRef>>> WITH_FROM = asList(
+            singletonList(IPR_1), asList(IPR_2, IPR_3));
+    private static final List<List<Supplier<Annotation.QualifiedXref>>> EXTENSIONS = asList(
+            singletonList(OCCURS_IN_CL_1),
+            asList(OCCURS_IN_CL_2, OCCURS_IN_CL_3));
+    private static final String GENE_PRODUCT_ID = "IntAct:EBI-10043081";
+    private static final String ASSIGNED_BY = "IntAct";
+    public static final String GO_ASPECT = "molecular_function";
     private static final Date DATE = Date.from(
             LocalDate.of(2012, 10, 2).atStartOfDay(ZoneId.systemDefault()).toInstant());
-    public static final String DATE_AS_STRING = "20121002";
-
+    public static final String SYNONYMS = "A0A000_9ACTN,moeA5";
+    public static final String NAME = "MoeA5";
+    public static final String TYPE = "complex";
 
     public static Annotation createValidAnnotation() {
         Annotation annotation = new Annotation();
         annotation.id = DB + ":" + ID;
-        annotation.extensions = connectedQualifiedXrefs(EXTENSIONS);
-        annotation.taxonId  = TAXON_ID;
+        annotation.extensions = connectedXrefs(EXTENSIONS);
+        annotation.taxonId = TAXON_ID;
         annotation.goAspect = GO_ASPECT;     //todo is this populated
         annotation.goEvidence = GO_EVIDENCE;
         annotation.assignedBy = ASSIGNED_BY;
         annotation.date = DATE;
-        annotation.evidenceCode = EVIDENCE_CODE;
+        annotation.evidenceCode = ECO_ID;
         annotation.geneProductId = GENE_PRODUCT_ID;
         annotation.qualifier = QUALIFIER;
         annotation.symbol = SYMBOL;
         annotation.reference = REFERENCE;
-        annotation.withFrom = connectedSimpleXrefs(WITH_FROM);
+        annotation.withFrom = connectedXrefs(WITH_FROM);
         annotation.goId = GO_ID;
         annotation.interactingTaxonId = INTERACTING_TAXON_ID;
+        annotation.goName = GO_NAME;
+        annotation.taxonName = TAXON_NAME;
+        annotation.name = NAME;
+        annotation.synonyms = SYNONYMS;
         return annotation;
     }
 
-    private static List<Annotation.ConnectedXRefs<Annotation.SimpleXRef>> connectedSimpleXrefs(
-            List<List<Supplier<Annotation.SimpleXRef>>> items) {
+    private static <T extends Annotation.AbstractXref> List<Annotation.ConnectedXRefs<T>> connectedXrefs(
+            List<List<Supplier<T>>> items) {
         return items.stream().map(itemList -> {
-                                      Annotation.ConnectedXRefs<Annotation.SimpleXRef> xrefs = new Annotation.ConnectedXRefs<>();
-                                      itemList.stream().map(Supplier::get).forEach(xrefs::addXref);
-                                      return xrefs;
-                                  }
-        ).collect(Collectors.toList());
-    }
-
-    private static List<Annotation.ConnectedXRefs<Annotation.QualifiedXref>> connectedQualifiedXrefs(
-            List<List<Supplier<Annotation.QualifiedXref>>> items) {
-        return items.stream().map(itemList -> {
-                                      Annotation.ConnectedXRefs<Annotation.QualifiedXref> xrefs = new Annotation.ConnectedXRefs<>();
-                                      itemList.stream().map(Supplier::get).forEach(xrefs::addXref);
-                                      return xrefs;
-                                  }
+                    Annotation.ConnectedXRefs<T> xrefs = new Annotation.ConnectedXRefs<>();
+                    itemList.stream().map(Supplier::get).forEach(xrefs::addXref);
+                    return xrefs;
+                }
         ).collect(Collectors.toList());
     }
 
@@ -135,14 +136,5 @@ public class AnnotationMocker {
         @Override public String toString() {
             return qualifier + "(" + db + ":" + id + ")";
         }
-    }
-
-    private static <T extends Annotation.AbstractXref> List<String> stringsForConnectedXrefs(
-            List<List<Supplier<T>>> items) {
-        return items.stream()
-                    .map(itemList ->
-                                 itemList.stream()
-                                         .map(Supplier::toString).collect(Collectors.joining(COMMA))
-                    ).collect(Collectors.toList());
     }
 }

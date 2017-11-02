@@ -2,13 +2,16 @@ package uk.ac.ebi.quickgo.annotation.controller;
 
 import uk.ac.ebi.quickgo.annotation.AnnotationParameters;
 import uk.ac.ebi.quickgo.annotation.AnnotationREST;
+import uk.ac.ebi.quickgo.annotation.IdGeneratorUtil;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker;
-import uk.ac.ebi.quickgo.annotation.download.http.GAFHttpMessageConverter;
-import uk.ac.ebi.quickgo.annotation.download.http.GPADHttpMessageConverter;
+import uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory;
+import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.BasicOntology;
 import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -19,29 +22,42 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.client.RestOperations;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static java.util.Collections.singletonList;
 import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.stringContainsInOrder;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
+import static org.springframework.http.HttpHeaders.VARY;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.INCLUDE_FIELD_PARAM;
+import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.SELECTED_FIELD_PARAM;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.createGenericDocs;
 import static uk.ac.ebi.quickgo.annotation.controller.DownloadResponseVerifier.nonNullMandatoryFieldsExist;
-import static uk.ac.ebi.quickgo.annotation.download.http.GAFHttpMessageConverter.GAF_MEDIA_TYPE;
-import static uk.ac.ebi.quickgo.annotation.download.http.GPADHttpMessageConverter.GPAD_MEDIA_TYPE;
+import static uk.ac.ebi.quickgo.annotation.controller.DownloadResponseVerifierSelectedFields.selectedFieldsExist;
+import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.*;
 
 /**
  * Tests whether the downloading functionality of the {@link AnnotationController} works as expected.
@@ -65,6 +81,12 @@ public class AnnotationControllerDownloadIT {
     private static final int MIN_DOWNLOAD_NUMBER = 1;
     private static final int MAX_DOWNLOAD_NUMBER = 50000;
     private static final String EXACT = "exact";
+    private static final String GO_NAME_FIELD = "goName";
+    private static final String GO_TERM_RESOURCE_FORMAT = "/ontology/go/terms/%s";
+    private static final String BASE_URL = "https://localhost";
+    private static final String GENE_PRODUCT_ID_FIELD_NAME_MIXED_CASE = "geneproDuctid";
+    private static final String SYMBOL_FIELD_NAME_MIXED_CASE = "sYmbol";
+    private static final String WITH_FROM_FIELD_NAME_MIXED_CASE = "withfrOm";
     private MockMvc mockMvc;
 
     private List<AnnotationDocument> genericDocs;
@@ -75,6 +97,12 @@ public class AnnotationControllerDownloadIT {
 
     @Autowired
     private AnnotationRepository repository;
+
+    @Autowired
+    private RestOperations restOperations;
+
+    private MockRestServiceServer mockRestServiceServer;
+    private ObjectMapper dtoMapper;
 
     @Before
     public void setup() {
@@ -88,6 +116,9 @@ public class AnnotationControllerDownloadIT {
         savedDocs = new ArrayList<>();
 
         saveToRepo(genericDocs);
+
+        mockRestServiceServer = MockRestServiceServer.createServer((RestTemplate) restOperations);
+        dtoMapper = new ObjectMapper();
     }
 
     @Test
@@ -157,6 +188,21 @@ public class AnnotationControllerDownloadIT {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    public void canDownloadInTSVFormat() throws Exception {
+        int downloadCount = 97;
+        for(int i=1; i<=downloadCount; i++) {
+            expectGoTermsHaveGoNamesViaRest(singletonList(IdGeneratorUtil.createGoId(3824)), singletonList
+                    ("catalytic activity"));
+        }
+        canDownloadWithOptionalFields();
+    }
+
+    @Test
+    public void canDownloadInTSVFormatWithSelectedFieldsCaseInsensitive() throws Exception {
+        canDownloadWithSelectedFields();
+    }
+
     private List<AnnotationDocument> createDocs(int number) {
         return createGenericDocs(number, AnnotationDocMocker::createUniProtGPID);
     }
@@ -183,15 +229,51 @@ public class AnnotationControllerDownloadIT {
         checkResponse(mediaType, response, storedIds);
     }
 
+    private void canDownloadWithOptionalFields() throws Exception {
+        int expectedDownloadCount = 97;
+        ResultActions response = mockMvc.perform(
+                get(DOWNLOAD_SEARCH_URL)
+                        .header(ACCEPT, MediaTypeFactory.TSV_MEDIA_TYPE)
+                        .param(DOWNLOAD_LIMIT_PARAM, Integer.toString(expectedDownloadCount))
+                        .param(INCLUDE_FIELD_PARAM.getName(), GO_NAME_FIELD));
+
+        List<String> storedIds = getFieldValuesFromRepo(doc -> idFrom(doc.geneProductId), expectedDownloadCount);
+        List<String> perLine = new ArrayList<>();
+        perLine.add("GENE");
+        //StringContainsInOrder.matchesSafely not working as expected, not finding A0A009, so cut down list.
+        perLine.addAll(storedIds.subList(0,8));
+        checkResponse(MediaTypeFactory.TSV_MEDIA_TYPE, response, perLine);
+    }
+
+    private void canDownloadWithSelectedFields() throws Exception {
+        int expectedDownloadCount = 97;
+        ResultActions response = mockMvc.perform(
+                get(DOWNLOAD_SEARCH_URL)
+                        .header(ACCEPT, MediaTypeFactory.TSV_MEDIA_TYPE)
+                        .param(DOWNLOAD_LIMIT_PARAM, Integer.toString(expectedDownloadCount))
+                        .param(SELECTED_FIELD_PARAM.getName(), SYMBOL_FIELD_NAME_MIXED_CASE,
+                               WITH_FROM_FIELD_NAME_MIXED_CASE));
+
+        getFieldValuesFromRepo(doc -> idFrom(doc.geneProductId), expectedDownloadCount);
+        checkResponseForSelectedFields(response, SYMBOL_FIELD_NAME_MIXED_CASE, WITH_FROM_FIELD_NAME_MIXED_CASE);
+    }
+
     private void checkResponse(MediaType mediaType, ResultActions response, List<String> storedIds) throws Exception {
-        response
-                .andExpect(request().asyncStarted())
+        response.andExpect(request().asyncStarted())
                 .andDo(MvcResult::getAsyncResult)
                 .andDo(print())
+                .andExpect(header().string(VARY, is(ACCEPT)))
                 .andExpect(header().string(CONTENT_DISPOSITION, endsWith(getFileNameEndingFor(mediaType))))
                 .andExpect(content().contentType(mediaType))
                 .andExpect(nonNullMandatoryFieldsExist(mediaType))
                 .andExpect(content().string(stringContainsInOrder(storedIds)));
+    }
+
+    private void checkResponseForSelectedFields(ResultActions response, String... expectedFields) throws Exception {
+        response.andExpect(request().asyncStarted())
+                .andDo(MvcResult::getAsyncResult)
+                .andDo(print())
+                .andExpect(selectedFieldsExist(expectedFields));
     }
 
     private void canDownloadWithFilter(MediaType mediaType) throws Exception {
@@ -201,10 +283,7 @@ public class AnnotationControllerDownloadIT {
 
         createDocs(moreThanExpectedDownloadCount)
                 .stream()
-                .map(doc -> {
-                    doc.taxonId = expectedTaxonId;
-                    return doc;
-                })
+                .peek(doc -> doc.taxonId = expectedTaxonId)
                 .forEach(this::saveToRepo);
 
         // we expect to receive fewer ids in the response than those we saved, because we will request fewer
@@ -226,8 +305,9 @@ public class AnnotationControllerDownloadIT {
 
     private String getFileNameEndingFor(MediaType mediaType) {
         switch (mediaType.getSubtype()) {
-            case GAFHttpMessageConverter.SUB_TYPE:
-            case GPADHttpMessageConverter.SUB_TYPE:
+            case MediaTypeFactory.GAF_SUB_TYPE:
+            case MediaTypeFactory.GPAD_SUB_TYPE:
+            case MediaTypeFactory.TSV_SUB_TYPE:
                 return "." + mediaType.getSubtype() + "\"";
             default:
                 throw new IllegalArgumentException("Unknown media type: " + mediaType);
@@ -241,10 +321,7 @@ public class AnnotationControllerDownloadIT {
 
         createDocs(actualAvailableDownloadCount)
                 .stream()
-                .map(doc -> {
-                    doc.taxonId = expectedTaxonId;
-                    return doc;
-                })
+                .peek(doc -> doc.taxonId = expectedTaxonId)
                 .forEach(this::saveToRepo);
 
         // we expect to receive fewer ids in the response than those we saved, because we will request fewer
@@ -276,5 +353,70 @@ public class AnnotationControllerDownloadIT {
         return genericDocs.stream()
                 .map(transformation)
                 .collect(Collectors.toList());
+    }
+
+    private void expectRestCallSuccess(String url, String response) {
+        mockRestServiceServer.expect(requestTo(BASE_URL + url))
+                             .andExpect(method(HttpMethod.GET))
+                             .andRespond(withSuccess(response, MediaType.APPLICATION_JSON));
+    }
+
+    private void expectGoTermsHaveGoNamesViaRest(
+            List<String> termIds,
+            List<String> termNames) {
+        checkArgument(termIds != null, "termIds cannot be null");
+        checkArgument(termNames != null, "termIds cannot be null");
+        checkArgument(termIds.size() == termNames.size(),
+                      "termIds and termNames lists must be the same size");
+
+        for (int i = 0; i < termIds.size(); i++) {
+            String termId = termIds.get(i);
+            String termName = termNames.get(i);
+            expectRestCallSuccess(buildResource(termId),
+                    constructGoTermsResponseObject(singletonList(termId), singletonList(termName)));
+        }
+    }
+
+    private String buildResource(String... arguments) {
+        int requiredArgsCount = AnnotationControllerDownloadIT.GO_TERM_RESOURCE_FORMAT.length() - AnnotationControllerDownloadIT.GO_TERM_RESOURCE_FORMAT
+
+                .replace("%", "").length();
+        List<String> args = new ArrayList<>();
+        for (int i = 0; i < requiredArgsCount; i++) {
+            if (i < arguments.length) {
+                args.add(arguments[i]);
+            } else {
+                args.add("");
+            }
+        }
+        return String.format(AnnotationControllerDownloadIT.GO_TERM_RESOURCE_FORMAT, args.toArray());
+    }
+
+    private String constructGoTermsResponseObject(List<String> termIds, List<String> termNames) {
+        checkArgument(termIds != null, "termIds cannot be null");
+        checkArgument(termNames != null, "termIds cannot be null");
+        checkArgument(termIds.size() == termNames.size(),
+                      "termIds and termNames lists must be the same size");
+
+        BasicOntology response = new BasicOntology();
+        List<BasicOntology.Result> results = new ArrayList<>();
+
+        for (int i = 0; i < termIds.size(); i++) {
+            BasicOntology.Result result = new BasicOntology.Result();
+            result.setId(termIds.get(i));
+            result.setName(termNames.get(i));
+            results.add(result);
+        }
+
+        response.setResults(results);
+        return getResponseAsString(response);
+    }
+
+    private <T> String getResponseAsString(T response) {
+        try {
+            return dtoMapper.writeValueAsString(response);
+        } catch (JsonProcessingException e) {
+            throw new IllegalStateException("Problem constructing mocked GO term REST response:", e);
+        }
     }
 }

@@ -48,7 +48,6 @@ public class AnnotationConfig {
     @Autowired
     private SolrTemplate annotationTemplate;
 
-
     @Bean
     MultiResourceItemReader<Annotation> annotationMultiFileReader() {
         MultiResourceItemReader<Annotation> reader = new MultiResourceItemReader<>();

@@ -9,6 +9,8 @@ import uk.ac.ebi.quickgo.rest.search.request.config.FilterConfig;
 import com.google.common.base.Preconditions;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -31,21 +33,24 @@ class RESTFilterConverter<T> implements FilterConverter<FilterRequest, T> {
     static final String TIMEOUT = "timeout";
     static final String RESPONSE_CLASS = "responseClass";
     static final String RESPONSE_CONVERTER_CLASS = "responseConverter";
+    static final String DEFAULT_PROTOCOL = "http://";
 
     private static final Logger LOGGER = getLogger(RESTFilterConverter.class);
     private static final String COMMA = ",";
-    private static final String HTTP_HOST_PREFIX = "http://";
     private static final String FORWARD_SLASH = "/";
+    private static final String PROTOCOL_FORMAT = "^[a-zA-Z][a-zA-Z+.-]*://";
 
     private static final Pattern IP_REGEX = Pattern.compile(
-            HTTP_HOST_PREFIX + "(?:[0-9]{1,3}\\.){3}[0-9]{1,3}(:[0-9]+)?");
+            PROTOCOL_FORMAT + "(?:[0-9]{1,3}\\.){3}[0-9]{1,3}(:[0-9]+)?");
     private static final Pattern HOSTNAME_REGEX = Pattern.compile(
-            HTTP_HOST_PREFIX + "([a-zA-Z0-9](?:(?:[a-zA-Z0-9-]*|(?<!-)\\.(?![-.]))*[a-zA-Z0-9]+)?)(:[0-9]+)?");
+            PROTOCOL_FORMAT + "([a-zA-Z0-9](?:(?:[a-zA-Z0-9-]*|(?<!-)\\.(?![-.]))*[a-zA-Z0-9]+)?)(:[0-9]+)?");
+    private static final Pattern PROTOCOL_REGEX = Pattern.compile(PROTOCOL_FORMAT);
     private static final String FAILED_REST_FETCH_PREFIX = "Failed to fetch REST response";
     private static final int DEFAULT_TIMEOUT_MILLIS = 2000;
 
     private final FilterConfig filterConfig;
     private final RestOperations restOperations;
+    private final Map<String, Constructor<?>> constructorMap;
     private int timeoutMillis;
 
     RESTFilterConverter(FilterConfig filterConfig, RestOperations restOperations) {
@@ -60,12 +65,12 @@ class RESTFilterConverter<T> implements FilterConverter<FilterRequest, T> {
         checkMandatoryProperty(RESPONSE_CLASS);
         checkMandatoryProperty(RESPONSE_CONVERTER_CLASS);
 
+        this.constructorMap = new HashMap<>();
         this.timeoutMillis = loadTimeout();
     }
 
     @Override public ConvertedFilter<T> transform(FilterRequest request) {
         Preconditions.checkArgument(request != null, "FilterRequest cannot be null");
-
         RESTRequesterImpl.Builder restRequesterBuilder = initRequestBuilder(request);
 
         try {
@@ -97,12 +102,18 @@ class RESTFilterConverter<T> implements FilterConverter<FilterRequest, T> {
         return resourceFormat;
     }
 
+    private static boolean usesProtocol(String uri) {
+        return PROTOCOL_REGEX.matcher(uri).find();
+    }
+
     private static String retrieveHostProperty(FilterConfig config) {
         String host = config.getProperties().get(HOST).trim();
 
-        if (!host.startsWith(HTTP_HOST_PREFIX)) {
-            host = HTTP_HOST_PREFIX + host;
+        if (!usesProtocol(host)) {
+            // default protocol over REST
+            host = DEFAULT_PROTOCOL + host;
         }
+
         if (host.endsWith(FORWARD_SLASH)) {
             host = host.substring(0, host.length() - 1);
         }
@@ -135,20 +146,28 @@ class RESTFilterConverter<T> implements FilterConverter<FilterRequest, T> {
             throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException,
                    InstantiationException {
         String converterClassName = filterConfig.getProperties().get(RESPONSE_CONVERTER_CLASS);
-        Class<?> converterClass = Class.forName(converterClassName);
 
-        Constructor<?> declaredConstructor = converterClass.getDeclaredConstructor();
+        Constructor<?> declaredConstructor;
+        if (constructorMap.containsKey(converterClassName)) {
+            declaredConstructor = constructorMap.get(converterClassName);
+        } else {
+            Class<?> converterClass = Class.forName(converterClassName);
+            declaredConstructor = converterClass.getDeclaredConstructor();
+            constructorMap.put(converterClassName, declaredConstructor);
+        }
+
         return (FilterConverter<ResponseType, T>) declaredConstructor.newInstance();
     }
 
     private RESTRequesterImpl.Builder initRequestBuilder(FilterRequest request) {
         RESTRequesterImpl.Builder restRequesterBuilder = createRestRequesterBuilder();
-        request.getProperties().entrySet().forEach(entry ->
+
+        request.getProperties().forEach((key, value) ->
                 restRequesterBuilder.addRequestParameter(
-                        entry.getKey(),
-                        entry.getValue().stream()
-                                .collect(Collectors.joining(COMMA)))
-        );
+                        key,
+                        value.stream()
+                                .collect(Collectors.joining(COMMA))));
+
         return restRequesterBuilder;
     }
 
