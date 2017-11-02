@@ -30,6 +30,10 @@ public class WorkbookFromStatisticsImpl implements WorkbookFromStatistics {
     private static final int DETAIL_ROW_INITIAL_VALUE = 3;
     private static final int FIRST_COLUMN = 0;
     private static final int SUMMARY_DETAIL_ROW = 2;
+    static final String SUMMARY_SHEET_NAME = "summary";
+    static final String ANNOTATIONS_SUMMARY = "Number of annotations:";
+    static final String GENE_PRODUCTS_SUMMARY = "Number of distinct proteins:";
+    static final String SUMMARY_HEADER = "Summary";
     private final String[] sectionTypes;
     private final Map<String, SheetLayout> sheetLayoutMap;
 
@@ -61,7 +65,7 @@ public class WorkbookFromStatisticsImpl implements WorkbookFromStatistics {
     }
 
     private void createSummarySheet(List<StatisticsGroup> statisticsGroups, Workbook wb, CellStyle boldCellFormat) {
-        Sheet summarySheet = wb.createSheet("summary");
+        Sheet summarySheet = wb.createSheet(SUMMARY_SHEET_NAME);
         populateSummarySheet(summarySheet, statisticsGroups, boldCellFormat);
     }
 
@@ -158,16 +162,36 @@ public class WorkbookFromStatisticsImpl implements WorkbookFromStatistics {
     }
 
     private void populateSummarySheet(Sheet sheet, List<StatisticsGroup> statisticsGroups, CellStyle boldCellFormat) {
+        showSummaryHeaderText(sheet, boldCellFormat);
+        showAnnotationSummary(sheet, statisticsGroups);
+        showGeneProductSummary(sheet, statisticsGroups);
+    }
+
+    private void showSummaryHeaderText(Sheet sheet, CellStyle boldCellFormat) {
+        Row headerRow = sheet.createRow(HEADER_ROW);
+        final Cell headerCell = headerRow.createCell(FIRST_COLUMN);
+        headerCell.setCellStyle(boldCellFormat);
+        headerCell.setCellValue(SUMMARY_HEADER);
+    }
+
+    private void showAnnotationSummary(Sheet sheet, List<StatisticsGroup> statisticsGroups) {
         statisticsGroups.stream()
                         .filter(statisticsGroup -> statisticsGroup.getGroupName().equals("annotation"))
                         .forEach(statisticsGroup -> {
-                            Row row1 = sheet.createRow(HEADER_ROW);
-                            final Cell header = row1.createCell(FIRST_COLUMN);
-                            header.setCellStyle(boldCellFormat);
-                            header.setCellValue("Summary");
-                            Row row2 = sheet.createRow(SUMMARY_DETAIL_ROW);
-                            row2.createCell(FIRST_COLUMN).setCellValue("Number of annotations:" + statisticsGroup.getTotalHits());
+                            Row annotationSummaryRow = sheet.createRow(SUMMARY_DETAIL_ROW);
+                            annotationSummaryRow.createCell(FIRST_COLUMN).setCellValue(
+                                    ANNOTATIONS_SUMMARY + statisticsGroup.getTotalHits());
                         });
+    }
+
+    private void showGeneProductSummary(Sheet sheet, List<StatisticsGroup> statisticsGroups) {
+        statisticsGroups.stream()
+                .filter(statisticsGroup -> statisticsGroup.getGroupName().equals("geneProduct"))
+                .forEach(statisticsGroup -> {
+                    Row geneProductSummaryRow = sheet.createRow(SUMMARY_DETAIL_ROW + 1);
+                    geneProductSummaryRow.createCell(FIRST_COLUMN)
+                            .setCellValue(GENE_PRODUCTS_SUMMARY + statisticsGroup.getTotalHits());
+                });
     }
 
     static class SheetLayout {
