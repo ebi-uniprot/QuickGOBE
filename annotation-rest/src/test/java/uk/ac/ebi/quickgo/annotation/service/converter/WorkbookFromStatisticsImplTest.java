@@ -12,6 +12,9 @@ import org.junit.Test;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static uk.ac.ebi.quickgo.annotation.service.converter.StatisticsWorkBookLayout.SECTION_TYPES;
+import static uk.ac.ebi.quickgo.annotation.service.converter.WorkbookFromStatisticsImpl.ANNOTATIONS_SUMMARY;
+import static uk.ac.ebi.quickgo.annotation.service.converter.WorkbookFromStatisticsImpl.GENE_PRODUCTS_SUMMARY;
+import static uk.ac.ebi.quickgo.annotation.service.converter.WorkbookFromStatisticsImpl.SUMMARY_HEADER;
 
 /**
  * Test the creation of a worksheet for a known data set.
@@ -58,7 +61,14 @@ public class WorkbookFromStatisticsImplTest {
 
         assertThat(workbook.getNumberOfSheets(), is(3));
         assertThat(workbook.getSheetAt(0).getSheetName(), is("summary"));
-        assertThat(workbook.getSheetAt(0).getPhysicalNumberOfRows(), is(2));
+        assertThat(workbook.getSheetAt(0).getPhysicalNumberOfRows(), is(3));
+        assertThat(workbook.getSheetAt(0).getRow(1).getCell(0).getStringCellValue(),
+                is(SUMMARY_HEADER));
+        assertThat(workbook.getSheetAt(0).getRow(2).getCell(0).getStringCellValue(),
+                is(ANNOTATIONS_SUMMARY + "5"));
+        assertThat(workbook.getSheetAt(0).getRow(3).getCell(0).getStringCellValue(),
+                is(GENE_PRODUCTS_SUMMARY + "1"));
+
 
         assertThat(workbook.getSheetAt(1).getSheetName(), is("goid"));
         assertThat(workbook.getSheetAt(1).getPhysicalNumberOfRows(), is(5));
@@ -66,7 +76,7 @@ public class WorkbookFromStatisticsImplTest {
         testColumnHeaders(workbook, 0);
         testColumnHeaders(workbook, 10);
 
-        // test goid sheet contents
+        // test goID sheet contents
         //by annotation
         assertThat(workbook.getSheetAt(1).getRow(3).getCell(0).getStringCellValue(),is("GO:0003824"));
         assertThat(workbook.getSheetAt(1).getRow(3).getCell(2).getNumericCellValue(),is(20.00d));
