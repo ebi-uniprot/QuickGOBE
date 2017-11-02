@@ -16,7 +16,7 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "annotation.stats")
 public class StatisticsServiceConfig {
     private Map<String, Integer> typeLimitsForStandardUsage = new HashMap<>();
-    private Map<String, Integer> typeLimitsForDownload = new HashMap<>();
+    private Map<String, Integer> typeLimitsForDownloadUsage = new HashMap<>();
 
     public Map<String, Integer> getTypeLimitsForStandardUsage() {
         return typeLimitsForStandardUsage;
@@ -26,12 +26,12 @@ public class StatisticsServiceConfig {
         this.typeLimitsForStandardUsage = typeLimitsForStandardUsage;
     }
 
-    public Map<String, Integer> getTypeLimitsForDownload() {
-        return typeLimitsForDownload;
+    public Map<String, Integer> getTypeLimitsForDownloadUsage() {
+        return typeLimitsForDownloadUsage;
     }
 
-    public void setTypeLimitsForDownload(Map<String, Integer> typeLimitsForDownload) {
-        this.typeLimitsForDownload = typeLimitsForDownload;
+    public void setTypeLimitsForDownloadUsage(Map<String, Integer> typeLimitsForDownloadUsage) {
+        this.typeLimitsForDownloadUsage = typeLimitsForDownloadUsage;
     }
 
     @Bean
@@ -53,6 +53,6 @@ public class StatisticsServiceConfig {
 
     @Bean
     public StatisticsTypeConfigurer statsTypeConfigurerForDownloadUsage() {
-        return new StatisticsTypeConfigurer(typeLimitsForDownload);
+        return new StatisticsTypeConfigurer(typeLimitsForDownloadUsage);
     }
 }
