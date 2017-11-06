@@ -75,6 +75,10 @@ public class OntologyGraph implements OntologyGraphTraversal {
         }
     }
 
+    public Set<String> getVertices() {
+        return ontology.vertexSet();
+    }
+
     public void addRelationships(Collection<? extends OntologyRelationship> relationships) {
         Preconditions.checkArgument(relationships != null, "Relationships to add to the graph cannot be null");
 
