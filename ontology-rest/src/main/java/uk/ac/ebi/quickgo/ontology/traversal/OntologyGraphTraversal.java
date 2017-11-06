@@ -97,7 +97,6 @@ public interface OntologyGraphTraversal {
      * @return a {@link BitSet} representing the ancestors
      */
     BitSet getAncestorsBitSet(String vertex, List<String> range, OntologyRelationType... requestedRelations);
-}
 
     /**
      * Find the sub-graph between two sets of vertices in a graph, navigable via
