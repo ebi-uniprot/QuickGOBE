@@ -1,17 +1,20 @@
 package uk.ac.ebi.quickgo.ontology.traversal;
 
-import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
-import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
-
 import com.google.common.base.Preconditions;
-import java.util.*;
-import java.util.stream.Collectors;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.AllDirectedPaths;
 import org.jgrapht.graph.ClassBasedEdgeFactory;
 import org.jgrapht.graph.DirectedMultigraph;
+import uk.ac.ebi.quickgo.ontology.common.OntologyType;
+import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
+import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
+
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * This class represents an ontology graph whose vertices are ontology terms,
@@ -26,16 +29,23 @@ public class OntologyGraph implements OntologyGraphTraversal {
     static final String BIOLOGICAL_PROCESS_STOP_NODE = "GO:0008150";
     static final String CELLULAR_COMPONENT_STOP_NODE = "GO:0005575";
 
+    private static final EnumMap<OntologyType, Matcher> ONTOLOGY_TYPE_PATTERN_MAP = new EnumMap<>(OntologyType.class);
     private static final List<String> STOP_NODES =
             Arrays.asList(MOLECULAR_FUNCTION_STOP_NODE,
                     BIOLOGICAL_PROCESS_STOP_NODE,
                     CELLULAR_COMPONENT_STOP_NODE);
 
+    static {
+        ONTOLOGY_TYPE_PATTERN_MAP.put(OntologyType.GO, Pattern.compile("^GO:[0-9]+").matcher(""));
+    }
+
     private final DirectedGraph<String, OntologyRelationship> ontology;
     private final Map<String, Set<OntologyRelationship>> ancestorEdgesMap = new HashMap<>();
+    private final EnumMap<OntologyType, Set<String>> typeToVertexMap;
 
     public OntologyGraph() {
         ontology = new DirectedMultigraph<>(new ClassBasedEdgeFactory<>(OntologyRelationship.class));
+        typeToVertexMap = new EnumMap<>(OntologyType.class);
     }
 
     public Set<OntologyRelationship> getEdges() {
@@ -54,9 +64,11 @@ public class OntologyGraph implements OntologyGraphTraversal {
                 oEdge -> {
                     if (!ontology.containsVertex(oEdge.child)) {
                         ontology.addVertex(oEdge.child);
+                        categoriseVertexIfRequired(oEdge.child);
                     }
                     if (!ontology.containsVertex(oEdge.parent)) {
                         ontology.addVertex(oEdge.parent);
+                        categoriseVertexIfRequired(oEdge.parent);
                     }
                     ontology.addEdge(
                             oEdge.child,
@@ -168,6 +180,29 @@ public class OntologyGraph implements OntologyGraphTraversal {
                 .collect(Collectors.toSet());
     }
 
+    @Override
+    public Set<String> getVertices(OntologyType ontologyType) {
+        if (typeToVertexMap.containsKey(ontologyType)) {
+            return typeToVertexMap.get(ontologyType);
+        } else {
+            throw new IllegalArgumentException("Terms of OntologyType "+ontologyType.name()+" were not stored, so cannot " +
+                    "provide them. Please update OntologyGraph configuration");
+        }
+    }
+
+    @Override
+    public BitSet getAncestorsBitSet(String vertex, List<String> range, OntologyRelationType... requestedRelations) {
+        BitSet results = new BitSet();
+        Set<String> filteredAncestors = getFilteredAncestors(vertex, requestedRelations);
+        for (int i = 0; i < range.size(); i++) {
+            if (filteredAncestors.contains(range.get(i))) {
+                results.set(i);
+            }
+        }
+
+        return results;
+    }
+
     @Override public int hashCode() {
         int result = ontology != null ? ontology.hashCode() : 0;
         result = 31 * result + (ancestorEdgesMap != null ? ancestorEdgesMap.hashCode() : 0);
@@ -205,6 +240,23 @@ public class OntologyGraph implements OntologyGraphTraversal {
         }
     }
 
+    /**
+     * Given a vertex in the ontology graph, store it in an explicit vertex set if matches one of the regular
+     * expressions in {@link #ONTOLOGY_TYPE_PATTERN_MAP}.
+     *
+     * @param vertex the vertex to possibly categorise and store
+     */
+    private void categoriseVertexIfRequired(String vertex) {
+        for (Map.Entry<OntologyType, Matcher> entry : ONTOLOGY_TYPE_PATTERN_MAP.entrySet()) {
+            Matcher ontologyTypeMatcher = entry.getValue().reset(vertex);
+            if (ontologyTypeMatcher.matches()) {
+                typeToVertexMap
+                        .computeIfAbsent(entry.getKey(), key -> new HashSet<>())
+                        .add(vertex);
+            }
+        }
+    }
+
     private boolean isNullOrEmpty(Collection<?> collection) {
         return collection == null || collection.isEmpty();
     }
@@ -230,10 +282,6 @@ public class OntologyGraph implements OntologyGraphTraversal {
             ancestorEdgesMap.put(vertex, ancestorEdgesOfV);
         }
         return ancestorEdgesMap.get(vertex);
-    }
-
-    private boolean isNotStopNode(String id) {
-        return !STOP_NODES.contains(id);
     }
 
     /**
@@ -264,6 +312,28 @@ public class OntologyGraph implements OntologyGraphTraversal {
         );
 
         return successors;
+    }
+
+    private Set<String> getFilteredAncestors(String vertex, OntologyRelationType... requestedRelations) {
+        OntologyRelationType[] relations;
+        if (requestedRelations.length == 0) {
+            relations = new OntologyRelationType[]{OntologyRelationType.UNDEFINED};
+        } else {
+            relations = requestedRelations;
+        }
+
+        Set<String> results = new HashSet<>();
+        for (OntologyRelationship ancestorRel : getAncestorEdges(vertex)) {
+            if (ancestorRel.relationship.hasTransitiveType(relations)) {
+                results.add(ancestorRel.parent);
+            }
+        }
+
+        return results;
+    }
+
+    private boolean isNotStopNode(String id) {
+        return !STOP_NODES.contains(id);
     }
 
     private HashSet<OntologyRelationType> createRelevantRelationsSet(OntologyRelationType... relations) {

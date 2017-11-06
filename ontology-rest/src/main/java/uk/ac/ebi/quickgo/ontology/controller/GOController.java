@@ -9,16 +9,20 @@ import uk.ac.ebi.quickgo.ontology.controller.validation.OBOControllerValidationH
 import uk.ac.ebi.quickgo.ontology.model.About;
 import uk.ac.ebi.quickgo.ontology.model.GOTerm;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
+import uk.ac.ebi.quickgo.ontology.model.SlimTerm;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;
 import uk.ac.ebi.quickgo.ontology.service.search.SearchServiceConfig;
+import uk.ac.ebi.quickgo.rest.ParameterException;
 import uk.ac.ebi.quickgo.rest.headers.HttpHeadersProvider;
 import uk.ac.ebi.quickgo.rest.metadata.MetaData;
 import uk.ac.ebi.quickgo.rest.metadata.MetaDataProvider;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
+import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import com.google.common.base.Preconditions;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.http.HttpStatus;
@@ -26,7 +30,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.DEFAULT_SLIM_TRAVERSAL_TYPES_CSV;
 
 /**
  * REST controller for accessing GO related information.
@@ -43,17 +50,19 @@ import org.springframework.web.bind.annotation.RestController;
 @EnableConfigurationProperties(OntologyRestProperties.class)
 public class GOController extends OBOController<GOTerm> {
 
+    static final String MISSING_SLIM_SET_ERROR_MESSAGE =
+            "Please enter slim-set request parameter: 'ids=<GO_TERM>'";
     private final MetaDataProvider metaDataProvider;
 
     @Autowired
     public GOController(OntologyService<GOTerm> goOntologyService,
-                        SearchService<OBOTerm> ontologySearchService,
-                        SearchableField searchableField,
-                        SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig,
-                        GraphImageService graphImageService,
-                        OBOControllerValidationHelper goValidationHelper,
-                        OntologyRestConfig.OntologyPagingConfig ontologyPagingConfig,
-                        MetaDataProvider metaDataProvider,
+            SearchService<OBOTerm> ontologySearchService,
+            SearchableField searchableField,
+            SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig,
+            GraphImageService graphImageService,
+            OBOControllerValidationHelper goValidationHelper,
+            OntologyRestConfig.OntologyPagingConfig ontologyPagingConfig,
+            MetaDataProvider metaDataProvider,
             HttpHeadersProvider httpHeadersProvider) {
         super(goOntologyService, ontologySearchService, searchableField, ontologyRetrievalConfig, graphImageService,
                 goValidationHelper, ontologyPagingConfig, OntologyType.GO, httpHeadersProvider);
@@ -72,5 +81,33 @@ public class GOController extends OBOController<GOTerm> {
     @RequestMapping(value = "/about", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<MetaData> provideMetaData() {
         return new ResponseEntity<>(this.metaDataProvider.lookupMetaData(), HttpStatus.OK);
+    }
+
+    /**
+     * Gets slimming information for the provided slim-set, where the slims can be reached only via the
+     * provided relationships.
+     *
+     * @param ids the slim-set
+     * @param relations the relationships over which the slims can be reached
+     * @return a response containing the id/slim-id mappings
+     */
+    @RequestMapping(value = "slim", method = RequestMethod.GET, produces = {MediaType
+            .APPLICATION_JSON_VALUE})
+    public ResponseEntity<QueryResult<SlimTerm>> findSlims(
+            @ApiParam(value = "Comma-separated term IDs forming the 'slim-set'", required = true)
+            @RequestParam(value = "ids", required = false) String ids,
+            @ApiParam(value = "The relationships over which the slimming information is computed")
+            @RequestParam(value = "relations", defaultValue = DEFAULT_SLIM_TRAVERSAL_TYPES_CSV) String relations) {
+
+        checkSlimSetIsSet(ids);
+        return getResultsResponse(ontologyService.findSlimmedInfoForSlimmedTerms(
+                validationHelper.validateCSVIds(ids),
+                asOntologyRelationTypeArray(validationHelper.validateRelationTypes(relations))));
+    }
+
+    private void checkSlimSetIsSet(String ids) {
+        if (ids == null || ids.isEmpty()) {
+            throw new ParameterException(MISSING_SLIM_SET_ERROR_MESSAGE);
+        }
     }
 }
