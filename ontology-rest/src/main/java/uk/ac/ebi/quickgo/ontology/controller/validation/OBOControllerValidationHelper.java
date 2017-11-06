@@ -26,5 +26,5 @@ public interface OBOControllerValidationHelper extends ControllerValidationHelpe
      * @throws ParameterException if {@code relationTypesCSV} contains a value that does not correspond
      * to a valid {@link OntologyRelationType}
      */
-    List<OntologyRelationType> validateRelationTypes(String relationTypesCSV,List<OntologyRelationType> validTypes);
+    List<OntologyRelationType> validateRelationTypes(String relationTypesCSV, List<OntologyRelationType> validTypes);
 }
