@@ -27,10 +27,7 @@ import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import java.awt.image.RenderedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.*;
 import javax.imageio.ImageIO;
 import org.slf4j.Logger;
@@ -501,25 +498,23 @@ public abstract class OBOController<T extends OBOTerm> {
                         .render();
         ByteArrayOutputStream os = new ByteArrayOutputStream();
 
-        ResponseEntity.BodyBuilder responseBodyBuilder = ResponseEntity.ok().contentType(MediaType.IMAGE_PNG);
-
-        InputStream is;
+        ResponseEntity.BodyBuilder bodyBuilder;
         if (base64) {
             ImageIO.write(renderedImage, PNG, Base64.getMimeEncoder().wrap(os));
-            is = new ByteArrayInputStream(os.toByteArray());
-
-            return responseBodyBuilder
-                    .contentLength(os.size())
-                    .header(CONTENT_ENCODING, BASE_64_CONTENT_ENCODING)
-                    .body(new InputStreamResource(is));
+            bodyBuilder = buildChartResponseBodyBuilder(os).header(CONTENT_ENCODING, BASE_64_CONTENT_ENCODING);
         } else {
             ImageIO.write(renderedImage, PNG, os);
-            is = new ByteArrayInputStream(os.toByteArray());
-
-            return responseBodyBuilder
-                    .contentLength(os.size())
-                    .body(new InputStreamResource(is));
+            bodyBuilder = buildChartResponseBodyBuilder(os);
         }
+
+        return bodyBuilder.body(new InputStreamResource(new ByteArrayInputStream(os.toByteArray())));
+    }
+
+    private ResponseEntity.BodyBuilder buildChartResponseBodyBuilder(ByteArrayOutputStream os) {
+        return ResponseEntity
+                .ok()
+                .contentType(MediaType.IMAGE_PNG)
+                .contentLength(os.size());
     }
 
     private QueryRequest buildRequest(String query,
