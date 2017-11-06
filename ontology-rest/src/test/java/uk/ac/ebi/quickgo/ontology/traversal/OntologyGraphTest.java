@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.ontology.traversal;
 
+import uk.ac.ebi.quickgo.ontology.common.OntologyType;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
 import uk.ac.ebi.quickgo.ontology.model.graph.AncestorEdge;
@@ -8,6 +9,7 @@ import uk.ac.ebi.quickgo.ontology.model.graph.AncestorGraph;
 import de.bechte.junit.runners.context.HierarchicalContextRunner;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -114,6 +116,21 @@ public class OntologyGraphTest {
                     null,
                     null
             );
+        }
+
+        @Test
+        public void canFetchCategorisedVertices() {
+            setupGraphWith3SimpleRelationships();
+
+            Set<String> goVertices = ontologyGraph.getVertices(OntologyType.GO);
+            assertThat(goVertices, containsInAnyOrder(id("1"), id("2"), id("3")));
+        }
+
+        @Test(expected = IllegalArgumentException.class)
+        public void uncategorisedVerticesCausesException() {
+            setupGraphWith3SimpleRelationships();
+
+            ontologyGraph.getVertices(OntologyType.ECO);
         }
     }
 
@@ -444,7 +461,6 @@ public class OntologyGraphTest {
             OntologyRelationship v3_IS_v5 = createRelationship(id("3"), id("5"), IS_A);
             OntologyRelationship v4_IS_v6 = createRelationship(id("4"), id("6"), IS_A);
 
-
             ontologyGraph.addRelationships(asList(
                     v1_IS_v2,
                     v2_IS_vStopA,
@@ -492,6 +508,26 @@ public class OntologyGraphTest {
             List<String> ancestors = ontologyGraph.ancestors(ids("1"));
 
             assertThat(ancestors, containsInAnyOrder(id("1"), id("2"), id("3"), id("4"), stopA, stopB, stopC));
+        }
+
+        @Test
+        public void fetchingFilteredAncestorsAsBitSetSucceeds() {
+            OntologyRelationship v0_IS_v1 = createRelationship(id("0"), id("1"), IS_A);
+            OntologyRelationship v1_IS_v2 = createRelationship(id("1"), id("2"), IS_A);
+            OntologyRelationship v1_HAS_v3 = createRelationship(id("1"), id("3"), HAS_PART);
+            OntologyRelationship v2_PART_v4 = createRelationship(id("2"), id("4"), PART_OF);
+
+            ontologyGraph.addRelationships(asList(v0_IS_v1, v1_IS_v2, v1_HAS_v3, v2_PART_v4));
+
+            BitSet ancestorsBitSet =
+                    ontologyGraph.getAncestorsBitSet(id("0"), asList(id("0"), id("1"), id("2")), IS_A, HAS_PART);
+            for (int i = 0; i < ancestorsBitSet.size(); i++) {
+                if (i == 0 || i == 1 || i == 2) {
+                    assertThat(ancestorsBitSet.get(i), is(true));
+                } else {
+                    assertThat(ancestorsBitSet.get(i), is(false));
+                }
+            }
         }
     }
 

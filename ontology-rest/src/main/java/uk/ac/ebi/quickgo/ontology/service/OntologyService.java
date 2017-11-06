@@ -5,9 +5,14 @@ import uk.ac.ebi.quickgo.ontology.common.OntologyType;
 import uk.ac.ebi.quickgo.ontology.model.*;
 import uk.ac.ebi.quickgo.ontology.model.graph.AncestorGraph;
 import uk.ac.ebi.quickgo.ontology.model.graph.AncestorVertex;
+import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
+import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
+import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
+import uk.ac.ebi.quickgo.ontology.model.SlimTerm;
 import uk.ac.ebi.quickgo.rest.search.query.RegularPage;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
+import java.util.BitSet;
 import java.util.List;
 import java.util.Set;
 
@@ -124,6 +129,35 @@ public interface OntologyService<T extends OBOTerm> {
     List<T> findDescendantsInfoByOntologyId(List<String> ids, OntologyRelationType... relations);
 
     /**
+     * Maps ids to their equivalent, slimmed ids. The results are presented as a list of {@link SlimTerm} instances,
+     * each of which contains a term id, and which shows the ids to which this term slims to.
+     *
+     * @param slimTerms the terms to which we want to find term ids that map "up" to.
+     * @param relationTypes the relationships over which the slimming calculation will traverse
+     * @return a list of {@link SlimTerm} objects that provide the slimming information
+     */
+    List<SlimTerm> findSlimmedInfoForSlimmedTerms(List<String> slimTerms, OntologyRelationType... relationTypes);
+
+    /**
+     * Finds all vertices in the graph associated with the given {@link OntologyType}
+     * @param ontologyType the ontology whose vertices are wanted
+     * @return the vertices associated with the specified {@link OntologyType}
+     */
+    Set<String> getVertices(OntologyType ontologyType);
+
+    /**
+     * Finds the ancestors of a specified {@code vertex}, which will be a subset of a given {@code range} of
+     * vertices. These ancestors are reachable only via the {@code requestedRelations}. Results are provided
+     * as a {@link BitSet}, for efficient result processing.
+     *
+     * @param vertex the vertex whose ancestors are needed
+     * @param range a list of vertices that are permissible as ancestors, i.e., the ancestors will be a subset
+     * @param requestedRelations the relationships over which ancestors can be computed
+     * @return a {@link BitSet} representing the ancestors
+     */
+    BitSet getAncestorsBitSet(String vertex, List<String> range, OntologyRelationType... requestedRelations);
+
+    /**
      * Find the set of ancestor vertices reachable from a list of ids, {@code ids}, navigable via a specified
      * set of relations.
      *
@@ -136,5 +170,4 @@ public interface OntologyService<T extends OBOTerm> {
      */
     AncestorGraph<AncestorVertex> findOntologySubGraphById(Set<String> startIds, Set<String> stopIds,
             OntologyRelationType... relations);
-
 }

@@ -3,17 +3,23 @@ package uk.ac.ebi.quickgo.ontology.service;
 import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
 import uk.ac.ebi.quickgo.ontology.common.OntologyType;
+import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
+import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
+import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
+import uk.ac.ebi.quickgo.ontology.model.SlimTerm;
 import uk.ac.ebi.quickgo.ontology.model.*;
 import uk.ac.ebi.quickgo.ontology.model.graph.AncestorGraph;
 import uk.ac.ebi.quickgo.ontology.model.graph.AncestorVertex;
 import uk.ac.ebi.quickgo.ontology.service.converter.OntologyDocConverter;
 import uk.ac.ebi.quickgo.ontology.traversal.OntologyGraphTraversal;
+import uk.ac.ebi.quickgo.ontology.traversal.TermSlimmer;
 import uk.ac.ebi.quickgo.rest.search.QueryStringSanitizer;
 import uk.ac.ebi.quickgo.rest.search.query.RegularPage;
 import uk.ac.ebi.quickgo.rest.search.results.PageInfo;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import com.google.common.base.Preconditions;
+import java.util.*;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
@@ -122,7 +128,7 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
 
     @Override
     public List<List<OntologyRelationship>> paths(Set<String> startingIds, Set<String> endingIds,
-                                                  OntologyRelationType... relations) {
+            OntologyRelationType... relations) {
         return ontologyTraversal.paths(startingIds, endingIds, relations);
     }
 
@@ -141,6 +147,18 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
     }
 
     @Override
+    public List<SlimTerm> findSlimmedInfoForSlimmedTerms(List<String> slimTerms, OntologyRelationType... relationTypes) {
+        TermSlimmer slimmer = TermSlimmer
+                .createSlims(OntologyType.valueOf(ontologyType), ontologyTraversal, slimTerms, relationTypes);
+
+        return slimmer.getSlimmedTermsMap().entrySet().stream()
+                .filter(this::doesNotSlimToOnlyItself)
+                .map(Map.Entry::getKey)
+                .map(id -> new SlimTerm(id, slimmer.findSlims(id)))
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public AncestorGraph<AncestorVertex> findOntologySubGraphById(Set<String> startIds, Set<String> stopIds,
             OntologyRelationType... relations) {
         AncestorGraph<String> ancestorGraph = ontologyTraversal.subGraph(startIds, stopIds, relations);
@@ -154,10 +172,21 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
         return new AncestorGraph<>(ancestorGraph.edges, coreVertices);
     }
 
-    List<String> buildIdList(List<String> ids) {
+    List<String> buildIdList(Collection<String> ids) {
         Preconditions.checkArgument(ids != null, "List of IDs cannot be null");
 
         return ids.stream().map(queryStringSanitizer::sanitize).collect(Collectors.toList());
+    }
+
+    /**
+     * Determines whether a slim term maps to only itself and no other slim terms.
+     * @param slimTermMapping a slim-term and the terms to which it maps
+     * @return whether or not the slim-term maps only to itself
+     */
+    private boolean doesNotSlimToOnlyItself(Map.Entry<String, List<String>> slimTermMapping) {
+        return slimTermMapping.getValue().size() > 1 ||
+                (slimTermMapping.getValue().size() == 1 &&
+                        !slimTermMapping.getKey().equals(slimTermMapping.getValue().get(0)));
     }
 
     /**
@@ -166,10 +195,10 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
      * <p>
      * <p>No ontology graph data is added to the {@link OntologyDocument}s.
      *
-     * @param docs the list od {@link OntologyDocument}s to convertRelation
+     * @param docs the list of {@link OntologyDocument}s to convert
      * @return a {@link Stream} of {@link T} instances
      */
-    private Stream<T> convertDocs(List<OntologyDocument> docs) {
+    private Stream<T> convertDocs(Collection<OntologyDocument> docs) {
         return docs.stream()
                 .map(converter::convert)
                 .map(this::insertChildren);
@@ -244,7 +273,7 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
     }
 
     private QueryResult<T> buildQueryResult(org.springframework.data.domain.Page<OntologyDocument> pagedResult,
-                                            RegularPage page) {
+            RegularPage page) {
         long totalNumberOfHits = pagedResult.getTotalElements();
 
         PageInfo pageInfo = new PageInfo.Builder()

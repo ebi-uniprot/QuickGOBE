@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static java.util.Arrays.asList;
+import static java.util.Arrays.stream;
 
 /**
  * This {@code enum} defines the ontology relationships that are valid for use in QuickGO's source files.
@@ -45,7 +45,13 @@ public enum OntologyRelationType {
     // keep these variables below the above 'static' block
     public static final String DEFAULT_TRAVERSAL_TYPES_CSV = "is_a,part_of,occurs_in,regulates";
     public static final List<OntologyRelationType> DEFAULT_TRAVERSAL_TYPES =
-            asList(DEFAULT_TRAVERSAL_TYPES_CSV.split(",")).stream()
+            stream(DEFAULT_TRAVERSAL_TYPES_CSV.split(","))
+                    .map(OntologyRelationType::getByLongName)
+                    .collect(Collectors.toList());
+
+    public static final String DEFAULT_SLIM_TRAVERSAL_TYPES_CSV = "is_a,part_of,occurs_in";
+    public static final List<OntologyRelationType> DEFAULT_SLIM_TRAVERSAL_TYPES =
+            stream(DEFAULT_SLIM_TRAVERSAL_TYPES_CSV.split(","))
                     .map(OntologyRelationType::getByLongName)
                     .collect(Collectors.toList());
 
