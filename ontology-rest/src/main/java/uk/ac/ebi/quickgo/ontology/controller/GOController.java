@@ -33,6 +33,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.DEFAULT_SLIM_TRAVERSAL_TYPES;
 import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.GO_GRAPH_TRAVERSAL_TYPES;
 
 import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.DEFAULT_SLIM_TRAVERSAL_TYPES_CSV;
@@ -106,7 +108,7 @@ public class GOController extends OBOController<GOTerm> {
         checkSlimSetIsSet(ids);
         return getResultsResponse(ontologyService.findSlimmedInfoForSlimmedTerms(
                 validationHelper.validateCSVIds(ids),
-                asOntologyRelationTypeArray(validationHelper.validateRelationTypes(relations))));
+                asOntologyRelationTypeArray(validationHelper.validateRelationTypes(relations, DEFAULT_SLIM_TRAVERSAL_TYPES))));
     }
 
     private void checkSlimSetIsSet(String ids) {
