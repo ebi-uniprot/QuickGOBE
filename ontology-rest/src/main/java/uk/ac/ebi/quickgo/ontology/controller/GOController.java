@@ -97,6 +97,8 @@ public class GOController extends OBOController<GOTerm> {
      * @param relations the relationships over which the slims can be reached
      * @return a response containing the id/slim-id mappings
      */
+    @ApiOperation(value = "Gets slimming information for the provided slim-set, where the slims can be reached only " +
+            "via the provided relationships")
     @RequestMapping(value = "slim", method = RequestMethod.GET, produces = {MediaType
             .APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<SlimTerm>> findSlims(

@@ -1,17 +1,5 @@
 package uk.ac.ebi.quickgo.ontology.controller;
 
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import uk.ac.ebi.quickgo.common.SearchableField;
 import uk.ac.ebi.quickgo.graphics.model.GraphImageLayout;
 import uk.ac.ebi.quickgo.graphics.ontology.RenderingGraphException;
@@ -19,7 +7,10 @@ import uk.ac.ebi.quickgo.graphics.service.GraphImageService;
 import uk.ac.ebi.quickgo.ontology.OntologyRestConfig;
 import uk.ac.ebi.quickgo.ontology.common.OntologyFields;
 import uk.ac.ebi.quickgo.ontology.controller.validation.OBOControllerValidationHelper;
-import uk.ac.ebi.quickgo.ontology.model.*;
+import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
+import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
+import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
+import uk.ac.ebi.quickgo.ontology.model.OntologySpecifier;
 import uk.ac.ebi.quickgo.ontology.model.graph.AncestorGraph;
 import uk.ac.ebi.quickgo.ontology.model.graph.AncestorVertex;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;
@@ -35,13 +26,25 @@ import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.query.RegularPage;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
-import javax.imageio.ImageIO;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import java.awt.image.RenderedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import javax.imageio.ImageIO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.DEFAULT_TRAVERSAL_TYPES;
@@ -143,9 +146,9 @@ public abstract class OBOController<T extends OBOTerm> {
 
         return new ResponseEntity<>(ontologyService.findAllByOntologyType
                 (this.ontologySpecifier.ontologyType,
-                 new RegularPage(page, ontologyPagingConfig.defaultPageSize())),
-                                    httpHeadersProvider.provide(),
-                                    HttpStatus.OK);
+                        new RegularPage(page, ontologyPagingConfig.defaultPageSize())),
+                httpHeadersProvider.provide(),
+                HttpStatus.OK);
     }
 
     /**
@@ -346,7 +349,7 @@ public abstract class OBOController<T extends OBOTerm> {
                 ontologyService.findAncestorsInfoByOntologyId(
                         validationHelper.validateCSVIds(ids),
                         asOntologyRelationTypeArray(validationHelper.validateRelationTypes(relations,
-                                                                                           DEFAULT_TRAVERSAL_TYPES))));
+                                DEFAULT_TRAVERSAL_TYPES))));
     }
 
     /**
@@ -366,7 +369,7 @@ public abstract class OBOController<T extends OBOTerm> {
                 ontologyService.findDescendantsInfoByOntologyId(
                         validationHelper.validateCSVIds(ids),
                         asOntologyRelationTypeArray(validationHelper.validateRelationTypes(relations,
-                                                                                           DEFAULT_TRAVERSAL_TYPES))));
+                                DEFAULT_TRAVERSAL_TYPES))));
     }
 
     /**
@@ -381,7 +384,7 @@ public abstract class OBOController<T extends OBOTerm> {
     @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + PATHS_SUB_RESOURCE + "/{toIds}", method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<List<OntologyRelationship>>> findPaths(
-            @ApiParam(value = "Comma-separate source term IDs") @PathVariable(value = "ids") String ids,
+            @ApiParam(value = "Comma-separated source term IDs") @PathVariable(value = "ids") String ids,
             @ApiParam(value = "Comma-separated target term IDs") @PathVariable(value = "toIds") String toIds,
             @ApiParam(value = "Comma-separated ontology relationships")
             @RequestParam(value = "relations", defaultValue = DEFAULT_TRAVERSAL_TYPES_CSV) String relations) {
@@ -390,7 +393,7 @@ public abstract class OBOController<T extends OBOTerm> {
                         asSet(validationHelper.validateCSVIds(ids)),
                         asSet(validationHelper.validateCSVIds(toIds)),
                         asOntologyRelationTypeArray(validationHelper.validateRelationTypes(relations,
-                                                                                           DEFAULT_TRAVERSAL_TYPES))
+                                DEFAULT_TRAVERSAL_TYPES))
                 ));
     }
 
@@ -427,7 +430,8 @@ public abstract class OBOController<T extends OBOTerm> {
             @ApiParam(value = "Comma-separated term IDs", required = true) @PathVariable(value = "ids") String ids) {
         try {
             GraphImageLayout layout = graphImageService
-                    .createChart(validationHelper.validateCSVIds(ids), ontologySpecifier.ontologyType.name()).getLayout();
+                    .createChart(validationHelper.validateCSVIds(ids), ontologySpecifier.ontologyType.name())
+                    .getLayout();
             return ResponseEntity
                     .ok()
                     .body(layout);
@@ -437,33 +441,37 @@ public abstract class OBOController<T extends OBOTerm> {
     }
 
     /**
-     * Retrieves a subgraph of the ontology graph information as jason
+     * Retrieves a sub-graph of the ontology graph between two sets of provided term ids
      *
-     * @param startIds the term ids whose image is required
-     * @param stopIds the term ids whose image is required
-     * @return the json data corresponding to the requested term ids
+     * @param startIds the term ids from which to the sub-graph should begin
+     * @param stopIds the term ids that indicate the ending of the sub-graph
+     * @return the specified ontology sub-graph
      */
-    @ApiOperation(value = "")
+    @ApiOperation(value = "Fetches a sub-graph of the ontology")
     @RequestMapping(value = TERMS_RESOURCE + "/graph", method = RequestMethod.GET, produces = {MediaType
             .APPLICATION_JSON_VALUE})
-    public ResponseEntity<QueryResult<AncestorGraph>> getGraph(@RequestParam(value = "startIds") String startIds,
+    public ResponseEntity<QueryResult<AncestorGraph>> getGraph(
+            @ApiParam(value = "Comma-separated term IDs specifying the beginning of the sub-graph")
+            @RequestParam(value = "startIds") String startIds,
+            @ApiParam(value = "Comma-separated term IDs specifying the end of the sub-graph")
             @RequestParam(value = "stopIds", required = false) String stopIds,
+            @ApiParam(value = "Comma-separated relationships over which the graph will navigate")
             @RequestParam(value = "relations", required = false) String relations) {
         final AncestorGraph<AncestorVertex> ancestorGraph = ontologyService.findOntologySubGraphById(
                 asSet(validationHelper.validateCSVIds(startIds)),
                 asSet(validationHelper.validateCSVIds(stopIds)),
-                 validRelations(relations).toArray(new OntologyRelationType[]{}));
+                validRelations(relations).toArray(new OntologyRelationType[]{}));
 
-        if(ancestorGraph.vertices.size()== 0 && ancestorGraph.edges.size() == 0){
+        if (ancestorGraph.vertices.size() == 0 && ancestorGraph.edges.size() == 0) {
             return getResultsResponse(Collections.emptyList());
-        }else{
+        } else {
             return getResultsResponse(Collections.singletonList(ancestorGraph));
         }
     }
 
     private List<OntologyRelationType> validRelations(String relations) {
         return Objects.isNull(relations) || relations.isEmpty() ? this.ontologySpecifier.allowedRelations :
-                    validationHelper.validateRelationTypes(relations, this.ontologySpecifier.allowedRelations);
+                validationHelper.validateRelationTypes(relations, this.ontologySpecifier.allowedRelations);
     }
 
     /**
@@ -569,7 +577,7 @@ public abstract class OBOController<T extends OBOTerm> {
      */
     private QuickGOQuery restrictQueryToOTypeResults(QuickGOQuery query) {
         return and(query,
-                   ontologyQueryConverter.convert(
-                           OntologyFields.Searchable.ONTOLOGY_TYPE + COLON + ontologySpecifier.ontologyType.name()));
+                ontologyQueryConverter.convert(
+                        OntologyFields.Searchable.ONTOLOGY_TYPE + COLON + ontologySpecifier.ontologyType.name()));
     }
 }
