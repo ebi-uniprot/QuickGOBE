@@ -1,9 +1,5 @@
 package uk.ac.ebi.quickgo.ontology.controller;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.ResultActions;
 import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocMocker;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
@@ -15,11 +11,19 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import org.junit.Before;
+import org.junit.Test;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.ResultActions;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.ac.ebi.quickgo.common.converter.HelpfulConverter.toCSV;
 import static uk.ac.ebi.quickgo.ontology.controller.GOController.MISSING_SLIM_SET_ERROR_MESSAGE;
 import static uk.ac.ebi.quickgo.ontology.controller.OBOController.COMPLETE_SUB_RESOURCE;
@@ -59,6 +63,7 @@ public class GOControllerIT extends OBOControllerIT {
     private static final String SLIM_IDS_PARAM = "ids";
     private static final String SLIM_RELATIONS_PARAM = "relations";
     private static final String STOP_NODE = "GO:0008150";
+    private static final String NO_VALID_SLIM_TERMS_ERROR_MESSAGE = "Requested slim-set contains no valid terms";
 
     @Before
     public void setUp() {
@@ -123,6 +128,18 @@ public class GOControllerIT extends OBOControllerIT {
     }
 
     @Test
+    public void oneIdAndOneInvalidIdHasOneSlim() throws Exception {
+        ResultActions response = mockMvc.perform(get(getSlimURL())
+                .param(SLIM_IDS_PARAM, toCSV(GO_SLIM1, "GO:0000000")));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.numberOfHits").value(1))
+                .andExpect(jsonPath("$.results.*.id", contains(GO_SLIM_CHILD1)));
+    }
+
+    @Test
     public void oneIdHasTwoSlims() throws Exception {
         ResultActions response = mockMvc.perform(get(getSlimURL())
                 .param(SLIM_IDS_PARAM, GO_SLIM2));
@@ -172,7 +189,16 @@ public class GOControllerIT extends OBOControllerIT {
         ResultActions response = mockMvc.perform(get(getSlimURL())
                 .param(SLIM_IDS_PARAM, ""));
 
-        expectChartCreationError(response, MISSING_SLIM_SET_ERROR_MESSAGE)
+        expectResponseCreationError(response, MISSING_SLIM_SET_ERROR_MESSAGE)
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void slimmingWithNoValidIDsCausesCauses400() throws Exception {
+        ResultActions response = mockMvc.perform(get(getSlimURL())
+                .param(SLIM_IDS_PARAM, "GO:0000000"));
+
+        expectResponseCreationError(response, NO_VALID_SLIM_TERMS_ERROR_MESSAGE)
                 .andExpect(status().isBadRequest());
     }
 

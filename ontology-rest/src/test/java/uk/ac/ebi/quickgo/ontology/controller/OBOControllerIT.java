@@ -810,7 +810,7 @@ public abstract class OBOControllerIT {
         ResultActions response = mockMvc.perform(
                 get(buildTermsURLWithSubResource(validId, CHART_SUB_RESOURCE)));
 
-        expectChartCreationError(response.andExpect(status().is5xxServerError()), exceptionDescription);
+        expectResponseCreationError(response.andExpect(status().is5xxServerError()), exceptionDescription);
     }
 
     @Test
@@ -850,7 +850,7 @@ public abstract class OBOControllerIT {
         ResultActions response = mockMvc.perform(
                 get(buildTermsURLWithSubResource(validId, CHART_COORDINATES_SUB_RESOURCE)));
 
-        expectChartCreationError(response.andExpect(status().is5xxServerError()), exceptionDescription);
+        expectResponseCreationError(response.andExpect(status().is5xxServerError()), exceptionDescription);
     }
 
     @Test
@@ -913,7 +913,7 @@ public abstract class OBOControllerIT {
                                                          .param("startIds", startIds)
                                                          .param(RELATIONS_PARAM, getInvalidRelations()));
 
-        expectUntransverseableRelationError(response, getInvalidRelations());
+        expectUntraverseableRelationError(response, getInvalidRelations());
     }
 
     //-----------------------  Check Http Header for Cache-Control content ------------------------------------------
@@ -1065,7 +1065,7 @@ public abstract class OBOControllerIT {
                         containsString("Unknown relationship requested: '" + relation + "'"))));
     }
 
-    protected ResultActions expectUntransverseableRelationError(ResultActions result, String relation) throws
+    protected ResultActions expectUntraverseableRelationError(ResultActions result, String relation) throws
                                                                                                        Exception {
         return result
                 .andDo(print())
@@ -1075,7 +1075,7 @@ public abstract class OBOControllerIT {
                                 "Cannot traverse over relation type: " + relation + ". Can only traverse over:"))));
     }
 
-    protected ResultActions expectChartCreationError(ResultActions result, String messagePrefix) throws Exception {
+    protected ResultActions expectResponseCreationError(ResultActions result, String messagePrefix) throws Exception {
         return result
                 .andDo(print())
                 .andExpect(jsonPath("$.url", is(requestUrl(result))))

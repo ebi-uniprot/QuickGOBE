@@ -6,7 +6,9 @@ import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
 import java.util.*;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static java.util.Collections.*;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+import static java.util.Collections.unmodifiableMap;
 import static uk.ac.ebi.quickgo.ontology.common.OntologyType.GO;
 import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.DEFAULT_SLIM_TRAVERSAL_TYPES;
 import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.DEFAULT_TRAVERSAL_TYPES;
@@ -34,20 +36,22 @@ public class TermSlimmer {
      *
      * @param ontologyType           the ontology type
      * @param ontology               the ontology
-     * @param slimTerms              the slimmed-terms
+     * @param requestedSlimTerms     the slimmed-terms
      * @param requestedRelationTypes the relationships over which slimmed ancestors will be computed
      * @return a {@link TermSlimmer}
      */
     public static TermSlimmer createSlims(
             OntologyType ontologyType,
             OntologyGraphTraversal ontology,
-            List<String> slimTerms,
+            List<String> requestedSlimTerms,
             OntologyRelationType... requestedRelationTypes) {
         // if no slim terms have been supplied, there's nothing to do
         checkArgument(ontologyType != null && ontologyType == GO, "OntologyType cannot be null and must be GO");
         checkArgument(ontology != null, "Ontology cannot be null");
-        checkArgument(slimTerms != null && !slimTerms.isEmpty(), "Slim-set cannot be null or empty");
+        checkArgument(requestedSlimTerms != null && !requestedSlimTerms.isEmpty(), "Slim-set cannot be null or empty");
         checkArgument(requestedRelationTypes != null, "Requested relation types cannot be null");
+        List<String> slimTerms = retainValidSlimTerms(ontology, ontologyType, requestedSlimTerms);
+        checkArgument(!slimTerms.isEmpty(), "Requested slim-set contains no valid terms");
 
         OntologyRelationType[] relationTypes = getOntologyRelationTypes(requestedRelationTypes);
 
@@ -107,6 +111,18 @@ public class TermSlimmer {
      */
     public Map<String, List<String>> getSlimmedTermsMap() {
         return slimTranslate;
+    }
+
+    private static List<String> retainValidSlimTerms(OntologyGraphTraversal ontology, OntologyType ontologyType,
+            List<String> requestedSlimTerms) {
+        List<String> validSlimTerms = new ArrayList<>();
+        Set<String> allValidTerms = ontology.getVertices(ontologyType);
+        for (String requestedTerm : requestedSlimTerms) {
+            if (allValidTerms.contains(requestedTerm)) {
+                validSlimTerms.add(requestedTerm);
+            }
+        }
+        return validSlimTerms;
     }
 
     /**
