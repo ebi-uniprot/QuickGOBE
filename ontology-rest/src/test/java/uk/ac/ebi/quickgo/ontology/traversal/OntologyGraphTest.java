@@ -1,18 +1,21 @@
 package uk.ac.ebi.quickgo.ontology.traversal;
 
+import uk.ac.ebi.quickgo.ontology.common.OntologyType;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
+import uk.ac.ebi.quickgo.ontology.model.graph.AncestorEdge;
+import uk.ac.ebi.quickgo.ontology.model.graph.AncestorGraph;
 
 import de.bechte.junit.runners.context.HierarchicalContextRunner;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -57,11 +60,9 @@ public class OntologyGraphTest {
     }
 
     private Set<String> ids(String... ids) {
-        Set<String> idSet = new HashSet<>();
-        for (String id : ids) {
-            idSet.add(id(id));
-        }
-        return idSet;
+        return Arrays.stream(ids)
+                     .map(this::id)
+                     .collect(Collectors.toSet());
     }
 
     private String id(String id) {return "GO:" + id;}
@@ -115,6 +116,21 @@ public class OntologyGraphTest {
                     null,
                     null
             );
+        }
+
+        @Test
+        public void canFetchCategorisedVertices() {
+            setupGraphWith3SimpleRelationships();
+
+            Set<String> goVertices = ontologyGraph.getVertices(OntologyType.GO);
+            assertThat(goVertices, containsInAnyOrder(id("1"), id("2"), id("3")));
+        }
+
+        @Test(expected = IllegalArgumentException.class)
+        public void uncategorisedVerticesCausesException() {
+            setupGraphWith3SimpleRelationships();
+
+            ontologyGraph.getVertices(OntologyType.ECO);
         }
     }
 
@@ -175,8 +191,8 @@ public class OntologyGraphTest {
             );
 
             assertThat(paths, hasSize(2));
-            checkPathsContains(paths, Collections.singletonList(v1_CO_v2));
-            checkPathsContains(paths, Collections.singletonList(v1_CP_v2));
+            checkPathsContains(paths, singletonList(v1_CO_v2));
+            checkPathsContains(paths, singletonList(v1_CP_v2));
         }
 
         @Test
@@ -190,7 +206,7 @@ public class OntologyGraphTest {
             );
 
             assertThat(paths, hasSize(1));
-            checkPathsContains(paths, Collections.singletonList(v1_CP_v2));
+            checkPathsContains(paths, singletonList(v1_CP_v2));
         }
 
         @Test
@@ -445,7 +461,6 @@ public class OntologyGraphTest {
             OntologyRelationship v3_IS_v5 = createRelationship(id("3"), id("5"), IS_A);
             OntologyRelationship v4_IS_v6 = createRelationship(id("4"), id("6"), IS_A);
 
-
             ontologyGraph.addRelationships(asList(
                     v1_IS_v2,
                     v2_IS_vStopA,
@@ -493,6 +508,26 @@ public class OntologyGraphTest {
             List<String> ancestors = ontologyGraph.ancestors(ids("1"));
 
             assertThat(ancestors, containsInAnyOrder(id("1"), id("2"), id("3"), id("4"), stopA, stopB, stopC));
+        }
+
+        @Test
+        public void fetchingFilteredAncestorsAsBitSetSucceeds() {
+            OntologyRelationship v0_IS_v1 = createRelationship(id("0"), id("1"), IS_A);
+            OntologyRelationship v1_IS_v2 = createRelationship(id("1"), id("2"), IS_A);
+            OntologyRelationship v1_HAS_v3 = createRelationship(id("1"), id("3"), HAS_PART);
+            OntologyRelationship v2_PART_v4 = createRelationship(id("2"), id("4"), PART_OF);
+
+            ontologyGraph.addRelationships(asList(v0_IS_v1, v1_IS_v2, v1_HAS_v3, v2_PART_v4));
+
+            BitSet ancestorsBitSet =
+                    ontologyGraph.getAncestorsBitSet(id("0"), asList(id("0"), id("1"), id("2")), IS_A, HAS_PART);
+            for (int i = 0; i < ancestorsBitSet.size(); i++) {
+                if (i == 0 || i == 1 || i == 2) {
+                    assertThat(ancestorsBitSet.get(i), is(true));
+                } else {
+                    assertThat(ancestorsBitSet.get(i), is(false));
+                }
+            }
         }
     }
 
@@ -741,6 +776,248 @@ public class OntologyGraphTest {
 
             assertThat(expectedParents, hasSize(4));
             assertThat(expectedParents, not(hasItem(grandParentHasPart)));
+        }
+    }
+
+    public class AncestorGraphTests {
+        private OntologyGraph og;
+
+        final OntologyVertex pyrophosphataseActivity =  new OntologyVertex("GO:0016462", "pyrophosphatase activity");
+        final OntologyVertex cyclaseActivity =  new OntologyVertex("GO:0009975", "cyclase activity");
+        final OntologyVertex catalyticActivity = new OntologyVertex("GO:0003824", "catalytic activity");
+        final OntologyVertex molecularFunction = new OntologyVertex("GO:0003674", "molecularFunction");
+
+        private final OntologyRelationship py_IA_cy = new OntologyRelationship(pyrophosphataseActivity.id, cyclaseActivity.id,
+                                                                               IS_A);
+        private final OntologyRelationship cy_IA_ca = new OntologyRelationship(cyclaseActivity.id, catalyticActivity.id,
+                                                                               IS_A);
+        private final OntologyRelationship ca_IA_mf = new OntologyRelationship(catalyticActivity.id, molecularFunction.id, IS_A);
+
+        final OntologyRelationType[] relations = GO_GRAPH_TRAVERSAL_TYPES.toArray(new
+
+                                                                                                  OntologyRelationType[]{});
+        // Defaults.
+        final HashSet<String> startingVertices = new HashSet<>();
+        final Set<String> stopVertices = new HashSet<>();
+
+        @Before
+        public void setup(){
+            og = new OntologyGraph();
+            og.addRelationships(asList(py_IA_cy, cy_IA_ca, ca_IA_mf));
+        }
+
+        @Test
+        public void findSubGraphUsingAllRelationsDefaultStopVertices() {
+            final HashSet<String> startingVertices = new HashSet<>(singletonList(catalyticActivity.id));
+            final Set<String> stopVertices = new HashSet<>();
+
+            AncestorGraph<String> ancestorGraph = og.subGraph(startingVertices, stopVertices, relations);
+
+            assertThat(ancestorGraph.vertices, hasSize(2));
+            assertThat(ancestorGraph.vertices, containsInAnyOrder(catalyticActivity.id, molecularFunction.id));
+            assertThat(ancestorGraph.edges, hasSize(1));
+            assertThat(ancestorGraph.edges, containsInAnyOrder(toAE(ca_IA_mf)));
+        }
+
+        @Test
+        public void findSubGraphUsingAllRelationsSpecifyDefaultStopVertices() {
+            final HashSet<String> startingVertices = new HashSet<>(singletonList(catalyticActivity.id));
+            final HashSet<String> stopVertices = new HashSet<>(singletonList(molecularFunction.id));
+
+            AncestorGraph<String> ancestorGraph = og.subGraph(startingVertices, stopVertices, relations);
+
+            assertThat(ancestorGraph.vertices, hasSize(2));
+            assertThat(ancestorGraph.vertices, containsInAnyOrder(catalyticActivity.id, molecularFunction.id));
+            assertThat(ancestorGraph.edges, hasSize(1));
+            assertThat(ancestorGraph.edges, containsInAnyOrder(toAE(ca_IA_mf)));
+        }
+
+        @Test
+        public void findSubGraphSpecifyingRelationsDoNotSpecifyStopNode() {
+            final HashSet<String> startingVertices = new HashSet<>(singletonList(catalyticActivity.id));
+            final OntologyRelationType[] relations = {OntologyRelationType.IS_A};
+
+            AncestorGraph<String> ancestorGraph = og.subGraph(startingVertices, stopVertices, relations);
+
+            assertThat(ancestorGraph.vertices, hasSize(2));
+            assertThat(ancestorGraph.vertices, containsInAnyOrder(catalyticActivity.id, molecularFunction.id));
+            assertThat(ancestorGraph.edges, hasSize(1));
+            assertThat(ancestorGraph.edges, containsInAnyOrder(toAE(ca_IA_mf)));
+        }
+
+        @Test
+        public void findSubGraphSpecifyingRelationsSpecifyNonRootStopNode() {
+            final HashSet<String> startingVertices = new HashSet<>(singletonList(pyrophosphataseActivity.id));
+            final HashSet<String> stopVertices = new HashSet<>(singletonList(catalyticActivity.id));
+            final OntologyRelationType[] relations = {OntologyRelationType.IS_A};
+
+            AncestorGraph<String> ancestorGraph = og.subGraph(startingVertices, stopVertices, relations);
+
+            assertThat(ancestorGraph.vertices, hasSize(3));
+            assertThat(ancestorGraph.vertices, containsInAnyOrder(pyrophosphataseActivity.id, cyclaseActivity.id,
+                                                                  catalyticActivity.id));
+            assertThat(ancestorGraph.edges, hasSize(2));
+            assertThat(ancestorGraph.edges, containsInAnyOrder(toAE(py_IA_cy), toAE(cy_IA_ca)));
+        }
+
+        @Test
+        public void findSubGraphWhereMultipleRouteOfSameType() {
+            OntologyRelationship py_IA_mf = new OntologyRelationship(pyrophosphataseActivity.id, molecularFunction.id, IS_A);
+            calculateGraphForRelationship(py_IA_mf);
+        }
+
+        @Test
+        public void findSubGraphForMultipleInheritance() {
+            OntologyRelationship py_RT_mf = new OntologyRelationship(pyrophosphataseActivity.id, molecularFunction
+                    .id, OCCURS_IN);
+            calculateGraphForRelationship(py_RT_mf);
+        }
+
+        @Test
+        public void findSubGraphFilteringByRelationship() {
+            OntologyRelationship py_OI_mf = new OntologyRelationship(pyrophosphataseActivity.id, molecularFunction
+                    .id, OCCURS_IN);
+            og.addRelationships(singletonList(py_OI_mf));
+            final HashSet<String> startingVertices = new HashSet<>(singletonList(pyrophosphataseActivity.id));
+            final OntologyRelationType[] relations = {OCCURS_IN};
+
+            AncestorGraph<String> ancestorGraph = og.subGraph(startingVertices, stopVertices, relations);
+
+            assertThat(ancestorGraph.vertices, hasSize(2));
+            assertThat(ancestorGraph.vertices, containsInAnyOrder(pyrophosphataseActivity.id, molecularFunction.id));
+            assertThat(ancestorGraph.edges, hasSize(1));
+            assertThat(ancestorGraph.edges, containsInAnyOrder(toAE(py_OI_mf)));
+        }
+
+        @Test
+        public void unrelatedVerticesIgnored() {
+            //Build new graph and add to relationships
+            OntologyVertex biologicalProcess = new OntologyVertex("GO:0008150","biological process");
+            OntologyVertex localization = new OntologyVertex("GO:0051179","localization");
+            OntologyVertex estOfLocalization = new OntologyVertex("GO:0051234","establishment of localization");
+            OntologyRelationship lo_IA_bp = new OntologyRelationship(localization.id, biologicalProcess.id, IS_A);
+            OntologyRelationship el_IA_lo = new OntologyRelationship(estOfLocalization.id, localization.id, IS_A);
+            og.addRelationships(asList(lo_IA_bp, el_IA_lo));
+
+            HashSet<String> startingVertices = new HashSet<>(singletonList(pyrophosphataseActivity.id));
+            final OntologyRelationType[] relations = {IS_A};
+
+            AncestorGraph<String> ancestorGraph = og.subGraph(startingVertices, stopVertices, relations);
+
+            assertThat(ancestorGraph.vertices, hasSize(4));
+            assertThat(ancestorGraph.vertices, containsInAnyOrder(pyrophosphataseActivity.id, cyclaseActivity.id,
+                                                                  catalyticActivity.id, molecularFunction.id));
+            assertThat(ancestorGraph.edges, hasSize(3));
+            assertThat(ancestorGraph.edges, containsInAnyOrder(toAE(py_IA_cy), toAE(cy_IA_ca), toAE(ca_IA_mf)));
+
+            //Now try un-related
+            startingVertices = new HashSet<>(singletonList(estOfLocalization.id));
+            ancestorGraph = og.subGraph(startingVertices, stopVertices, relations);
+
+            assertThat(ancestorGraph.vertices, hasSize(3));
+            assertThat(ancestorGraph.vertices, containsInAnyOrder(estOfLocalization.id, localization.id,
+                                                                  biologicalProcess.id));
+            assertThat(ancestorGraph.edges, hasSize(2));
+            assertThat(ancestorGraph.edges, containsInAnyOrder(toAE(lo_IA_bp), toAE(el_IA_lo)));
+        }
+
+        @Test
+        public void noMatchingSubGraphProducesEmptyAncestorGraph() {
+            final HashSet<String> startingVertices = new HashSet<>(singletonList("GO:XXXXXX"));
+
+            AncestorGraph<String> ancestorGraph = og.subGraph(startingVertices, stopVertices, relations);
+
+            assertThat(ancestorGraph.vertices, hasSize(0));
+            assertThat(ancestorGraph.edges, hasSize(0));
+        }
+
+
+        @Test
+        public void okIfStartingNodeIsTopNode() {
+            final HashSet<String> startingVertices = new HashSet<>(singletonList(molecularFunction.id));
+
+            AncestorGraph<String> ancestorGraph = og.subGraph(startingVertices, stopVertices, relations);
+
+            assertThat(ancestorGraph.vertices, hasSize(1));
+            assertThat(ancestorGraph.vertices, containsInAnyOrder(molecularFunction.id));
+            assertThat(ancestorGraph.edges, hasSize(0));
+        }
+
+        @Test
+        public void cyclicalOntologyCanBeCalculatedWithoutEnteringInfiniteLooping() {
+            OntologyRelationship mf_OI_py = new OntologyRelationship(molecularFunction.id,
+                                                                     pyrophosphataseActivity.id, OCCURS_IN);
+            og.addRelationships(singletonList(mf_OI_py));
+            final HashSet<String> startingVertices = new HashSet<>(singletonList(pyrophosphataseActivity.id));
+
+            AncestorGraph<String> ancestorGraph = og.subGraph(startingVertices, stopVertices, relations);
+
+            assertThat(ancestorGraph.vertices, hasSize(4));
+            assertThat(ancestorGraph.vertices, containsInAnyOrder(pyrophosphataseActivity.id, cyclaseActivity.id,
+                                                                  catalyticActivity.id, molecularFunction.id));
+            assertThat(ancestorGraph.edges, hasSize(3));
+            assertThat(ancestorGraph.edges, containsInAnyOrder(toAE(py_IA_cy), toAE(cy_IA_ca), toAE(ca_IA_mf)));
+        }
+
+        @Test
+        public void findSubGraphForWhereRelationshipsCanBeCyclical() {
+            OntologyRelationship ca_OI_py = new OntologyRelationship(catalyticActivity.id,
+                                                                     pyrophosphataseActivity.id, OCCURS_IN);
+            calculateGraphForRelationship(ca_OI_py);
+        }
+
+        @Test(expected = IllegalArgumentException.class)
+        public void requestingSubGraphWithNullStartingVerticesThrowsException() {
+            og.subGraph(null, stopVertices, relations);
+
+        }
+
+        @Test(expected = IllegalArgumentException.class)
+        public void requestingSubGraphWithEmptyStartingVerticesThrowsException() {
+            og.subGraph(startingVertices, stopVertices, relations);
+
+        }
+
+        @Test(expected = IllegalArgumentException.class)
+        public void requestingSubGraphWithNullRelationsThrowsException() {
+            og.subGraph(startingVertices, stopVertices, (OntologyRelationType[]) null);
+
+        }
+
+        @Test(expected = IllegalArgumentException.class)
+        public void requestingSubGraphWithEmptyRelationsThrowsException() {
+            final OntologyRelationType[] relations = {};
+
+            og.subGraph(startingVertices, stopVertices, relations);
+
+        }
+
+        public void calculateGraphForRelationship(OntologyRelationship ontologyRelationship ) {
+            og.addRelationships(singletonList(ontologyRelationship));
+            final HashSet<String> startingVertices = new HashSet<>(singletonList(pyrophosphataseActivity.id));
+
+            AncestorGraph<String> ancestorGraph = og.subGraph(startingVertices, stopVertices, relations);
+
+            assertThat(ancestorGraph.vertices, hasSize(4));
+            assertThat(ancestorGraph.vertices, containsInAnyOrder(pyrophosphataseActivity.id, cyclaseActivity.id,
+                                                                  catalyticActivity.id, molecularFunction.id));
+            assertThat(ancestorGraph.edges, hasSize(4));
+            assertThat(ancestorGraph.edges, containsInAnyOrder(toAE(py_IA_cy), toAE(cy_IA_ca), toAE(ca_IA_mf),
+                                                               toAE(ontologyRelationship)));
+        }
+
+        private class OntologyVertex {
+            final String id;
+            final String name;
+
+            OntologyVertex(String id, String name) {
+                this.id = id;
+                this.name = name;
+            }
+        }
+
+        private AncestorEdge toAE(OntologyRelationship or){
+            return new AncestorEdge(or.child, or.relationship.getLongName(), or.parent);
         }
     }
 }

@@ -26,7 +26,7 @@ search:
         properties: {
           ip: "https://localhost",
           resourceFormat: "/ontology/eco/terms/{evidenceCode}/descendants?relations={evidenceCodeUsageRelationships}",
-          responseClass: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.OntologyDescendants",
+          responseClass: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.OntologyRelatives",
           responseConverter: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.DescendantsFilterConverter"
         }
       - signature: descendants,goId,goUsageRelationships
@@ -34,15 +34,15 @@ search:
         properties: {
           ip: "https://localhost",
           resourceFormat: "/ontology/go/terms/{goId}/descendants?relations={goUsageRelationships}",
-          responseClass: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.OntologyDescendants",
+          responseClass: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.OntologyRelatives",
           responseConverter: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.DescendantsFilterConverter"
         }
       - signature: goId,goUsageRelationships,slim
         execution: REST_COMM
         properties: {
           ip: "https://localhost",
-          resourceFormat: "/ontology/go/terms/{goId}/descendants?relations={goUsageRelationships}",
-          responseClass: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.OntologyDescendants",
+          resourceFormat: "/ontology/go/slim?ids={goId}&relations={goUsageRelationships}",
+          responseClass: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.OntologyRelatives",
           responseConverter: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.SlimmingFilterConverter"
         }
       - signature: goId,goName

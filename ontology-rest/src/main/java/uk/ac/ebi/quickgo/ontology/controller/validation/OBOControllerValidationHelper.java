@@ -19,11 +19,12 @@ public interface OBOControllerValidationHelper extends ControllerValidationHelpe
      * in CSV format, correspond to known {@link OntologyRelationType} values.
      *
      * @param relationTypesCSV a list of relation types, specified as a {@link String} in CSV format
+     * @param validTypes a list of acceptable relation types.
      * @return the {@link List} of {@link OntologyRelationType} which correspond to the original {@code
      * relationTypesCSV}
      *
      * @throws ParameterException if {@code relationTypesCSV} contains a value that does not correspond
      * to a valid {@link OntologyRelationType}
      */
-    List<OntologyRelationType> validateRelationTypes(String relationTypesCSV);
+    List<OntologyRelationType> validateRelationTypes(String relationTypesCSV, List<OntologyRelationType> validTypes);
 }
