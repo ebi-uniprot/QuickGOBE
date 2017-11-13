@@ -6,6 +6,7 @@ import uk.ac.ebi.quickgo.rest.search.query.AggregateRequest;
 
 import com.google.common.base.Preconditions;
 import java.util.Collection;
+import java.util.StringJoiner;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.joining;
@@ -27,6 +28,7 @@ public class AggregateToStringConverter implements AggregateConverter<String> {
     private static final String AGG_BLOCK_FORMAT = "{%s}";
     private static final String FACET_TYPE_FORMAT = "type" + NAME_TO_VALUE_SEPARATOR + "%s";
     private static final String FACET_FIELD_FORMAT = "field" + NAME_TO_VALUE_SEPARATOR + "%s";
+    private static final String LIMIT_FIELD_FORMAT = "limit" + NAME_TO_VALUE_SEPARATOR + "%s";
 
     @Override public String convert(AggregateRequest aggregate) {
         Preconditions.checkArgument(aggregate != null, "AggregateRequest to convert cannot be null");
@@ -63,6 +65,12 @@ public class AggregateToStringConverter implements AggregateConverter<String> {
         Preconditions.checkArgument(field != null && !field.trim().isEmpty(),
                 "Cannot create facet field declaration with null or empty input parameter");
         return String.format(FACET_FIELD_FORMAT, field);
+    }
+
+    static String createLimitField(int limit) {
+        Preconditions.checkArgument(limit > 0,
+                "Cannot create limit field declaration with input parameter <= 0");
+        return String.format(LIMIT_FIELD_FORMAT, limit);
     }
 
     /**
@@ -165,19 +173,18 @@ public class AggregateToStringConverter implements AggregateConverter<String> {
 
         Collection<AggregateFunctionRequest> fields = nestedAggregate.getAggregateFunctionRequests();
 
-        String facetBlock = "";
+        StringJoiner subFacetComponents = new StringJoiner(DECLARATION_SEPARATOR);
+        subFacetComponents.add(createFacetType(FACET_TYPE_TERM))
+                .add(createFacetField(nestedAggregate.getName()));
+        subFacetComponents.add(createLimitField(nestedAggregate.getLimit()));
 
         if (!fields.isEmpty()) {
-            facetBlock = FACET_MARKER + NAME_TO_VALUE_SEPARATOR + convert(nestedAggregate);
+            subFacetComponents.add(FACET_MARKER + NAME_TO_VALUE_SEPARATOR + convert(nestedAggregate));
         }
-
-        String subFacet = createFacetType(FACET_TYPE_TERM) + DECLARATION_SEPARATOR
-                + createFacetField(nestedAggregate.getName()) + DECLARATION_SEPARATOR
-                + facetBlock;
 
         return aggregatePrefixWithTypeTitle(nestedAggregate.getName())
                 + NAME_TO_VALUE_SEPARATOR
-                + encloseBlock(subFacet);
+                + encloseBlock(subFacetComponents.toString());
     }
 
     private static String encloseBlock(String blockContent) {

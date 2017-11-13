@@ -39,7 +39,7 @@ public class OBOControllerValidationHelperImplTest {
     @Test
     public void checkValidTraversalRelationshipTypes() {
         for (OntologyRelationType validRelationship : DEFAULT_TRAVERSAL_TYPES) {
-            validator.checkValidTraversalRelationType(validRelationship);
+            validator.checkValidTraversalRelationType(validRelationship, DEFAULT_TRAVERSAL_TYPES);
         }
     }
 
@@ -48,7 +48,7 @@ public class OBOControllerValidationHelperImplTest {
         List<ParameterException> exceptions = new ArrayList<>();
         for (OntologyRelationType relationship : OntologyRelationType.values()) {
             try {
-                validator.checkValidTraversalRelationType(relationship);
+                validator.checkValidTraversalRelationType(relationship, DEFAULT_TRAVERSAL_TYPES);
             } catch (ParameterException exception) {
                 exceptions.add(exception);
             }
@@ -59,7 +59,8 @@ public class OBOControllerValidationHelperImplTest {
     @Test
     public void checkValidationWorksFor1ValidRelation() {
         OntologyRelationType validRelation = OntologyRelationType.DEFAULT_TRAVERSAL_TYPES.get(0);
-        List<OntologyRelationType> validRelations = validator.validateRelationTypes(validRelation.getLongName());
+        List<OntologyRelationType> validRelations =
+                validator.validateRelationTypes(validRelation.getLongName(), DEFAULT_TRAVERSAL_TYPES);
         assertThat(validRelations, contains(validRelation));
     }
 
@@ -68,24 +69,25 @@ public class OBOControllerValidationHelperImplTest {
         OntologyRelationType validRelation0 = OntologyRelationType.DEFAULT_TRAVERSAL_TYPES.get(0);
         OntologyRelationType validRelation1 = OntologyRelationType.DEFAULT_TRAVERSAL_TYPES.get(1);
 
-//        List<OntologyRelationType> validRelations = validator.validateRelationTypes(
-//                relationsToCSV(validRelation0, validRelation1));
         List<OntologyRelationType> validRelations = validator.validateRelationTypes(toCSV
-                        (validRelation0.getLongName(), validRelation1.getLongName()));
+                                                                                            (validRelation0.getLongName(),
+                                                                                             validRelation1.getLongName()),
+                                                                                    DEFAULT_TRAVERSAL_TYPES);
 
         assertThat(validRelations, containsInAnyOrder(validRelation0, validRelation1));
     }
 
     @Test(expected = ParameterException.class)
     public void checkValidationWorksFor1InvalidRelation() {
-        validator.validateRelationTypes(invalidRelationships.get(0).getLongName());
+        validator.validateRelationTypes(invalidRelationships.get(0).getLongName(), DEFAULT_TRAVERSAL_TYPES);
     }
 
     @Test(expected = ParameterException.class)
     public void checkValidationWorksFor2InvalidRelations() {
         validator.validateRelationTypes(
                 toCSV(invalidRelationships.get(0).getLongName(), invalidRelationships.get(1)
-                        .getLongName()));
+                                                                                     .getLongName()),
+                DEFAULT_TRAVERSAL_TYPES);
     }
 
 }

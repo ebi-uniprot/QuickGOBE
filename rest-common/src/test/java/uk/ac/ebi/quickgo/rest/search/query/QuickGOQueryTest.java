@@ -7,6 +7,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.SELECT_ALL_WHERE_FIELD_IS_NOT_EMPTY;
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.and;
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.not;
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.or;
@@ -120,6 +121,20 @@ public class QuickGOQueryTest {
     @Test(expected = IllegalArgumentException.class)
     public void notWithNullQueryCausesException() {
         QuickGOQuery query1 = null;
-        QuickGOQuery compositeQuery = not(query1);
+        not(query1);
+    }
+
+    @Test
+    public void canCreateFieldQuery() {
+        QuickGOQuery query = QuickGOQuery.createQuery("field1", "value1");
+
+        assertThat(query, instanceOf(FieldQuery.class));
+    }
+
+    @Test
+    public void canCreateAllNotEmptyQuery() {
+        QuickGOQuery query = QuickGOQuery.createQuery("field1", SELECT_ALL_WHERE_FIELD_IS_NOT_EMPTY);
+
+        assertThat(query, instanceOf(AllNonEmptyFieldQuery.class));
     }
 }

@@ -14,13 +14,13 @@ import uk.ac.ebi.quickgo.rest.search.solr.SolrRequestRetrieval;
 import uk.ac.ebi.quickgo.rest.search.solr.SolrRetrievalConfig;
 import uk.ac.ebi.quickgo.rest.service.ServiceRetrievalConfig;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.data.solr.core.SolrTemplate;
@@ -101,7 +101,7 @@ public class SearchServiceConfig {
 
     @Bean
     public QueryRequestConverter<SolrQuery> geneProductSolrQueryRequestConverter() {
-        return new SolrQueryConverter(SOLR_GENE_PRODUCT_QUERY_REQUEST_HANDLER);
+        return SolrQueryConverter.create(SOLR_GENE_PRODUCT_QUERY_REQUEST_HANDLER);
     }
 
     @Bean

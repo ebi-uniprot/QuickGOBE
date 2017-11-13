@@ -12,13 +12,12 @@ import uk.ac.ebi.quickgo.rest.search.solr.SolrRequestRetrieval;
 import uk.ac.ebi.quickgo.rest.search.solr.SolrRetrievalConfig;
 import uk.ac.ebi.quickgo.rest.service.ServiceRetrievalConfig;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
@@ -37,7 +36,6 @@ import static uk.ac.ebi.quickgo.rest.service.ServiceRetrievalConfigHelper.extrac
 public class SearchServiceConfig {
     public static final String SOLR_ONTOLOGY_QUERY_REQUEST_HANDLER = "/search";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SearchServiceConfig.class);
     private static final String COMMA = ",";
     private static final String DEFAULT_ONTOLOGY_SEARCH_RETURN_FIELDS = "id,name,ontologyType";
 
@@ -66,9 +64,8 @@ public class SearchServiceConfig {
                 ontologyRetrievalConfig);
     }
 
-    @Bean
-    public QueryRequestConverter<SolrQuery> ontologySolrQueryRequestConverter() {
-        return new SolrQueryConverter(SOLR_ONTOLOGY_QUERY_REQUEST_HANDLER);
+    @Bean public QueryRequestConverter<SolrQuery> ontologySolrQueryRequestConverter() {
+        return SolrQueryConverter.create(SOLR_ONTOLOGY_QUERY_REQUEST_HANDLER);
     }
 
     @Bean

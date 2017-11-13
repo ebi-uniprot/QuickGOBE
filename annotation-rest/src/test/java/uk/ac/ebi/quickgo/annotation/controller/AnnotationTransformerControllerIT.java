@@ -72,7 +72,7 @@ public class AnnotationTransformerControllerIT {
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
 
     private static final String SEARCH_RESOURCE = "/annotation/search";
-    private static final String BASE_URL = "http://localhost";
+    private static final String BASE_URL = "https://localhost";
     private static final String GO_NAME_FIELD = "goName";
     private static final String TAXON_NAME_FIELD = "taxonName";
     private static final String GO_TERM_RESOURCE_FORMAT = "/ontology/go/terms/%s";
