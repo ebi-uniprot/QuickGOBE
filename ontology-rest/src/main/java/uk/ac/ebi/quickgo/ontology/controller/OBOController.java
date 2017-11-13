@@ -47,6 +47,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static org.apache.http.HttpHeaders.CONTENT_ENCODING;
 import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.DEFAULT_TRAVERSAL_TYPES;
 import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.DEFAULT_TRAVERSAL_TYPES_CSV;
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.and;
@@ -73,11 +74,13 @@ public abstract class OBOController<T extends OBOTerm> {
     static final String PATHS_SUB_RESOURCE = "paths";
     static final String CHART_SUB_RESOURCE = "chart";
     static final String CHART_COORDINATES_SUB_RESOURCE = CHART_SUB_RESOURCE + "/coords";
+    static final String BASE_64_CONTENT_ENCODING = "base64";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OBOController.class);
     private static final String COLON = ":";
     private static final String DEFAULT_ENTRIES_PER_PAGE = "25";
     private static final String DEFAULT_PAGE_NUMBER = "1";
+    private static final String PNG = "png";
 
     final OntologyService<T> ontologyService;
     final OBOControllerValidationHelper validationHelper;
@@ -407,9 +410,11 @@ public abstract class OBOController<T extends OBOTerm> {
     @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + CHART_SUB_RESOURCE, method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.IMAGE_PNG_VALUE})
     public ResponseEntity<InputStreamResource> getChart(
-            @ApiParam(value = "Comma-separated term IDs", required = true) @PathVariable(value = "ids") String ids) {
+            @ApiParam(value = "Comma-separated term IDs", required = true) @PathVariable(value = "ids") String ids,
+            @ApiParam(value = "Whether or not to encode the image as base64", defaultValue = "false")
+            @RequestParam(value = "base64", defaultValue = "false", required = false) boolean base64) {
         try {
-            return createChartResponseEntity(validationHelper.validateCSVIds(ids));
+            return createChartResponseEntity(validationHelper.validateCSVIds(ids), base64);
         } catch (IOException | RenderingGraphException e) {
             throw createChartGraphicsException(e);
         }
@@ -523,11 +528,12 @@ public abstract class OBOController<T extends OBOTerm> {
      * of {@code ids} and returns the appropriate {@link ResponseEntity}.
      *
      * @param ids the terms whose corresponding graphical image is required
+     * @param base64 whether or not to encode the image as base64
      * @return the image corresponding to the specified terms
      * @throws IOException if there is an error during creation of the image {@link InputStreamResource}
      * @throws RenderingGraphException if there was an error during the rendering of the image
      */
-    private ResponseEntity<InputStreamResource> createChartResponseEntity(List<String> ids)
+    private ResponseEntity<InputStreamResource> createChartResponseEntity(List<String> ids, boolean base64)
             throws IOException, RenderingGraphException {
         RenderedImage renderedImage =
                 graphImageService
@@ -535,16 +541,24 @@ public abstract class OBOController<T extends OBOTerm> {
                         .getGraphImage()
                         .render();
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        ImageIO.write(renderedImage, "png", Base64.getMimeEncoder().wrap(os));
 
-        InputStream is = new ByteArrayInputStream(os.toByteArray());
+        ResponseEntity.BodyBuilder bodyBuilder;
+        if (base64) {
+            ImageIO.write(renderedImage, PNG, Base64.getMimeEncoder().wrap(os));
+            bodyBuilder = buildChartResponseBodyBuilder(os).header(CONTENT_ENCODING, BASE_64_CONTENT_ENCODING);
+        } else {
+            ImageIO.write(renderedImage, PNG, os);
+            bodyBuilder = buildChartResponseBodyBuilder(os);
+        }
 
+        return bodyBuilder.body(new InputStreamResource(new ByteArrayInputStream(os.toByteArray())));
+    }
+
+    private ResponseEntity.BodyBuilder buildChartResponseBodyBuilder(ByteArrayOutputStream os) {
         return ResponseEntity
                 .ok()
-                .contentLength(os.size())
                 .contentType(MediaType.IMAGE_PNG)
-                .header("Content-Encoding", "base64")
-                .body(new InputStreamResource(is));
+                .contentLength(os.size());
     }
 
     private QueryRequest buildRequest(String query,
