@@ -99,7 +99,7 @@ class DownloadResponseVerifier {
     }
 
     static class TSVAllFieldsMatcher extends TypeSafeMatcher<String> {
-        private static final int DEFAULT_NOT_SLIMMED_FIELD_COUNT = 15;
+        private static final int DEFAULT_NOT_SLIMMED_FIELD_COUNT = 14;
         private static final String TYPE = "TSV";
         private static final List<Integer> MANDATORY_INDICES = asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
 

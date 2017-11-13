@@ -37,8 +37,7 @@ public class TSVHeaderCreatorTest {
     private static final String DEFAULT_HEADER_STRING =
             GENE_PRODUCT_DB + "\t" + GENE_PRODUCT_ID + "\t" + SYMBOL + "\t" + QUALIFIER + "\t" + GO_TERM + "\t" +
                     GO_ASPECT + "\t" + ECO_ID + "\t" + GO_EVIDENCE_CODE + "\t" + REFERENCE + "\t" + WITH_FROM + "\t" +
-                    TAXON_ID + "\t" + ASSIGNED_BY + "\t" + ANNOTATION_EXTENSION + "\t" + DATE + "\t" +
-                    GENE_PRODUCT_TYPE + "\n";
+                    TAXON_ID + "\t" + ASSIGNED_BY + "\t" + ANNOTATION_EXTENSION + "\t" + DATE + "\n";
 
     static {
         initialiseFieldColumns();

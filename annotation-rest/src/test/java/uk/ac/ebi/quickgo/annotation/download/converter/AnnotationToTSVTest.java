@@ -77,7 +77,6 @@ public class AnnotationToTSVTest {
         assertThat(elements[DefaultColumns.COL_ASSIGNED_BY], equalTo(DB));
         assertThat(elements[DefaultColumns.COL_ANNOTATION_EXTENSION], is(EXTENSIONS_AS_STRING));
         assertThat(elements[DefaultColumns.COL_DATE], equalTo(DATE_AS_STRING));
-        assertThat(elements[DefaultColumns.COL_DB_OBJECT_TYPE], is(TYPE));
     }
 
     @Test
@@ -99,7 +98,6 @@ public class AnnotationToTSVTest {
         assertThat(elements[DefaultColumnsWithSlimming.COL_TAXON], is(Integer.toString(TAXON_ID)));
         assertThat(elements[DefaultColumnsWithSlimming.COL_ASSIGNED_BY], equalTo(DB));
         assertThat(elements[DefaultColumnsWithSlimming.COL_ANNOTATION_EXTENSION], is(EXTENSIONS_AS_STRING));
-        assertThat(elements[DefaultColumnsWithSlimming.COL_DB_OBJECT_TYPE], is(TYPE));
         assertThat(elements[DefaultColumnsWithSlimming.COL_DATE], equalTo(DATE_AS_STRING));
     }
 
@@ -320,7 +318,6 @@ public class AnnotationToTSVTest {
         private static final int COL_QUALIFIER = 3;
         private static final int COL_GO_ID = 4;
         private static final int COL_GO_ASPECT = 5;
-//        private static final int COL_NAME = ;
         private static final int COL_ECO_ID = 6;
         private static final int COL_GO_EVIDENCE = 7;
         private static final int COL_REFERENCE = 8;
@@ -329,10 +326,6 @@ public class AnnotationToTSVTest {
         private static final int COL_ASSIGNED_BY = 11;
         private static final int COL_ANNOTATION_EXTENSION = 12;
         private static final int COL_DATE = 13;
-//        private static final int COL_TAXON_NAME = ;
-//        private static final int COL_DB_OBJECT_NAME =  ;
-//        private static final int COL_DB_OBJECT_SYNONYM = ;
-        private static final int COL_DB_OBJECT_TYPE = 14;
     }
 
     private class DefaultColumnsWithSlimming{
@@ -343,7 +336,6 @@ public class AnnotationToTSVTest {
         private static final int COL_GO_ID = 4;
         private static final int COL_SLIMMED_FROM = 5;
         private static final int COL_GO_ASPECT = 6;
-//        private static final int COL_NAME = ;
         private static final int COL_ECO_ID = 7;
         private static final int COL_GO_EVIDENCE = 8;
         private static final int COL_REFERENCE = 9;
@@ -352,9 +344,5 @@ public class AnnotationToTSVTest {
         private static final int COL_ASSIGNED_BY = 12;
         private static final int COL_ANNOTATION_EXTENSION = 13;
         private static final int COL_DATE = 14;
-//        private static final int COL_TAXON_NAME = ;
-//        private static final int COL_DB_OBJECT_NAME = ;
-//        private static final int COL_DB_OBJECT_SYNONYM = ;
-        private static final int COL_DB_OBJECT_TYPE = 15;
     }
 }

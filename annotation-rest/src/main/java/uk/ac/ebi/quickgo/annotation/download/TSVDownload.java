@@ -38,8 +38,7 @@ public class TSVDownload {
                                                                       GO_EVIDENCE_CODE_FIELD_NAME,
                                                                       REFERENCE_FIELD_NAME, WITH_FROM_FIELD_NAME,
                                                                       TAXON_ID_FIELD_NAME, ASSIGNED_BY_FIELD_NAME,
-                                                                      ANNOTATION_EXTENSION_FIELD_NAME, DATE_FIELD_NAME,
-                                                                      GENE_PRODUCT_TYPE_FIELD_NAME);
+                                                                      ANNOTATION_EXTENSION_FIELD_NAME, DATE_FIELD_NAME);
 
     public static List<String> whichColumnsWillWeShow(List<String> selectedFields) {
         return selectedFields.isEmpty() ? DEFAULT_FIELD_LIST : selectedFields;
