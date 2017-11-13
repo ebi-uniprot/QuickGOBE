@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter;
 
-import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.SlimResultsTransformer;
+import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.annotation.SlimResultsTransformer;
 
 import com.google.common.base.Preconditions;
 import java.util.*;

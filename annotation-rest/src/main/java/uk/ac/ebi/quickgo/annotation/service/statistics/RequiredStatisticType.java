@@ -31,7 +31,7 @@ public class RequiredStatisticType {
                 "RequiredStatisticType name cannot be null or empty");
 
         this.name = name;
-        
+
         if (limit <= 0) {
             LOGGER.warn("Attempt to set RequiredStatisticType limit to {}. Value must be greater than 0.", limit);
             this.limit = DEFAULT_LIMIT;
@@ -49,9 +49,7 @@ public class RequiredStatisticType {
     }
 
     @Override public int hashCode() {
-        int result = name != null ? name.hashCode() : 0;
-        result = 31 * result + limit;
-        return result;
+        return name != null ? name.hashCode() : 0;
     }
 
     @Override

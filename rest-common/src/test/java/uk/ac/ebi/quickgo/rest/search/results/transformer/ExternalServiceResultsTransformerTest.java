@@ -5,11 +5,12 @@ import uk.ac.ebi.quickgo.rest.search.RetrievalException;
 import uk.ac.ebi.quickgo.rest.search.request.converter.RESTFilterConverterFactory;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -50,26 +51,33 @@ public class ExternalServiceResultsTransformerTest {
     @Mock
     private FakeValueInjector mockTaxonNameInjector;
 
-    private ExternalServiceResultsTransformer<FakeResponseModel> resultsTransformer;
+    private ExternalServiceResultsTransformer<QueryResult<FakeResponseModel>,FakeResponseModel> resultsTransformer;
+
+    private ValueMutator<QueryResult<FakeResponseModel>,FakeResponseModel> resultMutator;
 
     @Before
     public void setUp() {
         when(mockGoNameInjector.getId()).thenReturn(GO_NAME_REQUEST);
         when(mockTaxonNameInjector.getId()).thenReturn(TAXON_NAME_REQUEST);
 
+        resultMutator = new
+                ValueInjectionToQueryResults<>(mockRestFetcher);
+
         resultsTransformer =
-                new ExternalServiceResultsTransformer<>(mockRestFetcher, asList(mockGoNameInjector,
-                        mockTaxonNameInjector));
+                new ExternalServiceResultsTransformer<>(asList(mockGoNameInjector,
+                                                               mockTaxonNameInjector), resultMutator);
+
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void nullRESTFilterConverterFactoryCausesException() {
-        new ExternalServiceResultsTransformer<>(null, Collections.emptyList());
+    public void nullResultMutatorCausesException() {
+        new ExternalServiceResultsTransformer<>(Collections.emptyList(), null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void nullFieldInjectorsCausesException() {
-        new ExternalServiceResultsTransformer<>(mockRestFetcher, null);
+        new ExternalServiceResultsTransformer<>(null,
+                                                resultMutator);
     }
 
     @Test
@@ -127,11 +135,9 @@ public class ExternalServiceResultsTransformerTest {
 
     // -------------------- helpers --------------------
     private List<FakeResponseModel> createMockedAnnotationList(int docCount) {
-        List<FakeResponseModel> annotations = new ArrayList<>();
-        for (int i = 0; i < docCount; i++) {
-            annotations.add(new FakeResponseModel());
-        }
-        return annotations;
+        return IntStream.range(0, docCount)
+                .mapToObj(i -> new FakeResponseModel())
+                .collect(Collectors.toList());
     }
 
     private <T> void setValues(List<T> items, BiConsumer<Integer, T> consumer) {
@@ -170,6 +176,5 @@ public class ExternalServiceResultsTransformerTest {
         String goId;
         String goName;
         int taxonId;
-        String taxonName;
     }
 }

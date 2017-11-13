@@ -5,12 +5,13 @@ import uk.ac.ebi.quickgo.annotation.common.AnnotationRepoConfig;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.geneproduct.transformer.GeneProductNameInjector;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.geneproduct.transformer.GeneProductSynonymsInjector;
-import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.OntologyNameInjector;
-import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.SlimResultsTransformer;
-import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.TaxonomyNameInjector;
+import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.annotation.OntologyNameInjector;
+import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.annotation.SlimResultsTransformer;
+import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.annotation.TaxonomyNameInjector;
 import uk.ac.ebi.quickgo.annotation.service.converter.AnnotationDocConverterImpl;
 import uk.ac.ebi.quickgo.common.SearchableField;
 import uk.ac.ebi.quickgo.common.loader.DbXRefLoader;
+import uk.ac.ebi.quickgo.rest.model.CompletableValue;
 import uk.ac.ebi.quickgo.common.validator.DbXRefEntityValidation;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelper;
 import uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl;
@@ -21,16 +22,13 @@ import uk.ac.ebi.quickgo.rest.search.query.SortCriterion;
 import uk.ac.ebi.quickgo.rest.search.request.converter.RESTFilterConverterFactory;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 import uk.ac.ebi.quickgo.rest.search.results.config.FieldNameTransformer;
-import uk.ac.ebi.quickgo.rest.search.results.transformer.ExternalServiceResultsTransformer;
-import uk.ac.ebi.quickgo.rest.search.results.transformer.ResponseValueInjector;
-import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformerChain;
+import uk.ac.ebi.quickgo.rest.search.results.transformer.*;
 import uk.ac.ebi.quickgo.rest.search.solr.SolrQueryConverter;
 import uk.ac.ebi.quickgo.rest.search.solr.SolrRequestRetrieval;
 import uk.ac.ebi.quickgo.rest.search.solr.SolrRetrievalConfig;
 import uk.ac.ebi.quickgo.rest.search.solr.UnsortedSolrQuerySerializer;
 import uk.ac.ebi.quickgo.rest.service.ServiceRetrievalConfig;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -39,12 +37,12 @@ import java.util.stream.Stream;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.data.solr.core.SolrTemplate;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 
 /**
  * Spring Configuration facilitating Annotation search functionality.
@@ -60,7 +58,7 @@ import static java.util.Arrays.asList;
 @PropertySource("classpath:search.properties")
 public class SearchServiceConfig {
 
-    public static final int MAX_PAGE_RESULTS = 100;
+    private static final int MAX_PAGE_RESULTS = 100;
 
     private static final boolean DEFAULT_XREF_VALIDATION_IS_CASE_SENSITIVE = true;
     private static final String COMMA = ",";
@@ -189,8 +187,8 @@ public class SearchServiceConfig {
 
     @Bean
     public ResultTransformerChain<QueryResult<Annotation>> resultTransformerChain(
-            ExternalServiceResultsTransformer<Annotation> ontologyResultsTransformer,
-            ExternalServiceResultsTransformer<Annotation> geneProductResultsTransformer) {
+            ExternalServiceResultsTransformer<QueryResult<Annotation>,Annotation> ontologyResultsTransformer,
+            ExternalServiceResultsTransformer<QueryResult<Annotation>,Annotation> geneProductResultsTransformer) {
         ResultTransformerChain<QueryResult<Annotation>> transformerChain = new ResultTransformerChain<>();
         transformerChain.addTransformer(new SlimResultsTransformer());
         transformerChain.addTransformer(ontologyResultsTransformer);
@@ -199,21 +197,26 @@ public class SearchServiceConfig {
     }
 
     @Bean
-    public ExternalServiceResultsTransformer<Annotation> ontologyResultsTransformer(RESTFilterConverterFactory
-    restFilterConverterFactory) {
+    public ExternalServiceResultsTransformer<QueryResult<Annotation>,Annotation> ontologyResultsTransformer
+            (RESTFilterConverterFactory converterFactory) {
         List<ResponseValueInjector<Annotation>> responseValueInjectors = asList(
                 new OntologyNameInjector(),
                 new TaxonomyNameInjector());
-        return new ExternalServiceResultsTransformer<>(restFilterConverterFactory, responseValueInjectors);
+        return new ExternalServiceResultsTransformer<>(responseValueInjectors,queryResultMutator(converterFactory));
     }
 
     @Bean
-    public ExternalServiceResultsTransformer<Annotation> geneProductResultsTransformer(RESTFilterConverterFactory
-            restFilterConverterFactory) {
+    public ExternalServiceResultsTransformer<QueryResult<Annotation>,Annotation> geneProductResultsTransformer
+            (RESTFilterConverterFactory converterFactory) {
         List<ResponseValueInjector<Annotation>> responseValueInjectors = asList(
                 new GeneProductNameInjector(),
                 new GeneProductSynonymsInjector());
-        return new ExternalServiceResultsTransformer<>(restFilterConverterFactory, responseValueInjectors);
+        return new ExternalServiceResultsTransformer<>(responseValueInjectors, queryResultMutator(converterFactory));
+    }
+
+    private ValueInjectionToQueryResults<Annotation> queryResultMutator(
+            RESTFilterConverterFactory converterFactory) {
+        return new ValueInjectionToQueryResults<>(converterFactory);
     }
 
     @Bean
@@ -243,5 +246,39 @@ public class SearchServiceConfig {
     public interface AnnotationCompositeRetrievalConfig extends SolrRetrievalConfig, ServiceRetrievalConfig {
         List<SortCriterion> getDownloadSortCriteria();
         int getDownloadPageSize();
+    }
+
+    @Bean
+    public ResultTransformerChain<CompletableValue> completableValueResultTransformerChain(
+            ExternalServiceResultsTransformer<CompletableValue,CompletableValue> completableValueOntologyNameTransformer,
+            ExternalServiceResultsTransformer<CompletableValue,CompletableValue> completableValueTaxonNameTransformer) {
+        ResultTransformerChain<CompletableValue> transformerChain = new ResultTransformerChain<>();
+        transformerChain.addTransformer(completableValueOntologyNameTransformer);
+        transformerChain.addTransformer(completableValueTaxonNameTransformer);
+        return transformerChain;
+    }
+
+    @Bean
+    public ExternalServiceResultsTransformer<CompletableValue,CompletableValue> completableValueOntologyNameTransformer
+            (RESTFilterConverterFactory converterFactory) {
+        List<ResponseValueInjector<CompletableValue>> responseValueInjectors =
+                singletonList(new uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer
+                        .completablevalue.OntologyNameInjector());
+        return new ExternalServiceResultsTransformer<>(responseValueInjectors, completableValueResultMutator(converterFactory));
+    }
+
+    @Bean
+    public ExternalServiceResultsTransformer<CompletableValue,CompletableValue> completableValueTaxonNameTransformer
+            (RESTFilterConverterFactory converterFactory) {
+        List<ResponseValueInjector<CompletableValue>> responseValueInjectors = singletonList(
+                new uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.completablevalue
+                        .TaxonomyNameInjector());
+        return new ExternalServiceResultsTransformer<>(responseValueInjectors, completableValueResultMutator(converterFactory));
+    }
+
+    @Bean
+    public ValueInjectionToSingleResult<CompletableValue> completableValueResultMutator(
+            RESTFilterConverterFactory converterFactory) {
+        return new ValueInjectionToSingleResult<>(converterFactory);
     }
 }

@@ -1,4 +1,4 @@
-package uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer;
+package uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.annotation;
 
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.BasicTaxonomyNode;
@@ -17,7 +17,7 @@ public class TaxonomyNameInjector extends AbstractValueInjector<BasicTaxonomyNod
 
     static final String TAXON_NAME = "taxonName";
     static final String TAXON_ID = "taxonId";
-    
+
     @Override
     public String getId() {
         return TAXON_NAME;

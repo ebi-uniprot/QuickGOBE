@@ -25,21 +25,21 @@ public class AnnotationDocMocker {
 
     public static final String GO_ID = "GO:0003824";
     public static final String ECO_ID = "ECO:0000256";
-    public static final String QUALIFIER = "enables";
-    public static final String GO_EVIDENCE = "IEA";
+    private static final String QUALIFIER = "enables";
+    private static final String GO_EVIDENCE = "IEA";
     public static final String REFERENCE = "GO_REF:0000002";
-    public static final List<String> WITH_FROM = asList("InterPro:IPR015421", "InterPro:IPR015422");
-    public static final int INTERACTING_TAXON_ID = 35758;
-    public static final String ASSIGNED_BY = "InterPro";
-    public static final String SYMBOL = "moeA5";
-    public static final String OBJECT_TYPE = "protein";
-    public static final int TAXON_ID = 12345;
-    public static final List<Integer> TAXON_ANCESTORS = asList(12345, 1234, 123, 12, 1);
+    private static final List<String> WITH_FROM = asList("InterPro:IPR015421", "InterPro:IPR015422");
+    private static final int INTERACTING_TAXON_ID = 35758;
+    private static final String ASSIGNED_BY = "InterPro";
+    private static final String SYMBOL = "moeA5";
+    private static final String OBJECT_TYPE = "protein";
+    private static final int TAXON_ID = 12345;
+    private static final List<Integer> TAXON_ANCESTORS = asList(12345, 1234, 123, 12, 1);
 
-    public static final List<String> TARGET_SET = asList("KRUK", "BHF-UCL", "Exosome");
-    public static final String GP_SUBSET = "TrEMBL";
+    private static final List<String> TARGET_SET = asList("KRUK", "BHF-UCL", "Exosome");
+    private static final String GP_SUBSET = "TrEMBL";
     public static final String GO_ASPECT = "cellular_component";
-    public static final Date DATE = Date.from(
+    private static final Date DATE = Date.from(
             LocalDate.of(1869, 10, 2).atStartOfDay(ZoneId.systemDefault()).toInstant());
 
     public static final String EXTENSION_DB1 = "NCBI_gi";
@@ -51,14 +51,14 @@ public class AnnotationDocMocker {
     public static final String EXTENSION_ID3 = "000-6000";
     public static final String EXTENSION_ID4 = "QWE_90hy";
     public static final String EXTENSION_RELATIONSHIP1 = "results_in_development_of";
-    public static final String EXTENSION_RELATIONSHIP2 = "acts_on_population_of";
-    public static final String EXTENSION_RELATIONSHIP3 = "indicative_of";
-    public static final String EXTENSION_RELATIONSHIP4 = "happy_about";
+    private static final String EXTENSION_RELATIONSHIP2 = "acts_on_population_of";
+    private static final String EXTENSION_RELATIONSHIP3 = "indicative_of";
+    private static final String EXTENSION_RELATIONSHIP4 = "happy_about";
 
     public static final String EXTENSION_1 = asExtension(EXTENSION_RELATIONSHIP1, EXTENSION_DB1, EXTENSION_ID1);
     public static final String EXTENSION_2 = asExtension(EXTENSION_RELATIONSHIP2, EXTENSION_DB2, EXTENSION_ID2);
     public static final String EXTENSION_3 = asExtension(EXTENSION_RELATIONSHIP3, EXTENSION_DB3, EXTENSION_ID3);
-    public static final String EXTENSION_4 = asExtension(EXTENSION_RELATIONSHIP4, EXTENSION_DB4, EXTENSION_ID4);
+    private static final String EXTENSION_4 = asExtension(EXTENSION_RELATIONSHIP4, EXTENSION_DB4, EXTENSION_ID4);
     public static final List<String> EXTENSIONS = asList(String.format("%s,%s", EXTENSION_1, EXTENSION_2), String
             .format("%s,%s",EXTENSION_3, EXTENSION_4));
 
@@ -122,6 +122,37 @@ public class AnnotationDocMocker {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Create a list of {@link AnnotationDocument} where the GO id is not constant but varies.
+     * @param number the square of which will be the number of documents created. The number of docs created will be
+     * number (each with same GO id) * number.
+     * @return list of annotation documents generated.
+     */
+    public static List<AnnotationDocument> createGenericDocsChangingGoId(int number) {
+
+        return IntStream.range(0, number)
+                        .mapToObj(i -> createGenericDocs(number, createUniProtGPID(i)))
+                        .flatMap(List::stream)
+                        .collect(Collectors.toList());
+    }
+
+    /**
+     * Create a list of {@link AnnotationDocument} for the supplied gene product id, and generating a GO id based on
+     * the number of documents to create.
+     * @param number of documents to create
+     * @param gpId a gene product id
+     * @return list of annotation documents generated.
+     */
+    public static List<AnnotationDocument> createGenericDocs(int number, String gpId) {
+        return IntStream.range(0, number)
+                        .mapToObj(i -> {
+                            AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc(gpId);
+                            doc.goId = createGOID(i);
+                            return doc;
+                        })
+                        .collect(Collectors.toList());
+    }
+
     public static List<AnnotationDocument> createGenericDocs(int n, Supplier<String> gpIdCreator) {
         return IntStream.range(0, n)
                 .mapToObj(i -> AnnotationDocMocker.createAnnotationDoc(gpIdCreator.get()))
@@ -129,11 +160,20 @@ public class AnnotationDocMocker {
     }
 
 
-    public static String createGPId(int idNum) {
+    private static String createGPId(int idNum) {
         return String.format("A0A%03d", idNum);
     }
 
     public static String createUniProtGPID(int idNum) {
         return String.format("UniProtKB:A0A%03d", idNum);
+    }
+
+    /**
+     * Generate a GO id.
+     * @param idNum the number to be formatted as a GO id
+     * @return GO id
+     */
+    private static String createGOID(int idNum) {
+        return String.format("GO:%07d", idNum);
     }
 }

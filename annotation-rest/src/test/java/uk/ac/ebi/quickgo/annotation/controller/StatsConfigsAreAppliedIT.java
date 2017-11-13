@@ -61,7 +61,7 @@ public class StatsConfigsAreAppliedIT {
     private static final int SAVED_DOC_COUNT = 50;
     private static final int DEFAULT_STATS_TYPE_COUNT = 10;
     private static final String STATS_VALUES_JSON_PATH_FORMAT =
-            "$.results[?(@.groupName == %s)].types[?(@.type == %s)].values[*].key";
+            "$.results[?(@.groupName == '%s')].types[?(@.type == '%s')].values[*].key";
     private static final String STATS_ENDPOINT = "/annotation/stats";
     private static final String ANNOTATION = "annotation";
     private static final String GENE_PRODUCT = "geneProduct";
@@ -138,7 +138,7 @@ public class StatsConfigsAreAppliedIT {
     /**
      * Creates a list of {@link AnnotationDocument}s and applies a transformation to each document
      * according to their index in this document list.
-     * 
+     *
      * @param docTransformer the document transformation function
      * @return a list of {@link AnnotationDocument}s
      */

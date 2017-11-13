@@ -23,18 +23,18 @@ import static uk.ac.ebi.quickgo.annotation.service.statistics.RequiredStatisticT
  */
 @ActiveProfiles("stats-type-limit-properties-test")
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = StatisticsTypeReadPropertiesIT.FakeApplication.class)
-public class StatisticsTypeReadPropertiesIT {
+@SpringApplicationConfiguration(classes = StatisticsDownloadTypeReadPropertiesIT.FakeApplication.class)
+public class StatisticsDownloadTypeReadPropertiesIT {
     private static final String GO_ID = "goId";
     private static final String TAXON_ID = "taxonId";
 
     @Autowired
-    private RequiredStatistics requiredStatisticsForStandardUsage;
+    private RequiredStatistics requiredStatisticsForDownloadUsage;
     private List<RequiredStatistic> statistics;
 
     @Before
     public void setUp() {
-        statistics = requiredStatisticsForStandardUsage.getStats();
+        statistics = requiredStatisticsForDownloadUsage.getStats();
     }
 
     @Test
@@ -44,11 +44,11 @@ public class StatisticsTypeReadPropertiesIT {
                 switch (type.getName()) {
                     case GO_ID:
                         // value read from yml
-                        assertThat(type.getLimit(), is(18));
+                        assertThat(type.getLimit(), is(500));
                         break;
                     case TAXON_ID:
                         // value read from yml
-                        assertThat(type.getLimit(), is(11));
+                        assertThat(type.getLimit(), is(50));
                         break;
                     default:
                         assertThat(type.getLimit(), is(DEFAULT_LIMIT));

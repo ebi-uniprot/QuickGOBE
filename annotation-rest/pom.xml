@@ -2,6 +2,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+     <properties>
+         <apache.poi.version>3.17</apache.poi.version>
+    </properties>
+
     <parent>
         <artifactId>quickgo-parent</artifactId>
         <groupId>uk.ac.ebi.quickgo</groupId>
@@ -48,6 +52,13 @@
         <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger-ui</artifactId>
+        </dependency>
+
+        <!-- Conversion into Microsoft Office formats -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>${apache.poi.version}</version>
         </dependency>
 
         <!--Test dependencies-->

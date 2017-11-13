@@ -97,8 +97,11 @@ spring:
    profiles: stats-type-limit-properties-test
 annotation:
   stats:
-    typeLimits:
+    typeLimitsForStandardUsage:
       goId: 18
       taxonId: 11
       typeDoesNotExist: 12
-
+    typeLimitsForDownloadUsage:
+      goId: 500
+      taxonId: 50
+      typeDoesNotExist: 5

@@ -26,7 +26,7 @@ import static org.mockito.Mockito.verify;
 @RunWith(MockitoJUnitRunner.class)
 public class HttpMessageConverterTest {
     @Mock
-    private DispatchWriter mockDispatchWriter;
+    private OutputStreamWriter mockDispatchWriter;
 
     @Mock
     private HttpOutputMessage mockHttpOutputMessage;
