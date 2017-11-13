@@ -11,6 +11,7 @@ import uk.ac.ebi.quickgo.model.ontology.generic.RelationType;
 import java.util.*;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static java.util.stream.Collectors.joining;
 
 /**
  * Created 26/09/16
@@ -24,6 +25,7 @@ public class GraphImageServiceImpl implements GraphImageService {
     private static final EnumSet<RelationType> GO_RELATIONS_SET = EnumSet.of(RelationType.ISA, RelationType.PARTOF,
             RelationType.REGULATES, RelationType.POSITIVEREGULATES, RelationType.NEGATIVEREGULATES,
             RelationType.OCCURSIN, RelationType.CAPABLEOF, RelationType.CAPABLEOFPARTOF);
+    private static final int TERM_DISPLAY_THRESHOLD = 6;
     private final OntologyGraphicsSourceLoader sourceLoader;
 
     public GraphImageServiceImpl(OntologyGraphicsSourceLoader ontologyGraphicsSourceLoader) {
@@ -43,9 +45,9 @@ public class GraphImageServiceImpl implements GraphImageService {
             int idsSize = ids.size();
             if (idsSize == 1) {
                 description = "Ancestor chart for " + ids.get(0);
-            } else {
-                description = "Comparison chart for " + String.valueOf(idsSize);
-            }
+            } else if( idsSize < TERM_DISPLAY_THRESHOLD) {
+                description = "Comparison chart for " + ids.stream().collect(joining(","));
+            } else description = "Comparison chart for " + String.valueOf(idsSize) + " terms";
 
             return new GraphImageResult(
                     description,
