@@ -190,11 +190,6 @@ public class AnnotationController {
         this.completableValueTransformerChain = completableValueResultTransformerChain;
     }
 
-    private static String formattedDateStringForNow() {
-        LocalDateTime now = LocalDateTime.now();
-        return now.format(DOWNLOAD_FILE_NAME_DATE_FORMATTER);
-    }
-
     /**
      * Search for an Annotations based on their attributes
      * @return a {@link QueryResult} instance containing the results of the search
@@ -222,6 +217,127 @@ public class AnnotationController {
 
         return searchAndTransform(queryRequest, annotationSearchService, resultTransformerChain,
                 filterQueryInfo.getFilterContext());
+    }
+
+    /**
+     * Return statistics based on the search result.
+     *
+     * The statistics are subdivided into two areas, each with
+     * @return a {@link QueryResult} instance containing the results of the search
+     */
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Statistics have been calculated for the annotation result set " +
+                    "obtained from the application of the filter parameters"),
+            @ApiResponse(code = 500, message = "Internal server error occurred whilst producing statistics",
+                    response = ResponseExceptionHandler.ErrorInfo.class),
+            @ApiResponse(code = 400, message = "Bad request due to a validation issue encountered in one of the " +
+                    "filters", response = ResponseExceptionHandler.ErrorInfo.class)})
+    @ApiOperation(value = "Generate statistics for the annotation result set obtained from applying the filters.",
+            hidden = true)
+    @RequestMapping(value = "/stats", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<QueryResult<StatisticsGroup>> annotationStats(
+            @Valid @ModelAttribute AnnotationRequest request, BindingResult bindingResult) {
+        checkBindingErrors(bindingResult);
+
+        QueryResult<StatisticsGroup> stats = statsService.calculateForStandardUsage(request);
+        return new ResponseEntity<>(stats, HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "Download all annotations that match the supplied filter criteria.",
+            response = File.class)
+    @RequestMapping(value = "/downloadSearch",
+            method = {RequestMethod.GET},
+            produces = {GPAD_MEDIA_TYPE_STRING, GAF_MEDIA_TYPE_STRING, TSV_MEDIA_TYPE_STRING})
+    public ResponseEntity<ResponseBodyEmitter> downloadLookup(
+            @Valid @ModelAttribute AnnotationRequest request,
+            BindingResult bindingResult,
+            @RequestHeader(ACCEPT) MediaType mediaTypeAcceptHeader,
+            HttpServletRequest servletRequest) {
+        LOGGER.info("Download Request:: " + request + ", " + mediaTypeAcceptHeader);
+
+        checkBindingErrors(bindingResult);
+        FilterQueryInfo filterQueryInfo = extractFilterQueryInfo(request);
+
+        final int pageLimit = request.getDownloadLimit() < this.annotationRetrievalConfig.getDownloadPageSize() ?
+                request.getDownloadLimit() : this.annotationRetrievalConfig.getDownloadPageSize();
+        QueryRequest queryRequest = downloadQueryTemplate.newBuilder()
+                .setQuery(QuickGOQuery.createAllQuery())
+                .addFilters(filterQueryInfo.getFilterQueries())
+                .setPage(createFirstCursorPage(pageLimit))
+                .build();
+
+        ResponseBodyEmitter emitter = new ResponseBodyEmitter();
+
+        HeaderCreator headerCreator = headerCreatorFactory.provide(mediaTypeAcceptHeader.getSubtype());
+        final List<String> selectedFields = selectedFieldList(request);
+        HeaderContent headerContent = buildHeaderContent(servletRequest, selectedFields);
+        headerCreator.write(emitter, headerContent);
+
+        taskExecutor.execute(() -> {
+            final Stream<QueryResult<Annotation>> annotationResultStream =
+                    getQueryResultStream(request, filterQueryInfo, queryRequest);
+            DownloadContent downloadContent = new DownloadContent(annotationResultStream, selectedFields);
+            emitDownloadWithMediaType(emitter, downloadContent, mediaTypeAcceptHeader);
+        });
+
+        return ResponseEntity
+                .ok()
+                .headers(createHttpDownloadHeader(mediaTypeAcceptHeader, TO_DOWNLOAD_FILENAME))
+                .body(emitter);
+    }
+
+    /**
+     * Get meta data information about the Annotation service
+     *
+     * @return response with metadata information.
+     */
+    @ApiOperation(value = "Get meta-data information about the annotation service",
+            response = About.class,
+            notes = "Provides the date the annotation information was created.")
+    @RequestMapping(value = "/about", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<MetaData> provideMetaData() {
+        return new ResponseEntity<>(metaDataProvider.lookupMetaData(), HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "Download statistics for all annotations that match the supplied filter criteria.",
+            response = File.class)
+    @RequestMapping(value = "/downloadStats", method = {RequestMethod.GET},
+            produces = {EXCEL_MEDIA_TYPE_STRING, JSON_MEDIA_TYPE_STRING})
+    public ResponseEntity<ResponseBodyEmitter> downloadStats(@Valid @ModelAttribute AnnotationRequest request,
+            BindingResult bindingResult, @RequestHeader(ACCEPT) MediaType mediaTypeAcceptHeader) throws IOException {
+        checkBindingErrors(bindingResult);
+        ResponseBodyEmitter emitter = new ResponseBodyEmitter();
+
+        taskExecutor.execute(() -> {
+            QueryResult<StatisticsGroup> stats = statsService.calculateForDownloadUsage(request);
+            addNamesToStatisticsValues(stats, createFilterContextForName(GO_NAME), OntologyNameInjector.GO_ID);
+            addNamesToStatisticsValues(stats, createFilterContextForName(TAXON_NAME), TaxonomyNameInjector.TAXON_ID);
+            emitDownloadWithMediaType(emitter, stats, mediaTypeAcceptHeader);
+        });
+
+        return ResponseEntity.ok()
+                .headers(createHttpDownloadHeader(mediaTypeAcceptHeader,
+                        TO_DOWNLOAD_STATISTICS_FILENAME))
+                .body(emitter);
+    }
+
+    @Cacheable("statisticsNames")
+    public CompletableValue completeValue(FilterContext filterContext, String key) {
+        CompletableValue completableValue = new CompletableValue(key);
+        return completableValueTransformerChain.applyTransformations(completableValue, filterContext);
+    }
+
+    private static String formattedDateStringForNow() {
+        LocalDateTime now = LocalDateTime.now();
+        return now.format(DOWNLOAD_FILE_NAME_DATE_FORMATTER);
+    }
+
+    private static FilterContext createFilterContextForName(String targetName) {
+        FilterContext filterContext = new FilterContext();
+        ResultTransformationRequests transformationRequests = new ResultTransformationRequests();
+        transformationRequests.addTransformationRequest(new ResultTransformationRequest(targetName));
+        filterContext.save(ResultTransformationRequests.class, transformationRequests);
+        return filterContext;
     }
 
     private void checkBindingErrors(BindingResult bindingResult) {
@@ -279,74 +395,6 @@ public class AnnotationController {
             transformationContext.save(ResultTransformationRequests.class, transformationRequests);
             filterContexts.add(transformationContext);
         }
-    }
-
-    /**
-     * Return statistics based on the search result.
-     *
-     * The statistics are subdivided into two areas, each with
-     * @return a {@link QueryResult} instance containing the results of the search
-     */
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Statistics have been calculated for the annotation result set " +
-                    "obtained from the application of the filter parameters"),
-            @ApiResponse(code = 500, message = "Internal server error occurred whilst producing statistics",
-                    response = ResponseExceptionHandler.ErrorInfo.class),
-            @ApiResponse(code = 400, message = "Bad request due to a validation issue encountered in one of the " +
-                    "filters", response = ResponseExceptionHandler.ErrorInfo.class)})
-    @ApiOperation(value = "Generate statistics for the annotation result set obtained from applying the filters.",
-            hidden = true)
-    @RequestMapping(value = "/stats", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<QueryResult<StatisticsGroup>> annotationStats(
-            @Valid @ModelAttribute AnnotationRequest request, BindingResult bindingResult) {
-        checkBindingErrors(bindingResult);
-
-        QueryResult<StatisticsGroup> stats = statsService.calculateForStandardUsage(request);
-        return new ResponseEntity<>(stats, HttpStatus.OK);
-    }
-
-    @ApiOperation(value = "Download all annotations that match the supplied filter criteria.",
-            hidden = true,
-            response = File.class)
-    @RequestMapping(value = "/downloadSearch",
-            method = {RequestMethod.GET},
-            produces = {GPAD_MEDIA_TYPE_STRING, GAF_MEDIA_TYPE_STRING, TSV_MEDIA_TYPE_STRING})
-    public ResponseEntity<ResponseBodyEmitter> downloadLookup(
-            @Valid @ModelAttribute AnnotationRequest request,
-            BindingResult bindingResult,
-            @RequestHeader(ACCEPT) MediaType mediaTypeAcceptHeader,
-            HttpServletRequest servletRequest) {
-        LOGGER.info("Download Request:: " + request + ", " + mediaTypeAcceptHeader);
-
-        checkBindingErrors(bindingResult);
-        FilterQueryInfo filterQueryInfo = extractFilterQueryInfo(request);
-
-        final int pageLimit = request.getDownloadLimit() < this.annotationRetrievalConfig.getDownloadPageSize() ?
-                request.getDownloadLimit() : this.annotationRetrievalConfig.getDownloadPageSize();
-        QueryRequest queryRequest = downloadQueryTemplate.newBuilder()
-                .setQuery(QuickGOQuery.createAllQuery())
-                .addFilters(filterQueryInfo.getFilterQueries())
-                .setPage(createFirstCursorPage(pageLimit))
-                .build();
-
-        ResponseBodyEmitter emitter = new ResponseBodyEmitter();
-
-        HeaderCreator headerCreator = headerCreatorFactory.provide(mediaTypeAcceptHeader.getSubtype());
-        final List<String> selectedFields = selectedFieldList(request);
-        HeaderContent headerContent = buildHeaderContent(servletRequest, selectedFields);
-        headerCreator.write(emitter, headerContent);
-
-        taskExecutor.execute(() -> {
-            final Stream<QueryResult<Annotation>> annotationResultStream =
-                    getQueryResultStream(request, filterQueryInfo, queryRequest);
-            DownloadContent downloadContent = new DownloadContent(annotationResultStream, selectedFields);
-            emitDownloadWithMediaType(emitter, downloadContent, mediaTypeAcceptHeader);
-        });
-
-        return ResponseEntity
-                .ok()
-                .headers(createHttpDownloadHeader(mediaTypeAcceptHeader, TO_DOWNLOAD_FILENAME))
-                .body(emitter);
     }
 
     private List<String> selectedFieldList(AnnotationRequest annotationRequest) {
@@ -407,19 +455,6 @@ public class AnnotationController {
                 servletRequest.getQueryString().contains(GO_USAGE_SLIM);
     }
 
-    /**
-     * Get meta data information about the Annotation service
-     *
-     * @return response with metadata information.
-     */
-    @ApiOperation(value = "Get meta-data information about the annotation service",
-            response = About.class,
-            notes = "Provides the date the annotation information was created.")
-    @RequestMapping(value = "/about", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<MetaData> provideMetaData() {
-        return new ResponseEntity<>(metaDataProvider.lookupMetaData(), HttpStatus.OK);
-    }
-
     private DefaultSearchQueryTemplate createSearchQueryTemplate(
             SearchServiceConfig.AnnotationCompositeRetrievalConfig retrievalConfig) {
         DefaultSearchQueryTemplate template = new DefaultSearchQueryTemplate();
@@ -436,29 +471,6 @@ public class AnnotationController {
                 .forEach(criterion ->
                         template.addSortCriterion(criterion.getSortField().getField(), criterion.getSortOrder()));
         return template;
-    }
-
-    @ApiOperation(value = "Download statistics for all annotations that match the supplied filter criteria.",
-            hidden = true,
-            response = File.class)
-    @RequestMapping(value = "/downloadStats", method = {RequestMethod.GET},
-            produces = {EXCEL_MEDIA_TYPE_STRING, JSON_MEDIA_TYPE_STRING})
-    public ResponseEntity<ResponseBodyEmitter> downloadStats(@Valid @ModelAttribute AnnotationRequest request,
-            BindingResult bindingResult, @RequestHeader(ACCEPT) MediaType mediaTypeAcceptHeader) throws IOException {
-        checkBindingErrors(bindingResult);
-        ResponseBodyEmitter emitter = new ResponseBodyEmitter();
-
-        taskExecutor.execute(() -> {
-            QueryResult<StatisticsGroup> stats = statsService.calculateForDownloadUsage(request);
-            addNamesToStatisticsValues(stats, createFilterContextForName(GO_NAME), OntologyNameInjector.GO_ID);
-            addNamesToStatisticsValues(stats, createFilterContextForName(TAXON_NAME), TaxonomyNameInjector.TAXON_ID);
-            emitDownloadWithMediaType(emitter, stats, mediaTypeAcceptHeader);
-        });
-
-        return ResponseEntity.ok()
-                .headers(createHttpDownloadHeader(mediaTypeAcceptHeader,
-                        TO_DOWNLOAD_STATISTICS_FILENAME))
-                .body(emitter);
     }
 
     private void addNamesToStatisticsValues(QueryResult<StatisticsGroup> stats, FilterContext filterContext,
@@ -478,23 +490,9 @@ public class AnnotationController {
         }
     }
 
-    @Cacheable("statisticsNames")
-    public CompletableValue completeValue(FilterContext filterContext, String key) {
-        CompletableValue completableValue = new CompletableValue(key);
-        return completableValueTransformerChain.applyTransformations(completableValue, filterContext);
-
-    }
-
-    private static FilterContext createFilterContextForName(String targetName) {
-        FilterContext filterContext = new FilterContext();
-        ResultTransformationRequests transformationRequests = new ResultTransformationRequests();
-        transformationRequests.addTransformationRequest(new ResultTransformationRequest(targetName));
-        filterContext.save(ResultTransformationRequests.class, transformationRequests);
-        return filterContext;
-    }
-
     private interface FilterQueryInfo {
         Set<QuickGOQuery> getFilterQueries();
+
         FilterContext getFilterContext();
     }
 }
