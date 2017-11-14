@@ -34,11 +34,17 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
 import org.springframework.beans.factory.annotation.Value;
+import net.sf.ehcache.CacheManager;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.ehcache.EhCacheCacheManager;
+import org.springframework.cache.ehcache.EhCacheManagerFactoryBean;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.solr.core.SolrTemplate;
 
 import static java.util.Arrays.asList;
@@ -56,6 +62,7 @@ import static java.util.Collections.singletonList;
 @Import({AnnotationRepoConfig.class})
 @ComponentScan({"uk.ac.ebi.quickgo.annotation.service.search"})
 @PropertySource("classpath:search.properties")
+@EnableCaching
 public class SearchServiceConfig {
 
     private static final int MAX_PAGE_RESULTS = 100;
@@ -256,6 +263,25 @@ public class SearchServiceConfig {
         transformerChain.addTransformer(completableValueOntologyNameTransformer);
         transformerChain.addTransformer(completableValueTaxonNameTransformer);
         return transformerChain;
+    }
+
+    @Bean
+    public EhCacheCacheManager cacheManager(CacheManager cm){
+        return new EhCacheCacheManager(cm);
+    }
+
+    @Bean
+    public EhCacheManagerFactoryBean ehCache(){
+        EhCacheManagerFactoryBean factoryBean = new EhCacheManagerFactoryBean();
+        factoryBean.setConfigLocation(new ClassPathResource("ehcache.xml"));
+        return factoryBean;
+    }
+
+
+    @Bean
+    public NameService nameService(ResultTransformerChain<CompletableValue> completableValueResultTransformerChain,
+            CacheManager cacheManager) {
+        return new NameService(completableValueResultTransformerChain, cacheManager);
     }
 
     @Bean
