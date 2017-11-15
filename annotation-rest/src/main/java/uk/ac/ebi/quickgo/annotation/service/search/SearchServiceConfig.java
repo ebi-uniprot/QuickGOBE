@@ -279,9 +279,8 @@ public class SearchServiceConfig {
 
 
     @Bean
-    public NameService nameService(ResultTransformerChain<CompletableValue> completableValueResultTransformerChain,
-            CacheManager cacheManager) {
-        return new NameService(completableValueResultTransformerChain, cacheManager);
+    public NameService nameService(ResultTransformerChain<CompletableValue> completableValueResultTransformerChain) {
+        return new NameService(completableValueResultTransformerChain);
     }
 
     @Bean
