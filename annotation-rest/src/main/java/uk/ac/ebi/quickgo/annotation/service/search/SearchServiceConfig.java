@@ -31,12 +31,15 @@ import uk.ac.ebi.quickgo.rest.service.ServiceRetrievalConfig;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import net.sf.ehcache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
@@ -45,6 +48,7 @@ import org.springframework.cache.ehcache.EhCacheManagerFactoryBean;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.solr.core.SolrTemplate;
 
 import static java.util.Arrays.asList;
@@ -64,7 +68,7 @@ import static java.util.Collections.singletonList;
 @PropertySource("classpath:search.properties")
 @EnableCaching
 public class SearchServiceConfig {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(SearchServiceConfig.class);
     private static final int MAX_PAGE_RESULTS = 100;
 
     private static final boolean DEFAULT_XREF_VALIDATION_IS_CASE_SENSITIVE = true;
@@ -79,6 +83,7 @@ public class SearchServiceConfig {
     private static final String SOLR_ANNOTATION_QUERY_REQUEST_HANDLER = "/query";
     private static final String DEFAULT_DOWNLOAD_SORT_FIELDS = "rowNumber,id";
     private static final int DEFAULT_DOWNLOAD_PAGE_SIZE = 500;
+    private static final String CACHE_CONFIG_FILE = "ehcache.xml";
 
     @Value("${geneproduct.db.xref.valid.regexes}")
     String xrefValidationRegexFile;
@@ -96,6 +101,9 @@ public class SearchServiceConfig {
 
     @Value("${search.wildcard.fields:}")
     private String fieldsThatCanBeSearchedByWildCard;
+
+    @Value("${cache.config.path:" + CACHE_CONFIG_FILE +"}")
+    private String cacheConfigPath;
 
     @Bean
     public SearchService<Annotation> annotationSearchService(
@@ -273,10 +281,21 @@ public class SearchServiceConfig {
     @Bean
     public EhCacheManagerFactoryBean ehCache(){
         EhCacheManagerFactoryBean factoryBean = new EhCacheManagerFactoryBean();
-        factoryBean.setConfigLocation(new ClassPathResource("ehcache.xml"));
+        try {
+            if (Objects.nonNull(cacheConfigPath)) {
+                FileSystemResource fileSystemResource = new FileSystemResource(cacheConfigPath);
+                if (fileSystemResource.exists() && fileSystemResource.isReadable()) {
+                    factoryBean.setConfigLocation(fileSystemResource);
+                    return factoryBean;
+                }
+            }
+        }catch (Exception e){
+            LOGGER.error("Failed to load cache configuration file from " + cacheConfigPath);
+        }
+        //Failed to load config file, so use the version bundled with this jar
+        factoryBean.setConfigLocation(new ClassPathResource(CACHE_CONFIG_FILE));
         return factoryBean;
     }
-
 
     @Bean
     public NameService nameService(ResultTransformerChain<CompletableValue> completableValueResultTransformerChain) {
