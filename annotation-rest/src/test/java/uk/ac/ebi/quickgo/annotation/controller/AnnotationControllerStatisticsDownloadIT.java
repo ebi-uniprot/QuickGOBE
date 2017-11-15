@@ -117,8 +117,10 @@ public class AnnotationControllerStatisticsDownloadIT {
 
     @Test
     public void canDownloadInExcelFormat() throws Exception {
+        cacheManager.clearAll();
         setExpectationsForSuccessfulOntologyServiceRestResponse();
         setExpectationsForSuccessfulTaxonomyServiceRestResponse();
+
         ResultActions response = mockMvc.perform(get(DOWNLOAD_STATISTICS_SEARCH_URL).header(ACCEPT, EXCEL_MEDIA_TYPE));
 
         checkResponse(EXCEL_MEDIA_TYPE, response);
