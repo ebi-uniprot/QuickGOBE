@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import net.sf.ehcache.CacheManager;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -93,6 +94,9 @@ public class AnnotationControllerStatisticsDownloadIT {
     private ObjectMapper dtoMapper;
     private List<String> populatedGoNames;
 
+    @Autowired
+    CacheManager cacheManager;
+
     @Before
     public void setup() {
         annotationRepository.deleteAll();
@@ -121,17 +125,15 @@ public class AnnotationControllerStatisticsDownloadIT {
     }
 
     private void setExpectationsForSuccessfulOntologyServiceRestResponse() {
-        for (int k = 0; k < NO_OF_STATISTICS_GROUPS; k++) {
-            for (int j = 0; j < NUMBER_OF_GENERIC_DOCS; j++) {
-                expectGoTermsHaveGoNamesViaRest(singletonList(goId(j)), singletonList(goName(j)));
-            }
+        //Hitting the cache means that the call to the rest service will occur only once for each term to get term name
+        for (int j = 0; j < NUMBER_OF_GENERIC_DOCS; j++) {
+            expectGoTermsHaveGoNamesViaRest(singletonList(goId(j)), singletonList(goName(j)));
         }
     }
 
     private void setExpectationsForSuccessfulTaxonomyServiceRestResponse() {
-        for (int i = 0; i < NO_OF_STATISTICS_GROUPS; i++) {
-            expectTaxonIdHasGivenTaxonNameViaRest(taxonId(), taxonName());
-        }
+        //We are only going to hit the restful service once due to caching the result
+        expectTaxonIdHasGivenTaxonNameViaRest(taxonId(), taxonName());
     }
 
     private void checkResponse(MediaType mediaType, ResultActions response) throws Exception {
@@ -234,6 +236,7 @@ public class AnnotationControllerStatisticsDownloadIT {
 
     @Test
     public void canDownloadInJsonFormat() throws Exception {
+        cacheManager.clearAll();
         setExpectationsForSuccessfulOntologyServiceRestResponse();
         setExpectationsForSuccessfulTaxonomyServiceRestResponse();
         ResultActions response = mockMvc.perform(get(DOWNLOAD_STATISTICS_SEARCH_URL).header(ACCEPT, JSON_MEDIA_TYPE));
@@ -251,12 +254,14 @@ public class AnnotationControllerStatisticsDownloadIT {
 
     @Test
     public void downloadStatisticsSuccessfulAfterFailedToRetrieveGONames() throws Exception {
+        cacheManager.clearAll();
         setExpectationsForUnsuccessfulOntologyServiceRestResponse();
         setExpectationsForSuccessfulTaxonomyServiceRestResponse();
 
         ResultActions response = mockMvc.perform(get(DOWNLOAD_STATISTICS_SEARCH_URL).header(ACCEPT, JSON_MEDIA_TYPE));
 
         checkResponse(JSON_MEDIA_TYPE, response);
+
         response.andExpect(expectedValues(ALL_GO_TERM_NAMES, Arrays.asList(null, null, null, null, null)));
         response.andExpect(expectedValues(ALL_TAXON_NAMES, singletonList(String.valueOf(taxonName()))));
     }
@@ -279,6 +284,7 @@ public class AnnotationControllerStatisticsDownloadIT {
 
     @Test
     public void downloadStatisticsSuccessfulAfterFailedToRetrieveTaxonNames() throws Exception {
+        cacheManager.clearAll();
         setExpectationsForSuccessfulOntologyServiceRestResponse();
         setExpectationsForUnsuccessfulTaxonomyServiceRestResponse();
 
