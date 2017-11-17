@@ -164,4 +164,10 @@ public class AggregateResponseTest {
 
         assertThat(aggregation.isPopulated(), is(true));
     }
+
+    @Test
+    public void aggregationSetDistinctValueCount(){
+        aggregation.setDistinctValuesCount(12);
+        assertThat(aggregation.getDistinctValuesCount(), is(12));
+    }
 }
