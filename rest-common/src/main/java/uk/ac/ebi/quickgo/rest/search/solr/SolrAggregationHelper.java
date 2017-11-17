@@ -4,6 +4,8 @@ import uk.ac.ebi.quickgo.rest.search.AggregateFunction;
 
 import com.google.common.base.Preconditions;
 
+import static uk.ac.ebi.quickgo.rest.search.solr.AggregateToStringConverter.NUM_BUCKETS;
+
 /**
  * Defines a set of constants and utility methods to aid in the processing of aggregation requests and results from
  * Solr to the domain model, and vice versa.
@@ -69,5 +71,14 @@ class SolrAggregationHelper {
         }
 
         return fieldName;
+    }
+
+    /**
+     * Test the field to see if holds the result of the distinct value count.
+     * @param field element of the aggregation result
+     * @return true if field holds distinct value count field definition.
+     */
+    static boolean distinctValueCountTester(String field) {
+        return NUM_BUCKETS.equals(field);
     }
 }
