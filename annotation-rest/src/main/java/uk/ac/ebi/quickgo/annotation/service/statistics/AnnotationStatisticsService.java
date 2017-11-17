@@ -175,15 +175,12 @@ public class AnnotationStatisticsService implements StatisticsService {
         }
 
         private StatisticsByType createStatsType(AggregateResponse aggregation, long totalHits) {
-            StatisticsByType type = new StatisticsByType(aggregation.getName());
-
+            StatisticsByType type = new StatisticsByType(aggregation.getName(),aggregation.getDistinctValuesCount());
             Set<AggregationBucket> buckets = aggregation.getBuckets();
-
             buckets.stream()
                     .map(bucket -> createStatsValues(bucket, totalHits))
                     .flatMap(Collection::stream)
                     .forEach(type::addValue);
-
             return type;
         }
 
