@@ -15,6 +15,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.core.IsNot.not;
 import static uk.ac.ebi.quickgo.rest.search.query.AggregateRequest.DEFAULT_AGGREGATE_LIMIT;
+import static uk.ac.ebi.quickgo.rest.search.solr.AggregateToStringConverter.NUM_BUCKETS_TRUE;
 import static uk.ac.ebi.quickgo.rest.search.solr.AggregateToStringConverter.convertToSolrAggregation;
 import static uk.ac.ebi.quickgo.rest.search.solr.AggregateToStringConverter.createFacetField;
 import static uk.ac.ebi.quickgo.rest.search.solr.AggregateToStringConverter.createFacetType;
@@ -31,7 +32,6 @@ public class AggregateRequestToStringConverterTest {
     private static final String GP_ID_FIELD = "geneProductId";
     private static final String ANN_ID_FIELD = "annId";
     private static final String GO_ID_TYPE = "goId";
-    private static final String LIMIT = "limit";
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
@@ -171,6 +171,7 @@ public class AggregateRequestToStringConverterTest {
         assertThat(convertedAggregation, containsString(aggregatePrefixWithTypeTitle(GO_ID_TYPE)));
         assertThat(convertedAggregation, containsString(createFacetType(FACET_TYPE_TERM)));
         assertThat(convertedAggregation, containsString(createFacetField(GO_ID_TYPE)));
+        assertThat(convertedAggregation, containsString(NUM_BUCKETS_TRUE));
     }
 
     @Test
@@ -186,6 +187,7 @@ public class AggregateRequestToStringConverterTest {
         assertThat(convertedAggregation, containsString(createFacetType(FACET_TYPE_TERM)));
         assertThat(convertedAggregation, containsString(createFacetField(GO_ID_TYPE)));
         assertThat(convertedAggregation, containsString(createLimitField(limit)));
+        assertThat(convertedAggregation, containsString(NUM_BUCKETS_TRUE));
     }
 
     @Test
@@ -200,6 +202,7 @@ public class AggregateRequestToStringConverterTest {
         assertThat(convertedAggregation, containsString(createFacetType(FACET_TYPE_TERM)));
         assertThat(convertedAggregation, containsString(createFacetField(GO_ID_TYPE)));
         assertThat(convertedAggregation, containsString(createLimitField(DEFAULT_AGGREGATE_LIMIT)));
+        assertThat(convertedAggregation, containsString(NUM_BUCKETS_TRUE));
     }
 
     @Test
@@ -215,6 +218,7 @@ public class AggregateRequestToStringConverterTest {
         assertThat(convertedAggregation, containsString(createFacetType(FACET_TYPE_TERM)));
         assertThat(convertedAggregation, containsString(createFacetField(GO_ID_TYPE)));
         assertThat(convertedAggregation, containsString(createSolrCOUNTAggregation(GO_ID_TYPE, COUNT_FUNCTION)));
+        assertThat(convertedAggregation, containsString(NUM_BUCKETS_TRUE));
     }
 
     private String createSolrAggregation(String field, AggregateFunction function) {
