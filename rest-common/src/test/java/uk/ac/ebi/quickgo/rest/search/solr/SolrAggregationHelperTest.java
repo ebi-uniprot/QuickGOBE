@@ -7,9 +7,9 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.isEmptyString;
 import static org.junit.Assert.*;
+import static uk.ac.ebi.quickgo.rest.search.solr.AggregateToStringConverter.NUM_BUCKETS;
 import static uk.ac.ebi.quickgo.rest.search.solr.SolrAggregationHelper.*;
 
 /**
@@ -78,7 +78,7 @@ public class SolrAggregationHelperTest {
     }
 
     @Test
-    public void nullPrefixedFieldThrowsExceptionWhenExtratingPrefix() throws Exception {
+    public void nullPrefixedFieldThrowsExceptionWhenExtractingPrefix() throws Exception {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Cannot extract prefix from null input");
 
@@ -86,21 +86,21 @@ public class SolrAggregationHelperTest {
     }
 
     @Test
-    public void fieldWithNoPrefixReturnsAnEmptyPrefixWhenExtratingPrefix() throws Exception {
+    public void fieldWithNoPrefixReturnsAnEmptyPrefixWhenExtractingPrefix() throws Exception {
         String prefix = fieldPrefixExtractor(GP_ID_FIELD);
 
         assertThat(prefix, isEmptyString());
     }
 
     @Test
-    public void fieldWithCountPrefixReturnsAnCountPrefixWhenExtratingPrefix() throws Exception {
+    public void fieldWithCountPrefixReturnsAnCountPrefixWhenExtractingPrefix() throws Exception {
         String prefix = fieldPrefixExtractor(aggregateFieldTitle(COUNT_FUNCTION, GP_ID_FIELD));
 
         assertThat(prefix, is(COUNT_FUNCTION.getName()));
     }
 
     @Test
-    public void nullPrefixedFieldThrowsExceptionWhenExtratingField() throws Exception {
+    public void nullPrefixedFieldThrowsExceptionWhenExtractingField() throws Exception {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Cannot extract field from null input");
 
@@ -108,17 +108,26 @@ public class SolrAggregationHelperTest {
     }
 
     @Test
-    public void emptyPrefixedFieldThrowsExceptionWhenExtratingField() throws Exception {
+    public void emptyPrefixedFieldThrowsExceptionWhenExtractingField() throws Exception {
         String fieldName = fieldNameExtractor("");
 
         assertThat(fieldName, isEmptyString());
     }
 
     @Test
-    public void fieldWithCountPrefixReturnsAnTheFieldWhenExtratingField() throws Exception {
+    public void fieldWithCountPrefixReturnsAnTheFieldWhenExtractingField() throws Exception {
         String field = fieldNameExtractor(aggregateFieldTitle(COUNT_FUNCTION, GP_ID_FIELD));
 
         assertThat(field, is(GP_ID_FIELD));
     }
 
+    @Test
+    public void testForNumBucketsReturnsTrue(){
+        assertThat(distinctValueCountTester(NUM_BUCKETS), is(true)) ;
+    }
+
+    @Test
+    public void testForNumBucketsReturnsFalse(){
+        assertThat(distinctValueCountTester("bucketHead"), is(false)) ;
+    }
 }
