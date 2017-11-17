@@ -6,6 +6,7 @@ import org.junit.rules.ExpectedException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.is;
 
 /**
  * Tests the behaviour of the {@link StatisticsByType} class.
@@ -21,7 +22,7 @@ public class StatisticsByTypeTest {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Statistics type cannot be null or empty");
 
-        new StatisticsByType(type);
+        new StatisticsByType(type,0);
     }
 
     @Test
@@ -31,7 +32,7 @@ public class StatisticsByTypeTest {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Statistics type cannot be null or empty");
 
-        new StatisticsByType(type);
+        new StatisticsByType(type,0);
     }
 
     @Test
@@ -42,7 +43,7 @@ public class StatisticsByTypeTest {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Stats value cannot be null");
 
-        StatisticsByType statsType = new StatisticsByType(type);
+        StatisticsByType statsType = new StatisticsByType(type,0);
         statsType.addValue(value);
     }
 
@@ -51,9 +52,10 @@ public class StatisticsByTypeTest {
         String type = "type";
         StatisticsValue value = new StatisticsValue("key", 0, 0);
 
-        StatisticsByType statsType = new StatisticsByType(type);
+        StatisticsByType statsType = new StatisticsByType(type,12);
         statsType.addValue(value);
 
         assertThat(statsType.getValues(), contains(value));
+        assertThat(statsType.getDistinctValueCount(), is(12));
     }
 }
