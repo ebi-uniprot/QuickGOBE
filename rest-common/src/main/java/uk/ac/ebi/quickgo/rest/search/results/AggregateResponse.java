@@ -23,6 +23,9 @@ import java.util.Set;
  *     <li>A set of {@link AggregateResponse#nestedAggregations}: A nested aggregation is a drilled down view of the main
  *     aggregation. This means that it tries to retrieve metrics on a different aggregate field, but always based on
  *     the result of the current aggregation</li>
+ *     <li>A distinct value count. The number of buckets contained in an instance of this class is constrained by
+ *     the limits applied at the time the aggregation was defined. This value holds the total number of distinct
+ *     values (i.e. the number of buckets there would be if no limits were applied)</li>
  * </ul>
  * <p/>
  * As an example, assume that the data source has a table/collection of orders, with the following fields:
@@ -50,6 +53,8 @@ import java.util.Set;
  *                - aggregationResults: [5] - where 5 represents the sum of the quantities for order_item_2
  *            ...
  *        ]
+ *       - distinctValueCount: the total number of order items (the results for the query may show only order items
+ *       only over a certain value, or goods type.
  * </pre>
  * <p/>
  * If {@link AggregateRequest} instances are attached to the
@@ -63,12 +68,12 @@ public class AggregateResponse {
     private final AggregationResultsManager aggregationResultsManager;
     private final Set<AggregateResponse> nestedAggregations;
     private final Set<AggregationBucket> buckets;
+    private int distinctValuesCount;
 
     public AggregateResponse(String name) {
         Preconditions.checkArgument(name != null && !name.trim().isEmpty(), "Name cannot be null or empty");
 
         this.name = name;
-
         this.aggregationResultsManager = new AggregationResultsManager();
         nestedAggregations = new LinkedHashSet<>();
         buckets = new LinkedHashSet<>();
@@ -190,5 +195,31 @@ public class AggregateResponse {
      */
     public boolean isPopulated() {
         return this.hasAggregationResults() || this.hasNestedAggregations() || this.hasBuckets();
+    }
+
+    /**
+     * Set the total number of distinct values for the aggregation.
+     * @param distinctValuesCount
+     */
+    public void setDistinctValuesCount(int distinctValuesCount) {
+        this.distinctValuesCount = distinctValuesCount;
+    }
+
+    /**
+     * Return the total number of distinct values for the aggregation.
+     * @return total number of distinct values
+     */
+    public int getDistinctValuesCount() {
+        return distinctValuesCount;
+    }
+
+    @Override public String toString() {
+        return "AggregateResponse{" +
+                "name='" + name + '\'' +
+                ", aggregationResultsManager=" + aggregationResultsManager +
+                ", nestedAggregations=" + nestedAggregations +
+                ", buckets=" + buckets +
+                ", distinctValuesCount=" + distinctValuesCount +
+                '}';
     }
 }
