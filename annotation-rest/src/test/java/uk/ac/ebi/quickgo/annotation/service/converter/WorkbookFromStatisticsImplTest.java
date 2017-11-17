@@ -121,25 +121,25 @@ public class WorkbookFromStatisticsImplTest {
         statisticsGroups.add(geneProductStatisticsGroup);
 
         //GoId
-        StatisticsByType statisticsByAnnotationTypeGoId = new StatisticsByType("TEST_GO_ID");
+        StatisticsByType statisticsByAnnotationTypeGoId = new StatisticsByType("TEST_GO_ID",0);
         statisticsByAnnotationTypeGoId.addValue(new StatisticsValue("GO:0003824", 1, 5L));
         statisticsByAnnotationTypeGoId.addValue(new StatisticsValue("GO:0003870",1, 5L));
         statisticsByAnnotationTypeGoId.addValue(new StatisticsValue("GO:0009058",1, 5L));
         annotationStatisticsGroup.addStatsType(statisticsByAnnotationTypeGoId);
 
-        StatisticsByType statisticsByGeneProductTypeGoId = new StatisticsByType("TEST_GO_ID");
+        StatisticsByType statisticsByGeneProductTypeGoId = new StatisticsByType("TEST_GO_ID",0);
         statisticsByGeneProductTypeGoId.addValue(new StatisticsValue("GO:0003824",1, 1L));
         statisticsByGeneProductTypeGoId.addValue(new StatisticsValue("GO:0003870",1, 1L));
         statisticsByGeneProductTypeGoId.addValue(new StatisticsValue("GO:0009058",1, 1L));
         geneProductStatisticsGroup.addStatsType(statisticsByGeneProductTypeGoId);
 
         //aspect
-        StatisticsByType statisticsByAnnotationTypeAspect = new StatisticsByType("aspect");
+        StatisticsByType statisticsByAnnotationTypeAspect = new StatisticsByType("aspect",0);
         statisticsByAnnotationTypeAspect.addValue(new StatisticsValue("molecular_function",3, 5L));
         statisticsByAnnotationTypeAspect.addValue(new StatisticsValue("biological_process",2, 5L));
         annotationStatisticsGroup.addStatsType(statisticsByAnnotationTypeAspect);
 
-        StatisticsByType statisticsByGeneProductTypeAspect = new StatisticsByType("aspect");
+        StatisticsByType statisticsByGeneProductTypeAspect = new StatisticsByType("aspect",0);
         statisticsByGeneProductTypeAspect.addValue(new StatisticsValue("molecular_function",1, 1L));
         statisticsByGeneProductTypeAspect.addValue(new StatisticsValue("biological_process",1, 1L));
         geneProductStatisticsGroup.addStatsType(statisticsByGeneProductTypeAspect);
