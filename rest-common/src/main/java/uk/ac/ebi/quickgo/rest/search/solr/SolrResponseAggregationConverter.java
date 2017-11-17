@@ -28,6 +28,7 @@ import static uk.ac.ebi.quickgo.rest.search.solr.SolrAggregationHelper.*;
  *  unique_id=3,
  *  unique_geneProductId=3,
  *  agg_goId={
+ *    numBuckets: 11
  *    buckets=[
  *      {
  *        val=GO:0003824,
@@ -38,6 +39,7 @@ import static uk.ac.ebi.quickgo.rest.search.solr.SolrAggregationHelper.*;
  *    ]
  *  },
  *  agg_ecoId={
+ *    numBuckets: 20
  *    buckets=[
  *      {
  *        val=ECO:0000256,
@@ -112,7 +114,6 @@ public class SolrResponseAggregationConverter implements AggregationConverter<So
 
         if (!fieldPrefix.isEmpty()) {
             String name = SolrAggregationHelper.fieldNameExtractor(field);
-
             if (isNestedAggregate(fieldPrefix)) {
                 AggregateResponse nestedAggregation = createNestedAggregation(name, value);
                 aggregation.addNestedAggregation(nestedAggregation);
@@ -121,6 +122,9 @@ public class SolrResponseAggregationConverter implements AggregationConverter<So
             } else {
                 logger.debug("Unable to process field:{}, with prefix:{}", field, fieldPrefix);
             }
+        } else if (SolrAggregationHelper.distinctValueCountTester(field)){
+            aggregation.setDistinctValuesCount(((Number)value).intValue());
+
         } else if (isFieldBucket(field)) {
             List<NamedList<?>> buckets = (List<NamedList<?>>) value;
             buckets.forEach(bucket -> convertBucket((NamedList<?>) bucket, aggregation));
