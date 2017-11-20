@@ -17,7 +17,7 @@
 
     <artifactId>annotation-rest</artifactId>
     <name>Annotation RESTful service</name>
-    <packaging>jar</packaging>`
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
