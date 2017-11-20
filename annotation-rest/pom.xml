@@ -4,6 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
      <properties>
          <apache.poi.version>3.17</apache.poi.version>
+         <ehcache.version>2.10.4</ehcache.version>
     </properties>
 
     <parent>
@@ -16,7 +17,7 @@
 
     <artifactId>annotation-rest</artifactId>
     <name>Annotation RESTful service</name>
-    <packaging>jar</packaging>
+    <packaging>jar</packaging>`
 
     <dependencies>
         <dependency>
@@ -120,7 +121,7 @@
         <dependency>
             <groupId>net.sf.ehcache</groupId>
             <artifactId>ehcache</artifactId>
-            <version>2.10.4</version>
+            <version>${ehcache.version}</version>
         </dependency>
     </dependencies>
 
