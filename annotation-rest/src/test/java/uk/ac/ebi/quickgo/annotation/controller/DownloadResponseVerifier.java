@@ -99,7 +99,7 @@ class DownloadResponseVerifier {
     }
 
     static class TSVAllFieldsMatcher extends TypeSafeMatcher<String> {
-        private static final int FIELD_COUNT = 19;
+        private static final int DEFAULT_NOT_SLIMMED_FIELD_COUNT = 14;
         private static final String TYPE = "TSV";
         private static final List<Integer> MANDATORY_INDICES = asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
 
@@ -113,8 +113,8 @@ class DownloadResponseVerifier {
             for (String line : dataLines) {
                 if (!line.startsWith("!")) {
                     String[] components = line.split("\t");
-                    if (components.length != FIELD_COUNT) {
-                        LOGGER.error(TYPE + " line should contain " + FIELD_COUNT + " fields, but found: " + components
+                    if (components.length != DEFAULT_NOT_SLIMMED_FIELD_COUNT) {
+                        LOGGER.error(TYPE + " line should contain " + DEFAULT_NOT_SLIMMED_FIELD_COUNT + " fields, but found: " + components
                                 .length);
                         return false;
                     }

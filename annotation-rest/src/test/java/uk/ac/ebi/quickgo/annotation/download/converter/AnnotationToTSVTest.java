@@ -62,53 +62,43 @@ public class AnnotationToTSVTest {
     @Test
     public void createTsvStringFromAnnotationModelContainingIntAct() {
         String[] elements = annotationToElements(annotation);
-        assertThat(elements[NonSlimmedColumns.COL_GENE_PRODUCT_DB], is(DB));
-        assertThat(elements[NonSlimmedColumns.COL_GENE_PRODUCT_ID], is(ID));
-        assertThat(elements[NonSlimmedColumns.COL_DB_OBJECT_SYMBOL], is(SYMBOL));
-        assertThat(elements[NonSlimmedColumns.COL_QUALIFIER], is(QUALIFIER));
-        assertThat(elements[NonSlimmedColumns.COL_GO_ID], is(GO_ID));
-        assertThat(elements[NonSlimmedColumns.COL_GO_ASPECT],
+        assertThat(elements[DefaultColumns.COL_GENE_PRODUCT_DB], is(DB));
+        assertThat(elements[DefaultColumns.COL_GENE_PRODUCT_ID], is(ID));
+        assertThat(elements[DefaultColumns.COL_DB_OBJECT_SYMBOL], is(SYMBOL));
+        assertThat(elements[DefaultColumns.COL_QUALIFIER], is(QUALIFIER));
+        assertThat(elements[DefaultColumns.COL_GO_ID], is(GO_ID));
+        assertThat(elements[DefaultColumns.COL_GO_ASPECT],
                    is(Aspect.fromScientificName(GO_ASPECT).get().getCharacter()));
-        assertThat(elements[NonSlimmedColumns.COL_NAME], is(GO_NAME));
-        assertThat(elements[NonSlimmedColumns.COL_ECO_ID], is(ECO_ID));
-        assertThat(elements[NonSlimmedColumns.COL_GO_EVIDENCE], is(GO_EVIDENCE));
-        assertThat(elements[NonSlimmedColumns.COL_REFERENCE], is(REFERENCE));
-        assertThat(elements[NonSlimmedColumns.COL_WITH], equalTo(WITH_FROM_AS_STRING));
-        assertThat(elements[NonSlimmedColumns.COL_TAXON], is(Integer.toString(TAXON_ID)));
-        assertThat(elements[NonSlimmedColumns.COL_ASSIGNED_BY], equalTo(DB));
-        assertThat(elements[NonSlimmedColumns.COL_ANNOTATION_EXTENSION], is(EXTENSIONS_AS_STRING));
-        assertThat(elements[NonSlimmedColumns.COL_TAXON_NAME],is(TAXON_NAME));
-        assertThat(elements[NonSlimmedColumns.COL_DB_OBJECT_NAME], is(NAME));
-        assertThat(elements[NonSlimmedColumns.COL_DB_OBJECT_SYNONYM], is(SYNONYMS));
-        assertThat(elements[NonSlimmedColumns.COL_DB_OBJECT_TYPE], is(TYPE));
-        assertThat(elements[NonSlimmedColumns.COL_DATE], equalTo(DATE_AS_STRING));
+        assertThat(elements[DefaultColumns.COL_ECO_ID], is(ECO_ID));
+        assertThat(elements[DefaultColumns.COL_GO_EVIDENCE], is(GO_EVIDENCE));
+        assertThat(elements[DefaultColumns.COL_REFERENCE], is(REFERENCE));
+        assertThat(elements[DefaultColumns.COL_WITH], equalTo(WITH_FROM_AS_STRING));
+        assertThat(elements[DefaultColumns.COL_TAXON], is(Integer.toString(TAXON_ID)));
+        assertThat(elements[DefaultColumns.COL_ASSIGNED_BY], equalTo(DB));
+        assertThat(elements[DefaultColumns.COL_ANNOTATION_EXTENSION], is(EXTENSIONS_AS_STRING));
+        assertThat(elements[DefaultColumns.COL_DATE], equalTo(DATE_AS_STRING));
     }
 
     @Test
     public void createTsvStringFromAnnotationModelContainingSlimmedToIds(){
         annotation.slimmedIds = SLIMMED_TO_IDS;
         String[] elements = annotationToElements(annotation);
-        assertThat(elements[SlimmedColumns.COL_GENE_PRODUCT_DB], is(DB));
-        assertThat(elements[SlimmedColumns.COL_GENE_PRODUCT_ID], is(ID));
-        assertThat(elements[SlimmedColumns.COL_DB_OBJECT_SYMBOL], is(SYMBOL));
-        assertThat(elements[SlimmedColumns.COL_QUALIFIER], is(QUALIFIER));
-        assertThat(elements[SlimmedColumns.COL_GO_ID], is(SLIMMED_TO_IDS.get(0)));
-        assertThat(elements[SlimmedColumns.COL_GO_ASPECT],
+        assertThat(elements[DefaultColumnsWithSlimming.COL_GENE_PRODUCT_DB], is(DB));
+        assertThat(elements[DefaultColumnsWithSlimming.COL_GENE_PRODUCT_ID], is(ID));
+        assertThat(elements[DefaultColumnsWithSlimming.COL_DB_OBJECT_SYMBOL], is(SYMBOL));
+        assertThat(elements[DefaultColumnsWithSlimming.COL_QUALIFIER], is(QUALIFIER));
+        assertThat(elements[DefaultColumnsWithSlimming.COL_GO_ID], is(SLIMMED_TO_IDS.get(0)));
+        assertThat(elements[DefaultColumnsWithSlimming.COL_GO_ASPECT],
                    is(Aspect.fromScientificName(GO_ASPECT).get().getCharacter()));
-        assertThat(elements[SlimmedColumns.COL_SLIMMED_FROM], is(GO_ID));
-        assertThat(elements[SlimmedColumns.COL_NAME], is(GO_NAME));
-        assertThat(elements[SlimmedColumns.COL_ECO_ID], is(ECO_ID));
-        assertThat(elements[SlimmedColumns.COL_GO_EVIDENCE], is(GO_EVIDENCE));
-        assertThat(elements[SlimmedColumns.COL_REFERENCE], is(REFERENCE));
-        assertThat(elements[SlimmedColumns.COL_WITH], equalTo(WITH_FROM_AS_STRING));
-        assertThat(elements[SlimmedColumns.COL_TAXON], is(Integer.toString(TAXON_ID)));
-        assertThat(elements[SlimmedColumns.COL_ASSIGNED_BY], equalTo(DB));
-        assertThat(elements[SlimmedColumns.COL_ANNOTATION_EXTENSION], is(EXTENSIONS_AS_STRING));
-        assertThat(elements[SlimmedColumns.COL_TAXON_NAME],is(TAXON_NAME));
-        assertThat(elements[SlimmedColumns.COL_DB_OBJECT_NAME], is(NAME));
-        assertThat(elements[SlimmedColumns.COL_DB_OBJECT_SYNONYM], is(SYNONYMS));
-        assertThat(elements[SlimmedColumns.COL_DB_OBJECT_TYPE], is(TYPE));
-        assertThat(elements[SlimmedColumns.COL_DATE], equalTo(DATE_AS_STRING));
+        assertThat(elements[DefaultColumnsWithSlimming.COL_SLIMMED_FROM], is(GO_ID));
+        assertThat(elements[DefaultColumnsWithSlimming.COL_ECO_ID], is(ECO_ID));
+        assertThat(elements[DefaultColumnsWithSlimming.COL_GO_EVIDENCE], is(GO_EVIDENCE));
+        assertThat(elements[DefaultColumnsWithSlimming.COL_REFERENCE], is(REFERENCE));
+        assertThat(elements[DefaultColumnsWithSlimming.COL_WITH], equalTo(WITH_FROM_AS_STRING));
+        assertThat(elements[DefaultColumnsWithSlimming.COL_TAXON], is(Integer.toString(TAXON_ID)));
+        assertThat(elements[DefaultColumnsWithSlimming.COL_ASSIGNED_BY], equalTo(DB));
+        assertThat(elements[DefaultColumnsWithSlimming.COL_ANNOTATION_EXTENSION], is(EXTENSIONS_AS_STRING));
+        assertThat(elements[DefaultColumnsWithSlimming.COL_DATE], equalTo(DATE_AS_STRING));
     }
 
     @Test
@@ -138,8 +128,8 @@ public class AnnotationToTSVTest {
 
         //Test Gene Product separately
         String[] elements = annotationToElements(annotation, Collections.singletonList(GENE_PRODUCT_FIELD_NAME));
-        assertThat(elements[NonSlimmedColumns.COL_GENE_PRODUCT_DB], is(DB));
-        assertThat(elements[NonSlimmedColumns.COL_GENE_PRODUCT_ID], is(ID));
+        assertThat(elements[DefaultColumns.COL_GENE_PRODUCT_DB], is(DB));
+        assertThat(elements[DefaultColumns.COL_GENE_PRODUCT_ID], is(ID));
     }
 
     @Test
@@ -157,93 +147,93 @@ public class AnnotationToTSVTest {
     public void nullGeneProductId() {
         annotation.geneProductId = null;
         String[] elements = annotationToElements(annotation);
-        assertThat(elements[NonSlimmedColumns.COL_GENE_PRODUCT_DB], is(""));
-        assertThat(elements[NonSlimmedColumns.COL_GENE_PRODUCT_ID], is(""));
+        assertThat(elements[DefaultColumns.COL_GENE_PRODUCT_DB], is(""));
+        assertThat(elements[DefaultColumns.COL_GENE_PRODUCT_ID], is(""));
     }
 
     @Test
     public void emptyGeneProductId() {
         annotation.geneProductId = "";
         String[] elements = annotationToElements(annotation);
-        assertThat(elements[NonSlimmedColumns.COL_GENE_PRODUCT_DB], is(""));
-        assertThat(elements[NonSlimmedColumns.COL_GENE_PRODUCT_ID], is(""));
+        assertThat(elements[DefaultColumns.COL_GENE_PRODUCT_DB], is(""));
+        assertThat(elements[DefaultColumns.COL_GENE_PRODUCT_ID], is(""));
     }
 
     @Test
     public void nullSymbol() {
         annotation.symbol = null;
         String[] elements = annotationToElements(annotation);
-        assertThat(elements[NonSlimmedColumns.COL_DB_OBJECT_SYMBOL], is(""));
+        assertThat(elements[DefaultColumns.COL_DB_OBJECT_SYMBOL], is(""));
     }
 
     @Test
     public void nullQualifier() {
         annotation.qualifier = null;
         String[] elements = annotationToElements(annotation);
-        assertThat(elements[NonSlimmedColumns.COL_QUALIFIER], is(""));
+        assertThat(elements[DefaultColumns.COL_QUALIFIER], is(""));
     }
 
     @Test
     public void nullGoId() {
         annotation.goId = null;
         String[] elements = annotationToElements(annotation);
-        assertThat(elements[NonSlimmedColumns.COL_GO_ID], is(""));
+        assertThat(elements[DefaultColumns.COL_GO_ID], is(""));
     }
 
     @Test
     public void nullAspect() {
         annotation.goAspect = null;
         String[] elements = annotationToElements(annotation);
-        assertThat(elements[NonSlimmedColumns.COL_GO_ASPECT], is(""));
+        assertThat(elements[DefaultColumns.COL_GO_ASPECT], is(""));
     }
 
     @Test
     public void emptyAspect() {
         annotation.goAspect = "";
         String[] elements = annotationToElements(annotation);
-        assertThat(elements[NonSlimmedColumns.COL_GO_ASPECT], is(""));
+        assertThat(elements[DefaultColumns.COL_GO_ASPECT], is(""));
     }
 
     @Test
     public void unknownAspect() {
         annotation.goAspect = "Dish_Washing";
         String[] elements = annotationToElements(annotation);
-        assertThat(elements[NonSlimmedColumns.COL_GO_ASPECT], is(""));
+        assertThat(elements[DefaultColumns.COL_GO_ASPECT], is(""));
     }
 
     @Test
     public void nullReference() {
         annotation.reference = null;
         String[] elements = annotationToElements(annotation);
-        assertThat(elements[NonSlimmedColumns.COL_REFERENCE], is(""));
+        assertThat(elements[DefaultColumns.COL_REFERENCE], is(""));
     }
 
     @Test
     public void nullEcoId() {
         annotation.evidenceCode = null;
         String[] elements = annotationToElements(annotation);
-        assertThat(elements[NonSlimmedColumns.COL_ECO_ID], is(""));
+        assertThat(elements[DefaultColumns.COL_ECO_ID], is(""));
     }
 
     @Test
     public void emptyEcoId() {
         annotation.evidenceCode = "";
         String[] elements = annotationToElements(annotation);
-        assertThat(elements[NonSlimmedColumns.COL_ECO_ID], is(""));
+        assertThat(elements[DefaultColumns.COL_ECO_ID], is(""));
     }
 
     @Test
     public void nullGoEvidence() {
         annotation.goEvidence = null;
         String[] elements = annotationToElements(annotation);
-        assertThat(elements[NonSlimmedColumns.COL_GO_EVIDENCE], is(""));
+        assertThat(elements[DefaultColumns.COL_GO_EVIDENCE], is(""));
     }
 
     @Test
     public void emptyGoEvidence() {
         annotation.goEvidence = null;
         String[] elements = annotationToElements(annotation);
-        assertThat(elements[NonSlimmedColumns.COL_GO_EVIDENCE], is(""));
+        assertThat(elements[DefaultColumns.COL_GO_EVIDENCE], is(""));
     }
 
 
@@ -251,49 +241,49 @@ public class AnnotationToTSVTest {
     public void nullWithFrom() {
         annotation.withFrom = null;
         String[] elements = annotationToElements(annotation);
-        assertThat(elements[NonSlimmedColumns.COL_WITH], is(""));
+        assertThat(elements[DefaultColumns.COL_WITH], is(""));
     }
 
     @Test
     public void emptyWithFrom() {
         annotation.withFrom = new ArrayList<>();
         String[] elements = annotationToElements(annotation);
-        assertThat(elements[NonSlimmedColumns.COL_WITH], is(""));
+        assertThat(elements[DefaultColumns.COL_WITH], is(""));
     }
 
     @Test
     public void emptyTaxonId() {
         annotation.taxonId = 0;
         String[] elements = annotationToElements(annotation);
-        assertThat(elements[NonSlimmedColumns.COL_TAXON], is(""));
+        assertThat(elements[DefaultColumns.COL_TAXON], is(""));
     }
 
     @Test
     public void nullAssignedBy() {
         annotation.assignedBy = null;
         String[] elements = annotationToElements(annotation);
-        assertThat(elements[NonSlimmedColumns.COL_ASSIGNED_BY], is(""));
+        assertThat(elements[DefaultColumns.COL_ASSIGNED_BY], is(""));
     }
 
     @Test
     public void nullInExtensions() {
         annotation.extensions = null;
         String[] elements = annotationToElements(annotation);
-        assertThat(elements[NonSlimmedColumns.COL_ANNOTATION_EXTENSION], is(""));
+        assertThat(elements[DefaultColumns.COL_ANNOTATION_EXTENSION], is(""));
     }
 
     @Test
     public void emptyExtensions() {
         annotation.extensions = new ArrayList<>();
         String[] elements = annotationToElements(annotation);
-        assertThat(elements[NonSlimmedColumns.COL_ANNOTATION_EXTENSION], is(""));
+        assertThat(elements[DefaultColumns.COL_ANNOTATION_EXTENSION], is(""));
     }
 
     @Test
     public void nullDate() {
         annotation.date = null;
         String[] elements = annotationToElements(annotation);
-        assertThat(elements[NonSlimmedColumns.COL_DATE], is(""));
+        assertThat(elements[DefaultColumns.COL_DATE], is(""));
     }
 
     @Test
@@ -318,17 +308,34 @@ public class AnnotationToTSVTest {
 
     private void checkReturned(String slimmedToGoId, String converted) {
         String[] elements = converted.split(AnnotationToTSV.OUTPUT_DELIMITER, -1);
-        assertThat(elements[SlimmedColumns.COL_GO_ID], is(slimmedToGoId));
+        assertThat(elements[DefaultColumnsWithSlimming.COL_GO_ID], is(slimmedToGoId));
     }
 
-    private class NonSlimmedColumns{
+    private class DefaultColumns{
         private static final int COL_GENE_PRODUCT_DB = 0;
         private static final int COL_GENE_PRODUCT_ID = 1;
         private static final int COL_DB_OBJECT_SYMBOL = 2;
         private static final int COL_QUALIFIER = 3;
         private static final int COL_GO_ID = 4;
         private static final int COL_GO_ASPECT = 5;
-        private static final int COL_NAME = 6;
+        private static final int COL_ECO_ID = 6;
+        private static final int COL_GO_EVIDENCE = 7;
+        private static final int COL_REFERENCE = 8;
+        private static final int COL_WITH = 9;
+        private static final int COL_TAXON = 10;
+        private static final int COL_ASSIGNED_BY = 11;
+        private static final int COL_ANNOTATION_EXTENSION = 12;
+        private static final int COL_DATE = 13;
+    }
+
+    private class DefaultColumnsWithSlimming{
+        private static final int COL_GENE_PRODUCT_DB = 0;
+        private static final int COL_GENE_PRODUCT_ID = 1;
+        private static final int COL_DB_OBJECT_SYMBOL = 2;
+        private static final int COL_QUALIFIER = 3;
+        private static final int COL_GO_ID = 4;
+        private static final int COL_SLIMMED_FROM = 5;
+        private static final int COL_GO_ASPECT = 6;
         private static final int COL_ECO_ID = 7;
         private static final int COL_GO_EVIDENCE = 8;
         private static final int COL_REFERENCE = 9;
@@ -337,32 +344,5 @@ public class AnnotationToTSVTest {
         private static final int COL_ASSIGNED_BY = 12;
         private static final int COL_ANNOTATION_EXTENSION = 13;
         private static final int COL_DATE = 14;
-        private static final int COL_TAXON_NAME = 15;
-        private static final int COL_DB_OBJECT_NAME = 16 ;
-        private static final int COL_DB_OBJECT_SYNONYM = 17;
-        private static final int COL_DB_OBJECT_TYPE = 18;
-    }
-
-    private class SlimmedColumns{
-        private static final int COL_GENE_PRODUCT_DB = 0;
-        private static final int COL_GENE_PRODUCT_ID = 1;
-        private static final int COL_DB_OBJECT_SYMBOL = 2;
-        private static final int COL_QUALIFIER = 3;
-        private static final int COL_GO_ID = 4;
-        private static final int COL_SLIMMED_FROM = 5;
-        private static final int COL_GO_ASPECT = 6;
-        private static final int COL_NAME = 7;
-        private static final int COL_ECO_ID = 8;
-        private static final int COL_GO_EVIDENCE = 9;
-        private static final int COL_REFERENCE = 10;
-        private static final int COL_WITH = 11;
-        private static final int COL_TAXON = 12;
-        private static final int COL_ASSIGNED_BY = 13;
-        private static final int COL_ANNOTATION_EXTENSION = 14;
-        private static final int COL_DATE = 15;
-        private static final int COL_TAXON_NAME = 16;
-        private static final int COL_DB_OBJECT_NAME = 17;
-        private static final int COL_DB_OBJECT_SYNONYM = 18;
-        private static final int COL_DB_OBJECT_TYPE = 19;
     }
 }
