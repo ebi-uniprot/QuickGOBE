@@ -142,7 +142,6 @@ public class AnnotationController {
     private final StatisticsService statsService;
     private final TaskExecutor taskExecutor;
     private final HeaderCreatorFactory headerCreatorFactory;
-//    private final ResultTransformerChain<CompletableValue> completableValueTransformerChain;
     private final NameService nameService;
 
     @Autowired
@@ -167,8 +166,6 @@ public class AnnotationController {
         checkArgument(taskExecutor != null, "TaskExecutor cannot be null.");
         checkArgument(headerCreatorFactory != null, "HeaderCreatorFactory cannot be null.");
         checkArgument(metaDataProvider != null, "Metadata provider cannot be null.");
-//        checkArgument(completableValueResultTransformerChain != null,
-//                "The ResultTransformerChain<CompletableValue> cannot be null.");
 
         this.annotationSearchService = annotationSearchService;
         this.converterFactory = converterFactory;
@@ -184,7 +181,6 @@ public class AnnotationController {
         this.headerCreatorFactory = headerCreatorFactory;
 
         this.metaDataProvider = metaDataProvider;
-//        this.completableValueTransformerChain = completableValueResultTransformerChain;
 
         this.nameService = nameService;
     }
