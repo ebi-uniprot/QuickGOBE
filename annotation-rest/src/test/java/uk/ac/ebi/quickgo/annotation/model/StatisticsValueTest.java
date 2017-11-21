@@ -63,18 +63,6 @@ public class StatisticsValueTest {
     }
 
     @Test
-    public void totalLessThanOccurrenceThrowsException() throws Exception {
-        String key = "key";
-        long total = 1;
-        long occurrence = 2;
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Stats total cannot be less than hits: " + total + " < " + occurrence);
-
-        new StatisticsValue(key, occurrence, total);
-    }
-
-    @Test
     public void statisticsModelWithIdAndPositiveTotalGreaterThanOccurrence() throws Exception {
         String key = "key";
         long total = 2;
