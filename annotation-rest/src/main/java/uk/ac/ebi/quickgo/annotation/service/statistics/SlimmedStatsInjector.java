@@ -16,11 +16,11 @@ import static uk.ac.ebi.quickgo.annotation.service.statistics.SlimmedStatsHelper
  * @author Edd
  */
 class SlimmedStatsInjector {
-    private static final String SLIMMING_GROUP_NAME = "slimming";
+    static final String SLIMMING_GROUP_NAME = "slimming";
+    static final String ANNOTATIONS_FOR_GO_SLIMS_NAME = "annotationsForGoId";
     private static final StatisticsGroup EMPTY_SLIM_STATS_GROUP = new StatisticsGroup(SLIMMING_GROUP_NAME, 0);
     private static final String ANNOTATION_GROUP_NAME = "annotation";
     private static final String GO_ID_TYPE_NAME = "goId";
-    private static final String ANNOTATIONS_FOR_GO_SLIMS_NAME = "annotationsForGoId";
 
     void process(List<StatisticsGroup> statsGroups, Map<String, List<String>> slimmingMap) {
         extractMatchingStat(statsGroups, StatisticsGroup::getGroupName, ANNOTATION_GROUP_NAME)
