@@ -2,7 +2,6 @@ package uk.ac.ebi.quickgo.annotation.model;
 
 import com.google.common.base.Preconditions;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -30,7 +29,7 @@ public class StatisticsByType {
     }
 
     public List<StatisticsValue> getValues() {
-        return Collections.unmodifiableList(values);
+        return values;
     }
 
     @Override public boolean equals(Object o) {
