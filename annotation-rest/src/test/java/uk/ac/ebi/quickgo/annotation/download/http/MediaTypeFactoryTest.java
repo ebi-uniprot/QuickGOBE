@@ -19,19 +19,18 @@ import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.EXCEL_
 public class MediaTypeFactoryTest {
 
     @Test
-    public void requestedMediaTypeWithoutCharacterSet(){
-        assertThat(MediaTypeFactory.fileExtension(new MediaType("text","tsv")), is("tsv"));
+    public void requestedMediaTypeWithoutCharacterSet() {
+        assertThat(MediaTypeFactory.fileExtension(new MediaType("text", "tsv")), is("tsv"));
     }
 
     @Test
-    public void requestedMediaTypeWithUTF8(){
-        assertThat(MediaTypeFactory.fileExtension(new MediaType("text","tsv", StandardCharsets.UTF_8)),
+    public void requestedMediaTypeWithUTF8() {
+        assertThat(MediaTypeFactory.fileExtension(new MediaType("text", "tsv", StandardCharsets.UTF_8)),
                 is("tsv"));
     }
 
     @Test
-    public void requestedMediaTypeIsExcel(){
+    public void requestedMediaTypeIsExcel() {
         assertThat(MediaTypeFactory.fileExtension(EXCEL_MEDIA_TYPE), is("xls"));
     }
-
 }
