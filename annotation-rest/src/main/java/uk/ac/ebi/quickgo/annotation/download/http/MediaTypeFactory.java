@@ -20,8 +20,8 @@ public class MediaTypeFactory {
     public static final String TSV_SUB_TYPE = "tsv";
     public static final String GAF_SUB_TYPE = "gaf";
     public static final String GPAD_SUB_TYPE = "gpad";
-    public static final String EXCEL_SUB_TYPE = "vnd.ms-excel";
-    public static final String JSON_SUB_TYPE = "json";
+    private static final String EXCEL_SUB_TYPE = "vnd.ms-excel";
+    private static final String JSON_SUB_TYPE = "json";
 
     public static final String TSV_MEDIA_TYPE_STRING = TEXT_TYPE + "/" + TSV_SUB_TYPE;
     public static final String GAF_MEDIA_TYPE_STRING = TEXT_TYPE + "/" + GAF_SUB_TYPE;
@@ -35,19 +35,13 @@ public class MediaTypeFactory {
 
     public static final MediaType EXCEL_MEDIA_TYPE = new MediaType(APPLICATION_TYPE, EXCEL_SUB_TYPE);
     public static final MediaType JSON_MEDIA_TYPE = new MediaType(APPLICATION_TYPE, JSON_SUB_TYPE);
-
-    private static Map<MediaType, String> MEDIA_TYPE_TO_FILE_EXTENSIONS = new HashMap<>();
-
-    static {
-        MEDIA_TYPE_TO_FILE_EXTENSIONS.put(TSV_MEDIA_TYPE, TSV_SUB_TYPE);
-        MEDIA_TYPE_TO_FILE_EXTENSIONS.put(GAF_MEDIA_TYPE, GAF_SUB_TYPE);
-        MEDIA_TYPE_TO_FILE_EXTENSIONS.put(GPAD_MEDIA_TYPE, GPAD_SUB_TYPE);
-        MEDIA_TYPE_TO_FILE_EXTENSIONS.put(EXCEL_MEDIA_TYPE, "xls");
-        MEDIA_TYPE_TO_FILE_EXTENSIONS.put(JSON_MEDIA_TYPE, JSON_SUB_TYPE);
-    }
+    private static final String EXCEL_FILE_TYPE = "xls";
 
     public static String fileExtension(MediaType mediaType){
-        return MEDIA_TYPE_TO_FILE_EXTENSIONS.get(mediaType);
+       if( EXCEL_MEDIA_TYPE.equals(mediaType)){
+           return EXCEL_FILE_TYPE;
+       }
+       return mediaType.getSubtype();
     }
 
 }
