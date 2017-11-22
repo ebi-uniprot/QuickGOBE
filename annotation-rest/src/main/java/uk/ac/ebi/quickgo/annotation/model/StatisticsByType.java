@@ -27,7 +27,7 @@ public class StatisticsByType {
     }
 
     public int getDistinctValueCount(){
-        return distinctValueCount;
+        return truncateToTensOfThousands(distinctValueCount);
     }
 
     public void addValue(StatisticsValue value) {
@@ -70,5 +70,12 @@ public class StatisticsByType {
                 ", distinctValueCount=" + distinctValueCount +
                 ", values=" + values +
                 '}';
+    }
+
+    private int truncateToTensOfThousands(int distinctValueCount) {
+        if (distinctValueCount < 10000) {
+            return distinctValueCount;
+        }
+        return Integer.parseInt(String.format("%d000", distinctValueCount / 1000));
     }
 }
