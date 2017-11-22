@@ -16,7 +16,8 @@ import static uk.ac.ebi.quickgo.annotation.service.statistics.RequiredStatisticT
 import static uk.ac.ebi.quickgo.annotation.service.statistics.RequiredStatistics.DEFAULT_GO_TERM_LIMIT;
 
 /**
- * // TODO: 21/11/17
+ * Contains methods common to slimming.
+ * 
  * Created 21/11/17
  * @author Edd
  */
