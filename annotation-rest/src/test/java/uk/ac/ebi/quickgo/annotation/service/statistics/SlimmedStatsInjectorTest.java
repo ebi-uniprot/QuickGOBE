@@ -11,12 +11,12 @@ import org.junit.Test;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.IsNot.not;
 import static uk.ac.ebi.quickgo.annotation.service.statistics.SlimmedStatsHelper.extractMatchingStat;
 import static uk.ac.ebi.quickgo.annotation.service.statistics.SlimmedStatsInjector.ANNOTATIONS_FOR_GO_SLIMS_NAME;
+import static uk.ac.ebi.quickgo.annotation.service.statistics.SlimmedStatsInjector.ANNOTATION_GROUP_NAME;
+import static uk.ac.ebi.quickgo.annotation.service.statistics.SlimmedStatsInjector.GO_ID_TYPE_NAME;
 import static uk.ac.ebi.quickgo.annotation.service.statistics.SlimmedStatsInjector.SLIMMING_GROUP_NAME;
 
 /**
@@ -24,35 +24,36 @@ import static uk.ac.ebi.quickgo.annotation.service.statistics.SlimmedStatsInject
  * @author Edd
  */
 public class SlimmedStatsInjectorTest {
-    public static final String GO_ID = "goId";
     private static final int TOTAL = 10;
     private static final int UNTOUCHED_HITS = 5;
+    private static final String GENE_PRODUCT = "geneProduct";
     private Map<String, List<String>> slimMap;
     private SlimmedStatsInjector slimStatsInjector;
     private List<StatisticsGroup> stats;
     private StatisticsGroup annotationGroup;
-    private StatisticsByType goStatsType;
-    private StatisticsByType gpGoStatsType = new StatisticsByType(GO_ID);
+    private StatisticsByType annotationGoStatsType;
+    private StatisticsByType gpGoStatsType = new StatisticsByType(GO_ID_TYPE_NAME);
     private StatisticsValue gpGoValue = new StatisticsValue(go(1), UNTOUCHED_HITS, TOTAL);
+    private List<StatisticsGroup> initialStatsGroups;
 
     @Before
     public void setUp() {
         slimMap = new HashMap<>();
         slimStatsInjector = new SlimmedStatsInjector();
         stats = new ArrayList<>();
-        annotationGroup = new StatisticsGroup("annotation", TOTAL);
-        goStatsType = new StatisticsByType("goId");
+        annotationGroup = new StatisticsGroup(ANNOTATION_GROUP_NAME, TOTAL);
+        annotationGoStatsType = new StatisticsByType(GO_ID_TYPE_NAME);
     }
 
     @Test
     public void termSlimsToNoTerm() {
         slimMap.put(go(1), singletonList(go(2)));
-        ;
-        goStatsType.addValue(new StatisticsValue(go(4444), 5, TOTAL));
+        annotationGoStatsType.addValue(new StatisticsValue(go(4444), 5, TOTAL));
         setUpStats();
 
         slimStatsInjector.process(stats, slimMap);
 
+        validateExistingGroups();
         List<StatisticsValue> slimValues = validateSlimGroup();
         assertThat(slimValues, hasSize(0));
     }
@@ -60,12 +61,13 @@ public class SlimmedStatsInjectorTest {
     @Test
     public void termSlimsToOneTerm() {
         slimMap.put(go(1), singletonList(go(2)));
-        ;
-        goStatsType.addValue(new StatisticsValue(go(1), 5, TOTAL));
+
+        annotationGoStatsType.addValue(new StatisticsValue(go(1), 5, TOTAL));
         setUpStats();
 
         slimStatsInjector.process(stats, slimMap);
 
+        validateExistingGroups();
         List<StatisticsValue> slimValues = validateSlimGroup();
         assertThat(slimValues, hasSize(1));
         slimValuesContain(slimValues, go(2), (long) 5, (double) (long) 5 / TOTAL);
@@ -75,12 +77,13 @@ public class SlimmedStatsInjectorTest {
     public void twoTermsSlimToSameTerm() {
         slimMap.put(go(1), singletonList(go(2)));
         slimMap.put(go(2), singletonList(go(2)));
-        goStatsType.addValue(new StatisticsValue(go(1), 5, TOTAL));
-        goStatsType.addValue(new StatisticsValue(go(2), 3, TOTAL));
+        annotationGoStatsType.addValue(new StatisticsValue(go(1), 5, TOTAL));
+        annotationGoStatsType.addValue(new StatisticsValue(go(2), 3, TOTAL));
         setUpStats();
 
         slimStatsInjector.process(stats, slimMap);
 
+        validateExistingGroups();
         List<StatisticsValue> slimValues = validateSlimGroup();
         assertThat(slimValues, hasSize(1));
         slimValuesContain(slimValues, go(2), (long) 8, (double) (long) 8 / TOTAL);
@@ -89,19 +92,15 @@ public class SlimmedStatsInjectorTest {
     @Test
     public void termSlimsToTwoTerms() {
         slimMap.put(go(1), asList(go(2), go(3)));
-        goStatsType.addValue(new StatisticsValue(go(1), 5, TOTAL));
+        annotationGoStatsType.addValue(new StatisticsValue(go(1), 5, TOTAL));
         setUpStats();
 
         slimStatsInjector.process(stats, slimMap);
 
+        validateExistingGroups();
         List<StatisticsValue> slimValues = validateSlimGroup();
         assertThat(slimValues, hasSize(2));
         slimValuesContain(slimValues, go(2), 5L, (double) 5 / TOTAL);
-    }
-
-    @Test
-    public void existingGroupsRemainAfterInjection() {
-        // TODO: 21/11/17  
     }
 
     private void slimValuesContain(List<StatisticsValue> slimValues,
@@ -114,15 +113,39 @@ public class SlimmedStatsInjectorTest {
     }
 
     private void setUpStats() {
-        annotationGroup.addStatsType(goStatsType);
+        annotationGroup.addStatsType(annotationGoStatsType);
         stats.add(annotationGroup);
 
-        StatisticsGroup geneProductGroup = new StatisticsGroup("geneProduct", TOTAL);
+        StatisticsGroup geneProductGroup = new StatisticsGroup(GENE_PRODUCT, TOTAL);
         gpGoStatsType.addValue(gpGoValue);
         geneProductGroup.addStatsType(gpGoStatsType);
         stats.add(geneProductGroup);
 
         assertThat(stats, hasSize(2));
+
+        recordInitialStats();
+    }
+
+    private void recordInitialStats() {
+        initialStatsGroups = new ArrayList<>();
+        for (StatisticsGroup stat : stats) {
+            StatisticsGroup copyOfInitialGroup = new StatisticsGroup(stat.getGroupName(), stat.getTotalHits());
+            for (StatisticsByType type : stat.getTypes()) {
+                StatisticsByType copyOfStatType = new StatisticsByType(type.getType());
+                for (StatisticsValue statValue : type.getValues()) {
+                    copyOfStatType.addValue(
+                            new StatisticsValue(statValue.getKey(), statValue.getHits(), stat.getTotalHits()));
+                }
+                copyOfInitialGroup.addStatsType(copyOfStatType);
+            }
+            initialStatsGroups.add(copyOfInitialGroup);
+        }
+    }
+
+    private void validateExistingGroups() {
+        for (StatisticsGroup initialStatsGroup : initialStatsGroups) {
+            assertThat(stats, hasItem(initialStatsGroup));
+        }
     }
 
     private List<StatisticsValue> validateSlimGroup() {
