@@ -26,7 +26,7 @@ public class StatisticsByType {
         return type;
     }
 
-    public int getDistinctValueCount(){
+    public int getDistinctValueCount() {
         return truncateToTensOfThousands(distinctValueCount);
     }
 
