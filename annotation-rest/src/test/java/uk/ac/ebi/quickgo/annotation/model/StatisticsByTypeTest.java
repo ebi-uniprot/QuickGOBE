@@ -5,7 +5,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
 
 /**
@@ -22,7 +21,7 @@ public class StatisticsByTypeTest {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Statistics type cannot be null or empty");
 
-        new StatisticsByType(type,0);
+        new StatisticsByType(type, 0);
     }
 
     @Test
@@ -32,7 +31,7 @@ public class StatisticsByTypeTest {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Statistics type cannot be null or empty");
 
-        new StatisticsByType(type,0);
+        new StatisticsByType(type, 0);
     }
 
     @Test
@@ -43,14 +42,14 @@ public class StatisticsByTypeTest {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Stats value cannot be null");
 
-        StatisticsByType statsType = new StatisticsByType(type,0);
+        StatisticsByType statsType = new StatisticsByType(type, 0);
         statsType.addValue(value);
     }
 
     @Test
     public void addedStatisticsValueIsRetrievedCorrectly() {
         String type = "type";
-        StatisticsByType statsType = new StatisticsByType(type,12);
+        StatisticsByType statsType = new StatisticsByType(type, 12);
 
         assertThat(statsType.getDistinctValueCount(), is(12));
     }
