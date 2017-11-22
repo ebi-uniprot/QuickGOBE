@@ -50,12 +50,40 @@ public class StatisticsByTypeTest {
     @Test
     public void addedStatisticsValueIsRetrievedCorrectly() {
         String type = "type";
-        StatisticsValue value = new StatisticsValue("key", 0, 0);
-
         StatisticsByType statsType = new StatisticsByType(type,12);
-        statsType.addValue(value);
 
-        assertThat(statsType.getValues(), contains(value));
         assertThat(statsType.getDistinctValueCount(), is(12));
+    }
+
+    @Test
+    public void addedStatisticsValueRoundedIfValueGreaterThan10K() {
+        String type = "type";
+        StatisticsByType statsType = new StatisticsByType(type, 10001);
+
+        assertThat(statsType.getDistinctValueCount(), is(10000));
+    }
+
+    @Test
+    public void addedStatisticsValueRoundedIfValueGreaterThan10KTest2() {
+        String type = "type";
+        StatisticsByType statsType = new StatisticsByType(type, 11999);
+
+        assertThat(statsType.getDistinctValueCount(), is(11000));
+    }
+
+    @Test
+    public void addedStatisticsValueRoundedIfValueGreaterThan100K() {
+        String type = "type";
+        StatisticsByType statsType = new StatisticsByType(type, 487934);
+
+        assertThat(statsType.getDistinctValueCount(), is(487000));
+    }
+
+    @Test
+    public void addedStatisticsValueRoundedIfValueGreaterThan1m() {
+        String type = "type";
+        StatisticsByType statsType = new StatisticsByType(type, 7487934);
+
+        assertThat(statsType.getDistinctValueCount(), is(7487000));
     }
 }
