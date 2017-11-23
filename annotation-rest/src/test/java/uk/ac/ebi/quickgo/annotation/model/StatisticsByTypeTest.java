@@ -67,22 +67,30 @@ public class StatisticsByTypeTest {
         String type = "type";
         StatisticsByType statsType = new StatisticsByType(type, 11999);
 
-        assertThat(statsType.getDistinctValueCount(), is(11000));
+        assertThat(statsType.getDistinctValueCount(), is(12000));
     }
 
     @Test
-    public void addedStatisticsValueRoundedIfValueGreaterThan100K() {
+    public void roundUpDistinctCount() {
         String type = "type";
         StatisticsByType statsType = new StatisticsByType(type, 487934);
 
-        assertThat(statsType.getDistinctValueCount(), is(487000));
+        assertThat(statsType.getDistinctValueCount(), is(488000));
     }
 
     @Test
-    public void addedStatisticsValueRoundedIfValueGreaterThan1m() {
+    public void noNeedToRoundUpDistinctCount() {
+        String type = "type";
+        StatisticsByType statsType = new StatisticsByType(type, 333434);
+
+        assertThat(statsType.getDistinctValueCount(), is(333000));
+    }
+
+    @Test
+    public void distinctCountGreaterThan1m() {
         String type = "type";
         StatisticsByType statsType = new StatisticsByType(type, 7487934);
 
-        assertThat(statsType.getDistinctValueCount(), is(7487000));
+        assertThat(statsType.getDistinctValueCount(), is(7488000));
     }
 }
