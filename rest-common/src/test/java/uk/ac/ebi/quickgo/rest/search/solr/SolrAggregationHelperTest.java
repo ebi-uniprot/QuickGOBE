@@ -93,7 +93,7 @@ public class SolrAggregationHelperTest {
     }
 
     @Test
-    public void fieldWithCountPrefixReturnsAnCountPrefixWhenExtractingPrefix() throws Exception {
+    public void fieldWithCountPrefixReturnsCountPrefixWhenExtractingPrefix() throws Exception {
         String prefix = fieldPrefixExtractor(aggregateFieldTitle(COUNT_FUNCTION, GP_ID_FIELD));
 
         assertThat(prefix, is(COUNT_FUNCTION.getName()));
@@ -115,7 +115,7 @@ public class SolrAggregationHelperTest {
     }
 
     @Test
-    public void fieldWithCountPrefixReturnsAnTheFieldWhenExtractingField() throws Exception {
+    public void fieldWithCountPrefixReturnsFieldWhenExtractingField() throws Exception {
         String field = fieldNameExtractor(aggregateFieldTitle(COUNT_FUNCTION, GP_ID_FIELD));
 
         assertThat(field, is(GP_ID_FIELD));
