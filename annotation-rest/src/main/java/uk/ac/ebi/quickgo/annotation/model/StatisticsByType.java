@@ -1,6 +1,8 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
 import com.google.common.base.Preconditions;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -76,6 +78,7 @@ public class StatisticsByType {
         if (distinctValueCount < 10000) {
             return distinctValueCount;
         }
-        return Integer.parseInt(String.format("%d000", distinctValueCount / 1000));
+        int value = new BigDecimal(distinctValueCount).divide(new BigDecimal(1000), RoundingMode.HALF_UP).intValue();
+        return Integer.parseInt(String.format("%d000", value));
     }
 }
