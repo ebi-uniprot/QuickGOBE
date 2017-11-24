@@ -123,11 +123,11 @@ public class SolrAggregationHelperTest {
 
     @Test
     public void testForNumBucketsReturnsTrue(){
-        assertThat(distinctValueCountTester(NUM_BUCKETS), is(true)) ;
+        assertThat(isDistinctValueCount(NUM_BUCKETS), is(true));
     }
 
     @Test
     public void testForNumBucketsReturnsFalse(){
-        assertThat(distinctValueCountTester("bucketHead"), is(false)) ;
+        assertThat(isDistinctValueCount("bucketHead"), is(false));
     }
 }

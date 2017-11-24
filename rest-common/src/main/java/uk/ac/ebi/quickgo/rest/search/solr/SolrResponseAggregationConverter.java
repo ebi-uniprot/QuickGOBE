@@ -122,12 +122,12 @@ public class SolrResponseAggregationConverter implements AggregationConverter<So
             } else {
                 logger.debug("Unable to process field:{}, with prefix:{}", field, fieldPrefix);
             }
-        } else if (SolrAggregationHelper.distinctValueCountTester(field)){
+        } else if (isDistinctValueCount(field)) {
             aggregation.setDistinctValuesCount(((Number)value).intValue());
 
         } else if (isFieldBucket(field)) {
             List<NamedList<?>> buckets = (List<NamedList<?>>) value;
-            buckets.forEach(bucket -> convertBucket((NamedList<?>) bucket, aggregation));
+            buckets.forEach(bucket -> convertBucket(bucket, aggregation));
         } else {
             logger.debug("Did not process field: {} with value: {}", field, value);
         }

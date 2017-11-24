@@ -78,7 +78,7 @@ class SolrAggregationHelper {
      * @param field element of the aggregation result
      * @return true if field holds distinct value count field definition.
      */
-    static boolean distinctValueCountTester(String field) {
+    static boolean isDistinctValueCount(String field) {
         return NUM_BUCKETS.equals(field);
     }
 }
