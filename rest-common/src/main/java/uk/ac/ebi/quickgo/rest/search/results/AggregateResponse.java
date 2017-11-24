@@ -4,9 +4,10 @@ import uk.ac.ebi.quickgo.rest.search.AggregateFunction;
 import uk.ac.ebi.quickgo.rest.search.query.AggregateRequest;
 
 import com.google.common.base.Preconditions;
-import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
+
+import static java.util.Collections.unmodifiableSet;
 
 /**
  * Stores the result of the aggregation section found within the response of the underlying data source.
@@ -20,7 +21,8 @@ import java.util.Set;
  *     field that can be calculated within the response's ability, example: sum(field1) or unique(field2)</li>
  *     <li>A set of {@link AggregationBucket}: Each bucket represents a distinct value of the field being
  *     aggregated upon, as well as any {@link AggregationResult} applied to the bucket value</li>
- *     <li>A set of {@link AggregateResponse#nestedAggregations}: A nested aggregation is a drilled down view of the main
+ *     <li>A set of {@link AggregateResponse#nestedAggregations}: A nested aggregation is a drilled down view of the
+ *     main
  *     aggregation. This means that it tries to retrieve metrics on a different aggregate field, but always based on
  *     the result of the current aggregation</li>
  *     <li>A distinct value count. The number of buckets contained in an instance of this class is constrained by
@@ -70,46 +72,21 @@ public class AggregateResponse {
     private final Set<AggregationBucket> buckets;
     private int distinctValuesCount;
 
-    public AggregateResponse(String name) {
+    public AggregateResponse(String name, AggregationResultsManager aggregationResultsManager, Set
+            nestedAggregations, Set buckets, int distinctValuesCount) {
         Preconditions.checkArgument(name != null && !name.trim().isEmpty(), "Name cannot be null or empty");
+        Preconditions.checkArgument(aggregationResultsManager != null, "Aggregation Results Manager cannot be null");
+        Preconditions.checkArgument(nestedAggregations != null && !name.trim().isEmpty(), "Nested Aggregations " +
+                "cannot be null");
+        Preconditions.checkArgument(buckets != null && !name.trim().isEmpty(), "Buckets " +
+                "cannot be null");
+        Preconditions.checkArgument(distinctValuesCount >= 0, "DistinctValueCount must be zero or greater");
 
         this.name = name;
-        this.aggregationResultsManager = new AggregationResultsManager();
-        nestedAggregations = new LinkedHashSet<>();
-        buckets = new LinkedHashSet<>();
-    }
-
-    /**
-     * Adds the result of the application of an aggregation function over a given field.
-     *
-     * @param function the aggregation function that was applied
-     * @param field the field the function was applied over
-     * @param result the result of the application of the function over the field
-     */
-    public void addAggregationResult(AggregateFunction function, String field, double result) {
-        aggregationResultsManager.addAggregateResult(function, field, result);
-    }
-
-    /**
-     * Adds a set of distinct values of a given field. The bucket can also potentially contain aggregation
-     * results.
-     *
-     * @param bucket a set of distinct results of field
-     */
-    public void addBucket(AggregationBucket bucket) {
-        Preconditions.checkArgument(bucket != null, "AggregationBucket cannot be null");
-        buckets.add(bucket);
-    }
-
-    /**
-     * Adds a lower level aggregation to the current one. Usually nested aggregations are drilled down results
-     * applied to a different field than the current aggregation.
-     *
-     * @param aggregation an aggregation
-     */
-    public void addNestedAggregation(AggregateResponse aggregation) {
-        Preconditions.checkArgument(aggregation != null, "Nested aggregation cannot be null");
-        nestedAggregations.add(aggregation);
+        this.aggregationResultsManager = aggregationResultsManager;
+        this.nestedAggregations = nestedAggregations;
+        this.buckets = buckets;
+        this.distinctValuesCount = distinctValuesCount;
     }
 
     /**
@@ -127,19 +104,10 @@ public class AggregateResponse {
     /**
      * Returns all the results of aggregation functions applied on fields.
      *
-     * @return a set of {@link AggregationResult}s.
+     * @return a unmodifiable set of {@link AggregationResult}s.
      */
     public Set<AggregationResult> getAggregationResults() {
-        return aggregationResultsManager.getAggregationResults();
-    }
-
-    /**
-     * Checks if there are any aggregations results stored within the aggregation.
-     *
-     * @return true if there is at least one aggregation result, false otherwise.
-     */
-    public boolean hasAggregationResults() {
-        return !aggregationResultsManager.getAggregationResults().isEmpty();
+        return unmodifiableSet(aggregationResultsManager.getAggregationResults());
     }
 
     /**
@@ -156,10 +124,10 @@ public class AggregateResponse {
     /**
      * Returns a set of all nested aggregations.
      *
-     * @return a set of the nested aggregations.
+     * @return a unmodifiable set of the nested aggregations.
      */
     public Set<AggregateResponse> getNestedAggregations() {
-        return nestedAggregations;
+        return unmodifiableSet(nestedAggregations);
     }
 
     /**
@@ -173,10 +141,10 @@ public class AggregateResponse {
     /**
      * Returns the set of aggregation buckets associated to this aggregation.
      *
-     * @return a set of {@link AggregationBucket}
+     * @return a unmodifiable set of {@link AggregationBucket}
      */
     public Set<AggregationBucket> getBuckets() {
-        return buckets;
+        return unmodifiableSet(buckets);
     }
 
     /**
@@ -198,14 +166,6 @@ public class AggregateResponse {
     }
 
     /**
-     * Set the total number of distinct values for the aggregation.
-     * @param distinctValuesCount
-     */
-    public void setDistinctValuesCount(int distinctValuesCount) {
-        this.distinctValuesCount = distinctValuesCount;
-    }
-
-    /**
      * Return the total number of distinct values for the aggregation.
      * @return total number of distinct values
      */
@@ -221,5 +181,14 @@ public class AggregateResponse {
                 ", buckets=" + buckets +
                 ", distinctValuesCount=" + distinctValuesCount +
                 '}';
+    }
+
+    /**
+     * Checks if there are any aggregations results stored within the aggregation.
+     *
+     * @return true if there is at least one aggregation result, false otherwise.
+     */
+    boolean hasAggregationResults() {
+        return !aggregationResultsManager.getAggregationResults().isEmpty();
     }
 }
