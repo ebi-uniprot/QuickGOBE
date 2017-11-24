@@ -66,7 +66,7 @@ public class StatisticsGroupTest {
         String groupName = "group";
         int totalHits = 0;
 
-        StatisticsByType statsType = new StatisticsByType("type",0);
+        StatisticsByType statsType = new StatisticsByType("type", 0);
 
         StatisticsGroup statsGroup = new StatisticsGroup(groupName, totalHits);
         statsGroup.addStatsType(statsType);
