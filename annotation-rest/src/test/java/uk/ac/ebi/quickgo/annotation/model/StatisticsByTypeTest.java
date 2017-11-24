@@ -35,6 +35,16 @@ public class StatisticsByTypeTest {
     }
 
     @Test
+    public void negativeDistinctValueCountThrowsException() {
+        String type = "type";
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Distinct Value Count should be be greater than zero.");
+
+        new StatisticsByType(type, -10);
+    }
+
+    @Test
     public void nullStatisticsValueThrowsException() {
         String type = "type";
         StatisticsValue value = null;
@@ -47,15 +57,23 @@ public class StatisticsByTypeTest {
     }
 
     @Test
-    public void addedStatisticsValueIsRetrievedCorrectly() {
+    public void zeroDistinctValueCountIsOK() {
         String type = "type";
-        StatisticsByType statsType = new StatisticsByType(type, 12);
+        StatisticsByType statsType = new StatisticsByType(type, 0);
 
-        assertThat(statsType.getDistinctValueCount(), is(12));
+        assertThat(statsType.getDistinctValueCount(), is(0));
     }
 
     @Test
-    public void addedStatisticsValueRoundedIfValueGreaterThan10K() {
+    public void distinctValueCountBelow10001IsUnchanged() {
+        String type = "type";
+        StatisticsByType statsType = new StatisticsByType(type, 10000);
+
+        assertThat(statsType.getDistinctValueCount(), is(10000));
+    }
+
+    @Test
+    public void distinctValueCountRoundedDownIfValueGreaterThan10KAndEndsWith101To499() {
         String type = "type";
         StatisticsByType statsType = new StatisticsByType(type, 10001);
 
@@ -63,34 +81,18 @@ public class StatisticsByTypeTest {
     }
 
     @Test
-    public void addedStatisticsValueRoundedIfValueGreaterThan10KTest2() {
+    public void distinctValueCountRoundedDownIfEndsWith499OrLess() {
         String type = "type";
-        StatisticsByType statsType = new StatisticsByType(type, 11999);
+        StatisticsByType statsType = new StatisticsByType(type, 10499);
 
-        assertThat(statsType.getDistinctValueCount(), is(12000));
+        assertThat(statsType.getDistinctValueCount(), is(10000));
     }
 
     @Test
-    public void roundUpDistinctCount() {
+    public void distinctValueCountRoundedUpIfEndsWith500OrGreater() {
         String type = "type";
-        StatisticsByType statsType = new StatisticsByType(type, 487934);
+        StatisticsByType statsType = new StatisticsByType(type, 10500);
 
-        assertThat(statsType.getDistinctValueCount(), is(488000));
-    }
-
-    @Test
-    public void noNeedToRoundUpDistinctCount() {
-        String type = "type";
-        StatisticsByType statsType = new StatisticsByType(type, 333434);
-
-        assertThat(statsType.getDistinctValueCount(), is(333000));
-    }
-
-    @Test
-    public void distinctCountGreaterThan1m() {
-        String type = "type";
-        StatisticsByType statsType = new StatisticsByType(type, 7487934);
-
-        assertThat(statsType.getDistinctValueCount(), is(7488000));
+        assertThat(statsType.getDistinctValueCount(), is(11000));
     }
 }
