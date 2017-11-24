@@ -72,8 +72,8 @@ public class AggregateResponse {
     private final Set<AggregationBucket> buckets;
     private int distinctValuesCount;
 
-    public AggregateResponse(String name, AggregationResultsManager aggregationResultsManager, Set
-            nestedAggregations, Set buckets, int distinctValuesCount) {
+    public AggregateResponse(String name, AggregationResultsManager aggregationResultsManager, Set<AggregateResponse>
+            nestedAggregations, Set<AggregationBucket> buckets, int distinctValuesCount) {
         Preconditions.checkArgument(name != null && !name.trim().isEmpty(), "Name cannot be null or empty");
         Preconditions.checkArgument(aggregationResultsManager != null, "Aggregation Results Manager cannot be null");
         Preconditions.checkArgument(nestedAggregations != null && !name.trim().isEmpty(), "Nested Aggregations " +
@@ -134,7 +134,7 @@ public class AggregateResponse {
      * Indicates whether the aggregation has nested aggregations stored within it.
      * @return true if there are nested aggregations associated to this aggregation, false otherwise.
      */
-    public boolean hasNestedAggregations() {
+    boolean hasNestedAggregations() {
         return !nestedAggregations.isEmpty();
     }
 
@@ -151,7 +151,7 @@ public class AggregateResponse {
      * Indicates whether the aggregation, at the moment of the method call, has any buckets associated to it.
      * @return boolean indicating whether or not the aggregation has associated buckets
      */
-    public boolean hasBuckets() {
+    boolean hasBuckets() {
         return !buckets.isEmpty();
     }
 
