@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.rest.search.solr;
 
 import uk.ac.ebi.quickgo.rest.search.AggregateFunction;
 import uk.ac.ebi.quickgo.rest.search.results.AggregateResponse;
+import uk.ac.ebi.quickgo.rest.search.results.AggregateResponseBuilder;
 import uk.ac.ebi.quickgo.rest.search.results.AggregationBucket;
 import uk.ac.ebi.quickgo.rest.service.ServiceRetrievalConfig;
 
@@ -78,30 +79,31 @@ public class SolrResponseAggregationConverter implements AggregationConverter<So
 
     @Override public AggregateResponse convert(SolrResponse response) {
         Preconditions.checkArgument(response != null, "Cannot convert null Solr response to an aggregation");
-        NamedList<?> aggregateResponse = extractAggregationsFromResponse(response);
+        NamedList<?> facetData = extractAggregationsFromResponse(response);
 
-        AggregateResponse globalAgg = new AggregateResponse(GLOBAL_ID);
+        AggregateResponseBuilder globalAggBuilder = new AggregateResponseBuilder(GLOBAL_ID);
 
-        if (aggregateResponse != null && aggregateResponse.size() > 0) {
-            convertSolrAggregationsToDomainAggregations(aggregateResponse, globalAgg);
+        if (facetData != null && facetData.size() > 0) {
+            convertSolrAggregationsToDomainAggregations(facetData, globalAggBuilder);
         }
 
-        return globalAgg;
+        return globalAggBuilder.createAggregateResponse();
     }
 
     /**
      * Extracts the section of the {@link SolrResponse} that is used specifically for the aggregation.
      *
-     * @param response the native Solr resposne
+     * @param response the native Solr response
      * @return The data structure used to store the aggregation results
      */
     private NamedList<?> extractAggregationsFromResponse(SolrResponse response) {
         return (NamedList<?>) response.getResponse().get(AGGREGATIONS_MARKER);
     }
 
-    private void convertSolrAggregationsToDomainAggregations(NamedList<?> facetData, AggregateResponse aggregation) {
+    private void convertSolrAggregationsToDomainAggregations(NamedList<?> facetData, AggregateResponseBuilder
+            aggregationBuilder) {
         for (Map.Entry<String, ?> facetDataEntry : facetData) {
-            convertAggregateValue(facetDataEntry.getKey(), facetDataEntry.getValue(), aggregation);
+            convertAggregateValue(facetDataEntry.getKey(), facetDataEntry.getValue(), aggregationBuilder);
         }
     }
 
@@ -109,25 +111,25 @@ public class SolrResponseAggregationConverter implements AggregationConverter<So
      * Converts an element found within a {@link NamedList} into an value that makes sense within an
      * {@link AggregateResponse}
      */
-    private void convertAggregateValue(String field, Object value, AggregateResponse aggregation) {
+    private void convertAggregateValue(String field, Object value, AggregateResponseBuilder aggregationBuilder) {
         String fieldPrefix = SolrAggregationHelper.fieldPrefixExtractor(field);
 
         if (!fieldPrefix.isEmpty()) {
             String name = SolrAggregationHelper.fieldNameExtractor(field);
             if (isNestedAggregate(fieldPrefix)) {
                 AggregateResponse nestedAggregation = createNestedAggregation(name, value);
-                aggregation.addNestedAggregation(nestedAggregation);
+                aggregationBuilder.addNestedAggregation(nestedAggregation);
             } else if (isAggregateFunction(fieldPrefix)) {
-                addAggregationFunctionToAggregation(fieldPrefix, name, value, aggregation);
+                addAggregationFunctionToAggregation(fieldPrefix, name, value, aggregationBuilder);
             } else {
                 logger.debug("Unable to process field:{}, with prefix:{}", field, fieldPrefix);
             }
         } else if (isDistinctValueCount(field)) {
-            aggregation.setDistinctValuesCount(((Number)value).intValue());
+            aggregationBuilder.setDistinctValuesCount(((Number) value).intValue());
 
         } else if (isFieldBucket(field)) {
             List<NamedList<?>> buckets = (List<NamedList<?>>) value;
-            buckets.forEach(bucket -> convertBucket(bucket, aggregation));
+            buckets.forEach(bucket -> convertBucket(bucket, aggregationBuilder));
         } else {
             logger.debug("Did not process field: {} with value: {}", field, value);
         }
@@ -179,11 +181,10 @@ public class SolrResponseAggregationConverter implements AggregationConverter<So
      * @return creates a new {@link AggregateResponse} base on the method arguments
      */
     private AggregateResponse createNestedAggregation(String name, Object nestedFacets) {
-        AggregateResponse nestedAggregation = new AggregateResponse(responseFieldName2DomainFieldName(name));
-
-        convertSolrAggregationsToDomainAggregations((NamedList) nestedFacets, nestedAggregation);
-
-        return nestedAggregation;
+        AggregateResponseBuilder nestedAggregationBuilder =
+                new AggregateResponseBuilder(responseFieldName2DomainFieldName(name));
+        convertSolrAggregationsToDomainAggregations((NamedList) nestedFacets, nestedAggregationBuilder);
+        return nestedAggregationBuilder.createAggregateResponse();
     }
 
     /**
@@ -194,15 +195,15 @@ public class SolrResponseAggregationConverter implements AggregationConverter<So
      * @param field the name of the field that was aggregated
      * @param hitsObject the result of the application of the function defined in {@code functionText} to the
      * aggregation field defined in {@code field}.
-     * @param aggregation the aggregation where the aggragetion result will be added to.
+     * @param aggregationBuilder the aggregation builder the aggregation result will be added to.
      */
     private void addAggregationFunctionToAggregation(String functionText, String field, Object hitsObject,
-            AggregateResponse aggregation) {
+            AggregateResponseBuilder aggregationBuilder) {
         AggregateFunction function = AggregateFunction.typeOf(functionText);
 
         double hits = convertToDouble(hitsObject);
 
-        aggregation.addAggregationResult(function, field, hits);
+        aggregationBuilder.addAggregationResult(function, field, hits);
     }
 
     private String responseFieldName2DomainFieldName(String name) {
@@ -212,9 +213,9 @@ public class SolrResponseAggregationConverter implements AggregationConverter<So
         return name;
     }
 
-    private void convertBucket(NamedList<?> facetBucket, AggregateResponse aggregation) {
+    private void convertBucket(NamedList<?> facetBucket, AggregateResponseBuilder aggregationBuilder) {
         AggregationBucket aggBucket = new AggregationBucket(String.valueOf(facetBucket.get(BUCKET_FIELD_ID)));
-        aggregation.addBucket(aggBucket);
+        aggregationBuilder.addBucket(aggBucket);
 
         for (Map.Entry<String, ?> bucketEntry : facetBucket) {
             convertBucketValue(bucketEntry.getKey(), bucketEntry.getValue(), aggBucket);
@@ -242,7 +243,7 @@ public class SolrResponseAggregationConverter implements AggregationConverter<So
 
         if (number instanceof Double) {
             convertedValue = (double) number;
-        } else if(number instanceof Long) {
+        } else if (number instanceof Long) {
             convertedValue = (long) number;
         } else if (number instanceof Integer) {
             convertedValue = ((Integer) number).doubleValue();
