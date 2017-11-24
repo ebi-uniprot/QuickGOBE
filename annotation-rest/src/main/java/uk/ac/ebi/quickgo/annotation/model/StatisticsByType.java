@@ -18,7 +18,8 @@ public class StatisticsByType {
     private final List<StatisticsValue> values;
 
     public StatisticsByType(String type, int distinctValueCount) {
-        Preconditions.checkArgument(type != null && !type.isEmpty(), "Statistics type cannot be null or empty");
+        Preconditions.checkArgument(type != null && !type.isEmpty(), "Statistics type cannot be null or empty.");
+        Preconditions.checkArgument(distinctValueCount >= 0, "Distinct Value Count should be be greater than zero.");
         this.type = type;
         this.distinctValueCount = distinctValueCount;
         this.values = new ArrayList<>();
@@ -75,7 +76,7 @@ public class StatisticsByType {
     }
 
     private int truncateToTensOfThousands(int distinctValueCount) {
-        if (distinctValueCount < 10000) {
+        if (distinctValueCount < 10001) {
             return distinctValueCount;
         }
         int value = new BigDecimal(distinctValueCount).divide(new BigDecimal(1000), RoundingMode.HALF_UP).intValue();
