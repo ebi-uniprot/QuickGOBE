@@ -70,7 +70,7 @@ public class AggregateResponse {
     private final AggregationResultsManager aggregationResultsManager;
     private final Set<AggregateResponse> nestedAggregations;
     private final Set<AggregationBucket> buckets;
-    private int distinctValuesCount;
+    private final int distinctValuesCount;
 
     public AggregateResponse(String name, AggregationResultsManager aggregationResultsManager, Set<AggregateResponse>
             nestedAggregations, Set<AggregationBucket> buckets, int distinctValuesCount) {
