@@ -32,7 +32,7 @@ public class AggregateResponseBuilderTest {
     public void setUp() throws Exception {
         aggregateResponseBuilder = new AggregateResponseBuilder("agg");
         nestedAggregation = new AggregateResponse("nestedAggregation", new AggregationResultsManager(),
-                new LinkedHashSet(), new LinkedHashSet(), 5);
+                new LinkedHashSet<>(), new LinkedHashSet<>(), 5);
     }
 
     @Test
