@@ -29,6 +29,8 @@ public class AggregateToStringConverter implements AggregateConverter<String> {
     private static final String FACET_TYPE_FORMAT = "type" + NAME_TO_VALUE_SEPARATOR + "%s";
     private static final String FACET_FIELD_FORMAT = "field" + NAME_TO_VALUE_SEPARATOR + "%s";
     private static final String LIMIT_FIELD_FORMAT = "limit" + NAME_TO_VALUE_SEPARATOR + "%s";
+    static final String NUM_BUCKETS = "numBuckets";
+    static final String NUM_BUCKETS_TRUE = NUM_BUCKETS + ":true";
 
     @Override public String convert(AggregateRequest aggregate) {
         Preconditions.checkArgument(aggregate != null, "AggregateRequest to convert cannot be null");
@@ -175,8 +177,9 @@ public class AggregateToStringConverter implements AggregateConverter<String> {
 
         StringJoiner subFacetComponents = new StringJoiner(DECLARATION_SEPARATOR);
         subFacetComponents.add(createFacetType(FACET_TYPE_TERM))
-                .add(createFacetField(nestedAggregate.getName()));
-        subFacetComponents.add(createLimitField(nestedAggregate.getLimit()));
+                .add(NUM_BUCKETS_TRUE)
+                .add(createFacetField(nestedAggregate.getName()))
+                .add(createLimitField(nestedAggregate.getLimit()));
 
         if (!fields.isEmpty()) {
             subFacetComponents.add(FACET_MARKER + NAME_TO_VALUE_SEPARATOR + convert(nestedAggregate));

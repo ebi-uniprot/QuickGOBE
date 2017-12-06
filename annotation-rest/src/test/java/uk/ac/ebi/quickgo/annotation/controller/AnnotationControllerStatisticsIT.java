@@ -38,6 +38,7 @@ import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.TAXON_USAGE_PARA
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.contentTypeToBeJson;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.totalNumOfResults;
 import static uk.ac.ebi.quickgo.annotation.controller.StatsResponseVerifier.keysInTypeWithinGroup;
+import static uk.ac.ebi.quickgo.annotation.controller.StatsResponseVerifier.numericValueForGroup;
 import static uk.ac.ebi.quickgo.annotation.controller.StatsResponseVerifier.totalHitsInGroup;
 
 /**
@@ -65,7 +66,8 @@ public class AnnotationControllerStatisticsIT {
     private static final String REFERENCE_STATS_FIELD = "reference";
     private static final String TAXON_ID_STATS_FIELD = "taxonId";
     private static final String GO_ASPECT_STATS_FIELD = "aspect";
-    public static final String EXACT_USAGE = "exact";
+    private static final String EXACT_USAGE = "exact";
+    private static final String DISTINCT_VALUE_COUNT = "distinctValueCount";
 
     private MockMvc mockMvc;
 
@@ -104,7 +106,7 @@ public class AnnotationControllerStatisticsIT {
     //----------- Ontology ID -----------//
     @Test
     public void statsForAllDocsContaining1OntologyIdReturns1OntologyIdStat() throws Exception {
-        executesAndAssertsCalculatedStatsForAttribute(GO_ID_STATS_FIELD, savedDocs, doc -> doc.goId);
+        executesAndAssertsCalculatedStatsForAttribute(GO_ID_STATS_FIELD, savedDocs, doc -> doc.goId, 1);
     }
 
     @Test
@@ -116,7 +118,7 @@ public class AnnotationControllerStatisticsIT {
         List<AnnotationDocument> savedDocsPlusOne = new ArrayList<>(savedDocs);
         savedDocsPlusOne.add(extraDoc);
 
-        executesAndAssertsCalculatedStatsForAttribute(GO_ID_STATS_FIELD, savedDocsPlusOne, doc -> doc.goId);
+        executesAndAssertsCalculatedStatsForAttribute(GO_ID_STATS_FIELD, savedDocsPlusOne, doc -> doc.goId, 2);
     }
 
     @Test
@@ -139,14 +141,14 @@ public class AnnotationControllerStatisticsIT {
                         .param(TAXON_USAGE_PARAM.getName(), EXACT_USAGE)
         );
 
-        assertStatsResponse(response, GO_ID_STATS_FIELD, 2, relevantGOIds);
+        assertStatsResponse(response, GO_ID_STATS_FIELD, 2, relevantGOIds, 2);
     }
 
     //----------- Taxon ID -----------//
     @Test
     public void statsForAllDocsContaining1TaxonIdReturns1TaxonIdStat() throws Exception {
         executesAndAssertsCalculatedStatsForAttribute(TAXON_ID_STATS_FIELD, savedDocs,
-                doc -> String.valueOf(doc.taxonId));
+                doc -> String.valueOf(doc.taxonId), 1);
     }
 
     @Test
@@ -159,7 +161,7 @@ public class AnnotationControllerStatisticsIT {
         savedDocsPlusOne.add(extraDoc);
 
         executesAndAssertsCalculatedStatsForAttribute(TAXON_ID_STATS_FIELD, savedDocsPlusOne,
-                doc -> String.valueOf(doc.taxonId));
+                doc -> String.valueOf(doc.taxonId), 2);
     }
 
     @Test
@@ -184,13 +186,13 @@ public class AnnotationControllerStatisticsIT {
                         .param(GO_USAGE_PARAM.getName(), EXACT_USAGE)
         );
 
-        assertStatsResponse(response, TAXON_ID_STATS_FIELD, 2, relevantTaxonIds);
+        assertStatsResponse(response, TAXON_ID_STATS_FIELD, 2, relevantTaxonIds, 2);
     }
 
     //----------- Reference -----------//
     @Test
     public void statsForAllDocsContaining1ReferenceIdReturns1ReferenceIdStat() throws Exception {
-        executesAndAssertsCalculatedStatsForAttribute(REFERENCE_STATS_FIELD, savedDocs, doc -> doc.reference);
+        executesAndAssertsCalculatedStatsForAttribute(REFERENCE_STATS_FIELD, savedDocs, doc -> doc.reference, 1);
     }
 
     @Test
@@ -202,7 +204,7 @@ public class AnnotationControllerStatisticsIT {
         List<AnnotationDocument> savedDocsPlusOne = new ArrayList<>(savedDocs);
         savedDocsPlusOne.add(extraDoc);
 
-        executesAndAssertsCalculatedStatsForAttribute(REFERENCE_STATS_FIELD, savedDocsPlusOne, doc -> doc.reference);
+        executesAndAssertsCalculatedStatsForAttribute(REFERENCE_STATS_FIELD, savedDocsPlusOne, doc -> doc.reference, 2);
     }
 
     @Test
@@ -227,13 +229,14 @@ public class AnnotationControllerStatisticsIT {
                         .param(GO_USAGE_PARAM.getName(), EXACT_USAGE)
         );
 
-        assertStatsResponse(response, REFERENCE_STATS_FIELD, 2, relevantReferenceIds);
+        assertStatsResponse(response, REFERENCE_STATS_FIELD, 2, relevantReferenceIds, 2);
     }
 
     //----------- Evidence code -----------//
     @Test
     public void statsForAllDocsContaining1EvidenceCodeReturns1EvidenceCodeStat() throws Exception {
-        executesAndAssertsCalculatedStatsForAttribute(EVIDENCE_CODE_STATS_FIELD, savedDocs, doc -> doc.evidenceCode);
+        executesAndAssertsCalculatedStatsForAttribute(EVIDENCE_CODE_STATS_FIELD, savedDocs, doc -> doc.evidenceCode,
+                1);
     }
 
     @Test
@@ -246,7 +249,7 @@ public class AnnotationControllerStatisticsIT {
         savedDocsPlusOne.add(extraDoc);
 
         executesAndAssertsCalculatedStatsForAttribute(EVIDENCE_CODE_STATS_FIELD, savedDocsPlusOne,
-                doc -> doc.evidenceCode);
+                doc -> doc.evidenceCode, 2);
     }
 
     @Test
@@ -271,13 +274,13 @@ public class AnnotationControllerStatisticsIT {
                         .param(GO_USAGE_PARAM.getName(), EXACT_USAGE)
         );
 
-        assertStatsResponse(response, EVIDENCE_CODE_STATS_FIELD, 2, relevantEvidenceCodes);
+        assertStatsResponse(response, EVIDENCE_CODE_STATS_FIELD, 2, relevantEvidenceCodes, 2);
     }
 
     //----------- Assigned by -----------//
     @Test
     public void statsForAllDocsContaining1AssignedByReturns1AssignedByStat() throws Exception {
-        executesAndAssertsCalculatedStatsForAttribute(ASSIGNED_BY_STATS_FIELD, savedDocs, doc -> doc.assignedBy);
+        executesAndAssertsCalculatedStatsForAttribute(ASSIGNED_BY_STATS_FIELD, savedDocs, doc -> doc.assignedBy, 1);
     }
 
     @Test
@@ -289,7 +292,8 @@ public class AnnotationControllerStatisticsIT {
         List<AnnotationDocument> savedDocsPlusOne = new ArrayList<>(savedDocs);
         savedDocsPlusOne.add(extraDoc);
 
-        executesAndAssertsCalculatedStatsForAttribute(ASSIGNED_BY_STATS_FIELD, savedDocsPlusOne, doc -> doc.assignedBy);
+        executesAndAssertsCalculatedStatsForAttribute(ASSIGNED_BY_STATS_FIELD, savedDocsPlusOne, doc -> doc
+                .assignedBy, 2);
     }
 
     @Test
@@ -314,44 +318,13 @@ public class AnnotationControllerStatisticsIT {
                         .param(GO_USAGE_PARAM.getName(), EXACT_USAGE)
         );
 
-        assertStatsResponse(response, ASSIGNED_BY_STATS_FIELD, 2, relevantAssignedBy);
-    }
-
-    /**
-     * Extracts all values of a given attribute, within all saved document, and then checks to see if the statistics run
-     * on that attribute are correct.
-     *
-     * @param attribute the attribute to run statistics on
-     * @param docs a collection of docs that the stats will be run on
-     * @param extractAttributeValuesFromDoc a function to extract the values of {@code statsType} from the saved
-     * documents
-     * @throws Exception if an error occurs whilst saving or retrieving documents
-     */
-    private void executesAndAssertsCalculatedStatsForAttribute(String attribute, Collection<AnnotationDocument> docs,
-            Function<AnnotationDocument, String> extractAttributeValuesFromDoc) throws Exception {
-        Set<String> extractedAttributeValues = selectValuesFromDocs(docs, extractAttributeValuesFromDoc);
-
-        ResultActions response = mockMvc.perform(get(STATS_ENDPOINT));
-
-        assertStatsResponse(response, attribute, docs.size(), extractedAttributeValues);
-    }
-
-    private void assertStatsResponse(ResultActions response, String statsType, int totalHits,
-            Collection<String> statsValues) throws Exception {
-        response.andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(2))
-                .andExpect(totalHitsInGroup(ANNOTATION_GROUP, totalHits))
-                .andExpect(totalHitsInGroup(GENE_PRODUCT_GROUP, totalHits))
-                .andExpect(keysInTypeWithinGroup(ANNOTATION_GROUP, statsType, asArray(statsValues)))
-                .andExpect(keysInTypeWithinGroup(GENE_PRODUCT_GROUP, statsType, asArray(statsValues)));
+        assertStatsResponse(response, ASSIGNED_BY_STATS_FIELD, 2, relevantAssignedBy, 2);
     }
 
     //----------- GO aspect -----------//
     @Test
     public void statsForAllDocsContaining1AspectReturns1AspectByStat() throws Exception {
-        executesAndAssertsCalculatedStatsForAttribute(GO_ASPECT_STATS_FIELD, savedDocs, doc -> doc.goAspect);
+        executesAndAssertsCalculatedStatsForAttribute(GO_ASPECT_STATS_FIELD, savedDocs, doc -> doc.goAspect, 1);
     }
 
     @Test
@@ -363,7 +336,7 @@ public class AnnotationControllerStatisticsIT {
         List<AnnotationDocument> savedDocsPlusOne = new ArrayList<>(savedDocs);
         savedDocsPlusOne.add(extraDoc);
 
-        executesAndAssertsCalculatedStatsForAttribute(GO_ASPECT_STATS_FIELD, savedDocsPlusOne, doc -> doc.goAspect);
+        executesAndAssertsCalculatedStatsForAttribute(GO_ASPECT_STATS_FIELD, savedDocsPlusOne, doc -> doc.goAspect, 2);
     }
 
     @Test
@@ -388,17 +361,51 @@ public class AnnotationControllerStatisticsIT {
                         .param(GO_USAGE_PARAM.getName(), EXACT_USAGE)
         );
 
-        assertStatsResponse(response, GO_ASPECT_STATS_FIELD, 2, relevantAspect);
-    }
-
-    private String[] asArray(Collection<String> elements) {
-        return elements.stream().toArray(String[]::new);
+        assertStatsResponse(response, GO_ASPECT_STATS_FIELD, 2, relevantAspect, 2);
     }
 
     private static <T, D extends QuickGODocument> Set<T> selectValuesFromDocs(
             Collection<D> documents,
             Function<D, T> docTransformation) {
         return documents.stream().map(docTransformation).collect(Collectors.toSet());
+    }
+
+    /**
+     * Extracts all values of a given attribute, within all saved document, and then checks to see if the statistics run
+     * on that attribute are correct.
+     *
+     * @param attribute the attribute to run statistics on
+     * @param docs a collection of docs that the stats will be run on
+     * @param extractAttributeValuesFromDoc a function to extract the values of {@code statsType} from the saved
+     * documents
+     * @throws Exception if an error occurs whilst saving or retrieving documents
+     */
+    private void executesAndAssertsCalculatedStatsForAttribute(String attribute, Collection<AnnotationDocument> docs,
+            Function<AnnotationDocument, String> extractAttributeValuesFromDoc, int expectedDistinctValueCount)
+            throws Exception {
+        Set<String> extractedAttributeValues = selectValuesFromDocs(docs, extractAttributeValuesFromDoc);
+
+        ResultActions response = mockMvc.perform(get(STATS_ENDPOINT));
+
+        assertStatsResponse(response, attribute, docs.size(), extractedAttributeValues, expectedDistinctValueCount);
+    }
+
+    private void assertStatsResponse(ResultActions response, String statsType, int totalHits,
+            Collection<String> statsValues, int expectedDistinctValueCount) throws Exception {
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(2))
+                .andExpect(totalHitsInGroup(ANNOTATION_GROUP, totalHits))
+                .andExpect(totalHitsInGroup(GENE_PRODUCT_GROUP, totalHits))
+                .andExpect(numericValueForGroup(ANNOTATION_GROUP, statsType, DISTINCT_VALUE_COUNT,
+                        expectedDistinctValueCount))
+                .andExpect(keysInTypeWithinGroup(ANNOTATION_GROUP, statsType, asArray(statsValues)))
+                .andExpect(keysInTypeWithinGroup(GENE_PRODUCT_GROUP, statsType, asArray(statsValues)));
+    }
+
+    private String[] asArray(Collection<String> elements) {
+        return elements.stream().toArray(String[]::new);
     }
 
     private List<AnnotationDocument> createGenericDocs(int n) {

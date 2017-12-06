@@ -31,20 +31,16 @@ public class TSVDownload {
     public static final String GENE_PRODUCT_SYNONYMS_FIELD_NAME = "synonyms";
     public static final String GENE_PRODUCT_TYPE_FIELD_NAME = "type";
 
-    private static final List<String> FULL_FIELD_LIST = Arrays.asList(GENE_PRODUCT_FIELD_NAME, SYMBOL_FIELD_NAME,
+    private static final List<String> DEFAULT_FIELD_LIST = Arrays.asList(GENE_PRODUCT_FIELD_NAME, SYMBOL_FIELD_NAME,
                                                                       QUALIFIER_FIELD_NAME, GO_TERM_FIELD_NAME,
-                                                                      GO_ASPECT_FIELD_NAME, GO_NAME_FIELD_NAME,
+                                                                      GO_ASPECT_FIELD_NAME,
                                                                       ECO_ID_FIELD_NAME,
                                                                       GO_EVIDENCE_CODE_FIELD_NAME,
                                                                       REFERENCE_FIELD_NAME, WITH_FROM_FIELD_NAME,
                                                                       TAXON_ID_FIELD_NAME, ASSIGNED_BY_FIELD_NAME,
-                                                                      ANNOTATION_EXTENSION_FIELD_NAME, DATE_FIELD_NAME,
-                                                                      TAXON_NAME_FIELD_NAME,
-                                                                      GENE_PRODUCT_NAME_FIELD_NAME,
-                                                                      GENE_PRODUCT_SYNONYMS_FIELD_NAME,
-                                                                      GENE_PRODUCT_TYPE_FIELD_NAME);
+                                                                      ANNOTATION_EXTENSION_FIELD_NAME, DATE_FIELD_NAME);
 
     public static List<String> whichColumnsWillWeShow(List<String> selectedFields) {
-        return selectedFields.isEmpty() ? FULL_FIELD_LIST : selectedFields;
+        return selectedFields.isEmpty() ? DEFAULT_FIELD_LIST : selectedFields;
     }
 }

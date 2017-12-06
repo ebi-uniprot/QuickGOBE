@@ -34,11 +34,10 @@ public class TSVHeaderCreatorTest {
             "/QuickGO/services/annotation/downloadSearch?downloadLimit=7&geneProductId" +
                     "=UniProtKB:A0A000&includeFields=goName,taxonName";
     private static final List<String[]> fields2Columns = new ArrayList<>();
-    private static final String FULL_HEADER_STRING =
-            GENE_PRODUCT_DB + "\t" +GENE_PRODUCT_ID + "\t" + SYMBOL + "\t" + QUALIFIER + "\t" + GO_TERM + "\t" + GO_ASPECT +
-            "\t" + GO_NAME + "\t" + ECO_ID + "\t" + GO_EVIDENCE_CODE + "\t" + REFERENCE + "\t" + WITH_FROM + "\t" +
-                    TAXON_ID + "\t" + ASSIGNED_BY + "\t" + ANNOTATION_EXTENSION + "\t" + DATE + "\t" + TAXON_NAME +
-                    "\t" + GENE_PRODUCT_NAME + "\t" + GENE_PRODUCT_SYNONYMS + "\t" + GENE_PRODUCT_TYPE + "\n";
+    private static final String DEFAULT_HEADER_STRING =
+            GENE_PRODUCT_DB + "\t" + GENE_PRODUCT_ID + "\t" + SYMBOL + "\t" + QUALIFIER + "\t" + GO_TERM + "\t" +
+                    GO_ASPECT + "\t" + ECO_ID + "\t" + GO_EVIDENCE_CODE + "\t" + REFERENCE + "\t" + WITH_FROM + "\t" +
+                    TAXON_ID + "\t" + ASSIGNED_BY + "\t" + ANNOTATION_EXTENSION + "\t" + DATE + "\n";
 
     static {
         initialiseFieldColumns();
@@ -124,8 +123,8 @@ public class TSVHeaderCreatorTest {
 
         tsvHeaderCreator.write(mockEmitter, mockContent);
 
-        verify(mockEmitter).send(FULL_HEADER_STRING,
-                MediaType.TEXT_PLAIN);
+        verify(mockEmitter).send(DEFAULT_HEADER_STRING,
+                                 MediaType.TEXT_PLAIN);
     }
 
     @Test

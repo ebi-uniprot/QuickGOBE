@@ -1,0 +1,4 @@
+<ehcache>
+    <cache name="names" maxBytesLocalHeap="500m">
+    </cache>
+</ehcache>

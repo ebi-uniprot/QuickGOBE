@@ -1,6 +1,8 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
 import com.google.common.base.Preconditions;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -12,16 +14,23 @@ import java.util.List;
  */
 public class StatisticsByType {
     private final String type;
+    private final int distinctValueCount;
     private final List<StatisticsValue> values;
 
-    public StatisticsByType(String type) {
-        Preconditions.checkArgument(type != null && !type.isEmpty(), "Statistics type cannot be null or empty");
+    public StatisticsByType(String type, int distinctValueCount) {
+        Preconditions.checkArgument(type != null && !type.isEmpty(), "Statistics type cannot be null or empty.");
+        Preconditions.checkArgument(distinctValueCount >= 0, "Distinct Value Count should be be greater than zero.");
         this.type = type;
+        this.distinctValueCount = distinctValueCount;
         this.values = new ArrayList<>();
     }
 
     public String getType() {
         return type;
+    }
+
+    public int getDistinctValueCount() {
+        return truncateToTensOfThousands(distinctValueCount);
     }
 
     public void addValue(StatisticsValue value) {
@@ -31,6 +40,12 @@ public class StatisticsByType {
 
     public List<StatisticsValue> getValues() {
         return Collections.unmodifiableList(values);
+    }
+
+    @Override public int hashCode() {
+        int result = type.hashCode();
+        result = 31 * result + values.hashCode();
+        return result;
     }
 
     @Override public boolean equals(Object o) {
@@ -43,23 +58,28 @@ public class StatisticsByType {
 
         StatisticsByType that = (StatisticsByType) o;
 
-        if (!type.equals(that.type)) {
+        if (distinctValueCount != that.distinctValueCount) {
             return false;
         }
-        return values.equals(that.values);
-
-    }
-
-    @Override public int hashCode() {
-        int result = type.hashCode();
-        result = 31 * result + values.hashCode();
-        return result;
+        if (type != null ? !type.equals(that.type) : that.type != null) {
+            return false;
+        }
+        return values != null ? values.equals(that.values) : that.values == null;
     }
 
     @Override public String toString() {
         return "StatisticsByType{" +
                 "type='" + type + '\'' +
+                ", distinctValueCount=" + distinctValueCount +
                 ", values=" + values +
                 '}';
+    }
+
+    private int truncateToTensOfThousands(int distinctValueCount) {
+        if (distinctValueCount < 10001) {
+            return distinctValueCount;
+        }
+        int value = new BigDecimal(distinctValueCount).divide(new BigDecimal(1000), RoundingMode.HALF_UP).intValue();
+        return Integer.parseInt(String.format("%d000", value));
     }
 }
