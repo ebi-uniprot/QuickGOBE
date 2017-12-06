@@ -24,6 +24,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.mockito.Mockito.when;
+import static uk.ac.ebi.quickgo.rest.search.solr.AggregateToStringConverter.NUM_BUCKETS;
 import static uk.ac.ebi.quickgo.rest.search.solr.SolrAggregationHelper.AGGREGATIONS_MARKER;
 import static uk.ac.ebi.quickgo.rest.search.solr.SolrAggregationHelper.BUCKETS_ID;
 import static uk.ac.ebi.quickgo.rest.search.solr.SolrAggregationHelper.BUCKET_FIELD_ID;
@@ -116,6 +117,28 @@ public class SolrResponseAggregationConverterTest {
         assertThat(agg.getAggregationResults(), hasSize(0));
         assertThat(agg.getBuckets(), hasSize(0));
         assertThat(agg.getNestedAggregations(), hasSize(0));
+    }
+
+    @Test
+    public void solrResponseWithTotalDistinctCountForFacetIsAddedToNestedAggregation() throws Exception {
+        String bucketValue1 = "GO:0000001";
+        String bucketValue2 = "GO:0000002";
+
+        String aggTypeGoId = SolrAggregationHelper.aggregatePrefixWithTypeTitle("goId");
+        SolrBucket bucket = new SolrBucket(aggTypeGoId);
+        bucket.addValueAndAggResults(bucketValue1);
+        bucket.addValueAndAggResults(bucketValue2);
+        solrAggregate.addBucket(bucket);
+
+        Object namedList = solrAggregate.facetValues.get("agg_goId");
+        ((NamedList)namedList).add(NUM_BUCKETS,12);
+
+        AggregateResponse agg = converter.convert(responseMock);
+
+        Optional<AggregateResponse> nestedAggregation = agg.getNestedAggregations().stream().findFirst();
+        assertThat(nestedAggregation.isPresent(), is(true));
+        AggregateResponse nestedResponse = nestedAggregation.get();
+        assertThat(nestedResponse.getDistinctValuesCount(), is(12));
     }
 
     @Test
