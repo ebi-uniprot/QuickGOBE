@@ -1,10 +1,5 @@
 package uk.ac.ebi.quickgo.annotation.service.statistics;
 
-import com.google.common.base.Preconditions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import uk.ac.ebi.quickgo.annotation.model.*;
 import uk.ac.ebi.quickgo.rest.search.AggregateFunction;
 import uk.ac.ebi.quickgo.rest.search.DefaultSearchQueryTemplate;
@@ -25,10 +20,18 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Service that collects distribution statistics of annotations and gene products throughout a given set of annotation
- * fields.
+ * fields. This class provides statistics for two different request types: requiredStatisticsForStandardUsage defines
+ * the statistics
+ * required for presentation by the front end of QuickGO, available as a restful service, while downloadStatistics
+ * defines statistics that will be downloaded as a file to the client.
  *
  * @author Ricardo Antunes
  */
@@ -38,46 +41,61 @@ public class AnnotationStatisticsService implements StatisticsService {
 
     private static final int FIRST_PAGE = 1;
     private static final int RESULTS_PER_PAGE = 0;
-
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
+    private final List<RequiredStatistic> requiredStatisticsForStandardUsage;
+    private final List<RequiredStatistic> requiredStatisticsForDownloadUsage;
     private final FilterConverterFactory converterFactory;
     private final SearchService<Annotation> searchService;
-    private final StatsRequestConverter converter;
-
+    private final StatsConverter converter;
     private final DefaultSearchQueryTemplate queryTemplate;
 
     @Autowired
     public AnnotationStatisticsService(FilterConverterFactory converterFactory,
             SearchService<Annotation> searchService,
-            StatsRequestConverter converter) {
-        Preconditions.checkArgument(converterFactory != null, "Filter factory cannot be null");
-        Preconditions.checkArgument(searchService != null, "Search service cannot be null");
-        Preconditions.checkArgument(converter != null, "Stats request converter cannot be null");
+            StatsConverter converter,
+            RequiredStatistics requiredStatisticsForStandardUsage,
+            RequiredStatistics requiredStatisticsForDownloadUsage) {
+        checkArgument(converterFactory != null, "Filter factory cannot be null.");
+        checkArgument(searchService != null, "Search service cannot be null.");
+        checkArgument(converter != null, "Stats request converter cannot be null.");
+        checkArgument(requiredStatisticsForStandardUsage != null,
+                "Required statistics for standard usage cannot be null.");
+        checkArgument(requiredStatisticsForDownloadUsage != null,
+                "Required statistics for download usage cannot be null.");
 
         this.converterFactory = converterFactory;
         this.searchService = searchService;
         this.converter = converter;
 
+        checkState(requiredStatisticsForStandardUsage.getStats() != null,
+                "Required statistics for standard usage cannot be null.");
+        checkState(requiredStatisticsForDownloadUsage.getStats() != null,
+                "Required statistics for download cannot be null.");
+
+        this.requiredStatisticsForStandardUsage = requiredStatisticsForStandardUsage.getStats();
+        this.requiredStatisticsForDownloadUsage = requiredStatisticsForDownloadUsage.getStats();
+
         queryTemplate = new DefaultSearchQueryTemplate();
     }
 
-    @Override public QueryResult<StatisticsGroup> calculate(AnnotationRequest request) {
-        Preconditions.checkArgument(request != null, "Annotation request cannot be null");
+    @Override
+    public QueryResult<StatisticsGroup> calculateForStandardUsage(AnnotationRequest request) {
+        return calculateForRequiredStatistics(request, requiredStatisticsForStandardUsage);
+    }
 
-        List<AnnotationRequest.StatsRequest> statsRequest = request.createStatsRequests();
-        Preconditions.checkArgument(statsRequest != null, "Statistics request cannot be null");
+    @Override
+    public QueryResult<StatisticsGroup> calculateForDownloadUsage(AnnotationRequest request) {
+        return calculateForRequiredStatistics(request, requiredStatisticsForDownloadUsage);
+    }
 
-        QueryRequest queryRequest = buildQueryRequest(request);
-
+    private QueryResult<StatisticsGroup> calculateForRequiredStatistics(AnnotationRequest request,
+            List<RequiredStatistic> requiredStatistics) {
+        checkArgument(request != null, "Annotation request cannot be null");
+        QueryRequest queryRequest = buildQueryRequest(request, requiredStatistics);
         QueryResult<Annotation> annotationQueryResult = searchService.findByQuery(queryRequest);
-
         AggregateResponse globalAggregation = annotationQueryResult.getAggregation();
-
         QueryResult<StatisticsGroup> response;
-
-        if(globalAggregation.isPopulated()) {
-            List<StatisticsGroup> statsGroups = statsRequest.stream()
+        if (globalAggregation.isPopulated()) {
+            List<StatisticsGroup> statsGroups = requiredStatistics.stream()
                     .map(req -> convertResponse(globalAggregation, req))
                     .collect(Collectors.toList());
             response = new QueryResult.Builder<>(statsGroups.size(), statsGroups).build();
@@ -88,7 +106,7 @@ public class AnnotationStatisticsService implements StatisticsService {
         return response;
     }
 
-    private QueryRequest buildQueryRequest(AnnotationRequest request) {
+    private QueryRequest buildQueryRequest(AnnotationRequest request, List<RequiredStatistic> requiredStatistics) {
         return queryTemplate.newBuilder()
                 .setQuery(QuickGOQuery.createAllQuery())
                 .addFilters(request.createFilterRequests().stream()
@@ -96,20 +114,21 @@ public class AnnotationStatisticsService implements StatisticsService {
                         .map(ConvertedFilter::getConvertedValue)
                         .collect(Collectors.toSet()))
                 .setPage(new RegularPage(FIRST_PAGE, RESULTS_PER_PAGE))
-                .setAggregate(converter.convert(request.createStatsRequests()))
+                .setAggregate(converter.convert(requiredStatistics))
                 .build();
     }
 
-    private StatisticsGroup convertResponse(AggregateResponse globalAggregation,
-            AnnotationRequest.StatsRequest statsRequest) {
+    private StatisticsGroup convertResponse(AggregateResponse globalAggregation, RequiredStatistic requiredStatistic) {
         StatisticsConverter converter =
-                new StatisticsConverter(statsRequest.getGroupName(), statsRequest.getGroupField());
+                new StatisticsConverter(requiredStatistic.getGroupName(), requiredStatistic.getGroupField());
 
         long totalHits =
-                extractCount(globalAggregation, statsRequest.getGroupField(), statsRequest.getAggregateFunction());
+                extractCount(globalAggregation, requiredStatistic.getGroupField(),
+                        requiredStatistic.getAggregateFunction());
 
         if (totalHits == NO_COUNT_FOR_GROUP_ERROR) {
-            throw new RetrievalException("Unable to calculate statistics for group: " + statsRequest.getGroupName());
+            throw new RetrievalException(
+                    "Unable to calculate statistics for group: " + requiredStatistic.getGroupName());
         }
 
         return converter.convert(globalAggregation.getNestedAggregations(), totalHits);
@@ -118,7 +137,7 @@ public class AnnotationStatisticsService implements StatisticsService {
     /**
      * Extracts the counts made on the whole data set for a given group.
      *
-     * @see AnnotationRequest.StatsRequest#getGroupName()
+     * @see RequiredStatistic#getGroupName()
      *
      * @param globalAggregation the aggregation object containing the group count values
      * @param groupField the name of the groupField the count was made upon
@@ -156,15 +175,12 @@ public class AnnotationStatisticsService implements StatisticsService {
         }
 
         private StatisticsByType createStatsType(AggregateResponse aggregation, long totalHits) {
-            StatisticsByType type = new StatisticsByType(aggregation.getName());
-
+            StatisticsByType type = new StatisticsByType(aggregation.getName(),aggregation.getDistinctValuesCount());
             Set<AggregationBucket> buckets = aggregation.getBuckets();
-
             buckets.stream()
                     .map(bucket -> createStatsValues(bucket, totalHits))
                     .flatMap(Collection::stream)
                     .forEach(type::addValue);
-
             return type;
         }
 

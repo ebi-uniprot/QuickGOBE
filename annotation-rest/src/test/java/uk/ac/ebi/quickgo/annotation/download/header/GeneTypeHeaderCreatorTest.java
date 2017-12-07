@@ -1,11 +1,15 @@
 package uk.ac.ebi.quickgo.annotation.download.header;
 
+import java.io.IOException;
 import java.util.Arrays;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.MediaType;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -27,12 +31,14 @@ public class GeneTypeHeaderCreatorTest {
     private OntologyHeaderInfo mockOntology = mock(OntologyHeaderInfo.class);
     private ResponseBodyEmitter mockEmitter = mock(ResponseBodyEmitter.class);
     private HeaderContent mockContent = mock(HeaderContent.class);
+    private GeneTypeHeaderCreator gTypeHeaderCreator;
 
     @Before
     public void setup() {
         when(mockContent.getDate()).thenReturn(DATE);
         when(mockContent.getUri()).thenReturn(REQUEST_URI);
         when(mockOntology.versions()).thenReturn(Arrays.asList(FORMAT_VERSION_1, FORMAT_VERSION_2));
+        gTypeHeaderCreator = new TestGTypeHeaderCreator(mockOntology);
     }
 
     @Test
@@ -64,14 +70,19 @@ public class GeneTypeHeaderCreatorTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void exceptionThrownIfEmitterIsNull() {
-        GeneTypeHeaderCreator gTypeHeaderCreator = new TestGTypeHeaderCreator(mockOntology);
         gTypeHeaderCreator.write(null, mockContent);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void exceptionThrownIfContentIsNull() {
-        GeneTypeHeaderCreator gTypeHeaderCreator = new TestGTypeHeaderCreator(mockOntology);
         gTypeHeaderCreator.write(mockEmitter, null);
+    }
+
+    @Test
+    public void noExceptionThrownIfEmitterThrowsIOException() throws Exception{
+        doThrow(new IOException("Test IOException")).when(mockEmitter).send(any(Object.class), eq(MediaType
+                                                                                                          .TEXT_PLAIN));
+        gTypeHeaderCreator.write(mockEmitter, mockContent);
     }
 
     private static class TestGTypeHeaderCreator extends GeneTypeHeaderCreator {

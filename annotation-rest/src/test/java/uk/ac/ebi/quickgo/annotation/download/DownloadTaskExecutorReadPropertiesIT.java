@@ -26,8 +26,8 @@ import static org.mockito.Mockito.verify;
  */
 @ActiveProfiles("download-task-executor-test")
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = DownloadTaskExecutorReadPropertiesTest.FakeApplication.class)
-public class DownloadTaskExecutorReadPropertiesTest {
+@SpringApplicationConfiguration(classes = DownloadTaskExecutorReadPropertiesIT.FakeApplication.class)
+public class DownloadTaskExecutorReadPropertiesIT {
     @Autowired
     private ThreadPoolTaskExecutor taskExecutor;
 

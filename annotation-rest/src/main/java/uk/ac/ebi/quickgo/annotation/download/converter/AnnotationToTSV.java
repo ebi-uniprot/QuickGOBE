@@ -48,8 +48,17 @@ public class AnnotationToTSV extends AnnotationTo implements BiFunction<Annotati
     }
 
     private void initialiseContentMappings() {
-        selected2Content.put(GENE_PRODUCT_ID_FIELD_NAME,
-                             (c, j) -> j.add(nullToEmptyString.apply(c.annotation.geneProductId)));
+        selected2Content.put(GENE_PRODUCT_FIELD_NAME,
+                             (c, j) -> {
+                                 String[] elements = nullToEmptyString.apply(c.annotation.geneProductId).split(":");
+                                 if (elements.length == 2) {
+                                     j.add(elements[0]);
+                                     j.add(elements[1]);
+                                 } else {
+                                     j.add("");
+                                     j.add("");
+                                 }
+                             });
         selected2Content.put(SYMBOL_FIELD_NAME, (c, j) -> j.add(nullToEmptyString.apply(c.annotation.symbol)));
         selected2Content.put(QUALIFIER_FIELD_NAME, (c, j) -> j.add(nullToEmptyString.apply(c.annotation.qualifier)));
         selected2Content.put(GO_TERM_FIELD_NAME, (c, j) -> {

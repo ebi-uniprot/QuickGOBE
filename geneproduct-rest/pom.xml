@@ -15,7 +15,7 @@
     <packaging>jar</packaging>
 
     <properties>
-        <json-path.version>1.2.0</json-path.version>
+        <json-path.version>2.4.0</json-path.version>
     </properties>
 
     <dependencies>
@@ -42,10 +42,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.data</groupId>
-            <artifactId>spring-data-solr</artifactId>
         </dependency>
 
         <!-- REST API documentation -->

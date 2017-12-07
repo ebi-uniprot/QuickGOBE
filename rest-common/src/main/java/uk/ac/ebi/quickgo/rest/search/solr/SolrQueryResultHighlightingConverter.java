@@ -4,9 +4,7 @@ import uk.ac.ebi.quickgo.rest.search.results.DocHighlight;
 import uk.ac.ebi.quickgo.rest.search.results.FieldHighlight;
 
 import com.google.common.base.Preconditions;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import org.apache.solr.common.SolrDocumentList;
 
@@ -26,11 +24,27 @@ public class SolrQueryResultHighlightingConverter implements
     private static final String DOC_ID = "id";
 
     private final Map<String, String> highlightedFieldsNameMap;
+    private final Map<String, List<String>> transformationsToSameFieldMap;
 
     public SolrQueryResultHighlightingConverter(Map<String, String> highlightedFieldsNameMap) {
         Preconditions.checkArgument(highlightedFieldsNameMap != null, "Map of highlighted fields cannot be null");
 
         this.highlightedFieldsNameMap = highlightedFieldsNameMap;
+        this.transformationsToSameFieldMap = extractSameFields(this.highlightedFieldsNameMap);
+    }
+
+    private Map<String, List<String>> extractSameFields(Map<String, String> highlightedFieldsNameMap) {
+        HashMap<String, List<String>> sameFieldsMap = new HashMap<>();
+
+        for (Map.Entry<String, String> fieldAndTransformation : highlightedFieldsNameMap.entrySet()) {
+            String value = fieldAndTransformation.getValue();
+            if (!sameFieldsMap.containsKey(value)) {
+                sameFieldsMap.put(value, new ArrayList<>());
+            }
+            sameFieldsMap.get(value).add(fieldAndTransformation.getKey());
+        }
+        
+        return sameFieldsMap;
     }
 
     /**
@@ -67,8 +81,10 @@ public class SolrQueryResultHighlightingConverter implements
      */
     private DocHighlight convertToDocHighlight(String id, Map<String, Map<String, List<String>>>
             resultHighlights) {
-        List<FieldHighlight> fieldHighlights = resultHighlights
-                .get(id)
+        Map<String, List<String>> originalEntryHighlights = resultHighlights.get(id);
+        Map<String, List<String>> entryHighlights = removeDuplicateMappings(originalEntryHighlights);
+
+        List<FieldHighlight> fieldHighlights = entryHighlights
                 .entrySet().stream()
                 .map(entry -> {
                     // by default, field name is that given by Solr
@@ -82,5 +98,20 @@ public class SolrQueryResultHighlightingConverter implements
                 })
                 .collect(Collectors.toList());
         return new DocHighlight(id, fieldHighlights);
+    }
+
+    private Map<String, List<String>> removeDuplicateMappings(Map<String, List<String>> entryHighlights) {
+        HashMap<String, List<String>> highlights = new HashMap<>(entryHighlights);
+
+        for (Map.Entry<String, List<String>> sameFields : transformationsToSameFieldMap.entrySet()) {
+            List<String> fields = sameFields.getValue();
+            if (fields.size() > 1 && entryHighlights.keySet().containsAll(fields)) {
+                for (int i = 1; i < fields.size(); i++) {
+                    highlights.remove(fields.get(i));
+                }
+            }
+        }
+
+        return highlights;
     }
 }

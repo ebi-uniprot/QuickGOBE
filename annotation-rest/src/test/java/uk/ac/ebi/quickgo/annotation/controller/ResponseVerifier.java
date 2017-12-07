@@ -3,7 +3,6 @@ package uk.ac.ebi.quickgo.annotation.controller;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.util.*;
-import org.hamcrest.Matchers;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpResponse;
@@ -25,21 +24,22 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * service is working as expected.
  */
 final class ResponseVerifier {
-    public static final String ASSIGNED_BY_FIELD = "assignedBy";
-    public static final String GENEPRODUCT_ID_FIELD = "geneProductId";
-    public static final String GO_EVIDENCE_FIELD = "goEvidence";
-    public static final String GO_ID_FIELD = "goId";
-    public static final String SLIMMED_ID_FIELD = "slimmedIds";
-    public static final String RESULTS = "results";
-    public static final String QUALIFIER_FIELD = "qualifier";
-    public static final String REFERENCE_FIELD = "reference";
-    public static final String TAXON_ID_FIELD = "taxonId";
-    public static final String DATE_FIELD = "date";
+    static final String ASSIGNED_BY_FIELD = "assignedBy";
+    static final String GENEPRODUCT_ID_FIELD = "geneProductId";
+    static final String GO_EVIDENCE_FIELD = "goEvidence";
+    static final String GO_ID_FIELD = "goId";
+    static final String SLIMMED_ID_FIELD = "slimmedIds";
+    static final String RESULTS = "results";
+    static final String QUALIFIER_FIELD = "qualifier";
+    static final String REFERENCE_FIELD = "reference";
+    static final String TAXON_ID_FIELD = "taxonId";
+    static final String DATE_FIELD = "date";
 
     private static final String ERROR_MESSAGE = "messages";
     private static final String RESULTS_CONTENT_BY_INDEX = RESULTS + "[%d].";
 
-    private ResponseVerifier() {}
+    private ResponseVerifier() {
+    }
 
     static ResultMatcher valuesOccurInErrorMessage(String... values) {
         return jsonPath(ERROR_MESSAGE, contains(values));
@@ -70,7 +70,7 @@ final class ResponseVerifier {
     }
 
     static ResultMatcher itemExistsExpectedTimes(String fieldName, String value, int expectedCount) {
-        return jsonPath(RESULTS + ".*.[?(@." + fieldName + " == " + value + ")]", hasSize(expectedCount));
+        return jsonPath(RESULTS + ".*.[?(@." + fieldName + " == '" + value + "')]", hasSize(expectedCount));
     }
 
     static <T> ResultMatcher valueOccursInField(String fieldName, T value) {
@@ -81,30 +81,26 @@ final class ResponseVerifier {
         return jsonPath(RESULTS + ".*." + fieldName + ".*", hasItem(value));
     }
 
-    static ResultMatcher messageExists(String message) {
-        return jsonPath("$.messages", Matchers.hasItem(is(message)));
-    }
-
-    private static ResultMatcher fieldsInResultExist(int resultIndex) throws Exception {
+    private static ResultMatcher fieldsInResultExist(int resultIndex) {
         String path = String.format(RESULTS_CONTENT_BY_INDEX, resultIndex);
 
         return new CompositeResultMatcher().addMatcher(jsonPath(path + "id").exists())
-                .addMatcher(jsonPath(path + "geneProductId").exists())
-                .addMatcher(jsonPath(path + "qualifier").exists())
-                .addMatcher(jsonPath(path + "goId").exists())
-                .addMatcher(jsonPath(path + "goEvidence").exists())
-                .addMatcher(jsonPath(path + "evidenceCode").exists())
-                .addMatcher(jsonPath(path + "reference").exists())
-                .addMatcher(jsonPath(path + "withFrom").exists())
-                .addMatcher(jsonPath(path + "taxonId").exists())
-                .addMatcher(jsonPath(path + "assignedBy").exists())
-                .addMatcher(jsonPath(path + "targetSets").exists())
-                .addMatcher(jsonPath(path + "symbol").exists())
-                .addMatcher(jsonPath(path + "date").exists())
-                .addMatcher(jsonPath(path + "extensions").exists());
+                                           .addMatcher(jsonPath(path + "geneProductId").exists())
+                                           .addMatcher(jsonPath(path + "qualifier").exists())
+                                           .addMatcher(jsonPath(path + "goId").exists())
+                                           .addMatcher(jsonPath(path + "goEvidence").exists())
+                                           .addMatcher(jsonPath(path + "evidenceCode").exists())
+                                           .addMatcher(jsonPath(path + "reference").exists())
+                                           .addMatcher(jsonPath(path + "withFrom").exists())
+                                           .addMatcher(jsonPath(path + "taxonId").exists())
+                                           .addMatcher(jsonPath(path + "assignedBy").exists())
+                                           .addMatcher(jsonPath(path + "targetSets").exists())
+                                           .addMatcher(jsonPath(path + "symbol").exists())
+                                           .addMatcher(jsonPath(path + "date").exists())
+                                           .addMatcher(jsonPath(path + "extensions").exists());
     }
 
-    static ResultMatcher fieldsInAllResultsExist(int numResults) throws Exception {
+    static ResultMatcher fieldsInAllResultsExist(int numResults) {
         CompositeResultMatcher matcher = new CompositeResultMatcher();
 
         for (int i = 0; i < numResults; i++) {
@@ -114,38 +110,48 @@ final class ResponseVerifier {
         return matcher;
     }
 
-
-    static ResultMatcher fieldInRowHasValue(String fieldName, int index, String value) throws Exception {
+    static ResultMatcher fieldInRowHasValue(String fieldName, int index, String value) {
         String path = String.format(RESULTS_CONTENT_BY_INDEX, index);
         return new CompositeResultMatcher().addMatcher(jsonPath(path + fieldName, is(value)));
 
     }
 
-
-    static ResultMatcher resultsInPage(int numResults) throws Exception {
+    static ResultMatcher resultsInPage(int numResults) {
         return jsonPath("$.results", hasSize(numResults));
     }
 
     static ResultMatcher pageInfoMatches(int pageNumber, int totalPages, int resultsPerPage) {
         return new CompositeResultMatcher().addMatcher(jsonPath("$.pageInfo").exists())
-                .addMatcher(jsonPath("$.pageInfo.resultsPerPage").value(resultsPerPage))
-                .addMatcher(jsonPath("$.pageInfo.total").value(totalPages))
-                .addMatcher(jsonPath("$.pageInfo.current").value(pageNumber));
+                                           .addMatcher(jsonPath("$.pageInfo.resultsPerPage").value(resultsPerPage))
+                                           .addMatcher(jsonPath("$.pageInfo.total").value(totalPages))
+                                           .addMatcher(jsonPath("$.pageInfo.current").value(pageNumber));
     }
 
-    static ResultMatcher pageInfoExists() throws Exception {
+    static ResultMatcher pageInfoExists() {
         return new CompositeResultMatcher().addMatcher(jsonPath("$.pageInfo").exists())
-                .addMatcher(jsonPath("$.pageInfo.resultsPerPage").exists())
-                .addMatcher(jsonPath("$.pageInfo.total").exists())
-                .addMatcher(jsonPath("$.pageInfo.current").exists());
+                                           .addMatcher(jsonPath("$.pageInfo.resultsPerPage").exists())
+                                           .addMatcher(jsonPath("$.pageInfo.total").exists())
+                                           .addMatcher(jsonPath("$.pageInfo.current").exists());
     }
 
-    static ResultMatcher contentTypeToBeJson() throws Exception {
+    static ResultMatcher contentTypeToBeJson() {
         return content().contentType(MediaType.APPLICATION_JSON_VALUE);
     }
 
     static ResultMatcher totalNumOfResults(int numResults) {
         return jsonPath("$.numberOfHits").value(numResults);
+    }
+
+    static ResultMatcher numOfResults(String path, int numResults) {
+        return jsonPath(path).value(numResults);
+    }
+
+    static ResultMatcher expectedValues(String path, List<String> expectedValues) {
+        return jsonPath(path).value(is(expectedValues));
+    }
+
+    static TimeoutResponseCreator withTimeout() {
+        return new TimeoutResponseCreator();
     }
 
     private static class CompositeResultMatcher implements ResultMatcher {
@@ -175,28 +181,23 @@ final class ResponseVerifier {
             contents = new HashMap<>();
         }
 
-        public static ResponseItem responseItem() {
+        static ResponseItem responseItem() {
             return new ResponseItem();
-        }
-
-        public ResponseItem withAttribute(String key, String value) {
-            contents.put(key, value);
-            return this;
         }
 
         public Map<String, String> build() {
             return Collections.unmodifiableMap(contents);
         }
-    }
 
-    public static class TimeoutResponseCreator implements ResponseCreator {
-        @Override
-        public ClientHttpResponse createResponse(ClientHttpRequest request) throws IOException {
-            throw new SocketTimeoutException("Socket timeout generated.");
+        ResponseItem withAttribute(String key, String value) {
+            contents.put(key, value);
+            return this;
         }
     }
 
-    public static TimeoutResponseCreator withTimeout() {
-        return new TimeoutResponseCreator();
+    static class TimeoutResponseCreator implements ResponseCreator {
+        @Override public ClientHttpResponse createResponse(ClientHttpRequest request) throws IOException {
+            throw new SocketTimeoutException("Socket timeout generated.");
+        }
     }
 }

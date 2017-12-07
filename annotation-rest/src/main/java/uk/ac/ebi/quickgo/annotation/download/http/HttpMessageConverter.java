@@ -9,16 +9,16 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 
 /**
- * An HTTP message converter wrapper that defers the actual writing to an instance of {@link DispatchWriter}.
+ * An HTTP message converter wrapper that defers the actual writing to an instance of {@link OutputStreamWriter}.
  *
  * Created 19/01/17
  * @author Tony Wardell
  */
 public class HttpMessageConverter extends AbstractHttpMessageConverter<Object> {
 
-    private final DispatchWriter writer;
+    private final OutputStreamWriter writer;
 
-    public HttpMessageConverter(DispatchWriter dispatchWriter, MediaType mediaType) {
+    public HttpMessageConverter(OutputStreamWriter dispatchWriter, MediaType mediaType) {
         super(mediaType);
         this.writer = dispatchWriter;
     }

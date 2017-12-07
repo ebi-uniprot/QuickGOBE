@@ -79,6 +79,7 @@
             <modules>
                 <module>common</module>
                 <module>annotation-common</module>
+                <module>ontology-common</module>
                 <module>rest-common</module>
                 <module>annotation-rest</module>
                 <module>solr-plugin</module>

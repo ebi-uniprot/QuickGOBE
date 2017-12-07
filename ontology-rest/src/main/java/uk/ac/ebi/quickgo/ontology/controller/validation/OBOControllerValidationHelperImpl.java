@@ -27,8 +27,8 @@ public class OBOControllerValidationHelperImpl
         super(maxPageResults, validIDCondition);
     }
 
-    @Override public List<OntologyRelationType> validateRelationTypes(String relationTypesCSV) {
-        relationTypesCSV = relationTypesCSV.toLowerCase();
+    @Override public List<OntologyRelationType> validateRelationTypes(String relationTypesCSV,
+            List<OntologyRelationType> validTypes) {
 
         List<String> relationTypeStrList = csvToList(relationTypesCSV);
 
@@ -36,14 +36,15 @@ public class OBOControllerValidationHelperImpl
         for (String relationTypeStr : relationTypeStrList) {
             OntologyRelationType relationType;
             try {
-                relationType = OntologyRelationType.getByLongName(relationTypeStr);
+                String relationTypeStrLowerCase = relationTypeStr.toLowerCase();
+                relationType = OntologyRelationType.getByLongName(relationTypeStrLowerCase);
             } catch (IllegalArgumentException e) {
                 LOGGER.error(e.getMessage());
                 throw new ParameterException("Unknown relationship requested: '" + relationTypeStr + "'");
             }
 
             if (relationType != null) {
-                checkValidTraversalRelationType(relationType);
+                checkValidTraversalRelationType(relationType, validTypes);
                 relationTypes.add(relationType);
             }
         }
@@ -51,10 +52,10 @@ public class OBOControllerValidationHelperImpl
         return relationTypes;
     }
 
-    void checkValidTraversalRelationType(OntologyRelationType relationType) {
-        if (!DEFAULT_TRAVERSAL_TYPES.contains(relationType)) {
+    void checkValidTraversalRelationType(OntologyRelationType relationType,List<OntologyRelationType> validTypes) {
+        if (!validTypes.contains(relationType)) {
             String errorMessage = "Cannot traverse over relation type: " + relationType.getLongName() + ". " +
-                    "Can only traverse over: " + DEFAULT_TRAVERSAL_TYPES_CSV;
+                    "Can only traverse over: " + validTypes;
             LOGGER.error(errorMessage);
             throw new ParameterException(errorMessage);
         }

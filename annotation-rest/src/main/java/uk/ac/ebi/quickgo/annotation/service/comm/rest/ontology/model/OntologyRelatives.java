@@ -5,21 +5,23 @@ import uk.ac.ebi.quickgo.rest.comm.ResponseType;
 import java.util.List;
 
 /**
- * Represents part of the model corresponding to the response available from the resource:
+ * Represents parts of the model corresponding to responses available from the resources:
  *
  * <ul>
  *     <li>/go/terms/{term}/descendants</li>
+ *     <li>/go/slim?ids={terms}</li>
  * </ul>
  *
- * Currently, this model captures the parts reached by the JSON path expression, "$.results.descendants".
+ * Currently, this model captures the parts reached by the JSON path expressions, "$.results.descendants" or
+ * "$.results.slimsTo".
  *
  * Created 09/08/16
  * @author Edd
  */
-public class OntologyDescendants implements ResponseType {
+public class OntologyRelatives implements ResponseType {
     private List<Result> results;
 
-    public OntologyDescendants() {}
+    public OntologyRelatives() {}
 
     public List<Result> getResults() {
         return results;
@@ -39,7 +41,16 @@ public class OntologyDescendants implements ResponseType {
         public Result() {}
 
         private String id;
+        private List<String> slimsTo;
         private List<String> descendants;
+
+        public List<String> getSlimsTo() {
+            return slimsTo;
+        }
+
+        public void setSlimsTo(List<String> slimsTo) {
+            this.slimsTo = slimsTo;
+        }
 
         public List<String> getDescendants() {
             return descendants;
@@ -60,6 +71,7 @@ public class OntologyDescendants implements ResponseType {
         @Override public String toString() {
             return "Result{" +
                     "id='" + id + '\'' +
+                    ", slimsTo=" + slimsTo +
                     ", descendants=" + descendants +
                     '}';
         }

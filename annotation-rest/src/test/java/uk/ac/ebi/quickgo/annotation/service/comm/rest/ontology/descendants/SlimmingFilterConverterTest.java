@@ -2,7 +2,7 @@ package uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.descendants;
 
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.SlimmingConversionInfo;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.SlimmingFilterConverter;
-import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.OntologyDescendants;
+import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.OntologyRelatives;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
 
@@ -27,12 +27,12 @@ import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.or;
  * @author Edd
  */
 public class SlimmingFilterConverterTest {
-    private OntologyDescendants response;
+    private OntologyRelatives response;
     private SlimmingFilterConverter converter;
 
     @Before
     public void setUp() {
-        response = new OntologyDescendants();
+        response = new OntologyRelatives();
         response.setResults(new ArrayList<>());
         converter = new SlimmingFilterConverter();
     }
@@ -40,12 +40,12 @@ public class SlimmingFilterConverterTest {
     @Test
     public void descendantsFromSingleResourceAreConvertedToQuickGOQuery() {
         String id1 = createGoId(1);
-        String desc1 = createGoId(11);
+        String slim1 = createGoId(11);
 
-        addResponseDescendant(id1, desc1);
+        addResponseSlimsTo(id1, slim1);
         ConvertedFilter<QuickGOQuery> convertedFilter = converter.transform(response);
 
-        assertThat(convertedFilter.getConvertedValue(), is(QuickGOQuery.createQuery(Searchable.GO_ID, desc1)));
+        assertThat(convertedFilter.getConvertedValue(), is(QuickGOQuery.createQuery(Searchable.GO_ID, id1)));
         assertThat(convertedFilter.getFilterContext().isPresent(), is(true));
     }
 
@@ -53,17 +53,17 @@ public class SlimmingFilterConverterTest {
     public void differentDescendantsFromMultipleResourcesAreConvertedToQuickGOQuery() {
         String id1 = createGoId(1);
         String id2 = createGoId(2);
-        String desc1 = createGoId(11);
-        String desc2 = createGoId(22);
+        String slim1 = createGoId(11);
+        String slim2 = createGoId(22);
 
-        addResponseDescendant(id1, desc1);
-        addResponseDescendant(id2, desc2);
+        addResponseSlimsTo(id1, slim1);
+        addResponseSlimsTo(id2, slim2);
 
         ConvertedFilter<QuickGOQuery> convertedFilter = converter.transform(response);
 
         assertThat(convertedFilter.getConvertedValue(), is(
-                or(QuickGOQuery.createQuery(Searchable.GO_ID, desc1),
-                        QuickGOQuery.createQuery(Searchable.GO_ID, desc2))));
+                or(QuickGOQuery.createQuery(Searchable.GO_ID, id1),
+                        QuickGOQuery.createQuery(Searchable.GO_ID, id2))));
         assertThat(convertedFilter.getFilterContext().isPresent(), is(true));
     }
 
@@ -71,15 +71,17 @@ public class SlimmingFilterConverterTest {
     public void sameDescendantsFromMultipleResourcesAreConvertedToQuickGOQuery() {
         String id1 = createGoId(1);
         String id2 = createGoId(2);
-        String desc1 = createGoId(11);
+        String slim1 = createGoId(11);
 
-        addResponseDescendant(id1, desc1);
-        addResponseDescendant(id2, desc1);
+        addResponseSlimsTo(id1, slim1);
+        addResponseSlimsTo(id2, slim1);
 
         ConvertedFilter<QuickGOQuery> convertedFilter = converter.transform(response);
 
-        assertThat(convertedFilter.getConvertedValue(), is(
-                QuickGOQuery.createQuery(Searchable.GO_ID, desc1)));
+        assertThat(convertedFilter.getConvertedValue(),
+                is(
+                        or(QuickGOQuery.createQuery(Searchable.GO_ID, id1),
+                                QuickGOQuery.createQuery(Searchable.GO_ID, id2))));
         assertThat(convertedFilter.getFilterContext().isPresent(), is(true));
     }
 
@@ -101,31 +103,30 @@ public class SlimmingFilterConverterTest {
     @Test
     public void conversionContextContainsOneMapping() {
         String id1 = createGoId(1);
-        String desc1 = createGoId(11);
+        String slim1 = createGoId(11);
 
-        addResponseDescendant(id1, desc1);
+        addResponseSlimsTo(id1, slim1);
         ConvertedFilter<QuickGOQuery> convertedFilter = converter.transform(response);
 
-        assertThat(extractContextProperties(convertedFilter), hasEntry(desc1, singletonList(id1)));
+        assertThat(extractContextProperties(convertedFilter), hasEntry(id1, singletonList(slim1)));
     }
 
     @Test
     public void conversionContextContainsTwoMappings() {
         String id1 = createGoId(1);
         String id2 = createGoId(2);
-        String desc1 = createGoId(11);
-        String desc2 = createGoId(22);
-        String desc3 = createGoId(33);
+        String slim1 = createGoId(11);
+        String slim2 = createGoId(22);
+        String slim3 = createGoId(33);
 
-        addResponseDescendant(id1, desc1);
-        addResponseDescendant(id1, desc2);
-        addResponseDescendant(id1, desc3);
-        addResponseDescendant(id2, desc3);
+        addResponseSlimsTo(id1, slim1);
+        addResponseSlimsTo(id1, slim2);
+        addResponseSlimsTo(id1, slim3);
+        addResponseSlimsTo(id2, slim3);
         ConvertedFilter<QuickGOQuery> convertedFilter = converter.transform(response);
 
-        assertThat(extractContextProperties(convertedFilter), hasEntry(desc1, singletonList(id1)));
-        assertThat(extractContextProperties(convertedFilter), hasEntry(desc2, singletonList(id1)));
-        assertThat(extractContextProperties(convertedFilter), hasEntry(desc3, asList(id1, id2)));
+        assertThat(extractContextProperties(convertedFilter), hasEntry(id1, asList(slim1, slim2, slim3)));
+        assertThat(extractContextProperties(convertedFilter), hasEntry(id2, singletonList(slim3)));
     }
 
     private Map<String, List<String>> extractContextProperties(ConvertedFilter<QuickGOQuery> convertedFilter) {
@@ -137,19 +138,19 @@ public class SlimmingFilterConverterTest {
         return conversionInfo.getInfo();
     }
 
-    private void addResponseDescendant(String termId, String descendantId) {
-        for (OntologyDescendants.Result result : response.getResults()) {
+    private void addResponseSlimsTo(String termId, String slimId) {
+        for (OntologyRelatives.Result result : response.getResults()) {
             if (result.getId().equals(termId)) {
-                result.getDescendants().add(descendantId);
+                result.getSlimsTo().add(slimId);
                 return;
             }
         }
 
-        OntologyDescendants.Result newResult = new OntologyDescendants.Result();
+        OntologyRelatives.Result newResult = new OntologyRelatives.Result();
         newResult.setId(termId);
-        List<String> descList = new ArrayList<>();
-        descList.add(descendantId);
-        newResult.setDescendants(descList);
+        List<String> slimList = new ArrayList<>();
+        slimList.add(slimId);
+        newResult.setSlimsTo(slimList);
         response.getResults().add(newResult);
     }
 }

@@ -40,7 +40,7 @@
         <solr.version>5.5.0</solr.version>
 
         <jackson.version>2.5.4</jackson.version>
-        <json-path.version>2.0.0</json-path.version>
+        <json-path.version>2.4.0</json-path.version>
 
         <slf4j.version>1.7.12</slf4j.version>
         <logback.version>1.1.3</logback.version>
@@ -50,7 +50,7 @@
         <hamcrest.version>1.3</hamcrest.version>
         <mockito-version>1.9.5</mockito-version>
 
-        <springfox-swagger2.version>2.6.0</springfox-swagger2.version>
+        <springfox-swagger2.version>2.7.0</springfox-swagger2.version>
 
         <!-- plugin version numbers -->
         <compiler.version>3.3</compiler.version>

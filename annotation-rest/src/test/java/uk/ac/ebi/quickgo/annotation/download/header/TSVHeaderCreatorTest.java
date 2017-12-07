@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.download.header;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -13,6 +14,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyObject;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -32,11 +34,10 @@ public class TSVHeaderCreatorTest {
             "/QuickGO/services/annotation/downloadSearch?downloadLimit=7&geneProductId" +
                     "=UniProtKB:A0A000&includeFields=goName,taxonName";
     private static final List<String[]> fields2Columns = new ArrayList<>();
-    private static final String FULL_HEADER_STRING =
-            GENE_PRODUCT_ID + "\t" + SYMBOL + "\t" + QUALIFIER + "\t" + GO_TERM + "\t" + GO_ASPECT + "\t" +
-                    GO_NAME + "\t" + ECO_ID + "\t" + GO_EVIDENCE_CODE + "\t" + REFERENCE + "\t" + WITH_FROM + "\t" +
-                    TAXON_ID + "\t" + ASSIGNED_BY + "\t" + ANNOTATION_EXTENSION + "\t" + DATE + "\t" + TAXON_NAME +
-                    "\t" + GENE_PRODUCT_NAME + "\t" + GENE_PRODUCT_SYNONYMS + "\t" + GENE_PRODUCT_TYPE + "\n";
+    private static final String DEFAULT_HEADER_STRING =
+            GENE_PRODUCT_DB + "\t" + GENE_PRODUCT_ID + "\t" + SYMBOL + "\t" + QUALIFIER + "\t" + GO_TERM + "\t" +
+                    GO_ASPECT + "\t" + ECO_ID + "\t" + GO_EVIDENCE_CODE + "\t" + REFERENCE + "\t" + WITH_FROM + "\t" +
+                    TAXON_ID + "\t" + ASSIGNED_BY + "\t" + ANNOTATION_EXTENSION + "\t" + DATE + "\n";
 
     static {
         initialiseFieldColumns();
@@ -61,25 +62,36 @@ public class TSVHeaderCreatorTest {
     @Test
     public void writeColumnNameForIndividualField() throws Exception {
         for (String[] field2Column : fields2Columns) {
-            HeaderContent content = mock(HeaderContent.class);
-            when(content.isSlimmed()).thenReturn(false);
-            when(content.getSelectedFields()).thenReturn(singletonList(field2Column[0]));
-
-            tsvHeaderCreator.write(mockEmitter, content);
-
-            verify(mockEmitter).send(field2Column[1] + "\n", MediaType.TEXT_PLAIN);
+            verifyColumnNameForIndividualField(singletonList(field2Column[0]), field2Column[1] + "\n");
         }
+
+        //Test gene product separately
+        verifyColumnNameForIndividualField(singletonList(GENE_PRODUCT_FIELD_NAME),
+                                         GENE_PRODUCT_DB + "\t" + GENE_PRODUCT_ID + "\n");
+    }
+
+    private void verifyColumnNameForIndividualField(List<String> selectedFields,
+            String columnName) throws IOException {
+        HeaderContent content = mock(HeaderContent.class);
+        when(content.isSlimmed()).thenReturn(false);
+        when(content.getSelectedFields()).thenReturn(selectedFields);
+        ResponseBodyEmitter emitter = mock(ResponseBodyEmitter.class);
+
+            tsvHeaderCreator.write(emitter, content);
+
+            verify(emitter).send(columnName, MediaType.TEXT_PLAIN);
     }
 
     @Test
     public void writeHeaderForSeveralSelectedFields() throws Exception {
         when(mockContent.isSlimmed()).thenReturn(false);
         when(mockContent.getSelectedFields())
-                .thenReturn(asList(GENE_PRODUCT_ID_FIELD_NAME, GO_NAME_FIELD_NAME, TAXON_NAME_FIELD_NAME));
+                .thenReturn(asList(GENE_PRODUCT_FIELD_NAME, GO_NAME_FIELD_NAME, TAXON_NAME_FIELD_NAME));
 
         tsvHeaderCreator.write(mockEmitter, mockContent);
 
-        verify(mockEmitter).send(TSVHeaderCreator.GENE_PRODUCT_ID + "\t"
+        verify(mockEmitter).send(TSVHeaderCreator.GENE_PRODUCT_DB + "\t"
+                + TSVHeaderCreator.GENE_PRODUCT_ID + "\t"
                 + TSVHeaderCreator.GO_NAME + "\t"
                 + TSVHeaderCreator.TAXON_NAME + "\n", MediaType.TEXT_PLAIN);
     }
@@ -88,13 +100,14 @@ public class TSVHeaderCreatorTest {
     public void writeHeaderForSeveralSelectedFieldsInNewOrder() throws Exception {
         when(mockContent.isSlimmed()).thenReturn(false);
         when(mockContent.getSelectedFields()).thenReturn(asList(TAXON_NAME_FIELD_NAME, GO_NAME_FIELD_NAME,
-                GENE_PRODUCT_ID_FIELD_NAME));
-
+                GENE_PRODUCT_FIELD_NAME));
         tsvHeaderCreator.write(mockEmitter, mockContent);
 
         verify(mockEmitter).send(TSVHeaderCreator.TAXON_NAME + "\t"
-                + TSVHeaderCreator.GO_NAME + "\t"
-                + TSVHeaderCreator.GENE_PRODUCT_ID + "\n", MediaType.TEXT_PLAIN);
+                                         + TSVHeaderCreator.GO_NAME + "\t"
+                                         + TSVHeaderCreator.GENE_PRODUCT_DB + "\t"
+                                         + TSVHeaderCreator.GENE_PRODUCT_ID
+                                         + "\n", MediaType.TEXT_PLAIN);
     }
 
     @Test(expected = IllegalStateException.class)
@@ -110,20 +123,21 @@ public class TSVHeaderCreatorTest {
 
         tsvHeaderCreator.write(mockEmitter, mockContent);
 
-        verify(mockEmitter).send(FULL_HEADER_STRING,
-                MediaType.TEXT_PLAIN);
+        verify(mockEmitter).send(DEFAULT_HEADER_STRING,
+                                 MediaType.TEXT_PLAIN);
     }
 
     @Test
     public void writeHeaderForSeveralSelectedFieldsWhenSlimmed() throws Exception {
         when(mockContent.isSlimmed()).thenReturn(true);
-        when(mockContent.getSelectedFields()).thenReturn(asList(GENE_PRODUCT_ID_FIELD_NAME,
-                GO_TERM_FIELD_NAME,
-                TAXON_NAME_FIELD_NAME));
+        when(mockContent.getSelectedFields()).thenReturn(asList(GENE_PRODUCT_FIELD_NAME,
+                                                                GO_TERM_FIELD_NAME,
+                                                                TAXON_NAME_FIELD_NAME));
 
         tsvHeaderCreator.write(mockEmitter, mockContent);
 
-        verify(mockEmitter).send(GENE_PRODUCT_ID + "\t"
+        verify(mockEmitter).send(GENE_PRODUCT_DB + "\t"
+                                 + GENE_PRODUCT_ID + "\t"
                 + GO_TERM + "\t"
                 + SLIMMED_FROM + "\t"
                 + TAXON_NAME + "\n", MediaType.TEXT_PLAIN);
@@ -139,8 +153,14 @@ public class TSVHeaderCreatorTest {
         tsvHeaderCreator.write(mockEmitter, null);
     }
 
+    @Test
+    public void noExceptionThrownIfEmitterThrowsIOException() throws Exception{
+        doThrow(new IOException("Test IOException")).when(mockEmitter).send(any(Object.class), eq(MediaType
+                                                                                                          .TEXT_PLAIN));
+        tsvHeaderCreator.write(mockEmitter, mockContent);
+    }
+
     private static void initialiseFieldColumns() {
-        fields2Columns.add(new String[]{GENE_PRODUCT_ID_FIELD_NAME, GENE_PRODUCT_ID});
         fields2Columns.add(new String[]{SYMBOL_FIELD_NAME, SYMBOL});
         fields2Columns.add(new String[]{QUALIFIER_FIELD_NAME, QUALIFIER});
         fields2Columns.add(new String[]{GO_TERM_FIELD_NAME, GO_TERM});

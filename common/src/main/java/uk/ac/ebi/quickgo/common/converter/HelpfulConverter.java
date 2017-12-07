@@ -32,4 +32,9 @@ public class HelpfulConverter {
     public static String toCSV(Stream<String> stream){
         return stream.collect(Collectors.joining(","));
     }
+
+    public static String toCSV(Stream<String> stream, int quantityRequired){
+        return stream.limit(quantityRequired)
+                     .collect(Collectors.joining(","));
+    }
 }

@@ -3,9 +3,12 @@ package uk.ac.ebi.quickgo.rest.search.solr;
 import uk.ac.ebi.quickgo.rest.search.SolrQueryStringSanitizer;
 import uk.ac.ebi.quickgo.rest.search.query.*;
 
+import java.util.Collections;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static uk.ac.ebi.quickgo.rest.search.solr.SolrQueryConverter.CROSS_CORE_JOIN_SYNTAX;
 import static uk.ac.ebi.quickgo.rest.search.solr.SolrQueryConverter.SOLR_FIELD_SEPARATOR;
 
@@ -19,10 +22,21 @@ import static uk.ac.ebi.quickgo.rest.search.solr.SolrQueryConverter.SOLR_FIELD_S
  * @author Edd
  */
 public class SortedSolrQuerySerializer implements QueryVisitor<String> {
+    static final String RETRIEVE_ALL_NON_EMPTY = "[ '' TO * ]";
     private final SolrQueryStringSanitizer queryStringSanitizer;
+    private final Set<String> wildCardFieldQueryCompatibleFields;
 
-    public SortedSolrQuerySerializer() {
+    SortedSolrQuerySerializer(Set<String> wildCardFieldQueryCompatibleFields) {
+        checkArgument(Objects.nonNull(wildCardFieldQueryCompatibleFields), "If passed to the " +
+                "SortedSolrQuerySerializer, the list of wildcard compatible fields should not be null, use an empty " +
+                "set or the no-argument constructor");
         this.queryStringSanitizer = new SolrQueryStringSanitizer();
+        this.wildCardFieldQueryCompatibleFields = wildCardFieldQueryCompatibleFields;
+    }
+
+    SortedSolrQuerySerializer() {
+        this.queryStringSanitizer = new SolrQueryStringSanitizer();
+        this.wildCardFieldQueryCompatibleFields = Collections.emptySet();
     }
 
     @Override public String visit(FieldQuery query) {
@@ -64,5 +78,12 @@ public class SortedSolrQuerySerializer implements QueryVisitor<String> {
 
         return String.format(CROSS_CORE_JOIN_SYNTAX, query.getJoinFromAttribute(), query.getJoinToAttribute(),
                 query.getJoinFromTable(), fromFilterString);
+    }
+
+    @Override public String visit(AllNonEmptyFieldQuery query) {
+        if(wildCardFieldQueryCompatibleFields.contains(query.field())) {
+            return "(" + query.field() + SOLR_FIELD_SEPARATOR + RETRIEVE_ALL_NON_EMPTY + ")";
+        }
+        throw new IllegalArgumentException("It's invalid to search for all non-empty values of " + query.field());
     }
 }

@@ -14,9 +14,12 @@ import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.core.IsNot.not;
+import static uk.ac.ebi.quickgo.rest.search.query.AggregateRequest.DEFAULT_AGGREGATE_LIMIT;
+import static uk.ac.ebi.quickgo.rest.search.solr.AggregateToStringConverter.NUM_BUCKETS_TRUE;
 import static uk.ac.ebi.quickgo.rest.search.solr.AggregateToStringConverter.convertToSolrAggregation;
 import static uk.ac.ebi.quickgo.rest.search.solr.AggregateToStringConverter.createFacetField;
 import static uk.ac.ebi.quickgo.rest.search.solr.AggregateToStringConverter.createFacetType;
+import static uk.ac.ebi.quickgo.rest.search.solr.AggregateToStringConverter.createLimitField;
 import static uk.ac.ebi.quickgo.rest.search.solr.SolrAggregationHelper.*;
 
 /**
@@ -168,6 +171,38 @@ public class AggregateRequestToStringConverterTest {
         assertThat(convertedAggregation, containsString(aggregatePrefixWithTypeTitle(GO_ID_TYPE)));
         assertThat(convertedAggregation, containsString(createFacetType(FACET_TYPE_TERM)));
         assertThat(convertedAggregation, containsString(createFacetField(GO_ID_TYPE)));
+        assertThat(convertedAggregation, containsString(NUM_BUCKETS_TRUE));
+    }
+
+    @Test
+    public void aggregateWithNestedAggregateAndLimitIsConvertedIntoSolrSubFacet() {
+        int limit = 200;
+        AggregateRequest goIDAggregate = new AggregateRequest(GO_ID_TYPE, limit);
+
+        aggregate.addNestedAggregate(goIDAggregate);
+
+        String convertedAggregation = converter.convert(aggregate);
+
+        assertThat(convertedAggregation, containsString(aggregatePrefixWithTypeTitle(GO_ID_TYPE)));
+        assertThat(convertedAggregation, containsString(createFacetType(FACET_TYPE_TERM)));
+        assertThat(convertedAggregation, containsString(createFacetField(GO_ID_TYPE)));
+        assertThat(convertedAggregation, containsString(createLimitField(limit)));
+        assertThat(convertedAggregation, containsString(NUM_BUCKETS_TRUE));
+    }
+
+    @Test
+    public void aggregateWithNestedAggregateAndNoLimitIsConvertedIntoSolrSubFacet() {
+        AggregateRequest goIDAggregate = new AggregateRequest(GO_ID_TYPE);
+
+        aggregate.addNestedAggregate(goIDAggregate);
+
+        String convertedAggregation = converter.convert(aggregate);
+
+        assertThat(convertedAggregation, containsString(aggregatePrefixWithTypeTitle(GO_ID_TYPE)));
+        assertThat(convertedAggregation, containsString(createFacetType(FACET_TYPE_TERM)));
+        assertThat(convertedAggregation, containsString(createFacetField(GO_ID_TYPE)));
+        assertThat(convertedAggregation, containsString(createLimitField(DEFAULT_AGGREGATE_LIMIT)));
+        assertThat(convertedAggregation, containsString(NUM_BUCKETS_TRUE));
     }
 
     @Test
@@ -183,6 +218,7 @@ public class AggregateRequestToStringConverterTest {
         assertThat(convertedAggregation, containsString(createFacetType(FACET_TYPE_TERM)));
         assertThat(convertedAggregation, containsString(createFacetField(GO_ID_TYPE)));
         assertThat(convertedAggregation, containsString(createSolrCOUNTAggregation(GO_ID_TYPE, COUNT_FUNCTION)));
+        assertThat(convertedAggregation, containsString(NUM_BUCKETS_TRUE));
     }
 
     private String createSolrAggregation(String field, AggregateFunction function) {

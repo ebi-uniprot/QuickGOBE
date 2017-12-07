@@ -33,12 +33,18 @@ public class AnnotationStatisticsServiceTest {
     private SearchService<Annotation> searchServiceMock;
 
     @Mock
-    private StatsRequestConverter statsRequestConverterMock;
+    private StatsConverter statsConverterMock;
+
+    @Mock
+    private RequiredStatistics requiredStatisticsForStandardUsage;
+
+    @Mock
+    private RequiredStatistics requiredStatisticsForDownloadUsage;
 
     @Before
     public void setUp() throws Exception {
         statsService = new AnnotationStatisticsService(filterFactoryMock, searchServiceMock,
-                statsRequestConverterMock);
+                statsConverterMock, requiredStatisticsForStandardUsage, requiredStatisticsForDownloadUsage);
     }
 
     @Test
@@ -47,7 +53,7 @@ public class AnnotationStatisticsServiceTest {
         thrown.expectMessage("Filter factory cannot be null");
 
         statsService = new AnnotationStatisticsService(null, searchServiceMock,
-                statsRequestConverterMock);
+                statsConverterMock, requiredStatisticsForStandardUsage, requiredStatisticsForDownloadUsage);
     }
 
     @Test
@@ -56,34 +62,70 @@ public class AnnotationStatisticsServiceTest {
         thrown.expectMessage("Search service cannot be null");
 
         statsService = new AnnotationStatisticsService(filterFactoryMock, null,
-                statsRequestConverterMock);
+                statsConverterMock, requiredStatisticsForStandardUsage, requiredStatisticsForDownloadUsage);
     }
 
     @Test
-    public void nullStatsRequestConverterThrowsExceptionInConstructor() throws Exception {
+    public void nullStatsConverterThrowsExceptionInConstructor() throws Exception {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Stats request converter cannot be null");
 
         statsService = new AnnotationStatisticsService(filterFactoryMock, searchServiceMock,
-                null);
+                null, requiredStatisticsForStandardUsage, requiredStatisticsForDownloadUsage);
     }
 
     @Test
-    public void calculatingNullAnnotationRequestThrowsException() throws Exception {
+    public void nullRequiredStatisticsForStandardUsageThrowsExceptionInConstructor() throws Exception {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Required statistics for standard usage cannot be null.");
+
+        statsService = new AnnotationStatisticsService(filterFactoryMock, searchServiceMock,
+                statsConverterMock, null, requiredStatisticsForDownloadUsage);
+    }
+
+    @Test
+    public void nullRequiredStatisticsForDownloadUsageThrowsExceptionInConstructor() throws Exception {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Required statistics for download usage cannot be null.");
+
+        statsService = new AnnotationStatisticsService(filterFactoryMock, searchServiceMock,
+                statsConverterMock, requiredStatisticsForStandardUsage, null);
+    }
+
+    @Test
+    public void calculatingRequiredStatisticsForStandardUsageWithNullAnnotationThrowsException() throws Exception {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Annotation request cannot be null");
 
-        statsService.calculate(null);
+        statsService.calculateForStandardUsage(null);
     }
 
     @Test
-    public void calculatingStatsForAnnotationRequestWithNullStatsRequestThrowsException() throws Exception {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Statistics request cannot be null");
+    public void calculatingRequiredStatisticsForStandardUsageWithNullContentThrowsException() throws Exception {
+        thrown.expect(IllegalStateException.class);
+        thrown.expectMessage("Required statistics for standard usage cannot be null.");
 
+        when(requiredStatisticsForStandardUsage.getStats()).thenReturn(null);
+        statsService = new AnnotationStatisticsService(filterFactoryMock, searchServiceMock,
+                statsConverterMock, requiredStatisticsForStandardUsage,
+                requiredStatisticsForDownloadUsage);
         AnnotationRequest request = Mockito.mock(AnnotationRequest.class);
-        when(request.createStatsRequests()).thenReturn(null);
 
-        statsService.calculate(request);
+        statsService.calculateForStandardUsage(request);
     }
+
+    @Test
+    public void calculatingRequiredStatisticsForDownloadUsageWithNullContentThrowsException() throws Exception {
+        thrown.expect(IllegalStateException.class);
+        thrown.expectMessage("Required statistics for download cannot be null.");
+
+        when(requiredStatisticsForDownloadUsage.getStats()).thenReturn(null);
+        statsService = new AnnotationStatisticsService(filterFactoryMock, searchServiceMock,
+                statsConverterMock, requiredStatisticsForStandardUsage,
+                requiredStatisticsForDownloadUsage);
+        AnnotationRequest request = Mockito.mock(AnnotationRequest.class);
+
+        statsService.calculateForStandardUsage(request);
+    }
+
 }

@@ -6,11 +6,13 @@ import uk.ac.ebi.quickgo.graphics.ontology.RenderingGraphException;
 import uk.ac.ebi.quickgo.graphics.service.GraphImageService;
 import uk.ac.ebi.quickgo.ontology.OntologyRestConfig;
 import uk.ac.ebi.quickgo.ontology.common.OntologyFields;
-import uk.ac.ebi.quickgo.ontology.common.OntologyType;
 import uk.ac.ebi.quickgo.ontology.controller.validation.OBOControllerValidationHelper;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
+import uk.ac.ebi.quickgo.ontology.model.OntologySpecifier;
+import uk.ac.ebi.quickgo.ontology.model.graph.AncestorGraph;
+import uk.ac.ebi.quickgo.ontology.model.graph.AncestorVertex;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;
 import uk.ac.ebi.quickgo.ontology.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
@@ -25,6 +27,7 @@ import uk.ac.ebi.quickgo.rest.search.query.RegularPage;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import java.awt.image.RenderedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -44,6 +47,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static org.apache.http.HttpHeaders.CONTENT_ENCODING;
+import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.DEFAULT_TRAVERSAL_TYPES;
 import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.DEFAULT_TRAVERSAL_TYPES_CSV;
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.and;
 
@@ -69,20 +74,22 @@ public abstract class OBOController<T extends OBOTerm> {
     static final String PATHS_SUB_RESOURCE = "paths";
     static final String CHART_SUB_RESOURCE = "chart";
     static final String CHART_COORDINATES_SUB_RESOURCE = CHART_SUB_RESOURCE + "/coords";
+    static final String BASE_64_CONTENT_ENCODING = "base64";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OBOController.class);
     private static final String COLON = ":";
     private static final String DEFAULT_ENTRIES_PER_PAGE = "25";
     private static final String DEFAULT_PAGE_NUMBER = "1";
+    private static final String PNG = "png";
 
-    private final OntologyService<T> ontologyService;
+    final OntologyService<T> ontologyService;
+    final OBOControllerValidationHelper validationHelper;
     private final SearchService<OBOTerm> ontologySearchService;
     private final StringToQuickGOQueryConverter ontologyQueryConverter;
     private final SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig;
-    private final OBOControllerValidationHelper validationHelper;
     private final GraphImageService graphImageService;
     private final OntologyRestConfig.OntologyPagingConfig ontologyPagingConfig;
-    private final OntologyType ontologyType;
+    private final OntologySpecifier ontologySpecifier;
     private final HttpHeadersProvider httpHeadersProvider;
 
     public OBOController(OntologyService<T> ontologyService,
@@ -92,7 +99,7 @@ public abstract class OBOController<T extends OBOTerm> {
             GraphImageService graphImageService,
             OBOControllerValidationHelper oboControllerValidationHelper,
             OntologyRestConfig.OntologyPagingConfig ontologyPagingConfig,
-            OntologyType ontologyType,
+            OntologySpecifier ontologySpecifier,
             HttpHeadersProvider httpHeadersProvider) {
         checkArgument(ontologyService != null, "Ontology service cannot be null");
         checkArgument(ontologySearchService != null, "Ontology search service cannot be null");
@@ -101,7 +108,7 @@ public abstract class OBOController<T extends OBOTerm> {
         checkArgument(graphImageService != null, "Graph image service cannot be null");
         checkArgument(oboControllerValidationHelper != null, "OBO validation helper cannot be null");
         checkArgument(ontologyPagingConfig != null, "Paging config cannot be null");
-        checkArgument(ontologyType != null, "Ontology type config cannot be null");
+        checkArgument(ontologySpecifier != null, "Ontology specifier cannot be null");
         checkArgument(httpHeadersProvider != null, "Http Headers Provider cannot be null");
 
         this.ontologyService = ontologyService;
@@ -111,7 +118,7 @@ public abstract class OBOController<T extends OBOTerm> {
         this.validationHelper = oboControllerValidationHelper;
         this.graphImageService = graphImageService;
         this.ontologyPagingConfig = ontologyPagingConfig;
-        this.ontologyType = ontologyType;
+        this.ontologySpecifier = ontologySpecifier;
         this.httpHeadersProvider = httpHeadersProvider;
     }
 
@@ -120,30 +127,31 @@ public abstract class OBOController<T extends OBOTerm> {
      *
      * @return a 400 response
      */
-    @ApiOperation(value = "Catches any bad requests and returns an error response with a 400 status")
+    @ApiOperation(value = "Catches any bad requests and returns an error response with a 400 status", hidden = true)
     @RequestMapping(value = "/*", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<ResponseExceptionHandler.ErrorInfo> emptyId() {
         throw new IllegalArgumentException("The requested end-point does not exist.");
     }
 
     /**
-     * Get all information about all terms and page through the results.
+     * Get information about all terms and page through the results.
      *
      * @param page the page number of results to retrieve
      * @return the specified page of results as a {@link QueryResult} instance or a 400 response
      *          if the page number is invalid
      */
-    @ApiOperation(value = "Get all information on all terms and page through the results")
+    @ApiOperation(value = "Get information on all terms and page through the results")
     @RequestMapping(value = "/" + TERMS_RESOURCE, method = {RequestMethod.GET},
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> baseUrl(
+            @ApiParam(value = "The results page to retrieve")
             @RequestParam(value = "page", defaultValue = DEFAULT_PAGE_NUMBER) int page) {
 
         return new ResponseEntity<>(ontologyService.findAllByOntologyType
-                (this.ontologyType,
-                 new RegularPage(page, ontologyPagingConfig.defaultPageSize())),
-                                    httpHeadersProvider.provide(),
-                                    HttpStatus.OK);
+                (this.ontologySpecifier.ontologyType,
+                        new RegularPage(page, ontologyPagingConfig.defaultPageSize())),
+                httpHeadersProvider.provide(),
+                HttpStatus.OK);
     }
 
     /**
@@ -159,10 +167,11 @@ public abstract class OBOController<T extends OBOTerm> {
      */
     @ApiOperation(value = "Get core information about a (CSV) list of terms based on their ids",
             notes = "If possible, response fields include: id, isObsolete, name, definition, ancestors, synonyms, " +
-                    "aspect and usage.")
+                    "comment, aspect (for GO) and usage.")
     @RequestMapping(value = TERMS_RESOURCE + "/{ids}", method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<QueryResult<T>> findTermsCoreAttr(@PathVariable(value = "ids") String ids) {
+    public ResponseEntity<QueryResult<T>> findTermsCoreAttr(
+            @ApiParam(value = "Comma-separated term IDs", required = true) @PathVariable(value = "ids") String ids) {
         return getResultsResponse(ontologyService.findCoreInfoByOntologyId(validationHelper.validateCSVIds(ids)));
     }
 
@@ -181,7 +190,8 @@ public abstract class OBOController<T extends OBOTerm> {
             notes = "All fields will be populated providing they have a value.")
     @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + COMPLETE_SUB_RESOURCE, method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<QueryResult<T>> findTermsComplete(@PathVariable(value = "ids") String ids) {
+    public ResponseEntity<QueryResult<T>> findTermsComplete(
+            @ApiParam(value = "Comma-separated term IDs", required = true) @PathVariable(value = "ids") String ids) {
         return getResultsResponse(
                 ontologyService.findCompleteInfoByOntologyId(validationHelper.validateCSVIds(ids)));
     }
@@ -201,7 +211,8 @@ public abstract class OBOController<T extends OBOTerm> {
             notes = "If possible, response fields include: id, isObsolete, name, definition, history.")
     @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + HISTORY_SUB_RESOURCE, method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<QueryResult<T>> findTermsHistory(@PathVariable(value = "ids") String ids) {
+    public ResponseEntity<QueryResult<T>> findTermsHistory(
+            @ApiParam(value = "Comma-separated term IDs", required = true) @PathVariable(value = "ids") String ids) {
 
         return getResultsResponse(
                 ontologyService.findHistoryInfoByOntologyId(validationHelper.validateCSVIds(ids)));
@@ -219,10 +230,11 @@ public abstract class OBOController<T extends OBOTerm> {
      * </ul>
      */
     @ApiOperation(value = "Get cross-reference information about a (CSV) list of terms based on their ids",
-            notes = "If possible, response fields include: id, isObsolete, name, definition, xRefs.")
+            notes = "If possible, response fields include: id, isObsolete, name, definition, comment, xRefs.")
     @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + XREFS_SUB_RESOURCE, method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<QueryResult<T>> findTermsXRefs(@PathVariable(value = "ids") String ids) {
+    public ResponseEntity<QueryResult<T>> findTermsXRefs(
+            @ApiParam(value = "Comma-separated term IDs", required = true) @PathVariable(value = "ids") String ids) {
         return getResultsResponse(
                 ontologyService.findXRefsInfoByOntologyId(validationHelper.validateCSVIds(ids)));
     }
@@ -239,10 +251,12 @@ public abstract class OBOController<T extends OBOTerm> {
      * </ul>
      */
     @ApiOperation(value = "Get taxonomy constraint information about a (CSV) list of terms based on their ids",
-            notes = "If possible, response fields include: id, isObsolete, name, definition, taxonConstraints.")
+            notes = "If possible, response fields include: id, isObsolete, name, definition, taxonConstraints, " +
+                    "blacklist.")
     @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + CONSTRAINTS_SUB_RESOURCE, method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<QueryResult<T>> findTermsTaxonConstraints(@PathVariable(value = "ids") String ids) {
+    public ResponseEntity<QueryResult<T>> findTermsTaxonConstraints(
+            @ApiParam(value = "Comma-separated term IDs", required = true) @PathVariable(value = "ids") String ids) {
         return getResultsResponse(
                 ontologyService.findTaxonConstraintsInfoByOntologyId(validationHelper.validateCSVIds(ids)));
     }
@@ -259,10 +273,11 @@ public abstract class OBOController<T extends OBOTerm> {
      * </ul>
      */
     @ApiOperation(value = "Get cross ontology relationship information about a (CSV) list of terms based on their ids",
-            notes = "If possible, response fields include: id, isObsolete, name, definition, xRelations.")
+            notes = "If possible, response fields include: id, isObsolete, name, definition, comment, xRelations.")
     @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + XRELATIONS_SUB_RESOURCE, method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<QueryResult<T>> findTermsXOntologyRelations(@PathVariable(value = "ids") String ids) {
+    public ResponseEntity<QueryResult<T>> findTermsXOntologyRelations(
+            @ApiParam(value = "Comma-separated term IDs", required = true) @PathVariable(value = "ids") String ids) {
         return getResultsResponse(
                 ontologyService.findXORelationsInfoByOntologyId(validationHelper.validateCSVIds(ids)));
     }
@@ -279,13 +294,15 @@ public abstract class OBOController<T extends OBOTerm> {
      * </ul>
      */
     @ApiOperation(value = "Get annotation guideline information about a (CSV) list of terms based on their ids",
-            notes = "If possible, response fields include: id, isObsolete, name, definition, annotationGuidelines.")
+            notes = "If possible, response fields include: id, isObsolete, name, definition, " +
+                    "comment, annotationGuidelines.")
     @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + GUIDELINES_SUB_RESOURCE, method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<QueryResult<T>> findTermsAnnotationGuideLines(@PathVariable(value = "ids") String ids) {
+    public ResponseEntity<QueryResult<T>> findTermsAnnotationGuideLines(
+            @ApiParam(value = "Comma-separated term IDs", required = true) @PathVariable(value = "ids") String ids) {
         return getResultsResponse(ontologyService
-                                          .findAnnotationGuideLinesInfoByOntologyId(validationHelper.validateCSVIds
-                                                  (ids)));
+                .findAnnotationGuideLinesInfoByOntologyId(validationHelper.validateCSVIds
+                        (ids)));
     }
 
     /**
@@ -296,12 +313,14 @@ public abstract class OBOController<T extends OBOTerm> {
      * @return a {@link QueryResult} instance containing the results of the search
      */
     @ApiOperation(value = "Searches a simple user query, e.g., query=apopto",
-            notes = "If possible, response fields include: id, name, definition, isObsolete")
+            notes = "If possible, response fields include: id, name, isObsolete, aspect (for GO)")
     @RequestMapping(value = "/" + SEARCH_RESOUCE, method = {RequestMethod.GET},
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<OBOTerm>> ontologySearch(
-            @RequestParam(value = "query") String query,
+            @ApiParam(value = "Some value to search for in the ontology") @RequestParam(value = "query") String query,
+            @ApiParam(value = "The number of results per page [1-600]")
             @RequestParam(value = "limit", defaultValue = DEFAULT_ENTRIES_PER_PAGE) int limit,
+            @ApiParam(value = "The results page to retrieve")
             @RequestParam(value = "page", defaultValue = DEFAULT_PAGE_NUMBER) int page) {
 
         validationHelper.validateRequestedResults(limit);
@@ -326,12 +345,14 @@ public abstract class OBOController<T extends OBOTerm> {
     @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + ANCESTORS_SUB_RESOURCE, method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findAncestors(
-            @PathVariable(value = "ids") String ids,
+            @ApiParam(value = "Comma-separated term IDs", required = true) @PathVariable(value = "ids") String ids,
+            @ApiParam(value = "Comma-separated ontology relationships")
             @RequestParam(value = "relations", defaultValue = DEFAULT_TRAVERSAL_TYPES_CSV) String relations) {
         return getResultsResponse(
                 ontologyService.findAncestorsInfoByOntologyId(
                         validationHelper.validateCSVIds(ids),
-                        asOntologyRelationTypeArray(validationHelper.validateRelationTypes(relations))));
+                        asOntologyRelationTypeArray(validationHelper.validateRelationTypes(relations,
+                                DEFAULT_TRAVERSAL_TYPES))));
     }
 
     /**
@@ -344,12 +365,14 @@ public abstract class OBOController<T extends OBOTerm> {
     @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + DESCENDANTS_SUB_RESOURCE, method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findDescendants(
-            @PathVariable(value = "ids") String ids,
+            @ApiParam(value = "Comma-separated term IDs", required = true) @PathVariable(value = "ids") String ids,
+            @ApiParam(value = "Comma-separated ontology relationships")
             @RequestParam(value = "relations", defaultValue = DEFAULT_TRAVERSAL_TYPES_CSV) String relations) {
         return getResultsResponse(
                 ontologyService.findDescendantsInfoByOntologyId(
                         validationHelper.validateCSVIds(ids),
-                        asOntologyRelationTypeArray(validationHelper.validateRelationTypes(relations))));
+                        asOntologyRelationTypeArray(validationHelper.validateRelationTypes(relations,
+                                DEFAULT_TRAVERSAL_TYPES))));
     }
 
     /**
@@ -364,14 +387,16 @@ public abstract class OBOController<T extends OBOTerm> {
     @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + PATHS_SUB_RESOURCE + "/{toIds}", method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<List<OntologyRelationship>>> findPaths(
-            @PathVariable(value = "ids") String ids,
-            @PathVariable(value = "toIds") String toIds,
+            @ApiParam(value = "Comma-separated source term IDs") @PathVariable(value = "ids") String ids,
+            @ApiParam(value = "Comma-separated target term IDs") @PathVariable(value = "toIds") String toIds,
+            @ApiParam(value = "Comma-separated ontology relationships")
             @RequestParam(value = "relations", defaultValue = DEFAULT_TRAVERSAL_TYPES_CSV) String relations) {
         return getResultsResponse(
                 ontologyService.paths(
                         asSet(validationHelper.validateCSVIds(ids)),
                         asSet(validationHelper.validateCSVIds(toIds)),
-                        asOntologyRelationTypeArray(validationHelper.validateRelationTypes(relations))
+                        asOntologyRelationTypeArray(validationHelper.validateRelationTypes(relations,
+                                DEFAULT_TRAVERSAL_TYPES))
                 ));
     }
 
@@ -384,9 +409,12 @@ public abstract class OBOController<T extends OBOTerm> {
     @ApiOperation(value = "Retrieves the PNG image corresponding to the specified ontology terms")
     @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + CHART_SUB_RESOURCE, method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.IMAGE_PNG_VALUE})
-    public ResponseEntity<InputStreamResource> getChart(@PathVariable(value = "ids") String ids) {
+    public ResponseEntity<InputStreamResource> getChart(
+            @ApiParam(value = "Comma-separated term IDs", required = true) @PathVariable(value = "ids") String ids,
+            @ApiParam(value = "Whether or not to encode the image as base64", defaultValue = "false")
+            @RequestParam(value = "base64", defaultValue = "false", required = false) boolean base64) {
         try {
-            return createChartResponseEntity(validationHelper.validateCSVIds(ids));
+            return createChartResponseEntity(validationHelper.validateCSVIds(ids), base64);
         } catch (IOException | RenderingGraphException e) {
             throw createChartGraphicsException(e);
         }
@@ -403,16 +431,52 @@ public abstract class OBOController<T extends OBOTerm> {
     @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + CHART_COORDINATES_SUB_RESOURCE,
             method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<GraphImageLayout> getChartCoordinates(@PathVariable(value = "ids") String ids) {
+    public ResponseEntity<GraphImageLayout> getChartCoordinates(
+            @ApiParam(value = "Comma-separated term IDs", required = true) @PathVariable(value = "ids") String ids) {
         try {
             GraphImageLayout layout = graphImageService
-                    .createChart(validationHelper.validateCSVIds(ids), ontologyType.name()).getLayout();
+                    .createChart(validationHelper.validateCSVIds(ids), ontologySpecifier.ontologyType.name())
+                    .getLayout();
             return ResponseEntity
                     .ok()
                     .body(layout);
         } catch (RenderingGraphException e) {
             throw createChartGraphicsException(e);
         }
+    }
+
+    /**
+     * Retrieves a sub-graph of the ontology graph between two sets of provided term ids
+     *
+     * @param startIds the term ids from which to the sub-graph should begin
+     * @param stopIds the term ids that indicate the ending of the sub-graph
+     * @return the specified ontology sub-graph
+     */
+    @ApiOperation(value = "Fetches a sub-graph of the ontology")
+    @RequestMapping(value = TERMS_RESOURCE + "/graph", method = RequestMethod.GET, produces = {MediaType
+            .APPLICATION_JSON_VALUE})
+    public ResponseEntity<QueryResult<AncestorGraph>> getGraph(
+            @ApiParam(value = "Comma-separated term IDs specifying the beginning of the sub-graph")
+            @RequestParam(value = "startIds") String startIds,
+            @ApiParam(value = "Comma-separated term IDs specifying the end of the sub-graph")
+            @RequestParam(value = "stopIds", required = false) String stopIds,
+            @ApiParam(value = "Comma-separated relationships over which the graph will navigate")
+            @RequestParam(value = "relations", required = false) String relations) {
+        final AncestorGraph<AncestorVertex> ancestorGraph = ontologyService.findOntologySubGraphById(
+                asSet(validationHelper.validateCSVIds(startIds)),
+                asSet(validationHelper.validateCSVIds(stopIds)),
+                validRelations(relations).toArray(new OntologyRelationType[]{}));
+
+        if (ancestorGraph.vertices.size() == 0 && ancestorGraph.edges.size() == 0) {
+            return getResultsResponse(Collections.emptyList());
+        } else {
+            return getResultsResponse(Collections.singletonList(ancestorGraph));
+        }
+    }
+
+    private List<OntologyRelationType> validRelations(String relations) {
+        return Objects.isNull(relations) || relations.isEmpty() ? this.ontologySpecifier.allowedRelations :
+                validationHelper.validateRelationTypes(relations, this.ontologySpecifier.allowedRelations);
     }
 
     /**
@@ -431,8 +495,8 @@ public abstract class OBOController<T extends OBOTerm> {
      * @param relations the {@link OntologyRelationType}s
      * @return an array of {@link OntologyRelationType}s
      */
-    private static OntologyRelationType[] asOntologyRelationTypeArray(Collection<OntologyRelationType> relations) {
-        return relations.stream().toArray(OntologyRelationType[]::new);
+    static OntologyRelationType[] asOntologyRelationTypeArray(Collection<OntologyRelationType> relations) {
+        return relations.toArray(new OntologyRelationType[relations.size()]);
     }
 
     /**
@@ -452,6 +516,7 @@ public abstract class OBOController<T extends OBOTerm> {
         QueryResult<ResponseType> queryResult = new QueryResult.Builder<>(resultsToShow.size(), resultsToShow).build();
         return new ResponseEntity<>(queryResult, httpHeadersProvider.provide(), HttpStatus.OK);
     }
+
     private RetrievalException createChartGraphicsException(Throwable throwable) {
         String errorMessage = "Error encountered during creation of ontology chart graphics.";
         LOGGER.error(errorMessage, throwable);
@@ -463,28 +528,37 @@ public abstract class OBOController<T extends OBOTerm> {
      * of {@code ids} and returns the appropriate {@link ResponseEntity}.
      *
      * @param ids the terms whose corresponding graphical image is required
+     * @param base64 whether or not to encode the image as base64
      * @return the image corresponding to the specified terms
      * @throws IOException if there is an error during creation of the image {@link InputStreamResource}
      * @throws RenderingGraphException if there was an error during the rendering of the image
      */
-    private ResponseEntity<InputStreamResource> createChartResponseEntity(List<String> ids)
+    private ResponseEntity<InputStreamResource> createChartResponseEntity(List<String> ids, boolean base64)
             throws IOException, RenderingGraphException {
         RenderedImage renderedImage =
                 graphImageService
-                        .createChart(ids, ontologyType.name())
+                        .createChart(ids, ontologySpecifier.ontologyType.name())
                         .getGraphImage()
                         .render();
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        ImageIO.write(renderedImage, "png", Base64.getMimeEncoder().wrap(os));
 
-        InputStream is = new ByteArrayInputStream(os.toByteArray());
+        ResponseEntity.BodyBuilder bodyBuilder;
+        if (base64) {
+            ImageIO.write(renderedImage, PNG, Base64.getMimeEncoder().wrap(os));
+            bodyBuilder = buildChartResponseBodyBuilder(os).header(CONTENT_ENCODING, BASE_64_CONTENT_ENCODING);
+        } else {
+            ImageIO.write(renderedImage, PNG, os);
+            bodyBuilder = buildChartResponseBodyBuilder(os);
+        }
 
+        return bodyBuilder.body(new InputStreamResource(new ByteArrayInputStream(os.toByteArray())));
+    }
+
+    private ResponseEntity.BodyBuilder buildChartResponseBodyBuilder(ByteArrayOutputStream os) {
         return ResponseEntity
                 .ok()
-                .contentLength(os.size())
                 .contentType(MediaType.IMAGE_PNG)
-                .header("Content-Encoding", "base64")
-                .body(new InputStreamResource(is));
+                .contentLength(os.size());
     }
 
     private QueryRequest buildRequest(String query,
@@ -501,7 +575,7 @@ public abstract class OBOController<T extends OBOTerm> {
 
         if (!ontologyRetrievalConfig.getSearchReturnedFields().isEmpty()) {
             ontologyRetrievalConfig.getSearchReturnedFields()
-                                   .forEach(builder::addProjectedField);
+                    .forEach(builder::addProjectedField);
         }
 
         return builder.build();
@@ -517,7 +591,7 @@ public abstract class OBOController<T extends OBOTerm> {
      */
     private QuickGOQuery restrictQueryToOTypeResults(QuickGOQuery query) {
         return and(query,
-                   ontologyQueryConverter.convert(
-                           OntologyFields.Searchable.ONTOLOGY_TYPE + COLON + ontologyType.name()));
+                ontologyQueryConverter.convert(
+                        OntologyFields.Searchable.ONTOLOGY_TYPE + COLON + ontologySpecifier.ontologyType.name()));
     }
 }

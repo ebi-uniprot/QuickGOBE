@@ -62,10 +62,6 @@
             <artifactId>solr-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework.data</groupId>
-            <artifactId>spring-data-solr</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.github.dfabulich</groupId>
             <artifactId>sitemapgen4j</artifactId>
             <version>${sitemapgen4j.version}</version>
