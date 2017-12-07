@@ -88,7 +88,7 @@ public class OntologyConfig {
         try {
             return new OntologyReader(new File(sourceFile));
         } catch (Exception e) {
-            throw new IllegalStateException("Failed to load ontology files", e);
+            throw new IllegalStateException("Failed to load ontology files from " + sourceFile, e);
         }
     }
 
