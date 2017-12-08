@@ -90,6 +90,40 @@ public class OntologyReaderTest {
         }
     }
 
+    public class DocReaderAccessingEmptyOntologies {
+        private GeneOntology validGO;
+        private EvidenceCodeOntology validECO;
+        private GeneOntology emptyGO;
+        private EvidenceCodeOntology emptyECO;
+
+        @Before
+        public void setUp() {
+            validGO = mock(GeneOntology.class);
+            when(validGO.getTerms()).thenReturn(createGOTerms());
+
+            validECO = mock(EvidenceCodeOntology.class);
+            when(validECO.getTerms()).thenReturn(createECOTerms());
+
+            emptyGO = new OntologyReader.EmptyGeneOntology();
+            emptyECO = new OntologyReader.EmptyEvidenceCodeOntology();
+        }
+
+        @Test
+        public void openingEmptyGoOntologyIsSuccessful() {
+            ontologyReader = new OntologyReader(emptyGO, validECO);
+            ontologyReader.open(new ExecutionContext());
+            assertThat(ontologyReader, is(not(nullValue())));
+        }
+
+        @Test
+        public void openingEmptyEcoOntologyIsSuccessful() {
+            ontologyReader = new OntologyReader(validGO, emptyECO);
+            ontologyReader.open(new ExecutionContext());
+            assertThat(ontologyReader, is(not(nullValue())));
+        }
+    }
+
+
     private List<GenericTerm> createGOTerms() {
         GOTerm term = new GOTerm();
         term.setId("GO:0000001");
