@@ -13,7 +13,9 @@ import uk.ac.ebi.quickgo.model.ontology.go.GeneOntology;
 import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,11 +45,25 @@ public class OntologyReader extends AbstractItemStreamItemReader<OntologyDocumen
     private Iterator<GenericTerm> goTermIterator;
     private Iterator<GenericTerm> ecoTermIterator;
 
-    public OntologyReader(File sourceFileDir) throws Exception {
-        this(
-                new GOLoader(new GOSourceFiles(requireNonNull(sourceFileDir))).load(),
-                new ECOLoader(new ECOSourceFiles(requireNonNull(sourceFileDir))).load()
-        );
+    public static OntologyReader buildReader(File sourceFileDir) {
+        GeneOntology geneOntology;
+
+        try {
+            geneOntology = new GOLoader(new GOSourceFiles(requireNonNull(sourceFileDir))).load();
+        } catch (Exception e) {
+            e.printStackTrace();
+            geneOntology = new EmptyGeneOntology();
+        }
+
+        EvidenceCodeOntology evidenceCodeOntology;
+        try {
+            evidenceCodeOntology = new ECOLoader(new ECOSourceFiles(requireNonNull(sourceFileDir))).load();
+        } catch (Exception e) {
+            e.printStackTrace();
+            evidenceCodeOntology = new EmptyEvidenceCodeOntology();
+        }
+
+        return new OntologyReader(geneOntology, evidenceCodeOntology);
     }
 
     OntologyReader(GeneOntology go, EvidenceCodeOntology  eco) {
@@ -91,5 +107,21 @@ public class OntologyReader extends AbstractItemStreamItemReader<OntologyDocumen
         LOGGER.info("Loaded Gene Ontology successfully");
         this.ecoTermIterator = eco.getTerms().iterator();
         LOGGER.info("Loaded Evidence Code Ontology successfully");
+    }
+}
+
+class EmptyGeneOntology extends GeneOntology {
+
+    @Override
+    public List<GenericTerm> getTerms() {
+        return Collections.emptyList();
+    }
+}
+
+class EmptyEvidenceCodeOntology extends EvidenceCodeOntology {
+
+    @Override
+    public List<GenericTerm> getTerms() {
+        return Collections.emptyList();
     }
 }
