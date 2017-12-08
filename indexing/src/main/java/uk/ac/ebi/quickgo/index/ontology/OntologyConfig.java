@@ -86,7 +86,7 @@ public class OntologyConfig {
     @Bean
     OntologyReader ontologyReader() {
         try {
-            return new OntologyReader(new File(sourceFile));
+            return OntologyReader.buildReader(new File(sourceFile));
         } catch (Exception e) {
             throw new IllegalStateException("Failed to load ontology files from " + sourceFile, e);
         }
