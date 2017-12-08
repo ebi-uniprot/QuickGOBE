@@ -24,6 +24,10 @@ public class StatisticsByType {
         this.values = new ArrayList<>();
     }
 
+    public StatisticsByType(String type) {
+        this(type, 0);
+    }
+
     public String getType() {
         return type;
     }
