@@ -51,7 +51,7 @@ public class OntologyReader extends AbstractItemStreamItemReader<OntologyDocumen
         try {
             geneOntology = new GOLoader(new GOSourceFiles(requireNonNull(sourceFileDir))).load();
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Failed to load GO ontology files", e);
             geneOntology = new EmptyGeneOntology();
         }
 
@@ -59,7 +59,7 @@ public class OntologyReader extends AbstractItemStreamItemReader<OntologyDocumen
         try {
             evidenceCodeOntology = new ECOLoader(new ECOSourceFiles(requireNonNull(sourceFileDir))).load();
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Failed to load ECO ontology files", e);
             evidenceCodeOntology = new EmptyEvidenceCodeOntology();
         }
 
@@ -103,25 +103,38 @@ public class OntologyReader extends AbstractItemStreamItemReader<OntologyDocumen
      */
     @Override public void open(ExecutionContext executionContext) {
         super.open(executionContext);
-        this.goTermIterator = go.getTerms().iterator();
-        LOGGER.info("Loaded Gene Ontology successfully");
-        this.ecoTermIterator = eco.getTerms().iterator();
-        LOGGER.info("Loaded Evidence Code Ontology successfully");
+        final List<GenericTerm> terms = go.getTerms();
+        if (terms.size() > 0) {
+            LOGGER.info("Loaded Gene Ontology successfully");
+        } else {
+            LOGGER.info("Loading Gene Ontology unsuccessful");
+        }
+        this.goTermIterator = terms.iterator();
+
+        final List<GenericTerm> ecoTerms = eco.getTerms();
+        if (ecoTerms.size() > 0) {
+            LOGGER.info("Loaded Evidence Code Ontology successfully");
+        } else {
+            LOGGER.info("Loading Evidence Code Ontology unsuccessful");
+        }
+        this.ecoTermIterator = ecoTerms.iterator();
+    }
+
+    static class EmptyGeneOntology extends GeneOntology {
+
+        @Override
+        public List<GenericTerm> getTerms() {
+            return Collections.emptyList();
+        }
+    }
+
+    static class EmptyEvidenceCodeOntology extends EvidenceCodeOntology {
+
+        @Override
+        public List<GenericTerm> getTerms() {
+            return Collections.emptyList();
+        }
     }
 }
 
-class EmptyGeneOntology extends GeneOntology {
 
-    @Override
-    public List<GenericTerm> getTerms() {
-        return Collections.emptyList();
-    }
-}
-
-class EmptyEvidenceCodeOntology extends EvidenceCodeOntology {
-
-    @Override
-    public List<GenericTerm> getTerms() {
-        return Collections.emptyList();
-    }
-}
