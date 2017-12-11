@@ -45,6 +45,15 @@ public class OntologyReader extends AbstractItemStreamItemReader<OntologyDocumen
     private Iterator<GenericTerm> goTermIterator;
     private Iterator<GenericTerm> ecoTermIterator;
 
+    OntologyReader(GeneOntology go, EvidenceCodeOntology eco) {
+        checkArgument(Objects.nonNull(go), "The GeneOntology passed to the OntologyReader is " +
+                "null");
+        checkArgument(Objects.nonNull(eco), "The EvidenceCodeOntology passed to the OntologyReader is " +
+                "null");
+        this.go = go;
+        this.eco = eco;
+    }
+
     public static OntologyReader buildReader(File sourceFileDir) {
         GeneOntology geneOntology;
 
@@ -66,15 +75,6 @@ public class OntologyReader extends AbstractItemStreamItemReader<OntologyDocumen
         return new OntologyReader(geneOntology, evidenceCodeOntology);
     }
 
-    OntologyReader(GeneOntology go, EvidenceCodeOntology  eco) {
-        checkArgument(Objects.nonNull(go), "The GeneOntology passed to the OntologyReader is " +
-                "null");
-        checkArgument(Objects.nonNull(eco), "The EvidenceCodeOntology passed to the OntologyReader is " +
-                "null");
-        this.go = go;
-        this.eco = eco;
-    }
-
     /**
      * Creates and returns {@link OntologyDocument} instances corresponding to
      * each known GO / ECO term.
@@ -82,7 +82,7 @@ public class OntologyReader extends AbstractItemStreamItemReader<OntologyDocumen
      * @return an {@link OntologyDocument} corresponding to each known GO / ECO term
      * @throws Exception exception indicating an error during reading
      */
-    @Override public OntologyDocument read() throws Exception {
+    @Override public OntologyDocument read() {
         if (goTermIterator.hasNext()) {
             return GO_TERM_TO_DOC_CONVERTER.apply((GOTerm) goTermIterator.next());
         } else if (ecoTermIterator.hasNext()) {
