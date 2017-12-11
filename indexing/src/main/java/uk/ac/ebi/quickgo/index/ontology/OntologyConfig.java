@@ -85,7 +85,11 @@ public class OntologyConfig {
 
     @Bean
     OntologyReader ontologyReader() {
-        return new OntologyReader(new File(sourceFile));
+        try {
+            return OntologyReader.buildReader(new File(sourceFile));
+        } catch (Exception e) {
+            throw new IllegalStateException("Failed to load ontology files from " + sourceFile, e);
+        }
     }
 
     private ItemWriter<OntologyDocument> compositeOntologyWriter() {

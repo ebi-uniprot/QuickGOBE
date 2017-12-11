@@ -4,7 +4,6 @@ import uk.ac.ebi.quickgo.ff.files.ontology.ECOSourceFiles;
 import uk.ac.ebi.quickgo.ff.files.ontology.GOSourceFiles;
 import uk.ac.ebi.quickgo.ff.loader.ontology.ECOLoader;
 import uk.ac.ebi.quickgo.ff.loader.ontology.GOLoader;
-import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
 import uk.ac.ebi.quickgo.index.ontology.converter.GOTermToODocConverter;
 import uk.ac.ebi.quickgo.index.ontology.converter.GenericTermToODocConverter;
 import uk.ac.ebi.quickgo.model.ontology.eco.EvidenceCodeOntology;
@@ -14,13 +13,16 @@ import uk.ac.ebi.quickgo.model.ontology.go.GeneOntology;
 import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.Iterator;
-import java.util.Optional;
+import java.util.List;
+import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.support.AbstractItemStreamItemReader;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -37,22 +39,40 @@ public class OntologyReader extends AbstractItemStreamItemReader<OntologyDocumen
     private static final GOTermToODocConverter GO_TERM_TO_DOC_CONVERTER = new GOTermToODocConverter();
     private static final GenericTermToODocConverter GENERIC_TERM_TO_DOC_CONVERTER = new GenericTermToODocConverter();
 
-    private final Optional<GeneOntology> goOptional;
-    private final Optional<EvidenceCodeOntology> ecoOptional;
+    private final GeneOntology go;
+    private final EvidenceCodeOntology eco;
 
     private Iterator<GenericTerm> goTermIterator;
     private Iterator<GenericTerm> ecoTermIterator;
 
-    public OntologyReader(File sourceFileDir) {
-        this(
-                new GOLoader(new GOSourceFiles(requireNonNull(sourceFileDir))).load(),
-                new ECOLoader(new ECOSourceFiles(requireNonNull(sourceFileDir))).load());
+    OntologyReader(GeneOntology go, EvidenceCodeOntology eco) {
+        checkArgument(Objects.nonNull(go), "The GeneOntology passed to the OntologyReader is " +
+                "null");
+        checkArgument(Objects.nonNull(eco), "The EvidenceCodeOntology passed to the OntologyReader is " +
+                "null");
+        this.go = go;
+        this.eco = eco;
     }
 
-    OntologyReader(Optional<GeneOntology> goOptional, Optional<EvidenceCodeOntology>
-            ecoOptional) {
-        this.goOptional = goOptional;
-        this.ecoOptional = ecoOptional;
+    public static OntologyReader buildReader(File sourceFileDir) {
+        GeneOntology geneOntology;
+
+        try {
+            geneOntology = new GOLoader(new GOSourceFiles(requireNonNull(sourceFileDir))).load();
+        } catch (Exception e) {
+            LOGGER.error("Failed to load GO ontology files", e);
+            geneOntology = new EmptyGeneOntology();
+        }
+
+        EvidenceCodeOntology evidenceCodeOntology;
+        try {
+            evidenceCodeOntology = new ECOLoader(new ECOSourceFiles(requireNonNull(sourceFileDir))).load();
+        } catch (Exception e) {
+            LOGGER.error("Failed to load ECO ontology files", e);
+            evidenceCodeOntology = new EmptyEvidenceCodeOntology();
+        }
+
+        return new OntologyReader(geneOntology, evidenceCodeOntology);
     }
 
     /**
@@ -62,26 +82,13 @@ public class OntologyReader extends AbstractItemStreamItemReader<OntologyDocumen
      * @return an {@link OntologyDocument} corresponding to each known GO / ECO term
      * @throws Exception exception indicating an error during reading
      */
-    @Override public OntologyDocument read() throws Exception {
+    @Override public OntologyDocument read() {
         if (goTermIterator.hasNext()) {
-            Optional<OntologyDocument> optionalDoc =
-                    GO_TERM_TO_DOC_CONVERTER.apply(Optional.of((GOTerm) goTermIterator.next()));
-            return extractOntologyDocument(optionalDoc);
+            return GO_TERM_TO_DOC_CONVERTER.apply((GOTerm) goTermIterator.next());
         } else if (ecoTermIterator.hasNext()) {
-            Optional<OntologyDocument> optionalDoc =
-                    GENERIC_TERM_TO_DOC_CONVERTER.apply(Optional.of(ecoTermIterator.next()));
-            return extractOntologyDocument(optionalDoc);
+            return GENERIC_TERM_TO_DOC_CONVERTER.apply(ecoTermIterator.next());
         } else {
             return null;
-        }
-    }
-
-    protected OntologyDocument extractOntologyDocument(Optional<OntologyDocument> optionalDoc)
-            throws DocumentReaderException {
-        if (optionalDoc.isPresent()) {
-            return optionalDoc.get();
-        } else {
-            throw new DocumentReaderException("The converted Optional<OntologyDocument> should never be empty");
         }
     }
 
@@ -96,21 +103,38 @@ public class OntologyReader extends AbstractItemStreamItemReader<OntologyDocumen
      */
     @Override public void open(ExecutionContext executionContext) {
         super.open(executionContext);
-
-        if (goOptional.isPresent()) {
-            this.goTermIterator = goOptional.get().getTerms().iterator();
+        final List<GenericTerm> terms = go.getTerms();
+        if (terms.size() > 0) {
             LOGGER.info("Loaded Gene Ontology successfully");
         } else {
-            LOGGER.error("Could not load Gene Ontology from source files.");
-            throw new DocumentReaderException("Could not load Gene Ontology from source files.");
+            LOGGER.info("Loading Gene Ontology unsuccessful");
         }
+        this.goTermIterator = terms.iterator();
 
-        if (ecoOptional.isPresent()) {
-            this.ecoTermIterator = ecoOptional.get().getTerms().iterator();
+        final List<GenericTerm> ecoTerms = eco.getTerms();
+        if (ecoTerms.size() > 0) {
             LOGGER.info("Loaded Evidence Code Ontology successfully");
         } else {
-            LOGGER.error("Could not load Evidence Code Ontology from source files.");
-            throw new DocumentReaderException("Could not load Gene Ontology from source files.");
+            LOGGER.info("Loading Evidence Code Ontology unsuccessful");
+        }
+        this.ecoTermIterator = ecoTerms.iterator();
+    }
+
+    static class EmptyGeneOntology extends GeneOntology {
+
+        @Override
+        public List<GenericTerm> getTerms() {
+            return Collections.emptyList();
+        }
+    }
+
+    static class EmptyEvidenceCodeOntology extends EvidenceCodeOntology {
+
+        @Override
+        public List<GenericTerm> getTerms() {
+            return Collections.emptyList();
         }
     }
 }
+
+

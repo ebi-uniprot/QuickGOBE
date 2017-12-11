@@ -38,7 +38,7 @@ public class GenericTermToODocConverterTest {
     public void extractsNoReplacementsWhenGenericTermHasNullReplacements() {
         when(term.getReplacements()).thenReturn(null);
 
-        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
+        OntologyDocument docOpt = converter.apply(term);
         List<String> extractedReplacement = extractFieldFromDocument(docOpt,
                 (OntologyDocument doc) -> doc.replacements);
 
@@ -54,7 +54,7 @@ public class GenericTermToODocConverterTest {
         TermRelation mockReplace = mockReplaceRelation(replacedByTermId, replacedWithTermId, relation);
         when(term.getReplacements()).thenReturn(Collections.singletonList(mockReplace));
 
-        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
+        OntologyDocument docOpt = converter.apply(term);
         List<String> extractedReplacements = extractFieldFromDocument(docOpt,
                 (OntologyDocument doc) -> doc.replacements);
 
@@ -73,7 +73,7 @@ public class GenericTermToODocConverterTest {
         TermRelation mockReplace = mockReplaceRelation(replacedByTermId, replacedWithTermId, relation);
         when(term.getReplacements()).thenReturn(Collections.singletonList(mockReplace));
 
-        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
+        OntologyDocument docOpt = converter.apply(term);
         List<String> extractedReplacements =
                 extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.replacements);
 
@@ -92,7 +92,7 @@ public class GenericTermToODocConverterTest {
 
         when(term.getReplacements()).thenReturn(relations);
 
-        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
+        OntologyDocument docOpt = converter.apply(term);
         List<String> extractedReplacements =
                 extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.replacements);
 
@@ -109,10 +109,8 @@ public class GenericTermToODocConverterTest {
         GenericTerm toConvert = mock(GenericTerm.class);
         when(toConvert.getReplacements()).thenReturn(relations);
 
-        Optional<OntologyDocument> expectedDocOptional = converter.apply(Optional.of(toConvert));
-        assertThat(expectedDocOptional.isPresent(), is(true));
-
-        OntologyDocument expectedDoc = expectedDocOptional.get();
+        OntologyDocument expectedDocOptional = converter.apply(toConvert);
+        OntologyDocument expectedDoc = expectedDocOptional;
 
         assertThat(expectedDoc.replacements, hasSize(relations.size()));
     }
@@ -122,7 +120,7 @@ public class GenericTermToODocConverterTest {
     public void extractsNoReplacesWhenGenericTermHasNullReplaces() {
         when(term.getReplacements()).thenReturn(null);
 
-        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
+        OntologyDocument docOpt = converter.apply(term);
         List<String> extractedReplacement = extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.replaces);
 
         assertThat(extractedReplacement, is(nullValue()));
@@ -137,7 +135,7 @@ public class GenericTermToODocConverterTest {
         TermRelation mockReplace = mockReplaceRelation(replacedWithTermId, replacedByTermId, relation);
         when(term.getReplaces()).thenReturn(Collections.singletonList(mockReplace));
 
-        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
+        OntologyDocument docOpt = converter.apply(term);
         List<String> extractedReplaces = extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.replaces);
 
         assertThat(extractedReplaces, hasSize(1));
@@ -155,7 +153,7 @@ public class GenericTermToODocConverterTest {
         TermRelation mockReplace = mockReplaceRelation(replacedWIthTermId, replacedByTermId, relation);
         when(term.getReplaces()).thenReturn(Collections.singletonList(mockReplace));
 
-        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
+        OntologyDocument docOpt = converter.apply(term);
         List<String> extractedReplaces = extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.replaces);
 
         assertThat(extractedReplaces, hasSize(1));
@@ -173,7 +171,7 @@ public class GenericTermToODocConverterTest {
 
         when(term.getReplaces()).thenReturn(relations);
 
-        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
+        OntologyDocument docOpt = converter.apply(term);
         List<String> extractedReplaces = extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.replaces);
 
         assertThat(extractedReplaces, hasSize(relations.size()));
@@ -189,10 +187,8 @@ public class GenericTermToODocConverterTest {
         GenericTerm toConvert = mock(GenericTerm.class);
         when(toConvert.getReplaces()).thenReturn(relations);
 
-        Optional<OntologyDocument> expectedDocOptional = converter.apply(Optional.of(toConvert));
-        assertThat(expectedDocOptional.isPresent(), is(true));
-
-        OntologyDocument expectedDoc = expectedDocOptional.get();
+        OntologyDocument expectedDocOptional = converter.apply(toConvert);
+        OntologyDocument expectedDoc = expectedDocOptional;
 
         assertThat(expectedDoc.replaces, hasSize(relations.size()));
     }
@@ -228,7 +224,7 @@ public class GenericTermToODocConverterTest {
 
         when(termOntologyHistory.getHistoryAll()).thenReturn(Collections.singletonList(auditRecord));
 
-        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
+        OntologyDocument docOpt = converter.apply(term);
         List<String> extractedHistory = extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.history);
 
         assertThat(extractedHistory, hasSize(1));
@@ -239,7 +235,7 @@ public class GenericTermToODocConverterTest {
     public void extractHistoryWhenNotExists() {
         when(term.getHistory()).thenReturn(null);
 
-        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
+        OntologyDocument docOpt = converter.apply(term);
         List<String> extractedHistory = extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.history);
 
         assertThat(extractedHistory, is(nullValue()));
@@ -257,7 +253,7 @@ public class GenericTermToODocConverterTest {
 
         when(term.getCrossOntologyRelations()).thenReturn(Collections.singletonList(xrelationMock));
 
-        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
+        OntologyDocument docOpt = converter.apply(term);
         List<String> extractedXRelations = extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.xRelations);
 
         assertThat(extractedXRelations, is(not(nullValue())));
@@ -269,7 +265,7 @@ public class GenericTermToODocConverterTest {
     public void extractXRelationsWhenNotExist() {
         when(term.getCrossOntologyRelations()).thenReturn(null);
 
-        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
+        OntologyDocument docOpt = converter.apply(term);
         List<String> extractedXRelations = extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.xRelations);
 
         assertThat(extractedXRelations, is(nullValue()));
@@ -285,7 +281,7 @@ public class GenericTermToODocConverterTest {
 
         when(term.getXrefs()).thenReturn(Collections.singletonList(namedXRef));
 
-        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
+        OntologyDocument docOpt = converter.apply(term);
         List<String> extractedXrefs = extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.xrefs);
 
         assertThat(extractedXrefs, hasSize(1));
@@ -296,7 +292,7 @@ public class GenericTermToODocConverterTest {
     public void extractXrefsWhenNotExist() {
         when(term.getXrefs()).thenReturn(null);
 
-        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
+        OntologyDocument docOpt = converter.apply(term);
         List<String> extractedXrefs = extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.xrefs);
 
         assertThat(extractedXrefs, is(nullValue()));
@@ -312,7 +308,7 @@ public class GenericTermToODocConverterTest {
         when(term.getSynonyms()).thenReturn(Collections.singletonList(synonym));
 
         // check doc.synonyms
-        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
+        OntologyDocument docOpt = converter.apply(term);
         List<String> extractedSynonyms = extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.synonyms);
 
         assertThat(extractedSynonyms, hasSize(1));
@@ -323,7 +319,7 @@ public class GenericTermToODocConverterTest {
     public void extractSynonymsWhenNotExist() {
         when(term.getSynonyms()).thenReturn(null);
 
-        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
+        OntologyDocument docOpt = converter.apply(term);
         List<String> extractedSynonyms = extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.synonyms);
         List<String> extractedSynonymNames =
                 extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.synonymNames);
@@ -350,9 +346,8 @@ public class GenericTermToODocConverterTest {
         replacedBy.add(replacementTerm);
         when(term.replacedBy()).thenReturn(replacedBy);
 
-        Optional<OntologyDocument> result = converter.apply(Optional.of(term));
-        assertThat(result.isPresent(), is(true));
-        OntologyDocument document = result.get();
+        OntologyDocument result = converter.apply(term);
+        OntologyDocument document = result;
         assertThat(document.isObsolete, is(isObsolete));
         assertThat(document.comment, is("comment1"));
         assertThat(document.definition, is("def1"));
@@ -364,9 +359,8 @@ public class GenericTermToODocConverterTest {
 
     @Test
     public void convertsSimpleNullFields() {
-        Optional<OntologyDocument> result = converter.apply(Optional.of(term));
-        assertThat(result.isPresent(), is(true));
-        OntologyDocument document = result.get();
+        OntologyDocument result = converter.apply(term);
+        OntologyDocument document = result;
         assertThat(document.isObsolete, is(false));
         assertThat(document.comment, is(nullValue()));
         assertThat(document.definition, is(nullValue()));
@@ -375,15 +369,8 @@ public class GenericTermToODocConverterTest {
         assertThat(document.secondaryIds, is(nullValue()));
     }
 
-    // empty optional conversion
     @Test
-    public void convertsEmptyOptional() {
-        Optional<OntologyDocument> documentOptional = converter.apply(Optional.empty());
-        assertThat(documentOptional.isPresent(), is(false));
-    }
-
-    @Test
-    public void extractDefinitionXref() throws Exception {
+    public void extractDefinitionXref() {
         String db1 = "db1";
         String id1 = "id1";
 
@@ -393,7 +380,7 @@ public class GenericTermToODocConverterTest {
 
         when(term.getDefinitionXrefs()).thenReturn(Collections.singletonList(xref));
 
-        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
+        OntologyDocument docOpt = converter.apply(term);
         List<String> extractedDefinitionXrefs =
                 extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.definitionXrefs);
 
@@ -402,10 +389,10 @@ public class GenericTermToODocConverterTest {
     }
 
     @Test
-    public void extractionOfEmptyDefinitionXrefListReturnsEmptyList() throws Exception {
+    public void extractionOfEmptyDefinitionXrefListReturnsEmptyList() {
         when(term.getDefinitionXrefs()).thenReturn(Collections.emptyList());
 
-        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
+        OntologyDocument docOpt = converter.apply(term);
         List<String> extractedDefinitionXrefs =
                 extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.definitionXrefs);
 
@@ -414,27 +401,27 @@ public class GenericTermToODocConverterTest {
 
     //credits
     @Test
-    public void extractsNoCreditElementsWhenCreditsInTermIsNull() throws Exception {
+    public void extractsNoCreditElementsWhenCreditsInTermIsNull() {
         when(term.getCredits()).thenReturn(null);
 
-        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
+        OntologyDocument docOpt = converter.apply(term);
         List<String> extractedCredits = extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.credits);
 
         assertThat(extractedCredits, is(nullValue()));
     }
 
     @Test
-    public void extractsNoCreditElementsWhenCreditsInTermIsEmpty() throws Exception {
+    public void extractsNoCreditElementsWhenCreditsInTermIsEmpty() {
         when(term.getCredits()).thenReturn(Collections.emptyList());
 
-        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
+        OntologyDocument docOpt = converter.apply(term);
         List<String> extractedCredits = extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.credits);
 
         assertThat(extractedCredits, is(nullValue()));
     }
 
     @Test
-    public void extracts1CreditElementWhenCreditsInTermHas1Element() throws Exception {
+    public void extracts1CreditElementWhenCreditsInTermHas1Element() {
         String code1 = "BHF";
         String url1 = "http://www.ucl.ac.uk/cardiovasculargeneontology/";
 
@@ -447,12 +434,17 @@ public class GenericTermToODocConverterTest {
 
         when(term.getCredits()).thenReturn(Arrays.asList(credit1, credit2));
 
-        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
+        OntologyDocument docOpt = converter.apply(term);
         List<String> extractedCredits = extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.credits);
 
         assertThat(extractedCredits, hasSize(2));
         assertThat(creditExists(credit1, extractedCredits), is(true));
         assertThat(creditExists(credit2, extractedCredits), is(true));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void cannotConvertNullGenericTerm() {
+        converter.apply(null);
     }
 
     private boolean creditExists(TermCredit credit, Collection<String> extractedCredits) {
@@ -462,8 +454,8 @@ public class GenericTermToODocConverterTest {
                 .findFirst().isPresent();
     }
 
-    public static <T> T extractFieldFromDocument(Optional<OntologyDocument> docOpt, Function<OntologyDocument, T>
+    public static <T> T extractFieldFromDocument(OntologyDocument docOpt, Function<OntologyDocument, T>
             extractor) {
-        return extractor.apply(docOpt.get());
+        return extractor.apply(docOpt);
     }
 }
