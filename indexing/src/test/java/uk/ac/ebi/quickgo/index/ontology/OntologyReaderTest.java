@@ -40,6 +40,22 @@ public class OntologyReaderTest {
         }
     }
 
+    private List<GenericTerm> createGOTerms() {
+        GOTerm term = new GOTerm();
+        term.setId("GO:0000001");
+        return Collections.singletonList(term);
+    }
+
+    private List<GenericTerm> createECOTerms() {
+        ECOTerm term1 = new ECOTerm();
+        term1.setId("ECO:0000001");
+
+        ECOTerm term2 = new ECOTerm();
+        term2.setId("ECO:0000002");
+
+        return Arrays.asList(term1, term2);
+    }
+
     public class DocReaderAccessingValidOntologies {
 
         @Before
@@ -57,7 +73,7 @@ public class OntologyReaderTest {
         }
 
         @Test
-        public void readsAllDocsWithoutError() throws Exception {
+        public void readsAllDocsWithoutError() {
             int count = 0;
             while (ontologyReader.read() != null) {
                 count++;
@@ -128,21 +144,5 @@ public class OntologyReaderTest {
             ontologyReader.open(new ExecutionContext());
             assertThat(ontologyReader, is(not(nullValue())));
         }
-    }
-
-    private List<GenericTerm> createGOTerms() {
-        GOTerm term = new GOTerm();
-        term.setId("GO:0000001");
-        return Collections.singletonList(term);
-    }
-
-    private List<GenericTerm> createECOTerms() {
-        ECOTerm term1 = new ECOTerm();
-        term1.setId("ECO:0000001");
-
-        ECOTerm term2 = new ECOTerm();
-        term2.setId("ECO:0000002");
-
-        return Arrays.asList(term1, term2);
     }
 }
