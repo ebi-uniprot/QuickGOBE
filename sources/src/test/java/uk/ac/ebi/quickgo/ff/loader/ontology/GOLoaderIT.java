@@ -5,7 +5,6 @@ import uk.ac.ebi.quickgo.model.ontology.go.GOTerm;
 import uk.ac.ebi.quickgo.model.ontology.go.GeneOntology;
 
 import java.io.File;
-import java.util.Optional;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -42,14 +41,10 @@ public class GOLoaderIT {
             assertThat(geneOntology, is(notNullValue()));
 
             //Highly input data specific
-            assertEquals(((GOTerm)geneOntology.getTerm("GO:0003774")).getBlacklist().get(0).getMethodId(),
-                         "IPR001609|IPR002928");
+            assertEquals(((GOTerm) geneOntology.getTerm("GO:0003774")).getBlacklist().get(0).getMethodId(),
+                    "IPR001609|IPR002928");
         } catch (Exception e) {
             assertThat(e, is(nullValue()));
         }
-
-
-
     }
-
 }
