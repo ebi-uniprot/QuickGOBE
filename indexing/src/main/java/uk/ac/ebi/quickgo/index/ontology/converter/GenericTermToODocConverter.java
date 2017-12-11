@@ -7,9 +7,11 @@ import uk.ac.ebi.quickgo.model.ontology.generic.Synonym;
 import uk.ac.ebi.quickgo.model.ontology.generic.TermRelation;
 import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
 
+import com.google.common.base.Preconditions;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -27,6 +29,8 @@ public class GenericTermToODocConverter implements Function<GenericTerm,
         OntologyDocument> {
 
     @Override public OntologyDocument apply(GenericTerm term) {
+        Preconditions.checkArgument(Objects.nonNull(term), "The Generic Term instance applied to " +
+                "GenericTermToODocConverter cannot be null");
             OntologyDocument doc = new OntologyDocument();
             doc.id = term.getId();
             doc.isObsolete = term.isObsolete();
