@@ -5,7 +5,10 @@ import uk.ac.ebi.quickgo.model.ontology.go.GOTermBlacklist;
 import uk.ac.ebi.quickgo.model.ontology.go.TaxonConstraint;
 import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -132,7 +135,6 @@ public class GOTermToODocConverterTest {
         assertThat(document.aspect, is(nullValue()));
     }
 
-
     // blacklist
     @Test
     public void extractsBlacklistWhenExists() {
@@ -234,13 +236,6 @@ public class GOTermToODocConverterTest {
         assertThat(goDiscussionExists(plannedChange2, extractedGoDiscussions), is(true));
     }
 
-    private boolean goDiscussionExists(GOTerm.NamedURL goDiscussion, Collection<String> expectedGoDiscussions) {
-        return expectedGoDiscussions.stream()
-                .filter(expectedDiscussionText -> expectedDiscussionText.contains(goDiscussion.getTitle()) &&
-                        expectedDiscussionText.contains(goDiscussion.getUrl()))
-                .findFirst().isPresent();
-    }
-
     //Protein complexes
     @Test
     public void extracts2ProteinComplexFromProteinComplexList() {
@@ -282,6 +277,13 @@ public class GOTermToODocConverterTest {
     @Test(expected = IllegalArgumentException.class)
     public void cannotConvertNullGOTerm() {
         converter.apply(null);
+    }
+
+    private boolean goDiscussionExists(GOTerm.NamedURL goDiscussion, Collection<String> expectedGoDiscussions) {
+        return expectedGoDiscussions.stream()
+                .filter(expectedDiscussionText -> expectedDiscussionText.contains(goDiscussion.getTitle()) &&
+                        expectedDiscussionText.contains(goDiscussion.getUrl()))
+                .findFirst().isPresent();
     }
 
     private boolean proteinComplexExists(GOTerm.ProteinComplex proteinComplex,
