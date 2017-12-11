@@ -18,7 +18,7 @@ import static org.slf4j.LoggerFactory.getLogger;
  * only for showing graph images via {@link GraphImageService}. Encapsulation
  * of the loading functionality makes it simpler to test at the level of any callers
  * of {@link GraphImageService}.
- * lasjdflsjdf
+ *
  * Created 27/09/16
  * @author Edd
  */
@@ -28,7 +28,7 @@ public class OntologyGraphicsSourceLoader {
     private GeneOntology geneOntology;
     private EvidenceCodeOntology evidenceCodeOntology;
 
-    public OntologyGraphicsSourceLoader(File sourceDir){
+    public OntologyGraphicsSourceLoader(File sourceDir) {
         checkArgument(sourceDir != null && sourceDir.exists(), "Source directory cannot be null and must exist");
 
         this.sourceDir = sourceDir;
