@@ -142,6 +142,7 @@ public class OntologyReaderTest {
 
     @After
     public void after() {
+        //useless comment
         if(ontologyReader != null) ontologyReader.close();
     }
 
