@@ -18,7 +18,7 @@ import static org.slf4j.LoggerFactory.getLogger;
  * only for showing graph images via {@link GraphImageService}. Encapsulation
  * of the loading functionality makes it simpler to test at the level of any callers
  * of {@link GraphImageService}.
- *
+ * lasjdflsjdf
  * Created 27/09/16
  * @author Edd
  */
