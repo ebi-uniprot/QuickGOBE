@@ -38,10 +38,15 @@ public class OntologyGraphicsSourceLoader {
 
     private void loadOntologies() {
         try {
-            this.geneOntology = new GOLoader(new GOSourceFiles(requireNonNull(sourceDir))).load();
+            geneOntology = new GOLoader(new GOSourceFiles(requireNonNull(sourceDir))).load();
+        } catch (Exception e) {
+            LOGGER.warn("Could not load Gene Ontology correctly. No graphics can be provided.");
+        }
+
+        try {
             evidenceCodeOntology = new ECOLoader(new ECOSourceFiles(requireNonNull(sourceDir))).load();
         } catch (Exception e) {
-            LOGGER.warn("Could not load ontologies correctly. No graphics can be provided.");
+            LOGGER.warn("Could not load ECO Ontology correctly. No graphics can be provided.");
         }
     }
 
