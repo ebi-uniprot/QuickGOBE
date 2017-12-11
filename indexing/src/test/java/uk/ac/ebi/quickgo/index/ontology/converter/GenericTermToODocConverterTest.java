@@ -369,15 +369,8 @@ public class GenericTermToODocConverterTest {
         assertThat(document.secondaryIds, is(nullValue()));
     }
 
-    // empty optional conversion
-//    @Test
-//    public void convertsEmptyOptional() {
-//        OntologyDocument documentOptional = converter.apply(Optional.empty());
-//        assertThat(documentOptional, is(false));
-//    }
-
     @Test
-    public void extractDefinitionXref() throws Exception {
+    public void extractDefinitionXref() {
         String db1 = "db1";
         String id1 = "id1";
 
@@ -396,7 +389,7 @@ public class GenericTermToODocConverterTest {
     }
 
     @Test
-    public void extractionOfEmptyDefinitionXrefListReturnsEmptyList() throws Exception {
+    public void extractionOfEmptyDefinitionXrefListReturnsEmptyList() {
         when(term.getDefinitionXrefs()).thenReturn(Collections.emptyList());
 
         OntologyDocument docOpt = converter.apply(term);
@@ -408,7 +401,7 @@ public class GenericTermToODocConverterTest {
 
     //credits
     @Test
-    public void extractsNoCreditElementsWhenCreditsInTermIsNull() throws Exception {
+    public void extractsNoCreditElementsWhenCreditsInTermIsNull() {
         when(term.getCredits()).thenReturn(null);
 
         OntologyDocument docOpt = converter.apply(term);
@@ -418,7 +411,7 @@ public class GenericTermToODocConverterTest {
     }
 
     @Test
-    public void extractsNoCreditElementsWhenCreditsInTermIsEmpty() throws Exception {
+    public void extractsNoCreditElementsWhenCreditsInTermIsEmpty() {
         when(term.getCredits()).thenReturn(Collections.emptyList());
 
         OntologyDocument docOpt = converter.apply(term);
@@ -428,7 +421,7 @@ public class GenericTermToODocConverterTest {
     }
 
     @Test
-    public void extracts1CreditElementWhenCreditsInTermHas1Element() throws Exception {
+    public void extracts1CreditElementWhenCreditsInTermHas1Element() {
         String code1 = "BHF";
         String url1 = "http://www.ucl.ac.uk/cardiovasculargeneontology/";
 
@@ -447,6 +440,11 @@ public class GenericTermToODocConverterTest {
         assertThat(extractedCredits, hasSize(2));
         assertThat(creditExists(credit1, extractedCredits), is(true));
         assertThat(creditExists(credit2, extractedCredits), is(true));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void cannotConvertNullGenericTerm() {
+        converter.apply(null);
     }
 
     private boolean creditExists(TermCredit credit, Collection<String> extractedCredits) {
