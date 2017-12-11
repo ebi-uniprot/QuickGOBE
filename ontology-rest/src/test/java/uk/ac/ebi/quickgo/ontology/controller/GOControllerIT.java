@@ -58,9 +58,11 @@ public class GOControllerIT extends OBOControllerIT {
     private static final String GO_SLIM5 = "GO:5555555";
     private static final String GO_SLIM6 = "GO:6666666";
     private static final String GO_SLIM7 = "GO:7777777";
+    private static final String NON_EXISTENT_TERM = "GO:8787878";
 
     private static final String SLIM_RESOURCE = "/slim";
-    private static final String SLIM_IDS_PARAM = "ids";
+    private static final String SLIM_TO_IDS_PARAM = "slimsToIds";
+    private static final String SLIM_FROM_IDS_PARAM = "slimsFromIds";
     private static final String SLIM_RELATIONS_PARAM = "relations";
     private static final String STOP_NODE = "GO:0008150";
     private static final String NO_VALID_SLIM_TERMS_ERROR_MESSAGE = "Requested slim-set contains no valid terms";
@@ -118,7 +120,7 @@ public class GOControllerIT extends OBOControllerIT {
     @Test
     public void oneIdHasOneSlim() throws Exception {
         ResultActions response = mockMvc.perform(get(getSlimURL())
-                .param(SLIM_IDS_PARAM, GO_SLIM1));
+                .param(SLIM_TO_IDS_PARAM, GO_SLIM1));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -130,7 +132,7 @@ public class GOControllerIT extends OBOControllerIT {
     @Test
     public void oneIdAndOneInvalidIdHasOneSlim() throws Exception {
         ResultActions response = mockMvc.perform(get(getSlimURL())
-                .param(SLIM_IDS_PARAM, toCSV(GO_SLIM1, "GO:0000000")));
+                .param(SLIM_TO_IDS_PARAM, toCSV(GO_SLIM1, "GO:0000000")));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -142,7 +144,7 @@ public class GOControllerIT extends OBOControllerIT {
     @Test
     public void oneIdHasTwoSlims() throws Exception {
         ResultActions response = mockMvc.perform(get(getSlimURL())
-                .param(SLIM_IDS_PARAM, GO_SLIM2));
+                .param(SLIM_TO_IDS_PARAM, GO_SLIM2));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -151,7 +153,7 @@ public class GOControllerIT extends OBOControllerIT {
                 .andExpect(jsonPath("$.results.*.id", contains(GO_SLIM_CHILD2)));
 
         mockMvc.perform(get(getSlimURL())
-                .param(SLIM_IDS_PARAM, GO_SLIM3));
+                .param(SLIM_TO_IDS_PARAM, GO_SLIM3));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -163,7 +165,7 @@ public class GOControllerIT extends OBOControllerIT {
     @Test
     public void twoIdsHave1Slim() throws Exception {
         ResultActions response = mockMvc.perform(get(getSlimURL())
-                .param(SLIM_IDS_PARAM, GO_SLIM4));
+                .param(SLIM_TO_IDS_PARAM, GO_SLIM4));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -175,7 +177,7 @@ public class GOControllerIT extends OBOControllerIT {
     @Test
     public void twoIdsHave2Slims() throws Exception {
         ResultActions response = mockMvc.perform(get(getSlimURL())
-                .param(SLIM_IDS_PARAM, toCSV(GO_SLIM5, GO_SLIM6)));
+                .param(SLIM_TO_IDS_PARAM, toCSV(GO_SLIM5, GO_SLIM6)));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -185,9 +187,34 @@ public class GOControllerIT extends OBOControllerIT {
     }
 
     @Test
+    public void twoIdsHave2SlimsButOnlyOneIsRequested() throws Exception {
+        ResultActions response = mockMvc.perform(get(getSlimURL())
+                .param(SLIM_TO_IDS_PARAM, toCSV(GO_SLIM5, GO_SLIM6))
+                .param(SLIM_FROM_IDS_PARAM, GO_SLIM_CHILD5));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.numberOfHits").value(1))
+                .andExpect(jsonPath("$.results.*.id", containsInAnyOrder(GO_SLIM_CHILD5)));
+    }
+
+    @Test
+    public void twoIdsHave2SlimsButOnlyNoneAreRequested() throws Exception {
+        ResultActions response = mockMvc.perform(get(getSlimURL())
+                .param(SLIM_TO_IDS_PARAM, toCSV(GO_SLIM5, GO_SLIM6))
+                .param(SLIM_FROM_IDS_PARAM, NON_EXISTENT_TERM));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.numberOfHits").value(0));
+    }
+
+    @Test
     public void slimmingWithEmptyIDsCausesCauses400() throws Exception {
         ResultActions response = mockMvc.perform(get(getSlimURL())
-                .param(SLIM_IDS_PARAM, ""));
+                .param(SLIM_TO_IDS_PARAM, ""));
 
         expectResponseCreationError(response, MISSING_SLIM_SET_ERROR_MESSAGE)
                 .andExpect(status().isBadRequest());
@@ -196,7 +223,7 @@ public class GOControllerIT extends OBOControllerIT {
     @Test
     public void slimmingWithNoValidIDsCausesCauses400() throws Exception {
         ResultActions response = mockMvc.perform(get(getSlimURL())
-                .param(SLIM_IDS_PARAM, "GO:0000000"));
+                .param(SLIM_TO_IDS_PARAM, "GO:0000000"));
 
         expectResponseCreationError(response, NO_VALID_SLIM_TERMS_ERROR_MESSAGE)
                 .andExpect(status().isBadRequest());
@@ -206,7 +233,7 @@ public class GOControllerIT extends OBOControllerIT {
     public void slimmingOverInvalidRelationshipCauses400() throws Exception {
         String invalidRelation = "XXXX";
         ResultActions response = mockMvc.perform(get(getSlimURL())
-                .param(SLIM_IDS_PARAM, GO_SLIM1)
+                .param(SLIM_TO_IDS_PARAM, GO_SLIM1)
                 .param(SLIM_RELATIONS_PARAM, invalidRelation));
 
         expectInvalidRelationError(response, invalidRelation)
@@ -217,7 +244,7 @@ public class GOControllerIT extends OBOControllerIT {
     public void slimmingOverRelationshipNotInGraphReturnsEmptyResponse() throws Exception {
         String nonExistentGraphRelationship = "occurs_in";
         ResultActions response = mockMvc.perform(get(getSlimURL())
-                .param(SLIM_IDS_PARAM, GO_SLIM1)
+                .param(SLIM_TO_IDS_PARAM, GO_SLIM1)
                 .param(SLIM_RELATIONS_PARAM, nonExistentGraphRelationship));
 
         response.andDo(print())

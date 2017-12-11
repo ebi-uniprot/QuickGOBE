@@ -130,11 +130,13 @@ public interface OntologyService<T extends OBOTerm> {
      * Maps ids to their equivalent, slimmed ids. The results are presented as a list of {@link SlimTerm} instances,
      * each of which contains a term id, and which shows the ids to which this term slims to.
      *
-     * @param slimTerms the terms to which we want to find term ids that map "up" to.
+     * @param slimsFromTerms the terms from which we want slimming information. If omitted, defaults to all terms.
+     * @param slimsToTerms the terms that {@code slimsFromTerms} map "up" to, i.e., the "slim-set".
      * @param relationTypes the relationships over which the slimming calculation will traverse
      * @return a list of {@link SlimTerm} objects that provide the slimming information
      */
-    List<SlimTerm> findSlimmedInfoForSlimmedTerms(List<String> slimTerms, OntologyRelationType... relationTypes);
+    List<SlimTerm> findSlimmedInfoForSlimmedTerms(Set<String> slimsFromTerms, List<String> slimsToTerms,
+            OntologyRelationType... relationTypes);
 
     /**
      * Find the set of ancestor vertices reachable from a list of ids, {@code ids}, navigable via a specified
