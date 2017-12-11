@@ -132,12 +132,6 @@ public class GOTermToODocConverterTest {
         assertThat(document.aspect, is(nullValue()));
     }
 
-    // empty optional conversion
-//    @Test
-//    public void convertsEmptyOptional() {
-//        OntologyDocument documentOptional = converter.apply(Optional.empty());
-//        assertThat(documentOptional.isPresent(), is(false));
-//    }
 
     // blacklist
     @Test
@@ -187,7 +181,7 @@ public class GOTermToODocConverterTest {
 
     //GO discussions
     @Test
-    public void extractingGoDiscussionsFromEmptyPlannedChangesListReturnsNull() throws Exception {
+    public void extractingGoDiscussionsFromEmptyPlannedChangesListReturnsNull() {
         when(term.getPlannedChanges()).thenReturn(null);
 
         OntologyDocument docOpt = converter.apply(term);
@@ -198,7 +192,7 @@ public class GOTermToODocConverterTest {
     }
 
     @Test
-    public void extracts1GoDiscussionsFrom1ElementPlannedChangesList() throws Exception {
+    public void extracts1GoDiscussionsFrom1ElementPlannedChangesList() {
         String title = "Viral Processes";
         String url = "http://wiki.geneontology.org/index.php/Virus_terms";
 
@@ -216,7 +210,7 @@ public class GOTermToODocConverterTest {
     }
 
     @Test
-    public void extracts2GoDiscussionsFrom2ElementPlannedChangesList() throws Exception {
+    public void extracts2GoDiscussionsFrom2ElementPlannedChangesList() {
         String title1 = "Viral Processes";
         String url1 = "http://wiki.geneontology.org/index.php/Virus_terms";
 
@@ -274,7 +268,7 @@ public class GOTermToODocConverterTest {
 
 
     @Test
-    public void extractingProteinComplexesFromEmptyProteinComplexesListReturnsNull() throws Exception {
+    public void extractingProteinComplexesFromEmptyProteinComplexesListReturnsNull() {
         when(term.getProteinComplexes()).thenReturn(null);
 
         OntologyDocument docOpt = converter.apply(term);
