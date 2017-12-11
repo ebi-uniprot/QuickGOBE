@@ -9,6 +9,7 @@ import uk.ac.ebi.quickgo.annotation.model.About;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
 import uk.ac.ebi.quickgo.annotation.model.StatisticsGroup;
+import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.completablevalue.EvidenceNameInjector;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.completablevalue.OntologyNameInjector;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.completablevalue.TaxonomyNameInjector;
 import uk.ac.ebi.quickgo.annotation.service.search.NameService;
@@ -132,6 +133,7 @@ public class AnnotationController {
             fileExtension(mt));
     private static final String GO_NAME = "goName";
     private static final String TAXON_NAME = "taxonName";
+    private static final String EVIDENCE_NAME = "evidenceName";
     private final MetaDataProvider metaDataProvider;
     private final SearchService<Annotation> annotationSearchService;
     private final SearchServiceConfig.AnnotationCompositeRetrievalConfig annotationRetrievalConfig;
@@ -235,6 +237,7 @@ public class AnnotationController {
         checkBindingErrors(bindingResult);
 
         QueryResult<StatisticsGroup> stats = statsService.calculateForStandardUsage(request);
+        addAllNamesToStatisticsValues(stats);
         return new ResponseEntity<>(stats, HttpStatus.OK);
     }
 
@@ -300,14 +303,13 @@ public class AnnotationController {
     @RequestMapping(value = "/downloadStats", method = {RequestMethod.GET},
             produces = {EXCEL_MEDIA_TYPE_STRING, JSON_MEDIA_TYPE_STRING})
     public ResponseEntity<ResponseBodyEmitter> downloadStats(@Valid @ModelAttribute AnnotationRequest request,
-            BindingResult bindingResult, @RequestHeader(ACCEPT) MediaType mediaTypeAcceptHeader) throws IOException {
+            BindingResult bindingResult, @RequestHeader(ACCEPT) MediaType mediaTypeAcceptHeader) {
         checkBindingErrors(bindingResult);
         ResponseBodyEmitter emitter = new ResponseBodyEmitter();
 
         taskExecutor.execute(() -> {
             QueryResult<StatisticsGroup> stats = statsService.calculateForDownloadUsage(request);
-            addNamesToStatisticsValues(stats, GO_NAME, OntologyNameInjector.GO_ID);
-            addNamesToStatisticsValues(stats, TAXON_NAME, TaxonomyNameInjector.TAXON_ID);
+            addAllNamesToStatisticsValues(stats);
             emitDownloadWithMediaType(emitter, stats, mediaTypeAcceptHeader);
         });
 
@@ -315,6 +317,12 @@ public class AnnotationController {
                 .headers(createHttpDownloadHeader(mediaTypeAcceptHeader,
                         TO_DOWNLOAD_STATISTICS_FILENAME))
                 .body(emitter);
+    }
+
+    private void addAllNamesToStatisticsValues(QueryResult<StatisticsGroup> stats) {
+        addNamesToStatisticsValues(stats, GO_NAME, OntologyNameInjector.GO_ID);
+        addNamesToStatisticsValues(stats, TAXON_NAME, TaxonomyNameInjector.TAXON_ID);
+        addNamesToStatisticsValues(stats, EVIDENCE_NAME, EvidenceNameInjector.EVIDENCE_CODE);
     }
 
     private static String formattedDateStringForNow() {
