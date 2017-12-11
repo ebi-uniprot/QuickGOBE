@@ -21,7 +21,7 @@ public abstract class AbstractGenericOLoader<S extends OntologySourceFiles, T ex
         super(sources);
     }
 
-    T createWithGenericOInfo(String nameSpace, String optionalRootTermId) throws Exception {
+    protected T createWithGenericOInfo(String nameSpace, String optionalRootTermId) throws Exception {
         T genericOntology = getInstance();
         genericOntology.namespace = nameSpace;
 
