@@ -2,8 +2,6 @@ package uk.ac.ebi.quickgo.ff.loader;
 
 import uk.ac.ebi.quickgo.ff.files.ontology.OntologySourceFiles;
 
-import java.util.Optional;
-
 /**
  * Class whose responsibility is to retrieve information from
  * ontology source files and construct a new instance of type
@@ -14,15 +12,15 @@ import java.util.Optional;
  */
 public abstract class SourceInfoLoader<S extends OntologySourceFiles, T> {
     protected final S sourceFiles;
+    private T instance;
 
     public SourceInfoLoader(S sourceFiles) {
         this.sourceFiles = sourceFiles;
     }
 
-    protected abstract T newInstance();
     public abstract T load() throws Exception;
 
-    private T instance;
+    protected abstract T newInstance();
 
     protected T getInstance() {
         if (this.instance == null) {
