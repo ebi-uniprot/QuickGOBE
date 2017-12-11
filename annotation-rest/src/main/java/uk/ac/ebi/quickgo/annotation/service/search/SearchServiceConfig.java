@@ -8,6 +8,7 @@ import uk.ac.ebi.quickgo.annotation.service.comm.rest.geneproduct.transformer.Ge
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.annotation.OntologyNameInjector;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.annotation.SlimResultsTransformer;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.annotation.TaxonomyNameInjector;
+import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.completablevalue.EvidenceNameInjector;
 import uk.ac.ebi.quickgo.annotation.service.converter.AnnotationDocConverterImpl;
 import uk.ac.ebi.quickgo.common.SearchableField;
 import uk.ac.ebi.quickgo.common.loader.DbXRefLoader;
@@ -262,10 +263,13 @@ public class SearchServiceConfig {
             ExternalServiceResultsTransformer<CompletableValue, CompletableValue>
                     completableValueOntologyNameTransformer,
             ExternalServiceResultsTransformer<CompletableValue, CompletableValue>
-                    completableValueTaxonNameTransformer) {
+                    completableValueTaxonNameTransformer,
+            ExternalServiceResultsTransformer<CompletableValue, CompletableValue>
+                    completableValueEvidenceNameTransformer) {
         ResultTransformerChain<CompletableValue> transformerChain = new ResultTransformerChain<>();
         transformerChain.addTransformer(completableValueOntologyNameTransformer);
         transformerChain.addTransformer(completableValueTaxonNameTransformer);
+        transformerChain.addTransformer(completableValueEvidenceNameTransformer);
         return transformerChain;
     }
 
@@ -320,6 +324,15 @@ public class SearchServiceConfig {
         List<ResponseValueInjector<CompletableValue>> responseValueInjectors = singletonList(
                 new uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.completablevalue
                         .TaxonomyNameInjector());
+        return new ExternalServiceResultsTransformer<>(responseValueInjectors,
+                completableValueResultMutator(converterFactory));
+    }
+
+    @Bean
+    public ExternalServiceResultsTransformer<CompletableValue, CompletableValue> completableValueEvidenceNameTransformer
+            (RESTFilterConverterFactory converterFactory) {
+        List<ResponseValueInjector<CompletableValue>> responseValueInjectors = singletonList(
+                new EvidenceNameInjector());
         return new ExternalServiceResultsTransformer<>(responseValueInjectors,
                 completableValueResultMutator(converterFactory));
     }
