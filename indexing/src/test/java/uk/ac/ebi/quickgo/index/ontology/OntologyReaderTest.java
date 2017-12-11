@@ -33,6 +33,13 @@ public class OntologyReaderTest {
     private OntologyReader ontologyReader;
     private int docCount;
 
+    @After
+    public void after() {
+        if (ontologyReader != null) {
+            ontologyReader.close();
+        }
+    }
+
     public class DocReaderAccessingValidOntologies {
 
         @Before
@@ -123,7 +130,6 @@ public class OntologyReaderTest {
         }
     }
 
-
     private List<GenericTerm> createGOTerms() {
         GOTerm term = new GOTerm();
         term.setId("GO:0000001");
@@ -139,11 +145,4 @@ public class OntologyReaderTest {
 
         return Arrays.asList(term1, term2);
     }
-
-    @After
-    public void after() {
-        //useless comment
-        if(ontologyReader != null) ontologyReader.close();
-    }
-
 }
