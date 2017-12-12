@@ -126,7 +126,7 @@ public class GOControllerIT extends OBOControllerIT {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.numberOfHits").value(1))
-                .andExpect(jsonPath("$.results.*.id", contains(GO_SLIM_CHILD1)));
+                .andExpect(jsonPath("$.results.*.slimsFromId", contains(GO_SLIM_CHILD1)));
     }
 
     @Test
@@ -138,7 +138,7 @@ public class GOControllerIT extends OBOControllerIT {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.numberOfHits").value(1))
-                .andExpect(jsonPath("$.results.*.id", contains(GO_SLIM_CHILD1)));
+                .andExpect(jsonPath("$.results.*.slimsFromId", contains(GO_SLIM_CHILD1)));
     }
 
     @Test
@@ -150,7 +150,7 @@ public class GOControllerIT extends OBOControllerIT {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.numberOfHits").value(1))
-                .andExpect(jsonPath("$.results.*.id", contains(GO_SLIM_CHILD2)));
+                .andExpect(jsonPath("$.results.*.slimsFromId", contains(GO_SLIM_CHILD2)));
 
         mockMvc.perform(get(getSlimURL())
                 .param(SLIM_TO_IDS_PARAM, GO_SLIM3));
@@ -159,7 +159,7 @@ public class GOControllerIT extends OBOControllerIT {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.numberOfHits").value(1))
-                .andExpect(jsonPath("$.results.*.id", contains(GO_SLIM_CHILD2)));
+                .andExpect(jsonPath("$.results.*.slimsFromId", contains(GO_SLIM_CHILD2)));
     }
 
     @Test
@@ -171,7 +171,7 @@ public class GOControllerIT extends OBOControllerIT {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.numberOfHits").value(2))
-                .andExpect(jsonPath("$.results.*.id", containsInAnyOrder(GO_SLIM_CHILD3, GO_SLIM_CHILD4)));
+                .andExpect(jsonPath("$.results.*.slimsFromId", containsInAnyOrder(GO_SLIM_CHILD3, GO_SLIM_CHILD4)));
     }
 
     @Test
@@ -183,7 +183,7 @@ public class GOControllerIT extends OBOControllerIT {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.numberOfHits").value(2))
-                .andExpect(jsonPath("$.results.*.id", containsInAnyOrder(GO_SLIM_CHILD5, GO_SLIM_CHILD6)));
+                .andExpect(jsonPath("$.results.*.slimsFromId", containsInAnyOrder(GO_SLIM_CHILD5, GO_SLIM_CHILD6)));
     }
 
     @Test
@@ -196,7 +196,7 @@ public class GOControllerIT extends OBOControllerIT {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.numberOfHits").value(1))
-                .andExpect(jsonPath("$.results.*.id", containsInAnyOrder(GO_SLIM_CHILD5)));
+                .andExpect(jsonPath("$.results.*.slimsFromId", containsInAnyOrder(GO_SLIM_CHILD5)));
     }
 
     @Test
