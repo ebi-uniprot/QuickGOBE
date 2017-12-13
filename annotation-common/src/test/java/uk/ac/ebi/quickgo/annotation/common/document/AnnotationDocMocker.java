@@ -33,7 +33,7 @@ public class AnnotationDocMocker {
     private static final String ASSIGNED_BY = "InterPro";
     private static final String SYMBOL = "moeA5";
     private static final String OBJECT_TYPE = "protein";
-    private static final int TAXON_ID = 12345;
+    public static final int TAXON_ID = 12345;
     private static final List<Integer> TAXON_ANCESTORS = asList(12345, 1234, 123, 12, 1);
 
     private static final List<String> TARGET_SET = asList("KRUK", "BHF-UCL", "Exosome");
