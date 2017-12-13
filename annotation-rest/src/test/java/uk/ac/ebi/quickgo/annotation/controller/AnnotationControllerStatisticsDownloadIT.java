@@ -51,6 +51,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.ECO_ID;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.createGenericDocsChangingGoId;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.expectedValues;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.numOfResults;
@@ -77,15 +78,18 @@ public class AnnotationControllerStatisticsDownloadIT {
             "$.results[0].types.[?(@.type == 'goId')].values.length()";
     private static final String ALL_GO_TERM_NAMES = "$.results[0].types.[?(@.type == 'goId')].values.*.name";
     private static final String ALL_TAXON_NAMES = "$.results[0].types.[?(@.type == 'taxonId')].values.*.name";
+    private static final String ALL_ECO_NAMES = "$.results[0].types.[?(@.type == 'evidenceCode')].values.*.name";
     private static final String BASE_URL = "https://localhost";
     private static final String GO_TERM_RESOURCE_FORMAT = "/ontology/go/terms/%s";
+    private static final String ECO_TERM_RESOURCE_FORMAT = "/ontology/eco/terms/%s";
+    private static final String ECO_TERM_NAME = "match to sequence model evidence used in automatic assertion";
     private static final String TAXONOMY_ID_NODE_RESOURCE_FORMAT = "/proteins/api/taxonomy/id/%s/node";
     private static final int NO_OF_STATISTICS_GROUPS = 2;
+    @Autowired
+    CacheManager cacheManager;
     private MockMvc mockMvc;
-
     @Autowired
     private WebApplicationContext webApplicationContext;
-
     @Autowired
     private AnnotationRepository annotationRepository;
     @Autowired
@@ -93,9 +97,6 @@ public class AnnotationControllerStatisticsDownloadIT {
     private MockRestServiceServer mockRestServiceServer;
     private ObjectMapper dtoMapper;
     private List<String> populatedGoNames;
-
-    @Autowired
-    CacheManager cacheManager;
 
     @Before
     public void setup() {
@@ -116,6 +117,7 @@ public class AnnotationControllerStatisticsDownloadIT {
         cacheManager.clearAll();
         setExpectationsForSuccessfulOntologyServiceRestResponse();
         setExpectationsForSuccessfulTaxonomyServiceRestResponse();
+        setExpectationsForSuccessfulOntologyServiceRestResponseForEcoCodes();
 
         ResultActions response = mockMvc.perform(get(DOWNLOAD_STATISTICS_SEARCH_URL).header(ACCEPT, EXCEL_MEDIA_TYPE));
 
@@ -127,12 +129,15 @@ public class AnnotationControllerStatisticsDownloadIT {
         cacheManager.clearAll();
         setExpectationsForSuccessfulOntologyServiceRestResponse();
         setExpectationsForSuccessfulTaxonomyServiceRestResponse();
+        setExpectationsForSuccessfulOntologyServiceRestResponseForEcoCodes();
+
         ResultActions response = mockMvc.perform(get(DOWNLOAD_STATISTICS_SEARCH_URL).header(ACCEPT, JSON_MEDIA_TYPE));
 
         checkResponse(response, NUMBER_OF_GENERIC_DOCS);
 
         response.andExpect(expectedValues(ALL_GO_TERM_NAMES, populatedGoNames));
         response.andExpect(expectedValues(ALL_TAXON_NAMES, singletonList(String.valueOf(taxonName()))));
+        response.andExpect(expectedValues(ALL_ECO_NAMES, singletonList(String.valueOf(ECO_TERM_NAME))));
     }
 
     @Test
@@ -140,6 +145,7 @@ public class AnnotationControllerStatisticsDownloadIT {
         cacheManager.clearAll();
         setExpectationsForUnsuccessfulOntologyServiceRestResponse();
         setExpectationsForSuccessfulTaxonomyServiceRestResponse();
+        setExpectationsForSuccessfulOntologyServiceRestResponseForEcoCodes();
 
         ResultActions response = mockMvc.perform(get(DOWNLOAD_STATISTICS_SEARCH_URL).header(ACCEPT, JSON_MEDIA_TYPE));
 
@@ -147,6 +153,7 @@ public class AnnotationControllerStatisticsDownloadIT {
 
         response.andExpect(expectedValues(ALL_GO_TERM_NAMES, Arrays.asList(null, null, null, null, null)));
         response.andExpect(expectedValues(ALL_TAXON_NAMES, singletonList(String.valueOf(taxonName()))));
+        response.andExpect(expectedValues(ALL_ECO_NAMES, singletonList(String.valueOf(ECO_TERM_NAME))));
     }
 
     @Test
@@ -154,12 +161,30 @@ public class AnnotationControllerStatisticsDownloadIT {
         cacheManager.clearAll();
         setExpectationsForSuccessfulOntologyServiceRestResponse();
         setExpectationsForUnsuccessfulTaxonomyServiceRestResponse();
+        setExpectationsForSuccessfulOntologyServiceRestResponseForEcoCodes();
 
         ResultActions response = mockMvc.perform(get(DOWNLOAD_STATISTICS_SEARCH_URL).header(ACCEPT, JSON_MEDIA_TYPE));
 
         checkResponse(JSON_MEDIA_TYPE, response);
         response.andExpect(expectedValues(ALL_GO_TERM_NAMES, populatedGoNames));
         response.andExpect(expectedValues(ALL_TAXON_NAMES, singletonList(null)));
+        response.andExpect(expectedValues(ALL_ECO_NAMES, singletonList(String.valueOf(ECO_TERM_NAME))));
+    }
+
+    @Test
+    public void downloadStatisticsSuccessfulAfterFailedToRetrieveECONames() throws Exception {
+        cacheManager.clearAll();
+        setExpectationsForSuccessfulOntologyServiceRestResponse();
+        setExpectationsForSuccessfulTaxonomyServiceRestResponse();
+        setExpectationsForUnsuccessfulOntologyServiceRestResponseForEcoCodes();
+
+        ResultActions response = mockMvc.perform(get(DOWNLOAD_STATISTICS_SEARCH_URL).header(ACCEPT, JSON_MEDIA_TYPE));
+
+        checkResponse(JSON_MEDIA_TYPE, response);
+
+        response.andExpect(expectedValues(ALL_GO_TERM_NAMES, populatedGoNames));
+        response.andExpect(expectedValues(ALL_TAXON_NAMES, singletonList(String.valueOf(taxonName()))));
+        response.andExpect(expectedValues(ALL_ECO_NAMES, singletonList(null)));
     }
 
     private String goId(int id) {
@@ -272,6 +297,21 @@ public class AnnotationControllerStatisticsDownloadIT {
         //Hitting the cache means that the call to the rest service will occur only once for each term to get term name
         for (int j = 0; j < NUMBER_OF_GENERIC_DOCS; j++) {
             expectGoTermsHaveGoNamesViaRest(singletonList(goId(j)), singletonList(goName(j)));
+        }
+    }
+
+    private void setExpectationsForSuccessfulOntologyServiceRestResponseForEcoCodes() {
+        //Hitting the cache means that the call to the rest service will occur only once for each term to get term name
+        for (int j = 0; j < NUMBER_OF_GENERIC_DOCS; j++) {
+            expectRestCallSuccess(
+                    buildResource(ECO_TERM_RESOURCE_FORMAT, ECO_ID),
+                    constructGoTermsResponseObject(singletonList(ECO_ID), singletonList(ECO_TERM_NAME)));
+        }
+    }
+
+    private void setExpectationsForUnsuccessfulOntologyServiceRestResponseForEcoCodes() {
+        for (int i = 0; i < NO_OF_STATISTICS_GROUPS; i++) {
+            expectRestCallResponse(buildResource(ECO_TERM_RESOURCE_FORMAT, ECO_ID), withStatus(HttpStatus.NOT_FOUND));
         }
     }
 
