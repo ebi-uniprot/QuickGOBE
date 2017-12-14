@@ -4,9 +4,13 @@ import uk.ac.ebi.quickgo.annotation.AnnotationREST;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker;
+import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.BasicOntology;
+import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.BasicTaxonomyNode;
 import uk.ac.ebi.quickgo.common.QuickGODocument;
 import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -14,20 +18,31 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import net.sf.ehcache.CacheManager;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.client.RestOperations;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -35,9 +50,13 @@ import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.GO_ID_PARAM;
 import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.GO_USAGE_PARAM;
 import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.TAXON_ID_PARAM;
 import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.TAXON_USAGE_PARAM;
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.ECO_ID;
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.GO_ID;
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.TAXON_ID;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.contentTypeToBeJson;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.totalNumOfResults;
 import static uk.ac.ebi.quickgo.annotation.controller.StatsResponseVerifier.keysInTypeWithinGroup;
+import static uk.ac.ebi.quickgo.annotation.controller.StatsResponseVerifier.namesInTypeWithinGroup;
 import static uk.ac.ebi.quickgo.annotation.controller.StatsResponseVerifier.numericValueForGroup;
 import static uk.ac.ebi.quickgo.annotation.controller.StatsResponseVerifier.totalHitsInGroup;
 
@@ -54,6 +73,13 @@ public class AnnotationControllerStatisticsIT {
 
     private static final String RESOURCE_URL = "/annotation";
     private static final String STATS_ENDPOINT = RESOURCE_URL + "/stats";
+    private static final String BASE_URL = "https://localhost";
+    private static final String GO_TERM_RESOURCE_FORMAT = "/ontology/go/terms/%s";
+    private static final String ECO_TERM_RESOURCE_FORMAT = "/ontology/eco/terms/%s";
+    private static final String GO_TERM_NAME = "catalytic activity";
+    private static final String ECO_TERM_NAME = "match to sequence model evidence used in automatic assertion";
+    private static final String TAXONOMY_ID_NODE_RESOURCE_FORMAT = "/proteins/api/taxonomy/id/%s/node";
+    private static final String TAXON_TERM_NAME = "taxon name: " + 12345;
 
     private static final int NUMBER_OF_GENERIC_DOCS = 6;
     private static final String ANNOTATION_GROUP = "annotation";
@@ -70,6 +96,12 @@ public class AnnotationControllerStatisticsIT {
     private static final String DISTINCT_VALUE_COUNT = "distinctValueCount";
 
     private MockMvc mockMvc;
+    @Autowired
+    CacheManager cacheManager;
+    @Autowired
+    private RestOperations restOperations;
+    private MockRestServiceServer mockRestServiceServer;
+    private ObjectMapper dtoMapper;
 
     private List<AnnotationDocument> savedDocs;
 
@@ -86,9 +118,10 @@ public class AnnotationControllerStatisticsIT {
         mockMvc = MockMvcBuilders.
                 webAppContextSetup(webApplicationContext)
                 .build();
-
+        mockRestServiceServer = MockRestServiceServer.createServer((RestTemplate) restOperations);
         savedDocs = createGenericDocs(NUMBER_OF_GENERIC_DOCS);
         repository.save(savedDocs);
+        dtoMapper = new ObjectMapper();
     }
 
     @Test
@@ -142,6 +175,18 @@ public class AnnotationControllerStatisticsIT {
         );
 
         assertStatsResponse(response, GO_ID_STATS_FIELD, 2, relevantGOIds, 2);
+    }
+
+    //----------- Names for GO ids, taxon ids and eco codes -----------//
+    @Test
+    public void namesForGoIdsAndTaxonIdsAndEvidenceCodes() throws Exception {
+        cacheManager.clearAll();
+        final int expectedDistinctValueCount = 1;
+        setExpectationsForSuccessfulOntologyServiceRestResponse(expectedDistinctValueCount);
+        setExpectationsForSuccessfulTaxonomyServiceRestResponse(expectedDistinctValueCount);
+        setExpectationsForSuccessfulOntologyServiceRestResponseForEcoCodes(expectedDistinctValueCount);
+
+        assertStatsResponseIncludingNames(expectedDistinctValueCount);
     }
 
     //----------- Taxon ID -----------//
@@ -387,7 +432,8 @@ public class AnnotationControllerStatisticsIT {
 
         ResultActions response = mockMvc.perform(get(STATS_ENDPOINT));
 
-        assertStatsResponse(response, attribute, docs.size(), extractedAttributeValues, expectedDistinctValueCount);
+        assertStatsResponse(response, attribute, docs.size(), extractedAttributeValues, expectedDistinctValueCount
+        );
     }
 
     private void assertStatsResponse(ResultActions response, String statsType, int totalHits,
@@ -404,8 +450,24 @@ public class AnnotationControllerStatisticsIT {
                 .andExpect(keysInTypeWithinGroup(GENE_PRODUCT_GROUP, statsType, asArray(statsValues)));
     }
 
+    private void assertStatsResponseIncludingNames(int expectedDistinctValueCount) throws Exception {
+        ResultActions response = mockMvc.perform(get(STATS_ENDPOINT));
+
+        final String[] goNames = expectedNames(expectedDistinctValueCount, GO_TERM_NAME);
+        final String[] taxonNames = expectedNames(expectedDistinctValueCount, TAXON_TERM_NAME);
+        final String[] ecoNames = expectedNames(expectedDistinctValueCount, ECO_TERM_NAME);
+
+        response.andDo(print())
+                .andExpect(namesInTypeWithinGroup(ANNOTATION_GROUP, GO_ID_STATS_FIELD, goNames))
+                .andExpect(namesInTypeWithinGroup(GENE_PRODUCT_GROUP, GO_ID_STATS_FIELD, goNames))
+                .andExpect(namesInTypeWithinGroup(ANNOTATION_GROUP, TAXON_ID_STATS_FIELD, taxonNames))
+                .andExpect(namesInTypeWithinGroup(GENE_PRODUCT_GROUP, TAXON_ID_STATS_FIELD, taxonNames))
+                .andExpect(namesInTypeWithinGroup(ANNOTATION_GROUP, EVIDENCE_CODE_STATS_FIELD, ecoNames))
+                .andExpect(namesInTypeWithinGroup(GENE_PRODUCT_GROUP, EVIDENCE_CODE_STATS_FIELD, ecoNames));
+    }
+
     private String[] asArray(Collection<String> elements) {
-        return elements.stream().toArray(String[]::new);
+        return elements.toArray(new String[0]);
     }
 
     private List<AnnotationDocument> createGenericDocs(int n) {
@@ -416,5 +478,107 @@ public class AnnotationControllerStatisticsIT {
 
     private String createId(int idNum) {
         return String.format("A0A%03d", idNum);
+    }
+
+    private void setExpectationsForSuccessfulOntologyServiceRestResponse(int expectedNumber) {
+        for (int i = 0; i < expectedNumber; i++) {
+            expectGoTermsHaveGoNamesViaRest();
+        }
+    }
+
+    private void setExpectationsForSuccessfulTaxonomyServiceRestResponse(int expectedNumber) {
+        for (int i = 0; i < expectedNumber; i++) {
+            expectTaxonIdHasGivenTaxonNameViaRest();
+        }
+    }
+
+    private void setExpectationsForSuccessfulOntologyServiceRestResponseForEcoCodes(int expectedNumber) {
+        for (int i = 0; i < expectedNumber; i++) {
+            expectEcoCodeHasGivenEcoNameViaRest();
+        }
+    }
+
+    private void expectGoTermsHaveGoNamesViaRest() {
+        expectRestCallSuccess(
+                buildResource(GO_TERM_RESOURCE_FORMAT, GO_ID),
+                constructGoTermsResponseObject(singletonList(GO_ID), singletonList(GO_TERM_NAME)));
+
+    }
+
+    private void expectTaxonIdHasGivenTaxonNameViaRest() {
+        BasicTaxonomyNode expectedResponse = new BasicTaxonomyNode();
+        expectedResponse.setScientificName(taxonName());
+        String responseAsString = getResponseAsString(expectedResponse);
+
+        expectRestCallSuccess(
+                buildResource(
+                        TAXONOMY_ID_NODE_RESOURCE_FORMAT,
+                        String.valueOf(AnnotationDocMocker.TAXON_ID)),
+                responseAsString);
+    }
+
+    private void expectEcoCodeHasGivenEcoNameViaRest() {
+        expectRestCallSuccess(
+                buildResource(ECO_TERM_RESOURCE_FORMAT, ECO_ID),
+                constructGoTermsResponseObject(singletonList(ECO_ID), singletonList(ECO_TERM_NAME)));
+    }
+
+    private void expectRestCallSuccess(String url, String response) {
+        mockRestServiceServer.expect(
+                requestTo(BASE_URL + url))
+                .andExpect(method(HttpMethod.GET))
+                .andRespond(withSuccess(response, MediaType.APPLICATION_JSON));
+    }
+
+    private String buildResource(String format, String... arguments) {
+        int requiredArgsCount = format.length() - format.replace("%", "").length();
+        List<String> args = new ArrayList<>();
+        for (int i = 0; i < requiredArgsCount; i++) {
+            if (i < arguments.length) {
+                args.add(arguments[i]);
+            } else {
+                args.add("");
+            }
+        }
+        return String.format(format, args.toArray());
+    }
+
+    private String constructGoTermsResponseObject(List<String> termIds, List<String> termNames) {
+        checkArgument(termIds != null, "termIds cannot be null");
+        checkArgument(termNames != null, "termIds cannot be null");
+        checkArgument(termIds.size() == termNames.size(),
+                "termIds and termNames lists must be the same size");
+
+        BasicOntology response = new BasicOntology();
+        List<BasicOntology.Result> results = new ArrayList<>();
+
+        for (int i = 0; i < termIds.size(); i++) {
+            BasicOntology.Result result = new BasicOntology.Result();
+            result.setId(termIds.get(i));
+            result.setName(termNames.get(i));
+            results.add(result);
+        }
+
+        response.setResults(results);
+        return getResponseAsString(response);
+    }
+
+    private <T> String getResponseAsString(T response) {
+        try {
+            return dtoMapper.writeValueAsString(response);
+        } catch (JsonProcessingException e) {
+            throw new IllegalStateException("Problem constructing mocked GO term REST response:", e);
+        }
+    }
+
+    private String taxonName() {
+        return "taxon name: " + TAXON_ID;
+    }
+
+    private String[] expectedNames(int expectedSize, String source) {
+        String[] names = new String[expectedSize];
+        IntStream.range(0, names.length)
+                .forEach(i -> names[i] = source);
+        return names;
     }
 }
