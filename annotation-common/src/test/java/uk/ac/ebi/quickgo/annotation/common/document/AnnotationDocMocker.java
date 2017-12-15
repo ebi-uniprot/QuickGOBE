@@ -22,26 +22,12 @@ import static java.util.Arrays.asList;
  * @author Edd
  */
 public class AnnotationDocMocker {
-
+    public static AtomicLong rowNumberGenerator = new AtomicLong();
     public static final String GO_ID = "GO:0003824";
     public static final String ECO_ID = "ECO:0000256";
-    private static final String QUALIFIER = "enables";
-    private static final String GO_EVIDENCE = "IEA";
     public static final String REFERENCE = "GO_REF:0000002";
-    private static final List<String> WITH_FROM = asList("InterPro:IPR015421", "InterPro:IPR015422");
-    private static final int INTERACTING_TAXON_ID = 35758;
-    private static final String ASSIGNED_BY = "InterPro";
-    private static final String SYMBOL = "moeA5";
-    private static final String OBJECT_TYPE = "protein";
     public static final int TAXON_ID = 12345;
-    private static final List<Integer> TAXON_ANCESTORS = asList(12345, 1234, 123, 12, 1);
-
-    private static final List<String> TARGET_SET = asList("KRUK", "BHF-UCL", "Exosome");
-    private static final String GP_SUBSET = "TrEMBL";
     public static final String GO_ASPECT = "cellular_component";
-    private static final Date DATE = Date.from(
-            LocalDate.of(1869, 10, 2).atStartOfDay(ZoneId.systemDefault()).toInstant());
-
     public static final String EXTENSION_DB1 = "NCBI_gi";
     public static final String EXTENSION_DB2 = "Cl";
     public static final String EXTENSION_DB3 = "UBERON-AG";
@@ -54,7 +40,6 @@ public class AnnotationDocMocker {
     private static final String EXTENSION_RELATIONSHIP2 = "acts_on_population_of";
     private static final String EXTENSION_RELATIONSHIP3 = "indicative_of";
     private static final String EXTENSION_RELATIONSHIP4 = "happy_about";
-
     public static final String EXTENSION_1 = asExtension(EXTENSION_RELATIONSHIP1, EXTENSION_DB1, EXTENSION_ID1);
     public static final String EXTENSION_2 = asExtension(EXTENSION_RELATIONSHIP2, EXTENSION_DB2, EXTENSION_ID2);
     public static final String EXTENSION_3 = asExtension(EXTENSION_RELATIONSHIP3, EXTENSION_DB3, EXTENSION_ID3);
@@ -62,7 +47,18 @@ public class AnnotationDocMocker {
     public static final List<String> EXTENSIONS = asList(String.format("%s,%s", EXTENSION_1, EXTENSION_2), String
             .format("%s,%s",EXTENSION_3, EXTENSION_4));
 
-    public static AtomicLong rowNumberGenerator = new AtomicLong();
+    private static final Date DATE = Date.from(
+            LocalDate.of(1869, 10, 2).atStartOfDay(ZoneId.systemDefault()).toInstant());
+    private static final String OBJECT_TYPE = "protein";
+    private static final List<Integer> TAXON_ANCESTORS = asList(12345, 1234, 123, 12, 1);
+    private static final String QUALIFIER = "enables";
+    private static final String GO_EVIDENCE = "IEA";
+    private static final List<String> TARGET_SET = asList("KRUK", "BHF-UCL", "Exosome");
+    private static final String GP_SUBSET = "TrEMBL";
+    private static final List<String> WITH_FROM = asList("InterPro:IPR015421", "InterPro:IPR015422");
+    private static final int INTERACTING_TAXON_ID = 35758;
+    private static final String ASSIGNED_BY = "InterPro";
+    private static final String SYMBOL = "moeA5";
 
     private AnnotationDocMocker() {
     }
