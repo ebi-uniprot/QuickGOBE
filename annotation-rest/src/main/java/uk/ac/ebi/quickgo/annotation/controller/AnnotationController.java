@@ -61,6 +61,12 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.HttpHeaders.VARY;
 import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.*;
+import static uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.completablevalue
+        .EvidenceNameInjector.EVIDENCE_CODE;
+import static uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.completablevalue
+        .OntologyNameInjector.GO_ID;
+import static uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.completablevalue
+        .TaxonomyNameInjector.TAXON_ID;
 import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.searchAndTransform;
 import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.streamSearchResults;
 import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.createFirstCursorPage;
@@ -325,9 +331,9 @@ public class AnnotationController {
     }
 
     private void addAllNamesToStatisticsValues(QueryResult<StatisticsGroup> stats) {
-        addNamesToStatisticsValues(stats, GO_NAME, OntologyNameInjector.GO_ID);
-        addNamesToStatisticsValues(stats, TAXON_NAME, TaxonomyNameInjector.TAXON_ID);
-        addNamesToStatisticsValues(stats, EVIDENCE_NAME, EvidenceNameInjector.EVIDENCE_CODE);
+        addNamesToStatisticsValues(stats, GO_NAME, GO_ID);
+        addNamesToStatisticsValues(stats, TAXON_NAME, TAXON_ID);
+        addNamesToStatisticsValues(stats, EVIDENCE_NAME, EVIDENCE_CODE);
     }
 
     private void checkBindingErrors(BindingResult bindingResult) {
