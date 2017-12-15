@@ -220,11 +220,6 @@ public class SearchServiceConfig {
         return new ExternalServiceResultsTransformer<>(responseValueInjectors, queryResultMutator(converterFactory));
     }
 
-    private ValueInjectionToQueryResults<Annotation> queryResultMutator(
-            RESTFilterConverterFactory converterFactory) {
-        return new ValueInjectionToQueryResults<>(converterFactory);
-    }
-
     @Bean
     public ExternalServiceResultsTransformer<QueryResult<Annotation>, Annotation> geneProductResultsTransformer
             (RESTFilterConverterFactory converterFactory) {
@@ -237,10 +232,6 @@ public class SearchServiceConfig {
     @Bean
     public DbXRefEntityValidation geneProductValidator() {
         return DbXRefEntityValidation.createWithData(geneProductLoader().load());
-    }
-
-    private DbXRefLoader geneProductLoader() {
-        return new DbXRefLoader(this.xrefValidationRegexFile, xrefValidationCaseSensitive);
     }
 
     @Bean
@@ -335,6 +326,15 @@ public class SearchServiceConfig {
                 new EvidenceNameInjector());
         return new ExternalServiceResultsTransformer<>(responseValueInjectors,
                 completableValueResultMutator(converterFactory));
+    }
+
+    private ValueInjectionToQueryResults<Annotation> queryResultMutator(
+            RESTFilterConverterFactory converterFactory) {
+        return new ValueInjectionToQueryResults<>(converterFactory);
+    }
+
+    private DbXRefLoader geneProductLoader() {
+        return new DbXRefLoader(this.xrefValidationRegexFile, xrefValidationCaseSensitive);
     }
 
     public interface AnnotationCompositeRetrievalConfig extends SolrRetrievalConfig, ServiceRetrievalConfig {
