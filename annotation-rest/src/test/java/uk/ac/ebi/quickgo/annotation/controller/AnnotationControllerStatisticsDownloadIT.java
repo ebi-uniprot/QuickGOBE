@@ -11,8 +11,8 @@ import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.stream.IntStream;
 import net.sf.ehcache.CacheManager;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -53,8 +53,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.ECO_ID;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.createGenericDocsChangingGoId;
-import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.expectedValues;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.numOfResults;
+import static uk.ac.ebi.quickgo.annotation.controller.StatsResponseVerifier.namesInTypeWithinGroup;
 import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.EXCEL_MEDIA_TYPE;
 import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.JSON_MEDIA_TYPE;
 import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.fileExtension;
@@ -76,15 +76,20 @@ public class AnnotationControllerStatisticsDownloadIT {
     private static final String DOWNLOAD_STATISTICS_SEARCH_URL = "/annotation/downloadStats";
     private static final String NUMBER_OF_GO_ID_RESULTS_FOR_ANNOTATIONS =
             "$.results[0].types.[?(@.type == 'goId')].values.length()";
-    private static final String ALL_GO_TERM_NAMES = "$.results[0].types.[?(@.type == 'goId')].values.*.name";
-    private static final String ALL_TAXON_NAMES = "$.results[0].types.[?(@.type == 'taxonId')].values.*.name";
-    private static final String ALL_ECO_NAMES = "$.results[0].types.[?(@.type == 'evidenceCode')].values.*.name";
     private static final String BASE_URL = "https://localhost";
     private static final String GO_TERM_RESOURCE_FORMAT = "/ontology/go/terms/%s";
     private static final String ECO_TERM_RESOURCE_FORMAT = "/ontology/eco/terms/%s";
     private static final String ECO_TERM_NAME = "match to sequence model evidence used in automatic assertion";
     private static final String TAXONOMY_ID_NODE_RESOURCE_FORMAT = "/proteins/api/taxonomy/id/%s/node";
     private static final int NO_OF_STATISTICS_GROUPS = 2;
+    private static final String ANNOTATION_GROUP = "annotation";
+    private static final String GENE_PRODUCT_GROUP = "geneProduct";
+    private static final String TAXON_ID_STATS_FIELD = "taxonId";
+    private static final String EVIDENCE_CODE_STATS_FIELD = "evidenceCode";
+    private static final String GO_ID_STATS_FIELD = "goId";
+    private static final String TAXON_NAME = "taxon name: " + 12345;
+    private static final int TAXON_ID = 12345;
+
     @Autowired
     CacheManager cacheManager;
     private MockMvc mockMvc;
@@ -96,7 +101,7 @@ public class AnnotationControllerStatisticsDownloadIT {
     private RestOperations restOperations;
     private MockRestServiceServer mockRestServiceServer;
     private ObjectMapper dtoMapper;
-    private List<String> populatedGoNames;
+    private String[] goNames;
 
     @Before
     public void setup() {
@@ -106,10 +111,10 @@ public class AnnotationControllerStatisticsDownloadIT {
         dtoMapper = new ObjectMapper();
         List<AnnotationDocument> genericDocs = createGenericDocsChangingGoId(NUMBER_OF_GENERIC_DOCS);
         annotationRepository.save(genericDocs);
-        populatedGoNames = new ArrayList<>(NUMBER_OF_GENERIC_DOCS);
-        for (int j = 0; j < NUMBER_OF_GENERIC_DOCS; j++) {
-            populatedGoNames.add(goName(j));
-        }
+
+        goNames = new String[NUMBER_OF_GENERIC_DOCS];
+        IntStream.range(0, goNames.length)
+                .forEach(i -> goNames[i] = goName(i));
     }
 
     @Test
@@ -134,10 +139,15 @@ public class AnnotationControllerStatisticsDownloadIT {
         ResultActions response = mockMvc.perform(get(DOWNLOAD_STATISTICS_SEARCH_URL).header(ACCEPT, JSON_MEDIA_TYPE));
 
         checkResponse(response, NUMBER_OF_GENERIC_DOCS);
-
-        response.andExpect(expectedValues(ALL_GO_TERM_NAMES, populatedGoNames));
-        response.andExpect(expectedValues(ALL_TAXON_NAMES, singletonList(String.valueOf(taxonName()))));
-        response.andExpect(expectedValues(ALL_ECO_NAMES, singletonList(String.valueOf(ECO_TERM_NAME))));
+        response.andDo(print())
+                .andExpect(namesInTypeWithinGroup(ANNOTATION_GROUP, GO_ID_STATS_FIELD, goNames))
+                .andExpect(namesInTypeWithinGroup(GENE_PRODUCT_GROUP, GO_ID_STATS_FIELD, goNames))
+                .andExpect(namesInTypeWithinGroup(ANNOTATION_GROUP, TAXON_ID_STATS_FIELD, new String[]{TAXON_NAME}))
+                .andExpect(namesInTypeWithinGroup(GENE_PRODUCT_GROUP, TAXON_ID_STATS_FIELD, new String[]{TAXON_NAME}))
+                .andExpect(namesInTypeWithinGroup(ANNOTATION_GROUP, EVIDENCE_CODE_STATS_FIELD,
+                        new String[]{ECO_TERM_NAME}))
+                .andExpect(namesInTypeWithinGroup(GENE_PRODUCT_GROUP, EVIDENCE_CODE_STATS_FIELD,
+                        new String[]{ECO_TERM_NAME}));
     }
 
     @Test
@@ -150,10 +160,17 @@ public class AnnotationControllerStatisticsDownloadIT {
         ResultActions response = mockMvc.perform(get(DOWNLOAD_STATISTICS_SEARCH_URL).header(ACCEPT, JSON_MEDIA_TYPE));
 
         checkResponse(JSON_MEDIA_TYPE, response);
-
-        response.andExpect(expectedValues(ALL_GO_TERM_NAMES, Arrays.asList(null, null, null, null, null)));
-        response.andExpect(expectedValues(ALL_TAXON_NAMES, singletonList(String.valueOf(taxonName()))));
-        response.andExpect(expectedValues(ALL_ECO_NAMES, singletonList(String.valueOf(ECO_TERM_NAME))));
+        response.andDo(print())
+                .andExpect(namesInTypeWithinGroup(ANNOTATION_GROUP, GO_ID_STATS_FIELD,
+                        new String[]{null, null, null, null, null}))
+                .andExpect(namesInTypeWithinGroup(GENE_PRODUCT_GROUP, GO_ID_STATS_FIELD,
+                        new String[]{null, null, null, null, null}))
+                .andExpect(namesInTypeWithinGroup(ANNOTATION_GROUP, TAXON_ID_STATS_FIELD, new String[]{TAXON_NAME}))
+                .andExpect(namesInTypeWithinGroup(GENE_PRODUCT_GROUP, TAXON_ID_STATS_FIELD, new String[]{TAXON_NAME}))
+                .andExpect(namesInTypeWithinGroup(ANNOTATION_GROUP, EVIDENCE_CODE_STATS_FIELD,
+                        new String[]{ECO_TERM_NAME}))
+                .andExpect(namesInTypeWithinGroup(GENE_PRODUCT_GROUP, EVIDENCE_CODE_STATS_FIELD,
+                        new String[]{ECO_TERM_NAME}));
     }
 
     @Test
@@ -166,9 +183,15 @@ public class AnnotationControllerStatisticsDownloadIT {
         ResultActions response = mockMvc.perform(get(DOWNLOAD_STATISTICS_SEARCH_URL).header(ACCEPT, JSON_MEDIA_TYPE));
 
         checkResponse(JSON_MEDIA_TYPE, response);
-        response.andExpect(expectedValues(ALL_GO_TERM_NAMES, populatedGoNames));
-        response.andExpect(expectedValues(ALL_TAXON_NAMES, singletonList(null)));
-        response.andExpect(expectedValues(ALL_ECO_NAMES, singletonList(String.valueOf(ECO_TERM_NAME))));
+        response.andDo(print())
+                .andExpect(namesInTypeWithinGroup(ANNOTATION_GROUP, GO_ID_STATS_FIELD, goNames))
+                .andExpect(namesInTypeWithinGroup(GENE_PRODUCT_GROUP, GO_ID_STATS_FIELD, goNames))
+                .andExpect(namesInTypeWithinGroup(ANNOTATION_GROUP, TAXON_ID_STATS_FIELD, new String[]{null}))
+                .andExpect(namesInTypeWithinGroup(GENE_PRODUCT_GROUP, TAXON_ID_STATS_FIELD, new String[]{null}))
+                .andExpect(namesInTypeWithinGroup(ANNOTATION_GROUP, EVIDENCE_CODE_STATS_FIELD,
+                        new String[]{ECO_TERM_NAME}))
+                .andExpect(namesInTypeWithinGroup(GENE_PRODUCT_GROUP, EVIDENCE_CODE_STATS_FIELD,
+                        new String[]{ECO_TERM_NAME}));
     }
 
     @Test
@@ -181,10 +204,13 @@ public class AnnotationControllerStatisticsDownloadIT {
         ResultActions response = mockMvc.perform(get(DOWNLOAD_STATISTICS_SEARCH_URL).header(ACCEPT, JSON_MEDIA_TYPE));
 
         checkResponse(JSON_MEDIA_TYPE, response);
-
-        response.andExpect(expectedValues(ALL_GO_TERM_NAMES, populatedGoNames));
-        response.andExpect(expectedValues(ALL_TAXON_NAMES, singletonList(String.valueOf(taxonName()))));
-        response.andExpect(expectedValues(ALL_ECO_NAMES, singletonList(null)));
+        response.andDo(print())
+                .andExpect(namesInTypeWithinGroup(ANNOTATION_GROUP, GO_ID_STATS_FIELD, goNames))
+                .andExpect(namesInTypeWithinGroup(GENE_PRODUCT_GROUP, GO_ID_STATS_FIELD, goNames))
+                .andExpect(namesInTypeWithinGroup(ANNOTATION_GROUP, TAXON_ID_STATS_FIELD, new String[]{TAXON_NAME}))
+                .andExpect(namesInTypeWithinGroup(GENE_PRODUCT_GROUP, TAXON_ID_STATS_FIELD, new String[]{TAXON_NAME}))
+                .andExpect(namesInTypeWithinGroup(ANNOTATION_GROUP, EVIDENCE_CODE_STATS_FIELD, new String[]{null}))
+                .andExpect(namesInTypeWithinGroup(GENE_PRODUCT_GROUP, EVIDENCE_CODE_STATS_FIELD, new String[]{null}));
     }
 
     private String goId(int id) {
@@ -203,14 +229,6 @@ public class AnnotationControllerStatisticsDownloadIT {
                         TAXONOMY_ID_NODE_RESOURCE_FORMAT,
                         String.valueOf(taxonId)),
                 responseAsString);
-    }
-
-    private int taxonId() {
-        return 12345;
-    }
-
-    private String taxonName() {
-        return "taxon name: " + 12345;
     }
 
     private void expectRestCallSuccess(String url, String response) {
@@ -284,8 +302,8 @@ public class AnnotationControllerStatisticsDownloadIT {
 
     private void setExpectationsForUnsuccessfulTaxonomyServiceRestResponse() {
         for (int i = 0; i < NO_OF_STATISTICS_GROUPS; i++) {
-            expectRestCallResponse(buildResource(TAXONOMY_ID_NODE_RESOURCE_FORMAT, String.valueOf(taxonId()
-            )), withStatus(HttpStatus.NOT_FOUND));
+            expectRestCallResponse(buildResource(TAXONOMY_ID_NODE_RESOURCE_FORMAT, String.valueOf(TAXON_ID)),
+                    withStatus(HttpStatus.NOT_FOUND));
         }
     }
 
@@ -317,7 +335,7 @@ public class AnnotationControllerStatisticsDownloadIT {
 
     private void setExpectationsForSuccessfulTaxonomyServiceRestResponse() {
         //We are only going to hit the restful service once due to caching the result
-        expectTaxonIdHasGivenTaxonNameViaRest(taxonId(), taxonName());
+        expectTaxonIdHasGivenTaxonNameViaRest(TAXON_ID, TAXON_NAME);
     }
 
     private void checkResponse(MediaType mediaType, ResultActions response) throws Exception {
