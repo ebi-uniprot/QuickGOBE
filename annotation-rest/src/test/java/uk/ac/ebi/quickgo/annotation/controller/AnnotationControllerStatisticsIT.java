@@ -94,6 +94,7 @@ public class AnnotationControllerStatisticsIT {
     private static final String GO_ASPECT_STATS_FIELD = "aspect";
     private static final String EXACT_USAGE = "exact";
     private static final String DISTINCT_VALUE_COUNT = "distinctValueCount";
+    private static final String TAXON_NAME = "taxon name: " + TAXON_ID;
 
     private MockMvc mockMvc;
     @Autowired
@@ -507,7 +508,7 @@ public class AnnotationControllerStatisticsIT {
 
     private void expectTaxonIdHasGivenTaxonNameViaRest() {
         BasicTaxonomyNode expectedResponse = new BasicTaxonomyNode();
-        expectedResponse.setScientificName(taxonName());
+        expectedResponse.setScientificName(TAXON_NAME);
         String responseAsString = getResponseAsString(expectedResponse);
 
         expectRestCallSuccess(
@@ -569,10 +570,6 @@ public class AnnotationControllerStatisticsIT {
         } catch (JsonProcessingException e) {
             throw new IllegalStateException("Problem constructing mocked GO term REST response:", e);
         }
-    }
-
-    private String taxonName() {
-        return "taxon name: " + TAXON_ID;
     }
 
     private String[] expectedNames(int expectedSize, String source) {
