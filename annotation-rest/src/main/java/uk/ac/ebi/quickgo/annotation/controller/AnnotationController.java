@@ -319,15 +319,15 @@ public class AnnotationController {
                 .body(emitter);
     }
 
+    private static String formattedDateStringForNow() {
+        LocalDateTime now = LocalDateTime.now();
+        return now.format(DOWNLOAD_FILE_NAME_DATE_FORMATTER);
+    }
+
     private void addAllNamesToStatisticsValues(QueryResult<StatisticsGroup> stats) {
         addNamesToStatisticsValues(stats, GO_NAME, OntologyNameInjector.GO_ID);
         addNamesToStatisticsValues(stats, TAXON_NAME, TaxonomyNameInjector.TAXON_ID);
         addNamesToStatisticsValues(stats, EVIDENCE_NAME, EvidenceNameInjector.EVIDENCE_CODE);
-    }
-
-    private static String formattedDateStringForNow() {
-        LocalDateTime now = LocalDateTime.now();
-        return now.format(DOWNLOAD_FILE_NAME_DATE_FORMATTER);
     }
 
     private void checkBindingErrors(BindingResult bindingResult) {
@@ -479,6 +479,7 @@ public class AnnotationController {
 
     private interface FilterQueryInfo {
         Set<QuickGOQuery> getFilterQueries();
+
         FilterContext getFilterContext();
     }
 }
