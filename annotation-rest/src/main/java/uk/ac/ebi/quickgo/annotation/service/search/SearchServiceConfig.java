@@ -251,16 +251,13 @@ public class SearchServiceConfig {
 
     @Bean
     public ResultTransformerChain<CompletableValue> completableValueResultTransformerChain(
-            ExternalServiceResultsTransformer<CompletableValue, CompletableValue>
-                    completableValueOntologyNameTransformer,
-            ExternalServiceResultsTransformer<CompletableValue, CompletableValue>
-                    completableValueTaxonNameTransformer,
-            ExternalServiceResultsTransformer<CompletableValue, CompletableValue>
-                    completableValueEvidenceNameTransformer) {
+            ExternalServiceResultsTransformer<CompletableValue, CompletableValue> ontologyNameTransformer,
+            ExternalServiceResultsTransformer<CompletableValue, CompletableValue> taxonNameTransformer,
+            ExternalServiceResultsTransformer<CompletableValue, CompletableValue> evidenceNameTransformer) {
         ResultTransformerChain<CompletableValue> transformerChain = new ResultTransformerChain<>();
-        transformerChain.addTransformer(completableValueOntologyNameTransformer);
-        transformerChain.addTransformer(completableValueTaxonNameTransformer);
-        transformerChain.addTransformer(completableValueEvidenceNameTransformer);
+        transformerChain.addTransformer(ontologyNameTransformer);
+        transformerChain.addTransformer(taxonNameTransformer);
+        transformerChain.addTransformer(evidenceNameTransformer);
         return transformerChain;
     }
 
@@ -294,7 +291,7 @@ public class SearchServiceConfig {
     }
 
     @Bean
-    public ExternalServiceResultsTransformer<CompletableValue, CompletableValue> completableValueOntologyNameTransformer
+    public ExternalServiceResultsTransformer<CompletableValue, CompletableValue> ontologyNameTransformer
             (RESTFilterConverterFactory converterFactory) {
         List<ResponseValueInjector<CompletableValue>> responseValueInjectors =
                 singletonList(new uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer
@@ -310,7 +307,7 @@ public class SearchServiceConfig {
     }
 
     @Bean
-    public ExternalServiceResultsTransformer<CompletableValue, CompletableValue> completableValueTaxonNameTransformer
+    public ExternalServiceResultsTransformer<CompletableValue, CompletableValue> taxonNameTransformer
             (RESTFilterConverterFactory converterFactory) {
         List<ResponseValueInjector<CompletableValue>> responseValueInjectors = singletonList(
                 new uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.completablevalue
@@ -320,7 +317,7 @@ public class SearchServiceConfig {
     }
 
     @Bean
-    public ExternalServiceResultsTransformer<CompletableValue, CompletableValue> completableValueEvidenceNameTransformer
+    public ExternalServiceResultsTransformer<CompletableValue, CompletableValue> evidenceNameTransformer
             (RESTFilterConverterFactory converterFactory) {
         List<ResponseValueInjector<CompletableValue>> responseValueInjectors = singletonList(
                 new EvidenceNameInjector());
