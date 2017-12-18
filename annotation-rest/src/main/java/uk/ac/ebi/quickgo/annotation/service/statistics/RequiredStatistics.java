@@ -35,7 +35,8 @@ public class RequiredStatistics {
                 statsType(AnnotationFields.Facetable.REFERENCE),
                 statsType(AnnotationFields.Facetable.EVIDENCE_CODE),
                 statsType(AnnotationFields.Facetable.ASSIGNED_BY),
-                statsType(AnnotationFields.Facetable.GO_ASPECT)
+                statsType(AnnotationFields.Facetable.GO_ASPECT),
+                statsType(AnnotationFields.Facetable.GENE_PRODUCT_ID)
         );
     }
 
