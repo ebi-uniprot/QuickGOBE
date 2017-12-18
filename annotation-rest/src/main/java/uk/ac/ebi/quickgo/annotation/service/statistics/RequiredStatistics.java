@@ -24,12 +24,24 @@ import static uk.ac.ebi.quickgo.annotation.service.statistics.RequiredStatisticT
  */
 public class RequiredStatistics {
     static final int DEFAULT_GO_TERM_LIMIT = 200;
-    static final List<RequiredStatisticType> STATS_TYPES;
+    static final List<RequiredStatisticType> ANNOTATION_STATS_TYPES;
+    static final List<RequiredStatisticType> GENE_PRODUCT_STATS_TYPES;
+
     static final String ANNOTATION = "annotation";
     static final String GENE_PRODUCT = "geneProduct";
 
     static {
-        STATS_TYPES = asList(
+        ANNOTATION_STATS_TYPES = asList(
+                statsType(AnnotationFields.Facetable.GO_ID, DEFAULT_GO_TERM_LIMIT),
+                statsType(AnnotationFields.Facetable.TAXON_ID),
+                statsType(AnnotationFields.Facetable.REFERENCE),
+                statsType(AnnotationFields.Facetable.EVIDENCE_CODE),
+                statsType(AnnotationFields.Facetable.ASSIGNED_BY),
+                statsType(AnnotationFields.Facetable.GO_ASPECT),
+                statsType(AnnotationFields.Facetable.GENE_PRODUCT_ID)
+        );
+
+        GENE_PRODUCT_STATS_TYPES = asList(
                 statsType(AnnotationFields.Facetable.GO_ID, DEFAULT_GO_TERM_LIMIT),
                 statsType(AnnotationFields.Facetable.TAXON_ID),
                 statsType(AnnotationFields.Facetable.REFERENCE),
