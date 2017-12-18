@@ -153,8 +153,8 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
         return slimmer.getSlimmedTermsMap().entrySet().stream()
                 .filter(this::doesNotSlimToOnlyItself)
                 .map(Map.Entry::getKey)
-                .filter(term -> isRequestedSlimFromTerm(term, slimsFromTerms))
-                .map(id -> new SlimTerm(id, slimmer.findSlims(id)))
+                .filter(term -> slimsFromTerms.isEmpty() || slimsFromTerms.contains(term))
+                .map(id -> new SlimTerm(id, slimmer.findSlimmedToTerms(id)))
                 .collect(Collectors.toList());
     }
 
@@ -246,10 +246,6 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
     private T insertDescendants(T term, OntologyRelationType... relations) {
         term.descendants = getRelatives(descendantFetcher, term, relations);
         return term;
-    }
-
-    private boolean isRequestedSlimFromTerm(String term, Set<String> slimFromTerms) {
-        return slimFromTerms.isEmpty() || slimFromTerms.contains(term);
     }
 
     /**
