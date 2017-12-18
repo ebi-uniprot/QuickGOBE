@@ -257,8 +257,8 @@ public class GOControllerIT extends OBOControllerIT {
     @Test
     public void slimmingWithFromIdButToIdIsInvalidProduces400() throws Exception {
         ResultActions response = mockMvc.perform(get(getSlimURL())
-                .param(SLIM_FROM_IDS_PARAM, invalidId())
-                .param(SLIM_TO_IDS_PARAM, GO_SLIM1));
+                .param(SLIM_FROM_IDS_PARAM, GO_SLIM_CHILD1)
+                .param(SLIM_TO_IDS_PARAM, invalidId()));
 
         expectInvalidIdError(response, invalidId());
     }
