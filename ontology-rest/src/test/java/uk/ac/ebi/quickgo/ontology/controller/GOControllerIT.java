@@ -6,8 +6,6 @@ import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -16,6 +14,8 @@ import org.junit.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
@@ -78,7 +78,7 @@ public class GOControllerIT extends OBOControllerIT {
         ResultActions response = mockMvc.perform(get(
                 buildTermsURLWithSubResource(toCSV(GO_0000001, GO_0000002), CONSTRAINTS_SUB_RESOURCE)));
 
-        expectBasicFieldsInResults(response, Arrays.asList(GO_0000001, GO_0000002))
+        expectBasicFieldsInResults(response, asList(GO_0000001, GO_0000002))
                 .andExpect(jsonPath("$.results.*.blacklist", hasSize(2)))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk());
@@ -88,7 +88,7 @@ public class GOControllerIT extends OBOControllerIT {
     public void canRetrieveGoDiscussions() throws Exception {
         ResultActions response = mockMvc.perform(get(buildTermsURLWithSubResource(GO_0000001, COMPLETE_SUB_RESOURCE)));
 
-        expectBasicFieldsInResults(response, Collections.singletonList(GO_0000001))
+        expectBasicFieldsInResults(response, singletonList(GO_0000001))
                 .andExpect(jsonPath("$.results.*.goDiscussions", hasSize(1)))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk());
@@ -98,7 +98,7 @@ public class GOControllerIT extends OBOControllerIT {
     public void canRetrieveProteinComplexes() throws Exception {
         ResultActions response = mockMvc.perform(get(buildTermsURLWithSubResource(GO_0000001, COMPLETE_SUB_RESOURCE)));
 
-        expectBasicFieldsInResults(response, Collections.singletonList(GO_0000001))
+        expectBasicFieldsInResults(response, singletonList(GO_0000001))
                 .andExpect(jsonPath("$.results.*.proteinComplexes", hasSize(1)))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk());
@@ -126,19 +126,21 @@ public class GOControllerIT extends OBOControllerIT {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.numberOfHits").value(1))
-                .andExpect(jsonPath("$.results.*.slimsFromId", contains(GO_SLIM_CHILD1)));
+                .andExpect(jsonPath("$.results.*.slimsFromId", contains(GO_SLIM_CHILD1)))
+                .andExpect(jsonPath("$.results.*.slimsToIds.*", contains(GO_SLIM1)));
     }
 
     @Test
-    public void oneIdAndOneInvalidIdHasOneSlim() throws Exception {
+    public void oneIdAndOneNonExistingIdHasOneSlim() throws Exception {
         ResultActions response = mockMvc.perform(get(getSlimURL())
-                .param(SLIM_TO_IDS_PARAM, toCSV(GO_SLIM1, "GO:0000000")));
+                .param(SLIM_TO_IDS_PARAM, toCSV(GO_SLIM1, NON_EXISTENT_TERM)));
 
         response.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.numberOfHits").value(1))
-                .andExpect(jsonPath("$.results.*.slimsFromId", contains(GO_SLIM_CHILD1)));
+                .andExpect(jsonPath("$.results.*.slimsFromId", contains(GO_SLIM_CHILD1)))
+                .andExpect(jsonPath("$.results.*.slimsToIds.*", contains(GO_SLIM1)));
     }
 
     @Test
@@ -150,7 +152,8 @@ public class GOControllerIT extends OBOControllerIT {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.numberOfHits").value(1))
-                .andExpect(jsonPath("$.results.*.slimsFromId", contains(GO_SLIM_CHILD2)));
+                .andExpect(jsonPath("$.results.*.slimsFromId", contains(GO_SLIM_CHILD2)))
+                .andExpect(jsonPath("$.results.*.slimsToIds.*", contains(GO_SLIM2)));
 
         mockMvc.perform(get(getSlimURL())
                 .param(SLIM_TO_IDS_PARAM, GO_SLIM3));
@@ -159,7 +162,8 @@ public class GOControllerIT extends OBOControllerIT {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.numberOfHits").value(1))
-                .andExpect(jsonPath("$.results.*.slimsFromId", contains(GO_SLIM_CHILD2)));
+                .andExpect(jsonPath("$.results.*.slimsFromId", contains(GO_SLIM_CHILD2)))
+                .andExpect(jsonPath("$.results.*.slimsToIds.*", contains(GO_SLIM2)));
     }
 
     @Test
@@ -171,7 +175,8 @@ public class GOControllerIT extends OBOControllerIT {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.numberOfHits").value(2))
-                .andExpect(jsonPath("$.results.*.slimsFromId", containsInAnyOrder(GO_SLIM_CHILD3, GO_SLIM_CHILD4)));
+                .andExpect(jsonPath("$.results.*.slimsFromId", containsInAnyOrder(GO_SLIM_CHILD3, GO_SLIM_CHILD4)))
+                .andExpect(jsonPath("$.results.*.slimsToIds.*", contains(GO_SLIM4, GO_SLIM4)));
     }
 
     @Test
@@ -183,7 +188,8 @@ public class GOControllerIT extends OBOControllerIT {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.numberOfHits").value(2))
-                .andExpect(jsonPath("$.results.*.slimsFromId", containsInAnyOrder(GO_SLIM_CHILD5, GO_SLIM_CHILD6)));
+                .andExpect(jsonPath("$.results.*.slimsFromId", containsInAnyOrder(GO_SLIM_CHILD5, GO_SLIM_CHILD6)))
+                .andExpect(jsonPath("$.results.*.slimsToIds.*", contains(GO_SLIM5, GO_SLIM6, GO_SLIM5, GO_SLIM6)));
     }
 
     @Test
@@ -196,11 +202,12 @@ public class GOControllerIT extends OBOControllerIT {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.numberOfHits").value(1))
-                .andExpect(jsonPath("$.results.*.slimsFromId", containsInAnyOrder(GO_SLIM_CHILD5)));
+                .andExpect(jsonPath("$.results.*.slimsFromId", containsInAnyOrder(GO_SLIM_CHILD5)))
+                .andExpect(jsonPath("$.results.*.slimsToIds.*", contains(GO_SLIM5, GO_SLIM6)));
     }
 
     @Test
-    public void twoIdsHave2SlimsButOnlyNoneAreRequested() throws Exception {
+    public void twoIdsHave2SlimsButNoneAreRequested() throws Exception {
         ResultActions response = mockMvc.perform(get(getSlimURL())
                 .param(SLIM_TO_IDS_PARAM, toCSV(GO_SLIM5, GO_SLIM6))
                 .param(SLIM_FROM_IDS_PARAM, NON_EXISTENT_TERM));
@@ -223,10 +230,46 @@ public class GOControllerIT extends OBOControllerIT {
     @Test
     public void slimmingWithNoValidIDsCausesCauses400() throws Exception {
         ResultActions response = mockMvc.perform(get(getSlimURL())
-                .param(SLIM_TO_IDS_PARAM, "GO:0000000"));
+                .param(SLIM_TO_IDS_PARAM, NON_EXISTENT_TERM));
 
         expectResponseCreationError(response, NO_VALID_SLIM_TERMS_ERROR_MESSAGE)
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void slimmingWithInvalidFromIdButValidToIdProduces400() throws Exception {
+        ResultActions response = mockMvc.perform(get(getSlimURL())
+                .param(SLIM_FROM_IDS_PARAM, invalidId())
+                .param(SLIM_TO_IDS_PARAM, GO_SLIM1));
+
+        expectInvalidIdError(response, invalidId());
+    }
+
+    @Test
+    public void slimmingWithFromIdButNoToIdsProduces400() throws Exception {
+        ResultActions response = mockMvc.perform(get(getSlimURL())
+                .param(SLIM_FROM_IDS_PARAM, GO_SLIM_CHILD1));
+
+        expectResponseCreationError(response, MISSING_SLIM_SET_ERROR_MESSAGE)
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void slimmingWithFromIdButToIdIsInvalidProduces400() throws Exception {
+        ResultActions response = mockMvc.perform(get(getSlimURL())
+                .param(SLIM_FROM_IDS_PARAM, invalidId())
+                .param(SLIM_TO_IDS_PARAM, GO_SLIM1));
+
+        expectInvalidIdError(response, invalidId());
+    }
+
+    @Test
+    public void slimmingWithInvalidFromAndInvalidToIdProduces400() throws Exception {
+        ResultActions response = mockMvc.perform(get(getSlimURL())
+                .param(SLIM_FROM_IDS_PARAM, invalidId())
+                .param(SLIM_TO_IDS_PARAM, invalidId() + "XXX"));
+
+        expectInvalidIdError(response, invalidId());
     }
 
     @Test
@@ -237,7 +280,7 @@ public class GOControllerIT extends OBOControllerIT {
                 .param(SLIM_RELATIONS_PARAM, invalidRelation));
 
         expectInvalidRelationError(response, invalidRelation)
-            .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -266,13 +309,13 @@ public class GOControllerIT extends OBOControllerIT {
         return "part_of";
     }
 
-    @Override protected String getInvalidRelations(){
+    @Override protected String getInvalidRelations() {
         return "used_in";
     }
 
     @Override
     protected List<OntologyDocument> createBasicDocs() {
-        return Arrays.asList(
+        return asList(
                 OntologyDocMocker.createGODoc(GO_0000001, "doc name 1"),
                 OntologyDocMocker.createGODoc(GO_0000002, "doc name 2"),
                 OntologyDocMocker.createGODoc(GO_0000003, "doc name 3"),
