@@ -41,8 +41,10 @@ public class AnnotationStatisticsService implements StatisticsService {
 
     private static final int FIRST_PAGE = 1;
     private static final int RESULTS_PER_PAGE = 0;
-    private final List<RequiredStatistic> requiredStatisticsForStandardUsage;
-    private final List<RequiredStatistic> requiredStatisticsForDownloadUsage;
+    public static final QueryResult<StatisticsGroup>
+            EMPTY_STATS = new QueryResult.Builder<>(0, Collections.<StatisticsGroup>emptyList()).build();
+    private final RequiredStatisticsProvider requiredStatisticsForStandardUsage;
+    private final RequiredStatisticsProvider requiredStatisticsForDownloadUsage;
     private final FilterConverterFactory converterFactory;
     private final SearchService<Annotation> searchService;
     private final StatsConverter converter;
@@ -52,8 +54,8 @@ public class AnnotationStatisticsService implements StatisticsService {
     public AnnotationStatisticsService(FilterConverterFactory converterFactory,
             SearchService<Annotation> searchService,
             StatsConverter converter,
-            RequiredStatistics requiredStatisticsForStandardUsage,
-            RequiredStatistics requiredStatisticsForDownloadUsage) {
+            RequiredStatisticsProvider requiredStatisticsForStandardUsage,
+            RequiredStatisticsProvider requiredStatisticsForDownloadUsage) {
         checkArgument(converterFactory != null, "Filter factory cannot be null.");
         checkArgument(searchService != null, "Search service cannot be null.");
         checkArgument(converter != null, "Stats request converter cannot be null.");
@@ -66,44 +68,60 @@ public class AnnotationStatisticsService implements StatisticsService {
         this.searchService = searchService;
         this.converter = converter;
 
-        checkState(requiredStatisticsForStandardUsage.getStats() != null,
+        checkState(requiredStatisticsForStandardUsage != null,
                 "Required statistics for standard usage cannot be null.");
-        checkState(requiredStatisticsForDownloadUsage.getStats() != null,
+        checkState(requiredStatisticsForDownloadUsage != null,
                 "Required statistics for download cannot be null.");
 
-        this.requiredStatisticsForStandardUsage = requiredStatisticsForStandardUsage.getStats();
-        this.requiredStatisticsForDownloadUsage = requiredStatisticsForDownloadUsage.getStats();
+        this.requiredStatisticsForStandardUsage = requiredStatisticsForStandardUsage;
+        this.requiredStatisticsForDownloadUsage = requiredStatisticsForDownloadUsage;
 
         queryTemplate = new DefaultSearchQueryTemplate();
     }
 
     @Override
     public QueryResult<StatisticsGroup> calculateForStandardUsage(AnnotationRequest request) {
+        checkArgument(request != null, "Annotation request cannot be null");
         return calculateForRequiredStatistics(request, requiredStatisticsForStandardUsage);
     }
 
     @Override
     public QueryResult<StatisticsGroup> calculateForDownloadUsage(AnnotationRequest request) {
+        checkArgument(request != null, "Annotation request cannot be null");
         return calculateForRequiredStatistics(request, requiredStatisticsForDownloadUsage);
     }
 
     private QueryResult<StatisticsGroup> calculateForRequiredStatistics(AnnotationRequest request,
+            RequiredStatisticsProvider provider) {
+        final List<RequiredStatistic> requiredStatistics = requiredStatistics(request, provider);
+        AggregateResponse globalAggregation = statisticsResponse(request, requiredStatistics);
+        if (globalAggregation.isPopulated()) {
+            return createResult(requiredStatistics, globalAggregation);
+        }
+        return EMPTY_STATS;
+    }
+
+    private AggregateResponse statisticsResponse(AnnotationRequest request,
             List<RequiredStatistic> requiredStatistics) {
-        checkArgument(request != null, "Annotation request cannot be null");
         QueryRequest queryRequest = buildQueryRequest(request, requiredStatistics);
         QueryResult<Annotation> annotationQueryResult = searchService.findByQuery(queryRequest);
-        AggregateResponse globalAggregation = annotationQueryResult.getAggregation();
-        QueryResult<StatisticsGroup> response;
-        if (globalAggregation.isPopulated()) {
-            List<StatisticsGroup> statsGroups = requiredStatistics.stream()
-                    .map(req -> convertResponse(globalAggregation, req))
-                    .collect(Collectors.toList());
-            response = new QueryResult.Builder<>(statsGroups.size(), statsGroups).build();
-        } else {
-            response = new QueryResult.Builder<>(0, Collections.<StatisticsGroup>emptyList()).build();
-        }
+        return annotationQueryResult.getAggregation();
+    }
 
-        return response;
+    private QueryResult<StatisticsGroup> createResult(List<RequiredStatistic> requiredStatistics,
+            AggregateResponse globalAggregation) {
+        List<StatisticsGroup> statsGroups = requiredStatistics.stream()
+                .map(req -> convertResponse(globalAggregation, req))
+                .collect(Collectors.toList());
+        return new QueryResult.Builder<>(statsGroups.size(), statsGroups).build();
+    }
+
+    private List<RequiredStatistic> requiredStatistics(AnnotationRequest request,
+            RequiredStatisticsProvider requiredStatisticsProvider) {
+        RequiredStatistics source = request.getGeneProductId().length == 0 ?
+                requiredStatisticsProvider.usualCase :
+                requiredStatisticsProvider.withGeneProduct;
+        return source.requiredStats;
     }
 
     private QueryRequest buildQueryRequest(AnnotationRequest request, List<RequiredStatistic> requiredStatistics) {
