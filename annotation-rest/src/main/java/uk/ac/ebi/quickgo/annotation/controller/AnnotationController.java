@@ -479,7 +479,7 @@ public class AnnotationController {
                     .forEach(statisticsValue -> statisticsValue.setName(nameService.findName(nameField, statisticsValue
                             .getKey())));
         } catch (Exception e) {
-            LOGGER.error("Failed to retrieve GO names for StatisticsDownloadRequest", e);
+            LOGGER.error("Failed to retrieve name information processing statistics request", e);
         }
     }
 
