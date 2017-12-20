@@ -115,11 +115,11 @@ public class AnnotationControllerStatisticsDownloadIT {
         goNames = new String[NUMBER_OF_GENERIC_DOCS];
         IntStream.range(0, goNames.length)
                 .forEach(i -> goNames[i] = goName(i));
+        cacheManager.clearAll();
     }
 
     @Test
     public void canDownloadInExcelFormat() throws Exception {
-        cacheManager.clearAll();
         setExpectationsForSuccessfulOntologyServiceRestResponse();
         setExpectationsForSuccessfulTaxonomyServiceRestResponse();
         setExpectationsForSuccessfulOntologyServiceRestResponseForEcoCodes();
@@ -131,7 +131,6 @@ public class AnnotationControllerStatisticsDownloadIT {
 
     @Test
     public void canDownloadInJsonFormat() throws Exception {
-        cacheManager.clearAll();
         setExpectationsForSuccessfulOntologyServiceRestResponse();
         setExpectationsForSuccessfulTaxonomyServiceRestResponse();
         setExpectationsForSuccessfulOntologyServiceRestResponseForEcoCodes();
@@ -152,7 +151,6 @@ public class AnnotationControllerStatisticsDownloadIT {
 
     @Test
     public void downloadStatisticsSuccessfulAfterFailedToRetrieveGONames() throws Exception {
-        cacheManager.clearAll();
         setExpectationsForUnsuccessfulOntologyServiceRestResponse();
         setExpectationsForSuccessfulTaxonomyServiceRestResponse();
         setExpectationsForSuccessfulOntologyServiceRestResponseForEcoCodes();
@@ -175,7 +173,6 @@ public class AnnotationControllerStatisticsDownloadIT {
 
     @Test
     public void downloadStatisticsSuccessfulAfterFailedToRetrieveTaxonNames() throws Exception {
-        cacheManager.clearAll();
         setExpectationsForSuccessfulOntologyServiceRestResponse();
         setExpectationsForUnsuccessfulTaxonomyServiceRestResponse();
         setExpectationsForSuccessfulOntologyServiceRestResponseForEcoCodes();
@@ -196,7 +193,6 @@ public class AnnotationControllerStatisticsDownloadIT {
 
     @Test
     public void downloadStatisticsSuccessfulAfterFailedToRetrieveECONames() throws Exception {
-        cacheManager.clearAll();
         setExpectationsForSuccessfulOntologyServiceRestResponse();
         setExpectationsForSuccessfulTaxonomyServiceRestResponse();
         setExpectationsForUnsuccessfulOntologyServiceRestResponseForEcoCodes();
