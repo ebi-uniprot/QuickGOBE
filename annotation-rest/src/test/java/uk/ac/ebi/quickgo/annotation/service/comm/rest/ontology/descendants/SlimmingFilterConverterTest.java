@@ -140,17 +140,17 @@ public class SlimmingFilterConverterTest {
 
     private void addResponseSlimsTo(String termId, String slimId) {
         for (OntologyRelatives.Result result : response.getResults()) {
-            if (result.getId().equals(termId)) {
-                result.getSlimsTo().add(slimId);
+            if (result.getSlimsFromId().equals(termId)) {
+                result.getSlimsToIds().add(slimId);
                 return;
             }
         }
 
         OntologyRelatives.Result newResult = new OntologyRelatives.Result();
-        newResult.setId(termId);
+        newResult.setSlimsFromId(termId);
         List<String> slimList = new ArrayList<>();
         slimList.add(slimId);
-        newResult.setSlimsTo(slimList);
+        newResult.setSlimsToIds(slimList);
         response.getResults().add(newResult);
     }
 }

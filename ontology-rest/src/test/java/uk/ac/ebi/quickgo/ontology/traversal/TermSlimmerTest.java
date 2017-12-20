@@ -1,24 +1,29 @@
 package uk.ac.ebi.quickgo.ontology.traversal;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 import uk.ac.ebi.quickgo.ontology.common.OntologyType;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.is;
 import static uk.ac.ebi.quickgo.ontology.common.OntologyType.ECO;
-import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.*;
+import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.CAPABLE_OF_PART_OF;
+import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.HAS_PART;
+import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.IS_A;
+import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.PART_OF;
 import static uk.ac.ebi.quickgo.ontology.traversal.TermSlimmer.DEFAULT_RELATION_TYPES;
 
 /**
@@ -103,11 +108,11 @@ public class TermSlimmerTest {
         List<String> slimSetVertices = singletonList(MEMBRANE);
         TermSlimmer termSlimmer = TermSlimmer.createSlims(OntologyType.GO, ontology, slimSetVertices);
         assertThat(termSlimmer.getSlimmedTermsMap().size(), is(5));
-        assertThat(termSlimmer.findSlims(MEMBRANE), contains(MEMBRANE));
-        assertThat(termSlimmer.findSlims(MEMBRANE_PART), contains(MEMBRANE));
-        assertThat(termSlimmer.findSlims(PLASMA_MEMBRANE), contains(MEMBRANE));
-        assertThat(termSlimmer.findSlims(PLASMA_MEMBRANE_PART), contains(MEMBRANE));
-        assertThat(termSlimmer.findSlims(LATERAL_PLASMA_MEMBRANE), contains(MEMBRANE));
+        assertThat(termSlimmer.findSlimmedToTerms(MEMBRANE), contains(MEMBRANE));
+        assertThat(termSlimmer.findSlimmedToTerms(MEMBRANE_PART), contains(MEMBRANE));
+        assertThat(termSlimmer.findSlimmedToTerms(PLASMA_MEMBRANE), contains(MEMBRANE));
+        assertThat(termSlimmer.findSlimmedToTerms(PLASMA_MEMBRANE_PART), contains(MEMBRANE));
+        assertThat(termSlimmer.findSlimmedToTerms(LATERAL_PLASMA_MEMBRANE), contains(MEMBRANE));
     }
 
     @Test
@@ -115,12 +120,12 @@ public class TermSlimmerTest {
         List<String> slimSetVertices = asList(CELL_PART, MEMBRANE_PART);
         TermSlimmer termSlimmer = TermSlimmer.createSlims(OntologyType.GO, ontology, slimSetVertices);
         assertThat(termSlimmer.getSlimmedTermsMap().size(), is(6));
-        assertThat(termSlimmer.findSlims(CELL_PART), contains(CELL_PART));
-        assertThat(termSlimmer.findSlims(MEMBRANE_PART), contains(MEMBRANE_PART));
-        assertThat(termSlimmer.findSlims(CELL_PERIPHERY), contains(CELL_PART));
-        assertThat(termSlimmer.findSlims(PLASMA_MEMBRANE), contains(CELL_PART));
-        assertThat(termSlimmer.findSlims(PLASMA_MEMBRANE_PART), contains(CELL_PART, MEMBRANE_PART));
-        assertThat(termSlimmer.findSlims(LATERAL_PLASMA_MEMBRANE), contains(CELL_PART, MEMBRANE_PART));
+        assertThat(termSlimmer.findSlimmedToTerms(CELL_PART), contains(CELL_PART));
+        assertThat(termSlimmer.findSlimmedToTerms(MEMBRANE_PART), contains(MEMBRANE_PART));
+        assertThat(termSlimmer.findSlimmedToTerms(CELL_PERIPHERY), contains(CELL_PART));
+        assertThat(termSlimmer.findSlimmedToTerms(PLASMA_MEMBRANE), contains(CELL_PART));
+        assertThat(termSlimmer.findSlimmedToTerms(PLASMA_MEMBRANE_PART), contains(CELL_PART, MEMBRANE_PART));
+        assertThat(termSlimmer.findSlimmedToTerms(LATERAL_PLASMA_MEMBRANE), contains(CELL_PART, MEMBRANE_PART));
     }
 
     @Test
@@ -128,24 +133,24 @@ public class TermSlimmerTest {
         List<String> slimSetVertices = asList(CELL_PART, MEMBRANE_PART, PLASMA_MEMBRANE_PART);
         TermSlimmer termSlimmer = TermSlimmer.createSlims(OntologyType.GO, ontology, slimSetVertices);
         assertThat(termSlimmer.getSlimmedTermsMap().size(), is(6));
-        assertThat(termSlimmer.findSlims(CELL_PART), contains(CELL_PART));
-        assertThat(termSlimmer.findSlims(MEMBRANE_PART), contains(MEMBRANE_PART));
-        assertThat(termSlimmer.findSlims(CELL_PERIPHERY), contains(CELL_PART));
-        assertThat(termSlimmer.findSlims(PLASMA_MEMBRANE), contains(CELL_PART));
-        assertThat(termSlimmer.findSlims(PLASMA_MEMBRANE_PART), contains(PLASMA_MEMBRANE_PART));
-        assertThat(termSlimmer.findSlims(LATERAL_PLASMA_MEMBRANE), contains(PLASMA_MEMBRANE_PART));
+        assertThat(termSlimmer.findSlimmedToTerms(CELL_PART), contains(CELL_PART));
+        assertThat(termSlimmer.findSlimmedToTerms(MEMBRANE_PART), contains(MEMBRANE_PART));
+        assertThat(termSlimmer.findSlimmedToTerms(CELL_PERIPHERY), contains(CELL_PART));
+        assertThat(termSlimmer.findSlimmedToTerms(PLASMA_MEMBRANE), contains(CELL_PART));
+        assertThat(termSlimmer.findSlimmedToTerms(PLASMA_MEMBRANE_PART), contains(PLASMA_MEMBRANE_PART));
+        assertThat(termSlimmer.findSlimmedToTerms(LATERAL_PLASMA_MEMBRANE), contains(PLASMA_MEMBRANE_PART));
     }
 
     @Test
     public void termInOntologySlimsToNothing() {
         TermSlimmer termSlimmer = TermSlimmer.createSlims(OntologyType.GO, ontology, singletonList(CELL));
-        assertThat(termSlimmer.findSlims(CELLULAR_COMPONENT), is(empty()));
+        assertThat(termSlimmer.findSlimmedToTerms(CELLULAR_COMPONENT), is(empty()));
     }
 
     @Test
     public void termNotInOntologySlimsToNothing() {
         TermSlimmer termSlimmer = TermSlimmer.createSlims(OntologyType.GO, ontology, singletonList(CELLULAR_COMPONENT));
-        assertThat(termSlimmer.findSlims("XXXXXX"), is(empty()));
+        assertThat(termSlimmer.findSlimmedToTerms("XXXXXX"), is(empty()));
     }
 
     /**
