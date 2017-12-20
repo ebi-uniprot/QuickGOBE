@@ -45,7 +45,7 @@ public class RequiredStatisticsTest {
 
         RequiredStatistics reqStats = new RequiredStatistics(configurer);
 
-        List<RequiredStatistic> stats = reqStats.getStats();
+        List<RequiredStatistic> stats = reqStats.getRequiredStatistics();
         List<String> statsGroupNames = stats.stream().map(RequiredStatistic::getGroupName).collect(Collectors.toList());
         assertThat(statsGroupNames, hasItems(ANNOTATION, GENE_PRODUCT));
     }
@@ -56,7 +56,7 @@ public class RequiredStatisticsTest {
 
         RequiredStatistics reqStats = new RequiredStatistics(configurer);
 
-        List<RequiredStatistic> stats = reqStats.getStats();
+        List<RequiredStatistic> stats = reqStats.getRequiredStatistics();
 
         for (RequiredStatistic stat : stats) {
             assertThat(stat.getTypes(), not(equalTo(STATS_TYPES)));
@@ -69,7 +69,7 @@ public class RequiredStatisticsTest {
 
         RequiredStatistics reqStats = new RequiredStatistics(configurer);
 
-        List<RequiredStatistic> stats = reqStats.getStats();
+        List<RequiredStatistic> stats = reqStats.getRequiredStatistics();
 
         for (RequiredStatistic stat : stats) {
             assertThat(stat.getTypes(), equalTo(STATS_TYPES));
