@@ -35,24 +35,7 @@ public class StatisticsServiceConfig {
     }
 
     @Bean
-    public RequiredStatisticsProvider requiredStatisticsForStandardUsage(
-            StatisticsTypeConfigurer statsTypeConfigurerForStandardUsage) {
-        return new RequiredStatisticsProvider(statsTypeConfigurerForStandardUsage);
-    }
-
-    @Bean
-    public RequiredStatisticsProvider requiredStatisticsForDownloadUsage(
-            StatisticsTypeConfigurer statsTypeConfigurerForDownloadUsage) {
-        return new RequiredStatisticsProvider(statsTypeConfigurerForDownloadUsage);
-    }
-
-    @Bean
-    public StatisticsTypeConfigurer statsTypeConfigurerForStandardUsage() {
-        return new StatisticsTypeConfigurer(typeLimitsForStandardUsage);
-    }
-
-    @Bean
-    public StatisticsTypeConfigurer statsTypeConfigurerForDownloadUsage() {
-        return new StatisticsTypeConfigurer(typeLimitsForDownloadUsage);
+    public RequiredStatisticsProvider statisticsProvider() {
+        return new RequiredStatisticsProvider(typeLimitsForStandardUsage, typeLimitsForDownloadUsage);
     }
 }
