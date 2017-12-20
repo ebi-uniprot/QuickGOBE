@@ -1,5 +1,8 @@
 package uk.ac.ebi.quickgo.annotation.service.statistics;
 
+import java.util.Map;
+
+
 /**
  * A source of {@link RequiredStatistics} instances.
  *
@@ -11,10 +14,16 @@ package uk.ac.ebi.quickgo.annotation.service.statistics;
 public class RequiredStatisticsProvider {
 
     final RequiredStatistics usualCase;
+    final RequiredStatistics usualCaseForDownload;
     final RequiredStatistics withGeneProduct;
+    final RequiredStatistics withGeneProductForDownload;
 
-    public RequiredStatisticsProvider(StatisticsTypeConfigurer statsConfigurer) {
-        usualCase = new RequiredStatistics(statsConfigurer);
-        withGeneProduct = new RequiredStatisticsWithGeneProduct(statsConfigurer);
+    public RequiredStatisticsProvider(Map<String, Integer> usualProperties, Map<String, Integer> downLoadProperties) {
+        StatisticsTypeConfigurer usualConfigurer = new StatisticsTypeConfigurer(usualProperties);
+        StatisticsTypeConfigurer downloadConfigurer = new StatisticsTypeConfigurer(downLoadProperties);
+        usualCase = new RequiredStatistics(usualConfigurer);
+        usualCaseForDownload = new RequiredStatistics(downloadConfigurer);
+        withGeneProduct = new RequiredStatisticsWithGeneProduct(usualConfigurer);
+        withGeneProductForDownload = new RequiredStatistics(downloadConfigurer);
     }
 }
