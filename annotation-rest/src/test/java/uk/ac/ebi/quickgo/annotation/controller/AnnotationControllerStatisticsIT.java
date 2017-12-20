@@ -183,9 +183,10 @@ public class AnnotationControllerStatisticsIT {
     public void namesForGoIdsAndTaxonIdsAndEvidenceCodes() throws Exception {
         cacheManager.clearAll();
         final int expectedDistinctValueCount = 1;
-        setExpectationsForSuccessfulOntologyServiceRestResponse(expectedDistinctValueCount);
-        setExpectationsForSuccessfulTaxonomyServiceRestResponse(expectedDistinctValueCount);
-        setExpectationsForSuccessfulOntologyServiceRestResponseForEcoCodes(expectedDistinctValueCount);
+
+        expectGoTermsHaveGoNamesViaRest();
+        expectTaxonIdHasGivenTaxonNameViaRest();
+        expectEcoCodeHasGivenEcoNameViaRest();
 
         assertStatsResponseIncludingNames(expectedDistinctValueCount);
     }
@@ -479,24 +480,6 @@ public class AnnotationControllerStatisticsIT {
 
     private String createId(int idNum) {
         return String.format("A0A%03d", idNum);
-    }
-
-    private void setExpectationsForSuccessfulOntologyServiceRestResponse(int expectedNumber) {
-        for (int i = 0; i < expectedNumber; i++) {
-            expectGoTermsHaveGoNamesViaRest();
-        }
-    }
-
-    private void setExpectationsForSuccessfulTaxonomyServiceRestResponse(int expectedNumber) {
-        for (int i = 0; i < expectedNumber; i++) {
-            expectTaxonIdHasGivenTaxonNameViaRest();
-        }
-    }
-
-    private void setExpectationsForSuccessfulOntologyServiceRestResponseForEcoCodes(int expectedNumber) {
-        for (int i = 0; i < expectedNumber; i++) {
-            expectEcoCodeHasGivenEcoNameViaRest();
-        }
     }
 
     private void expectGoTermsHaveGoNamesViaRest() {
