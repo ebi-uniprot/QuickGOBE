@@ -5,7 +5,6 @@ import uk.ac.ebi.quickgo.model.ontology.go.GOTerm;
 import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -19,43 +18,22 @@ import static uk.ac.ebi.quickgo.common.converter.FlatFieldLeaf.newFlatFieldLeaf;
  * Created 14/12/15
  * @author Edd
  */
-public class GOTermToODocConverter implements Function<Optional<GOTerm>, Optional<OntologyDocument>> {
+public class GOTermToODocConverter implements Function<GOTerm, OntologyDocument> {
 
     private final static GenericTermToODocConverter GENERIC_TERM_TO_DOC_CONVERTER = new GenericTermToODocConverter();
 
-    @Override public Optional<OntologyDocument> apply(Optional<GOTerm> termOptional) {
-        Optional<OntologyDocument> ontologyDocument = GENERIC_TERM_TO_DOC_CONVERTER.apply(termOptional);
-
-        if (termOptional.isPresent() && ontologyDocument.isPresent()) {
-
-            GOTerm term = termOptional.get();
-            OntologyDocument doc = ontologyDocument.get();
-
-            doc.annotationGuidelines = extractAnnGuidelines(term);
-            doc.aspect = term.getAspect() == null ?
-                    null : term.getAspect().text;
-            doc.taxonConstraints = extractTaxonConstraints(term);
-            doc.usage = term.getUsage() == null ?
-                    null : term.getUsage().getText();
-            doc.blacklist = extractBlacklist(term);
-            doc.goDiscussions = extractGoDiscussions(term);
-            doc.proteinComplexes = extractProteinComplexes(term);
-
-            return Optional.of(doc);
-        } else {
-            return Optional.empty();
-        }
-    }
-
-    private List<String> extractChildren(GOTerm goTerm) {
-        if (!isEmpty(goTerm.getChildren())) {
-            return goTerm.getChildren().stream()
-                    .map(
-                            t -> t.getChild().getId())
-                    .collect(Collectors.toList());
-        } else {
-            return null;
-        }
+    @Override public OntologyDocument apply(GOTerm term) {
+        OntologyDocument doc = GENERIC_TERM_TO_DOC_CONVERTER.apply(term);
+        doc.annotationGuidelines = extractAnnGuidelines(term);
+        doc.aspect = term.getAspect() == null ?
+                null : term.getAspect().text;
+        doc.taxonConstraints = extractTaxonConstraints(term);
+        doc.usage = term.getUsage() == null ?
+                null : term.getUsage().getText();
+        doc.blacklist = extractBlacklist(term);
+        doc.goDiscussions = extractGoDiscussions(term);
+        doc.proteinComplexes = extractProteinComplexes(term);
+        return doc;
     }
 
     /*
@@ -83,7 +61,7 @@ public class GOTermToODocConverter implements Function<Optional<GOTerm>, Optiona
             return goTerm.getTaxonConstraints().stream()
                     .map(t -> {
                         FlatFieldBuilder pubmedsAsFlatField = newFlatField();
-                        t.getSourcesIds().stream().forEach(
+                        t.getSourcesIds().forEach(
                                 s -> pubmedsAsFlatField.addField(newFlatFieldLeaf(s))
                         );
 

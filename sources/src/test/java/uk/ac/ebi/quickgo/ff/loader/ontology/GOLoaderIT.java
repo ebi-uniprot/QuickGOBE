@@ -5,12 +5,13 @@ import uk.ac.ebi.quickgo.model.ontology.go.GOTerm;
 import uk.ac.ebi.quickgo.model.ontology.go.GeneOntology;
 
 import java.io.File;
-import java.util.Optional;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import static junit.framework.TestCase.assertEquals;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 
 /**
@@ -34,11 +35,16 @@ public class GOLoaderIT {
     public void canLoadGOInstance() {
         GOSourceFiles sourceFiles = new GOSourceFiles(new File(SOURCE_FILE_DIR));
         GOLoader goLoader = new GOLoader(sourceFiles);
-        Optional<GeneOntology> geneOntologyOptional = goLoader.load();
-        assertThat(geneOntologyOptional.isPresent(), is(true));
+        GeneOntology geneOntology;
+        try {
+            geneOntology = goLoader.load();
+            assertThat(geneOntology, is(notNullValue()));
 
-        //Highly input data specific
-        assertEquals(((GOTerm)geneOntologyOptional.get().getTerm("GO:0003774")).getBlacklist().get(0).getMethodId(), "IPR001609|IPR002928");
+            //Highly input data specific
+            assertEquals(((GOTerm) geneOntology.getTerm("GO:0003774")).getBlacklist().get(0).getMethodId(),
+                    "IPR001609|IPR002928");
+        } catch (Exception e) {
+            assertThat(e, is(nullValue()));
+        }
     }
-
 }

@@ -5,7 +5,10 @@ import uk.ac.ebi.quickgo.model.ontology.go.GOTermBlacklist;
 import uk.ac.ebi.quickgo.model.ontology.go.TaxonConstraint;
 import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -48,9 +51,9 @@ public class GOTermToODocConverterTest {
         when(namedURL.getUrl()).thenReturn("url");
         when(term.getGuidelines()).thenReturn(Collections.singletonList(namedURL));
 
-        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
+        OntologyDocument docConverted = converter.apply(term);
         List<String> extractedAnnGuidelines =
-                extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.annotationGuidelines);
+                extractFieldFromDocument(docConverted, (OntologyDocument doc) -> doc.annotationGuidelines);
 
         assertThat(extractedAnnGuidelines, hasSize(1));
         assertThat(extractedAnnGuidelines, hasItems(containsString("title"), containsString("url")));
@@ -60,9 +63,9 @@ public class GOTermToODocConverterTest {
     public void extractsAnnGuideLinesWhenNotExists() {
         when(term.getGuidelines()).thenReturn(null);
 
-        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
+        OntologyDocument docConverted = converter.apply(term);
         List<String> extractedAnnGuidelines =
-                extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.annotationGuidelines);
+                extractFieldFromDocument(docConverted, (OntologyDocument doc) -> doc.annotationGuidelines);
 
         assertThat(extractedAnnGuidelines, is(nullValue()));
     }
@@ -81,8 +84,8 @@ public class GOTermToODocConverterTest {
 
         when(term.getTaxonConstraints()).thenReturn(Collections.singletonList(taxonConstraint));
 
-        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
-        List<String> extractedTaxonConstraints = extractFieldFromDocument(docOpt,
+        OntologyDocument docConverted = converter.apply(term);
+        List<String> extractedTaxonConstraints = extractFieldFromDocument(docConverted,
                 (OntologyDocument doc) -> doc.taxonConstraints);
 
         assertThat(extractedTaxonConstraints, hasSize(1));
@@ -102,8 +105,8 @@ public class GOTermToODocConverterTest {
     public void extractsTaxonConstraintsWhenNotExists() {
         when(term.getTaxonConstraints()).thenReturn(null);
 
-        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
-        List<String> extractedTaxonConstraints = extractFieldFromDocument(docOpt,
+        OntologyDocument docConverted = converter.apply(term);
+        List<String> extractedTaxonConstraints = extractFieldFromDocument(docConverted,
                 (OntologyDocument doc) -> doc.taxonConstraints);
 
         assertThat(extractedTaxonConstraints, is(nullValue()));
@@ -115,9 +118,8 @@ public class GOTermToODocConverterTest {
         when(term.getUsage()).thenReturn(GOTerm.ETermUsage.E);
         when(term.getAspect()).thenReturn(GOTerm.EGOAspect.C);
 
-        Optional<OntologyDocument> result = converter.apply(Optional.of(term));
-        assertThat(result.isPresent(), is(true));
-        OntologyDocument document = result.get();
+        OntologyDocument result = converter.apply(term);
+        OntologyDocument document = result;
         assertThat(document.aspect, is(GOTerm.EGOAspect.C.text));
         assertThat(document.usage, is(GOTerm.ETermUsage.E.text));
     }
@@ -127,18 +129,10 @@ public class GOTermToODocConverterTest {
         when(term.getUsage()).thenReturn(null);
         when(term.getAspect()).thenReturn(null);
 
-        Optional<OntologyDocument> result = converter.apply(Optional.of(term));
-        assertThat(result.isPresent(), is(true));
-        OntologyDocument document = result.get();
+        OntologyDocument result = converter.apply(term);
+        OntologyDocument document = result;
         assertThat(document.usage, is(nullValue()));
         assertThat(document.aspect, is(nullValue()));
-    }
-
-    // empty optional conversion
-    @Test
-    public void convertsEmptyOptional() {
-        Optional<OntologyDocument> documentOptional = converter.apply(Optional.empty());
-        assertThat(documentOptional.isPresent(), is(false));
     }
 
     // blacklist
@@ -159,8 +153,9 @@ public class GOTermToODocConverterTest {
 
         when(term.getBlacklist()).thenReturn(Collections.singletonList(goTermBlacklist));
 
-        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
-        List<String> extractedBlacklist = extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.blacklist);
+        OntologyDocument docConverted = converter.apply(term);
+        List<String> extractedBlacklist =
+                extractFieldFromDocument(docConverted, (OntologyDocument doc) -> doc.blacklist);
 
         assertThat(extractedBlacklist, hasSize(1));
         assertThat(extractedBlacklist, hasItems(containsString("GO:0007005"),
@@ -181,26 +176,27 @@ public class GOTermToODocConverterTest {
     public void extractsBlacklistWhenNotExists() {
         when(term.getBlacklist()).thenReturn(null);
 
-        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
-        List<String> extractedBlacklist = extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.blacklist);
+        OntologyDocument docConverted = converter.apply(term);
+        List<String> extractedBlacklist =
+                extractFieldFromDocument(docConverted, (OntologyDocument doc) -> doc.blacklist);
 
         assertThat(extractedBlacklist, is(nullValue()));
     }
 
     //GO discussions
     @Test
-    public void extractingGoDiscussionsFromEmptyPlannedChangesListReturnsNull() throws Exception {
+    public void extractingGoDiscussionsFromEmptyPlannedChangesListReturnsNull() {
         when(term.getPlannedChanges()).thenReturn(null);
 
-        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
+        OntologyDocument docConverted = converter.apply(term);
         List<String> extractedGoDiscussions =
-                extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.goDiscussions);
+                extractFieldFromDocument(docConverted, (OntologyDocument doc) -> doc.goDiscussions);
 
         assertThat(extractedGoDiscussions, is(nullValue()));
     }
 
     @Test
-    public void extracts1GoDiscussionsFrom1ElementPlannedChangesList() throws Exception {
+    public void extracts1GoDiscussionsFrom1ElementPlannedChangesList() {
         String title = "Viral Processes";
         String url = "http://wiki.geneontology.org/index.php/Virus_terms";
 
@@ -208,9 +204,9 @@ public class GOTermToODocConverterTest {
 
         when(term.getPlannedChanges()).thenReturn(Collections.singletonList(plannedChange));
 
-        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
+        OntologyDocument docConverted = converter.apply(term);
         List<String> extractedGoDiscussions =
-                extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.goDiscussions);
+                extractFieldFromDocument(docConverted, (OntologyDocument doc) -> doc.goDiscussions);
 
         assertThat(extractedGoDiscussions, hasSize(1));
 
@@ -218,7 +214,7 @@ public class GOTermToODocConverterTest {
     }
 
     @Test
-    public void extracts2GoDiscussionsFrom2ElementPlannedChangesList() throws Exception {
+    public void extracts2GoDiscussionsFrom2ElementPlannedChangesList() {
         String title1 = "Viral Processes";
         String url1 = "http://wiki.geneontology.org/index.php/Virus_terms";
 
@@ -231,20 +227,13 @@ public class GOTermToODocConverterTest {
 
         when(term.getPlannedChanges()).thenReturn(Arrays.asList(plannedChange1, plannedChange2));
 
-        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
+        OntologyDocument docConverted = converter.apply(term);
         List<String> extractedGoDiscussions =
-                extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.goDiscussions);
+                extractFieldFromDocument(docConverted, (OntologyDocument doc) -> doc.goDiscussions);
         assertThat(extractedGoDiscussions, hasSize(2));
 
         assertThat(goDiscussionExists(plannedChange1, extractedGoDiscussions), is(true));
         assertThat(goDiscussionExists(plannedChange2, extractedGoDiscussions), is(true));
-    }
-
-    private boolean goDiscussionExists(GOTerm.NamedURL goDiscussion, Collection<String> expectedGoDiscussions) {
-        return expectedGoDiscussions.stream()
-                .filter(expectedDiscussionText -> expectedDiscussionText.contains(goDiscussion.getTitle()) &&
-                        expectedDiscussionText.contains(goDiscussion.getUrl()))
-                .findFirst().isPresent();
     }
 
     //Protein complexes
@@ -264,9 +253,9 @@ public class GOTermToODocConverterTest {
 
         when(term.getProteinComplexes()).thenReturn(Arrays.asList(proteinComplex1, proteinComplex2));
 
-        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
+        OntologyDocument docConverted = converter.apply(term);
         List<String> extractedProteinComplexes =
-                extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.proteinComplexes);
+                extractFieldFromDocument(docConverted, (OntologyDocument doc) -> doc.proteinComplexes);
 
         assertThat(extractedProteinComplexes, hasSize(2));
 
@@ -274,16 +263,27 @@ public class GOTermToODocConverterTest {
         assertThat(proteinComplexExists(proteinComplex2, extractedProteinComplexes), is(true));
     }
 
-
     @Test
-    public void extractingProteinComplexesFromEmptyProteinComplexesListReturnsNull() throws Exception {
+    public void extractingProteinComplexesFromEmptyProteinComplexesListReturnsNull() {
         when(term.getProteinComplexes()).thenReturn(null);
 
-        Optional<OntologyDocument> docOpt = converter.apply(Optional.of(term));
+        OntologyDocument docConverted = converter.apply(term);
         List<String> extractedProteinComplexes =
-                extractFieldFromDocument(docOpt, (OntologyDocument doc) -> doc.proteinComplexes);
+                extractFieldFromDocument(docConverted, (OntologyDocument doc) -> doc.proteinComplexes);
 
         assertThat(extractedProteinComplexes, is(nullValue()));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void cannotConvertNullGOTerm() {
+        converter.apply(null);
+    }
+
+    private boolean goDiscussionExists(GOTerm.NamedURL goDiscussion, Collection<String> expectedGoDiscussions) {
+        return expectedGoDiscussions.stream()
+                .filter(expectedDiscussionText -> expectedDiscussionText.contains(goDiscussion.getTitle()) &&
+                        expectedDiscussionText.contains(goDiscussion.getUrl()))
+                .findFirst().isPresent();
     }
 
     private boolean proteinComplexExists(GOTerm.ProteinComplex proteinComplex,

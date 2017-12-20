@@ -6,11 +6,7 @@ import uk.ac.ebi.quickgo.ontology.OntologyRestConfig;
 import uk.ac.ebi.quickgo.ontology.OntologyRestProperties;
 import uk.ac.ebi.quickgo.ontology.common.OntologyType;
 import uk.ac.ebi.quickgo.ontology.controller.validation.OBOControllerValidationHelper;
-import uk.ac.ebi.quickgo.ontology.model.About;
-import uk.ac.ebi.quickgo.ontology.model.GOTerm;
-import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
-import uk.ac.ebi.quickgo.ontology.model.SlimTerm;
-import uk.ac.ebi.quickgo.ontology.model.OntologySpecifier;
+import uk.ac.ebi.quickgo.ontology.model.*;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;
 import uk.ac.ebi.quickgo.ontology.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.rest.ParameterException;
@@ -34,10 +30,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.google.common.collect.Sets.newHashSet;
 import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.DEFAULT_SLIM_TRAVERSAL_TYPES;
-import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.GO_GRAPH_TRAVERSAL_TYPES;
-
 import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.DEFAULT_SLIM_TRAVERSAL_TYPES_CSV;
+import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.GO_GRAPH_TRAVERSAL_TYPES;
 
 /**
  * REST controller for accessing GO related information.
@@ -55,7 +51,7 @@ import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.DEFAULT_SLIM
 public class GOController extends OBOController<GOTerm> {
 
     static final String MISSING_SLIM_SET_ERROR_MESSAGE =
-            "Please enter slim-set request parameter: 'ids=<GO_TERM>'";
+            "Please enter slim-set request parameter: 'slimsToIds=<GO_TERM>'";
     private final MetaDataProvider metaDataProvider;
     private static final OntologySpecifier GO_SPECIFIER = new OntologySpecifier(OntologyType.GO,
                                                                                 GO_GRAPH_TRAVERSAL_TYPES);
@@ -93,7 +89,7 @@ public class GOController extends OBOController<GOTerm> {
      * Gets slimming information for the provided slim-set, where the slims can be reached only via the
      * provided relationships.
      *
-     * @param ids the slim-set
+     * @param slimsToIds the slim-set
      * @param relations the relationships over which the slims can be reached
      * @return a response containing the id/slim-id mappings
      */
@@ -103,13 +99,16 @@ public class GOController extends OBOController<GOTerm> {
             .APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<SlimTerm>> findSlims(
             @ApiParam(value = "Comma-separated term IDs forming the 'slim-set'", required = true)
-            @RequestParam(value = "ids", required = false) String ids,
+            @RequestParam(value = "slimsToIds", required = false) String slimsToIds,
+            @ApiParam(value = "Comma-separated term IDs from which slimming information is applied.")
+            @RequestParam(value = "slimsFromIds", required = false) String slimsFromIds,
             @ApiParam(value = "The relationships over which the slimming information is computed")
             @RequestParam(value = "relations", defaultValue = DEFAULT_SLIM_TRAVERSAL_TYPES_CSV) String relations) {
 
-        checkSlimSetIsSet(ids);
+        checkSlimSetIsSet(slimsToIds);
         return getResultsResponse(ontologyService.findSlimmedInfoForSlimmedTerms(
-                validationHelper.validateCSVIds(ids),
+                newHashSet(validationHelper.validateCSVIds(slimsFromIds)),
+                validationHelper.validateCSVIds(slimsToIds),
                 asOntologyRelationTypeArray(validationHelper.validateRelationTypes(relations, DEFAULT_SLIM_TRAVERSAL_TYPES))));
     }
 

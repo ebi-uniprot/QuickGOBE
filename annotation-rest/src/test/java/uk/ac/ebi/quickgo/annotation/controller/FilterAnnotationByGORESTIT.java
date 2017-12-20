@@ -32,7 +32,7 @@ import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.*;
  */
 public class FilterAnnotationByGORESTIT extends AbstractFilterAnnotationByOntologyRESTIT {
     private static final String GO_DESCENDANTS_RESOURCE_FORMAT = "/ontology/go/terms/%s/descendants?relations=%s";
-    private static final String GO_SLIM_RESOURCE_FORMAT = "/ontology/go/slim?ids=%s&relations=%s";
+    private static final String GO_SLIM_RESOURCE_FORMAT = "/ontology/go/slim?slimsToIds=%s&relations=%s";
     private static final String STATS_RESOURCE = "/annotation/stats";
     private static final String STATS_GROUP_NAME = "groupName";
     private static final String ANNOTATION_GROUP_NAME = "annotation";
@@ -293,12 +293,6 @@ public class FilterAnnotationByGORESTIT extends AbstractFilterAnnotationByOntolo
             List<String> usageRelations,
             List<List<String>> slims) {
 
-//        expectRestCallHasValues(
-//                GO_SLIM_RESOURCE_FORMAT,
-//                termIds,
-//                usageRelations,
-//                slims,
-//                OntologyRelatives.Result::setSlimsTo);
         String slimTermsCSV = slims.stream()
                 .filter(Objects::nonNull)
                 .flatMap(Collection::stream)
@@ -313,6 +307,7 @@ public class FilterAnnotationByGORESTIT extends AbstractFilterAnnotationByOntolo
                         GO_SLIM_RESOURCE_FORMAT,
                         slimTermsCSV,
                         relationsCSV),
-                constructResponseObject(termIds, slims, OntologyRelatives.Result::setSlimsTo));
+                constructResponseObject(termIds, OntologyRelatives.Result::setSlimsFromId,
+                        slims, OntologyRelatives.Result::setSlimsToIds));
     }
 }

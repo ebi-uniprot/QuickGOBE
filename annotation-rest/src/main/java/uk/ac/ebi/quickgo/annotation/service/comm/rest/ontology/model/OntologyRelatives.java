@@ -13,7 +13,7 @@ import java.util.List;
  * </ul>
  *
  * Currently, this model captures the parts reached by the JSON path expressions, "$.results.descendants" or
- * "$.results.slimsTo".
+ * "$.results.slimsToIds".
  *
  * Created 09/08/16
  * @author Edd
@@ -41,15 +41,24 @@ public class OntologyRelatives implements ResponseType {
         public Result() {}
 
         private String id;
-        private List<String> slimsTo;
+        private String slimsFromId;
+        private List<String> slimsToIds;
         private List<String> descendants;
 
-        public List<String> getSlimsTo() {
-            return slimsTo;
+        public String getSlimsFromId() {
+            return slimsFromId;
         }
 
-        public void setSlimsTo(List<String> slimsTo) {
-            this.slimsTo = slimsTo;
+        public void setSlimsFromId(String slimsFromId) {
+            this.slimsFromId = slimsFromId;
+        }
+
+        public List<String> getSlimsToIds() {
+            return slimsToIds;
+        }
+
+        public void setSlimsToIds(List<String> slimsToIds) {
+            this.slimsToIds = slimsToIds;
         }
 
         public List<String> getDescendants() {
@@ -71,7 +80,8 @@ public class OntologyRelatives implements ResponseType {
         @Override public String toString() {
             return "Result{" +
                     "id='" + id + '\'' +
-                    ", slimsTo=" + slimsTo +
+                    ", slimsFromId='" + slimsFromId + '\'' +
+                    ", slimsToIds=" + slimsToIds +
                     ", descendants=" + descendants +
                     '}';
         }

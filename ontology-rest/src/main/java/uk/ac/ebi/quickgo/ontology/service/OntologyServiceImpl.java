@@ -7,7 +7,6 @@ import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
 import uk.ac.ebi.quickgo.ontology.model.SlimTerm;
-import uk.ac.ebi.quickgo.ontology.model.*;
 import uk.ac.ebi.quickgo.ontology.model.graph.AncestorGraph;
 import uk.ac.ebi.quickgo.ontology.model.graph.AncestorVertex;
 import uk.ac.ebi.quickgo.ontology.service.converter.OntologyDocConverter;
@@ -19,7 +18,6 @@ import uk.ac.ebi.quickgo.rest.search.results.PageInfo;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import com.google.common.base.Preconditions;
-import java.util.*;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
@@ -147,14 +145,16 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
     }
 
     @Override
-    public List<SlimTerm> findSlimmedInfoForSlimmedTerms(List<String> slimTerms, OntologyRelationType... relationTypes) {
+    public List<SlimTerm> findSlimmedInfoForSlimmedTerms(Set<String> slimsFromTerms, List<String> slimsToTerms,
+            OntologyRelationType... relationTypes) {
         TermSlimmer slimmer = TermSlimmer
-                .createSlims(OntologyType.valueOf(ontologyType), ontologyTraversal, slimTerms, relationTypes);
+                .createSlims(OntologyType.valueOf(ontologyType), ontologyTraversal, slimsToTerms, relationTypes);
 
         return slimmer.getSlimmedTermsMap().entrySet().stream()
                 .filter(this::doesNotSlimToOnlyItself)
                 .map(Map.Entry::getKey)
-                .map(id -> new SlimTerm(id, slimmer.findSlims(id)))
+                .filter(term -> slimsFromTerms.isEmpty() || slimsFromTerms.contains(term))
+                .map(id -> new SlimTerm(id, slimmer.findSlimmedToTerms(id)))
                 .collect(Collectors.toList());
     }
 

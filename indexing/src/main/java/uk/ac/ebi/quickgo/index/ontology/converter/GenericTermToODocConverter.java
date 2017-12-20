@@ -7,10 +7,11 @@ import uk.ac.ebi.quickgo.model.ontology.generic.Synonym;
 import uk.ac.ebi.quickgo.model.ontology.generic.TermRelation;
 import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
 
+import com.google.common.base.Preconditions;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -24,36 +25,31 @@ import static org.apache.commons.collections.CollectionUtils.isEmpty;
  * Created 14/12/15
  * @author Edd
  */
-public class GenericTermToODocConverter implements Function<Optional<? extends GenericTerm>,
-        Optional<OntologyDocument>> {
+public class GenericTermToODocConverter implements Function<GenericTerm,
+        OntologyDocument> {
 
-    @Override public Optional<OntologyDocument> apply(Optional<? extends GenericTerm> termOptional) {
-        if (termOptional.isPresent()) {
-            OntologyDocument doc = new OntologyDocument();
-            GenericTerm term = termOptional.get();
-            doc.id = term.getId();
-            doc.isObsolete = term.isObsolete();
-            doc.comment = term.getComment();
-            doc.definition = term.getDefinition();
-            doc.definitionXrefs = extractDefinitionXrefs(term);
-            doc.history = extractHistory(term);
-            doc.name = term.getName();
-            doc.ontologyType = term.getOntologyType();
-            doc.secondaryIds = extractSecondaries(term);
-            doc.subsets = extractSubsets(term);
-            doc.synonyms = extractSynonyms(term);
-            doc.synonymNames = extractSynonymNames(term);
-            doc.xrefs = extractXRefs(term);
-            doc.xRelations = extractXRelationsAsList(term);
-
-            doc.replaces = extractReplaces(term);
-            doc.replacements = extractReplacements(term);
-            doc.credits = extractCredits(term);
-
-            return Optional.of(doc);
-        } else {
-            return Optional.empty();
-        }
+    @Override public OntologyDocument apply(GenericTerm term) {
+        Preconditions.checkArgument(Objects.nonNull(term), "The Generic Term instance applied to " +
+                "GenericTermToODocConverter cannot be null");
+        OntologyDocument doc = new OntologyDocument();
+        doc.id = term.getId();
+        doc.isObsolete = term.isObsolete();
+        doc.comment = term.getComment();
+        doc.definition = term.getDefinition();
+        doc.definitionXrefs = extractDefinitionXrefs(term);
+        doc.history = extractHistory(term);
+        doc.name = term.getName();
+        doc.ontologyType = term.getOntologyType();
+        doc.secondaryIds = extractSecondaries(term);
+        doc.subsets = extractSubsets(term);
+        doc.synonyms = extractSynonyms(term);
+        doc.synonymNames = extractSynonymNames(term);
+        doc.xrefs = extractXRefs(term);
+        doc.xRelations = extractXRelationsAsList(term);
+        doc.replaces = extractReplaces(term);
+        doc.replacements = extractReplacements(term);
+        doc.credits = extractCredits(term);
+        return doc;
     }
 
     private List<String> extractCredits(GenericTerm term) {

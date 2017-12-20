@@ -36,20 +36,6 @@ public class OntologyGraphicsSourceLoader {
         loadOntologies();
     }
 
-    private void loadOntologies() {
-        new GOLoader(new GOSourceFiles(requireNonNull(sourceDir)))
-                .load()
-                .map(go -> this.geneOntology = go);
-
-        new ECOLoader(new ECOSourceFiles(requireNonNull(sourceDir)))
-                .load()
-                .map(eco -> evidenceCodeOntology = eco);
-
-        if (isLoaded()) {
-            LOGGER.warn("Could not load ontologies correctly. No graphics can be provided.");
-        }
-    }
-
     public GeneOntology getGeneOntology() {
         return geneOntology;
     }
@@ -60,5 +46,19 @@ public class OntologyGraphicsSourceLoader {
 
     public boolean isLoaded() {
         return geneOntology != null && evidenceCodeOntology != null;
+    }
+
+    private void loadOntologies() {
+        try {
+            geneOntology = new GOLoader(new GOSourceFiles(requireNonNull(sourceDir))).load();
+        } catch (Exception e) {
+            LOGGER.warn("Could not load Gene Ontology correctly. No graphics can be provided.");
+        }
+
+        try {
+            evidenceCodeOntology = new ECOLoader(new ECOSourceFiles(requireNonNull(sourceDir))).load();
+        } catch (Exception e) {
+            LOGGER.warn("Could not load ECO Ontology correctly. No graphics can be provided.");
+        }
     }
 }
