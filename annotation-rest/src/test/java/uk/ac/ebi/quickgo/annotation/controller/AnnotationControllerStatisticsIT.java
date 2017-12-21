@@ -97,8 +97,6 @@ public class AnnotationControllerStatisticsIT {
     @Autowired
     private AnnotationRepository repository;
 
-    private StatsSetupHelper statsSetupHelper;
-
     @Before
     public void setup() {
         repository.deleteAll();
@@ -109,7 +107,6 @@ public class AnnotationControllerStatisticsIT {
         mockRestServiceServer = MockRestServiceServer.createServer((RestTemplate) restOperations);
         savedDocs = createGenericDocs(NUMBER_OF_GENERIC_DOCS);
         repository.save(savedDocs);
-        statsSetupHelper = new StatsSetupHelper(mockRestServiceServer);
     }
 
     @Test
@@ -170,7 +167,7 @@ public class AnnotationControllerStatisticsIT {
     public void namesForGoIdsAndTaxonIdsAndEvidenceCodes() throws Exception {
         cacheManager.clearAll();
         final int expectedDistinctValueCount = 1;
-
+        StatsSetupHelper statsSetupHelper = new StatsSetupHelper(mockRestServiceServer);
         statsSetupHelper.expectGoTermHasNameViaRest(GO_ID, GO_TERM_NAME);
         statsSetupHelper.expectTaxonIdHasNameViaRest(String.valueOf(TAXON_ID), TAXON_NAME);
         statsSetupHelper.expectEcoCodeHasNameViaRest(ECO_ID, ECO_TERM_NAME, expectedDistinctValueCount);
@@ -442,9 +439,9 @@ public class AnnotationControllerStatisticsIT {
     private void assertStatsResponseIncludingNames(int expectedDistinctValueCount) throws Exception {
         ResultActions response = mockMvc.perform(get(STATS_ENDPOINT));
 
-        final String[] goNames = statsSetupHelper.expectedNames(expectedDistinctValueCount, GO_TERM_NAME);
-        final String[] taxonNames = statsSetupHelper.expectedNames(expectedDistinctValueCount, TAXON_TERM_NAME);
-        final String[] ecoNames = statsSetupHelper.expectedNames(expectedDistinctValueCount, ECO_TERM_NAME);
+        final String[] goNames = expectedNames(expectedDistinctValueCount, GO_TERM_NAME);
+        final String[] taxonNames = expectedNames(expectedDistinctValueCount, TAXON_TERM_NAME);
+        final String[] ecoNames = expectedNames(expectedDistinctValueCount, ECO_TERM_NAME);
 
         response.andDo(print())
                 .andExpect(namesInTypeWithinGroup(ANNOTATION_GROUP, GO_ID_STATS_FIELD, goNames))
@@ -467,5 +464,12 @@ public class AnnotationControllerStatisticsIT {
 
     private String createId(int idNum) {
         return String.format("A0A%03d", idNum);
+    }
+
+    private String[] expectedNames(int expectedSize, String source) {
+        String[] names = new String[expectedSize];
+        IntStream.range(0, names.length)
+                .forEach(i -> names[i] = source);
+        return names;
     }
 }
