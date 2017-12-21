@@ -1,11 +1,13 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
 import uk.ac.ebi.quickgo.annotation.AnnotationREST;
+import uk.ac.ebi.quickgo.annotation.IdGeneratorUtil;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
 import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.IntStream;
 import net.sf.ehcache.CacheManager;
 import org.junit.Before;
@@ -70,6 +72,8 @@ public class AnnotationControllerStatisticsDownloadIT {
     private static final String GO_ID_STATS_FIELD = "goId";
     private static final String TAXON_NAME = "taxon name: " + 12345;
     private static final String TAXON_ID = "12345";
+    private static final Function<Integer, String> toId = i -> IdGeneratorUtil.createGoId(i);
+    private static final Function<Integer, String> toName = i -> IdGeneratorUtil.createGoId(i) + " name";
 
     @Autowired
     CacheManager cacheManager;
@@ -93,7 +97,7 @@ public class AnnotationControllerStatisticsDownloadIT {
         setupHelper = new StatsSetupHelper(mockRestServiceServer);
         goNames = new String[NUMBER_OF_GENERIC_DOCS];
         IntStream.range(0, goNames.length)
-                .forEach(i -> goNames[i] = setupHelper.goName(i));
+                .forEach(i -> goNames[i] = toName.apply(i));
         cacheManager.clearAll();
     }
 
@@ -148,7 +152,7 @@ public class AnnotationControllerStatisticsDownloadIT {
 
     @Test
     public void downloadStatisticsSuccessfulAfterFailedToRetrieveTaxonNames() throws Exception {
-        setupHelper.expectGoTermHasNameViaRest(NUMBER_OF_GENERIC_DOCS);
+        setupHelper.expectGoTermHasNameViaRest(NUMBER_OF_GENERIC_DOCS, toId, toName);
         setExpectationsForUnsuccessfulTaxonomyServiceRestResponse();
         setupHelper.expectEcoCodeHasNameViaRest(ECO_ID, ECO_TERM_NAME, NUMBER_OF_GENERIC_DOCS);
 
@@ -168,7 +172,7 @@ public class AnnotationControllerStatisticsDownloadIT {
 
     @Test
     public void downloadStatisticsSuccessfulAfterFailedToRetrieveECONames() throws Exception {
-        setupHelper.expectGoTermHasNameViaRest(NUMBER_OF_GENERIC_DOCS);
+        setupHelper.expectGoTermHasNameViaRest(NUMBER_OF_GENERIC_DOCS, toId, toName);
         setupHelper.expectTaxonIdHasNameViaRest(TAXON_ID, TAXON_NAME);
         setExpectationsForUnsuccessfulOntologyServiceRestResponseForEcoCodes();
 
@@ -185,14 +189,14 @@ public class AnnotationControllerStatisticsDownloadIT {
     }
 
     private void setupSuccessfullyReceivingRestNames() {
-        setupHelper.expectGoTermHasNameViaRest(NUMBER_OF_GENERIC_DOCS);
+        setupHelper.expectGoTermHasNameViaRest(NUMBER_OF_GENERIC_DOCS, toId, toName);
         setupHelper.expectTaxonIdHasNameViaRest(TAXON_ID, TAXON_NAME);
         setupHelper.expectEcoCodeHasNameViaRest(ECO_ID, ECO_TERM_NAME, NUMBER_OF_GENERIC_DOCS);
     }
 
     private void setExpectationsForUnsuccessfulOntologyServiceRestResponse() {
         for (int k = 0; k < NO_OF_STATISTICS_GROUPS; k++) {
-            setupHelper.expectFailureToGetNameForGoTermViaRest(NUMBER_OF_GENERIC_DOCS);
+            setupHelper.expectFailureToGetNameForGoTermViaRest(NUMBER_OF_GENERIC_DOCS, toId);
         }
     }
 

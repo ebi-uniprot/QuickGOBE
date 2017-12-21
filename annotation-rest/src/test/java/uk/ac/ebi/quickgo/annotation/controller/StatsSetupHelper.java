@@ -8,6 +8,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.IntStream;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -42,9 +43,9 @@ public class StatsSetupHelper {
         this.expectResultViaOntologyRest(GO_TERM_RESOURCE_FORMAT, id, name);
     }
 
-    void expectGoTermHasNameViaRest(int number) {
+    void expectGoTermHasNameViaRest(int number, Function<Integer, String> toId, Function<Integer, String> toName) {
         IntStream.range(0, number)
-                .forEach(i -> expectGoTermHasNameViaRest(goId(i), goName(i)));
+                .forEach(i -> expectGoTermHasNameViaRest(toId.apply(i), toName.apply(i)));
     }
 
     void expectEcoCodeHasNameViaRest(String ecoId, String ecoTermName, int number) {
@@ -60,18 +61,10 @@ public class StatsSetupHelper {
         expectRestCall(buildResource(ECO_TERM_RESOURCE_FORMAT, id), withStatus(HttpStatus.NOT_FOUND));
     }
 
-    void expectFailureToGetNameForGoTermViaRest(int number) {
+    void expectFailureToGetNameForGoTermViaRest(int number, Function<Integer, String> toId) {
         IntStream.range(0, number)
-                .mapToObj(i -> buildResource(GO_TERM_RESOURCE_FORMAT, goId(i)))
+                .mapToObj(i -> buildResource(GO_TERM_RESOURCE_FORMAT, toId.apply(i)))
                 .forEach(r -> expectRestCall(r, withStatus(HttpStatus.NOT_FOUND)));
-    }
-
-    private String goId(int id) {
-        return IdGeneratorUtil.createGoId(id);
-    }
-
-    String goName(int id) {
-        return IdGeneratorUtil.createGoId(id) + " name";
     }
 
     void expectTaxonIdHasNameViaRest(String id, String name) {
