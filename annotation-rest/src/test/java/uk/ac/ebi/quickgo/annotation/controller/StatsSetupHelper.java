@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
+import uk.ac.ebi.quickgo.annotation.IdGeneratorUtil;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.BasicOntology;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.BasicTaxonomyNode;
 
@@ -13,8 +14,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.client.ResponseCreator;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static java.util.Collections.singletonList;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
@@ -36,34 +35,6 @@ public class StatsSetupHelper {
     StatsSetupHelper(
             MockRestServiceServer mockRestServiceServer) {
         this.mockRestServiceServer = mockRestServiceServer;
-    }
-
-    String constructOntologyTermsResponseObject(List<String> termIds, List<String> termNames) {
-        checkArgument(termIds != null, "termIds cannot be null");
-        checkArgument(termNames != null, "termIds cannot be null");
-        checkArgument(termIds.size() == termNames.size(),
-                "termIds and termNames lists must be the same size");
-
-        BasicOntology response = new BasicOntology();
-        List<BasicOntology.Result> results = new ArrayList<>();
-
-        for (int i = 0; i < termIds.size(); i++) {
-            BasicOntology.Result result = new BasicOntology.Result();
-            result.setId(termIds.get(i));
-            result.setName(termNames.get(i));
-            results.add(result);
-        }
-
-        response.setResults(results);
-        return getResponseAsString(response);
-    }
-
-    <T> String getResponseAsString(T response) {
-        try {
-            return dtoMapper.writeValueAsString(response);
-        } catch (JsonProcessingException e) {
-            throw new IllegalStateException("Problem constructing mocked GO term REST response:", e);
-        }
     }
 
     void expectRestCallSuccess(String url, String response) {
@@ -97,6 +68,36 @@ public class StatsSetupHelper {
                 .andRespond(response);
     }
 
+    void expectGoTermHasNameViaRest(String id, String name) {
+        this.expectIdHasGivenResultViaOntologyRest(GO_TERM_RESOURCE_FORMAT, id, name);
+    }
+
+    void expectGoTermHasNameViaRest(int number) {
+        for (int i = 0; i < number; i++) {
+            this.expectIdHasGivenResultViaOntologyRest(GO_TERM_RESOURCE_FORMAT, goId(i), goName(i));
+        }
+    }
+
+    void expectEcoCodeHasNameViaRest(String ecoId, String ecoTermName, int number) {
+        for (int i = 0; i < number; i++) {
+            this.expectIdHasGivenResultViaOntologyRest(ECO_TERM_RESOURCE_FORMAT, ecoId, ecoTermName);
+        }
+    }
+
+    String goId(int id) {
+        return IdGeneratorUtil.createGoId(id);
+    }
+
+    String goName(int id) {
+        return IdGeneratorUtil.createGoId(id) + " name";
+    }
+
+    void expectTaxonIdHasNameViaRest(String id, String name) {
+        String responseAsString = constructTaxonomyTermsResponseObject(name);
+        this.expectRestCallSuccess(
+                this.buildResource(TAXONOMY_ID_NODE_RESOURCE_FORMAT, id), responseAsString);
+    }
+
     String[] expectedNames(int expectedSize, String source) {
         String[] names = new String[expectedSize];
         IntStream.range(0, names.length)
@@ -104,7 +105,30 @@ public class StatsSetupHelper {
         return names;
     }
 
-    String buildResource(String format, String... arguments) {
+    private void expectIdHasGivenResultViaOntologyRest(String resourceFormat, String id, String result) {
+        this.expectRestCallSuccess(
+                this.buildResource(resourceFormat, id),
+                this.constructOntologyTermsResponseObject(id, result));
+    }
+
+    private String constructOntologyTermsResponseObject(String id, String termName) {
+        BasicOntology response = new BasicOntology();
+        List<BasicOntology.Result> results = new ArrayList<>();
+        BasicOntology.Result result = new BasicOntology.Result();
+        result.setId(id);
+        result.setName(termName);
+        results.add(result);
+        response.setResults(results);
+        return getResponseAsString(response);
+    }
+
+    private String constructTaxonomyTermsResponseObject(String name) {
+        BasicTaxonomyNode expectedResponse = new BasicTaxonomyNode();
+        expectedResponse.setScientificName(name);
+        return this.getResponseAsString(expectedResponse);
+    }
+
+    private String buildResource(String format, String... arguments) {
         int requiredArgsCount = format.length() - format.replace("%", "").length();
         List<String> args = new ArrayList<>();
         for (int i = 0; i < requiredArgsCount; i++) {
@@ -117,27 +141,11 @@ public class StatsSetupHelper {
         return String.format(format, args.toArray());
     }
 
-    void expectGoTermHasNameViaRest(String termId, String termName) {
-        this.expectIdHasGivenResultViaOntologyRest(GO_TERM_RESOURCE_FORMAT, termId, termName);
-    }
-
-    void expectEcoCodeHasNameViaRest(String ecoId, String ecoTermName) {
-        this.expectIdHasGivenResultViaOntologyRest(ECO_TERM_RESOURCE_FORMAT, ecoId,
-                ecoTermName);
-    }
-
-    private void expectIdHasGivenResultViaOntologyRest(String
-            resourceFormat, String id, String result) {
-        this.expectRestCallSuccess(
-                this.buildResource(resourceFormat, id),
-                this.constructOntologyTermsResponseObject(singletonList(id), singletonList(result)));
-    }
-
-    void expectTaxonIdHasNameViaRest(String id, String name) {
-        BasicTaxonomyNode expectedResponse = new BasicTaxonomyNode();
-        expectedResponse.setScientificName(name);
-        String responseAsString = this.getResponseAsString(expectedResponse);
-        this.expectRestCallSuccess(
-                this.buildResource(TAXONOMY_ID_NODE_RESOURCE_FORMAT, id), responseAsString);
+    private <T> String getResponseAsString(T response) {
+        try {
+            return dtoMapper.writeValueAsString(response);
+        } catch (JsonProcessingException e) {
+            throw new IllegalStateException("Problem constructing mocked GO term REST response:", e);
+        }
     }
 }
