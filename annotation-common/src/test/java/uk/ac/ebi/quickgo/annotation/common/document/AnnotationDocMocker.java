@@ -26,7 +26,7 @@ public class AnnotationDocMocker {
     public static final String GO_ID = "GO:0003824";
     public static final String ECO_ID = "ECO:0000256";
     public static final String REFERENCE = "GO_REF:0000002";
-    public static final int TAXON_ID = 12345;
+    public static final String TAXON_ID = "12345";
     public static final String GO_ASPECT = "cellular_component";
     public static final String EXTENSION_DB1 = "NCBI_gi";
     public static final String EXTENSION_DB2 = "Cl";
@@ -84,7 +84,7 @@ public class AnnotationDocMocker {
         doc.extensions = EXTENSIONS;
         doc.symbol = SYMBOL;
         doc.geneProductType = OBJECT_TYPE;
-        doc.taxonId = TAXON_ID;
+        doc.taxonId = Integer.parseInt(TAXON_ID);
         doc.taxonAncestors = TAXON_ANCESTORS;
         doc.targetSets = TARGET_SET;
         doc.geneProductSubset = GP_SUBSET;
