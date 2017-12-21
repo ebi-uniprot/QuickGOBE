@@ -39,9 +39,6 @@ import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.GO_USAGE_PARAM;
 import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.TAXON_ID_PARAM;
 import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.TAXON_USAGE_PARAM;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.*;
-import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.ECO_ID;
-import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.GO_ID;
-import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.TAXON_ID;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.contentTypeToBeJson;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.totalNumOfResults;
 import static uk.ac.ebi.quickgo.annotation.controller.StatsResponseVerifier.keysInTypeWithinGroup;
@@ -105,7 +102,7 @@ public class AnnotationControllerStatisticsIT {
                 webAppContextSetup(webApplicationContext)
                 .build();
         mockRestServiceServer = MockRestServiceServer.createServer((RestTemplate) restOperations);
-        savedDocs = createGenericDocs(NUMBER_OF_GENERIC_DOCS);
+        savedDocs = createGenericDocs();
         repository.save(savedDocs);
     }
 
@@ -456,8 +453,8 @@ public class AnnotationControllerStatisticsIT {
         return elements.toArray(new String[0]);
     }
 
-    private List<AnnotationDocument> createGenericDocs(int n) {
-        return IntStream.range(0, n)
+    private List<AnnotationDocument> createGenericDocs() {
+        return IntStream.range(0, AnnotationControllerStatisticsIT.NUMBER_OF_GENERIC_DOCS)
                 .mapToObj(i -> createAnnotationDoc(createId(i)))
                 .collect(Collectors.toList());
     }
