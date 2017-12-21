@@ -102,9 +102,7 @@ public class AnnotationControllerStatisticsDownloadIT {
 
     @Test
     public void canDownloadInExcelFormat() throws Exception {
-        setupHelper.expectGoTermHasNameViaRest(NUMBER_OF_GENERIC_DOCS);
-        setupHelper.expectTaxonIdHasNameViaRest(TAXON_ID, TAXON_NAME);
-        setupHelper.expectEcoCodeHasNameViaRest(ECO_ID, ECO_TERM_NAME, NUMBER_OF_GENERIC_DOCS);
+        setupSuccessfullyReceivingRestNames();
 
         ResultActions response = mockMvc.perform(get(DOWNLOAD_STATISTICS_SEARCH_URL).header(ACCEPT, EXCEL_MEDIA_TYPE));
 
@@ -113,9 +111,7 @@ public class AnnotationControllerStatisticsDownloadIT {
 
     @Test
     public void canDownloadInJsonFormat() throws Exception {
-        setupHelper.expectGoTermHasNameViaRest(NUMBER_OF_GENERIC_DOCS);
-        setupHelper.expectTaxonIdHasNameViaRest(TAXON_ID, TAXON_NAME);
-        setupHelper.expectEcoCodeHasNameViaRest(ECO_ID, ECO_TERM_NAME, NUMBER_OF_GENERIC_DOCS);
+        setupSuccessfullyReceivingRestNames();
 
         ResultActions response = mockMvc.perform(get(DOWNLOAD_STATISTICS_SEARCH_URL).header(ACCEPT, JSON_MEDIA_TYPE));
 
@@ -189,6 +185,12 @@ public class AnnotationControllerStatisticsDownloadIT {
                 .andExpect(namesInTypeWithinGroup(GENE_PRODUCT_GROUP, TAXON_ID_STATS_FIELD, new String[]{TAXON_NAME}))
                 .andExpect(namesInTypeWithinGroup(ANNOTATION_GROUP, EVIDENCE_CODE_STATS_FIELD, new String[]{null}))
                 .andExpect(namesInTypeWithinGroup(GENE_PRODUCT_GROUP, EVIDENCE_CODE_STATS_FIELD, new String[]{null}));
+    }
+
+    private void setupSuccessfullyReceivingRestNames() {
+        setupHelper.expectGoTermHasNameViaRest(NUMBER_OF_GENERIC_DOCS);
+        setupHelper.expectTaxonIdHasNameViaRest(TAXON_ID, TAXON_NAME);
+        setupHelper.expectEcoCodeHasNameViaRest(ECO_ID, ECO_TERM_NAME, NUMBER_OF_GENERIC_DOCS);
     }
 
     private void setExpectationsForUnsuccessfulOntologyServiceRestResponse() {
