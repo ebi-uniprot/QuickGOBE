@@ -27,42 +27,25 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 public class StatsSetupHelper {
     private static final String GO_TERM_RESOURCE_FORMAT = "/ontology/go/terms/%s";
     private static final String ECO_TERM_RESOURCE_FORMAT = "/ontology/eco/terms/%s";
-    private static final String TAXONOMY_ID_NODE_RESOURCE_FORMAT = "/proteins/api/taxonomy/id/%s/node";
+    private static final String TAXONOMY_RESOURCE_FORMAT = "/proteins/api/taxonomy/id/%s/node";
     private static final String BASE_URL = "https://localhost";
-    private ObjectMapper dtoMapper = new ObjectMapper();
-    private MockRestServiceServer mockRestServiceServer;
+    private final ObjectMapper dtoMapper = new ObjectMapper();
+    private final MockRestServiceServer mockRestServiceServer;
 
-    StatsSetupHelper(
-            MockRestServiceServer mockRestServiceServer) {
+    StatsSetupHelper(MockRestServiceServer mockRestServiceServer) {
         this.mockRestServiceServer = mockRestServiceServer;
     }
 
-    void expectRestCall(String url, ResponseCreator response) {
-        mockRestServiceServer.expect(
-                requestTo(BASE_URL + url))
-                .andExpect(method(HttpMethod.GET))
-                .andRespond(response);
-    }
-
     void expectGORestCallResponse(String id, ResponseCreator response) {
-        mockRestServiceServer.expect(
-                requestTo(BASE_URL + this.buildResource(GO_TERM_RESOURCE_FORMAT, id)))
-                .andExpect(method(HttpMethod.GET))
-                .andRespond(response);
+        expectRestCall(buildResource(GO_TERM_RESOURCE_FORMAT, id), response);
     }
 
     void expectTaxonomyRestCallResponse(String id, ResponseCreator response) {
-        mockRestServiceServer.expect(
-                requestTo(BASE_URL + this.buildResource(TAXONOMY_ID_NODE_RESOURCE_FORMAT, id)))
-                .andExpect(method(HttpMethod.GET))
-                .andRespond(response);
+        expectRestCall(buildResource(TAXONOMY_RESOURCE_FORMAT, id), response);
     }
 
     void expectEcoRestCallResponse(String id, ResponseCreator response) {
-        mockRestServiceServer.expect(
-                requestTo(BASE_URL + this.buildResource(ECO_TERM_RESOURCE_FORMAT, id)))
-                .andExpect(method(HttpMethod.GET))
-                .andRespond(response);
+        expectRestCall(buildResource(ECO_TERM_RESOURCE_FORMAT, id), response);
     }
 
     void expectGoTermHasNameViaRest(String id, String name) {
@@ -71,13 +54,13 @@ public class StatsSetupHelper {
 
     void expectGoTermHasNameViaRest(int number) {
         for (int i = 0; i < number; i++) {
-            this.expectIdHasGivenResultViaOntologyRest(GO_TERM_RESOURCE_FORMAT, goId(i), goName(i));
+            expectIdHasGivenResultViaOntologyRest(GO_TERM_RESOURCE_FORMAT, goId(i), goName(i));
         }
     }
 
     void expectEcoCodeHasNameViaRest(String ecoId, String ecoTermName, int number) {
         for (int i = 0; i < number; i++) {
-            this.expectIdHasGivenResultViaOntologyRest(ECO_TERM_RESOURCE_FORMAT, ecoId, ecoTermName);
+            expectIdHasGivenResultViaOntologyRest(ECO_TERM_RESOURCE_FORMAT, ecoId, ecoTermName);
         }
     }
 
@@ -91,8 +74,8 @@ public class StatsSetupHelper {
 
     void expectTaxonIdHasNameViaRest(String id, String name) {
         String responseAsString = constructTaxonomyTermsResponseObject(name);
-        this.expectRestCall(
-                this.buildResource(TAXONOMY_ID_NODE_RESOURCE_FORMAT, id), withSuccess(responseAsString, MediaType
+        expectRestCall(
+                buildResource(TAXONOMY_RESOURCE_FORMAT, id), withSuccess(responseAsString, MediaType
                         .APPLICATION_JSON));
     }
 
@@ -103,14 +86,20 @@ public class StatsSetupHelper {
         return names;
     }
 
-    private void expectIdHasGivenResultViaOntologyRest(String resourceFormat, String id, String result) {
+    private void expectIdHasGivenResultViaOntologyRest(String resourceFormat, String id, String response) {
         this.expectRestCall(
-                this.buildResource(resourceFormat, id),
-                withSuccess(this.constructOntologyTermsResponseObject(id, result), MediaType
-                        .APPLICATION_JSON));
+                buildResource(resourceFormat, id),
+                withSuccess(ontologyResponse(id, response), MediaType.APPLICATION_JSON));
     }
 
-    private String constructOntologyTermsResponseObject(String id, String termName) {
+    private void expectRestCall(String url, ResponseCreator response) {
+        mockRestServiceServer.expect(
+                requestTo(BASE_URL + url))
+                .andExpect(method(HttpMethod.GET))
+                .andRespond(response);
+    }
+
+    private String ontologyResponse(String id, String termName) {
         BasicOntology response = new BasicOntology();
         List<BasicOntology.Result> results = new ArrayList<>();
         BasicOntology.Result result = new BasicOntology.Result();
