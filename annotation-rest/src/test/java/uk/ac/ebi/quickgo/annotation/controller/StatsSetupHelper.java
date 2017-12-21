@@ -1,6 +1,5 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
-import uk.ac.ebi.quickgo.annotation.IdGeneratorUtil;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.BasicOntology;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.BasicTaxonomyNode;
 
@@ -16,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.client.ResponseCreator;
 
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
@@ -53,18 +53,21 @@ public class StatsSetupHelper {
                 .forEach(i -> expectResultViaOntologyRest(ECO_TERM_RESOURCE_FORMAT, ecoId, ecoTermName));
     }
 
-    void expectFailureToGetTaxonomyNameViaRest(String id) {
-        expectRestCall(buildResource(TAXONOMY_RESOURCE_FORMAT, id), withStatus(HttpStatus.NOT_FOUND));
-    }
-
-    void expectFailureToGetEcoNameViaRest(String id) {
-        expectRestCall(buildResource(ECO_TERM_RESOURCE_FORMAT, id), withStatus(HttpStatus.NOT_FOUND));
-    }
-
     void expectFailureToGetNameForGoTermViaRest(int number, Function<Integer, String> toId) {
         IntStream.range(0, number)
                 .mapToObj(i -> buildResource(GO_TERM_RESOURCE_FORMAT, toId.apply(i)))
-                .forEach(r -> expectRestCall(r, withStatus(HttpStatus.NOT_FOUND)));
+                .forEach(r -> expectRestCall(r, withStatus(NOT_FOUND)));
+    }
+
+    void expectFailureToGetTaxonomyNameViaRest(String id, int number) {
+        IntStream.range(0, number)
+                .forEach(i -> expectRestCall(buildResource(TAXONOMY_RESOURCE_FORMAT, id), withStatus(NOT_FOUND)));
+    }
+
+    void expectFailureToGetEcoNameViaRest(String id, int number) {
+        IntStream.range(0, number)
+                .forEach(i ->
+                        expectRestCall(buildResource(ECO_TERM_RESOURCE_FORMAT, id), withStatus(NOT_FOUND)));
     }
 
     void expectTaxonIdHasNameViaRest(String id, String name) {
