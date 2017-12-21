@@ -194,16 +194,14 @@ public class AnnotationControllerStatisticsDownloadIT {
     private void setExpectationsForUnsuccessfulOntologyServiceRestResponse() {
         for (int k = 0; k < NO_OF_STATISTICS_GROUPS; k++) {
             for (int j = 0; j < NUMBER_OF_GENERIC_DOCS; j++) {
-                setupHelper.expectGORestCallResponse(setupHelper.goId(j), withStatus(HttpStatus
-                        .NOT_FOUND));
+                setupHelper.expectGORestCallResponse(setupHelper.goId(j), withStatus(HttpStatus.NOT_FOUND));
             }
         }
     }
 
     private void setExpectationsForUnsuccessfulTaxonomyServiceRestResponse() {
         for (int i = 0; i < NO_OF_STATISTICS_GROUPS; i++) {
-            setupHelper.expectTaxonomyRestCallResponse(String.valueOf(TAXON_ID),
-                    withStatus(HttpStatus.NOT_FOUND));
+            setupHelper.expectTaxonomyRestCallResponse(String.valueOf(TAXON_ID), withStatus(HttpStatus.NOT_FOUND));
         }
     }
 
