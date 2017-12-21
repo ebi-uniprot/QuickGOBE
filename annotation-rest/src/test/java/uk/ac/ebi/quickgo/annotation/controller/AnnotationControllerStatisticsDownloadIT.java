@@ -201,15 +201,11 @@ public class AnnotationControllerStatisticsDownloadIT {
     }
 
     private void setExpectationsForUnsuccessfulTaxonomyServiceRestResponse() {
-        for (int i = 0; i < NO_OF_STATISTICS_GROUPS; i++) {
-            setupHelper.expectFailureToGetTaxonomyNameViaRest(TAXON_ID);
-        }
+        setupHelper.expectFailureToGetTaxonomyNameViaRest(TAXON_ID, NO_OF_STATISTICS_GROUPS);
     }
 
     private void setExpectationsForUnsuccessfulOntologyServiceRestResponseForEcoCodes() {
-        for (int i = 0; i < NO_OF_STATISTICS_GROUPS; i++) {
-            setupHelper.expectFailureToGetEcoNameViaRest(ECO_ID);
-        }
+        setupHelper.expectFailureToGetEcoNameViaRest(ECO_ID, NO_OF_STATISTICS_GROUPS);
     }
 
     private void checkResponse(ResultActions response) throws Exception {
