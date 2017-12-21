@@ -169,7 +169,7 @@ public class AnnotationControllerStatisticsIT {
         final int expectedDistinctValueCount = 1;
         StatsSetupHelper statsSetupHelper = new StatsSetupHelper(mockRestServiceServer);
         statsSetupHelper.expectGoTermHasNameViaRest(GO_ID, GO_TERM_NAME);
-        statsSetupHelper.expectTaxonIdHasNameViaRest(String.valueOf(TAXON_ID), TAXON_NAME);
+        statsSetupHelper.expectTaxonIdHasNameViaRest(TAXON_ID, TAXON_NAME);
         statsSetupHelper.expectEcoCodeHasNameViaRest(ECO_ID, ECO_TERM_NAME, expectedDistinctValueCount);
 
         assertStatsResponseIncludingNames(expectedDistinctValueCount);
