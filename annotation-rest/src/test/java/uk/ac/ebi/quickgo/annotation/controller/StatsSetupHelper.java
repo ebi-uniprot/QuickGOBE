@@ -16,6 +16,7 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.client.ResponseCreator;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
@@ -48,39 +49,35 @@ public class StatsSetupHelper {
                 .forEach(i -> expectGoTermHasNameViaRest(toId.apply(i), toName.apply(i)));
     }
 
-    void expectEcoCodeHasNameViaRest(String ecoId, String ecoTermName, int number) {
+    void expectFailureToGetEcoNameViaRest(String id, int number) {
         IntStream.range(0, number)
-                .forEach(i -> expectResultViaOntologyRest(ECO_TERM_RESOURCE_FORMAT, ecoId, ecoTermName));
+                .forEach(i -> expectRestCall(buildECOResource(id), withStatus(NOT_FOUND)));
     }
 
     void expectFailureToGetNameForGoTermViaRest(int number, Function<Integer, String> toId) {
         IntStream.range(0, number)
-                .mapToObj(i -> buildResource(GO_TERM_RESOURCE_FORMAT, toId.apply(i)))
+                .mapToObj(i -> buildGOResource(toId.apply(i)))
                 .forEach(r -> expectRestCall(r, withStatus(NOT_FOUND)));
     }
 
     void expectFailureToGetTaxonomyNameViaRest(String id, int number) {
         IntStream.range(0, number)
-                .forEach(i -> expectRestCall(buildResource(TAXONOMY_RESOURCE_FORMAT, id), withStatus(NOT_FOUND)));
+                .forEach(i -> expectRestCall(buildTaxResource(id), withStatus(NOT_FOUND)));
     }
 
-    void expectFailureToGetEcoNameViaRest(String id, int number) {
+    void expectEcoCodeHasNameViaRest(String id, String name, int number) {
         IntStream.range(0, number)
-                .forEach(i ->
-                        expectRestCall(buildResource(ECO_TERM_RESOURCE_FORMAT, id), withStatus(NOT_FOUND)));
+                .forEach(i -> expectResultViaOntologyRest(ECO_TERM_RESOURCE_FORMAT, id, name));
     }
 
     void expectTaxonIdHasNameViaRest(String id, String name) {
         String responseAsString = constructTaxonomyTermsResponseObject(name);
-        expectRestCall(
-                buildResource(TAXONOMY_RESOURCE_FORMAT, id), withSuccess(responseAsString, MediaType
-                        .APPLICATION_JSON));
+        expectRestCall(buildTaxResource(id), withSuccess(responseAsString, APPLICATION_JSON));
     }
 
     private void expectResultViaOntologyRest(String resourceFormat, String id, String response) {
         this.expectRestCall(
-                buildResource(resourceFormat, id),
-                withSuccess(ontologyResponse(id, response), MediaType.APPLICATION_JSON));
+                buildResource(resourceFormat, id), withSuccess(ontologyResponse(id, response), APPLICATION_JSON));
     }
 
     private void expectRestCall(String url, ResponseCreator response) {
@@ -105,6 +102,18 @@ public class StatsSetupHelper {
         BasicTaxonomyNode expectedResponse = new BasicTaxonomyNode();
         expectedResponse.setScientificName(name);
         return this.getResponseAsString(expectedResponse);
+    }
+
+    private String buildGOResource(String... arguments) {
+        return buildResource(GO_TERM_RESOURCE_FORMAT, arguments);
+    }
+
+    private String buildTaxResource(String... arguments) {
+        return buildResource(TAXONOMY_RESOURCE_FORMAT, arguments);
+    }
+
+    private String buildECOResource(String... arguments) {
+        return buildResource(ECO_TERM_RESOURCE_FORMAT, arguments);
     }
 
     private String buildResource(String format, String... arguments) {
