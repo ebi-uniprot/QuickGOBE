@@ -4,13 +4,11 @@ import uk.ac.ebi.quickgo.annotation.AnnotationREST;
 import uk.ac.ebi.quickgo.annotation.IdGeneratorUtil;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
-import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.BasicOntology;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.BasicTaxonomyNode;
 import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 import net.sf.ehcache.CacheManager;
@@ -20,13 +18,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.client.MockRestServiceServer;
-import org.springframework.test.web.client.ResponseCreator;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
@@ -42,10 +38,7 @@ import static org.hamcrest.Matchers.is;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
 import static org.springframework.http.HttpHeaders.VARY;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -76,9 +69,6 @@ public class AnnotationControllerStatisticsDownloadIT {
     private static final String DOWNLOAD_STATISTICS_SEARCH_URL = "/annotation/downloadStats";
     private static final String NUMBER_OF_GO_ID_RESULTS_FOR_ANNOTATIONS =
             "$.results[0].types.[?(@.type == 'goId')].values.length()";
-    private static final String BASE_URL = "https://localhost";
-    private static final String GO_TERM_RESOURCE_FORMAT = "/ontology/go/terms/%s";
-    private static final String ECO_TERM_RESOURCE_FORMAT = "/ontology/eco/terms/%s";
     private static final String ECO_TERM_NAME = "match to sequence model evidence used in automatic assertion";
     private static final String TAXONOMY_ID_NODE_RESOURCE_FORMAT = "/proteins/api/taxonomy/id/%s/node";
     private static final int NO_OF_STATISTICS_GROUPS = 2;
@@ -102,6 +92,7 @@ public class AnnotationControllerStatisticsDownloadIT {
     private MockRestServiceServer mockRestServiceServer;
     private ObjectMapper dtoMapper;
     private String[] goNames;
+    private StatsSetupHelper statsSetupHelper;
 
     @Before
     public void setup() {
@@ -111,7 +102,7 @@ public class AnnotationControllerStatisticsDownloadIT {
         dtoMapper = new ObjectMapper();
         List<AnnotationDocument> genericDocs = createGenericDocsChangingGoId(NUMBER_OF_GENERIC_DOCS);
         annotationRepository.save(genericDocs);
-
+        statsSetupHelper = new StatsSetupHelper();
         goNames = new String[NUMBER_OF_GENERIC_DOCS];
         IntStream.range(0, goNames.length)
                 .forEach(i -> goNames[i] = goName(i));
@@ -220,51 +211,11 @@ public class AnnotationControllerStatisticsDownloadIT {
         expectedResponse.setScientificName(taxonName);
         String responseAsString = getResponseAsString(expectedResponse);
 
-        expectRestCallSuccess(
-                buildResource(
+        statsSetupHelper.expectRestCallSuccess(mockRestServiceServer,
+                statsSetupHelper.buildResource(
                         TAXONOMY_ID_NODE_RESOURCE_FORMAT,
                         String.valueOf(taxonId)),
                 responseAsString);
-    }
-
-    private void expectRestCallSuccess(String url, String response) {
-        mockRestServiceServer.expect(
-                requestTo(BASE_URL + url))
-                .andExpect(method(HttpMethod.GET))
-                .andRespond(withSuccess(response, MediaType.APPLICATION_JSON));
-    }
-
-    private String buildResource(String format, String... arguments) {
-        int requiredArgsCount = format.length() - format.replace("%", "").length();
-        List<String> args = new ArrayList<>();
-        for (int i = 0; i < requiredArgsCount; i++) {
-            if (i < arguments.length) {
-                args.add(arguments[i]);
-            } else {
-                args.add("");
-            }
-        }
-        return String.format(format, args.toArray());
-    }
-
-    private String constructGoTermsResponseObject(List<String> termIds, List<String> termNames) {
-        checkArgument(termIds != null, "termIds cannot be null");
-        checkArgument(termNames != null, "termIds cannot be null");
-        checkArgument(termIds.size() == termNames.size(),
-                "termIds and termNames lists must be the same size");
-
-        BasicOntology response = new BasicOntology();
-        List<BasicOntology.Result> results = new ArrayList<>();
-
-        for (int i = 0; i < termIds.size(); i++) {
-            BasicOntology.Result result = new BasicOntology.Result();
-            result.setId(termIds.get(i));
-            result.setName(termNames.get(i));
-            results.add(result);
-        }
-
-        response.setResults(results);
-        return getResponseAsString(response);
     }
 
     private <T> String getResponseAsString(T response) {
@@ -283,22 +234,15 @@ public class AnnotationControllerStatisticsDownloadIT {
     private void setExpectationsForUnsuccessfulOntologyServiceRestResponse() {
         for (int k = 0; k < NO_OF_STATISTICS_GROUPS; k++) {
             for (int j = 0; j < NUMBER_OF_GENERIC_DOCS; j++) {
-                expectRestCallResponse(buildResource(GO_TERM_RESOURCE_FORMAT, goId(j)), withStatus(HttpStatus
+                statsSetupHelper.expectGORestCallResponse(mockRestServiceServer, goId(j), withStatus(HttpStatus
                         .NOT_FOUND));
             }
         }
     }
 
-    private void expectRestCallResponse(String url, ResponseCreator response) {
-        mockRestServiceServer.expect(
-                requestTo(BASE_URL + url))
-                .andExpect(method(HttpMethod.GET))
-                .andRespond(response);
-    }
-
     private void setExpectationsForUnsuccessfulTaxonomyServiceRestResponse() {
         for (int i = 0; i < NO_OF_STATISTICS_GROUPS; i++) {
-            expectRestCallResponse(buildResource(TAXONOMY_ID_NODE_RESOURCE_FORMAT, String.valueOf(TAXON_ID)),
+            statsSetupHelper.expectTaxonomyRestCallResponse(mockRestServiceServer, String.valueOf(TAXON_ID),
                     withStatus(HttpStatus.NOT_FOUND));
         }
     }
@@ -317,15 +261,13 @@ public class AnnotationControllerStatisticsDownloadIT {
     private void setExpectationsForSuccessfulOntologyServiceRestResponseForEcoCodes() {
         //Hitting the cache means that the call to the rest service will occur only once for each term to get term name
         for (int j = 0; j < NUMBER_OF_GENERIC_DOCS; j++) {
-            expectRestCallSuccess(
-                    buildResource(ECO_TERM_RESOURCE_FORMAT, ECO_ID),
-                    constructGoTermsResponseObject(singletonList(ECO_ID), singletonList(ECO_TERM_NAME)));
+            statsSetupHelper.expectEcoCodeHasNameViaRest(mockRestServiceServer, ECO_ID, ECO_TERM_NAME);
         }
     }
 
     private void setExpectationsForUnsuccessfulOntologyServiceRestResponseForEcoCodes() {
         for (int i = 0; i < NO_OF_STATISTICS_GROUPS; i++) {
-            expectRestCallResponse(buildResource(ECO_TERM_RESOURCE_FORMAT, ECO_ID), withStatus(HttpStatus.NOT_FOUND));
+            statsSetupHelper.expectEcoRestCallResponse(mockRestServiceServer, ECO_ID, withStatus(HttpStatus.NOT_FOUND));
         }
     }
 
@@ -344,17 +286,10 @@ public class AnnotationControllerStatisticsDownloadIT {
     }
 
     private void expectGoTermsHaveGoNamesViaRest(List<String> termIds, List<String> termNames) {
-        checkArgument(termIds != null, "termIds cannot be null");
-        checkArgument(termNames != null, "termIds cannot be null");
-        checkArgument(termIds.size() == termNames.size(),
-                "termIds and termNames lists must be the same size");
-
         for (int i = 0; i < termIds.size(); i++) {
             String termId = termIds.get(i);
             String termName = termNames.get(i);
-            expectRestCallSuccess(
-                    buildResource(GO_TERM_RESOURCE_FORMAT, termId),
-                    constructGoTermsResponseObject(singletonList(termId), singletonList(termName)));
+            statsSetupHelper.expectGoTermHasNameViaRest(mockRestServiceServer, termId, termName);
         }
     }
 }
