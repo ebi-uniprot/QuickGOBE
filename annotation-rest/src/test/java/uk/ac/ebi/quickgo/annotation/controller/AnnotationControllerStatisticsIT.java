@@ -30,10 +30,7 @@ import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Arrays.asList;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -65,7 +62,6 @@ public class AnnotationControllerStatisticsIT {
 
     private static final String RESOURCE_URL = "/annotation";
     private static final String STATS_ENDPOINT = RESOURCE_URL + "/stats";
-    private static final String BASE_URL = "https://localhost";
     private static final String GO_TERM_NAME = "catalytic activity";
     private static final String ECO_TERM_NAME = "match to sequence model evidence used in automatic assertion";
     private static final String TAXON_TERM_NAME = "taxon name: " + 12345;
@@ -177,7 +173,7 @@ public class AnnotationControllerStatisticsIT {
 
         statsSetupHelper.expectGoTermHasNameViaRest(GO_ID, GO_TERM_NAME);
         statsSetupHelper.expectTaxonIdHasNameViaRest(String.valueOf(TAXON_ID), TAXON_NAME);
-        statsSetupHelper.expectEcoCodeHasNameViaRest(ECO_ID, ECO_TERM_NAME);
+        statsSetupHelper.expectEcoCodeHasNameViaRest(ECO_ID, ECO_TERM_NAME, expectedDistinctValueCount);
 
         assertStatsResponseIncludingNames(expectedDistinctValueCount);
     }
