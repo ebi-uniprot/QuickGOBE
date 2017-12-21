@@ -14,7 +14,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -32,7 +31,6 @@ import static org.hamcrest.Matchers.is;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
 import static org.springframework.http.HttpHeaders.VARY;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -82,7 +80,6 @@ public class AnnotationControllerStatisticsDownloadIT {
     private AnnotationRepository annotationRepository;
     @Autowired
     private RestOperations restOperations;
-    private MockRestServiceServer mockRestServiceServer;
     private String[] goNames;
     private StatsSetupHelper setupHelper;
 
@@ -90,7 +87,7 @@ public class AnnotationControllerStatisticsDownloadIT {
     public void setup() {
         annotationRepository.deleteAll();
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-        mockRestServiceServer = MockRestServiceServer.createServer((RestTemplate) restOperations);
+        MockRestServiceServer mockRestServiceServer = MockRestServiceServer.createServer((RestTemplate) restOperations);
         List<AnnotationDocument> genericDocs = createGenericDocsChangingGoId(NUMBER_OF_GENERIC_DOCS);
         annotationRepository.save(genericDocs);
         setupHelper = new StatsSetupHelper(mockRestServiceServer);
@@ -115,7 +112,7 @@ public class AnnotationControllerStatisticsDownloadIT {
 
         ResultActions response = mockMvc.perform(get(DOWNLOAD_STATISTICS_SEARCH_URL).header(ACCEPT, JSON_MEDIA_TYPE));
 
-        checkResponse(response, NUMBER_OF_GENERIC_DOCS);
+        checkResponse(response);
         response.andDo(print())
                 .andExpect(namesInTypeWithinGroup(ANNOTATION_GROUP, GO_ID_STATS_FIELD, goNames))
                 .andExpect(namesInTypeWithinGroup(GENE_PRODUCT_GROUP, GO_ID_STATS_FIELD, goNames))
@@ -195,27 +192,26 @@ public class AnnotationControllerStatisticsDownloadIT {
 
     private void setExpectationsForUnsuccessfulOntologyServiceRestResponse() {
         for (int k = 0; k < NO_OF_STATISTICS_GROUPS; k++) {
-            for (int j = 0; j < NUMBER_OF_GENERIC_DOCS; j++) {
-                setupHelper.expectGORestCallResponse(setupHelper.goId(j), withStatus(HttpStatus.NOT_FOUND));
-            }
+            setupHelper.expectFailureToGetNameForGoTermViaRest(NUMBER_OF_GENERIC_DOCS);
         }
     }
 
     private void setExpectationsForUnsuccessfulTaxonomyServiceRestResponse() {
         for (int i = 0; i < NO_OF_STATISTICS_GROUPS; i++) {
-            setupHelper.expectTaxonomyRestCallResponse(String.valueOf(TAXON_ID), withStatus(HttpStatus.NOT_FOUND));
+            setupHelper.expectFailureToGetTaxonomyNameViaRest(TAXON_ID);
         }
     }
 
     private void setExpectationsForUnsuccessfulOntologyServiceRestResponseForEcoCodes() {
         for (int i = 0; i < NO_OF_STATISTICS_GROUPS; i++) {
-            setupHelper.expectEcoRestCallResponse(ECO_ID, withStatus(HttpStatus.NOT_FOUND));
+            setupHelper.expectFailureToGetEcoNameViaRest(ECO_ID);
         }
     }
 
-    private void checkResponse(ResultActions response, int expectedSize) throws Exception {
+    private void checkResponse(ResultActions response) throws Exception {
         checkResponse(JSON_MEDIA_TYPE, response);
-        response.andExpect(numOfResults(NUMBER_OF_GO_ID_RESULTS_FOR_ANNOTATIONS, expectedSize));
+        response.andExpect(numOfResults(NUMBER_OF_GO_ID_RESULTS_FOR_ANNOTATIONS,
+                AnnotationControllerStatisticsDownloadIT.NUMBER_OF_GENERIC_DOCS));
     }
 
     private void checkResponse(MediaType mediaType, ResultActions response) throws Exception {

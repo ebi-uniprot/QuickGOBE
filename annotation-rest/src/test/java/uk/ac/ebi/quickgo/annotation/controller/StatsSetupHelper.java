@@ -10,12 +10,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.client.ResponseCreator;
 
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 /**
@@ -36,35 +38,35 @@ public class StatsSetupHelper {
         this.mockRestServiceServer = mockRestServiceServer;
     }
 
-    void expectGORestCallResponse(String id, ResponseCreator response) {
-        expectRestCall(buildResource(GO_TERM_RESOURCE_FORMAT, id), response);
-    }
-
-    void expectTaxonomyRestCallResponse(String id, ResponseCreator response) {
-        expectRestCall(buildResource(TAXONOMY_RESOURCE_FORMAT, id), response);
-    }
-
-    void expectEcoRestCallResponse(String id, ResponseCreator response) {
-        expectRestCall(buildResource(ECO_TERM_RESOURCE_FORMAT, id), response);
-    }
-
     void expectGoTermHasNameViaRest(String id, String name) {
-        this.expectIdHasGivenResultViaOntologyRest(GO_TERM_RESOURCE_FORMAT, id, name);
+        this.expectResultViaOntologyRest(GO_TERM_RESOURCE_FORMAT, id, name);
     }
 
     void expectGoTermHasNameViaRest(int number) {
-        for (int i = 0; i < number; i++) {
-            expectIdHasGivenResultViaOntologyRest(GO_TERM_RESOURCE_FORMAT, goId(i), goName(i));
-        }
+        IntStream.range(0, number)
+                .forEach(i -> expectGoTermHasNameViaRest(goId(i), goName(i)));
     }
 
     void expectEcoCodeHasNameViaRest(String ecoId, String ecoTermName, int number) {
-        for (int i = 0; i < number; i++) {
-            expectIdHasGivenResultViaOntologyRest(ECO_TERM_RESOURCE_FORMAT, ecoId, ecoTermName);
-        }
+        IntStream.range(0, number)
+                .forEach(i -> expectResultViaOntologyRest(ECO_TERM_RESOURCE_FORMAT, ecoId, ecoTermName));
     }
 
-    String goId(int id) {
+    void expectFailureToGetTaxonomyNameViaRest(String id) {
+        expectRestCall(buildResource(TAXONOMY_RESOURCE_FORMAT, id), withStatus(HttpStatus.NOT_FOUND));
+    }
+
+    void expectFailureToGetEcoNameViaRest(String id) {
+        expectRestCall(buildResource(ECO_TERM_RESOURCE_FORMAT, id), withStatus(HttpStatus.NOT_FOUND));
+    }
+
+    void expectFailureToGetNameForGoTermViaRest(int number) {
+        IntStream.range(0, number)
+                .mapToObj(i -> buildResource(GO_TERM_RESOURCE_FORMAT, goId(i)))
+                .forEach(r -> expectRestCall(r, withStatus(HttpStatus.NOT_FOUND)));
+    }
+
+    private String goId(int id) {
         return IdGeneratorUtil.createGoId(id);
     }
 
@@ -79,14 +81,7 @@ public class StatsSetupHelper {
                         .APPLICATION_JSON));
     }
 
-    String[] expectedNames(int expectedSize, String source) {
-        String[] names = new String[expectedSize];
-        IntStream.range(0, names.length)
-                .forEach(i -> names[i] = source);
-        return names;
-    }
-
-    private void expectIdHasGivenResultViaOntologyRest(String resourceFormat, String id, String response) {
+    private void expectResultViaOntologyRest(String resourceFormat, String id, String response) {
         this.expectRestCall(
                 buildResource(resourceFormat, id),
                 withSuccess(ontologyResponse(id, response), MediaType.APPLICATION_JSON));
