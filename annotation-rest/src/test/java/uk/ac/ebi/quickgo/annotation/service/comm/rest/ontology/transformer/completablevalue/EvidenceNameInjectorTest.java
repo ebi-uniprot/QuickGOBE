@@ -31,7 +31,7 @@ public class EvidenceNameInjectorTest {
     }
 
     @Test
-    public void injectorIdIsGoName() {
+    public void injectorIdIsEvidenceName() {
         assertThat(nameInjector.getId(), is("evidenceName"));
     }
 
