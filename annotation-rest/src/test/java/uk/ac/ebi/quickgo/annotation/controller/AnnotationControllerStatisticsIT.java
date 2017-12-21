@@ -113,7 +113,7 @@ public class AnnotationControllerStatisticsIT {
         mockRestServiceServer = MockRestServiceServer.createServer((RestTemplate) restOperations);
         savedDocs = createGenericDocs(NUMBER_OF_GENERIC_DOCS);
         repository.save(savedDocs);
-        statsSetupHelper = new StatsSetupHelper();
+        statsSetupHelper = new StatsSetupHelper(mockRestServiceServer);
     }
 
     @Test
@@ -175,9 +175,9 @@ public class AnnotationControllerStatisticsIT {
         cacheManager.clearAll();
         final int expectedDistinctValueCount = 1;
 
-        statsSetupHelper.expectGoTermHasNameViaRest(mockRestServiceServer, GO_ID, GO_TERM_NAME);
-        statsSetupHelper.expectTaxonIdHasNameViaRest(mockRestServiceServer, String.valueOf(TAXON_ID), TAXON_NAME);
-        statsSetupHelper.expectEcoCodeHasNameViaRest(mockRestServiceServer, ECO_ID, ECO_TERM_NAME);
+        statsSetupHelper.expectGoTermHasNameViaRest(GO_ID, GO_TERM_NAME);
+        statsSetupHelper.expectTaxonIdHasNameViaRest(String.valueOf(TAXON_ID), TAXON_NAME);
+        statsSetupHelper.expectEcoCodeHasNameViaRest(ECO_ID, ECO_TERM_NAME);
 
         assertStatsResponseIncludingNames(expectedDistinctValueCount);
     }

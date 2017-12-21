@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.client.ResponseCreator;
@@ -18,7 +17,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Collections.singletonList;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 /**
@@ -35,11 +33,12 @@ public class StatsSetupHelper {
     private ObjectMapper dtoMapper = new ObjectMapper();
     private MockRestServiceServer mockRestServiceServer;
 
-    //    public StatsSetupHelper(MockRestServiceServer mockRestServiceServer) {
-    //        this.mockRestServiceServer = mockRestServiceServer;
-    //    }
+    StatsSetupHelper(
+            MockRestServiceServer mockRestServiceServer) {
+        this.mockRestServiceServer = mockRestServiceServer;
+    }
 
-    public String constructOntologyTermsResponseObject(List<String> termIds, List<String> termNames) {
+    String constructOntologyTermsResponseObject(List<String> termIds, List<String> termNames) {
         checkArgument(termIds != null, "termIds cannot be null");
         checkArgument(termNames != null, "termIds cannot be null");
         checkArgument(termIds.size() == termNames.size(),
@@ -59,7 +58,7 @@ public class StatsSetupHelper {
         return getResponseAsString(response);
     }
 
-    public <T> String getResponseAsString(T response) {
+    <T> String getResponseAsString(T response) {
         try {
             return dtoMapper.writeValueAsString(response);
         } catch (JsonProcessingException e) {
@@ -67,14 +66,14 @@ public class StatsSetupHelper {
         }
     }
 
-    public void expectRestCallSuccess(MockRestServiceServer mockRestServiceServer, String url, String response) {
+    void expectRestCallSuccess(String url, String response) {
         mockRestServiceServer.expect(
                 requestTo(BASE_URL + url))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withSuccess(response, MediaType.APPLICATION_JSON));
     }
 
-    void expectGORestCallResponse(MockRestServiceServer mockRestServiceServer, String id, ResponseCreator
+    void expectGORestCallResponse(String id, ResponseCreator
             response) {
         mockRestServiceServer.expect(
                 requestTo(BASE_URL + this.buildResource(GO_TERM_RESOURCE_FORMAT, id)))
@@ -82,7 +81,7 @@ public class StatsSetupHelper {
                 .andRespond(response);
     }
 
-    void expectTaxonomyRestCallResponse(MockRestServiceServer mockRestServiceServer, String id, ResponseCreator
+    void expectTaxonomyRestCallResponse(String id, ResponseCreator
             response) {
         mockRestServiceServer.expect(
                 requestTo(BASE_URL + this.buildResource(TAXONOMY_ID_NODE_RESOURCE_FORMAT, id)))
@@ -90,7 +89,7 @@ public class StatsSetupHelper {
                 .andRespond(response);
     }
 
-    void expectEcoRestCallResponse(MockRestServiceServer mockRestServiceServer, String id, ResponseCreator
+    void expectEcoRestCallResponse(String id, ResponseCreator
             response) {
         mockRestServiceServer.expect(
                 requestTo(BASE_URL + this.buildResource(ECO_TERM_RESOURCE_FORMAT, id)))
@@ -98,14 +97,14 @@ public class StatsSetupHelper {
                 .andRespond(response);
     }
 
-    public String[] expectedNames(int expectedSize, String source) {
+    String[] expectedNames(int expectedSize, String source) {
         String[] names = new String[expectedSize];
         IntStream.range(0, names.length)
                 .forEach(i -> names[i] = source);
         return names;
     }
 
-    public String buildResource(String format, String... arguments) {
+    String buildResource(String format, String... arguments) {
         int requiredArgsCount = format.length() - format.replace("%", "").length();
         List<String> args = new ArrayList<>();
         for (int i = 0; i < requiredArgsCount; i++) {
@@ -118,27 +117,27 @@ public class StatsSetupHelper {
         return String.format(format, args.toArray());
     }
 
-    void expectGoTermHasNameViaRest(MockRestServiceServer mockRestServiceServer, String termId, String termName) {
-        this.expectIdHasGivenResultViaOntologyRest(mockRestServiceServer, GO_TERM_RESOURCE_FORMAT, termId, termName);
+    void expectGoTermHasNameViaRest(String termId, String termName) {
+        this.expectIdHasGivenResultViaOntologyRest(GO_TERM_RESOURCE_FORMAT, termId, termName);
     }
 
-    void expectEcoCodeHasNameViaRest(MockRestServiceServer mockRestServiceServer, String ecoId, String ecoTermName) {
-        this.expectIdHasGivenResultViaOntologyRest(mockRestServiceServer, ECO_TERM_RESOURCE_FORMAT, ecoId,
+    void expectEcoCodeHasNameViaRest(String ecoId, String ecoTermName) {
+        this.expectIdHasGivenResultViaOntologyRest(ECO_TERM_RESOURCE_FORMAT, ecoId,
                 ecoTermName);
     }
 
-    private void expectIdHasGivenResultViaOntologyRest(MockRestServiceServer mockRestServiceServer, String
+    private void expectIdHasGivenResultViaOntologyRest(String
             resourceFormat, String id, String result) {
-        this.expectRestCallSuccess(mockRestServiceServer,
+        this.expectRestCallSuccess(
                 this.buildResource(resourceFormat, id),
                 this.constructOntologyTermsResponseObject(singletonList(id), singletonList(result)));
     }
 
-    void expectTaxonIdHasNameViaRest(MockRestServiceServer mockRestServiceServer, String id, String name) {
+    void expectTaxonIdHasNameViaRest(String id, String name) {
         BasicTaxonomyNode expectedResponse = new BasicTaxonomyNode();
         expectedResponse.setScientificName(name);
         String responseAsString = this.getResponseAsString(expectedResponse);
-        this.expectRestCallSuccess(mockRestServiceServer,
+        this.expectRestCallSuccess(
                 this.buildResource(TAXONOMY_ID_NODE_RESOURCE_FORMAT, id), responseAsString);
     }
 }

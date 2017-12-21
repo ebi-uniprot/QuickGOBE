@@ -102,7 +102,7 @@ public class AnnotationControllerStatisticsDownloadIT {
         dtoMapper = new ObjectMapper();
         List<AnnotationDocument> genericDocs = createGenericDocsChangingGoId(NUMBER_OF_GENERIC_DOCS);
         annotationRepository.save(genericDocs);
-        statsSetupHelper = new StatsSetupHelper();
+        statsSetupHelper = new StatsSetupHelper(mockRestServiceServer);
         goNames = new String[NUMBER_OF_GENERIC_DOCS];
         IntStream.range(0, goNames.length)
                 .forEach(i -> goNames[i] = goName(i));
@@ -211,7 +211,7 @@ public class AnnotationControllerStatisticsDownloadIT {
         expectedResponse.setScientificName(taxonName);
         String responseAsString = getResponseAsString(expectedResponse);
 
-        statsSetupHelper.expectRestCallSuccess(mockRestServiceServer,
+        statsSetupHelper.expectRestCallSuccess(
                 statsSetupHelper.buildResource(
                         TAXONOMY_ID_NODE_RESOURCE_FORMAT,
                         String.valueOf(taxonId)),
@@ -234,7 +234,7 @@ public class AnnotationControllerStatisticsDownloadIT {
     private void setExpectationsForUnsuccessfulOntologyServiceRestResponse() {
         for (int k = 0; k < NO_OF_STATISTICS_GROUPS; k++) {
             for (int j = 0; j < NUMBER_OF_GENERIC_DOCS; j++) {
-                statsSetupHelper.expectGORestCallResponse(mockRestServiceServer, goId(j), withStatus(HttpStatus
+                statsSetupHelper.expectGORestCallResponse(goId(j), withStatus(HttpStatus
                         .NOT_FOUND));
             }
         }
@@ -242,7 +242,7 @@ public class AnnotationControllerStatisticsDownloadIT {
 
     private void setExpectationsForUnsuccessfulTaxonomyServiceRestResponse() {
         for (int i = 0; i < NO_OF_STATISTICS_GROUPS; i++) {
-            statsSetupHelper.expectTaxonomyRestCallResponse(mockRestServiceServer, String.valueOf(TAXON_ID),
+            statsSetupHelper.expectTaxonomyRestCallResponse(String.valueOf(TAXON_ID),
                     withStatus(HttpStatus.NOT_FOUND));
         }
     }
@@ -261,13 +261,13 @@ public class AnnotationControllerStatisticsDownloadIT {
     private void setExpectationsForSuccessfulOntologyServiceRestResponseForEcoCodes() {
         //Hitting the cache means that the call to the rest service will occur only once for each term to get term name
         for (int j = 0; j < NUMBER_OF_GENERIC_DOCS; j++) {
-            statsSetupHelper.expectEcoCodeHasNameViaRest(mockRestServiceServer, ECO_ID, ECO_TERM_NAME);
+            statsSetupHelper.expectEcoCodeHasNameViaRest(ECO_ID, ECO_TERM_NAME);
         }
     }
 
     private void setExpectationsForUnsuccessfulOntologyServiceRestResponseForEcoCodes() {
         for (int i = 0; i < NO_OF_STATISTICS_GROUPS; i++) {
-            statsSetupHelper.expectEcoRestCallResponse(mockRestServiceServer, ECO_ID, withStatus(HttpStatus.NOT_FOUND));
+            statsSetupHelper.expectEcoRestCallResponse(ECO_ID, withStatus(HttpStatus.NOT_FOUND));
         }
     }
 
@@ -289,7 +289,7 @@ public class AnnotationControllerStatisticsDownloadIT {
         for (int i = 0; i < termIds.size(); i++) {
             String termId = termIds.get(i);
             String termName = termNames.get(i);
-            statsSetupHelper.expectGoTermHasNameViaRest(mockRestServiceServer, termId, termName);
+            statsSetupHelper.expectGoTermHasNameViaRest(termId, termName);
         }
     }
 }
