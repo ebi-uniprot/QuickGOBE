@@ -37,31 +37,28 @@ public class StatsSetupHelper {
         this.mockRestServiceServer = mockRestServiceServer;
     }
 
-    void expectRestCallSuccess(String url, String response) {
+    void expectRestCall(String url, ResponseCreator response) {
         mockRestServiceServer.expect(
                 requestTo(BASE_URL + url))
                 .andExpect(method(HttpMethod.GET))
-                .andRespond(withSuccess(response, MediaType.APPLICATION_JSON));
+                .andRespond(response);
     }
 
-    void expectGORestCallResponse(String id, ResponseCreator
-            response) {
+    void expectGORestCallResponse(String id, ResponseCreator response) {
         mockRestServiceServer.expect(
                 requestTo(BASE_URL + this.buildResource(GO_TERM_RESOURCE_FORMAT, id)))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(response);
     }
 
-    void expectTaxonomyRestCallResponse(String id, ResponseCreator
-            response) {
+    void expectTaxonomyRestCallResponse(String id, ResponseCreator response) {
         mockRestServiceServer.expect(
                 requestTo(BASE_URL + this.buildResource(TAXONOMY_ID_NODE_RESOURCE_FORMAT, id)))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(response);
     }
 
-    void expectEcoRestCallResponse(String id, ResponseCreator
-            response) {
+    void expectEcoRestCallResponse(String id, ResponseCreator response) {
         mockRestServiceServer.expect(
                 requestTo(BASE_URL + this.buildResource(ECO_TERM_RESOURCE_FORMAT, id)))
                 .andExpect(method(HttpMethod.GET))
@@ -94,8 +91,9 @@ public class StatsSetupHelper {
 
     void expectTaxonIdHasNameViaRest(String id, String name) {
         String responseAsString = constructTaxonomyTermsResponseObject(name);
-        this.expectRestCallSuccess(
-                this.buildResource(TAXONOMY_ID_NODE_RESOURCE_FORMAT, id), responseAsString);
+        this.expectRestCall(
+                this.buildResource(TAXONOMY_ID_NODE_RESOURCE_FORMAT, id), withSuccess(responseAsString, MediaType
+                        .APPLICATION_JSON));
     }
 
     String[] expectedNames(int expectedSize, String source) {
@@ -106,9 +104,10 @@ public class StatsSetupHelper {
     }
 
     private void expectIdHasGivenResultViaOntologyRest(String resourceFormat, String id, String result) {
-        this.expectRestCallSuccess(
+        this.expectRestCall(
                 this.buildResource(resourceFormat, id),
-                this.constructOntologyTermsResponseObject(id, result));
+                withSuccess(this.constructOntologyTermsResponseObject(id, result), MediaType
+                        .APPLICATION_JSON));
     }
 
     private String constructOntologyTermsResponseObject(String id, String termName) {
