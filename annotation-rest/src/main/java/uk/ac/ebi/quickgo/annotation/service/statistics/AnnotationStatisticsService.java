@@ -24,7 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Service that collects distribution statistics of annotations and gene products throughout a given set of annotation
@@ -185,7 +184,7 @@ public class AnnotationStatisticsService implements StatisticsService {
         }
 
         private StatisticsByType createStatsType(AggregateResponse aggregation, long totalHits) {
-            StatisticsByType type = new StatisticsByType(aggregation.getName(),aggregation.getDistinctValuesCount());
+            StatisticsByType type = new StatisticsByType(aggregation.getName(), aggregation.getDistinctValuesCount());
             Set<AggregationBucket> buckets = aggregation.getBuckets();
             buckets.stream()
                     .map(bucket -> createStatsValues(bucket, totalHits))
