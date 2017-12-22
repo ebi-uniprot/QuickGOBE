@@ -38,7 +38,6 @@ public class RequiredStatistics {
                 statsType(AnnotationFields.Facetable.GO_ASPECT),
                 statsType(AnnotationFields.Facetable.GENE_PRODUCT_ID)
         );
-
     }
 
     protected List<RequiredStatistic> requiredStats;
