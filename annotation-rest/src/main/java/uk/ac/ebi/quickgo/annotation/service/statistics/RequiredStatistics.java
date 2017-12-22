@@ -25,7 +25,6 @@ import static uk.ac.ebi.quickgo.annotation.service.statistics.RequiredStatisticT
 public class RequiredStatistics {
     static final int DEFAULT_GO_TERM_LIMIT = 200;
     static final List<RequiredStatisticType> STATS_TYPES;
-
     static final String ANNOTATION = "annotation";
     static final String GENE_PRODUCT = "geneProduct";
 
