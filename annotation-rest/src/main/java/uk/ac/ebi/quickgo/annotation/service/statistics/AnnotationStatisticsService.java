@@ -80,15 +80,15 @@ public class AnnotationStatisticsService implements StatisticsService {
     }
 
     private QueryResult<StatisticsGroup> calculateForRequiredStatistics(AnnotationRequest request, boolean download) {
-        final List<RequiredStatistic> requiredStatistics = requiredStatistics(request, download);
-        AggregateResponse globalAggregation = statisticsResponse(request, requiredStatistics);
+        final List<RequiredStatistic> requiredStatistics = listRequiredStatistics(request, download);
+        AggregateResponse globalAggregation = calculateStatistics(request, requiredStatistics);
         if (globalAggregation.isPopulated()) {
             return createResult(requiredStatistics, globalAggregation);
         }
         return EMPTY_STATS;
     }
 
-    private AggregateResponse statisticsResponse(AnnotationRequest request,
+    private AggregateResponse calculateStatistics(AnnotationRequest request,
             List<RequiredStatistic> requiredStatistics) {
         QueryRequest queryRequest = buildQueryRequest(request, requiredStatistics);
         QueryResult<Annotation> annotationQueryResult = searchService.findByQuery(queryRequest);
@@ -103,7 +103,7 @@ public class AnnotationStatisticsService implements StatisticsService {
         return new QueryResult.Builder<>(statsGroups.size(), statsGroups).build();
     }
 
-    private List<RequiredStatistic> requiredStatistics(AnnotationRequest request, boolean download) {
+    private List<RequiredStatistic> listRequiredStatistics(AnnotationRequest request, boolean download) {
         if (request.getGeneProductId().length == 0 && !download) {
             return statisticsProvider.usualCase.requiredStats;
         }
