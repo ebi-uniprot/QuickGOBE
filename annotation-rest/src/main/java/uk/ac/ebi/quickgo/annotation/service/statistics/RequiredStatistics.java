@@ -24,7 +24,7 @@ import static uk.ac.ebi.quickgo.annotation.service.statistics.RequiredStatisticT
  */
 public class RequiredStatistics {
     static final int DEFAULT_GO_TERM_LIMIT = 200;
-    static final List<RequiredStatisticType> STATS_TYPES;
+    protected static final List<RequiredStatisticType> STATS_TYPES;
     static final String ANNOTATION = "annotation";
     static final String GENE_PRODUCT = "geneProduct";
 
@@ -43,11 +43,9 @@ public class RequiredStatistics {
     protected List<RequiredStatistic> requiredStats;
     protected List<RequiredStatisticType> configuredTypes;
 
-    public RequiredStatistics() {}
-
     RequiredStatistics(StatisticsTypeConfigurer statsConfigurer) {
         checkArgument(statsConfigurer != null, "Stats configurer cannot be null");
-        configuredTypes = statsConfigurer.getConfiguredStatsTypes(STATS_TYPES);
+        configuredTypes = statsConfigurer.getConfiguredStatsTypes(getStatsTypes());
         requiredStats = Collections.unmodifiableList(asList(annotationStats(), geneProductStats()));
     }
 
@@ -63,5 +61,9 @@ public class RequiredStatistics {
     protected RequiredStatistic geneProductStats() {
         return new RequiredStatistic(GENE_PRODUCT, AnnotationFields.Facetable.GENE_PRODUCT_ID,
                 AggregateFunction.UNIQUE.getName(), configuredTypes);
+    }
+
+    protected List<RequiredStatisticType> getStatsTypes() {
+        return STATS_TYPES;
     }
 }

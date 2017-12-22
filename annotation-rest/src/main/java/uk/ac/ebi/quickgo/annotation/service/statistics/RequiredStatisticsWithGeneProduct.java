@@ -19,26 +19,19 @@ import static uk.ac.ebi.quickgo.annotation.service.statistics.RequiredStatisticT
  * @author Tony Wardell
  */
 public class RequiredStatisticsWithGeneProduct extends RequiredStatistics {
-    static final List<RequiredStatisticType> STATS_TYPES;
+
+    private static final List<RequiredStatisticType> requiredStatisticTypes = new ArrayList<>();
 
     static {
-        STATS_TYPES = new ArrayList<>(RequiredStatistics.STATS_TYPES);
-        STATS_TYPES.add(statsType(AnnotationFields.Facetable.GENE_PRODUCT_ID));
+        requiredStatisticTypes.addAll(STATS_TYPES);
+        requiredStatisticTypes.add(statsType(AnnotationFields.Facetable.GENE_PRODUCT_ID));
     }
 
     RequiredStatisticsWithGeneProduct(StatisticsTypeConfigurer statsConfigurer) {
-        super();
-        checkArgument(statsConfigurer != null, "Stats configurer cannot be null");
-        configuredTypes = statsConfigurer.getConfiguredStatsTypes(STATS_TYPES);
-        requiredStats = Collections.unmodifiableList(asList(annotationStats(), geneProductStats()));
+        super(statsConfigurer);
     }
 
-    public List<RequiredStatistic> getRequiredStatistics() {
-        return requiredStats;
-    }
-
-    protected RequiredStatistic annotationStats() {
-        return new RequiredStatistic(ANNOTATION, AnnotationFields.Facetable.ID,
-                AggregateFunction.COUNT.getName(), configuredTypes);
+    protected List<RequiredStatisticType> getStatsTypes() {
+        return requiredStatisticTypes;
     }
 }
