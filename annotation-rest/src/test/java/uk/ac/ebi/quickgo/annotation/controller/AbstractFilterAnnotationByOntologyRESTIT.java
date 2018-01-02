@@ -459,8 +459,9 @@ public abstract class AbstractFilterAnnotationByOntologyRESTIT {
                 .andRespond(response);
     }
 
-    String constructResponseObject(List<String> termIds, List<List<String>> values,
-            BiConsumer<OntologyRelatives.Result, List<String>> resultValueUpdater) {
+    String constructResponseObject(
+            List<String> termIds, BiConsumer<OntologyRelatives.Result, String> resultSourceUpdater,
+            List<List<String>> values, BiConsumer<OntologyRelatives.Result, List<String>> resultValueUpdater) {
         checkArgument(termIds != null, "termIds cannot be null");
         checkArgument(values != null, "values cannot be null");
         checkArgument(termIds.size() == values.size(), "Term ID list and the (list of lists) of their " +
@@ -473,7 +474,8 @@ public abstract class AbstractFilterAnnotationByOntologyRESTIT {
         Iterator<List<String>> valuesListsIterator = values.iterator();
         termIds.forEach(t -> {
             OntologyRelatives.Result result = new OntologyRelatives.Result();
-            result.setId(t);
+            //            result.setId(t);
+            resultSourceUpdater.accept(result, t);
             resultValueUpdater.accept(result, valuesListsIterator.next());
             results.add(result);
         });
@@ -511,6 +513,8 @@ public abstract class AbstractFilterAnnotationByOntologyRESTIT {
                         resourceFormat,
                         termIdsCSV,
                         relationsCSV),
-                constructResponseObject(termIds, descendants, OntologyRelatives.Result::setDescendants));
+                constructResponseObject(
+                        termIds, OntologyRelatives.Result::setId,
+                        descendants, OntologyRelatives.Result::setDescendants));
     }
 }

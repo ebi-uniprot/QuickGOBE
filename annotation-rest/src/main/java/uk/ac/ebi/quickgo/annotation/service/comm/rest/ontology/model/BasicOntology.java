@@ -11,6 +11,12 @@ import java.util.List;
  *     <li>/go/terms/{term}</li>
  * </ul>
  *
+ * or
+ *
+ * <ul>
+ *     <li>/eco/terms/{term}</li>
+ * </ul>
+ *
  * This model captures the parts reached by the JSON path expression, "$.results.name".
  *
  * Created 07/04/17

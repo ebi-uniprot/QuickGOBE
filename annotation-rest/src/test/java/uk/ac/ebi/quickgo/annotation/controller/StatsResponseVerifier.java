@@ -15,6 +15,7 @@ final class StatsResponseVerifier {
     private static final String GROUP_NAME_TAG = "groupName";
     private static final String TYPE_NAME_TAG = "type";
     private static final String KEY_NAME_TAG = "key";
+    private static final String NAME_NAME_TAG = "name";
     private static final String TOTAL_GROUP_HITS_TAG = "totalHits";
 
     private StatsResponseVerifier() {}
@@ -58,14 +59,30 @@ final class StatsResponseVerifier {
      * @return a {@link ResultMatcher} that checks for the given inputs
      */
     static ResultMatcher keysInTypeWithinGroup(String group, String type, String[] keys) {
+        return targetInTypeWithinGroup(group, type, keys, KEY_NAME_TAG);
+    }
+
+    /**
+     * Checks that all of the names defined in the {@param names} array are present in the {@param
+     * type} within the given {@param group}.
+     *
+     * @param group the stats group to check in
+     * @param type the stats type defined within in the {@param group}
+     * @param names the names to check for
+     * @return a {@link ResultMatcher} that checks for the given inputs
+     */
+    static ResultMatcher namesInTypeWithinGroup(String group, String type, String[] names) {
+        return targetInTypeWithinGroup(group, type, names, NAME_NAME_TAG);
+    }
+
+    private static ResultMatcher targetInTypeWithinGroup(String group, String type, String[] expected, String target) {
         String valuesInTypeForGroup = "%s[?(@.%s=='%s')]..[?(@.%s=='%s')]..%s";
         return jsonPath(
                 format(valuesInTypeForGroup,
                         ResponseVerifier.RESULTS,
                         GROUP_NAME_TAG, group,
                         TYPE_NAME_TAG, type,
-                        KEY_NAME_TAG),
-                containsInAnyOrder(keys)
-        );
+                        target),
+                containsInAnyOrder(expected));
     }
 }

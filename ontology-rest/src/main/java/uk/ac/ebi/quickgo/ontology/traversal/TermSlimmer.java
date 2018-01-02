@@ -100,7 +100,7 @@ public class TermSlimmer {
      * @param id the identifier of the term to map
      * @return a list of terms within the original slim-set to which this term slims up to.
      */
-    public List<String> findSlims(String id) {
+    public List<String> findSlimmedToTerms(String id) {
         return slimTranslate.getOrDefault(id, emptyList());
     }
 

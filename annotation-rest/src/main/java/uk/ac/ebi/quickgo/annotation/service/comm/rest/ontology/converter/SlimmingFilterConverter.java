@@ -29,14 +29,14 @@ public class SlimmingFilterConverter extends AbstractOntologyFilterConverter {
     }
 
     @Override protected boolean validResult(OntologyRelatives.Result result) {
-        return nonNull(result.getSlimsTo());
+        return nonNull(result.getSlimsToIds());
     }
 
     @Override protected void processResult(OntologyRelatives.Result result, Set<QuickGOQuery> queries) {
-        queries.add(createQueryForOntologyId(result.getId()));
-        result.getSlimsTo().stream()
+        queries.add(createQueryForOntologyId(result.getSlimsFromId()));
+        result.getSlimsToIds().stream()
                 .filter(slim -> !Strings.isNullOrEmpty(slim))
-                .forEach(slimId -> conversionInfo.addOriginal2SlimmedGOIdMapping(result.getId(), slimId)
+                .forEach(slimId -> conversionInfo.addOriginal2SlimmedGOIdMapping(result.getSlimsFromId(), slimId)
                 );
     }
 

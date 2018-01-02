@@ -8,6 +8,7 @@ import uk.ac.ebi.quickgo.annotation.service.comm.rest.geneproduct.transformer.Ge
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.annotation.OntologyNameInjector;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.annotation.SlimResultsTransformer;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.annotation.TaxonomyNameInjector;
+import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.completablevalue.EvidenceNameInjector;
 import uk.ac.ebi.quickgo.annotation.service.converter.AnnotationDocConverterImpl;
 import uk.ac.ebi.quickgo.common.SearchableField;
 import uk.ac.ebi.quickgo.common.loader.DbXRefLoader;
@@ -219,11 +220,6 @@ public class SearchServiceConfig {
         return new ExternalServiceResultsTransformer<>(responseValueInjectors, queryResultMutator(converterFactory));
     }
 
-    private ValueInjectionToQueryResults<Annotation> queryResultMutator(
-            RESTFilterConverterFactory converterFactory) {
-        return new ValueInjectionToQueryResults<>(converterFactory);
-    }
-
     @Bean
     public ExternalServiceResultsTransformer<QueryResult<Annotation>, Annotation> geneProductResultsTransformer
             (RESTFilterConverterFactory converterFactory) {
@@ -236,10 +232,6 @@ public class SearchServiceConfig {
     @Bean
     public DbXRefEntityValidation geneProductValidator() {
         return DbXRefEntityValidation.createWithData(geneProductLoader().load());
-    }
-
-    private DbXRefLoader geneProductLoader() {
-        return new DbXRefLoader(this.xrefValidationRegexFile, xrefValidationCaseSensitive);
     }
 
     @Bean
@@ -259,13 +251,13 @@ public class SearchServiceConfig {
 
     @Bean
     public ResultTransformerChain<CompletableValue> completableValueResultTransformerChain(
-            ExternalServiceResultsTransformer<CompletableValue, CompletableValue>
-                    completableValueOntologyNameTransformer,
-            ExternalServiceResultsTransformer<CompletableValue, CompletableValue>
-                    completableValueTaxonNameTransformer) {
+            ExternalServiceResultsTransformer<CompletableValue, CompletableValue> ontologyNameTransformer,
+            ExternalServiceResultsTransformer<CompletableValue, CompletableValue> taxonNameTransformer,
+            ExternalServiceResultsTransformer<CompletableValue, CompletableValue> evidenceNameTransformer) {
         ResultTransformerChain<CompletableValue> transformerChain = new ResultTransformerChain<>();
-        transformerChain.addTransformer(completableValueOntologyNameTransformer);
-        transformerChain.addTransformer(completableValueTaxonNameTransformer);
+        transformerChain.addTransformer(ontologyNameTransformer);
+        transformerChain.addTransformer(taxonNameTransformer);
+        transformerChain.addTransformer(evidenceNameTransformer);
         return transformerChain;
     }
 
@@ -299,7 +291,7 @@ public class SearchServiceConfig {
     }
 
     @Bean
-    public ExternalServiceResultsTransformer<CompletableValue, CompletableValue> completableValueOntologyNameTransformer
+    public ExternalServiceResultsTransformer<CompletableValue, CompletableValue> ontologyNameTransformer
             (RESTFilterConverterFactory converterFactory) {
         List<ResponseValueInjector<CompletableValue>> responseValueInjectors =
                 singletonList(new uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer
@@ -315,13 +307,31 @@ public class SearchServiceConfig {
     }
 
     @Bean
-    public ExternalServiceResultsTransformer<CompletableValue, CompletableValue> completableValueTaxonNameTransformer
+    public ExternalServiceResultsTransformer<CompletableValue, CompletableValue> taxonNameTransformer
             (RESTFilterConverterFactory converterFactory) {
         List<ResponseValueInjector<CompletableValue>> responseValueInjectors = singletonList(
                 new uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.completablevalue
                         .TaxonomyNameInjector());
         return new ExternalServiceResultsTransformer<>(responseValueInjectors,
                 completableValueResultMutator(converterFactory));
+    }
+
+    @Bean
+    public ExternalServiceResultsTransformer<CompletableValue, CompletableValue> evidenceNameTransformer
+            (RESTFilterConverterFactory converterFactory) {
+        List<ResponseValueInjector<CompletableValue>> responseValueInjectors = singletonList(
+                new EvidenceNameInjector());
+        return new ExternalServiceResultsTransformer<>(responseValueInjectors,
+                completableValueResultMutator(converterFactory));
+    }
+
+    private ValueInjectionToQueryResults<Annotation> queryResultMutator(
+            RESTFilterConverterFactory converterFactory) {
+        return new ValueInjectionToQueryResults<>(converterFactory);
+    }
+
+    private DbXRefLoader geneProductLoader() {
+        return new DbXRefLoader(this.xrefValidationRegexFile, xrefValidationCaseSensitive);
     }
 
     public interface AnnotationCompositeRetrievalConfig extends SolrRetrievalConfig, ServiceRetrievalConfig {

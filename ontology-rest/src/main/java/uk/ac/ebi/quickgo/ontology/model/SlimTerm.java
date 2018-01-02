@@ -11,11 +11,11 @@ import java.util.List;
  * @author Edd
  */
 public class SlimTerm {
-    public SlimTerm(String id, List<String> slimmedTerms) {
-        this.id = id;
-        this.slimsTo = Collections.unmodifiableList(slimmedTerms);
+    public SlimTerm(String slimsFromId, List<String> slimmedTerms) {
+        this.slimsFromId = slimsFromId;
+        this.slimsToIds = Collections.unmodifiableList(slimmedTerms);
     }
 
-    public final String id;
-    public final List<String> slimsTo;
+    public final String slimsFromId;
+    public final List<String> slimsToIds;
 }

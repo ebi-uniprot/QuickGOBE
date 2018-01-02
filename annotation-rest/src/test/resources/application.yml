@@ -41,7 +41,7 @@ search:
         execution: REST_COMM
         properties: {
           ip: "https://localhost",
-          resourceFormat: "/ontology/go/slim?ids={goId}&relations={goUsageRelationships}",
+          resourceFormat: "/ontology/go/slim?slimsToIds={goId}&relations={goUsageRelationships}",
           responseClass: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.OntologyRelatives",
           responseConverter: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.SlimmingFilterConverter"
         }
@@ -60,6 +60,15 @@ search:
           resourceFormat: "/proteins/api/taxonomy/id/{taxonId}/node",
           responseClass: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.BasicTaxonomyNode",
           responseConverter: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.BasicTaxonomyNodeIdentityFilterConverter"
+        }
+      - signature: evidenceCode,evidenceName
+        execution: REST_COMM
+        properties: {
+          ip: "https://localhost",
+          resourceFormat: "/ontology/eco/terms/{evidenceCode}",
+          responseClass: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.BasicOntology",
+          responseConverter: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.BasicOntologyIdentityFilterConverter",
+          timeout: 15000
         }
   wildcard:
     fields: extension_search
