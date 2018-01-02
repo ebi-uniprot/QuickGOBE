@@ -9,6 +9,7 @@ import uk.ac.ebi.quickgo.annotation.model.About;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
 import uk.ac.ebi.quickgo.annotation.model.StatisticsGroup;
+import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.completablevalue.EvidenceNameInjector;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.completablevalue.OntologyNameInjector;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.completablevalue.TaxonomyNameInjector;
 import uk.ac.ebi.quickgo.annotation.service.search.NameService;
@@ -60,6 +61,12 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.HttpHeaders.VARY;
 import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.*;
+import static uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.completablevalue
+        .EvidenceNameInjector.EVIDENCE_CODE;
+import static uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.completablevalue
+        .OntologyNameInjector.GO_ID;
+import static uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.completablevalue
+        .TaxonomyNameInjector.TAXON_ID;
 import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.searchAndTransform;
 import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.streamSearchResults;
 import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.createFirstCursorPage;
@@ -132,6 +139,7 @@ public class AnnotationController {
             fileExtension(mt));
     private static final String GO_NAME = "goName";
     private static final String TAXON_NAME = "taxonName";
+    private static final String EVIDENCE_NAME = "evidenceName";
     private final MetaDataProvider metaDataProvider;
     private final SearchService<Annotation> annotationSearchService;
     private final SearchServiceConfig.AnnotationCompositeRetrievalConfig annotationRetrievalConfig;
@@ -235,6 +243,7 @@ public class AnnotationController {
         checkBindingErrors(bindingResult);
 
         QueryResult<StatisticsGroup> stats = statsService.calculateForStandardUsage(request);
+        addAllNamesToStatisticsValues(stats);
         return new ResponseEntity<>(stats, HttpStatus.OK);
     }
 
@@ -300,14 +309,13 @@ public class AnnotationController {
     @RequestMapping(value = "/downloadStats", method = {RequestMethod.GET},
             produces = {EXCEL_MEDIA_TYPE_STRING, JSON_MEDIA_TYPE_STRING})
     public ResponseEntity<ResponseBodyEmitter> downloadStats(@Valid @ModelAttribute AnnotationRequest request,
-            BindingResult bindingResult, @RequestHeader(ACCEPT) MediaType mediaTypeAcceptHeader) throws IOException {
+            BindingResult bindingResult, @RequestHeader(ACCEPT) MediaType mediaTypeAcceptHeader) {
         checkBindingErrors(bindingResult);
         ResponseBodyEmitter emitter = new ResponseBodyEmitter();
 
         taskExecutor.execute(() -> {
             QueryResult<StatisticsGroup> stats = statsService.calculateForDownloadUsage(request);
-            addNamesToStatisticsValues(stats, GO_NAME, OntologyNameInjector.GO_ID);
-            addNamesToStatisticsValues(stats, TAXON_NAME, TaxonomyNameInjector.TAXON_ID);
+            addAllNamesToStatisticsValues(stats);
             emitDownloadWithMediaType(emitter, stats, mediaTypeAcceptHeader);
         });
 
@@ -320,6 +328,12 @@ public class AnnotationController {
     private static String formattedDateStringForNow() {
         LocalDateTime now = LocalDateTime.now();
         return now.format(DOWNLOAD_FILE_NAME_DATE_FORMATTER);
+    }
+
+    private void addAllNamesToStatisticsValues(QueryResult<StatisticsGroup> stats) {
+        addNamesToStatisticsValues(stats, GO_NAME, GO_ID);
+        addNamesToStatisticsValues(stats, TAXON_NAME, TAXON_ID);
+        addNamesToStatisticsValues(stats, EVIDENCE_NAME, EVIDENCE_CODE);
     }
 
     private void checkBindingErrors(BindingResult bindingResult) {
@@ -465,12 +479,13 @@ public class AnnotationController {
                     .forEach(statisticsValue -> statisticsValue.setName(nameService.findName(nameField, statisticsValue
                             .getKey())));
         } catch (Exception e) {
-            LOGGER.error("Failed to retrieve GO names for StatisticsDownloadRequest", e);
+            LOGGER.error("Failed to retrieve name information processing statistics request", e);
         }
     }
 
     private interface FilterQueryInfo {
         Set<QuickGOQuery> getFilterQueries();
+
         FilterContext getFilterContext();
     }
 }
