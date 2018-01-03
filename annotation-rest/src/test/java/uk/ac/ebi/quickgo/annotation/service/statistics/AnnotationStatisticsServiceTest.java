@@ -36,12 +36,6 @@ public class AnnotationStatisticsServiceTest {
     private StatsConverter statsConverterMock;
 
     @Mock
-    private RequiredStatistics requiredStatisticsForStandardUsage;
-
-    @Mock
-    private RequiredStatistics requiredStatisticsForDownloadUsage;
-
-    @Mock
     private RequiredStatisticsProvider requiredStatisticsProvider;
 
     @Before
@@ -80,7 +74,7 @@ public class AnnotationStatisticsServiceTest {
     @Test
     public void nullRequiredStatisticsProviderThrowsExceptionInConstructor() {
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Required statistics for standard usage cannot be null.");
+        thrown.expectMessage("Statistics provider cannot be null.");
 
         statsService = new AnnotationStatisticsService(filterFactoryMock, searchServiceMock,
                 statsConverterMock, null);
@@ -93,31 +87,4 @@ public class AnnotationStatisticsServiceTest {
 
         statsService.calculateForStandardUsage(null);
     }
-
-    @Test
-    public void calculatingRequiredStatisticsForStandardUsageWithNullContentThrowsException() {
-        thrown.expect(IllegalStateException.class);
-        thrown.expectMessage("Required statistics for standard usage cannot be null.");
-
-        when(requiredStatisticsForStandardUsage.getRequiredStatistics()).thenReturn(null);
-        statsService = new AnnotationStatisticsService(filterFactoryMock, searchServiceMock,
-                statsConverterMock, requiredStatisticsProvider);
-        AnnotationRequest request = Mockito.mock(AnnotationRequest.class);
-
-        statsService.calculateForStandardUsage(request);
-    }
-
-    @Test
-    public void calculatingRequiredStatisticsForDownloadUsageWithNullContentThrowsException() {
-        thrown.expect(IllegalStateException.class);
-        thrown.expectMessage("Required statistics for download cannot be null.");
-
-        when(requiredStatisticsForDownloadUsage.getRequiredStatistics()).thenReturn(null);
-        statsService = new AnnotationStatisticsService(filterFactoryMock, searchServiceMock,
-                statsConverterMock, requiredStatisticsProvider);
-        AnnotationRequest request = Mockito.mock(AnnotationRequest.class);
-
-        statsService.calculateForStandardUsage(request);
-    }
-
 }
