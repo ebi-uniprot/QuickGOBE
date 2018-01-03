@@ -23,8 +23,8 @@ import static uk.ac.ebi.quickgo.annotation.service.statistics.RequiredStatisticT
  * @author Edd
  */
 public class RequiredStatistics {
+    static final List<RequiredStatisticType> STATS_TYPES;
     static final int DEFAULT_GO_TERM_LIMIT = 200;
-    protected static final List<RequiredStatisticType> STATS_TYPES;
     static final String ANNOTATION = "annotation";
     static final String GENE_PRODUCT = "geneProduct";
 
@@ -35,13 +35,12 @@ public class RequiredStatistics {
                 statsType(AnnotationFields.Facetable.REFERENCE),
                 statsType(AnnotationFields.Facetable.EVIDENCE_CODE),
                 statsType(AnnotationFields.Facetable.ASSIGNED_BY),
-                statsType(AnnotationFields.Facetable.GO_ASPECT),
-                statsType(AnnotationFields.Facetable.GENE_PRODUCT_ID)
+                statsType(AnnotationFields.Facetable.GO_ASPECT)
         );
     }
 
-    protected List<RequiredStatistic> requiredStats;
-    protected List<RequiredStatisticType> configuredTypes;
+    private List<RequiredStatistic> requiredStats;
+    private List<RequiredStatisticType> configuredTypes;
 
     RequiredStatistics(StatisticsTypeConfigurer statsConfigurer) {
         checkArgument(statsConfigurer != null, "Stats configurer cannot be null");
@@ -53,12 +52,12 @@ public class RequiredStatistics {
         return requiredStats;
     }
 
-    protected RequiredStatistic annotationStats() {
+    private RequiredStatistic annotationStats() {
         return new RequiredStatistic(ANNOTATION, AnnotationFields.Facetable.ID,
                 AggregateFunction.COUNT.getName(), configuredTypes);
     }
 
-    protected RequiredStatistic geneProductStats() {
+    private RequiredStatistic geneProductStats() {
         return new RequiredStatistic(GENE_PRODUCT, AnnotationFields.Facetable.GENE_PRODUCT_ID,
                 AggregateFunction.UNIQUE.getName(), configuredTypes);
     }
