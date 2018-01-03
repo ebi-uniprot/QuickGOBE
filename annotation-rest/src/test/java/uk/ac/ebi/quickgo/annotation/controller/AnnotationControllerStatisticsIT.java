@@ -34,6 +34,7 @@ import static java.util.Arrays.asList;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.GENE_PRODUCT_ID_PARAM;
 import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.GO_ID_PARAM;
 import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.GO_USAGE_PARAM;
 import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.TAXON_ID_PARAM;
@@ -77,6 +78,7 @@ public class AnnotationControllerStatisticsIT {
     private static final String EXACT_USAGE = "exact";
     private static final String DISTINCT_VALUE_COUNT = "distinctValueCount";
     private static final String TAXON_NAME = "taxon name: " + TAXON_ID;
+    private static final String GENE_PRODUCT_ID_STATS_FIELD = "geneProductId";
 
     private MockMvc mockMvc;
     @Autowired
@@ -391,6 +393,22 @@ public class AnnotationControllerStatisticsIT {
 
         assertStatsResponse(response, GO_ASPECT_STATS_FIELD, 2, relevantAspect, 2);
     }
+
+    //----------- Gene Product Id -----------//
+
+    @Test
+    public void statsWhenFilteredByGeneProductContainsGeneProductIdBucket() throws Exception {
+        final String gene = "P99999";
+        repository.save(createAnnotationDoc(gene));
+
+        ResultActions response = mockMvc.perform(
+                get(STATS_ENDPOINT)
+                        .param(GENE_PRODUCT_ID_PARAM.getName(), gene)
+        );
+
+        assertStatsResponse(response, GENE_PRODUCT_ID_STATS_FIELD, 1, asList(gene), 1);
+    }
+
 
     private static <T, D extends QuickGODocument> Set<T> selectValuesFromDocs(
             Collection<D> documents,
