@@ -15,10 +15,7 @@ import uk.ac.ebi.quickgo.rest.search.results.AggregationBucket;
 import uk.ac.ebi.quickgo.rest.search.results.AggregationResult;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -42,7 +39,7 @@ public class AnnotationStatisticsService implements StatisticsService {
     private static final int RESULTS_PER_PAGE = 0;
     private static final QueryResult<StatisticsGroup>
             EMPTY_STATS = new QueryResult.Builder<>(0, Collections.<StatisticsGroup>emptyList()).build();
-    private final RequiredStatisticsProvider statisticsProvider;
+    private final RequiredStatisticsProvider requiredStatisticsProvider;
     private final FilterConverterFactory converterFactory;
     private final SearchService<Annotation> searchService;
     private final StatsConverter converter;
@@ -52,16 +49,16 @@ public class AnnotationStatisticsService implements StatisticsService {
     public AnnotationStatisticsService(FilterConverterFactory converterFactory,
             SearchService<Annotation> searchService,
             StatsConverter converter,
-            RequiredStatisticsProvider statisticsProvider) {
+            RequiredStatisticsProvider requiredStatisticsProvider) {
         checkArgument(converterFactory != null, "Filter factory cannot be null.");
         checkArgument(searchService != null, "Search service cannot be null.");
         checkArgument(converter != null, "Stats request converter cannot be null.");
-        checkArgument(statisticsProvider != null, "Statistics provider cannot be null.");
+        checkArgument(requiredStatisticsProvider != null, "Statistics provider cannot be null.");
 
         this.converterFactory = converterFactory;
         this.searchService = searchService;
         this.converter = converter;
-        this.statisticsProvider = statisticsProvider;
+        this.requiredStatisticsProvider = requiredStatisticsProvider;
 
         queryTemplate = new DefaultSearchQueryTemplate();
     }
@@ -103,16 +100,12 @@ public class AnnotationStatisticsService implements StatisticsService {
     }
 
     private List<RequiredStatistic> listRequiredStatistics(AnnotationRequest request, boolean download) {
-        if (request.getGeneProductId().length == 0 && !download) {
-            return statisticsProvider.usualCase.requiredStats;
+        if (isNullOrEmpty(request.getGeneProductId())) {
+            return download ? requiredStatisticsProvider.getDownloadUsage() :
+                    requiredStatisticsProvider.getStandardUsage();
         }
-        if (request.getGeneProductId().length == 0 && download) {
-            return statisticsProvider.usualCaseForDownload.requiredStats;
-        }
-        if (request.getGeneProductId().length > 0 && !download) {
-            return statisticsProvider.withGeneProduct.requiredStats;
-        }
-        return statisticsProvider.withGeneProductForDownload.requiredStats;
+        return download ? requiredStatisticsProvider.getDownloadUsageWithGeneProductFiltering() :
+                requiredStatisticsProvider.getStandardUsageWithGeneProductFiltering();
     }
 
     private QueryRequest buildQueryRequest(AnnotationRequest request, List<RequiredStatistic> requiredStatistics) {
@@ -200,5 +193,9 @@ public class AnnotationStatisticsService implements StatisticsService {
                     .map(aggResult -> new StatisticsValue(bucket.getValue(), (long) aggResult.getResult(), totalHits))
                     .collect(Collectors.toSet());
         }
+    }
+
+    private boolean isNullOrEmpty(String[] array) {
+        return array == null || array.length == 0;
     }
 }
