@@ -34,7 +34,7 @@ public class StatisticsDownloadTypeReadPropertiesIT {
 
     @Before
     public void setUp() {
-        statistics = requiredStatisticsProvider.usualCaseForDownload.requiredStats;
+        statistics = requiredStatisticsProvider.getDownloadUsage();
     }
 
     @Test
