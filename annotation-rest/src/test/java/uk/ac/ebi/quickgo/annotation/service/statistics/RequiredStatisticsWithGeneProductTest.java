@@ -17,7 +17,7 @@ import static org.mockito.Mockito.*;
  */
 public class RequiredStatisticsWithGeneProductTest {
 
-    private StatisticsTypeConfigurer configurer = mock(StatisticsTypeConfigurer.class);
+    private final StatisticsTypeConfigurer configurer = mock(StatisticsTypeConfigurer.class);
 
     @Test
     public void isConstructedProperly() {
