@@ -1,7 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.service.statistics;
 
-import java.util.Map;
-
+import java.util.List;
 
 /**
  * A source of {@link RequiredStatistics} instances.
@@ -13,17 +12,32 @@ import java.util.Map;
  */
 public class RequiredStatisticsProvider {
 
-    final RequiredStatistics usualCase;
-    final RequiredStatistics usualCaseForDownload;
-    final RequiredStatistics withGeneProduct;
-    final RequiredStatistics withGeneProductForDownload;
+    private final RequiredStatistics standardUsage;
+    private final RequiredStatistics downloadUsage;
+    private final RequiredStatistics standardUsageWithGeneProductFiltering;
+    private final RequiredStatistics downloadUsageWithGeneProductFiltering;
 
-    public RequiredStatisticsProvider(Map<String, Integer> usualProperties, Map<String, Integer> downLoadProperties) {
-        StatisticsTypeConfigurer usualConfigurer = new StatisticsTypeConfigurer(usualProperties);
-        StatisticsTypeConfigurer downloadConfigurer = new StatisticsTypeConfigurer(downLoadProperties);
-        usualCase = new RequiredStatistics(usualConfigurer);
-        usualCaseForDownload = new RequiredStatistics(downloadConfigurer);
-        withGeneProduct = new RequiredStatisticsWithGeneProduct(usualConfigurer);
-        withGeneProductForDownload = new RequiredStatistics(downloadConfigurer);
+    public RequiredStatisticsProvider(StatisticsTypeConfigurer standardConfiguration, StatisticsTypeConfigurer
+            downloadConfiguration) {
+        standardUsage = new RequiredStatistics(standardConfiguration);
+        downloadUsage = new RequiredStatistics(downloadConfiguration);
+        standardUsageWithGeneProductFiltering = new RequiredStatisticsWithGeneProduct(standardConfiguration);
+        downloadUsageWithGeneProductFiltering = new RequiredStatisticsWithGeneProduct(downloadConfiguration);
+    }
+
+    public List<RequiredStatistic> getStandardUsage() {
+        return standardUsage.getRequiredStatistics();
+    }
+
+    public List<RequiredStatistic> getDownloadUsage() {
+        return downloadUsage.getRequiredStatistics();
+    }
+
+    public List<RequiredStatistic> getStandardUsageWithGeneProductFiltering() {
+        return standardUsageWithGeneProductFiltering.getRequiredStatistics();
+    }
+
+    public List<RequiredStatistic> getDownloadUsageWithGeneProductFiltering() {
+        return downloadUsageWithGeneProductFiltering.getRequiredStatistics();
     }
 }
