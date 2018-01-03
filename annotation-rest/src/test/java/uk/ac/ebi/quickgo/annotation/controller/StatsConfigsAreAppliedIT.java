@@ -4,6 +4,7 @@ import uk.ac.ebi.quickgo.annotation.AnnotationREST;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationFields;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
+import uk.ac.ebi.quickgo.annotation.service.statistics.RequiredStatisticsProvider;
 import uk.ac.ebi.quickgo.annotation.service.statistics.StatisticsTypeConfigurer;
 import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 
@@ -51,12 +52,13 @@ public class StatsConfigsAreAppliedIT {
     // temporary data store for solr's data, which is automatically cleaned on exit
     @ClassRule
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
-    public static final String GO_ID = "goId";
-    public static final String TAXON_ID = "taxonId";
+    private static final String GO_ID = "goId";
+    private static final String TAXON_ID = "taxonId";
 
     // the configured stats limits used in this test
-    static final int GO_ID_LIMIT_PROPERTY = 6;
-    static final int TAXON_ID_LIMIT_PROPERTY = 7;
+    private static final int GO_ID_LIMIT_PROPERTY = 6;
+    private static final int GO_ID_LIMIT_PROPERTY_FOR_DOWNLOAD = 10;
+    private static final int TAXON_ID_LIMIT_PROPERTY = 7;
 
     private static final int SAVED_DOC_COUNT = 50;
     private static final int DEFAULT_STATS_TYPE_COUNT = 10;
@@ -168,17 +170,26 @@ public class StatsConfigsAreAppliedIT {
     @Configuration
     static class TestStatsTypeConfig {
 
-        static Map<String, Integer> typeLimitProperties = typeLimitTestValues();
+        static final Map<String, Integer> typeLimitProperties = typeLimitTestValues();
+        static final Map<String, Integer> typeLimitTestValuesForDownload = typeLimitTestValuesForDownload();
 
         @Primary
         @Bean
-        public StatisticsTypeConfigurer statsTypeConfigurer() {
-            return new StatisticsTypeConfigurer(typeLimitProperties);
+        public RequiredStatisticsProvider requiredStatisticsProvider() {
+            return new RequiredStatisticsProvider(new StatisticsTypeConfigurer(typeLimitProperties),
+                    new StatisticsTypeConfigurer(typeLimitTestValuesForDownload));
         }
 
         private static Map<String, Integer> typeLimitTestValues() {
             Map<String, Integer> properties = new HashMap<>();
             properties.put(AnnotationFields.Facetable.GO_ID, GO_ID_LIMIT_PROPERTY);
+            properties.put(AnnotationFields.Facetable.TAXON_ID, TAXON_ID_LIMIT_PROPERTY);
+            return properties;
+        }
+
+        private static Map<String, Integer> typeLimitTestValuesForDownload() {
+            Map<String, Integer> properties = new HashMap<>();
+            properties.put(AnnotationFields.Facetable.GO_ID, GO_ID_LIMIT_PROPERTY_FOR_DOWNLOAD);
             properties.put(AnnotationFields.Facetable.TAXON_ID, TAXON_ID_LIMIT_PROPERTY);
             return properties;
         }
