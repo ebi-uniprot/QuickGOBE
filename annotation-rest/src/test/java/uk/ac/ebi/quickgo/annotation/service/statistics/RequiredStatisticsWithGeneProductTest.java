@@ -25,6 +25,6 @@ public class RequiredStatisticsWithGeneProductTest {
         when(configurer.getConfiguredStatsTypes(anyList())).thenReturn(requiredStatisticTypes);
 
         RequiredStatisticsWithGeneProduct withGeneProduct = new RequiredStatisticsWithGeneProduct(configurer);
-        assertThat(withGeneProduct.getStatsTypes(), hasSize(8));
+        assertThat(withGeneProduct.getStatsTypes(), hasSize(7));
     }
 }
