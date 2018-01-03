@@ -34,7 +34,7 @@ public class StatisticsTypeDefaultPropertiesIT {
 
     @Before
     public void setUp() {
-        statistics = requiredStatisticsProvider.usualCaseForDownload.requiredStats;
+        statistics = requiredStatisticsProvider.getStandardUsage();
     }
 
     @Test
