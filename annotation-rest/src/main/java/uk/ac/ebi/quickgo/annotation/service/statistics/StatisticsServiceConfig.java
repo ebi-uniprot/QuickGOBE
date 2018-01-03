@@ -36,6 +36,14 @@ public class StatisticsServiceConfig {
 
     @Bean
     public RequiredStatisticsProvider statisticsProvider() {
-        return new RequiredStatisticsProvider(typeLimitsForStandardUsage, typeLimitsForDownloadUsage);
+        return new RequiredStatisticsProvider(standardConfiguration(), downloadConfiguration());
+    }
+
+    private StatisticsTypeConfigurer standardConfiguration() {
+        return new StatisticsTypeConfigurer(typeLimitsForStandardUsage);
+    }
+
+    private StatisticsTypeConfigurer downloadConfiguration() {
+        return new StatisticsTypeConfigurer(typeLimitsForDownloadUsage);
     }
 }
