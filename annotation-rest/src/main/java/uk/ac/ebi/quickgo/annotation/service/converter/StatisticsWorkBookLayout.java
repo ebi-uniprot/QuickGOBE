@@ -4,7 +4,7 @@ import java.util.LinkedHashSet;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
-import static uk.ac.ebi.quickgo.annotation.service.converter.WorkbookFromStatisticsImpl.SheetLayout.buildLayout;
+import static uk.ac.ebi.quickgo.annotation.service.converter.SheetLayout.buildLayout;
 
 /**
  * A specification of format and content for the statistics download.
@@ -14,7 +14,7 @@ import static uk.ac.ebi.quickgo.annotation.service.converter.WorkbookFromStatist
  * Created with IntelliJ IDEA.
  */
 public class StatisticsWorkBookLayout {
-    public static final LinkedHashSet<WorkbookFromStatisticsImpl.SheetLayout> SHEET_LAYOUT_SET = new LinkedHashSet<>();
+    public static final LinkedHashSet<SheetLayout> SHEET_LAYOUT_SET = new LinkedHashSet<>();
 
     private static final String ANNOTATION = "annotation";
     private static final String GENE_PRODUCT = "geneProduct";
@@ -83,7 +83,7 @@ public class StatisticsWorkBookLayout {
                 asList(SL_ANNOTATION_ASSIGNED, SL_GENE_PRODUCT_ASSIGNED)));
     }
 
-    static class AnnotationSectionLayout extends WorkbookFromStatisticsImpl.SectionLayout {
+    static class AnnotationSectionLayout extends SectionLayout {
         private static final int BY_ANNOTATION_STARTING_COLUMN = 0;
 
         AnnotationSectionLayout(String header) {
@@ -91,7 +91,7 @@ public class StatisticsWorkBookLayout {
         }
     }
 
-    static class GeneProductSectionLayout extends WorkbookFromStatisticsImpl.SectionLayout {
+    static class GeneProductSectionLayout extends SectionLayout {
         private static final int BY_PROTEIN_STARTING_COLUMN = 10;
 
         GeneProductSectionLayout(String header) {
