@@ -186,36 +186,4 @@ public class WorkbookFromStatisticsImpl implements WorkbookFromStatistics {
                             .setCellValue(GENE_PRODUCTS_SUMMARY + statisticsGroup.getTotalHits());
                 });
     }
-
-    /**
-     * Defines a workbook layout, the name to use for it, and the statistics data type it is associated with.
-     */
-    static class SheetLayout {
-        final String typeName;
-        final String displayName;
-        final List<SectionLayout> sectionLayouts;
-
-        private SheetLayout(String typeName, String displayName, List<SectionLayout> sectionLayouts) {
-            this.typeName = typeName;
-            this.displayName = displayName;
-            this.sectionLayouts = sectionLayouts;
-        }
-
-        static SheetLayout buildLayout(String typeName, String displayName, List<SectionLayout> sectionLayouts) {
-            return new SheetLayout(typeName, displayName, sectionLayouts);
-        }
-    }
-
-    static class SectionLayout {
-        private static final String[] SECTION_COL_HEADINGS = new String[]{"Code", "Name", "Percentage", "Count"};
-        final String type;
-        private final String header;
-        private final int startingColumn;
-
-        SectionLayout(String type, String header, int startingColumn) {
-            this.type = type;
-            this.header = header;
-            this.startingColumn = startingColumn;
-        }
-    }
 }
