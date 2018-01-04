@@ -18,7 +18,7 @@ public class StatisticsWorkBookLayout {
 
     public static final String[] SECTION_TYPES = new String[]{ANNOTATION, GENE_PRODUCT};
 
-    //Annotation stats
+    //Annotation headers
     private static final AnnotationSectionLayout SL_ANNOTATION_REFERENCES =
             new AnnotationSectionLayout("References (by annotation)");
     private static final AnnotationSectionLayout SL_ANNOTATION_TAXON =
@@ -32,7 +32,7 @@ public class StatisticsWorkBookLayout {
     private static final AnnotationSectionLayout SL_ANNOTATION_EVIDENCE_CODE =
             new AnnotationSectionLayout("Evidence Codes (by annotation)");
 
-    //Gene product stats
+    //Gene product headers
     private static final GeneProductSectionLayout SL_GENE_PRODUCT_GOID =
             new GeneProductSectionLayout("GO IDs (by protein)");
     private static final GeneProductSectionLayout SL_GENE_PRODUCT_ASPECT =
@@ -46,36 +46,50 @@ public class StatisticsWorkBookLayout {
     private static final GeneProductSectionLayout SL_GENE_PRODUCT_ASSIGNED =
             new GeneProductSectionLayout("Sources (by protein)");
 
+    private static final String GO_ID_SHEET_KEY = "goId";
+    private static final String ASPECT_SHEET_KEY = "aspect";
+    private static final String EVIDENCE_CODE_SHEET_KEY = "evidenceCode";
+    private static final String REFERENCE_SHEET_KEY = "reference";
+    private static final String TAXON_ID_SHEET_KEY = "taxonId";
+    private static final String ASSIGNED_BY_SHEET_KEY = "assignedBy";
+
+    private static final String GO_ID_SHEET_NAME = "goid";
+    private static final String ASPECT_SHEET_NAME = "aspect";
+    private static final String EVIDENCE_SHEET_NAME = "evidence";
+    private static final String REFERENCE_SHEET_NAME = "reference";
+    private static final String TAXON_SHEET_NAME = "taxon";
+    private static final String ASSIGNED_SHEET_NAME = "assigned";
+
+    //Add headers
     static {
-        SHEET_LAYOUT_MAP.put("goId",
-                new WorkbookFromStatisticsImpl.SheetLayout("goid",
+        SHEET_LAYOUT_MAP.put(GO_ID_SHEET_KEY,
+                new WorkbookFromStatisticsImpl.SheetLayout(GO_ID_SHEET_NAME,
                         Arrays.asList(SL_ANNOTATION_GOID,
                                 SL_GENE_PRODUCT_GOID)));
-        SHEET_LAYOUT_MAP.put("aspect",
-                new WorkbookFromStatisticsImpl.SheetLayout("aspect",
+        SHEET_LAYOUT_MAP.put(ASPECT_SHEET_KEY,
+                new WorkbookFromStatisticsImpl.SheetLayout(ASPECT_SHEET_NAME,
                         Arrays.asList(SL_ANNOTATION_ASPECT,
                                 SL_GENE_PRODUCT_ASPECT)));
-        SHEET_LAYOUT_MAP.put("evidenceCode",
-                new WorkbookFromStatisticsImpl.SheetLayout("evidence",
+        SHEET_LAYOUT_MAP.put(EVIDENCE_CODE_SHEET_KEY,
+                new WorkbookFromStatisticsImpl.SheetLayout(EVIDENCE_SHEET_NAME,
                         Arrays.asList(SL_ANNOTATION_EVIDENCE_CODE,
                                 SL_GENE_PRODUCT_EVIDENCE_CODE)));
-        SHEET_LAYOUT_MAP.put("reference",
-                new WorkbookFromStatisticsImpl.SheetLayout("reference",
+        SHEET_LAYOUT_MAP.put(REFERENCE_SHEET_KEY,
+                new WorkbookFromStatisticsImpl.SheetLayout(REFERENCE_SHEET_NAME,
                         Arrays.asList(SL_ANNOTATION_REFERENCES,
                                 SL_GENE_PRODUCT_REFERENCES)));
-        SHEET_LAYOUT_MAP.put("taxonId",
-                new WorkbookFromStatisticsImpl.SheetLayout("taxon",
+        SHEET_LAYOUT_MAP.put(TAXON_ID_SHEET_KEY,
+                new WorkbookFromStatisticsImpl.SheetLayout(TAXON_SHEET_NAME,
                         Arrays.asList(SL_ANNOTATION_TAXON,
                                 SL_GENE_PRODUCT_TAXON)));
-        SHEET_LAYOUT_MAP.put("assignedBy",
-                new WorkbookFromStatisticsImpl.SheetLayout("assigned",
+        SHEET_LAYOUT_MAP.put(ASSIGNED_BY_SHEET_KEY,
+                new WorkbookFromStatisticsImpl.SheetLayout(ASSIGNED_SHEET_NAME,
                         Arrays.asList(SL_ANNOTATION_ASSIGNED,
                                 SL_GENE_PRODUCT_ASSIGNED)));
     }
 
     static class AnnotationSectionLayout extends WorkbookFromStatisticsImpl.SectionLayout {
         private static final int BY_ANNOTATION_STARTING_COLUMN = 0;
-
         AnnotationSectionLayout(String header) {
             super(ANNOTATION, header, BY_ANNOTATION_STARTING_COLUMN);
         }
@@ -83,7 +97,6 @@ public class StatisticsWorkBookLayout {
 
     static class GeneProductSectionLayout extends WorkbookFromStatisticsImpl.SectionLayout {
         private static final int BY_PROTEIN_STARTING_COLUMN = 10;
-
         GeneProductSectionLayout(String header) {
             super(GENE_PRODUCT, header, BY_PROTEIN_STARTING_COLUMN);
         }
