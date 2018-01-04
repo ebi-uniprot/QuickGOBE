@@ -1,8 +1,9 @@
 package uk.ac.ebi.quickgo.annotation.service.statistics;
 
+import java.util.HashMap;
 import java.util.List;
+import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
@@ -15,10 +16,15 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
  */
 public class RequiredStatisticsProviderTest {
 
-    @Mock
+    // the configured stats limits used in this test
     private StatisticsTypeConfigurer standard;
-    @Mock
     private StatisticsTypeConfigurer download;
+
+    @Before
+    public void setup() {
+        standard = new StatisticsTypeConfigurer(new HashMap<>());
+        download = new StatisticsTypeConfigurer(new HashMap<>());
+    }
 
     @Test(expected = IllegalArgumentException.class)
     public void statisticsTypeConfigurerForStandardUseCannotBeNull() {
