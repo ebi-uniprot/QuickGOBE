@@ -24,7 +24,7 @@ public class RequiredStatisticsProvider {
             downloadConfiguration) {
         checkArgument(Objects.nonNull(standardConfiguration), "The standard StatisticsTypeConfigurer instance cannot" +
                 " be null");
-        checkArgument(Objects.nonNull(standardConfiguration), "The download StatisticsTypeConfigurer instance cannot" +
+        checkArgument(Objects.nonNull(downloadConfiguration), "The download StatisticsTypeConfigurer instance cannot" +
                 " be null");
         standardUsage = new RequiredStatistics(standardConfiguration);
         downloadUsage = new RequiredStatistics(downloadConfiguration);
