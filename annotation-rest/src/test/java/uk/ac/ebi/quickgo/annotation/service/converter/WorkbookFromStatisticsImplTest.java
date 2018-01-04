@@ -11,7 +11,7 @@ import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static uk.ac.ebi.quickgo.annotation.service.converter.StatisticsWorkBookLayout.SECTION_TYPES;
+import static uk.ac.ebi.quickgo.annotation.service.converter.SheetLayout.buildLayout;
 import static uk.ac.ebi.quickgo.annotation.service.converter.WorkbookFromStatisticsImpl.ANNOTATIONS_SUMMARY;
 import static uk.ac.ebi.quickgo.annotation.service.converter.WorkbookFromStatisticsImpl.GENE_PRODUCTS_SUMMARY;
 import static uk.ac.ebi.quickgo.annotation.service.converter.WorkbookFromStatisticsImpl.SUMMARY_HEADER;
@@ -24,7 +24,7 @@ import static uk.ac.ebi.quickgo.annotation.service.converter.WorkbookFromStatist
  * Created with IntelliJ IDEA.
  */
 public class WorkbookFromStatisticsImplTest {
-    private static final Map<String, WorkbookFromStatisticsImpl.SheetLayout> SHEET_LAYOUT_MAP = new HashMap<>();
+    private static final LinkedHashSet<SheetLayout> SHEET_LAYOUT_SET = new LinkedHashSet<>();
     private static final StatisticsWorkBookLayout.AnnotationSectionLayout SL_ANNOTATION_GOID =
             new StatisticsWorkBookLayout.AnnotationSectionLayout("GO IDs (by annotation)");
     private static final StatisticsWorkBookLayout.AnnotationSectionLayout SL_ANNOTATION_ASPECT =
@@ -35,15 +35,11 @@ public class WorkbookFromStatisticsImplTest {
             new StatisticsWorkBookLayout.GeneProductSectionLayout("Aspects (by protein)");
 
     static {
-        SHEET_LAYOUT_MAP.put("TEST_GO_ID",
-                new WorkbookFromStatisticsImpl.SheetLayout("goid",
-                        Arrays.asList(SL_ANNOTATION_GOID,
-                                SL_GENE_PRODUCT_GOID)));
+        SHEET_LAYOUT_SET.add(buildLayout("TEST_GO_ID", "goid",
+                Arrays.asList(SL_ANNOTATION_GOID, SL_GENE_PRODUCT_GOID)));
 
-        SHEET_LAYOUT_MAP.put("aspect",
-                new WorkbookFromStatisticsImpl.SheetLayout("aspect",
-                        Arrays.asList(SL_ANNOTATION_ASPECT,
-                                SL_GENE_PRODUCT_ASPECT)));
+        SHEET_LAYOUT_SET.add(buildLayout("aspect", "aspect",
+                Arrays.asList(SL_ANNOTATION_ASPECT, SL_GENE_PRODUCT_ASPECT)));
     }
 
     private List<StatisticsGroup> statisticsGroups;
@@ -56,7 +52,7 @@ public class WorkbookFromStatisticsImplTest {
     @Test
     public void workbookMatchesInputData() {
         WorkbookFromStatisticsImpl statisticsToWorkbook =
-                new WorkbookFromStatisticsImpl(SECTION_TYPES, SHEET_LAYOUT_MAP);
+                new WorkbookFromStatisticsImpl(SHEET_LAYOUT_SET);
 
         Workbook workbook = statisticsToWorkbook.generate(statisticsGroups);
 
@@ -96,13 +92,8 @@ public class WorkbookFromStatisticsImplTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void creatingStatisticsToWorkbookWithNullSectionTypesThrowsException() {
-        new WorkbookFromStatisticsImpl(null, SHEET_LAYOUT_MAP);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
     public void creatingStatisticsToWorkbookWithNullLayoutMapThrowsException() {
-        new WorkbookFromStatisticsImpl(SECTION_TYPES, null);
+        new WorkbookFromStatisticsImpl(null);
     }
 
     private void testColumnHeaders(Workbook workbook, int startingCol) {
