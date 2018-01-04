@@ -1,6 +1,9 @@
 package uk.ac.ebi.quickgo.annotation.service.statistics;
 
 import java.util.List;
+import java.util.Objects;
+
+import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * A source of {@link RequiredStatistics} instances.
@@ -19,6 +22,10 @@ public class RequiredStatisticsProvider {
 
     public RequiredStatisticsProvider(StatisticsTypeConfigurer standardConfiguration, StatisticsTypeConfigurer
             downloadConfiguration) {
+        checkArgument(Objects.nonNull(standardConfiguration), "The standard StatisticsTypeConfigurer instance cannot" +
+                " be null");
+        checkArgument(Objects.nonNull(standardConfiguration), "The download StatisticsTypeConfigurer instance cannot" +
+                " be null");
         standardUsage = new RequiredStatistics(standardConfiguration);
         downloadUsage = new RequiredStatistics(downloadConfiguration);
         standardUsageWithGeneProductFiltering = new RequiredStatisticsWithGeneProduct(standardConfiguration);
