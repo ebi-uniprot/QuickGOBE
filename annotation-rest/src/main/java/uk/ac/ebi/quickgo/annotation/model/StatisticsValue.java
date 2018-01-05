@@ -33,7 +33,7 @@ public class StatisticsValue {
                 "Stats total cannot be less than hits: " + total + " < " + hits);
 
         this.key = key;
-        this.percentage = (double) hits / (double) total;
+        this.percentage = ((double) hits / (double) total) * 100;
         this.hits = hits;
     }
 

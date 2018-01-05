@@ -149,7 +149,7 @@ public class WorkbookFromStatisticsImpl implements WorkbookFromStatistics {
     }
 
     private void populatePercentageCell(Cell targetCell, StatisticsValue statisticsValue, CellStyle cellStyle) {
-        targetCell.setCellValue(statisticsValue.getPercentage() * 100);
+        targetCell.setCellValue(statisticsValue.getPercentage());
         targetCell.setCellType(CellType.NUMERIC);
         targetCell.setCellStyle(cellStyle);
     }
