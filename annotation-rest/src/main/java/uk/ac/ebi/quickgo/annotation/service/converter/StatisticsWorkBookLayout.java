@@ -21,7 +21,7 @@ public class StatisticsWorkBookLayout {
 
     //Annotation headers
     private static final AnnotationSectionLayout SL_ANNOTATION_GENE_PRODUCT =
-            new AnnotationSectionLayout("Annotations (by protein)");
+            new AnnotationSectionLayout("Annotations (by gene product)");
     private static final AnnotationSectionLayout SL_ANNOTATION_REFERENCES =
             new AnnotationSectionLayout("References (by annotation)");
     private static final AnnotationSectionLayout SL_ANNOTATION_TAXON =
@@ -63,7 +63,7 @@ public class StatisticsWorkBookLayout {
     private static final String REFERENCE_SHEET_NAME = "reference";
     private static final String TAXON_SHEET_NAME = "taxon";
     private static final String ASSIGNED_BY_SHEET_NAME = "assigned";
-    private static final String GENE_PRODUCT_SHEET_NAME = "protein";
+    private static final String GENE_PRODUCT_SHEET_NAME = "gene product";
 
     //Add headers and layout
     static {
