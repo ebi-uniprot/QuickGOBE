@@ -95,7 +95,7 @@
     <copyField source="id" dest="text"/>
     <copyField source="name" dest="text"/>
     <copyField source="synonymName" dest="text"/>
-
+    <copyField source="secondaryId" dest="text"/>
 
     <!--Use this for autocomplete searches-->
     <fieldType name="text_edge" class="solr.TextField" sortMissingLast="true" omitNorms="false"
