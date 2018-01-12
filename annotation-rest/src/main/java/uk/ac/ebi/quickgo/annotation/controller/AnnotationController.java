@@ -304,7 +304,6 @@ public class AnnotationController {
     }
 
     @ApiOperation(value = "Download statistics for all annotations that match the supplied filter criteria.",
-            hidden = true,
             response = File.class)
     @RequestMapping(value = "/downloadStats", method = {RequestMethod.GET},
             produces = {EXCEL_MEDIA_TYPE_STRING, JSON_MEDIA_TYPE_STRING})
