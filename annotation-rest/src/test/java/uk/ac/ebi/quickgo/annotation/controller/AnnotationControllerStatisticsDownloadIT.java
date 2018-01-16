@@ -4,6 +4,7 @@ import uk.ac.ebi.quickgo.annotation.AnnotationREST;
 import uk.ac.ebi.quickgo.annotation.IdGeneratorUtil;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
+import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker;
 import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 
 import java.util.List;
@@ -74,6 +75,7 @@ public class AnnotationControllerStatisticsDownloadIT {
     private static final String TAXON_ID = "12345";
     private static final Function<Integer, String> toId = i -> IdGeneratorUtil.createGoId(i);
     private static final Function<Integer, String> toName = i -> IdGeneratorUtil.createGoId(i) + " name";
+    private static final String TAXON_ID_PARAMETER_NAME = "taxonId";
 
     @Autowired
     CacheManager cacheManager;
@@ -105,7 +107,9 @@ public class AnnotationControllerStatisticsDownloadIT {
     public void canDownloadInExcelFormat() throws Exception {
         setupSuccessfullyReceivingRestNames();
 
-        ResultActions response = mockMvc.perform(get(DOWNLOAD_STATISTICS_SEARCH_URL).header(ACCEPT, EXCEL_MEDIA_TYPE));
+        ResultActions response = mockMvc.perform(get(DOWNLOAD_STATISTICS_SEARCH_URL)
+                .param(TAXON_ID_PARAMETER_NAME, AnnotationDocMocker.TAXON_ID)
+                .header(ACCEPT, EXCEL_MEDIA_TYPE));
 
         checkResponse(EXCEL_MEDIA_TYPE, response);
     }
@@ -114,7 +118,9 @@ public class AnnotationControllerStatisticsDownloadIT {
     public void canDownloadInJsonFormat() throws Exception {
         setupSuccessfullyReceivingRestNames();
 
-        ResultActions response = mockMvc.perform(get(DOWNLOAD_STATISTICS_SEARCH_URL).header(ACCEPT, JSON_MEDIA_TYPE));
+        ResultActions response = mockMvc.perform(get(DOWNLOAD_STATISTICS_SEARCH_URL)
+                .param(TAXON_ID_PARAMETER_NAME, AnnotationDocMocker.TAXON_ID)
+                .header(ACCEPT, JSON_MEDIA_TYPE));
 
         checkResponse(response);
         response.andDo(print())
@@ -134,7 +140,9 @@ public class AnnotationControllerStatisticsDownloadIT {
         setupHelper.expectTaxonIdHasNameViaRest(TAXON_ID, TAXON_NAME);
         setupHelper.expectEcoCodeHasNameViaRest(ECO_ID, ECO_TERM_NAME, NUMBER_OF_GENERIC_DOCS);
 
-        ResultActions response = mockMvc.perform(get(DOWNLOAD_STATISTICS_SEARCH_URL).header(ACCEPT, JSON_MEDIA_TYPE));
+        ResultActions response = mockMvc.perform(get(DOWNLOAD_STATISTICS_SEARCH_URL)
+                .param(TAXON_ID_PARAMETER_NAME, AnnotationDocMocker.TAXON_ID)
+                .header(ACCEPT, JSON_MEDIA_TYPE));
 
         checkResponse(JSON_MEDIA_TYPE, response);
         response.andDo(print())
@@ -156,7 +164,9 @@ public class AnnotationControllerStatisticsDownloadIT {
         setExpectationsForUnsuccessfulTaxonomyServiceRestResponse();
         setupHelper.expectEcoCodeHasNameViaRest(ECO_ID, ECO_TERM_NAME, NUMBER_OF_GENERIC_DOCS);
 
-        ResultActions response = mockMvc.perform(get(DOWNLOAD_STATISTICS_SEARCH_URL).header(ACCEPT, JSON_MEDIA_TYPE));
+        ResultActions response = mockMvc.perform(get(DOWNLOAD_STATISTICS_SEARCH_URL)
+                .param(TAXON_ID_PARAMETER_NAME, AnnotationDocMocker.TAXON_ID)
+                .header(ACCEPT, JSON_MEDIA_TYPE));
 
         checkResponse(JSON_MEDIA_TYPE, response);
         response.andDo(print())
@@ -176,7 +186,9 @@ public class AnnotationControllerStatisticsDownloadIT {
         setupHelper.expectTaxonIdHasNameViaRest(TAXON_ID, TAXON_NAME);
         setExpectationsForUnsuccessfulOntologyServiceRestResponseForEcoCodes();
 
-        ResultActions response = mockMvc.perform(get(DOWNLOAD_STATISTICS_SEARCH_URL).header(ACCEPT, JSON_MEDIA_TYPE));
+        ResultActions response = mockMvc.perform(get(DOWNLOAD_STATISTICS_SEARCH_URL)
+                .param(TAXON_ID_PARAMETER_NAME, AnnotationDocMocker.TAXON_ID)
+                .header(ACCEPT, JSON_MEDIA_TYPE));
 
         checkResponse(JSON_MEDIA_TYPE, response);
         response.andDo(print())

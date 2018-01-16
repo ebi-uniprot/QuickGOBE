@@ -3,6 +3,7 @@ package uk.ac.ebi.quickgo.annotation.controller;
 import uk.ac.ebi.quickgo.annotation.AnnotationREST;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
+import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker;
 import uk.ac.ebi.quickgo.common.QuickGODocument;
 import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 
@@ -107,10 +108,18 @@ public class AnnotationControllerStatisticsIT {
     }
 
     @Test
+    public void statsRequestFailsIfNoFilteringParametersAreIncluded() throws Exception {
+        ResultActions response = mockMvc.perform(get(STATS_ENDPOINT));
+
+        response.andExpect(status().isBadRequest());
+    }
+
+    @Test
     public void queryWithNoHitsProducesEmptyStats() throws Exception {
         repository.deleteAll();
 
-        ResultActions response = mockMvc.perform(get(STATS_ENDPOINT));
+        ResultActions response = mockMvc.perform(get(STATS_ENDPOINT)
+                .param(TAXON_ID_STATS_FIELD, AnnotationDocMocker.TAXON_ID));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -413,7 +422,8 @@ public class AnnotationControllerStatisticsIT {
             throws Exception {
         Set<String> extractedAttributeValues = selectValuesFromDocs(docs, extractAttributeValuesFromDoc);
 
-        ResultActions response = mockMvc.perform(get(STATS_ENDPOINT));
+        ResultActions response = mockMvc.perform(get(STATS_ENDPOINT)
+                .param(TAXON_ID_STATS_FIELD, AnnotationDocMocker.TAXON_ID));
 
         assertStatsResponse(response, attribute, docs.size(), extractedAttributeValues, expectedDistinctValueCount
         );
@@ -434,7 +444,8 @@ public class AnnotationControllerStatisticsIT {
     }
 
     private void assertStatsResponseIncludingNames(int expectedDistinctValueCount) throws Exception {
-        ResultActions response = mockMvc.perform(get(STATS_ENDPOINT));
+        ResultActions response = mockMvc.perform(get(STATS_ENDPOINT)
+                .param(TAXON_ID_STATS_FIELD, AnnotationDocMocker.TAXON_ID));
 
         final String[] goNames = expectedNames(expectedDistinctValueCount, GO_TERM_NAME);
         final String[] taxonNames = expectedNames(expectedDistinctValueCount, TAXON_TERM_NAME);
