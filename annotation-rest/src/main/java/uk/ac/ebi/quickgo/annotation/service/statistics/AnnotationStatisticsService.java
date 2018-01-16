@@ -8,6 +8,7 @@ import uk.ac.ebi.quickgo.rest.search.SearchService;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.query.RegularPage;
+import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
 import uk.ac.ebi.quickgo.rest.search.request.converter.FilterConverterFactory;
 import uk.ac.ebi.quickgo.rest.search.results.AggregateResponse;
@@ -90,7 +91,10 @@ public class AnnotationStatisticsService implements StatisticsService {
     private QueryResult<StatisticsGroup> calculateForRequiredStatistics(AnnotationRequest request,
             List<RequiredStatistic> requiredStatistics) {
         checkArgument(request != null, "Annotation request cannot be null");
-        QueryRequest queryRequest = buildQueryRequest(request, requiredStatistics);
+        final List<FilterRequest> filterRequests = request.createFilterRequests();
+        checkArgument(!filterRequests.isEmpty(), "Statistics requests require at least one filtering parameter.");
+
+        QueryRequest queryRequest = buildQueryRequest(filterRequests, requiredStatistics);
         QueryResult<Annotation> annotationQueryResult = searchService.findByQuery(queryRequest);
         AggregateResponse globalAggregation = annotationQueryResult.getAggregation();
         QueryResult<StatisticsGroup> response;
@@ -106,10 +110,11 @@ public class AnnotationStatisticsService implements StatisticsService {
         return response;
     }
 
-    private QueryRequest buildQueryRequest(AnnotationRequest request, List<RequiredStatistic> requiredStatistics) {
+    private QueryRequest buildQueryRequest(List<FilterRequest> filterRequests, List<RequiredStatistic>
+            requiredStatistics) {
         return queryTemplate.newBuilder()
                 .setQuery(QuickGOQuery.createAllQuery())
-                .addFilters(request.createFilterRequests().stream()
+                .addFilters(filterRequests.stream()
                         .map(converterFactory::convert)
                         .map(ConvertedFilter::getConvertedValue)
                         .collect(Collectors.toSet()))
