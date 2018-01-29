@@ -3,7 +3,6 @@ package uk.ac.ebi.quickgo.annotation.controller;
 import uk.ac.ebi.quickgo.annotation.AnnotationREST;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
-import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker;
 import uk.ac.ebi.quickgo.common.QuickGODocument;
 import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 
@@ -14,6 +13,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import net.sf.ehcache.CacheManager;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -22,9 +22,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.client.RestOperations;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
 
 import static java.util.Arrays.asList;
@@ -35,9 +38,11 @@ import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.GO_ID_PARAM;
 import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.GO_USAGE_PARAM;
 import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.TAXON_ID_PARAM;
 import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.TAXON_USAGE_PARAM;
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.*;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.contentTypeToBeJson;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.totalNumOfResults;
 import static uk.ac.ebi.quickgo.annotation.controller.StatsResponseVerifier.keysInTypeWithinGroup;
+import static uk.ac.ebi.quickgo.annotation.controller.StatsResponseVerifier.namesInTypeWithinGroup;
 import static uk.ac.ebi.quickgo.annotation.controller.StatsResponseVerifier.numericValueForGroup;
 import static uk.ac.ebi.quickgo.annotation.controller.StatsResponseVerifier.totalHitsInGroup;
 
@@ -54,6 +59,9 @@ public class AnnotationControllerStatisticsIT {
 
     private static final String RESOURCE_URL = "/annotation";
     private static final String STATS_ENDPOINT = RESOURCE_URL + "/stats";
+    private static final String GO_TERM_NAME = "catalytic activity";
+    private static final String ECO_TERM_NAME = "match to sequence model evidence used in automatic assertion";
+    private static final String TAXON_TERM_NAME = "taxon name: " + 12345;
 
     private static final int NUMBER_OF_GENERIC_DOCS = 6;
     private static final String ANNOTATION_GROUP = "annotation";
@@ -68,8 +76,15 @@ public class AnnotationControllerStatisticsIT {
     private static final String GO_ASPECT_STATS_FIELD = "aspect";
     private static final String EXACT_USAGE = "exact";
     private static final String DISTINCT_VALUE_COUNT = "distinctValueCount";
+    private static final String TAXON_NAME = "taxon name: " + TAXON_ID;
 
     private MockMvc mockMvc;
+    @Autowired
+    CacheManager cacheManager;
+    @Autowired
+    private RestOperations restOperations;
+    private MockRestServiceServer mockRestServiceServer;
+
 
     private List<AnnotationDocument> savedDocs;
 
@@ -86,8 +101,8 @@ public class AnnotationControllerStatisticsIT {
         mockMvc = MockMvcBuilders.
                 webAppContextSetup(webApplicationContext)
                 .build();
-
-        savedDocs = createGenericDocs(NUMBER_OF_GENERIC_DOCS);
+        mockRestServiceServer = MockRestServiceServer.createServer((RestTemplate) restOperations);
+        savedDocs = createGenericDocs();
         repository.save(savedDocs);
     }
 
@@ -111,7 +126,7 @@ public class AnnotationControllerStatisticsIT {
 
     @Test
     public void statsForAllDocsContaining2OntologyIdsReturns2OntologyIdStats() throws Exception {
-        AnnotationDocument extraDoc = AnnotationDocMocker.createAnnotationDoc("P99999");
+        AnnotationDocument extraDoc = createAnnotationDoc("P99999");
         extraDoc.goId = "GO:0016020";
         repository.save(extraDoc);
 
@@ -123,12 +138,12 @@ public class AnnotationControllerStatisticsIT {
 
     @Test
     public void statsForFilteredDocsContaining2OntologyIdsReturns2OntologyIdStats() throws Exception {
-        AnnotationDocument extraDoc1 = AnnotationDocMocker.createAnnotationDoc("P99999");
+        AnnotationDocument extraDoc1 = createAnnotationDoc("P99999");
         extraDoc1.goId = "GO:1111111";
         extraDoc1.taxonId = 42;
         repository.save(extraDoc1);
 
-        AnnotationDocument extraDoc2 = AnnotationDocMocker.createAnnotationDoc("P99998");
+        AnnotationDocument extraDoc2 = createAnnotationDoc("P99998");
         extraDoc2.goId = "GO:2222222";
         extraDoc2.taxonId = 42;
         repository.save(extraDoc2);
@@ -144,6 +159,19 @@ public class AnnotationControllerStatisticsIT {
         assertStatsResponse(response, GO_ID_STATS_FIELD, 2, relevantGOIds, 2);
     }
 
+    //----------- Names for GO ids, taxon ids and eco codes -----------//
+    @Test
+    public void namesForGoIdsAndTaxonIdsAndEvidenceCodes() throws Exception {
+        cacheManager.clearAll();
+        final int expectedDistinctValueCount = 1;
+        StatsSetupHelper statsSetupHelper = new StatsSetupHelper(mockRestServiceServer);
+        statsSetupHelper.expectGoTermHasNameViaRest(GO_ID, GO_TERM_NAME);
+        statsSetupHelper.expectTaxonIdHasNameViaRest(TAXON_ID, TAXON_NAME);
+        statsSetupHelper.expectEcoCodeHasNameViaRest(ECO_ID, ECO_TERM_NAME, expectedDistinctValueCount);
+
+        assertStatsResponseIncludingNames(expectedDistinctValueCount);
+    }
+
     //----------- Taxon ID -----------//
     @Test
     public void statsForAllDocsContaining1TaxonIdReturns1TaxonIdStat() throws Exception {
@@ -153,7 +181,7 @@ public class AnnotationControllerStatisticsIT {
 
     @Test
     public void statsForAllDocsContaining2TaxonIdsReturns2TaxonIdStats() throws Exception {
-        AnnotationDocument extraDoc = AnnotationDocMocker.createAnnotationDoc("P99999");
+        AnnotationDocument extraDoc = createAnnotationDoc("P99999");
         extraDoc.taxonId = 7890;
         repository.save(extraDoc);
 
@@ -168,12 +196,12 @@ public class AnnotationControllerStatisticsIT {
     public void statsForFilteredDocsContaining2TaxonIdsReturns2TaxonIdStats() throws Exception {
         String filteringGoId = "GO:9999999";
 
-        AnnotationDocument extraDoc1 = AnnotationDocMocker.createAnnotationDoc("P99999");
+        AnnotationDocument extraDoc1 = createAnnotationDoc("P99999");
         extraDoc1.goId = filteringGoId;
         extraDoc1.taxonId = 9999;
         repository.save(extraDoc1);
 
-        AnnotationDocument extraDoc2 = AnnotationDocMocker.createAnnotationDoc("P99998");
+        AnnotationDocument extraDoc2 = createAnnotationDoc("P99998");
         extraDoc2.goId = filteringGoId;
         extraDoc2.taxonId = 9998;
         repository.save(extraDoc2);
@@ -197,7 +225,7 @@ public class AnnotationControllerStatisticsIT {
 
     @Test
     public void statsForAllDocsContaining2ReferencesReturns2ReferenceStats() throws Exception {
-        AnnotationDocument extraDoc = AnnotationDocMocker.createAnnotationDoc("P99999");
+        AnnotationDocument extraDoc = createAnnotationDoc("P99999");
         extraDoc.reference = "PMID:19864465";
         repository.save(extraDoc);
 
@@ -211,12 +239,12 @@ public class AnnotationControllerStatisticsIT {
     public void statsForFilteredDocsContaining2RefernecesReturns2ReferenceStats() throws Exception {
         String filteringGoId = "GO:9999999";
 
-        AnnotationDocument extraDoc1 = AnnotationDocMocker.createAnnotationDoc("P99999");
+        AnnotationDocument extraDoc1 = createAnnotationDoc("P99999");
         extraDoc1.goId = filteringGoId;
         extraDoc1.reference = "PMID:19864465";
         repository.save(extraDoc1);
 
-        AnnotationDocument extraDoc2 = AnnotationDocMocker.createAnnotationDoc("P99998");
+        AnnotationDocument extraDoc2 = createAnnotationDoc("P99998");
         extraDoc2.goId = filteringGoId;
         extraDoc2.reference = "GO_REF:0000020";
         repository.save(extraDoc2);
@@ -241,7 +269,7 @@ public class AnnotationControllerStatisticsIT {
 
     @Test
     public void statsForAllDocsContaining2evidenceCodesReturns2EvidenceCodeStats() throws Exception {
-        AnnotationDocument extraDoc = AnnotationDocMocker.createAnnotationDoc("P99999");
+        AnnotationDocument extraDoc = createAnnotationDoc("P99999");
         extraDoc.evidenceCode = "ECO:0000888";
         repository.save(extraDoc);
 
@@ -256,12 +284,12 @@ public class AnnotationControllerStatisticsIT {
     public void statsForFilteredDocsContaining2EvidenceCodesReturns2EvidenceCodesStats() throws Exception {
         String filteringGoId = "GO:9999999";
 
-        AnnotationDocument extraDoc1 = AnnotationDocMocker.createAnnotationDoc("P99999");
+        AnnotationDocument extraDoc1 = createAnnotationDoc("P99999");
         extraDoc1.goId = filteringGoId;
         extraDoc1.evidenceCode = "ECO:0000888";
         repository.save(extraDoc1);
 
-        AnnotationDocument extraDoc2 = AnnotationDocMocker.createAnnotationDoc("P99998");
+        AnnotationDocument extraDoc2 = createAnnotationDoc("P99998");
         extraDoc2.goId = filteringGoId;
         extraDoc2.evidenceCode = "ECO:0000777";
         repository.save(extraDoc2);
@@ -285,7 +313,7 @@ public class AnnotationControllerStatisticsIT {
 
     @Test
     public void statsForAllDocsContaining2AssignedByReturns2AssignedByStats() throws Exception {
-        AnnotationDocument extraDoc = AnnotationDocMocker.createAnnotationDoc("P99999");
+        AnnotationDocument extraDoc = createAnnotationDoc("P99999");
         extraDoc.assignedBy = "Agbase";
         repository.save(extraDoc);
 
@@ -300,12 +328,12 @@ public class AnnotationControllerStatisticsIT {
     public void statsForFilteredDocsContaining2AssignedByReturns2AssignedByStats() throws Exception {
         String filteringGoId = "GO:9999999";
 
-        AnnotationDocument extraDoc1 = AnnotationDocMocker.createAnnotationDoc("P99999");
+        AnnotationDocument extraDoc1 = createAnnotationDoc("P99999");
         extraDoc1.goId = filteringGoId;
         extraDoc1.assignedBy = "Agbase";
         repository.save(extraDoc1);
 
-        AnnotationDocument extraDoc2 = AnnotationDocMocker.createAnnotationDoc("P99998");
+        AnnotationDocument extraDoc2 = createAnnotationDoc("P99998");
         extraDoc2.goId = filteringGoId;
         extraDoc2.assignedBy = "Roslin_Institute";
         repository.save(extraDoc2);
@@ -329,7 +357,7 @@ public class AnnotationControllerStatisticsIT {
 
     @Test
     public void statsForAllDocsContaining2AspectsReturns2AspectsStats() throws Exception {
-        AnnotationDocument extraDoc = AnnotationDocMocker.createAnnotationDoc("P99999");
+        AnnotationDocument extraDoc = createAnnotationDoc("P99999");
         extraDoc.goAspect = "molecular_function";
         repository.save(extraDoc);
 
@@ -343,12 +371,12 @@ public class AnnotationControllerStatisticsIT {
     public void statsForFilteredDocsContaining2AspectsReturns2AspectStats() throws Exception {
         String filteringGoId = "GO:9999999";
 
-        AnnotationDocument extraDoc1 = AnnotationDocMocker.createAnnotationDoc("P99999");
+        AnnotationDocument extraDoc1 = createAnnotationDoc("P99999");
         extraDoc1.goId = filteringGoId;
         extraDoc1.goAspect = "molecular_function";
         repository.save(extraDoc1);
 
-        AnnotationDocument extraDoc2 = AnnotationDocMocker.createAnnotationDoc("P99998");
+        AnnotationDocument extraDoc2 = createAnnotationDoc("P99998");
         extraDoc2.goId = filteringGoId;
         extraDoc2.goAspect = "cellular_component";
         repository.save(extraDoc2);
@@ -387,7 +415,8 @@ public class AnnotationControllerStatisticsIT {
 
         ResultActions response = mockMvc.perform(get(STATS_ENDPOINT));
 
-        assertStatsResponse(response, attribute, docs.size(), extractedAttributeValues, expectedDistinctValueCount);
+        assertStatsResponse(response, attribute, docs.size(), extractedAttributeValues, expectedDistinctValueCount
+        );
     }
 
     private void assertStatsResponse(ResultActions response, String statsType, int totalHits,
@@ -404,17 +433,40 @@ public class AnnotationControllerStatisticsIT {
                 .andExpect(keysInTypeWithinGroup(GENE_PRODUCT_GROUP, statsType, asArray(statsValues)));
     }
 
-    private String[] asArray(Collection<String> elements) {
-        return elements.stream().toArray(String[]::new);
+    private void assertStatsResponseIncludingNames(int expectedDistinctValueCount) throws Exception {
+        ResultActions response = mockMvc.perform(get(STATS_ENDPOINT));
+
+        final String[] goNames = expectedNames(expectedDistinctValueCount, GO_TERM_NAME);
+        final String[] taxonNames = expectedNames(expectedDistinctValueCount, TAXON_TERM_NAME);
+        final String[] ecoNames = expectedNames(expectedDistinctValueCount, ECO_TERM_NAME);
+
+        response.andDo(print())
+                .andExpect(namesInTypeWithinGroup(ANNOTATION_GROUP, GO_ID_STATS_FIELD, goNames))
+                .andExpect(namesInTypeWithinGroup(GENE_PRODUCT_GROUP, GO_ID_STATS_FIELD, goNames))
+                .andExpect(namesInTypeWithinGroup(ANNOTATION_GROUP, TAXON_ID_STATS_FIELD, taxonNames))
+                .andExpect(namesInTypeWithinGroup(GENE_PRODUCT_GROUP, TAXON_ID_STATS_FIELD, taxonNames))
+                .andExpect(namesInTypeWithinGroup(ANNOTATION_GROUP, EVIDENCE_CODE_STATS_FIELD, ecoNames))
+                .andExpect(namesInTypeWithinGroup(GENE_PRODUCT_GROUP, EVIDENCE_CODE_STATS_FIELD, ecoNames));
     }
 
-    private List<AnnotationDocument> createGenericDocs(int n) {
-        return IntStream.range(0, n)
-                .mapToObj(i -> AnnotationDocMocker.createAnnotationDoc(createId(i)))
+    private String[] asArray(Collection<String> elements) {
+        return elements.toArray(new String[0]);
+    }
+
+    private List<AnnotationDocument> createGenericDocs() {
+        return IntStream.range(0, AnnotationControllerStatisticsIT.NUMBER_OF_GENERIC_DOCS)
+                .mapToObj(i -> createAnnotationDoc(createId(i)))
                 .collect(Collectors.toList());
     }
 
     private String createId(int idNum) {
         return String.format("A0A%03d", idNum);
+    }
+
+    private String[] expectedNames(int expectedSize, String source) {
+        String[] names = new String[expectedSize];
+        IntStream.range(0, names.length)
+                .forEach(i -> names[i] = source);
+        return names;
     }
 }
