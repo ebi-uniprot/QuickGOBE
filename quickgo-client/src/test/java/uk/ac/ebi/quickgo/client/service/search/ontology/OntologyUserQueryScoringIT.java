@@ -382,23 +382,36 @@ public class OntologyUserQueryScoringIT {
     }
 
     @Test
-    public void order2() throws Exception {
-        OntologyDocument doc1 = createDoc("GO:0000001", "something");
-        OntologyDocument doc2 = createDoc("GO:0000001", "something");
-        OntologyDocument doc3 = createDoc("GO:0000001", "something");
+    public void scoringWorks() throws Exception {
+        OntologyDocument doc1 = createDoc("GO:0000001", "something");                           //id
+        OntologyDocument doc2 = createDoc("GO:0000002", "GO:0000001");                          //name exact
+        OntologyDocument doc3 = createDoc("GO:0000003", "GO:000000123456");                     //name edge
+        OntologyDocument doc4 = createDoc("GO:0000004", "something", "GO:0000001");   //synonym exact
+        OntologyDocument doc5 = createDoc("GO:0000005", "something");                           //2ndary id
+        OntologyDocument doc6 = createDoc("GO:0000006", "something", "GO:0000001ABCD");//name edge
+        OntologyDocument doc7 = createDoc("GO:0000007", "something");                           //no match
 
-        doc1.secondaryIds = Collections.singletonList("GO:0000009");
-        doc2.secondaryIds = Collections.singletonList("GO:0000008");
-        doc3.secondaryIds = Collections.singletonList("GO:0000008");
+        doc5.secondaryIds = Collections.singletonList("GO:0000001");
 
         repository.save(doc1);
         repository.save(doc2);
         repository.save(doc3);
+        repository.save(doc4);
+        repository.save(doc5);
+        repository.save(doc6);
+        repository.save(doc7);
 
         mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "GO:0000001"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.results[0].id").value("GO:0000001"));
+                .andExpect(jsonPath("$.results.*", hasSize(6)))
+                .andExpect(jsonPath("$.results[0].id").value("GO:0000001"))
+                .andExpect(jsonPath("$.results[1].id").value("GO:0000002"))
+                .andExpect(jsonPath("$.results[2].id").value("GO:0000004"))
+                .andExpect(jsonPath("$.results[3].id").value("GO:0000005"))
+                .andExpect(jsonPath("$.results[4].id").value("GO:0000003"))
+                .andExpect(jsonPath("$.results[5].id").value("GO:0000006"));
+
     }
 
     private static OntologyDocument createDoc(String id, String name, String... synonyms) {
