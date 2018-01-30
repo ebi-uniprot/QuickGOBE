@@ -10,7 +10,6 @@ import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.query.RegularPage;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
-import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
 import uk.ac.ebi.quickgo.rest.search.request.converter.FilterConverterFactory;
 import uk.ac.ebi.quickgo.rest.search.results.AggregateResponse;
@@ -96,17 +95,12 @@ public class AnnotationStatisticsService implements StatisticsService {
             List<RequiredStatistic> requiredStatistics) {
         checkArgument(request != null, "Annotation request cannot be null");
 
-//        local
-//        final List<FilterRequest> filterRequests = request.createFilterRequests();
-//        checkArgument(!filterRequests.isEmpty(), "Statistics requests require at least one filtering parameter.");
-//        QueryRequest queryRequest = buildQueryRequest(filterRequests, requiredStatistics);
+        final List<FilterRequest> filterRequests = request.createFilterRequests();
+        checkArgument(!filterRequests.isEmpty(), "Statistics requests require at least one filtering parameter.");
 
-
-        //server
-        StatsQueryInfo queryInfo = createQueryInfo(request, requiredStatistics);
+        StatsQueryInfo queryInfo = createQueryInfo(request, requiredStatistics, filterRequests);
         QueryRequest queryRequest = queryInfo.getQueryRequest();
 
-//        QueryRequest queryRequest = buildQueryRequest(request, requiredStatistics);
         QueryResult<Annotation> annotationQueryResult = searchService.findByQuery(queryRequest);
         AggregateResponse globalAggregation = annotationQueryResult.getAggregation();
 
@@ -121,21 +115,21 @@ public class AnnotationStatisticsService implements StatisticsService {
         return response;
     }
 
-    private StatsQueryInfo createQueryInfo(AnnotationRequest request, List<RequiredStatistic> requiredStatistics) {
+    private StatsQueryInfo createQueryInfo(AnnotationRequest request, List<RequiredStatistic> requiredStatistics,
+            List<FilterRequest> filterRequests) {
         List<RequiredStatistic> stats = requiredStatistics;
         if (isSlimRequest(request)) {
             stats = updateRequiredStatsForSlimming(requiredStatistics);
         }
-
-        return buildQueryRequest(request, stats);
+        return buildQueryRequest(stats, filterRequests);
     }
 
-    private StatsQueryInfo buildQueryRequest(AnnotationRequest request,
-            List<RequiredStatistic> requiredStatistics) {
+    private StatsQueryInfo buildQueryRequest(List<RequiredStatistic> requiredStatistics,
+            List<FilterRequest> filterRequests) {
         Map<String, List<String>> slimmingInfoMap = new HashMap<>();
         QueryRequest queryRequest = queryTemplate.newBuilder()
                 .setQuery(QuickGOQuery.createAllQuery())
-                .addFilters(request.createFilterRequests().stream()
+                .addFilters(filterRequests.stream()
                         .map(converterFactory::convert)
                         .map(convertedFilter -> captureConvertedFilterInfo(convertedFilter, slimmingInfoMap))
                         .collect(Collectors.toSet()))
