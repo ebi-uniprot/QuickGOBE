@@ -383,34 +383,34 @@ public class OntologyUserQueryScoringIT {
 
     @Test
     public void scoringWorks() throws Exception {
-        OntologyDocument doc1 = createDoc("GO:0000001", "something");                           //id
-        OntologyDocument doc2 = createDoc("GO:0000002", "GO:0000001");                          //name exact
-        OntologyDocument doc3 = createDoc("GO:0000003", "GO:000000123456");                     //name edge
-        OntologyDocument doc4 = createDoc("GO:0000004", "something", "GO:0000001");   //synonym exact
-        OntologyDocument doc5 = createDoc("GO:0000005", "something");                           //2ndary id
-        OntologyDocument doc6 = createDoc("GO:0000006", "something", "GO:0000001ABCD");//synonym edge
-        OntologyDocument doc7 = createDoc("GO:0000007", "something");                           //no match
+        OntologyDocument idDoc = createDoc("GO:0000001", "something");
+        OntologyDocument nameExactDoc = createDoc("GO:0000002", "GO:0000001");
+        OntologyDocument nameEdgeDoc = createDoc("GO:0000003", "GO:000000123456");
+        OntologyDocument synonymExactDoc = createDoc("GO:0000004", "something", "GO:0000001");
+        OntologyDocument secondaryIdDoc = createDoc("GO:0000005", "something");
+        OntologyDocument synonymEdgeDoc = createDoc("GO:0000006", "something", "GO:0000001ABCD");
+        OntologyDocument noMatchDoc = createDoc("GO:0000007", "something");
 
-        doc5.secondaryIds = Collections.singletonList("GO:0000001");
+        secondaryIdDoc.secondaryIds = Collections.singletonList("GO:0000001");
 
-        repository.save(doc1);
-        repository.save(doc2);
-        repository.save(doc3);
-        repository.save(doc4);
-        repository.save(doc5);
-        repository.save(doc6);
-        repository.save(doc7);
+        repository.save(idDoc);
+        repository.save(nameExactDoc);
+        repository.save(nameEdgeDoc);
+        repository.save(synonymExactDoc);
+        repository.save(secondaryIdDoc);
+        repository.save(synonymEdgeDoc);
+        repository.save(noMatchDoc);
 
         mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "GO:0000001"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.results.*", hasSize(6)))
-                .andExpect(jsonPath("$.results[0].id").value("GO:0000001"))
-                .andExpect(jsonPath("$.results[1].id").value("GO:0000002"))
-                .andExpect(jsonPath("$.results[2].id").value("GO:0000004"))
-                .andExpect(jsonPath("$.results[3].id").value("GO:0000005"))
-                .andExpect(jsonPath("$.results[4].id").value("GO:0000003"))
-                .andExpect(jsonPath("$.results[5].id").value("GO:0000006"));
+                .andExpect(jsonPath("$.results[0].id").value(idDoc.id))
+                .andExpect(jsonPath("$.results[1].id").value(nameExactDoc.id))
+                .andExpect(jsonPath("$.results[2].id").value(synonymExactDoc.id))
+                .andExpect(jsonPath("$.results[3].id").value(secondaryIdDoc.id))
+                .andExpect(jsonPath("$.results[4].id").value(nameEdgeDoc.id))
+                .andExpect(jsonPath("$.results[5].id").value(synonymEdgeDoc.id));
 
     }
 
