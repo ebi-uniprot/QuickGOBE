@@ -361,25 +361,45 @@ public class OntologyUserQueryScoringIT {
     }
 
     @Test
-    public void order() throws Exception {
+    public void searchForASecondaryIdIsSuccessful() throws Exception {
         OntologyDocument doc1 = createDoc("GO:0000001", "something");
-        OntologyDocument doc2 = createDoc("GO:0000001", "something");
-        OntologyDocument doc3 = createDoc("GO:0000001", "something");
+        OntologyDocument doc2 = createDoc("GO:0000002", "something");
+        OntologyDocument doc3 = createDoc("GO:0000003", "something");
 
-        doc1.secondaryIds = Collections.singletonList("boom");
-        doc2.secondaryIds = Collections.singletonList("GO:0000000");
-        doc3.secondaryIds = Collections.singletonList("GO:0000000");
+        doc1.secondaryIds = Collections.singletonList("GO:0000008");
+        doc2.secondaryIds = Collections.singletonList("GO:0000009");
+        doc3.secondaryIds = Collections.singletonList("GO:0000008");
 
         repository.save(doc1);
         repository.save(doc2);
         repository.save(doc3);
 
-        mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "boom"))
+        mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "GO:0000009"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results.*", hasSize(1)))
+                .andExpect(jsonPath("$.results[0].id").value("GO:0000002"));
+    }
+
+    @Test
+    public void order2() throws Exception {
+        OntologyDocument doc1 = createDoc("GO:0000001", "something");
+        OntologyDocument doc2 = createDoc("GO:0000001", "something");
+        OntologyDocument doc3 = createDoc("GO:0000001", "something");
+
+        doc1.secondaryIds = Collections.singletonList("GO:0000009");
+        doc2.secondaryIds = Collections.singletonList("GO:0000008");
+        doc3.secondaryIds = Collections.singletonList("GO:0000008");
+
+        repository.save(doc1);
+        repository.save(doc2);
+        repository.save(doc3);
+
+        mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "GO:0000001"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.results[0].id").value("GO:0000001"));
     }
-
 
     private static OntologyDocument createDoc(String id, String name, String... synonyms) {
         OntologyDocument document = new OntologyDocument();
