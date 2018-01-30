@@ -235,8 +235,7 @@ public class AnnotationController {
                     response = ResponseExceptionHandler.ErrorInfo.class),
             @ApiResponse(code = 400, message = "Bad request due to a validation issue encountered in one of the " +
                     "filters", response = ResponseExceptionHandler.ErrorInfo.class)})
-    @ApiOperation(value = "Generate statistics for the annotation result set obtained from applying the filters.",
-            hidden = true)
+    @ApiOperation(value = "Generate statistics for the annotation result set obtained from applying the filters.")
     @RequestMapping(value = "/stats", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<StatisticsGroup>> annotationStats(
             @Valid @ModelAttribute AnnotationRequest request, BindingResult bindingResult) {
@@ -304,7 +303,6 @@ public class AnnotationController {
     }
 
     @ApiOperation(value = "Download statistics for all annotations that match the supplied filter criteria.",
-            hidden = true,
             response = File.class)
     @RequestMapping(value = "/downloadStats", method = {RequestMethod.GET},
             produces = {EXCEL_MEDIA_TYPE_STRING, JSON_MEDIA_TYPE_STRING})
