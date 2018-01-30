@@ -80,7 +80,7 @@ public class PresetsSuccessfulRelevancyFetchingIT {
         assertThat(status, is(BatchStatus.COMPLETED));
         assertThat(
                 extractPresetValues(presets.getReferences(), p -> p.getProperty(NAME)),
-                IsIterableContainingInOrder.contains(MockPresetDataConfig.DOI, MockPresetDataConfig.REACTOME));
+                IsIterableContainingInOrder.contains(MockPresetDataConfig.REACTOME, MockPresetDataConfig.DOI));
     }
 
     @Test

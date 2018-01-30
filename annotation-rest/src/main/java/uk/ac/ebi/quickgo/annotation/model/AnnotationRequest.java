@@ -34,6 +34,8 @@ import static uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern.Flag.CASE_I
  * Created with IntelliJ IDEA.
  */
 public class AnnotationRequest {
+    public static final String SLIM_USAGE = "slim";
+
     static final int MAX_GO_IDS = 600;
     static final int MAX_GENE_PRODUCT_IDS = 500;
     static final int MAX_EVIDENCE_CODE = 100;
@@ -72,7 +74,6 @@ public class AnnotationRequest {
     static final String EVIDENCE_CODE_USAGE_RELATIONSHIPS = "evidenceCodeUsageRelationships";
     static final String DESCENDANTS_USAGE = "descendants";
     static final String EXACT_USAGE = "exact";
-    static final String SLIM_USAGE = "slim";
 
     static final String DEFAULT_TAXON_USAGE = DESCENDANTS_USAGE;
     static final String DEFAULT_EVIDENCE_CODE_USAGE = DESCENDANTS_USAGE;

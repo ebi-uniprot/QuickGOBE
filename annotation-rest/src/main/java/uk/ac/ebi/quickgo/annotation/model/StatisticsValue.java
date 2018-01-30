@@ -29,8 +29,6 @@ public class StatisticsValue {
         Preconditions.checkArgument(key != null && !key.isEmpty(), "Stats key cannot be null or empty");
         Preconditions.checkArgument(hits >= 0, "Stats hits cannot be a negative value: " + hits);
         Preconditions.checkArgument(total >= 0, "Stats total cannot be a negative value: " + total);
-        Preconditions.checkArgument(total >= hits,
-                "Stats total cannot be less than hits: " + total + " < " + hits);
 
         this.key = key;
         this.percentage = (double) hits / (double) total;
