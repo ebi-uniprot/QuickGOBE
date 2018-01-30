@@ -7,6 +7,7 @@ import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
 import uk.ac.ebi.quickgo.ontology.common.OntologyType;
 
 import java.util.Arrays;
+import java.util.Collections;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -358,6 +359,27 @@ public class OntologyUserQueryScoringIT {
                 .andExpect(jsonPath("$.results.*", hasSize(1)))
                 .andExpect(jsonPath("$.results[0].id").value("GO:0000002"));
     }
+
+    @Test
+    public void order() throws Exception {
+        OntologyDocument doc1 = createDoc("GO:0000001", "something");
+        OntologyDocument doc2 = createDoc("GO:0000001", "something");
+        OntologyDocument doc3 = createDoc("GO:0000001", "something");
+
+        doc1.secondaryIds = Collections.singletonList("boom");
+        doc2.secondaryIds = Collections.singletonList("GO:0000000");
+        doc3.secondaryIds = Collections.singletonList("GO:0000000");
+
+        repository.save(doc1);
+        repository.save(doc2);
+        repository.save(doc3);
+
+        mockMvc.perform(get(RESOURCE_URL).param(QUERY_PARAM, "boom"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results[0].id").value("GO:0000001"));
+    }
+
 
     private static OntologyDocument createDoc(String id, String name, String... synonyms) {
         OntologyDocument document = new OntologyDocument();
