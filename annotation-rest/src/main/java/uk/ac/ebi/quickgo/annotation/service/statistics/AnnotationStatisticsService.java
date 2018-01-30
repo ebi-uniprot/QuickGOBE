@@ -148,19 +148,6 @@ public class AnnotationStatisticsService implements StatisticsService {
         };
     }
 
-//    private QueryRequest buildQueryRequest(List<FilterRequest> filterRequests, List<RequiredStatistic>
-//            requiredStatistics) {
-//        return queryTemplate.newBuilder()
-//                .setQuery(QuickGOQuery.createAllQuery())
-//                .addFilters(filterRequests.stream()
-//                        .map(converterFactory::convert)
-//                        .map(ConvertedFilter::getConvertedValue)
-//                        .collect(Collectors.toSet()))
-//                .setPage(new RegularPage(FIRST_PAGE, RESULTS_PER_PAGE))
-//                .setAggregate(converter.convert(requiredStatistics))
-//                .build();
-//    }
-
     /**
      * Given a {@link ConvertedFilter}, capture the slimming information it may contain, in addition to returning
      * associated {@link QuickGOQuery}.
