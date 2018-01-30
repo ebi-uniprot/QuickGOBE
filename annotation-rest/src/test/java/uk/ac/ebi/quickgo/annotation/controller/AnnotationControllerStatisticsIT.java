@@ -32,8 +32,11 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
 
 import static java.util.Arrays.asList;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.GO_ID_PARAM;
 import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.GO_USAGE_PARAM;
@@ -111,7 +114,10 @@ public class AnnotationControllerStatisticsIT {
     public void statsRequestFailsIfNoFilteringParametersAreIncluded() throws Exception {
         ResultActions response = mockMvc.perform(get(STATS_ENDPOINT));
 
-        response.andExpect(status().isBadRequest());
+        response.andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.messages",
+                        hasItem(containsString("Statistics requests require at least one filtering parameter."))));
     }
 
     @Test
