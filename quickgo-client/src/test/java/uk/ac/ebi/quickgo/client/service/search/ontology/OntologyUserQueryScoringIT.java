@@ -388,7 +388,7 @@ public class OntologyUserQueryScoringIT {
         OntologyDocument doc3 = createDoc("GO:0000003", "GO:000000123456");                     //name edge
         OntologyDocument doc4 = createDoc("GO:0000004", "something", "GO:0000001");   //synonym exact
         OntologyDocument doc5 = createDoc("GO:0000005", "something");                           //2ndary id
-        OntologyDocument doc6 = createDoc("GO:0000006", "something", "GO:0000001ABCD");//name edge
+        OntologyDocument doc6 = createDoc("GO:0000006", "something", "GO:0000001ABCD");//synonym edge
         OntologyDocument doc7 = createDoc("GO:0000007", "something");                           //no match
 
         doc5.secondaryIds = Collections.singletonList("GO:0000001");
