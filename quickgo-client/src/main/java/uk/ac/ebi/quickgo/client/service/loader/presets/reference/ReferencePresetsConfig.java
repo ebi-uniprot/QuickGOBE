@@ -10,7 +10,7 @@ import uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPresetValidato
 import uk.ac.ebi.quickgo.client.service.loader.presets.ff.SourceColumnsFactory;
 import uk.ac.ebi.quickgo.client.service.loader.presets.ff.StringToRawNamedPresetMapper;
 
-import java.util.Set;
+import java.util.List;
 import java.util.function.Function;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
@@ -54,14 +54,14 @@ public class ReferencePresetsConfig {
     @Value("${reference.db.preset.header.lines:1}")
     private int dbHeaderLines;
     @Value("#{'${reference.db.preset.defaults:" + REFERENCE_DB_DEFAULTS + "}'.split(',')}")
-    private Set<String> dbDefaults;
+    private List<String> dbDefaults;
 
     @Value("#{'${reference.specific.db.preset.source:}'.split(',')}")
     private Resource[] specificResources;
     @Value("${reference.db.preset.header.lines:1}")
     private int specificDBHeaderLines;
     @Value("#{'${reference.specific.db.preset.defaults:" + REFERENCE_SPECIFIC_DB_DEFAULTS + "}'.split(',')}")
-    private Set<String> specificDBDefaults;
+    private List<String> specificDBDefaults;
 
     @Bean
     public Step referenceGenericDbStep(
@@ -83,6 +83,7 @@ public class ReferencePresetsConfig {
                         presets,
                         aRawPresetItem -> PresetItem.createWithName(aRawPresetItem.name)
                                 .withProperty(PresetItem.Property.DESCRIPTION.getKey(), aRawPresetItem.description)
+                                .withRelevancy(aRawPresetItem.relevancy)
                                 .build()))
                 .listener(new LogStepListener())
                 .build();
@@ -108,7 +109,7 @@ public class ReferencePresetsConfig {
                         presets,
                         aRawPresetItem -> PresetItem.createWithName(buildGORefID(aRawPresetItem.name))
                                 .withProperty(PresetItem.Property.DESCRIPTION.getKey(), aRawPresetItem.description)
-                                .withRelevancy(aRawPresetItem.relevancy)
+                                .withRelevancy(dbDefaults.size() + aRawPresetItem.relevancy)
                                 .build()))
                 .listener(new LogStepListener())
                 .build();
@@ -118,7 +119,7 @@ public class ReferencePresetsConfig {
             CompositePresetImpl presets,
             Function<RawNamedPreset, PresetItem> presetItemSupplier) {
         return rawItemList -> rawItemList.forEach(rawItem ->
-            presets.addPreset(PresetType.REFERENCES, presetItemSupplier.apply(rawItem))
+                presets.addPreset(PresetType.REFERENCES, presetItemSupplier.apply(rawItem))
         );
     }
 
@@ -126,9 +127,15 @@ public class ReferencePresetsConfig {
         return String.format(GO_REF_FORMAT, name);
     }
 
-    private ItemProcessor<RawNamedPreset, RawNamedPreset> rawPresetFilter(Set<String> validPresetNames) {
-        return rawNamedPreset ->
-                validPresetNames.contains(rawNamedPreset.name) ? rawNamedPreset : INVALID_PRESET;
+    private ItemProcessor<RawNamedPreset, RawNamedPreset> rawPresetFilter(List<String> validPresetNames) {
+        return rawNamedPreset -> {
+            if (validPresetNames.contains(rawNamedPreset.name)) {
+                rawNamedPreset.relevancy = validPresetNames.indexOf(rawNamedPreset.name);
+                return rawNamedPreset;
+            } else {
+                return INVALID_PRESET;
+            }
+        };
     }
 
     private FieldSetMapper<RawNamedPreset> fieldSetMapper(SourceColumnsFactory.Source source) {

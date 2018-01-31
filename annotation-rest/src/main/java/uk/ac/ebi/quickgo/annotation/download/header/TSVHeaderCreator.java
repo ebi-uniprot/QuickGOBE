@@ -32,7 +32,7 @@ public class TSVHeaderCreator extends AbstractHeaderCreator {
     static final String GO_ASPECT = "GO ASPECT";
     static final String GO_NAME = "GO NAME";
     static final String SLIMMED_FROM = "SLIMMED FROM";
-    static final String ECO_ID = "ECO_ID";
+    static final String ECO_ID = "ECO ID";
     static final String GO_EVIDENCE_CODE = "GO EVIDENCE CODE";
     static final String REFERENCE = "REFERENCE";
     static final String WITH_FROM = "WITH/FROM";

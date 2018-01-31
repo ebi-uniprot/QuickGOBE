@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.annotation.service.statistics;
 
 import uk.ac.ebi.quickgo.annotation.model.*;
+import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.SlimmingConversionInfo;
 import uk.ac.ebi.quickgo.rest.search.AggregateFunction;
 import uk.ac.ebi.quickgo.rest.search.DefaultSearchQueryTemplate;
 import uk.ac.ebi.quickgo.rest.search.RetrievalException;
@@ -8,6 +9,7 @@ import uk.ac.ebi.quickgo.rest.search.SearchService;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.query.RegularPage;
+import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
 import uk.ac.ebi.quickgo.rest.search.request.converter.FilterConverterFactory;
 import uk.ac.ebi.quickgo.rest.search.results.AggregateResponse;
@@ -21,6 +23,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
+import static uk.ac.ebi.quickgo.annotation.service.statistics.SlimmedStatsHelper.adjustStatsGroupsAfterSlimming;
+import static uk.ac.ebi.quickgo.annotation.service.statistics.SlimmedStatsHelper.isSlimRequest;
+import static uk.ac.ebi.quickgo.annotation.service.statistics.SlimmedStatsHelper.updateRequiredStatsForSlimming;
 
 /**
  * Service that collects distribution statistics of annotations and gene products throughout a given set of annotation
@@ -44,6 +50,7 @@ public class AnnotationStatisticsService implements StatisticsService {
     private final SearchService<Annotation> searchService;
     private final StatsConverter converter;
     private final DefaultSearchQueryTemplate queryTemplate;
+    private final SlimmedStatsInjector slimmedStatsInjector;
 
     @Autowired
     public AnnotationStatisticsService(FilterConverterFactory converterFactory,
@@ -60,7 +67,8 @@ public class AnnotationStatisticsService implements StatisticsService {
         this.converter = converter;
         this.requiredStatisticsProvider = requiredStatisticsProvider;
 
-        queryTemplate = new DefaultSearchQueryTemplate();
+        this.queryTemplate = new DefaultSearchQueryTemplate();
+        this.slimmedStatsInjector = new SlimmedStatsInjector();
     }
 
     @Override
@@ -74,6 +82,8 @@ public class AnnotationStatisticsService implements StatisticsService {
         checkArgument(request != null, "Annotation request cannot be null");
         return calculateForRequiredStatistics(request, true);
     }
+
+
 
     private QueryResult<StatisticsGroup> calculateForRequiredStatistics(AnnotationRequest request, boolean download) {
         final List<RequiredStatistic> requiredStatistics = listRequiredStatistics(request, download);
@@ -108,16 +118,79 @@ public class AnnotationStatisticsService implements StatisticsService {
                 requiredStatisticsProvider.getStandardUsageWithGeneProductFiltering();
     }
 
-    private QueryRequest buildQueryRequest(AnnotationRequest request, List<RequiredStatistic> requiredStatistics) {
-        return queryTemplate.newBuilder()
+
+//    private QueryResult<StatisticsGroup> calculateForRequiredStatistics(AnnotationRequest request,
+//            List<RequiredStatistic> requiredStatistics) {
+//        checkArgument(request != null, "Annotation request cannot be null");
+//
+//        final List<FilterRequest> filterRequests = request.createFilterRequests();
+//        checkArgument(!filterRequests.isEmpty(), "Statistics requests require at least one filtering parameter.");
+//
+//        StatsQueryInfo queryInfo = createQueryInfo(request, requiredStatistics, filterRequests);
+//        QueryRequest queryRequest = queryInfo.getQueryRequest();
+//
+//        QueryResult<Annotation> annotationQueryResult = searchService.findByQuery(queryRequest);
+//        AggregateResponse globalAggregation = annotationQueryResult.getAggregation();
+//
+//        QueryResult<StatisticsGroup> response;
+//        if (globalAggregation.isPopulated()) {
+//            List<StatisticsGroup> statsGroups = createStatsGroups(requiredStatistics, queryInfo, globalAggregation);
+//            response = new QueryResult.Builder<>(statsGroups.size(), statsGroups).build();
+//        } else {
+//            response = new QueryResult.Builder<>(0, Collections.<StatisticsGroup>emptyList()).build();
+//        }
+//
+//        return response;
+//    }
+
+    private StatsQueryInfo createQueryInfo(AnnotationRequest request, List<RequiredStatistic> requiredStatistics,
+            List<FilterRequest> filterRequests) {
+        List<RequiredStatistic> stats = requiredStatistics;
+        if (isSlimRequest(request)) {
+            stats = updateRequiredStatsForSlimming(requiredStatistics);
+        }
+        return buildQueryRequest(stats, filterRequests);
+    }
+
+    private StatsQueryInfo buildQueryRequest(List<RequiredStatistic> requiredStatistics,
+            List<FilterRequest> filterRequests) {
+        Map<String, List<String>> slimmingInfoMap = new HashMap<>();
+        QueryRequest queryRequest = queryTemplate.newBuilder()
                 .setQuery(QuickGOQuery.createAllQuery())
-                .addFilters(request.createFilterRequests().stream()
+                .addFilters(filterRequests.stream()
                         .map(converterFactory::convert)
-                        .map(ConvertedFilter::getConvertedValue)
+                        .map(convertedFilter -> captureConvertedFilterInfo(convertedFilter, slimmingInfoMap))
                         .collect(Collectors.toSet()))
                 .setPage(new RegularPage(FIRST_PAGE, RESULTS_PER_PAGE))
                 .setAggregate(converter.convert(requiredStatistics))
                 .build();
+
+        return new StatsQueryInfo() {
+            @Override public QueryRequest getQueryRequest() {
+                return queryRequest;
+            }
+
+            @Override public Optional<Map<String, List<String>>> getSlimmingInfoMap() {
+                return slimmingInfoMap.isEmpty() ? Optional.empty() : Optional.of(slimmingInfoMap);
+            }
+        };
+    }
+
+    /**
+     * Given a {@link ConvertedFilter}, capture the slimming information it may contain, in addition to returning
+     * associated {@link QuickGOQuery}.
+     * @param filter the {@link ConvertedFilter}
+     * @param slimmingMap the map of slimming information
+     * @return the {@link QuickGOQuery} associated with the filter
+     */
+    private QuickGOQuery captureConvertedFilterInfo(ConvertedFilter<QuickGOQuery> filter,
+            Map<String, List<String>> slimmingMap) {
+        filter.getFilterContext().ifPresent(
+                filterContext -> filterContext
+                        .get(SlimmingConversionInfo.class)
+                        .ifPresent(slimInfo -> slimmingMap.putAll(slimInfo.getInfo()))
+        );
+        return filter.getConvertedValue();
     }
 
     private StatisticsGroup convertResponse(AggregateResponse globalAggregation, RequiredStatistic requiredStatistic) {
@@ -134,6 +207,22 @@ public class AnnotationStatisticsService implements StatisticsService {
         }
 
         return converter.convert(globalAggregation.getNestedAggregations(), totalHits);
+    }
+
+    private List<StatisticsGroup> createStatsGroups(List<RequiredStatistic> requiredStatistics,
+            StatsQueryInfo queryInfo, AggregateResponse
+            globalAggregation) {
+
+        List<StatisticsGroup> statsGroups = requiredStatistics.stream()
+                .map(req -> convertResponse(globalAggregation, req))
+                .collect(Collectors.toList());
+
+        queryInfo.getSlimmingInfoMap().ifPresent(slimmingMap -> {
+            slimmedStatsInjector.process(statsGroups, slimmingMap);
+            adjustStatsGroupsAfterSlimming(requiredStatistics, statsGroups);
+        });
+
+        return statsGroups;
     }
 
     /**
@@ -197,5 +286,11 @@ public class AnnotationStatisticsService implements StatisticsService {
 
     private boolean isNullOrEmpty(String[] array) {
         return array == null || array.length == 0;
+    }
+
+    private interface StatsQueryInfo {
+        QueryRequest getQueryRequest();
+
+        Optional<Map<String, List<String>>> getSlimmingInfoMap();
     }
 }

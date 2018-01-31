@@ -4,7 +4,6 @@ import uk.ac.ebi.quickgo.annotation.AnnotationREST;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationFields;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
-import uk.ac.ebi.quickgo.annotation.service.statistics.RequiredStatisticsProvider;
 import uk.ac.ebi.quickgo.annotation.service.statistics.StatisticsTypeConfigurer;
 import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 
@@ -69,6 +68,7 @@ public class StatsConfigsAreAppliedIT {
     private static final String GENE_PRODUCT = "geneProduct";
     private static final String REFERENCE = "reference";
     private MockMvc mockMvc;
+    private static final String TAXON_ID_PARAMETER_NAME = "taxonId";
 
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -91,7 +91,8 @@ public class StatsConfigsAreAppliedIT {
                 createDocsAndApply((i, doc) -> doc.goId = createGOId(i));
         repository.save(docs);
 
-        ResultActions response = mockMvc.perform(get(STATS_ENDPOINT));
+        ResultActions response = mockMvc.perform(get(STATS_ENDPOINT)
+                .param(TAXON_ID_PARAMETER_NAME, AnnotationDocMocker.TAXON_ID));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -107,7 +108,8 @@ public class StatsConfigsAreAppliedIT {
                 createDocsAndApply((i, doc) -> doc.taxonId = i);
         repository.save(docs);
 
-        ResultActions response = mockMvc.perform(get(STATS_ENDPOINT));
+        ResultActions response = mockMvc.perform(get(STATS_ENDPOINT)
+                .param(TAXON_ID_PARAMETER_NAME, AnnotationDocMocker.TAXON_ID));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -123,7 +125,8 @@ public class StatsConfigsAreAppliedIT {
                 createDocsAndApply((i, doc) -> doc.reference = createRef(i));
         repository.save(docs);
 
-        ResultActions response = mockMvc.perform(get(STATS_ENDPOINT));
+        ResultActions response = mockMvc.perform(get(STATS_ENDPOINT)
+                .param(TAXON_ID_PARAMETER_NAME, AnnotationDocMocker.TAXON_ID));
 
         response.andDo(print())
                 .andExpect(status().isOk())

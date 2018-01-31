@@ -16,13 +16,14 @@ public class StatisticsValueTest {
 
     @Test
     public void nullIdThrowsException() {
+        String key = null;
         long total = 2;
         long occurrence = 1;
 
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Stats key cannot be null or empty");
 
-        new StatisticsValue(null, occurrence, total);
+        new StatisticsValue(key, occurrence, total);
     }
 
     @Test
@@ -57,18 +58,6 @@ public class StatisticsValueTest {
 
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Stats total cannot be a negative value: " + total);
-
-        new StatisticsValue(key, occurrence, total);
-    }
-
-    @Test
-    public void totalLessThanOccurrenceThrowsException() {
-        String key = "key";
-        long total = 1;
-        long occurrence = 2;
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Stats total cannot be less than hits: " + total + " < " + occurrence);
 
         new StatisticsValue(key, occurrence, total);
     }
