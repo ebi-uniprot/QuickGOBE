@@ -115,6 +115,7 @@ public class AnnotationStatisticsServiceTest {
     public void requiredStatisticsProviderCalledForStandardUsageOnly() {
         statsService = new AnnotationStatisticsService(filterFactoryMock, searchServiceMock,
                 statsConverterMock, requiredStatisticsProvider);
+        request.setGeneProductId("A0A000");
 
         statsService.calculateForStandardUsage(request);
 
@@ -136,6 +137,7 @@ public class AnnotationStatisticsServiceTest {
     public void requiredStatisticsProviderCalledForDownloadUsageOnly() {
         statsService = new AnnotationStatisticsService(filterFactoryMock, searchServiceMock,
                 statsConverterMock, requiredStatisticsProvider);
+        request.setAspect("C");
 
         statsService.calculateForDownloadUsage(request);
 
