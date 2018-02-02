@@ -23,7 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkState;
 import static uk.ac.ebi.quickgo.annotation.service.statistics.SlimmedStatsHelper.adjustStatsGroupsAfterSlimming;
 import static uk.ac.ebi.quickgo.annotation.service.statistics.SlimmedStatsHelper.isSlimRequest;
 import static uk.ac.ebi.quickgo.annotation.service.statistics.SlimmedStatsHelper.updateRequiredStatsForSlimming;
@@ -43,8 +42,6 @@ public class AnnotationStatisticsService implements StatisticsService {
 
     private static final int FIRST_PAGE = 1;
     private static final int RESULTS_PER_PAGE = 0;
-    private static final QueryResult<StatisticsGroup>
-            EMPTY_STATS = new QueryResult.Builder<>(0, Collections.<StatisticsGroup>emptyList()).build();
     private final RequiredStatisticsProvider requiredStatisticsProvider;
     private final FilterConverterFactory converterFactory;
     private final SearchService<Annotation> searchService;
@@ -65,6 +62,7 @@ public class AnnotationStatisticsService implements StatisticsService {
         this.converterFactory = converterFactory;
         this.searchService = searchService;
         this.converter = converter;
+
         this.requiredStatisticsProvider = requiredStatisticsProvider;
 
         this.queryTemplate = new DefaultSearchQueryTemplate();
@@ -74,74 +72,39 @@ public class AnnotationStatisticsService implements StatisticsService {
     @Override
     public QueryResult<StatisticsGroup> calculateForStandardUsage(AnnotationRequest request) {
         checkArgument(request != null, "Annotation request cannot be null");
-        return calculateForRequiredStatistics(request, false);
+        final List<RequiredStatistic> requiredStatistics = listRequiredStatistics(request, false);
+        return calculateForRequiredStatistics(request, requiredStatistics);
     }
 
     @Override
     public QueryResult<StatisticsGroup> calculateForDownloadUsage(AnnotationRequest request) {
         checkArgument(request != null, "Annotation request cannot be null");
-        return calculateForRequiredStatistics(request, true);
+        final List<RequiredStatistic> requiredStatistics = listRequiredStatistics(request, true);
+        return calculateForRequiredStatistics(request, requiredStatistics);
     }
 
-
-
-    private QueryResult<StatisticsGroup> calculateForRequiredStatistics(AnnotationRequest request, boolean download) {
-        final List<RequiredStatistic> requiredStatistics = listRequiredStatistics(request, download);
-        AggregateResponse globalAggregation = calculateStatistics(request, requiredStatistics);
-        if (globalAggregation.isPopulated()) {
-            return createResult(requiredStatistics, globalAggregation);
-        }
-        return EMPTY_STATS;
-    }
-
-    private AggregateResponse calculateStatistics(AnnotationRequest request,
+    private QueryResult<StatisticsGroup> calculateForRequiredStatistics(AnnotationRequest request,
             List<RequiredStatistic> requiredStatistics) {
-        QueryRequest queryRequest = buildQueryRequest(request, requiredStatistics);
+
+        final List<FilterRequest> filterRequests = request.createFilterRequests();
+        checkArgument(!filterRequests.isEmpty(), "Statistics requests require at least one filtering parameter.");
+
+        StatsQueryInfo queryInfo = createQueryInfo(request, requiredStatistics, filterRequests);
+        QueryRequest queryRequest = queryInfo.getQueryRequest();
+
         QueryResult<Annotation> annotationQueryResult = searchService.findByQuery(queryRequest);
-        return annotationQueryResult.getAggregation();
-    }
+        AggregateResponse globalAggregation = annotationQueryResult.getAggregation();
 
-    private QueryResult<StatisticsGroup> createResult(List<RequiredStatistic> requiredStatistics,
-            AggregateResponse globalAggregation) {
-        List<StatisticsGroup> statsGroups = requiredStatistics.stream()
-                .map(req -> convertResponse(globalAggregation, req))
-                .collect(Collectors.toList());
-        return new QueryResult.Builder<>(statsGroups.size(), statsGroups).build();
-    }
-
-    private List<RequiredStatistic> listRequiredStatistics(AnnotationRequest request, boolean download) {
-        if (isNullOrEmpty(request.getGeneProductId())) {
-            return download ? requiredStatisticsProvider.getDownloadUsage() :
-                    requiredStatisticsProvider.getStandardUsage();
+        QueryResult<StatisticsGroup> response;
+        if (globalAggregation.isPopulated()) {
+            List<StatisticsGroup> statsGroups = createStatsGroups(requiredStatistics, queryInfo, globalAggregation);
+            response = new QueryResult.Builder<>(statsGroups.size(), statsGroups).build();
+        } else {
+            response = new QueryResult.Builder<>(0, Collections.<StatisticsGroup>emptyList()).build();
         }
-        return download ? requiredStatisticsProvider.getDownloadUsageWithGeneProductFiltering() :
-                requiredStatisticsProvider.getStandardUsageWithGeneProductFiltering();
+
+        return response;
     }
-
-
-//    private QueryResult<StatisticsGroup> calculateForRequiredStatistics(AnnotationRequest request,
-//            List<RequiredStatistic> requiredStatistics) {
-//        checkArgument(request != null, "Annotation request cannot be null");
-//
-//        final List<FilterRequest> filterRequests = request.createFilterRequests();
-//        checkArgument(!filterRequests.isEmpty(), "Statistics requests require at least one filtering parameter.");
-//
-//        StatsQueryInfo queryInfo = createQueryInfo(request, requiredStatistics, filterRequests);
-//        QueryRequest queryRequest = queryInfo.getQueryRequest();
-//
-//        QueryResult<Annotation> annotationQueryResult = searchService.findByQuery(queryRequest);
-//        AggregateResponse globalAggregation = annotationQueryResult.getAggregation();
-//
-//        QueryResult<StatisticsGroup> response;
-//        if (globalAggregation.isPopulated()) {
-//            List<StatisticsGroup> statsGroups = createStatsGroups(requiredStatistics, queryInfo, globalAggregation);
-//            response = new QueryResult.Builder<>(statsGroups.size(), statsGroups).build();
-//        } else {
-//            response = new QueryResult.Builder<>(0, Collections.<StatisticsGroup>emptyList()).build();
-//        }
-//
-//        return response;
-//    }
 
     private StatsQueryInfo createQueryInfo(AnnotationRequest request, List<RequiredStatistic> requiredStatistics,
             List<FilterRequest> filterRequests) {
@@ -284,13 +247,22 @@ public class AnnotationStatisticsService implements StatisticsService {
         }
     }
 
-    private boolean isNullOrEmpty(String[] array) {
-        return array == null || array.length == 0;
-    }
-
     private interface StatsQueryInfo {
         QueryRequest getQueryRequest();
 
         Optional<Map<String, List<String>>> getSlimmingInfoMap();
+    }
+
+    private List<RequiredStatistic> listRequiredStatistics(AnnotationRequest request, boolean download) {
+        if (isNullOrEmpty(request.getGeneProductId())) {
+            return download ? requiredStatisticsProvider.getDownloadUsage() :
+                    requiredStatisticsProvider.getStandardUsage();
+        }
+        return download ? requiredStatisticsProvider.getDownloadUsageWithGeneProductFiltering() :
+                requiredStatisticsProvider.getStandardUsageWithGeneProductFiltering();
+    }
+
+    private boolean isNullOrEmpty(String[] array) {
+        return array == null || array.length == 0;
     }
 }
