@@ -70,7 +70,8 @@ public class SlimmedStatsInjectorTest {
         validateExistingGroups();
         List<StatisticsValue> slimValues = validateSlimGroup();
         assertThat(slimValues, hasSize(1));
-        slimValuesContain(slimValues, go(2), (long) 5, (double) (long) 5 / TOTAL);
+        final double percentage = ((double) (long) 5 / TOTAL) * 100;
+        slimValuesContain(slimValues, go(2), (long) 5, percentage);
     }
 
     @Test
@@ -86,7 +87,8 @@ public class SlimmedStatsInjectorTest {
         validateExistingGroups();
         List<StatisticsValue> slimValues = validateSlimGroup();
         assertThat(slimValues, hasSize(1));
-        slimValuesContain(slimValues, go(2), (long) 8, (double) (long) 8 / TOTAL);
+        final double percentage = ((double) (long) 8 / TOTAL) * 100;
+        slimValuesContain(slimValues, go(2), (long) 8, percentage);
     }
 
     @Test
@@ -100,7 +102,8 @@ public class SlimmedStatsInjectorTest {
         validateExistingGroups();
         List<StatisticsValue> slimValues = validateSlimGroup();
         assertThat(slimValues, hasSize(2));
-        slimValuesContain(slimValues, go(2), 5L, (double) 5 / TOTAL);
+        final double percentage = ((double) 5 / TOTAL) * 100;
+        slimValuesContain(slimValues, go(2), 5L, percentage);
     }
 
     private void slimValuesContain(List<StatisticsValue> slimValues,
