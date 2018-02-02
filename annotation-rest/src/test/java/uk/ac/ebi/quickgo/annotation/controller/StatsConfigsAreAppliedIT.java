@@ -4,6 +4,8 @@ import uk.ac.ebi.quickgo.annotation.AnnotationREST;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationFields;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
+import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker;
+import uk.ac.ebi.quickgo.annotation.service.statistics.RequiredStatisticsProvider;
 import uk.ac.ebi.quickgo.annotation.service.statistics.StatisticsTypeConfigurer;
 import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 
