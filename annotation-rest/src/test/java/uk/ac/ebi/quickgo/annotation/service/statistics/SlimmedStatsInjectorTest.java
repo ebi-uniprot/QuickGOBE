@@ -160,6 +160,7 @@ public class SlimmedStatsInjectorTest {
         assertThat(slimmingGroupTypes, hasSize(1));
         StatisticsByType slimmedGoStatsType = slimmingGroupTypes.get(0);
         assertThat(slimmedGoStatsType.getType(), is(ANNOTATIONS_FOR_GO_SLIMS_NAME));
+        assertThat(slimmedGoStatsType.getDistinctValueCount(), is(slimmedGoStatsType.getValues().size()));
         return slimmedGoStatsType.getValues();
     }
 
