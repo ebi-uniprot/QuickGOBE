@@ -20,7 +20,6 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -32,7 +31,6 @@ public class AnnotationStatisticsServiceTest {
     public ExpectedException thrown = ExpectedException.none();
 
     private AnnotationStatisticsService statsService;
-    private AnnotationRequest request;
 
     @Mock
     private FilterConverterFactory filterFactoryMock;
@@ -57,8 +55,6 @@ public class AnnotationStatisticsServiceTest {
 
     @Before
     public void setUp() {
-        request = new AnnotationRequest();
-
         statsService = new AnnotationStatisticsService(filterFactoryMock, searchServiceMock,
                 statsConverterMock, requiredStatisticsProvider);
 
@@ -109,50 +105,6 @@ public class AnnotationStatisticsServiceTest {
         thrown.expectMessage("Annotation request cannot be null");
 
         statsService.calculateForStandardUsage(null);
-    }
-
-    @Test
-    public void requiredStatisticsProviderCalledForStandardUsageOnly() {
-        statsService = new AnnotationStatisticsService(filterFactoryMock, searchServiceMock,
-                statsConverterMock, requiredStatisticsProvider);
-        request.setGeneProductId("A0A000");
-
-        statsService.calculateForStandardUsage(request);
-
-        verify(requiredStatisticsProvider).getStandardUsage();
-    }
-
-    @Test
-    public void requiredStatisticsProviderCalledForStandardUsageWithGeneProductFiltering() {
-        statsService = new AnnotationStatisticsService(filterFactoryMock, searchServiceMock,
-                statsConverterMock, requiredStatisticsProvider);
-        request.setGeneProductId("A0A000");
-
-        statsService.calculateForStandardUsage(request);
-
-        verify(requiredStatisticsProvider).getStandardUsageWithGeneProductFiltering();
-    }
-
-    @Test
-    public void requiredStatisticsProviderCalledForDownloadUsageOnly() {
-        statsService = new AnnotationStatisticsService(filterFactoryMock, searchServiceMock,
-                statsConverterMock, requiredStatisticsProvider);
-        request.setAspect("C");
-
-        statsService.calculateForDownloadUsage(request);
-
-        verify(requiredStatisticsProvider).getDownloadUsage();
-    }
-
-    @Test
-    public void requiredStatisticsProviderCalledForDownloadUsageWithGeneProductFiltering() {
-        statsService = new AnnotationStatisticsService(filterFactoryMock, searchServiceMock,
-                statsConverterMock, requiredStatisticsProvider);
-        request.setGeneProductId("A0A000");
-
-        statsService.calculateForDownloadUsage(request);
-
-        verify(requiredStatisticsProvider).getDownloadUsageWithGeneProductFiltering();
     }
 
     class TestFilterConverter implements FilterConverter<FilterRequest, QuickGOQuery> {
