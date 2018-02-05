@@ -33,6 +33,11 @@ import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.*;
 public class FilterAnnotationByGORESTIT extends AbstractFilterAnnotationByOntologyRESTIT {
     private static final String GO_DESCENDANTS_RESOURCE_FORMAT = "/ontology/go/terms/%s/descendants?relations=%s";
     private static final String GO_SLIM_RESOURCE_FORMAT = "/ontology/go/slim?slimsToIds=%s&relations=%s";
+    private static final String STATS_RESOURCE = "/annotation/stats";
+    private static final String STATS_GROUP_NAME = "groupName";
+    private static final String ANNOTATION_GROUP_NAME = "annotation";
+    private static final String GENE_PRODUCT_GROUP_NAME = "geneProduct";
+    private static final String SLIMMING_GROUP_NAME = "slimming";
 
     public FilterAnnotationByGORESTIT() {
         resourceFormat = GO_DESCENDANTS_RESOURCE_FORMAT;
@@ -65,6 +70,29 @@ public class FilterAnnotationByGORESTIT extends AbstractFilterAnnotationByOntolo
                 .andExpect(fieldsInAllResultsExist(1))
                 .andExpect(valuesOccurInField(idParam, ontologyId(1)))
                 .andExpect(valuesOccurInField(SLIMMED_ID_FIELD, singletonList(singletonList(ontologyId(1)))));
+    }
+
+    @Test
+    public void slimFilterHasSlimStatsShown() throws Exception {
+        annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(1), ontologyId(1)));
+        annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(2), ontologyId(2)));
+
+        expectRestCallHasSlims(
+                singletonList(ontologyId(1)),
+                emptyList(),
+                singletonList((singletonList(ontologyId(1)))));
+
+        ResultActions response = mockMvc.perform(
+                get(STATS_RESOURCE)
+                        .param(usageParam, SLIM_USAGE)
+                        .param(idParam, ontologyId(1)));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(3))
+                .andExpect(valuesOccurInField(STATS_GROUP_NAME, ANNOTATION_GROUP_NAME, GENE_PRODUCT_GROUP_NAME,
+                        SLIMMING_GROUP_NAME));
     }
 
     @Test

@@ -29,12 +29,12 @@ public class StatisticsDownloadTypeReadPropertiesIT {
     private static final String TAXON_ID = "taxonId";
 
     @Autowired
-    private RequiredStatistics requiredStatisticsForDownloadUsage;
+    private RequiredStatisticsProvider requiredStatisticsProvider;
     private List<RequiredStatistic> statistics;
 
     @Before
     public void setUp() {
-        statistics = requiredStatisticsForDownloadUsage.getStats();
+        statistics = requiredStatisticsProvider.getDownloadUsage();
     }
 
     @Test

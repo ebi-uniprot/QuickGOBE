@@ -4,6 +4,7 @@ import org.springframework.test.web.servlet.ResultMatcher;
 
 import static java.lang.String.format;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 /**
@@ -84,5 +85,14 @@ final class StatsResponseVerifier {
                         TYPE_NAME_TAG, type,
                         target),
                 containsInAnyOrder(expected));
+    }
+
+    static ResultMatcher numberOfTypes(String group, int expectedSize) {
+        String valuesInTypeForGroup = "%s[?(@.%s=='%s')].types[*].length()";
+        return jsonPath(
+                format(valuesInTypeForGroup,
+                        ResponseVerifier.RESULTS,
+                        GROUP_NAME_TAG, group),
+                hasSize(expectedSize));
     }
 }

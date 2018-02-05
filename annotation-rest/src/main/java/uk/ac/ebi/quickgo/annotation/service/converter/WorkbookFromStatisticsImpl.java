@@ -4,8 +4,8 @@ import uk.ac.ebi.quickgo.annotation.model.StatisticsByType;
 import uk.ac.ebi.quickgo.annotation.model.StatisticsGroup;
 import uk.ac.ebi.quickgo.annotation.model.StatisticsValue;
 
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -24,24 +24,21 @@ import static com.google.common.base.Preconditions.checkArgument;
  */
 public class WorkbookFromStatisticsImpl implements WorkbookFromStatistics {
 
+    static final String ANNOTATIONS_SUMMARY = "Number of annotations:";
+    static final String GENE_PRODUCTS_SUMMARY = "Number of distinct proteins:";
+    static final String SUMMARY_HEADER = "Summary";
     private static final String PERCENTAGE_CELL_FORMAT = "0.00";
     private static final int HEADER_ROW = 1;
     private static final int COLUMN_NAMES_ROW = 2;
     private static final int DETAIL_ROW_INITIAL_VALUE = 3;
     private static final int FIRST_COLUMN = 0;
     private static final int SUMMARY_DETAIL_ROW = 2;
-    static final String SUMMARY_SHEET_NAME = "summary";
-    static final String ANNOTATIONS_SUMMARY = "Number of annotations:";
-    static final String GENE_PRODUCTS_SUMMARY = "Number of distinct proteins:";
-    static final String SUMMARY_HEADER = "Summary";
-    private final String[] sectionTypes;
-    private final Map<String, SheetLayout> sheetLayoutMap;
+    private static final String SUMMARY_SHEET_NAME = "summary";
+    private final LinkedHashSet<SheetLayout> sheetLayoutSet;
 
-    public WorkbookFromStatisticsImpl(String[] sectionTypes, Map<String, SheetLayout> sheetLayoutMap) {
-        checkArgument(Objects.nonNull(sectionTypes), "SectionTypes should not be null.");
-        checkArgument(Objects.nonNull(sheetLayoutMap), "Sheet layout map should not be null.");
-        this.sectionTypes = sectionTypes;
-        this.sheetLayoutMap = sheetLayoutMap;
+    public WorkbookFromStatisticsImpl(LinkedHashSet<SheetLayout> sheetLayouts) {
+        checkArgument(Objects.nonNull(sheetLayouts), "Sheet layout map should not be null.");
+        this.sheetLayoutSet = sheetLayouts;
     }
 
     public Workbook generate(List<StatisticsGroup> statisticsGroups) {
@@ -53,13 +50,29 @@ public class WorkbookFromStatisticsImpl implements WorkbookFromStatistics {
         return wb;
     }
 
-    private void createDetailSheets(List<StatisticsGroup> statisticsGroups, Workbook wb, CellStyle percentageCellFormat,
-            CellStyle boldCellFormat) {
-        for (StatisticsGroup statisticsGroup : statisticsGroups) {
-            for (String sectionType : sectionTypes) {
-                if (statisticsGroup.getGroupName().equalsIgnoreCase(sectionType)) {
-                    populateDetailSheetsForGroup(statisticsGroup, wb, percentageCellFormat, boldCellFormat);
-                }
+    private void createDetailSheets(List<StatisticsGroup> statisticsGroups, Workbook wb, CellStyle
+            percentageCellFormat, CellStyle boldCellFormat) {
+        for (SheetLayout layout : sheetLayoutSet) {
+            for (StatisticsGroup statisticsGroup : statisticsGroups) {
+                //add group/type information to layout
+                writeGroupAndTypeValuesToTab(layout, statisticsGroup, wb, percentageCellFormat, boldCellFormat);
+            }
+        }
+    }
+
+    private void writeGroupAndTypeValuesToTab(SheetLayout layout, StatisticsGroup statisticsGroup,
+            Workbook wb, CellStyle fixedDecimalPlaces, CellStyle boldCellFormat) {
+        for (StatisticsByType statisticsByType : statisticsGroup.getTypes()) {
+            if (layout.typeName.equals(statisticsByType.getType())) {
+                final Sheet sheet = retrieveOrCreateSheet(wb, layout);
+
+                layout.sectionLayouts.stream()
+                        .filter(sectionLayout -> sectionLayout.type.equals(statisticsGroup.getGroupName()))
+                        .forEach(sectionLayout -> populateSectionLayout(sheet,
+                                sectionLayout,
+                                statisticsByType,
+                                fixedDecimalPlaces,
+                                boldCellFormat));
             }
         }
     }
@@ -81,26 +94,6 @@ public class WorkbookFromStatisticsImpl implements WorkbookFromStatistics {
         font.setBold(true);
         boldCellFormat.setFont(font);
         return boldCellFormat;
-    }
-
-    private void populateDetailSheetsForGroup(StatisticsGroup statisticsGroup, Workbook wb,
-            CellStyle fixedDecimalPlaces, CellStyle boldCellFormat) {
-        for (StatisticsByType statisticsByType : statisticsGroup.getTypes()) {
-            final SheetLayout sheetLayout = sheetLayoutMap.get(statisticsByType.getType());
-            if (sheetLayout == null) {
-                continue;
-            }
-
-            final Sheet sheet = retrieveOrCreateSheet(wb, sheetLayout);
-
-            sheetLayout.sectionLayouts.stream()
-                                      .filter(sectionLayout -> sectionLayout.type.equals(statisticsGroup.getGroupName()))
-                                      .forEach(sectionLayout -> populateSectionLayout(sheet,
-                                                                                      sectionLayout,
-                                                                                      statisticsByType,
-                                                                                      fixedDecimalPlaces,
-                                                                                      boldCellFormat));
-        }
     }
 
     private Sheet retrieveOrCreateSheet(Workbook wb, SheetLayout sheetLayout) {
@@ -156,7 +149,7 @@ public class WorkbookFromStatisticsImpl implements WorkbookFromStatistics {
     }
 
     private void populatePercentageCell(Cell targetCell, StatisticsValue statisticsValue, CellStyle cellStyle) {
-        targetCell.setCellValue(statisticsValue.getPercentage() * 100);
+        targetCell.setCellValue(statisticsValue.getPercentage());
         targetCell.setCellType(CellType.NUMERIC);
         targetCell.setCellStyle(cellStyle);
     }
@@ -176,12 +169,12 @@ public class WorkbookFromStatisticsImpl implements WorkbookFromStatistics {
 
     private void showAnnotationSummary(Sheet sheet, List<StatisticsGroup> statisticsGroups) {
         statisticsGroups.stream()
-                        .filter(statisticsGroup -> statisticsGroup.getGroupName().equals("annotation"))
-                        .forEach(statisticsGroup -> {
-                            Row annotationSummaryRow = sheet.createRow(SUMMARY_DETAIL_ROW);
-                            annotationSummaryRow.createCell(FIRST_COLUMN).setCellValue(
-                                    ANNOTATIONS_SUMMARY + statisticsGroup.getTotalHits());
-                        });
+                .filter(statisticsGroup -> statisticsGroup.getGroupName().equals("annotation"))
+                .forEach(statisticsGroup -> {
+                    Row annotationSummaryRow = sheet.createRow(SUMMARY_DETAIL_ROW);
+                    annotationSummaryRow.createCell(FIRST_COLUMN).setCellValue(
+                            ANNOTATIONS_SUMMARY + statisticsGroup.getTotalHits());
+                });
     }
 
     private void showGeneProductSummary(Sheet sheet, List<StatisticsGroup> statisticsGroups) {
@@ -192,28 +185,5 @@ public class WorkbookFromStatisticsImpl implements WorkbookFromStatistics {
                     geneProductSummaryRow.createCell(FIRST_COLUMN)
                             .setCellValue(GENE_PRODUCTS_SUMMARY + statisticsGroup.getTotalHits());
                 });
-    }
-
-    static class SheetLayout {
-        final String displayName;
-        final List<SectionLayout> sectionLayouts;
-
-        SheetLayout(String displayName, List<SectionLayout> sectionLayouts) {
-            this.displayName = displayName;
-            this.sectionLayouts = sectionLayouts;
-        }
-    }
-
-    static class SectionLayout {
-        private static final String[] SECTION_COL_HEADINGS = new String[]{"Code", "Name", "Percentage", "Count"};
-        final String type;
-        private final String header;
-        private final int startingColumn;
-
-        SectionLayout(String type, String header, int startingColumn) {
-            this.type = type;
-            this.header = header;
-            this.startingColumn = startingColumn;
-        }
     }
 }

@@ -19,8 +19,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.*;
-import static uk.ac.ebi.quickgo.annotation.service.converter.StatisticsWorkBookLayout.SECTION_TYPES;
-import static uk.ac.ebi.quickgo.annotation.service.converter.StatisticsWorkBookLayout.SHEET_LAYOUT_MAP;
+import static uk.ac.ebi.quickgo.annotation.service.converter.StatisticsWorkBookLayout.SHEET_LAYOUT_SET;
 
 /**
  * Configures how the response to the client should be handled.
@@ -72,6 +71,6 @@ import static uk.ac.ebi.quickgo.annotation.service.converter.StatisticsWorkBookL
     }
 
     private OutputStreamWriter statsDispatchWriter() {
-        return new StatsExcelDispatchWriter(new WorkbookFromStatisticsImpl(SECTION_TYPES, SHEET_LAYOUT_MAP));
+        return new StatsExcelDispatchWriter(new WorkbookFromStatisticsImpl(SHEET_LAYOUT_SET));
     }
 }

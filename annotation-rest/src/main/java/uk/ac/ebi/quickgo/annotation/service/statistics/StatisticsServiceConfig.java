@@ -35,24 +35,15 @@ public class StatisticsServiceConfig {
     }
 
     @Bean
-    public RequiredStatistics requiredStatisticsForStandardUsage(
-            StatisticsTypeConfigurer statsTypeConfigurerForStandardUsage) {
-        return new RequiredStatistics(statsTypeConfigurerForStandardUsage);
+    public RequiredStatisticsProvider statisticsProvider() {
+        return new RequiredStatisticsProvider(standardConfiguration(), downloadConfiguration());
     }
 
-    @Bean
-    public RequiredStatistics requiredStatisticsForDownloadUsage(
-            StatisticsTypeConfigurer statsTypeConfigurerForDownloadUsage) {
-        return new RequiredStatistics(statsTypeConfigurerForDownloadUsage);
-    }
-
-    @Bean
-    public StatisticsTypeConfigurer statsTypeConfigurerForStandardUsage() {
+    private StatisticsTypeConfigurer standardConfiguration() {
         return new StatisticsTypeConfigurer(typeLimitsForStandardUsage);
     }
 
-    @Bean
-    public StatisticsTypeConfigurer statsTypeConfigurerForDownloadUsage() {
+    private StatisticsTypeConfigurer downloadConfiguration() {
         return new StatisticsTypeConfigurer(typeLimitsForDownloadUsage);
     }
 }

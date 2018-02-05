@@ -4,7 +4,6 @@ import com.google.common.base.Preconditions;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -25,6 +24,10 @@ public class StatisticsByType {
         this.values = new ArrayList<>();
     }
 
+    public StatisticsByType(String type) {
+        this(type, 0);
+    }
+
     public String getType() {
         return type;
     }
@@ -39,7 +42,7 @@ public class StatisticsByType {
     }
 
     public List<StatisticsValue> getValues() {
-        return Collections.unmodifiableList(values);
+        return values;
     }
 
     @Override public int hashCode() {

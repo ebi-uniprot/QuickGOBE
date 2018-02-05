@@ -4,6 +4,8 @@ import uk.ac.ebi.quickgo.annotation.AnnotationREST;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationFields;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
+import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker;
+import uk.ac.ebi.quickgo.annotation.service.statistics.RequiredStatisticsProvider;
 import uk.ac.ebi.quickgo.annotation.service.statistics.StatisticsTypeConfigurer;
 import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 
@@ -51,12 +53,13 @@ public class StatsConfigsAreAppliedIT {
     // temporary data store for solr's data, which is automatically cleaned on exit
     @ClassRule
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
-    public static final String GO_ID = "goId";
-    public static final String TAXON_ID = "taxonId";
+    private static final String GO_ID = "goId";
+    private static final String TAXON_ID = "taxonId";
 
     // the configured stats limits used in this test
-    static final int GO_ID_LIMIT_PROPERTY = 6;
-    static final int TAXON_ID_LIMIT_PROPERTY = 7;
+    private static final int GO_ID_LIMIT_PROPERTY = 6;
+    private static final int GO_ID_LIMIT_PROPERTY_FOR_DOWNLOAD = 10;
+    private static final int TAXON_ID_LIMIT_PROPERTY = 7;
 
     private static final int SAVED_DOC_COUNT = 50;
     private static final int DEFAULT_STATS_TYPE_COUNT = 10;
@@ -67,6 +70,7 @@ public class StatsConfigsAreAppliedIT {
     private static final String GENE_PRODUCT = "geneProduct";
     private static final String REFERENCE = "reference";
     private MockMvc mockMvc;
+    private static final String TAXON_ID_PARAMETER_NAME = "taxonId";
 
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -89,7 +93,8 @@ public class StatsConfigsAreAppliedIT {
                 createDocsAndApply((i, doc) -> doc.goId = createGOId(i));
         repository.save(docs);
 
-        ResultActions response = mockMvc.perform(get(STATS_ENDPOINT));
+        ResultActions response = mockMvc.perform(get(STATS_ENDPOINT)
+                .param(TAXON_ID_PARAMETER_NAME, AnnotationDocMocker.TAXON_ID));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -105,7 +110,8 @@ public class StatsConfigsAreAppliedIT {
                 createDocsAndApply((i, doc) -> doc.taxonId = i);
         repository.save(docs);
 
-        ResultActions response = mockMvc.perform(get(STATS_ENDPOINT));
+        ResultActions response = mockMvc.perform(get(STATS_ENDPOINT)
+                .param(TAXON_ID_PARAMETER_NAME, AnnotationDocMocker.TAXON_ID));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -121,7 +127,8 @@ public class StatsConfigsAreAppliedIT {
                 createDocsAndApply((i, doc) -> doc.reference = createRef(i));
         repository.save(docs);
 
-        ResultActions response = mockMvc.perform(get(STATS_ENDPOINT));
+        ResultActions response = mockMvc.perform(get(STATS_ENDPOINT)
+                .param(TAXON_ID_PARAMETER_NAME, AnnotationDocMocker.TAXON_ID));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -168,17 +175,26 @@ public class StatsConfigsAreAppliedIT {
     @Configuration
     static class TestStatsTypeConfig {
 
-        static Map<String, Integer> typeLimitProperties = typeLimitTestValues();
+        static final Map<String, Integer> typeLimitProperties = typeLimitTestValues();
+        static final Map<String, Integer> typeLimitTestValuesForDownload = typeLimitTestValuesForDownload();
 
         @Primary
         @Bean
-        public StatisticsTypeConfigurer statsTypeConfigurer() {
-            return new StatisticsTypeConfigurer(typeLimitProperties);
+        public RequiredStatisticsProvider requiredStatisticsProvider() {
+            return new RequiredStatisticsProvider(new StatisticsTypeConfigurer(typeLimitProperties),
+                    new StatisticsTypeConfigurer(typeLimitTestValuesForDownload));
         }
 
         private static Map<String, Integer> typeLimitTestValues() {
             Map<String, Integer> properties = new HashMap<>();
             properties.put(AnnotationFields.Facetable.GO_ID, GO_ID_LIMIT_PROPERTY);
+            properties.put(AnnotationFields.Facetable.TAXON_ID, TAXON_ID_LIMIT_PROPERTY);
+            return properties;
+        }
+
+        private static Map<String, Integer> typeLimitTestValuesForDownload() {
+            Map<String, Integer> properties = new HashMap<>();
+            properties.put(AnnotationFields.Facetable.GO_ID, GO_ID_LIMIT_PROPERTY_FOR_DOWNLOAD);
             properties.put(AnnotationFields.Facetable.TAXON_ID, TAXON_ID_LIMIT_PROPERTY);
             return properties;
         }

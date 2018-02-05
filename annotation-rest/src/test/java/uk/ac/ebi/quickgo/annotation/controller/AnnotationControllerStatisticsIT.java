@@ -3,13 +3,11 @@ package uk.ac.ebi.quickgo.annotation.controller;
 import uk.ac.ebi.quickgo.annotation.AnnotationREST;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
+import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker;
 import uk.ac.ebi.quickgo.common.QuickGODocument;
 import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -30,10 +28,15 @@ import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
 
+import static java.util.Collections.singletonList;
 import static java.util.Arrays.asList;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.GENE_PRODUCT_ID_PARAM;
 import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.GO_ID_PARAM;
 import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.GO_USAGE_PARAM;
 import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.TAXON_ID_PARAM;
@@ -43,6 +46,7 @@ import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.contentTy
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.totalNumOfResults;
 import static uk.ac.ebi.quickgo.annotation.controller.StatsResponseVerifier.keysInTypeWithinGroup;
 import static uk.ac.ebi.quickgo.annotation.controller.StatsResponseVerifier.namesInTypeWithinGroup;
+import static uk.ac.ebi.quickgo.annotation.controller.StatsResponseVerifier.numberOfTypes;
 import static uk.ac.ebi.quickgo.annotation.controller.StatsResponseVerifier.numericValueForGroup;
 import static uk.ac.ebi.quickgo.annotation.controller.StatsResponseVerifier.totalHitsInGroup;
 
@@ -77,6 +81,9 @@ public class AnnotationControllerStatisticsIT {
     private static final String EXACT_USAGE = "exact";
     private static final String DISTINCT_VALUE_COUNT = "distinctValueCount";
     private static final String TAXON_NAME = "taxon name: " + TAXON_ID;
+    private static final String GENE_PRODUCT_ID_STATS_FIELD = "geneProductId";
+    public static final int EXPECTED_NUMBER_OF_TYPES = 6;
+    public static final int EXPECTED_NUMBER_OF_TYPES_IF_FILTERING_BY_GENE_PRODUCT = 7;
 
     private MockMvc mockMvc;
     @Autowired
@@ -107,10 +114,21 @@ public class AnnotationControllerStatisticsIT {
     }
 
     @Test
+    public void statsRequestFailsIfNoFilteringParametersAreIncluded() throws Exception {
+        ResultActions response = mockMvc.perform(get(STATS_ENDPOINT));
+
+        response.andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.messages",
+                        hasItem(containsString("Statistics requests require at least one filtering parameter."))));
+    }
+
+    @Test
     public void queryWithNoHitsProducesEmptyStats() throws Exception {
         repository.deleteAll();
 
-        ResultActions response = mockMvc.perform(get(STATS_ENDPOINT));
+        ResultActions response = mockMvc.perform(get(STATS_ENDPOINT)
+                .param(TAXON_ID_STATS_FIELD, AnnotationDocMocker.TAXON_ID));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -156,7 +174,7 @@ public class AnnotationControllerStatisticsIT {
                         .param(TAXON_USAGE_PARAM.getName(), EXACT_USAGE)
         );
 
-        assertStatsResponse(response, GO_ID_STATS_FIELD, 2, relevantGOIds, 2);
+        assertStatsResponse(response, GO_ID_STATS_FIELD, 2, relevantGOIds, 2, 6);
     }
 
     //----------- Names for GO ids, taxon ids and eco codes -----------//
@@ -214,7 +232,7 @@ public class AnnotationControllerStatisticsIT {
                         .param(GO_USAGE_PARAM.getName(), EXACT_USAGE)
         );
 
-        assertStatsResponse(response, TAXON_ID_STATS_FIELD, 2, relevantTaxonIds, 2);
+        assertStatsResponse(response, TAXON_ID_STATS_FIELD, 2, relevantTaxonIds, 2, EXPECTED_NUMBER_OF_TYPES);
     }
 
     //----------- Reference -----------//
@@ -257,7 +275,7 @@ public class AnnotationControllerStatisticsIT {
                         .param(GO_USAGE_PARAM.getName(), EXACT_USAGE)
         );
 
-        assertStatsResponse(response, REFERENCE_STATS_FIELD, 2, relevantReferenceIds, 2);
+        assertStatsResponse(response, REFERENCE_STATS_FIELD, 2, relevantReferenceIds, 2, 6);
     }
 
     //----------- Evidence code -----------//
@@ -302,7 +320,7 @@ public class AnnotationControllerStatisticsIT {
                         .param(GO_USAGE_PARAM.getName(), EXACT_USAGE)
         );
 
-        assertStatsResponse(response, EVIDENCE_CODE_STATS_FIELD, 2, relevantEvidenceCodes, 2);
+        assertStatsResponse(response, EVIDENCE_CODE_STATS_FIELD, 2, relevantEvidenceCodes, 2, 6);
     }
 
     //----------- Assigned by -----------//
@@ -346,7 +364,7 @@ public class AnnotationControllerStatisticsIT {
                         .param(GO_USAGE_PARAM.getName(), EXACT_USAGE)
         );
 
-        assertStatsResponse(response, ASSIGNED_BY_STATS_FIELD, 2, relevantAssignedBy, 2);
+        assertStatsResponse(response, ASSIGNED_BY_STATS_FIELD, 2, relevantAssignedBy, 2, 6);
     }
 
     //----------- GO aspect -----------//
@@ -389,7 +407,23 @@ public class AnnotationControllerStatisticsIT {
                         .param(GO_USAGE_PARAM.getName(), EXACT_USAGE)
         );
 
-        assertStatsResponse(response, GO_ASPECT_STATS_FIELD, 2, relevantAspect, 2);
+        assertStatsResponse(response, GO_ASPECT_STATS_FIELD, 2, relevantAspect, 2, 6);
+    }
+
+    //----------- Gene Product Id -----------//
+
+    @Test
+    public void statsWhenFilteredByGeneProductContainsGeneProductIdBucket() throws Exception {
+        final String gene = "P99999";
+        repository.save(createAnnotationDoc(gene));
+
+        ResultActions response = mockMvc.perform(
+                get(STATS_ENDPOINT)
+                        .param(GENE_PRODUCT_ID_PARAM.getName(), gene)
+        );
+
+        assertStatsResponse(response, GENE_PRODUCT_ID_STATS_FIELD, 1, singletonList(gene), 1,
+                EXPECTED_NUMBER_OF_TYPES_IF_FILTERING_BY_GENE_PRODUCT);
     }
 
     private static <T, D extends QuickGODocument> Set<T> selectValuesFromDocs(
@@ -413,20 +447,24 @@ public class AnnotationControllerStatisticsIT {
             throws Exception {
         Set<String> extractedAttributeValues = selectValuesFromDocs(docs, extractAttributeValuesFromDoc);
 
-        ResultActions response = mockMvc.perform(get(STATS_ENDPOINT));
+        ResultActions response = mockMvc.perform(get(STATS_ENDPOINT)
+                .param(TAXON_ID_STATS_FIELD, AnnotationDocMocker.TAXON_ID));
 
-        assertStatsResponse(response, attribute, docs.size(), extractedAttributeValues, expectedDistinctValueCount
-        );
+        assertStatsResponse(response, attribute, docs.size(), extractedAttributeValues, expectedDistinctValueCount,
+                6);
     }
 
     private void assertStatsResponse(ResultActions response, String statsType, int totalHits,
-            Collection<String> statsValues, int expectedDistinctValueCount) throws Exception {
+            Collection<String> statsValues, int expectedDistinctValueCount, int expectedNumberOfTypes)
+            throws Exception {
         response.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(2))
                 .andExpect(totalHitsInGroup(ANNOTATION_GROUP, totalHits))
                 .andExpect(totalHitsInGroup(GENE_PRODUCT_GROUP, totalHits))
+                .andExpect(numberOfTypes(ANNOTATION_GROUP, expectedNumberOfTypes))
+                .andExpect(numberOfTypes(GENE_PRODUCT_GROUP, expectedNumberOfTypes))
                 .andExpect(numericValueForGroup(ANNOTATION_GROUP, statsType, DISTINCT_VALUE_COUNT,
                         expectedDistinctValueCount))
                 .andExpect(keysInTypeWithinGroup(ANNOTATION_GROUP, statsType, asArray(statsValues)))
@@ -434,7 +472,8 @@ public class AnnotationControllerStatisticsIT {
     }
 
     private void assertStatsResponseIncludingNames(int expectedDistinctValueCount) throws Exception {
-        ResultActions response = mockMvc.perform(get(STATS_ENDPOINT));
+        ResultActions response = mockMvc.perform(get(STATS_ENDPOINT)
+                .param(TAXON_ID_STATS_FIELD, AnnotationDocMocker.TAXON_ID));
 
         final String[] goNames = expectedNames(expectedDistinctValueCount, GO_TERM_NAME);
         final String[] taxonNames = expectedNames(expectedDistinctValueCount, TAXON_TERM_NAME);

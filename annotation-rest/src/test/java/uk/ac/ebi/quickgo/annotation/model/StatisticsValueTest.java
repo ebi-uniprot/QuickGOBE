@@ -15,7 +15,7 @@ public class StatisticsValueTest {
     public ExpectedException thrown = ExpectedException.none();
 
     @Test
-    public void nullIdThrowsException() throws Exception {
+    public void nullIdThrowsException() {
         String key = null;
         long total = 2;
         long occurrence = 1;
@@ -27,7 +27,7 @@ public class StatisticsValueTest {
     }
 
     @Test
-    public void emptyIdThrowsException() throws Exception {
+    public void emptyIdThrowsException() {
         String key = "";
         long total = 2;
         long occurrence = 1;
@@ -39,7 +39,7 @@ public class StatisticsValueTest {
     }
 
     @Test
-    public void negativeOccurrenceThrowsException() throws Exception {
+    public void negativeOccurrenceThrowsException() {
         String key = "key";
         long total = 2;
         long occurrence = -1;
@@ -51,7 +51,7 @@ public class StatisticsValueTest {
     }
 
     @Test
-    public void negativeTotalThrowsException() throws Exception {
+    public void negativeTotalThrowsException() {
         String key = "key";
         long total = -1;
         long occurrence = 2;
@@ -63,19 +63,7 @@ public class StatisticsValueTest {
     }
 
     @Test
-    public void totalLessThanOccurrenceThrowsException() throws Exception {
-        String key = "key";
-        long total = 1;
-        long occurrence = 2;
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Stats total cannot be less than hits: " + total + " < " + occurrence);
-
-        new StatisticsValue(key, occurrence, total);
-    }
-
-    @Test
-    public void statisticsModelWithIdAndPositiveTotalGreaterThanOccurrence() throws Exception {
+    public void statisticsModelWithIdAndPositiveTotalGreaterThanOccurrence() {
         String key = "key";
         long total = 2;
         long occurrence = 1;
@@ -88,6 +76,6 @@ public class StatisticsValueTest {
     }
 
     private double calcPercentage(long occurrence, long total) {
-        return (double) occurrence / (double) total;
+        return ((double) occurrence / (double) total) * 100;
     }
 }
