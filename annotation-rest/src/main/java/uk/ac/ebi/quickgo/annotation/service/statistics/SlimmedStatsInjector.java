@@ -69,10 +69,11 @@ class SlimmedStatsInjector {
         }
 
         StatisticsGroup slimInfoGroup = new StatisticsGroup(SLIMMING_GROUP_NAME, totalHits);
-        StatisticsByType gpsForGoId = new StatisticsByType(ANNOTATIONS_FOR_GO_SLIMS_NAME, slimAggregation.values()
+        StatisticsByType annotationsForGoId =
+                new StatisticsByType(ANNOTATIONS_FOR_GO_SLIMS_NAME, slimAggregation.values()
                 .size());
-        slimAggregation.values().forEach(gpsForGoId::addValue);
-        slimInfoGroup.addStatsType(gpsForGoId);
+        slimAggregation.values().forEach(annotationsForGoId::addValue);
+        slimInfoGroup.addStatsType(annotationsForGoId);
         return slimInfoGroup;
     }
 }
