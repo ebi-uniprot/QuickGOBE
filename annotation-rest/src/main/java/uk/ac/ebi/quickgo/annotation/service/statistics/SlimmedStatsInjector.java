@@ -53,9 +53,7 @@ class SlimmedStatsInjector {
      * @param slimmingMap the map of GO term to slimmed GO terms
      * @return {@link StatisticsGroup} summarising how many annotations there are to each slimmed GO term
      */
-    private StatisticsGroup aggregateGoIds(
-            long totalHits,
-            List<StatisticsValue> values,
+    private StatisticsGroup aggregateGoIds(long totalHits, List<StatisticsValue> values,
             Map<String, List<String>> slimmingMap) {
         Map<String, StatisticsValue> slimAggregation = new HashMap<>();
         for (StatisticsValue value : values) {
@@ -71,9 +69,11 @@ class SlimmedStatsInjector {
         }
 
         StatisticsGroup slimInfoGroup = new StatisticsGroup(SLIMMING_GROUP_NAME, totalHits);
-        StatisticsByType gpsForGoId = new StatisticsByType(ANNOTATIONS_FOR_GO_SLIMS_NAME);
-        slimAggregation.values().forEach(gpsForGoId::addValue);
-        slimInfoGroup.addStatsType(gpsForGoId);
+        StatisticsByType annotationsForGoId =
+                new StatisticsByType(ANNOTATIONS_FOR_GO_SLIMS_NAME, slimAggregation.values()
+                .size());
+        slimAggregation.values().forEach(annotationsForGoId::addValue);
+        slimInfoGroup.addStatsType(annotationsForGoId);
         return slimInfoGroup;
     }
 }
