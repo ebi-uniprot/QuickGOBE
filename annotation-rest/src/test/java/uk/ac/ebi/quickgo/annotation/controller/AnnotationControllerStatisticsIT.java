@@ -79,7 +79,7 @@ public class AnnotationControllerStatisticsIT {
     private static final String TAXON_ID_STATS_FIELD = "taxonId";
     private static final String GO_ASPECT_STATS_FIELD = "aspect";
     private static final String EXACT_USAGE = "exact";
-    private static final String DISTINCT_VALUE_COUNT = "distinctValueCount";
+    private static final String APPROXIMATE_COUNT = "approximateCount";
     private static final String TAXON_NAME = "taxon name: " + TAXON_ID;
     private static final String GENE_PRODUCT_ID_STATS_FIELD = "geneProductId";
     public static final int EXPECTED_NUMBER_OF_TYPES = 6;
@@ -465,7 +465,7 @@ public class AnnotationControllerStatisticsIT {
                 .andExpect(totalHitsInGroup(GENE_PRODUCT_GROUP, totalHits))
                 .andExpect(numberOfTypes(ANNOTATION_GROUP, expectedNumberOfTypes))
                 .andExpect(numberOfTypes(GENE_PRODUCT_GROUP, expectedNumberOfTypes))
-                .andExpect(numericValueForGroup(ANNOTATION_GROUP, statsType, DISTINCT_VALUE_COUNT,
+                .andExpect(numericValueForGroup(ANNOTATION_GROUP, statsType, APPROXIMATE_COUNT,
                         expectedDistinctValueCount))
                 .andExpect(keysInTypeWithinGroup(ANNOTATION_GROUP, statsType, asArray(statsValues)))
                 .andExpect(keysInTypeWithinGroup(GENE_PRODUCT_GROUP, statsType, asArray(statsValues)));
