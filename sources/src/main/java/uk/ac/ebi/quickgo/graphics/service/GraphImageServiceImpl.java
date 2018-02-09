@@ -85,20 +85,24 @@ public class GraphImageServiceImpl implements GraphImageService {
         layout.imageHeight = graphImage.height;
         layout.imageWidth = graphImage.width;
 
-        graphImage.legend.stream()
-                .map(legendNode -> {
-                    GraphImageLayout.LegendPosition legendPosition = new GraphImageLayout.LegendPosition();
-                    legendPosition.bottom = legendNode.bottom();
-                    legendPosition.top = legendNode.top();
-                    legendPosition.height = legendNode.height;
-                    legendPosition.width = legendNode.width;
-                    legendPosition.left = legendNode.left();
-                    legendPosition.right = legendNode.right();
-                    legendPosition.xCentre = legendNode.xCentre;
-                    legendPosition.yCentre = legendNode.yCentre;
-                    return legendPosition;
-                })
-                .forEach(layout.legendPositions::add);
+        boolean showLegend = false;
+        if (showLegend) {
+
+            graphImage.legend.stream()
+                    .map(legendNode -> {
+                        GraphImageLayout.LegendPosition legendPosition = new GraphImageLayout.LegendPosition();
+                        legendPosition.bottom = legendNode.bottom();
+                        legendPosition.top = legendNode.top();
+                        legendPosition.height = legendNode.height;
+                        legendPosition.width = legendNode.width;
+                        legendPosition.left = legendNode.left();
+                        legendPosition.right = legendNode.right();
+                        legendPosition.xCentre = legendNode.xCentre;
+                        legendPosition.yCentre = legendNode.yCentre;
+                        return legendPosition;
+                    })
+                    .forEach(layout.legendPositions::add);
+        }
 
         layout.title = title;
 
