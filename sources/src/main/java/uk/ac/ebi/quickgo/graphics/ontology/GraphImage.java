@@ -223,7 +223,7 @@ public class GraphImage extends RenderableImage {
 
             g2.setFont(infoFont);
             g2.setColor(Color.BLACK);
-            g2.drawString("QuickGO - http://www.ebi.ac.uk/QuickGO", 5, height - g2.getFontMetrics().getDescent());
+            g2.drawString("QuickGO - https://www.ebi.ac.uk/QuickGO", 5, height - g2.getFontMetrics().getDescent());
         }
     }
 
