@@ -1173,10 +1173,8 @@ public abstract class OBOControllerIT {
         when(mockGraphImageResult.getGraphImage()).thenReturn(new GraphImage("Mocked GraphImage"));
         GraphImageLayout layout = new GraphImageLayout();
         layout.title = "layout title";
-        GraphPresentation.Builder builder = new GraphPresentation.Builder();
-        GraphPresentation graphPresentation = builder.build();
         when(mockGraphImageResult.getLayout()).thenReturn(layout);
-        when(graphImageService.createChart(anyListOf(String.class), anyString(), eq(graphPresentation)))
+        when(graphImageService.createChart(anyListOf(String.class), anyString(), any(GraphPresentation.class)))
                 .thenReturn(mockGraphImageResult);
     }
 
