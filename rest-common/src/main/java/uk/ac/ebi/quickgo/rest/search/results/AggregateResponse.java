@@ -55,7 +55,8 @@ import static java.util.Collections.unmodifiableSet;
  *                - aggregationResults: [5] - where 5 represents the sum of the quantities for order_item_2
  *            ...
  *        ]
- *       - distinctValueCount: the total number of order items (the results for the query may show only order items
+ *       - approximateCount: estimated total number of order items (the results for the query may show only order
+ *       items
  *       only over a certain value, or goods type.
  * </pre>
  * <p/>

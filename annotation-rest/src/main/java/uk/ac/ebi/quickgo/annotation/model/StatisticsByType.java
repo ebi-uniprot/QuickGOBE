@@ -13,14 +13,22 @@ import java.util.List;
  */
 public class StatisticsByType {
     private final String type;
-    private final int distinctValueCount;
+    private final int approximateCount;
     private final List<StatisticsValue> values;
 
-    public StatisticsByType(String type, int distinctValueCount) {
+    /**
+     * Create an instances of StatisticsByType
+     * @param type the type i.e. name of the thing the statistics represents e.g. 'goId', 'aspect'
+     * @param approximateCount An estimated (due to the limitations of the persistence layer) count of the unique
+     * elements represented by this object. For example, if the type was 'goId', the approximateCount will be the
+     * number of unique goIds within the statistics search result. This MIGHT NOT be the same as the size of the
+     * values collection, since this can be curtailed by the limit defined for the facet query response.
+     */
+    public StatisticsByType(String type, int approximateCount) {
         Preconditions.checkArgument(type != null && !type.isEmpty(), "Statistics type cannot be null or empty.");
-        Preconditions.checkArgument(distinctValueCount >= 0, "Distinct Value Count should be be greater than zero.");
+        Preconditions.checkArgument(approximateCount >= 0, "Distinct Value Count should be be greater than zero.");
         this.type = type;
-        this.distinctValueCount = distinctValueCount;
+        this.approximateCount = approximateCount;
         this.values = new ArrayList<>();
     }
 
@@ -32,8 +40,15 @@ public class StatisticsByType {
         return type;
     }
 
-    public int getDistinctValueCount() {
-        return truncateToTensOfThousands(distinctValueCount);
+    /**
+     * An estimated count of the unique elements represented by this object. If the estimated count is less than the
+     * size of the results this object contains, then this method will return the count of the number of statistics
+     * elements this instance holds,  otherwise the estimated value will be returned, truncated to the  nearest tens of
+     * thousands (if over ten thousand) to reflect it's lack of accuracy.
+     * @return int of
+     */
+    public int getApproximateCount() {
+        return approximateCount < values.size() ? values.size() : truncateToTensOfThousands(approximateCount);
     }
 
     public void addValue(StatisticsValue value) {
@@ -61,7 +76,7 @@ public class StatisticsByType {
 
         StatisticsByType that = (StatisticsByType) o;
 
-        if (distinctValueCount != that.distinctValueCount) {
+        if (approximateCount != that.approximateCount) {
             return false;
         }
         if (type != null ? !type.equals(that.type) : that.type != null) {
@@ -73,16 +88,16 @@ public class StatisticsByType {
     @Override public String toString() {
         return "StatisticsByType{" +
                 "type='" + type + '\'' +
-                ", distinctValueCount=" + distinctValueCount +
+                ", approximateCount=" + approximateCount +
                 ", values=" + values +
                 '}';
     }
 
-    private int truncateToTensOfThousands(int distinctValueCount) {
-        if (distinctValueCount < 10001) {
-            return distinctValueCount;
+    private int truncateToTensOfThousands(int approximateCount) {
+        if (approximateCount < 10001) {
+            return approximateCount;
         }
-        int value = new BigDecimal(distinctValueCount).divide(new BigDecimal(1000), RoundingMode.HALF_UP).intValue();
+        int value = new BigDecimal(approximateCount).divide(new BigDecimal(1000), RoundingMode.HALF_UP).intValue();
         return Integer.parseInt(String.format("%d000", value));
     }
 }
