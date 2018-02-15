@@ -8,6 +8,8 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 
+import static uk.ac.ebi.quickgo.graphics.ontology.GraphPresentation.*;
+
 public class TermNode implements INode, IPositionableNode {
     private Font font;
 
@@ -29,11 +31,11 @@ public class TermNode implements INode, IPositionableNode {
         this.id = id;
         this.style = style;
         if (style.termIds && id.length() > 0) {
-            topLine = style.fontSize + 1;
+            topLine = fontSize + 1;
         }
         height = style.height;
         width = style.width;
-        font = style.getFont();
+        font = FONT;
     }
 
     public TermNode(GenericTerm term, GraphPresentation style) {
