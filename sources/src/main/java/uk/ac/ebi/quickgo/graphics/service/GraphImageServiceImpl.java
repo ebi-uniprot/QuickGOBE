@@ -35,19 +35,21 @@ public class GraphImageServiceImpl implements GraphImageService {
     }
 
     @Override
-    public GraphImageResult createChart(List<String> ids, String scope) {
+    public GraphImageResult createChart(List<String> ids, String scope, GraphPresentation graphPresentation) {
         if (sourceLoader.isLoaded()) {
 
             NameSpace nameSpace = NameSpace.getNameSpace(scope);
-            GraphImage graphImage = createRenderableImage(ids, nameSpace);
+            GraphImage graphImage = createRenderableImage(ids, nameSpace, graphPresentation);
 
             String description;
             int idsSize = ids.size();
             if (idsSize == 1) {
                 description = "Ancestor chart for " + ids.get(0);
-            } else if( idsSize < TERM_DISPLAY_THRESHOLD) {
+            } else if (idsSize < TERM_DISPLAY_THRESHOLD) {
                 description = "Comparison chart for " + ids.stream().collect(joining(","));
-            } else description = "Comparison chart for " + String.valueOf(idsSize) + " terms";
+            } else {
+                description = "Comparison chart for " + String.valueOf(idsSize) + " terms";
+            }
 
             return new GraphImageResult(
                     description,
@@ -57,6 +59,11 @@ public class GraphImageServiceImpl implements GraphImageService {
             throw new RenderingGraphException(
                     "Cannot create chart because internal ontologies could not be loaded at application startup");
         }
+    }
+
+    @Override
+    public GraphPresentation.Builder graphPresentationBuilder() {
+        return new GraphPresentation.Builder();
     }
 
     /**
@@ -71,38 +78,34 @@ public class GraphImageServiceImpl implements GraphImageService {
         GraphImageLayout layout = new GraphImageLayout();
 
         terms.stream()
-            .map(term -> {
-                GraphImageLayout.NodePosition nodePosition = new GraphImageLayout.NodePosition();
-                nodePosition.id = term.getId();
-                nodePosition.bottom = term.bottom();
-                nodePosition.top = term.top();
-                nodePosition.left = term.left();
-                nodePosition.right = term.right();
-                return nodePosition;
-            })
-            .forEach(layout.nodePositions::add);
+                .map(term -> {
+                    GraphImageLayout.NodePosition nodePosition = new GraphImageLayout.NodePosition();
+                    nodePosition.id = term.getId();
+                    nodePosition.bottom = term.bottom();
+                    nodePosition.top = term.top();
+                    nodePosition.left = term.left();
+                    nodePosition.right = term.right();
+                    return nodePosition;
+                })
+                .forEach(layout.nodePositions::add);
 
         layout.imageHeight = graphImage.height;
         layout.imageWidth = graphImage.width;
 
-        boolean showLegend = false;
-        if (showLegend) {
-
-            graphImage.legend.stream()
-                    .map(legendNode -> {
-                        GraphImageLayout.LegendPosition legendPosition = new GraphImageLayout.LegendPosition();
-                        legendPosition.bottom = legendNode.bottom();
-                        legendPosition.top = legendNode.top();
-                        legendPosition.height = legendNode.height;
-                        legendPosition.width = legendNode.width;
-                        legendPosition.left = legendNode.left();
-                        legendPosition.right = legendNode.right();
-                        legendPosition.xCentre = legendNode.xCentre;
-                        legendPosition.yCentre = legendNode.yCentre;
-                        return legendPosition;
-                    })
-                    .forEach(layout.legendPositions::add);
-        }
+        graphImage.legend.stream()
+                .map(legendNode -> {
+                    GraphImageLayout.LegendPosition legendPosition = new GraphImageLayout.LegendPosition();
+                    legendPosition.bottom = legendNode.bottom();
+                    legendPosition.top = legendNode.top();
+                    legendPosition.height = legendNode.height;
+                    legendPosition.width = legendNode.width;
+                    legendPosition.left = legendNode.left();
+                    legendPosition.right = legendNode.right();
+                    legendPosition.xCentre = legendNode.xCentre;
+                    legendPosition.yCentre = legendNode.yCentre;
+                    return legendPosition;
+                })
+                .forEach(layout.legendPositions::add);
 
         layout.title = title;
 
@@ -124,7 +127,8 @@ public class GraphImageServiceImpl implements GraphImageService {
         return targetSet;
     }
 
-    private GraphImage createRenderableImage(List<String> termsIds, NameSpace nameSpace) {
+    private GraphImage createRenderableImage(List<String> termsIds, NameSpace nameSpace,
+            GraphPresentation graphPresentation) {
         // Check if the selected terms exist
         List<GenericTerm> terms = new ArrayList<>();
 
@@ -138,7 +142,7 @@ public class GraphImageServiceImpl implements GraphImageService {
 
         // Create ontology graph
         OntologyGraph ontologyGraph =
-                OntologyGraph.makeGraph(termSet, getRelationTypes(nameSpace), 0, 0, new GraphPresentation());
+                OntologyGraph.makeGraph(termSet, getRelationTypes(nameSpace), 0, 0, graphPresentation);
         return ontologyGraph.layout();
     }
 
