@@ -4,6 +4,7 @@ import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 import uk.ac.ebi.quickgo.graphics.model.GraphImageLayout;
 import uk.ac.ebi.quickgo.graphics.ontology.GraphImage;
 import uk.ac.ebi.quickgo.graphics.ontology.GraphImageResult;
+import uk.ac.ebi.quickgo.graphics.ontology.GraphPresentation;
 import uk.ac.ebi.quickgo.graphics.ontology.RenderingGraphException;
 import uk.ac.ebi.quickgo.graphics.service.GraphImageService;
 import uk.ac.ebi.quickgo.ontology.OntologyREST;
@@ -39,8 +40,10 @@ import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.mockito.Mockito.any;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
@@ -130,6 +133,8 @@ public abstract class OBOControllerIT {
 
         validIdShortList = validIdList.subList(0, 2);
         validIdsShortCSV = toCSV(validIdShortList);
+
+        when(graphImageService.graphPresentationBuilder()).thenReturn(new GraphPresentation.Builder());
     }
 
     @After
@@ -845,7 +850,8 @@ public abstract class OBOControllerIT {
     @Test
     public void failedChartRequestProduces500() throws Exception {
         String exceptionDescription = "Error encountered during creation of ontology chart graphics.";
-        when(graphImageService.createChart(anyListOf(String.class), anyString())).thenThrow(
+        when(graphImageService.createChart(anyListOf(String.class), anyString(), any(GraphPresentation.class)))
+                .thenThrow(
                 new RenderingGraphException("Problem rendering graphics")
         );
 
@@ -885,7 +891,8 @@ public abstract class OBOControllerIT {
     @Test
     public void failedChartCoordsRequestProduces500() throws Exception {
         String exceptionDescription = "Error encountered during creation of ontology chart graphics.";
-        when(graphImageService.createChart(anyListOf(String.class), anyString())).thenThrow(
+        when(graphImageService.createChart(anyListOf(String.class), anyString(), any(GraphPresentation.class)))
+                .thenThrow(
                 new RenderingGraphException("Problem rendering graphics")
         );
 
@@ -956,6 +963,15 @@ public abstract class OBOControllerIT {
                                                          .param(RELATIONS_PARAM, getInvalidRelations()));
 
         expectUntraverseableRelationError(response, getInvalidRelations());
+    }
+
+    @Test
+    public void invalidGraphParameterProduces400() throws Exception {
+
+        final String urlTarget = buildTermsURLWithSubResource(validId, CHART_SUB_RESOURCE) + "?showKey=bloom";
+        ResultActions response = mockMvc.perform(get(urlTarget));
+
+        expectInvalidPropertyError(response);
     }
 
     //-----------------------  Check Http Header for Cache-Control content ------------------------------------------
@@ -1099,6 +1115,15 @@ public abstract class OBOControllerIT {
                 .andExpect(jsonPath("$.messages", hasItem(containsString("Provided ID: '" + id + "'"))));
     }
 
+    protected ResultActions expectInvalidPropertyError(ResultActions result) throws Exception {
+        return result
+                .andDo(print())
+                .andExpect(jsonPath("$.url", is(requestUrl(result))))
+                .andExpect(jsonPath("$.messages", hasItem(containsString(
+                        "Failed to convert property value of type [java.lang.String] to required type [boolean] for " +
+                                "property 'showKey'; nested exception is java.lang.IllegalArgumentException: Invalid boolean value [bloom]"))));
+    }
+
     protected ResultActions expectInvalidRelationError(ResultActions result, String relation) throws Exception {
         return result
                 .andDo(print())
@@ -1148,8 +1173,10 @@ public abstract class OBOControllerIT {
         when(mockGraphImageResult.getGraphImage()).thenReturn(new GraphImage("Mocked GraphImage"));
         GraphImageLayout layout = new GraphImageLayout();
         layout.title = "layout title";
+        GraphPresentation.Builder builder = new GraphPresentation.Builder();
+        GraphPresentation graphPresentation = builder.build();
         when(mockGraphImageResult.getLayout()).thenReturn(layout);
-        when(graphImageService.createChart(anyListOf(String.class), anyString()))
+        when(graphImageService.createChart(anyListOf(String.class), anyString(), eq(graphPresentation)))
                 .thenReturn(mockGraphImageResult);
     }
 
