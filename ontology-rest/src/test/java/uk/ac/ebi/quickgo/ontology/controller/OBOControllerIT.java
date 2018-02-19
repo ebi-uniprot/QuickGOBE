@@ -43,7 +43,6 @@ import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.any;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
@@ -111,6 +110,9 @@ public abstract class OBOControllerIT {
 
     @Value("${ontology.cache.control.end.time:18}")
     private int cacheControlEndTime;
+    public static final String GRAPH_PRESENTATION_PARMS =
+            "?showKey=true&showIds=true&termBoxWidth=60&termBoxHeight=90&showSlimColours=true&showChildren" +
+                    "=true";
 
     @Before
     public void setup() {
@@ -972,6 +974,35 @@ public abstract class OBOControllerIT {
         ResultActions response = mockMvc.perform(get(urlTarget));
 
         expectInvalidPropertyError(response);
+    }
+
+    @Test
+    public void validGraphParametersCanBeSet() throws Exception {
+
+        final String urlTarget = buildTermsURLWithSubResource(validId, CHART_SUB_RESOURCE) + GRAPH_PRESENTATION_PARMS;
+        requestToChartServiceReturnsValidImage();
+
+        ResultActions response = mockMvc.perform(get(urlTarget));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.IMAGE_PNG_VALUE))
+                .andExpect(header().doesNotExist(HttpHeaders.CONTENT_ENCODING));
+
+        MvcResult result = response.andReturn();
+        assertThat(result.getResponse().getContentLength(), is(greaterThan(0)));
+    }
+
+    @Test
+    public void canCallChartCoordsWithGraphPresentationParametersSpecified() throws Exception {
+        requestToChartServiceReturnsValidImage();
+
+        final String urlTarget = buildTermsURLWithSubResource(validId, CHART_COORDINATES_SUB_RESOURCE)
+                + GRAPH_PRESENTATION_PARMS;
+        ResultActions response = mockMvc.perform(get(urlTarget));
+
+        response.andExpect(status().isOk());
+
     }
 
     //-----------------------  Check Http Header for Cache-Control content ------------------------------------------
