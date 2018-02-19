@@ -3,7 +3,6 @@ package uk.ac.ebi.quickgo.ontology.model;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.Optional;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.Pattern;
 
 /**
  * The client can provide parameters to change the rendering of a terms chart. This class binds the parameters.
@@ -41,8 +40,6 @@ public class GraphRequest {
         this.ids = ids;
     }
 
-    @Pattern(regexp = "^true|false$", flags = Pattern.Flag.CASE_INSENSITIVE,
-            message = "Invalid base64: ${validatedValue}")
     public Optional<Boolean> isBase64() {
         return base64;
     }
@@ -51,8 +48,6 @@ public class GraphRequest {
         this.base64 = Optional.of(val);
     }
 
-    @Pattern(regexp = "^true|false$", flags = Pattern.Flag.CASE_INSENSITIVE,
-            message = "Invalid showKey: ${validatedValue}")
     public Optional<Boolean> showKey() {
         return showKey;
     }
@@ -61,8 +56,6 @@ public class GraphRequest {
         this.showKey = Optional.of(val);
     }
 
-    @Pattern(regexp = "^true|false$", flags = Pattern.Flag.CASE_INSENSITIVE,
-            message = "Invalid showIds: ${validatedValue}")
     public Optional<Boolean> showIds() {
         return showIds;
     }
@@ -89,8 +82,6 @@ public class GraphRequest {
         this.termBoxHeight = Optional.of(val);
     }
 
-    @Pattern(regexp = "^true|false$", flags = Pattern.Flag.CASE_INSENSITIVE,
-            message = "Invalid showSlimColours: ${validatedValue}")
     public Optional<Boolean> showSlimColours() {
         return showSlimColours;
     }
@@ -99,8 +90,6 @@ public class GraphRequest {
         this.showSlimColours = Optional.of(val);
     }
 
-    @Pattern(regexp = "^true|false$", flags = Pattern.Flag.CASE_INSENSITIVE,
-            message = "Invalid showChildren: ${validatedValue}")
     public Optional<Boolean> showChildren() {
         return this.showChildren;
     }
@@ -108,5 +97,4 @@ public class GraphRequest {
     public void setShowChildren(boolean val) {
         this.showChildren = Optional.of(val);
     }
-
 }
