@@ -25,10 +25,4 @@ public interface GraphImageService {
      * @throws RenderingGraphException if there was a problem rendering the graph
      */
     GraphImageResult createChart(List<String> ids, String scope, GraphPresentation graphPresentation);
-
-    /**
-     * Provide a supplier of GraphPresentation.Builder instances.
-     * @return a builder of GraphPresentation instances
-     */
-    GraphPresentation.Builder graphPresentationBuilder();
 }
