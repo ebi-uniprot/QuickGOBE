@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.graphics.ontology;
 
 import java.awt.*;
+import java.util.Objects;
 
 /**
  * Holds stylistic information for a Terms graph.
@@ -12,12 +13,12 @@ public class GraphPresentation {
     public final static boolean FILL = true;
     private static final String fontName = "Arial";
     public static final Font FONT = new Font(fontName, Font.PLAIN, fontSize);
-    static boolean defaultShowKey = true;
-    static boolean defaultShowTermIds = true;
-    static int defaultWidth = 85;
-    static int defaultHeight = 55;
-    static boolean defaultShowSlimColours = false;
-    static boolean defaultShowChildren = false;
+    public static boolean defaultShowKey = true;
+    public static boolean defaultShowTermIds = true;
+    public static int defaultWidth = 85;
+    public static int defaultHeight = 55;
+    public static boolean defaultShowSlimColours = false;
+    public static boolean defaultShowChildren = false;
     //changeable
     public final boolean termIds;
     public final boolean key;
@@ -86,5 +87,37 @@ public class GraphPresentation {
                     this.width,
                     this.height);
         }
+    }
+
+    @Override public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        GraphPresentation that = (GraphPresentation) o;
+        return termIds == that.termIds &&
+                key == that.key &&
+                subsetColours == that.subsetColours &&
+                showChildren == that.showChildren &&
+                width == that.width &&
+                height == that.height;
+    }
+
+    @Override public int hashCode() {
+
+        return Objects.hash(termIds, key, subsetColours, showChildren, width, height);
+    }
+
+    @Override public String toString() {
+        return "GraphPresentation{" +
+                "termIds=" + termIds +
+                ", key=" + key +
+                ", subsetColours=" + subsetColours +
+                ", showChildren=" + showChildren +
+                ", width=" + width +
+                ", height=" + height +
+                '}';
     }
 }
