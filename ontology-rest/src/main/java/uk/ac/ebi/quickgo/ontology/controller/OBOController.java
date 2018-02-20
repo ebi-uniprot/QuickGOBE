@@ -617,7 +617,7 @@ public abstract class OBOController<T extends OBOTerm> {
      * @return GraphPresentation instance
      */
     private GraphPresentation buildGraphPresentation(GraphRequest request) {
-        GraphPresentation.Builder presentationBuilder = graphImageService.graphPresentationBuilder();
+        GraphPresentation.Builder presentationBuilder = new GraphPresentation.Builder();
         request.showKey().map(presentationBuilder::showKey);
         request.showIds().map(presentationBuilder::showIDs);
         request.getTermBoxWidth().map(presentationBuilder::termBoxWidth);
