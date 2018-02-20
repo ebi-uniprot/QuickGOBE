@@ -61,11 +61,6 @@ public class GraphImageServiceImpl implements GraphImageService {
         }
     }
 
-    @Override
-    public GraphPresentation.Builder graphPresentationBuilder() {
-        return new GraphPresentation.Builder();
-    }
-
     /**
      * Creates the coordinates of the node information stored within the graph image
      * which can be used as an image-map.
