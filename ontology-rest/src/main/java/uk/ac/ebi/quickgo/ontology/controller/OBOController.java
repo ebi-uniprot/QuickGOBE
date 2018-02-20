@@ -413,7 +413,7 @@ public abstract class OBOController<T extends OBOTerm> {
             bindingResult) {
         checkBindingErrors(bindingResult);
         final GraphPresentation graphPresentation = buildGraphPresentation(request);
-        final boolean base64 = request.isBase64().isPresent() ? request.isBase64().get() : false;
+        Boolean base64 = request.isBase64().map(b -> b.booleanValue()).orElse(Boolean.FALSE);
 
         try {
 
