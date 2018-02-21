@@ -413,11 +413,10 @@ public abstract class OBOController<T extends OBOTerm> {
             bindingResult) {
         checkBindingErrors(bindingResult);
         final GraphPresentation graphPresentation = buildGraphPresentation(request);
-        Boolean base64 = request.isBase64().map(b -> b.booleanValue()).orElse(Boolean.FALSE);
 
         try {
 
-            return createChartResponseEntity(validationHelper.validateCSVIds(request.getIds()), base64,
+            return createChartResponseEntity(validationHelper.validateCSVIds(request.getIds()), request.isBase64(),
                     graphPresentation);
         } catch (IOException | RenderingGraphException e) {
             throw createChartGraphicsException(e);
@@ -618,12 +617,12 @@ public abstract class OBOController<T extends OBOTerm> {
      */
     private GraphPresentation buildGraphPresentation(GraphRequest request) {
         GraphPresentation.Builder presentationBuilder = new GraphPresentation.Builder();
-        request.showKey().map(presentationBuilder::showKey);
-        request.showIds().map(presentationBuilder::showIDs);
-        request.getTermBoxWidth().map(presentationBuilder::termBoxWidth);
-        request.getTermBoxHeight().map(presentationBuilder::termBoxHeight);
-        request.showSlimColours().map(presentationBuilder::showSlimColours);
-        request.showChildren().map(presentationBuilder::showChildren);
+        presentationBuilder.showKey(request.isShowKey());
+        presentationBuilder.showIDs(request.isShowIds());
+        presentationBuilder.termBoxWidth(request.getTermBoxWidth());
+        presentationBuilder.termBoxHeight(request.getTermBoxHeight());
+        presentationBuilder.showSlimColours(request.isShowSlimColours());
+        presentationBuilder.showChildren(request.isShowChildren());
         return presentationBuilder.build();
     }
 }
