@@ -13,9 +13,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class GraphImage extends RenderableImage {
-    private static final Font labelFont = new Font("Arial", Font.PLAIN, 10);
-    private static final Font infoFont = new Font("Arial", Font.PLAIN, 9);
-    private static final Font errorFont = new Font("Arial", Font.PLAIN, 16);
+    private static final Font labelFont = new Font("Lucida Sans", Font.PLAIN, 10);
+    private static final Font infoFont = new Font("Lucida Sans", Font.PLAIN, 9);
+    private static final Font errorFont = new Font("Lucida Sans", Font.PLAIN, 16);
 
     public static class KeyNode implements INode {
         public int xCentre;
@@ -197,7 +197,7 @@ public class GraphImage extends RenderableImage {
 
     private TermNode subsetNode(String name, String id, int row) {
         TermNode node = new TermNode(name, id, style);
-        node.setWidth(node.getWidth() + 26);
+        node.setWidth(node.getWidth() + 55);
         node.setHeight(node.getHeight() / 2);
         node.setLocation(width - node.getWidth() / 2 - rightMargin, node.getHeight() * row / 2);
         terms.add(node);
@@ -223,7 +223,7 @@ public class GraphImage extends RenderableImage {
 
             g2.setFont(infoFont);
             g2.setColor(Color.BLACK);
-            g2.drawString("QuickGO - http://www.ebi.ac.uk/QuickGO", 5, height - g2.getFontMetrics().getDescent());
+            g2.drawString("QuickGO - https://www.ebi.ac.uk/QuickGO", 5, height - g2.getFontMetrics().getDescent());
         }
     }
 

@@ -17,7 +17,7 @@ public class GraphPresentation {
 
     private Font font;
 
-    public String fontName = "Arial";
+    public String fontName = "Lucida Sans";
     public int fontSize = 11;
     public boolean fill = true;
     public boolean termIds = true;
