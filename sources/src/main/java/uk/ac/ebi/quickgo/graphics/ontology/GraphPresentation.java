@@ -11,7 +11,7 @@ public class GraphPresentation {
 
     public final static int fontSize = 11;
     public final static boolean FILL = true;
-    private static final String fontName = "Arial";
+    private static final String fontName = "Lucida Sans";
     public static final Font FONT = new Font(fontName, Font.PLAIN, fontSize);
     public static boolean defaultShowKey = true;
     public static boolean defaultShowTermIds = true;
