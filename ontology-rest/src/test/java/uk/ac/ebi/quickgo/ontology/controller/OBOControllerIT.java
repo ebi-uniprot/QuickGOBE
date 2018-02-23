@@ -4,6 +4,7 @@ import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 import uk.ac.ebi.quickgo.graphics.model.GraphImageLayout;
 import uk.ac.ebi.quickgo.graphics.ontology.GraphImage;
 import uk.ac.ebi.quickgo.graphics.ontology.GraphImageResult;
+import uk.ac.ebi.quickgo.graphics.ontology.GraphPresentation;
 import uk.ac.ebi.quickgo.graphics.ontology.RenderingGraphException;
 import uk.ac.ebi.quickgo.graphics.service.GraphImageService;
 import uk.ac.ebi.quickgo.ontology.OntologyREST;
@@ -39,10 +40,13 @@ import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.any;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -96,6 +100,7 @@ public abstract class OBOControllerIT {
     private List<OntologyRelationship> relationships;
     private String validRelation;
     private String invalidRelation;
+    private GraphPresentation defaultPresentation;
 
     @Value("${ontology.default_page_size:25}")
     private int defaultPageSize;
@@ -130,6 +135,9 @@ public abstract class OBOControllerIT {
 
         validIdShortList = validIdList.subList(0, 2);
         validIdsShortCSV = toCSV(validIdShortList);
+
+        GraphPresentation.Builder graphBuilder = new GraphPresentation.Builder();
+        defaultPresentation = graphBuilder.build();
     }
 
     @After
@@ -467,7 +475,6 @@ public abstract class OBOControllerIT {
 
         int totalEntries = defaultPageSize + 1;
         int pageSize = 1;
-        int pageNumWhichIsTooHigh = totalEntries;
 
         createAndSaveDocs(totalEntries);
 
@@ -475,7 +482,7 @@ public abstract class OBOControllerIT {
                 get(buildSearchURL())
                         .param(QUERY_PARAM, validId)
                         .param(LIMIT_PARAM, String.valueOf(pageSize))
-                        .param(PAGE_PARAM, String.valueOf(pageNumWhichIsTooHigh)));
+                        .param(PAGE_PARAM, String.valueOf(totalEntries)));
 
         response.andDo(print())
                 .andExpect(status().isBadRequest());
@@ -845,7 +852,8 @@ public abstract class OBOControllerIT {
     @Test
     public void failedChartRequestProduces500() throws Exception {
         String exceptionDescription = "Error encountered during creation of ontology chart graphics.";
-        when(graphImageService.createChart(anyListOf(String.class), anyString())).thenThrow(
+        when(graphImageService.createChart(anyListOf(String.class), anyString(), any(GraphPresentation.class)))
+                .thenThrow(
                 new RenderingGraphException("Problem rendering graphics")
         );
 
@@ -885,7 +893,8 @@ public abstract class OBOControllerIT {
     @Test
     public void failedChartCoordsRequestProduces500() throws Exception {
         String exceptionDescription = "Error encountered during creation of ontology chart graphics.";
-        when(graphImageService.createChart(anyListOf(String.class), anyString())).thenThrow(
+        when(graphImageService.createChart(anyListOf(String.class), anyString(), any(GraphPresentation.class)))
+                .thenThrow(
                 new RenderingGraphException("Problem rendering graphics")
         );
 
@@ -958,8 +967,75 @@ public abstract class OBOControllerIT {
         expectUntraverseableRelationError(response, getInvalidRelations());
     }
 
-    //-----------------------  Check Http Header for Cache-Control content ------------------------------------------
+    @Test
+    public void invalidGraphParameterProduces400() throws Exception {
 
+        final String urlTarget = buildTermsURLWithSubResource(validId, CHART_SUB_RESOURCE) + "?showKey=bloom";
+        ResultActions response = mockMvc.perform(get(urlTarget));
+
+        expectInvalidPropertyError(response);
+    }
+
+    @Test
+    public void defaultGraphParametersUsed() throws Exception {
+        final String urlTarget = buildTermsURLWithSubResource(validId, CHART_SUB_RESOURCE);
+        requestToChartServiceReturnsValidImage();
+
+        ResultActions response = mockMvc.perform(get(urlTarget));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.IMAGE_PNG_VALUE))
+                .andExpect(header().doesNotExist(HttpHeaders.CONTENT_ENCODING));
+
+        MvcResult result = response.andReturn();
+        assertThat(result.getResponse().getContentLength(), is(greaterThan(0)));
+        verify(graphImageService).createChart(anyListOf(String.class), anyString(), eq(defaultPresentation));
+    }
+
+    @Test
+    public void validGraphParametersCanBeSet() throws Exception {
+        final String urlTarget = buildTermsURLWithSubResource(validId, CHART_SUB_RESOURCE) + graphParamsNegated();
+        requestToChartServiceReturnsValidImage();
+
+        ResultActions response = mockMvc.perform(get(urlTarget));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.IMAGE_PNG_VALUE))
+                .andExpect(header().doesNotExist(HttpHeaders.CONTENT_ENCODING));
+
+        MvcResult result = response.andReturn();
+        assertThat(result.getResponse().getContentLength(), is(greaterThan(0)));
+        verify(graphImageService).createChart(anyListOf(String.class), anyString(), eq(getGraphPresentationNegated()));
+    }
+
+    @Test
+    public void canCallChartCoordsWithGraphPresentationDefaultUsed() throws Exception {
+        requestToChartServiceReturnsValidImage();
+
+        final String urlTarget = buildTermsURLWithSubResource(validId, CHART_COORDINATES_SUB_RESOURCE);
+        ResultActions response = mockMvc.perform(get(urlTarget));
+
+        response.andExpect(status().isOk());
+        verify(graphImageService).createChart(anyListOf(String.class), anyString(), eq(defaultPresentation));
+
+    }
+
+    @Test
+    public void canCallChartCoordsWithGraphPresentationParametersSpecified() throws Exception {
+        requestToChartServiceReturnsValidImage();
+
+        final String urlTarget = buildTermsURLWithSubResource(validId, CHART_COORDINATES_SUB_RESOURCE)
+                + graphParamsNegated();
+        ResultActions response = mockMvc.perform(get(urlTarget));
+
+        response.andExpect(status().isOk());
+        verify(graphImageService).createChart(anyListOf(String.class), anyString(), eq(getGraphPresentationNegated()));
+
+    }
+
+    //-----------------------  Check Http Header for Cache-Control content ------------------------------------------
     @Test
     public void cacheControlMaxAgeReducesOnSubsequentRequests() throws Exception {
         MvcResult mvcResult = mockMvc.perform(get(buildTermsURL(validId))).andReturn();
@@ -1099,6 +1175,15 @@ public abstract class OBOControllerIT {
                 .andExpect(jsonPath("$.messages", hasItem(containsString("Provided ID: '" + id + "'"))));
     }
 
+    protected ResultActions expectInvalidPropertyError(ResultActions result) throws Exception {
+        return result
+                .andDo(print())
+                .andExpect(jsonPath("$.url", is(requestUrl(result))))
+                .andExpect(jsonPath("$.messages", hasItem(containsString(
+                        "Failed to convert property value of type [java.lang.String] to required type [boolean] for " +
+                                "property 'showKey'; nested exception is java.lang.IllegalArgumentException: Invalid boolean value [bloom]"))));
+    }
+
     protected ResultActions expectInvalidRelationError(ResultActions result, String relation) throws Exception {
         return result
                 .andDo(print())
@@ -1149,7 +1234,7 @@ public abstract class OBOControllerIT {
         GraphImageLayout layout = new GraphImageLayout();
         layout.title = "layout title";
         when(mockGraphImageResult.getLayout()).thenReturn(layout);
-        when(graphImageService.createChart(anyListOf(String.class), anyString()))
+        when(graphImageService.createChart(anyListOf(String.class), anyString(), any(GraphPresentation.class)))
                 .thenReturn(mockGraphImageResult);
     }
 
@@ -1185,5 +1270,30 @@ public abstract class OBOControllerIT {
         ontologyRepository.save(nDocs);
         setupSimpleRelationshipChain(n);
         return nDocs;
+    }
+
+    private String graphParamsNegated() {
+        String graphParmsString =
+                "?showKey=%s&showIds=%s&termBoxWidth=%s&termBoxHeight=%s&showSlimColours=%s&showChildren" +
+                        "=%s";
+        return String.format(graphParmsString,
+                !GraphPresentation.defaultShowKey,
+                !GraphPresentation.defaultShowTermIds,
+                GraphPresentation.defaultWidth + 200,
+                GraphPresentation.defaultHeight + 100,
+                !GraphPresentation.defaultShowSlimColours,
+                !GraphPresentation.defaultShowChildren);
+    }
+
+    private GraphPresentation getGraphPresentationNegated() {
+        GraphPresentation.Builder graphBuilder = new GraphPresentation.Builder();
+        return graphBuilder
+                .showKey(!GraphPresentation.defaultShowKey)
+                .showIDs(!GraphPresentation.defaultShowTermIds)
+                .termBoxWidth(GraphPresentation.defaultWidth + 200)
+                .termBoxHeight(GraphPresentation.defaultHeight + 100)
+                .showSlimColours(!GraphPresentation.defaultShowSlimColours)
+                .showChildren(!GraphPresentation.defaultShowChildren)
+                .build();
     }
 }

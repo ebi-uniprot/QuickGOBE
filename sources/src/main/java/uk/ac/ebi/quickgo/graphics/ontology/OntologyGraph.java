@@ -12,18 +12,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class OntologyGraph extends GenericGraph<TermNode, RelationEdge> {
-    // map containing all terms that are part of (i.e., nodes in) the graph
-    private Map<GenericTerm, TermNode> termMap = new HashMap<>();
-    // map containing all relations that are part of (i.e., edges in) the graph 
-    private Map<TermRelation, RelationEdge> edgeMap = new HashMap<>();
+import static uk.ac.ebi.quickgo.graphics.ontology.GraphPresentation.*;
 
+public class OntologyGraph extends GenericGraph<TermNode, RelationEdge> {
+    public GraphPresentation presentation;
     EnumSet<RelationType> relationTypes;
     int ancestorLimit = 0;
     int pixelLimit = 0;
     int overflow = 0;
-
-    public GraphPresentation presentation;
+    // map containing all terms that are part of (i.e., nodes in) the graph
+    private Map<GenericTerm, TermNode> termMap = new HashMap<>();
+    // map containing all relations that are part of (i.e., edges in) the graph
+    private Map<TermRelation, RelationEdge> edgeMap = new HashMap<>();
 
     public OntologyGraph(EnumSet<RelationType> relationTypes, int ancestorLimit, int pixelLimit,
             GraphPresentation style) {
@@ -35,18 +35,6 @@ public class OntologyGraph extends GenericGraph<TermNode, RelationEdge> {
 
     public OntologyGraph(int ancestorLimit, int pixelLimit, GraphPresentation style) {
         this(null, ancestorLimit, pixelLimit, style);
-    }
-
-    void addRelation(TermRelation relation) {
-        if (!edgeMap.containsKey(relation)) {
-            TermNode pt = termMap.get(relation.parent);
-            TermNode ct = termMap.get(relation.child);
-            if (pt != null && ct != null) {
-                RelationEdge graphEdge = new RelationEdge(pt, ct, relation.typeof);
-                edgeMap.put(relation, graphEdge);
-                edges.add(graphEdge);
-            }
-        }
     }
 
     public TermNode add(GenericTerm term) {
@@ -96,7 +84,7 @@ public class OntologyGraph extends GenericGraph<TermNode, RelationEdge> {
 
     public GraphImage layout(ImageArchive imageArchive) {
         GraphImage image = layout();
-        imageArchive.store(image);
+        ImageArchive.store(image);
         return image;
     }
 
@@ -133,7 +121,7 @@ public class OntologyGraph extends GenericGraph<TermNode, RelationEdge> {
 
         for (GenericTerm term : terms.getTerms()) {
             TermNode node = graph.add(term);
-            if (node != null && style.fill) {
+            if (node != null && FILL) {
                 String colour = terms.getTermColour(term);
                 node.setFillColour(
                         new Color(colour.length() == 0 ? 0xffffcc : ColourUtils.intDecodeColour("#" + colour)));
@@ -146,5 +134,17 @@ public class OntologyGraph extends GenericGraph<TermNode, RelationEdge> {
     public static OntologyGraph makeGraph(GenericTermSet terms, int ancestorLimit, int pixelLimit,
             GraphPresentation style) {
         return makeGraph(terms, null, ancestorLimit, pixelLimit, style);
+    }
+
+    void addRelation(TermRelation relation) {
+        if (!edgeMap.containsKey(relation)) {
+            TermNode pt = termMap.get(relation.parent);
+            TermNode ct = termMap.get(relation.child);
+            if (pt != null && ct != null) {
+                RelationEdge graphEdge = new RelationEdge(pt, ct, relation.typeof);
+                edgeMap.put(relation, graphEdge);
+                edges.add(graphEdge);
+            }
+        }
     }
 }

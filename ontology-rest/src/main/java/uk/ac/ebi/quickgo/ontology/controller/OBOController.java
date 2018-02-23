@@ -2,6 +2,8 @@ package uk.ac.ebi.quickgo.ontology.controller;
 
 import uk.ac.ebi.quickgo.common.SearchableField;
 import uk.ac.ebi.quickgo.graphics.model.GraphImageLayout;
+import uk.ac.ebi.quickgo.ontology.model.GraphRequest;
+import uk.ac.ebi.quickgo.graphics.ontology.GraphPresentation;
 import uk.ac.ebi.quickgo.graphics.ontology.RenderingGraphException;
 import uk.ac.ebi.quickgo.graphics.service.GraphImageService;
 import uk.ac.ebi.quickgo.ontology.OntologyRestConfig;
@@ -15,6 +17,7 @@ import uk.ac.ebi.quickgo.ontology.model.graph.AncestorGraph;
 import uk.ac.ebi.quickgo.ontology.model.graph.AncestorVertex;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;
 import uk.ac.ebi.quickgo.ontology.service.search.SearchServiceConfig;
+import uk.ac.ebi.quickgo.rest.ParameterBindingException;
 import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
 import uk.ac.ebi.quickgo.rest.headers.HttpHeadersProvider;
 import uk.ac.ebi.quickgo.rest.search.RetrievalException;
@@ -32,19 +35,17 @@ import java.awt.image.RenderedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.*;
 import javax.imageio.ImageIO;
+import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.apache.http.HttpHeaders.CONTENT_ENCODING;
@@ -403,18 +404,20 @@ public abstract class OBOController<T extends OBOTerm> {
     /**
      * Retrieves the graphical image corresponding to ontology terms.
      *
-     * @param ids the term ids whose image is required
      * @return the image corresponding to the requested term ids
      */
     @ApiOperation(value = "Retrieves the PNG image corresponding to the specified ontology terms")
     @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + CHART_SUB_RESOURCE, method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.IMAGE_PNG_VALUE})
-    public ResponseEntity<InputStreamResource> getChart(
-            @ApiParam(value = "Comma-separated term IDs", required = true) @PathVariable(value = "ids") String ids,
-            @ApiParam(value = "Whether or not to encode the image as base64", defaultValue = "false")
-            @RequestParam(value = "base64", defaultValue = "false", required = false) boolean base64) {
+    public ResponseEntity<InputStreamResource> getChart(@Valid @ModelAttribute GraphRequest request, BindingResult
+            bindingResult) {
+        checkBindingErrors(bindingResult);
+        final GraphPresentation graphPresentation = buildGraphPresentation(request);
+
         try {
-            return createChartResponseEntity(validationHelper.validateCSVIds(ids), base64);
+
+            return createChartResponseEntity(validationHelper.validateCSVIds(request.getIds()), request.isBase64(),
+                    graphPresentation);
         } catch (IOException | RenderingGraphException e) {
             throw createChartGraphicsException(e);
         }
@@ -423,7 +426,6 @@ public abstract class OBOController<T extends OBOTerm> {
     /**
      * Retrieves the graphical image coordination information corresponding to ontology terms.
      *
-     * @param ids the term ids whose image is required
      * @return the coordinate information of the terms in the chart
      */
     @ApiOperation(value = "Retrieves coordinate information about terms within the PNG chart from the " +
@@ -431,11 +433,15 @@ public abstract class OBOController<T extends OBOTerm> {
     @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + CHART_COORDINATES_SUB_RESOURCE,
             method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<GraphImageLayout> getChartCoordinates(
-            @ApiParam(value = "Comma-separated term IDs", required = true) @PathVariable(value = "ids") String ids) {
+    public ResponseEntity<GraphImageLayout> getChartCoordinates(@Valid @ModelAttribute GraphRequest request,
+            BindingResult bindingResult) {
+        checkBindingErrors(bindingResult);
+        final GraphPresentation graphPresentation = buildGraphPresentation(request);
+
         try {
             GraphImageLayout layout = graphImageService
-                    .createChart(validationHelper.validateCSVIds(ids), ontologySpecifier.ontologyType.name())
+                    .createChart(validationHelper.validateCSVIds(request.getIds()), ontologySpecifier.ontologyType
+                            .name(), graphPresentation)
                     .getLayout();
             return ResponseEntity
                     .ok()
@@ -529,15 +535,18 @@ public abstract class OBOController<T extends OBOTerm> {
      *
      * @param ids the terms whose corresponding graphical image is required
      * @param base64 whether or not to encode the image as base64
+     * @param graphPresentation defines the look and attributes of the rendered graph
      * @return the image corresponding to the specified terms
      * @throws IOException if there is an error during creation of the image {@link InputStreamResource}
      * @throws RenderingGraphException if there was an error during the rendering of the image
      */
-    private ResponseEntity<InputStreamResource> createChartResponseEntity(List<String> ids, boolean base64)
+    private ResponseEntity<InputStreamResource> createChartResponseEntity(List<String> ids, boolean base64,
+            GraphPresentation graphPresentation)
             throws IOException, RenderingGraphException {
+
         RenderedImage renderedImage =
                 graphImageService
-                        .createChart(ids, ontologySpecifier.ontologyType.name())
+                        .createChart(ids, ontologySpecifier.ontologyType.name(), graphPresentation)
                         .getGraphImage()
                         .render();
         ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -593,5 +602,27 @@ public abstract class OBOController<T extends OBOTerm> {
         return and(query,
                 ontologyQueryConverter.convert(
                         OntologyFields.Searchable.ONTOLOGY_TYPE + COLON + ontologySpecifier.ontologyType.name()));
+    }
+
+    private void checkBindingErrors(BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            throw new ParameterBindingException(bindingResult);
+        }
+    }
+
+    /**
+     * Map the values of the graph presentational parameters to an instance of GraphPresentation
+     * @param request holds the stylistic parameters requested by the client
+     * @return GraphPresentation instance
+     */
+    private GraphPresentation buildGraphPresentation(GraphRequest request) {
+        GraphPresentation.Builder presentationBuilder = new GraphPresentation.Builder();
+        presentationBuilder.showKey(request.isShowKey());
+        presentationBuilder.showIDs(request.isShowIds());
+        presentationBuilder.termBoxWidth(request.getTermBoxWidth());
+        presentationBuilder.termBoxHeight(request.getTermBoxHeight());
+        presentationBuilder.showSlimColours(request.isShowSlimColours());
+        presentationBuilder.showChildren(request.isShowChildren());
+        return presentationBuilder.build();
     }
 }

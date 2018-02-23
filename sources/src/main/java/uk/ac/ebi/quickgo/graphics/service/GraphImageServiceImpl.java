@@ -35,19 +35,21 @@ public class GraphImageServiceImpl implements GraphImageService {
     }
 
     @Override
-    public GraphImageResult createChart(List<String> ids, String scope) {
+    public GraphImageResult createChart(List<String> ids, String scope, GraphPresentation graphPresentation) {
         if (sourceLoader.isLoaded()) {
 
             NameSpace nameSpace = NameSpace.getNameSpace(scope);
-            GraphImage graphImage = createRenderableImage(ids, nameSpace);
+            GraphImage graphImage = createRenderableImage(ids, nameSpace, graphPresentation);
 
             String description;
             int idsSize = ids.size();
             if (idsSize == 1) {
                 description = "Ancestor chart for " + ids.get(0);
-            } else if( idsSize < TERM_DISPLAY_THRESHOLD) {
+            } else if (idsSize < TERM_DISPLAY_THRESHOLD) {
                 description = "Comparison chart for " + ids.stream().collect(joining(","));
-            } else description = "Comparison chart for " + String.valueOf(idsSize) + " terms";
+            } else {
+                description = "Comparison chart for " + String.valueOf(idsSize) + " terms";
+            }
 
             return new GraphImageResult(
                     description,
@@ -71,16 +73,16 @@ public class GraphImageServiceImpl implements GraphImageService {
         GraphImageLayout layout = new GraphImageLayout();
 
         terms.stream()
-            .map(term -> {
-                GraphImageLayout.NodePosition nodePosition = new GraphImageLayout.NodePosition();
-                nodePosition.id = term.getId();
-                nodePosition.bottom = term.bottom();
-                nodePosition.top = term.top();
-                nodePosition.left = term.left();
-                nodePosition.right = term.right();
-                return nodePosition;
-            })
-            .forEach(layout.nodePositions::add);
+                .map(term -> {
+                    GraphImageLayout.NodePosition nodePosition = new GraphImageLayout.NodePosition();
+                    nodePosition.id = term.getId();
+                    nodePosition.bottom = term.bottom();
+                    nodePosition.top = term.top();
+                    nodePosition.left = term.left();
+                    nodePosition.right = term.right();
+                    return nodePosition;
+                })
+                .forEach(layout.nodePositions::add);
 
         layout.imageHeight = graphImage.height;
         layout.imageWidth = graphImage.width;
@@ -120,7 +122,8 @@ public class GraphImageServiceImpl implements GraphImageService {
         return targetSet;
     }
 
-    private GraphImage createRenderableImage(List<String> termsIds, NameSpace nameSpace) {
+    private GraphImage createRenderableImage(List<String> termsIds, NameSpace nameSpace,
+            GraphPresentation graphPresentation) {
         // Check if the selected terms exist
         List<GenericTerm> terms = new ArrayList<>();
 
@@ -134,7 +137,7 @@ public class GraphImageServiceImpl implements GraphImageService {
 
         // Create ontology graph
         OntologyGraph ontologyGraph =
-                OntologyGraph.makeGraph(termSet, getRelationTypes(nameSpace), 0, 0, new GraphPresentation());
+                OntologyGraph.makeGraph(termSet, getRelationTypes(nameSpace), 0, 0, graphPresentation);
         return ontologyGraph.layout();
     }
 
