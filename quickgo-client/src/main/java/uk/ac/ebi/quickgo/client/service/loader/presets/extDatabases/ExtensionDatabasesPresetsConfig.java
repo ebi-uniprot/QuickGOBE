@@ -5,6 +5,7 @@ import uk.ac.ebi.quickgo.client.model.presets.PresetType;
 import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
 import uk.ac.ebi.quickgo.client.service.loader.presets.LogStepListener;
 import uk.ac.ebi.quickgo.client.service.loader.presets.PresetsCommonConfig;
+import uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelper;
 import uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPreset;
 import uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPresetValidator;
 import uk.ac.ebi.quickgo.client.service.loader.presets.ff.SourceColumnsFactory;
@@ -61,7 +62,8 @@ public class ExtensionDatabasesPresetsConfig {
                 .<RawNamedPreset, RawNamedPreset>chunk(chunkSize)
                 .faultTolerant()
                 .skipLimit(SKIP_LIMIT)
-                .<RawNamedPreset>reader(rawPresetMultiFileReader(resources, itemReader))
+                .<RawNamedPreset>reader(
+                        rawPresetMultiFileReader(resources, itemReader, PresetsConfigHelper::getGzipResources))
                 .processor(compositeRawPresetProcessor())
                 .writer(rawPresetWriter(presets))
                 .listener(new LogStepListener())

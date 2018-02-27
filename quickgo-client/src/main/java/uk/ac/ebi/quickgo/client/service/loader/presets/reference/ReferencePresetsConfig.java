@@ -5,6 +5,7 @@ import uk.ac.ebi.quickgo.client.model.presets.PresetType;
 import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
 import uk.ac.ebi.quickgo.client.service.loader.presets.LogStepListener;
 import uk.ac.ebi.quickgo.client.service.loader.presets.PresetsCommonConfig;
+import uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelper;
 import uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPreset;
 import uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPresetValidator;
 import uk.ac.ebi.quickgo.client.service.loader.presets.ff.SourceColumnsFactory;
@@ -75,7 +76,8 @@ public class ReferencePresetsConfig {
                 .<RawNamedPreset, RawNamedPreset>chunk(chunkSize)
                 .faultTolerant()
                 .skipLimit(SKIP_LIMIT)
-                .<RawNamedPreset>reader(rawPresetMultiFileReader(dbResources, itemReader))
+                .<RawNamedPreset>reader(
+                        rawPresetMultiFileReader(dbResources, itemReader, PresetsConfigHelper::getGzipResources))
                 .processor(compositeItemProcessor(
                         rawPresetValidator(),
                         rawPresetFilter(dbDefaults)))
@@ -101,7 +103,8 @@ public class ReferencePresetsConfig {
                 .<RawNamedPreset, RawNamedPreset>chunk(chunkSize)
                 .faultTolerant()
                 .skipLimit(SKIP_LIMIT)
-                .<RawNamedPreset>reader(rawPresetMultiFileReader(specificResources, itemReader))
+                .<RawNamedPreset>reader(rawPresetMultiFileReader(specificResources, itemReader,
+                        PresetsConfigHelper::getGzipResources))
                 .processor(compositeItemProcessor(
                         rawPresetValidator(),
                         rawPresetFilter(specificDBDefaults)))
