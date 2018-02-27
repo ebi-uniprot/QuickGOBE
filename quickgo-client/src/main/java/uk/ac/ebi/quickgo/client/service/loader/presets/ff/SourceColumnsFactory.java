@@ -50,6 +50,13 @@ public class SourceColumnsFactory {
                 return RawNamedPresetColumnsBuilder
                         .createWithNamePosition(0)
                         .build();
+            case EVIDENCE_PRESETS_COLUMNS:
+                return RawNamedPresetColumnsBuilder
+                        .createWithNamePosition(0)
+                        .withDescriptionPosition(1)
+                        .withAssociationPosition(2)
+                        .withRelevancyPosition(3)
+                        .build();
             default:
                 throw new IllegalStateException("Source type: " + source + " is not handled.");
         }
@@ -63,6 +70,7 @@ public class SourceColumnsFactory {
         REF_COLUMNS,
         EXT_RELATION_COLUMNS,
         TAXON_COLUMNS,
-        EXT_DATABASE_COLUMNS
+        EXT_DATABASE_COLUMNS,
+        EVIDENCE_PRESETS_COLUMNS
     }
 }
