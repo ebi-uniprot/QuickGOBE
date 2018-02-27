@@ -25,7 +25,7 @@ import org.springframework.core.io.Resource;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfig.SKIP_LIMIT;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelper.fileReader;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelper.rawPresetMultiFileReader;
-import static uk.ac.ebi.quickgo.client.service.loader.presets.ff.SourceColumnsFactory.Source.ECO2GO_COLUMNS;
+import static uk.ac.ebi.quickgo.client.service.loader.presets.ff.SourceColumnsFactory.Source.EVIDENCE_PRESETS_COLUMNS;
 
 /**
  * Exposes the {@link Step} bean that is used to read and populate information relating to the evidence preset data.
@@ -79,7 +79,7 @@ public class EvidencePresetsConfig {
     }
 
     private FieldSetMapper<RawNamedPreset> rawPresetFieldSetMapper() {
-        return new StringToRawNamedPresetMapper(SourceColumnsFactory.createFor(ECO2GO_COLUMNS));
+        return new StringToRawNamedPresetMapper(SourceColumnsFactory.createFor(EVIDENCE_PRESETS_COLUMNS));
     }
 
     private ItemProcessor<RawNamedPreset, RawNamedPreset> rawPresetValidator() {
