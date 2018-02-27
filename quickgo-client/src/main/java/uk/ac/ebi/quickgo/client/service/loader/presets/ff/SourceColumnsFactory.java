@@ -20,12 +20,6 @@ public class SourceColumnsFactory {
                         .withDescriptionPosition(1)
                         .withRelevancyPosition(2)
                         .build();
-            case ECO2GO_COLUMNS:
-                return RawNamedPresetColumnsBuilder.createWithNamePosition(2)
-                        .withIdPosition(0)
-                        .withDescriptionPosition(1)
-                        .withRelevancyPosition(3)
-                        .build();
             case GENE_PRODUCT_COLUMNS:
                 return RawNamedPresetColumnsBuilder.createWithNamePosition(0)
                         .withDescriptionPosition(1)
@@ -52,9 +46,9 @@ public class SourceColumnsFactory {
                         .build();
             case EVIDENCE_PRESETS_COLUMNS:
                 return RawNamedPresetColumnsBuilder
-                        .createWithNamePosition(0)
+                        .createWithNamePosition(2)
+                        .withIdPosition(0)
                         .withDescriptionPosition(1)
-                        .withAssociationPosition(2)
                         .withRelevancyPosition(3)
                         .build();
             default:
@@ -64,7 +58,6 @@ public class SourceColumnsFactory {
 
     public enum Source {
         DB_COLUMNS,
-        ECO2GO_COLUMNS,
         GENE_PRODUCT_COLUMNS,
         GO_SLIM_SET_COLUMNS,
         REF_COLUMNS,
