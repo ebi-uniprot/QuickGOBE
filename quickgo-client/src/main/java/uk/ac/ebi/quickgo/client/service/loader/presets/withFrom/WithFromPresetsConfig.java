@@ -5,7 +5,6 @@ import uk.ac.ebi.quickgo.client.model.presets.PresetType;
 import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
 import uk.ac.ebi.quickgo.client.service.loader.presets.LogStepListener;
 import uk.ac.ebi.quickgo.client.service.loader.presets.PresetsCommonConfig;
-import uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelper;
 import uk.ac.ebi.quickgo.client.service.loader.presets.ff.*;
 
 import java.util.HashSet;
@@ -68,7 +67,7 @@ public class WithFromPresetsConfig {
                 .faultTolerant()
                 .skipLimit(SKIP_LIMIT)
                 .<RawNamedPreset>reader(
-                        rawPresetMultiFileReader(resources, itemReader, PresetsConfigHelper::getGzipResources))
+                        rawPresetMultiFileReader(resources, itemReader))
                 .processor(compositeItemProcessor(
                         rawPresetValidator(),
                         new RawNamedPresetRelevanceChecker(defaults),

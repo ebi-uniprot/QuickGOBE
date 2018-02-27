@@ -50,6 +50,11 @@ public class PresetsConfigHelper {
     }
 
     public static <T> MultiResourceItemReader<T> rawPresetMultiFileReader(
+            Resource[] resources, FlatFileItemReader<T> itemReader) {
+        return rawPresetMultiFileReader(resources, itemReader, PresetsConfigHelper::getGzipResources);
+    }
+
+    public static <T> MultiResourceItemReader<T> rawPresetMultiFileReader(
             Resource[] resources, FlatFileItemReader<T> itemReader, Function<Resource[], Optional<Resource[]>>
             resourceRefiner) {
         MultiResourceItemReader<T> reader = new MultiResourceItemReader<>();
@@ -62,7 +67,7 @@ public class PresetsConfigHelper {
         return reader;
     }
 
-    public static Optional<Resource[]> getGzipResources(Resource[] resources) {
+    private static Optional<Resource[]> getGzipResources(Resource[] resources) {
         try {
             GZIPResource[] zippedResources = new GZIPResource[resources.length];
             for (int i = 0; i < resources.length; i++) {
@@ -75,10 +80,6 @@ public class PresetsConfigHelper {
                             "No corresponding information for this preset will be available.", e);
         }
         return Optional.empty();
-    }
-
-    public static Optional<Resource[]> dontTouchResources(Resource[] resources) {
-        return Optional.of(resources);
     }
 
     public static <T> FlatFileItemReader<T> fileReader(FieldSetMapper<T> fieldSetMapper) {

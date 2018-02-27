@@ -5,7 +5,6 @@ import uk.ac.ebi.quickgo.client.model.presets.PresetType;
 import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
 import uk.ac.ebi.quickgo.client.service.loader.presets.LogStepListener;
 import uk.ac.ebi.quickgo.client.service.loader.presets.PresetsCommonConfig;
-import uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelper;
 import uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPreset;
 import uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPresetValidator;
 import uk.ac.ebi.quickgo.client.service.loader.presets.ff.SourceColumnsFactory;
@@ -63,7 +62,7 @@ public class ExtensionDatabasesPresetsConfig {
                 .faultTolerant()
                 .skipLimit(SKIP_LIMIT)
                 .<RawNamedPreset>reader(
-                        rawPresetMultiFileReader(resources, itemReader, PresetsConfigHelper::getGzipResources))
+                        rawPresetMultiFileReader(resources, itemReader))
                 .processor(compositeRawPresetProcessor())
                 .writer(rawPresetWriter(presets))
                 .listener(new LogStepListener())
@@ -108,7 +107,7 @@ public class ExtensionDatabasesPresetsConfig {
      */
     private class DatabaseFilterItemProcessor implements ItemProcessor<RawNamedPreset, RawNamedPreset> {
 
-        private Set<String> seenDatabases = new HashSet<String>();
+        private Set<String> seenDatabases = new HashSet<>();
 
         public RawNamedPreset process(RawNamedPreset rawNamedPreset) {
             if(seenDatabases.add(rawNamedPreset.name)) {
