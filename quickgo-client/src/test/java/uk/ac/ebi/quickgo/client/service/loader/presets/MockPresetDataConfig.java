@@ -100,10 +100,10 @@ public class MockPresetDataConfig {
         DEFAULT_RELEVANT_QUALIFIERS.terms.relevancies.add("100");
 
         PRESET_ECO_32 = PresetItem
-                .createWithName("All manual codes")
+                .createWithName("Any manual evidence")
                 .withProperty(PresetItem.Property.ID, "ECO:0000352")
                 .withProperty(PresetItem.Property.DESCRIPTION, "evidence used in manual assertion")
-                .withRelevancy(1)
+                .withRelevancy(0)
                 .build();
 
         PRESET_BHF_UCL = PresetItem
