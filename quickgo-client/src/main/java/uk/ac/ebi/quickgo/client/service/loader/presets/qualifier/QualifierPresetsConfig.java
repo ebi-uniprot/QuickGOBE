@@ -57,7 +57,7 @@ public class QualifierPresetsConfig {
         return rawItemList -> {
             rawItemList.forEach(rawItem -> {
                 presets.addPreset(PresetType.QUALIFIERS,
-                        PresetItem.createWithName(rawItem.name)
+                        PresetItem.createWithName(rawItem.name.replace("not|", "NOT|"))
                                 .withRelevancy(rawItem.relevancy)
                                 .build());
             });
