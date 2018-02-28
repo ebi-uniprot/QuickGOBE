@@ -125,7 +125,8 @@ public class PresetItem implements Comparable<PresetItem> {
         DESCRIPTION("description"),
         NAME("name"),
         ID("id"),
-        URL("url");
+        URL("url"),
+        GO_EVIDENCE("goEvidence");
 
         private String key;
 
