@@ -74,7 +74,7 @@ public class EvidencePresetsConfig {
                     PresetItem.createWithName(rawItem.name)
                             .withProperty(PresetItem.Property.ID.getKey(), rawItem.id)
                             .withRelevancy(rawItem.relevancy)
-                            .withProperty(PresetItem.Property.DESCRIPTION.getKey(), rawItem.description)
+                            .withProperty(PresetItem.Property.GO_EVIDENCE.getKey(), rawItem.goEvidence)
                             .build())
         );
     }
