@@ -20,4 +20,6 @@ interface RawNamedPresetColumns {
     int getMaxRequiredColumnCount();
 
     int getAssociationPosition();
+
+    int getGoEvidencePosition();
 }

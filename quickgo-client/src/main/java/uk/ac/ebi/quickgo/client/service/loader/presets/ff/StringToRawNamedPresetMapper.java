@@ -24,7 +24,7 @@ public class StringToRawNamedPresetMapper implements FieldSetMapper<RawNamedPres
         this.rawNamedPresetColumns = rawNamedPresetColumns;
     }
 
-    @Override public RawNamedPreset mapFieldSet(FieldSet fieldSet) throws BindException {
+    @Override public RawNamedPreset mapFieldSet(FieldSet fieldSet) {
         if (fieldSet == null) {
             throw new IllegalArgumentException("Provided field set is null");
         }
@@ -46,7 +46,8 @@ public class StringToRawNamedPresetMapper implements FieldSetMapper<RawNamedPres
         rawPreset.url = trimIfNotNull(extractStringValue(fieldSet, rawNamedPresetColumns.getURLPosition()));
         rawPreset.association =
                 trimIfNotNull(extractStringValue(fieldSet, rawNamedPresetColumns.getAssociationPosition()));
-
+        rawPreset.goEvidence =
+                trimIfNotNull(extractStringValue(fieldSet, rawNamedPresetColumns.getGoEvidencePosition()));
         return rawPreset;
     }
 

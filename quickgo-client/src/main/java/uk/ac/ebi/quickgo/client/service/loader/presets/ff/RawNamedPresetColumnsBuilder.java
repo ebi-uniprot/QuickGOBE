@@ -21,6 +21,7 @@ class RawNamedPresetColumnsBuilder {
     private int relevancyPosition;
     private int urlPosition;
     private int associationPosition;
+    private int goEvidencePosition;
 
     private RawNamedPresetColumnsBuilder(int namePosition) {
         checkColumnPosition(namePosition);
@@ -31,6 +32,7 @@ class RawNamedPresetColumnsBuilder {
         this.relevancyPosition = UNINITIALIZED_POSITION;
         this.urlPosition = UNINITIALIZED_POSITION;
         this.associationPosition = UNINITIALIZED_POSITION;
+        this.goEvidencePosition = UNINITIALIZED_POSITION;
     }
 
     public RawNamedPresetColumns build() {
@@ -44,6 +46,12 @@ class RawNamedPresetColumnsBuilder {
     RawNamedPresetColumnsBuilder withIdPosition(int idPosition) {
         checkColumnPosition(idPosition);
         this.idPosition = idPosition;
+        return this;
+    }
+
+    RawNamedPresetColumnsBuilder withGoEvidence(int _goEvidencePosition) {
+        checkColumnPosition(_goEvidencePosition);
+        this.goEvidencePosition = _goEvidencePosition;
         return this;
     }
 
@@ -87,6 +95,7 @@ class RawNamedPresetColumnsBuilder {
         private int descriptionPosition;
         private int relevancyPosition;
         private int associationPosition;
+        private int goEvidencePosition;
 
         private RawNamedPresetColumnsImpl(RawNamedPresetColumnsBuilder builder) {
             this.idPosition = builder.idPosition;
@@ -95,6 +104,7 @@ class RawNamedPresetColumnsBuilder {
             this.relevancyPosition = builder.relevancyPosition;
             this.urlPosition = builder.urlPosition;
             this.associationPosition = builder.associationPosition;
+            this.goEvidencePosition = builder.goEvidencePosition;
         }
 
         @Override public int getIdPosition() {
@@ -121,6 +131,10 @@ class RawNamedPresetColumnsBuilder {
             return associationPosition;
         }
 
+        @Override public int getGoEvidencePosition() {
+            return goEvidencePosition;
+        }
+
         @Override public int getMaxRequiredColumnCount() {
             if (maxRequiredColumnPosition == MAX_REQUIRED_COLUMN_POSITION_NOT_INITIALIZED) {
                 maxRequiredColumnPosition =
@@ -129,7 +143,8 @@ class RawNamedPresetColumnsBuilder {
                                 getIdPosition(),
                                 getNamePosition(),
                                 getRelevancyPosition(),
-                                getAssociationPosition()
+                                getAssociationPosition(),
+                                getGoEvidencePosition()
                         ).max(Comparator.naturalOrder())
                                 .map(columnPosition -> columnPosition + 1)
                                 .orElse(DEFAULT_COLUMN_POSITION_NOT_INITIALIZED);

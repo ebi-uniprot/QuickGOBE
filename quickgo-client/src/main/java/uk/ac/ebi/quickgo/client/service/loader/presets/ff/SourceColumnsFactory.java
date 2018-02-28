@@ -46,9 +46,9 @@ public class SourceColumnsFactory {
                         .build();
             case EVIDENCE_PRESETS_COLUMNS:
                 return RawNamedPresetColumnsBuilder
-                        .createWithNamePosition(2)
+                        .createWithNamePosition(1)
                         .withIdPosition(0)
-                        .withDescriptionPosition(1)
+                        .withGoEvidence(2)
                         .withRelevancyPosition(3)
                         .build();
             default:
