@@ -50,7 +50,7 @@ public enum OntologyRelationType {
                     .map(OntologyRelationType::getByLongName)
                     .collect(Collectors.toList());
 
-    public static final String DEFAULT_SLIM_TRAVERSAL_TYPES_CSV = "is_a,part_of,occurs_in";
+    public static final String DEFAULT_SLIM_TRAVERSAL_TYPES_CSV = "is_a,part_of,occurs_in,regulates";
     public static final List<OntologyRelationType> DEFAULT_SLIM_TRAVERSAL_TYPES =
             stream(DEFAULT_SLIM_TRAVERSAL_TYPES_CSV.split(","))
                     .map(OntologyRelationType::getByLongName)
