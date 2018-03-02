@@ -53,7 +53,7 @@ public class QualifierPresetsConfig {
      * @param presets the presets to write to
      * @return the corresponding {@link ItemWriter}
      */
-    private ItemWriter<RawNamedPreset> rawPresetWriter(CompositePresetImpl presets) {
+    ItemWriter<RawNamedPreset> rawPresetWriter(CompositePresetImpl presets) {
         return rawItemList -> {
             rawItemList.forEach(rawItem -> {
                 presets.addPreset(PresetType.QUALIFIERS,
