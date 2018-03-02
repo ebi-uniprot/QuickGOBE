@@ -53,14 +53,18 @@ public class QualifierPresetsConfig {
      * @param presets the presets to write to
      * @return the corresponding {@link ItemWriter}
      */
-    private ItemWriter<RawNamedPreset> rawPresetWriter(CompositePresetImpl presets) {
+    ItemWriter<RawNamedPreset> rawPresetWriter(CompositePresetImpl presets) {
         return rawItemList -> {
             rawItemList.forEach(rawItem -> {
                 presets.addPreset(PresetType.QUALIFIERS,
-                        PresetItem.createWithName(rawItem.name)
+                        PresetItem.createWithName(uppercaseNots(rawItem.name))
                                 .withRelevancy(rawItem.relevancy)
                                 .build());
             });
         };
+    }
+
+    private String uppercaseNots(String name) {
+        return name != null ? name.replace("not|", "NOT|") : null;
     }
 }
