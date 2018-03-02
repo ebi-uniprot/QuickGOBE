@@ -57,10 +57,14 @@ public class QualifierPresetsConfig {
         return rawItemList -> {
             rawItemList.forEach(rawItem -> {
                 presets.addPreset(PresetType.QUALIFIERS,
-                        PresetItem.createWithName(rawItem.name.replace("not|", "NOT|"))
+                        PresetItem.createWithName(uppercaseNots(rawItem.name))
                                 .withRelevancy(rawItem.relevancy)
                                 .build());
             });
         };
+    }
+
+    private String uppercaseNots(String name) {
+        return name != null ? name.replace("not|", "NOT|") : null;
     }
 }
