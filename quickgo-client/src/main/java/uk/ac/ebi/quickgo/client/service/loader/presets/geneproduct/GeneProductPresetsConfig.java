@@ -80,7 +80,8 @@ public class GeneProductPresetsConfig {
     }
 
     private FieldSetMapper<RawNamedPreset> rawPresetFieldSetMapper() {
-        return new StringToRawNamedPresetMapper(SourceColumnsFactory.createFor(GENE_PRODUCT_COLUMNS));
+        return new StringToRawNamedPresetMapper(SourceColumnsFactory.createFor(GENE_PRODUCT_COLUMNS),
+                RawNamedPreset::new);
     }
 
     private ItemProcessor<RawNamedPreset, RawNamedPreset> rawPresetValidator() {

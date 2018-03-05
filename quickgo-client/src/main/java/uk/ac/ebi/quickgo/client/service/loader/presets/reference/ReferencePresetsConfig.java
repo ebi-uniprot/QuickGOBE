@@ -140,7 +140,7 @@ public class ReferencePresetsConfig {
     }
 
     private FieldSetMapper<RawNamedPreset> fieldSetMapper(SourceColumnsFactory.Source source) {
-        return new StringToRawNamedPresetMapper(SourceColumnsFactory.createFor(source));
+        return new StringToRawNamedPresetMapper(SourceColumnsFactory.createFor(source), RawNamedPreset::new);
     }
 
     private ItemProcessor<RawNamedPreset, RawNamedPreset> rawPresetValidator() {

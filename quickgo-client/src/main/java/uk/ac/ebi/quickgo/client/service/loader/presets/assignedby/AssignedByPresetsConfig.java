@@ -108,7 +108,7 @@ public class AssignedByPresetsConfig {
     }
 
     private FieldSetMapper<RawNamedPreset> rawAssignedByPresetFieldSetMapper() {
-        return new StringToRawNamedPresetMapper(SourceColumnsFactory.createFor(DB_COLUMNS));
+        return new StringToRawNamedPresetMapper(SourceColumnsFactory.createFor(DB_COLUMNS), RawNamedPreset::new);
     }
 
     private ItemProcessor<RawNamedPreset, RawNamedPreset> assignedByValidator() {

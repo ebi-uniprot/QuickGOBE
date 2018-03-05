@@ -84,7 +84,8 @@ public class ExtensionDatabasesPresetsConfig {
     }
 
     private FieldSetMapper<RawNamedPreset> rawPresetFieldSetMapper() {
-        return new StringToRawNamedPresetMapper(SourceColumnsFactory.createFor(EXT_DATABASE_COLUMNS));
+        return new StringToRawNamedPresetMapper(SourceColumnsFactory.createFor(EXT_DATABASE_COLUMNS),
+                RawNamedPreset::new);
     }
 
     private ItemProcessor<RawNamedPreset, RawNamedPreset> compositeRawPresetProcessor() {

@@ -81,7 +81,8 @@ public class GOSlimSetPresetsConfig {
     }
 
     private FieldSetMapper<RawNamedPreset> rawPresetFieldSetMapper() {
-        return new StringToRawNamedPresetMapper(SourceColumnsFactory.createFor(GO_SLIM_SET_COLUMNS));
+        return new StringToRawNamedPresetMapper(SourceColumnsFactory.createFor(GO_SLIM_SET_COLUMNS),
+                RawNamedPreset::new);
     }
 
     private ItemProcessor<RawNamedPreset, RawNamedPreset> rawPresetValidator() {
