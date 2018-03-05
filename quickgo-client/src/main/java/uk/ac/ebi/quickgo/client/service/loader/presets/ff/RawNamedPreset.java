@@ -14,5 +14,4 @@ public class RawNamedPreset {
     public Integer relevancy;
     public String url;
     public String association;
-    public String goEvidence;
 }
