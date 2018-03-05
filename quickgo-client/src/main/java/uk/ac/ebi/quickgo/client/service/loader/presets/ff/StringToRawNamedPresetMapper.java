@@ -1,9 +1,9 @@
 package uk.ac.ebi.quickgo.client.service.loader.presets.ff;
 
+import java.util.function.Supplier;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.batch.item.file.transform.IncorrectTokenCountException;
-import org.springframework.validation.BindException;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPresetColumnsBuilder.UNINITIALIZED_POSITION;
@@ -16,12 +16,15 @@ import static uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPresetC
  * @author Edd
  */
 public class StringToRawNamedPresetMapper implements FieldSetMapper<RawNamedPreset> {
-    private final RawNamedPresetColumns rawNamedPresetColumns;
+    public final RawNamedPresetColumns rawNamedPresetColumns;
+    private final Supplier<RawNamedPreset> rawPresetSupplier;
 
-    public StringToRawNamedPresetMapper(RawNamedPresetColumns rawNamedPresetColumns) {
+    public StringToRawNamedPresetMapper(RawNamedPresetColumns rawNamedPresetColumns,
+            Supplier<RawNamedPreset> supplier) {
         checkArgument(rawNamedPresetColumns != null, "RawPresetColumns cannot be null");
 
         this.rawNamedPresetColumns = rawNamedPresetColumns;
+        this.rawPresetSupplier = supplier;
     }
 
     @Override public RawNamedPreset mapFieldSet(FieldSet fieldSet) {
@@ -37,7 +40,7 @@ public class StringToRawNamedPresetMapper implements FieldSetMapper<RawNamedPres
                     fieldSet.getFieldCount());
         }
 
-        RawNamedPreset rawPreset = new RawNamedPreset();
+        RawNamedPreset rawPreset = rawPresetSupplier.get();
         rawPreset.name = trimIfNotNull(extractStringValue(fieldSet, rawNamedPresetColumns.getNamePosition()));
         rawPreset.description =
                 trimIfNotNull(extractStringValue(fieldSet, rawNamedPresetColumns.getDescriptionPosition()));
@@ -46,8 +49,6 @@ public class StringToRawNamedPresetMapper implements FieldSetMapper<RawNamedPres
         rawPreset.url = trimIfNotNull(extractStringValue(fieldSet, rawNamedPresetColumns.getURLPosition()));
         rawPreset.association =
                 trimIfNotNull(extractStringValue(fieldSet, rawNamedPresetColumns.getAssociationPosition()));
-        rawPreset.goEvidence =
-                trimIfNotNull(extractStringValue(fieldSet, rawNamedPresetColumns.getGoEvidencePosition()));
         return rawPreset;
     }
 
@@ -59,7 +60,7 @@ public class StringToRawNamedPresetMapper implements FieldSetMapper<RawNamedPres
         }
     }
 
-    private String extractStringValue(FieldSet fieldSet, int position) {
+    public static String extractStringValue(FieldSet fieldSet, int position) {
         if (position > UNINITIALIZED_POSITION) {
             return fieldSet.readString(position);
         } else {
@@ -67,7 +68,7 @@ public class StringToRawNamedPresetMapper implements FieldSetMapper<RawNamedPres
         }
     }
 
-    private String trimIfNotNull(String value) {
+    public static String trimIfNotNull(String value) {
         return value == null ? null : value.trim();
     }
 
