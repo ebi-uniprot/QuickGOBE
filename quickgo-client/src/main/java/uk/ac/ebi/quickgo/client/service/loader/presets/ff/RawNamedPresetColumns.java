@@ -6,7 +6,7 @@ package uk.ac.ebi.quickgo.client.service.loader.presets.ff;
  * Created 13/09/16
  * @author Edd
  */
-interface RawNamedPresetColumns {
+public interface RawNamedPresetColumns {
     int getIdPosition();
 
     int getNamePosition();
@@ -20,6 +20,4 @@ interface RawNamedPresetColumns {
     int getMaxRequiredColumnCount();
 
     int getAssociationPosition();
-
-    int getGoEvidencePosition();
 }
