@@ -5,6 +5,8 @@ import uk.ac.ebi.quickgo.client.model.presets.PresetType;
 import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
 import uk.ac.ebi.quickgo.client.service.loader.presets.LogStepListener;
 import uk.ac.ebi.quickgo.client.service.loader.presets.PresetsCommonConfig;
+import uk.ac.ebi.quickgo.client.service.loader.presets.evidence.RawEvidenceNamedPresetColumnsBuilder
+        .RawEvidenceNamedPresetColumnsImpl;
 
 import java.util.Optional;
 import org.springframework.batch.core.Step;
@@ -65,13 +67,13 @@ public class EvidencePresetsConfig {
      */
     private ItemWriter<RawEvidenceNamedPreset> rawPresetWriter(CompositePresetImpl presets) {
         return rawItemList -> rawItemList.forEach(rawItem ->
-            presets.addPreset(PresetType.EVIDENCES,
-                    PresetItem.createWithName(rawItem.name)
-                            .withProperty(PresetItem.Property.ID.getKey(), rawItem.id)
-                            .withRelevancy(rawItem.relevancy)
-                            .withProperty(PresetItem.Property.GO_EVIDENCE.getKey(), rawItem
-                                    .goEvidence)
-                            .build())
+                presets.addPreset(PresetType.EVIDENCES,
+                        PresetItem.createWithName(rawItem.name)
+                                .withProperty(PresetItem.Property.ID.getKey(), rawItem.id)
+                                .withRelevancy(rawItem.relevancy)
+                                .withProperty(PresetItem.Property.GO_EVIDENCE.getKey(), rawItem
+                                        .goEvidence)
+                                .build())
         );
     }
 
@@ -83,14 +85,14 @@ public class EvidencePresetsConfig {
         return new RawEvidenceNamedPresetValidator();
     }
 
-    private RawEvidenceNamedPresetColumnsBuilder.RawEvidenceNamedPresetColumnsImpl getColumns() {
-        return (RawEvidenceNamedPresetColumnsBuilder.RawEvidenceNamedPresetColumnsImpl)
+    private RawEvidenceNamedPresetColumnsImpl getColumns() {
+        return (RawEvidenceNamedPresetColumnsImpl)
                 RawEvidenceNamedPresetColumnsBuilder
-                .createWithNamePosition(1)
-                .withGoEvidence(2)
-                .withIdPosition(0)
-                .withRelevancyPosition(3)
-                .build();
+                        .createWithNamePosition(1)
+                        .withGoEvidence(2)
+                        .withIdPosition(0)
+                        .withRelevancyPosition(3)
+                        .build();
     }
 
 }
