@@ -12,8 +12,8 @@ import static com.google.common.base.Preconditions.checkArgument;
  * Created 13/09/16
  * @author Edd
  */
-class RawNamedPresetColumnsBuilder {
-    static final int UNINITIALIZED_POSITION = -1;
+public class RawNamedPresetColumnsBuilder {
+    protected static final int UNINITIALIZED_POSITION = -1;
     private int idPosition;
 
     private int namePosition;
@@ -21,9 +21,8 @@ class RawNamedPresetColumnsBuilder {
     private int relevancyPosition;
     private int urlPosition;
     private int associationPosition;
-    private int goEvidencePosition;
 
-    private RawNamedPresetColumnsBuilder(int namePosition) {
+    protected RawNamedPresetColumnsBuilder(int namePosition) {
         checkColumnPosition(namePosition);
         this.namePosition = namePosition;
 
@@ -32,7 +31,6 @@ class RawNamedPresetColumnsBuilder {
         this.relevancyPosition = UNINITIALIZED_POSITION;
         this.urlPosition = UNINITIALIZED_POSITION;
         this.associationPosition = UNINITIALIZED_POSITION;
-        this.goEvidencePosition = UNINITIALIZED_POSITION;
     }
 
     public RawNamedPresetColumns build() {
@@ -43,15 +41,9 @@ class RawNamedPresetColumnsBuilder {
         return new RawNamedPresetColumnsBuilder(namePosition);
     }
 
-    RawNamedPresetColumnsBuilder withIdPosition(int idPosition) {
+    public RawNamedPresetColumnsBuilder withIdPosition(int idPosition) {
         checkColumnPosition(idPosition);
         this.idPosition = idPosition;
-        return this;
-    }
-
-    RawNamedPresetColumnsBuilder withGoEvidence(int _goEvidencePosition) {
-        checkColumnPosition(_goEvidencePosition);
-        this.goEvidencePosition = _goEvidencePosition;
         return this;
     }
 
@@ -61,7 +53,7 @@ class RawNamedPresetColumnsBuilder {
         return this;
     }
 
-    RawNamedPresetColumnsBuilder withRelevancyPosition(int relevancyPosition) {
+    public RawNamedPresetColumnsBuilder withRelevancyPosition(int relevancyPosition) {
         checkColumnPosition(relevancyPosition);
         this.relevancyPosition = relevancyPosition;
         return this;
@@ -79,15 +71,15 @@ class RawNamedPresetColumnsBuilder {
         return this;
     }
 
-    private void checkColumnPosition(int columnPosition) {
+    protected void checkColumnPosition(int columnPosition) {
         checkArgument(columnPosition >= 0,
                 "Column position [" + columnPosition + "] must be greater than or equal to 0");
     }
 
-    private static class RawNamedPresetColumnsImpl implements RawNamedPresetColumns {
-        static final int MAX_REQUIRED_COLUMN_POSITION_NOT_INITIALIZED = -1;
-        private static final int DEFAULT_COLUMN_POSITION_NOT_INITIALIZED = 0;
-        private int maxRequiredColumnPosition = MAX_REQUIRED_COLUMN_POSITION_NOT_INITIALIZED;
+    protected static class RawNamedPresetColumnsImpl implements RawNamedPresetColumns {
+        protected static final int MAX_REQUIRED_COLUMN_POSITION_NOT_INITIALIZED = -1;
+        protected static final int DEFAULT_COLUMN_POSITION_NOT_INITIALIZED = 0;
+        protected int maxRequiredColumnPosition = MAX_REQUIRED_COLUMN_POSITION_NOT_INITIALIZED;
 
         private final int urlPosition;
         private int idPosition;
@@ -95,16 +87,14 @@ class RawNamedPresetColumnsBuilder {
         private int descriptionPosition;
         private int relevancyPosition;
         private int associationPosition;
-        private int goEvidencePosition;
 
-        private RawNamedPresetColumnsImpl(RawNamedPresetColumnsBuilder builder) {
+        protected RawNamedPresetColumnsImpl(RawNamedPresetColumnsBuilder builder) {
             this.idPosition = builder.idPosition;
             this.namePosition = builder.namePosition;
             this.descriptionPosition = builder.descriptionPosition;
             this.relevancyPosition = builder.relevancyPosition;
             this.urlPosition = builder.urlPosition;
             this.associationPosition = builder.associationPosition;
-            this.goEvidencePosition = builder.goEvidencePosition;
         }
 
         @Override public int getIdPosition() {
@@ -131,10 +121,6 @@ class RawNamedPresetColumnsBuilder {
             return associationPosition;
         }
 
-        @Override public int getGoEvidencePosition() {
-            return goEvidencePosition;
-        }
-
         @Override public int getMaxRequiredColumnCount() {
             if (maxRequiredColumnPosition == MAX_REQUIRED_COLUMN_POSITION_NOT_INITIALIZED) {
                 maxRequiredColumnPosition =
@@ -143,8 +129,7 @@ class RawNamedPresetColumnsBuilder {
                                 getIdPosition(),
                                 getNamePosition(),
                                 getRelevancyPosition(),
-                                getAssociationPosition(),
-                                getGoEvidencePosition()
+                                getAssociationPosition()
                         ).max(Comparator.naturalOrder())
                                 .map(columnPosition -> columnPosition + 1)
                                 .orElse(DEFAULT_COLUMN_POSITION_NOT_INITIALIZED);
