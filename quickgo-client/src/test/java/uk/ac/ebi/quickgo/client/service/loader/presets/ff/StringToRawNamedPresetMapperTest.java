@@ -22,16 +22,16 @@ public class StringToRawNamedPresetMapperTest {
         this.presetColumns = RawNamedPresetColumnsBuilder.createWithNamePosition(0)
                 .withDescriptionPosition(1)
                 .build();
-        this.mapper = new StringToRawNamedPresetMapper(presetColumns);
+        this.mapper = new StringToRawNamedPresetMapper(presetColumns, RawNamedPreset::new);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void nullFieldSetThrowsException() throws Exception {
+    public void nullFieldSetThrowsException() {
         mapper.mapFieldSet(null);
     }
 
     @Test(expected = IncorrectTokenCountException.class)
-    public void fieldSetWithInsufficientValuesThrowsException() throws Exception {
+    public void fieldSetWithInsufficientValuesThrowsException() {
         String[] tokens = new String[numColumns() - 1];
         FieldSet fieldSet = new DefaultFieldSet(tokens);
 
@@ -39,7 +39,7 @@ public class StringToRawNamedPresetMapperTest {
     }
 
     @Test
-    public void convertFieldSetWithNullValues() throws Exception {
+    public void convertFieldSetWithNullValues() {
         String[] tokens = new String[numColumns()];
         tokens[presetColumns.getDescriptionPosition()] = null;
         tokens[presetColumns.getNamePosition()] = null;
@@ -53,7 +53,7 @@ public class StringToRawNamedPresetMapperTest {
     }
 
     @Test
-    public void convertFieldSetWithValidValues() throws Exception {
+    public void convertFieldSetWithValidValues() {
         String[] tokens = new String[numColumns()];
         tokens[presetColumns.getNamePosition()] = "UniProt";
         tokens[presetColumns.getDescriptionPosition()] = "The Universal Protein Resource";
@@ -67,7 +67,7 @@ public class StringToRawNamedPresetMapperTest {
     }
 
     @Test
-    public void trimFieldsFromFieldSetWhenConverting() throws Exception {
+    public void trimFieldsFromFieldSetWhenConverting() {
         String[] tokens = new String[numColumns()];
         tokens[presetColumns.getNamePosition()] = "  UniProt";
         tokens[presetColumns.getDescriptionPosition()] = "   The Universal Protein Resource   ";
