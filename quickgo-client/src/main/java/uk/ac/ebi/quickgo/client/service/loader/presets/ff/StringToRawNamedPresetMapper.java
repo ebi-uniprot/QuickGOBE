@@ -16,7 +16,7 @@ import static uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPresetC
  * @author Edd
  */
 public class StringToRawNamedPresetMapper implements FieldSetMapper<RawNamedPreset> {
-    public final RawNamedPresetColumns rawNamedPresetColumns;
+    private final RawNamedPresetColumns rawNamedPresetColumns;
     private final Supplier<RawNamedPreset> rawPresetSupplier;
 
     public StringToRawNamedPresetMapper(RawNamedPresetColumns rawNamedPresetColumns,
