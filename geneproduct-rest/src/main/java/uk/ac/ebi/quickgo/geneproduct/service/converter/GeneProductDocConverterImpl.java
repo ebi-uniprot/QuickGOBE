@@ -36,6 +36,7 @@ public class GeneProductDocConverterImpl implements GeneProductDocConverter {
         geneProduct.name = geneProductDocument.name;
         geneProduct.referenceProteome = geneProductDocument.referenceProteome;
         geneProduct.isCompleteProteome = geneProductDocument.isCompleteProteome;
+        geneProduct.proteomeMembership = geneProductDocument.proteomeMembership;
         geneProduct.parentId = geneProductDocument.parentId;
         geneProduct.symbol = geneProductDocument.symbol;
         geneProduct.taxonId = geneProductDocument.taxonId;
