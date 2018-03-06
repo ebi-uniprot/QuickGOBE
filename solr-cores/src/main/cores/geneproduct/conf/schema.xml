@@ -32,6 +32,7 @@
     <field name="dbSubset" type="string" indexed="true" stored="true"/>
     <field name="isCompleteProteome" type="boolean" indexed="false" stored="true"/>
     <field name="referenceProteome" type="string" indexed="false" stored="true"/>
+    <field name="proteomeMembership" type="proteomeMembership" indexed="false" stored="true"/>
     <field name="isIsoform" type="boolean" indexed="false" stored="true"/>
     <field name="isAnnotated" type="boolean" indexed="false" stored="true"/>
     <field name="parentId" type="string" indexed="false" stored="true"/>
@@ -380,6 +381,10 @@
             <filter class="solr.LowerCaseFilterFactory"/>
         </analyzer>
     </fieldType>
+
+    <!-- An enumeration of proteome membership possibilities  -->
+    <fieldType name="proteomeMembership" class="solr.EnumField" enumsConfig="enumsConfig.xml"
+               enumName="proteomeMembership"/>
 
     <!-- since fields of this type are by default not stored or indexed,
          any data added to them will be ignored outright.  -->
