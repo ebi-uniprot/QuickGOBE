@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<enumsConfig>
+    <enum name="proteomeMembership">
+        <value>Reference</value>
+        <value>Complete</value>
+        <value>None</value>
+    </enum>
+</enumsConfig>
