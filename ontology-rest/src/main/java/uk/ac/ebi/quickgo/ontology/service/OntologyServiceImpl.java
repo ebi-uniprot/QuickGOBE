@@ -151,7 +151,6 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
                 .createSlims(OntologyType.valueOf(ontologyType), ontologyTraversal, slimsToTerms, relationTypes);
 
         return slimmer.getSlimmedTermsMap().entrySet().stream()
-                .filter(this::doesNotSlimToOnlyItself)
                 .map(Map.Entry::getKey)
                 .filter(term -> slimsFromTerms.isEmpty() || slimsFromTerms.contains(term))
                 .map(id -> new SlimTerm(id, slimmer.findSlimmedToTerms(id)))
@@ -176,17 +175,6 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
         Preconditions.checkArgument(ids != null, "List of IDs cannot be null");
 
         return ids.stream().map(queryStringSanitizer::sanitize).collect(Collectors.toList());
-    }
-
-    /**
-     * Determines whether a slim term maps to only itself and no other slim terms.
-     * @param slimTermMapping a slim-term and the terms to which it maps
-     * @return whether or not the slim-term maps only to itself
-     */
-    private boolean doesNotSlimToOnlyItself(Map.Entry<String, List<String>> slimTermMapping) {
-        return slimTermMapping.getValue().size() > 1 ||
-                (slimTermMapping.getValue().size() == 1 &&
-                        !slimTermMapping.getKey().equals(slimTermMapping.getValue().get(0)));
     }
 
     /**
