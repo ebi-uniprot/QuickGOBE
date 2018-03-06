@@ -1,12 +1,14 @@
 package uk.ac.ebi.quickgo.index.geneproduct;
 
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductDocument;
+import uk.ac.ebi.quickgo.geneproduct.common.ProteomeMembership;
 import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
 
 import com.google.common.base.Preconditions;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import org.springframework.batch.item.ItemProcessor;
 
@@ -44,7 +46,7 @@ public class GeneProductDocumentConverter implements ItemProcessor<GeneProduct, 
         this.specificValueDelimiter = specificValueDelimiter;
     }
 
-    @Override public GeneProductDocument process(GeneProduct geneProduct) throws Exception {
+    @Override public GeneProductDocument process(GeneProduct geneProduct) {
         if (geneProduct == null) {
             throw new DocumentReaderException("Gene product object is null");
         }
@@ -68,7 +70,13 @@ public class GeneProductDocumentConverter implements ItemProcessor<GeneProduct, 
         doc.isCompleteProteome = isTrue(properties.get(COMPLETE_PROTEOME_KEY));
         doc.isAnnotated = isTrue(properties.get(IS_ANNOTATED_KEY));
         doc.isIsoform = isTrue(properties.get(IS_ISOFORM_KEY));
-
+        if (Objects.nonNull(doc.referenceProteome)) {
+            doc.proteomeMembership = ProteomeMembership.REFERENCE;
+        } else if (isTrue(properties.get(COMPLETE_PROTEOME_KEY))) {
+            doc.proteomeMembership = ProteomeMembership.COMPLETE;
+        } else {
+            doc.proteomeMembership = ProteomeMembership.NONE;
+        }
         return doc;
     }
 
