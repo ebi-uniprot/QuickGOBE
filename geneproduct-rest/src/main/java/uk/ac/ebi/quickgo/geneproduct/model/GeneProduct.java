@@ -50,10 +50,13 @@ public class GeneProduct {
     public boolean isAnnotated;
 
     //todo maybe.. this value could be replaced with the UPID (as we have for referenceProteome)
+    @Deprecated //replaced by proteomeMembership
     public boolean isCompleteProteome;
 
-    @Override
-    public String toString() {
+    // The assigned value fromProteomeMembership */
+    public Enum proteomeMembership;
+
+    @Override public String toString() {
         return "GeneProduct{" +
                 "database='" + database + '\'' +
                 ", id='" + id + '\'' +
@@ -61,11 +64,14 @@ public class GeneProduct {
                 ", name='" + name + '\'' +
                 ", synonyms=" + synonyms +
                 ", type=" + type +
-                ", databaseSubset=" + databaseSubset +
+                ", taxonId=" + taxonId +
+                ", databaseSubset='" + databaseSubset + '\'' +
                 ", referenceProteome='" + referenceProteome + '\'' +
                 ", parentId='" + parentId + '\'' +
                 ", isIsoform=" + isIsoform +
+                ", isAnnotated=" + isAnnotated +
                 ", isCompleteProteome=" + isCompleteProteome +
+                ", proteomeMembership=" + proteomeMembership +
                 '}';
     }
 }
