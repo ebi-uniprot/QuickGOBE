@@ -27,6 +27,7 @@ public class GeneProductFields {
     static final String DATABASE_SUBSET = "dbSubset";
     static final String COMPLETE_PROTEOME = "isCompleteProteome";
     static final String REFERENCE_PROTEOME = "referenceProteome";
+    static final String PROTEOME_MEMBERSHIP = "proteomeMembership";
     static final String IS_ISOFORM = "isIsoform";
     static final String IS_ANNOTATED = "isAnnotated";
     static final String PARENT_ID = "parentId";
@@ -79,7 +80,7 @@ public class GeneProductFields {
         public static final String TYPE = storeAndGet(VALUES, GeneProductFields.TYPE);
         public static final String TAXON_ID = storeAndGet(VALUES, GeneProductFields.TAXON_ID);
         public static final String DATABASE_SUBSET = storeAndGet(VALUES, GeneProductFields.DATABASE_SUBSET);
-
+        public static final String PROTEOME_MEMBERSHIP = storeAndGet(VALUES, GeneProductFields.PROTEOME_MEMBERSHIP);
         public static boolean isFacetable(String field) {
             return VALUES.contains(field);
         }
