@@ -98,10 +98,8 @@ public class SourceFiles {
 	// Reference: Source data
 	public enum EPublication { PUBMED_ID, TITLE }
 	public TSVDataFile<EPublication> publications;
-	public enum EInterProEntry { ENTRY_AC, NAME }
-	public TSVDataFile<EInterProEntry> interpro = new TSVDataFile<>(baseDirectory, "ENTRY");
 
-	NamedFile[] referenceSource = holder(publications, interpro);
+    NamedFile[] referenceSource = holder(publications);
 
 	// Protein information
 
