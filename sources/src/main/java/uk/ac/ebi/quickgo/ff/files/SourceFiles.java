@@ -25,7 +25,6 @@ public class SourceFiles {
 		goSourceFiles = new GOSourceFiles(baseDirectory);
 		ecoSourceFiles = new ECOSourceFiles(baseDirectory);
 		gpDataFileList = new NamedFile(baseDirectory, "GPAD_SOURCE_FILES");
-		mappingFileList = new NamedFile(baseDirectory, "MAPPING_FILES");
 		taxonomy = new TSVDataFile<>(baseDirectory, "TAXONOMY");
 		sequenceSource = new TSVDataFile<>(baseDirectory, "sequences");
 		publications = new TSVDataFile<>(baseDirectory, "PUBLICATIONS");
@@ -154,8 +153,7 @@ public class SourceFiles {
 
 	// Annotation: source data
 	NamedFile gpDataFileList;
-	NamedFile mappingFileList;
-	NamedFile[] annotationSource = holder(gpDataFileList, mappingFileList);
+	NamedFile[] annotationSource = holder(gpDataFileList);
 
 	// Prerequisite file set
 	protected NamedFile[] prerequisite = holder(annotationSource, referenceSource, proteinSource, controlledVocabs);
@@ -169,10 +167,6 @@ public class SourceFiles {
 
 	public NamedFile[] archiveFiles() {
 		return archive;
-	}
-
-	public NamedFile[] getMappingFiles() {
-		return getFiles(mappingFileList, "gp2protein");
 	}
 
 	public NamedFile[] getGPDataFiles() {
