@@ -26,7 +26,6 @@ public class SourceFiles {
 		ecoSourceFiles = new ECOSourceFiles(baseDirectory);
 		annotationGuidelines = new TSVDataFile<>(baseDirectory, "ANNOTATION_GUIDELINES");
 		annotationBlacklist = new TSVDataFile<>(baseDirectory, "ANNOTATION_BLACKLIST");
-		xrfAbbsInfo = new TSVDataFile<>(baseDirectory, "XRF_ABBS");
 		evidenceInfo = new TSVDataFile<>(baseDirectory, "CV_ECO2GO");
 	}
 
