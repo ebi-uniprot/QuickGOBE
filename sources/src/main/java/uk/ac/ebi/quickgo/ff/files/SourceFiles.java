@@ -24,7 +24,6 @@ public class SourceFiles {
 		this.baseDirectory = directory;
 		goSourceFiles = new GOSourceFiles(baseDirectory);
 		ecoSourceFiles = new ECOSourceFiles(baseDirectory);
-		gpDataFileList = new NamedFile(baseDirectory, "GPAD_SOURCE_FILES");
 		annotationGuidelines = new TSVDataFile<>(baseDirectory, "ANNOTATION_GUIDELINES");
 		annotationBlacklist = new TSVDataFile<>(baseDirectory, "ANNOTATION_BLACKLIST");
 		xrfAbbsInfo = new TSVDataFile<>(baseDirectory, "XRF_ABBS");
@@ -122,12 +121,8 @@ public class SourceFiles {
 
 	NamedFile[] controlledVocabsDerived = holder(gp2proteinDb);
 
-	// Annotation: source data
-	NamedFile gpDataFileList;
-	NamedFile[] annotationSource = holder(gpDataFileList);
-
 	// Prerequisite file set
-    protected NamedFile[] prerequisite = holder(annotationSource, controlledVocabs);
+    protected NamedFile[] prerequisite = holder(controlledVocabs);
 
 	// Archive file set
 	protected NamedFile[] archive = holder(controlledVocabs, controlledVocabsDerived);
@@ -140,9 +135,6 @@ public class SourceFiles {
 		return archive;
 	}
 
-	public NamedFile[] getGPDataFiles() {
-		return getFiles(gpDataFileList, null);
-	}
 
 	public NamedFile[] getFiles(NamedFile listFile, final String prefix) {
 		List<NamedFile> list = new ArrayList<NamedFile>();
