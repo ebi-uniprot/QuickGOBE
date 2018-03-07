@@ -25,7 +25,6 @@ public class SourceFiles {
 		goSourceFiles = new GOSourceFiles(baseDirectory);
 		ecoSourceFiles = new ECOSourceFiles(baseDirectory);
 		gpDataFileList = new NamedFile(baseDirectory, "GPAD_SOURCE_FILES");
-		taxonomy = new TSVDataFile<>(baseDirectory, "TAXONOMY");
 		annotationGuidelines = new TSVDataFile<>(baseDirectory, "ANNOTATION_GUIDELINES");
 		annotationBlacklist = new TSVDataFile<>(baseDirectory, "ANNOTATION_BLACKLIST");
 		xrfAbbsInfo = new TSVDataFile<>(baseDirectory, "XRF_ABBS");
@@ -92,12 +91,6 @@ public class SourceFiles {
 
 	// Protein information
 
-	// Protein: Source data
-	public enum ETaxon { TAXON_ID, NAME, ANCESTRY }
-	public TSVDataFile<ETaxon> taxonomy;
-
-    NamedFile[] proteinSource = holder(taxonomy);
-
 	// Controlled vocabularies
 	public enum EEvidenceCode { ECO_ID, NAME, GO_EVIDENCE, SORT_ORDER }
 	public TSVDataFile<EEvidenceCode> evidenceInfo;
@@ -134,7 +127,7 @@ public class SourceFiles {
 	NamedFile[] annotationSource = holder(gpDataFileList);
 
 	// Prerequisite file set
-    protected NamedFile[] prerequisite = holder(annotationSource, proteinSource, controlledVocabs);
+    protected NamedFile[] prerequisite = holder(annotationSource, controlledVocabs);
 
 	// Archive file set
 	protected NamedFile[] archive = holder(controlledVocabs, controlledVocabsDerived);
