@@ -118,9 +118,6 @@ public class SourceFiles {
 	public enum EEvidenceCode { ECO_ID, NAME, GO_EVIDENCE, SORT_ORDER }
 	public TSVDataFile<EEvidenceCode> evidenceInfo;
 
-	public enum EQualifier { QUALIFIER, DESCRIPTION }
-	public TSVDataFile<EQualifier> qualifierInfo = new TSVDataFile<>(baseDirectory, "CV_QUALIFIERS");
-
 	public enum EGORef { NAME, GO_REF }
 	public TSVDataFile<EGORef> goRefInfo = new TSVDataFile<>(baseDirectory, "CV_GO_REFS");
 
@@ -142,7 +139,9 @@ public class SourceFiles {
 	public enum EPostProcessingRule { RULE_ID, ANCESTOR_GO_ID, ANCESTOR_TERM, RELATIONSHIP, TAXON_NAME, ORIGINAL_GO_ID, ORIGINAL_TERM, CLEANUP_ACTION, AFFECTED_TAX_GROUP, SUBSTITUTED_GO_ID, SUBSTITUTED_TERM, CURATOR_NOTES }
 	public TSVDataFile<EPostProcessingRule> postProcessingRules;
 
-	NamedFile[] controlledVocabs = holder(evidenceInfo, qualifierInfo, goRefInfo, xrfAbbsInfo, proteinSetsInfo, evidence2ECO, annotationBlacklist, postProcessingRules);
+	NamedFile[] controlledVocabs =
+			holder(evidenceInfo, goRefInfo, xrfAbbsInfo, proteinSetsInfo, evidence2ECO, annotationBlacklist,
+					postProcessingRules);
 
 	// Controlled vocabularies: derived data
 	public enum EGP2ProteinDB { CODE, IS_DB }
