@@ -32,7 +32,6 @@ public class SourceFiles {
 		annotationBlacklist = new TSVDataFile<>(baseDirectory, "ANNOTATION_BLACKLIST");
 		postProcessingRules = new TSVDataFile<>(baseDirectory, "POST_PROCESSING_RULES");
 		xrfAbbsInfo = new TSVDataFile<>(baseDirectory, "XRF_ABBS");
-		//evidenceInfo = new TSVDataFile<>(baseDirectory, "CV_EVIDENCES");
 		evidenceInfo = new TSVDataFile<>(baseDirectory, "CV_ECO2GO");
 	}
 
