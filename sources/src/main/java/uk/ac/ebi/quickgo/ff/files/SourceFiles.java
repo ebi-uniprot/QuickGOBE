@@ -96,9 +96,6 @@ public class SourceFiles {
 	public enum EGORef { NAME, GO_REF }
 	public TSVDataFile<EGORef> goRefInfo = new TSVDataFile<>(baseDirectory, "CV_GO_REFS");
 
-	public enum EXrfAbbsEntry { ABBREVIATION, DATABASE, GENERIC_URL, URL_SYNTAX }
-	public TSVDataFile<EXrfAbbsEntry> xrfAbbsInfo;
-
 	public enum EProteinSet { NAME, DESCRIPTION, PROJECT_URL }
 	public TSVDataFile<EProteinSet> proteinSetsInfo = new TSVDataFile<>(baseDirectory, "CV_PROTEIN_SETS");
 
@@ -112,7 +109,7 @@ public class SourceFiles {
 	public TSVDataFile<EAnnotationGuidelineEntry> annotationGuidelines;
 
 	NamedFile[] controlledVocabs =
-            holder(evidenceInfo, goRefInfo, xrfAbbsInfo, proteinSetsInfo, evidence2ECO, annotationBlacklist);
+            holder(evidenceInfo, goRefInfo, proteinSetsInfo, evidence2ECO, annotationBlacklist);
 
 	// Controlled vocabularies: derived data
 	public enum EGP2ProteinDB { CODE, IS_DB }
