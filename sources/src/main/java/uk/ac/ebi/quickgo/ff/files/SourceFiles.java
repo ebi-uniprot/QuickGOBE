@@ -30,7 +30,6 @@ public class SourceFiles {
 		publications = new TSVDataFile<>(baseDirectory, "PUBLICATIONS");
 		annotationGuidelines = new TSVDataFile<>(baseDirectory, "ANNOTATION_GUIDELINES");
 		annotationBlacklist = new TSVDataFile<>(baseDirectory, "ANNOTATION_BLACKLIST");
-		postProcessingRules = new TSVDataFile<>(baseDirectory, "POST_PROCESSING_RULES");
 		xrfAbbsInfo = new TSVDataFile<>(baseDirectory, "XRF_ABBS");
 		evidenceInfo = new TSVDataFile<>(baseDirectory, "CV_ECO2GO");
 	}
@@ -134,12 +133,8 @@ public class SourceFiles {
 	public enum EAnnotationGuidelineEntry { GO_ID, TITLE, URL }
 	public TSVDataFile<EAnnotationGuidelineEntry> annotationGuidelines;
 
-	public enum EPostProcessingRule { RULE_ID, ANCESTOR_GO_ID, ANCESTOR_TERM, RELATIONSHIP, TAXON_NAME, ORIGINAL_GO_ID, ORIGINAL_TERM, CLEANUP_ACTION, AFFECTED_TAX_GROUP, SUBSTITUTED_GO_ID, SUBSTITUTED_TERM, CURATOR_NOTES }
-	public TSVDataFile<EPostProcessingRule> postProcessingRules;
-
 	NamedFile[] controlledVocabs =
-			holder(evidenceInfo, goRefInfo, xrfAbbsInfo, proteinSetsInfo, evidence2ECO, annotationBlacklist,
-					postProcessingRules);
+            holder(evidenceInfo, goRefInfo, xrfAbbsInfo, proteinSetsInfo, evidence2ECO, annotationBlacklist);
 
 	// Controlled vocabularies: derived data
 	public enum EGP2ProteinDB { CODE, IS_DB }
