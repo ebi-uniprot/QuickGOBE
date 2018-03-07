@@ -130,18 +130,6 @@ public class GOControllerIT extends OBOControllerIT {
         expectIdentitySlims(response, singletonList(GO_SLIM1));
     }
 
-    private void expectIdentitySlims(ResultActions response, List<String> slimSet) throws Exception {
-        for (String slim : slimSet) {
-            expectSlimInfo(response, slim, singletonList(slim));
-        }
-    }
-
-    private void expectSlimInfo(ResultActions response, String from, List<String> to) throws Exception {
-        response.andExpect(
-                jsonPath("$..results[?(@.slimsFromId==\"" + from + "\")].slimsToIds.*",
-                        equalTo(to)));
-    }
-
     @Test
     public void oneIdAndOneNonExistingIdHasOneSlim() throws Exception {
         ResultActions response = mockMvc.perform(get(getSlimURL())
@@ -390,7 +378,6 @@ public class GOControllerIT extends OBOControllerIT {
         relationships.add(createSlimRelationship(GO_SLIM_CHILD5, GO_SLIM6));
         relationships.add(createSlimRelationship(GO_SLIM_CHILD6, GO_SLIM5));
         relationships.add(createSlimRelationship(GO_SLIM_CHILD6, GO_SLIM6));
-        //        relationships.add(createSlimRelationship(GO_SLIM_IDENTITY, GO_SLIM_IDENTITY));
 
         relationships.add(createSlimRelationship(GO_SLIM1, STOP_NODE));
         relationships.add(createSlimRelationship(GO_SLIM2, STOP_NODE));
@@ -399,9 +386,20 @@ public class GOControllerIT extends OBOControllerIT {
         relationships.add(createSlimRelationship(GO_SLIM5, STOP_NODE));
         relationships.add(createSlimRelationship(GO_SLIM6, STOP_NODE));
         relationships.add(createSlimRelationship(GO_SLIM7, STOP_NODE));
-        //        relationships.add(createSlimRelationship(GO_SLIM_IDENTITY, STOP_NODE));
 
         ontologyGraph.addRelationships(relationships);
+    }
+
+    private void expectIdentitySlims(ResultActions response, List<String> slimSet) throws Exception {
+        for (String slim : slimSet) {
+            expectSlimInfo(response, slim, singletonList(slim));
+        }
+    }
+
+    private void expectSlimInfo(ResultActions response, String from, List<String> to) throws Exception {
+        response.andExpect(
+                jsonPath("$..results[?(@.slimsFromId==\"" + from + "\")].slimsToIds.*",
+                        equalTo(to)));
     }
 
     private OntologyRelationship createSlimRelationship(String term, String slimmedUpTerm) {
