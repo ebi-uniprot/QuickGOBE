@@ -26,7 +26,6 @@ public class SourceFiles {
 		ecoSourceFiles = new ECOSourceFiles(baseDirectory);
 		gpDataFileList = new NamedFile(baseDirectory, "GPAD_SOURCE_FILES");
 		taxonomy = new TSVDataFile<>(baseDirectory, "TAXONOMY");
-		sequenceSource = new TSVDataFile<>(baseDirectory, "sequences");
 		annotationGuidelines = new TSVDataFile<>(baseDirectory, "ANNOTATION_GUIDELINES");
 		annotationBlacklist = new TSVDataFile<>(baseDirectory, "ANNOTATION_BLACKLIST");
 		xrfAbbsInfo = new TSVDataFile<>(baseDirectory, "XRF_ABBS");
@@ -97,10 +96,7 @@ public class SourceFiles {
 	public enum ETaxon { TAXON_ID, NAME, ANCESTRY }
 	public TSVDataFile<ETaxon> taxonomy;
 
-	public enum ESequence { protein, sequence }
-	public TSVDataFile<ESequence> sequenceSource;
-
-	NamedFile[] proteinSource = holder(taxonomy, sequenceSource);
+    NamedFile[] proteinSource = holder(taxonomy);
 
 	// Controlled vocabularies
 	public enum EEvidenceCode { ECO_ID, NAME, GO_EVIDENCE, SORT_ORDER }
