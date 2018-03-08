@@ -117,6 +117,20 @@ public class GOControllerIT extends OBOControllerIT {
 
     // slimming ------------------
     @Test
+    public void slimmingFromAndToTheSameTermReturnsIdentitySlim() throws Exception {
+        ResultActions response = mockMvc.perform(get(getSlimURL())
+                .param(SLIM_TO_IDS_PARAM, GO_SLIM1)
+                .param(SLIM_FROM_IDS_PARAM, GO_SLIM1));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.numberOfHits").value(1));
+
+        expectIdentitySlims(response, singletonList(GO_SLIM1));
+    }
+
+    @Test
     public void oneIdHasOneSlim() throws Exception {
         ResultActions response = mockMvc.perform(get(getSlimURL())
                 .param(SLIM_TO_IDS_PARAM, GO_SLIM1));
