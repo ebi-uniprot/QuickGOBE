@@ -16,18 +16,31 @@ import java.util.stream.Stream;
 class RawEvidenceNamedPresetColumnsBuilder extends RawNamedPresetColumnsBuilder {
     private int goEvidencePosition;
 
-    public RawEvidenceNamedPresetColumnsBuilder(int namePosition) {
+    private RawEvidenceNamedPresetColumnsBuilder(int namePosition) {
         super(namePosition);
         this.goEvidencePosition = UNINITIALIZED_POSITION;
     }
 
+    @Override
     public RawEvidenceNamedPresetColumnsImpl build() {
         return new RawEvidenceNamedPresetColumnsImpl(this);
     }
 
-    public RawEvidenceNamedPresetColumnsBuilder withGoEvidence(int _goEvidencePosition) {
-        checkColumnPosition(_goEvidencePosition);
-        this.goEvidencePosition = _goEvidencePosition;
+    public RawEvidenceNamedPresetColumnsBuilder withGoEvidence(int goEvidencePosition) {
+        checkColumnPosition(goEvidencePosition);
+        this.goEvidencePosition = goEvidencePosition;
+        return this;
+    }
+
+    @Override
+    public RawEvidenceNamedPresetColumnsBuilder withIdPosition(int idPosition) {
+        super.withIdPosition(idPosition);
+        return this;
+    }
+
+    @Override
+    public RawEvidenceNamedPresetColumnsBuilder withRelevancyPosition(int relevancyPosition) {
+        super.withRelevancyPosition(relevancyPosition);
         return this;
     }
 
@@ -38,7 +51,7 @@ class RawEvidenceNamedPresetColumnsBuilder extends RawNamedPresetColumnsBuilder 
     protected static class RawEvidenceNamedPresetColumnsImpl extends RawNamedPresetColumnsImpl {
         private int goEvidencePosition;
 
-        protected RawEvidenceNamedPresetColumnsImpl(RawEvidenceNamedPresetColumnsBuilder builder) {
+        RawEvidenceNamedPresetColumnsImpl(RawEvidenceNamedPresetColumnsBuilder builder) {
             super(builder);
             this.goEvidencePosition = builder.goEvidencePosition;
         }
