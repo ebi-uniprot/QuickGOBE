@@ -49,7 +49,7 @@ class RawEvidenceNamedPresetColumnsBuilder extends RawNamedPresetColumnsBuilder 
     }
 
     protected static class RawEvidenceNamedPresetColumnsImpl extends RawNamedPresetColumnsImpl {
-        private int goEvidencePosition;
+        private final int goEvidencePosition;
 
         RawEvidenceNamedPresetColumnsImpl(RawEvidenceNamedPresetColumnsBuilder builder) {
             super(builder);
