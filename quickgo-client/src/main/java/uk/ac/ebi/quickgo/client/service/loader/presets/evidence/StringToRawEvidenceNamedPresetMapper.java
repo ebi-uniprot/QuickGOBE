@@ -19,10 +19,10 @@ import static uk.ac.ebi.quickgo.client.service.loader.presets.ff.StringToRawName
  * Created with IntelliJ IDEA.
  */
 public class StringToRawEvidenceNamedPresetMapper implements FieldSetMapper<RawEvidenceNamedPreset> {
-    public final RawEvidenceNamedPresetColumnsImpl rawNamedPresetColumns;
-    StringToRawNamedPresetMapper mapper;
+    private final RawEvidenceNamedPresetColumnsImpl rawNamedPresetColumns;
+    private StringToRawNamedPresetMapper mapper;
 
-    public StringToRawEvidenceNamedPresetMapper(RawEvidenceNamedPresetColumnsImpl rawEvidenceNamedPresetColumns) {
+    StringToRawEvidenceNamedPresetMapper(RawEvidenceNamedPresetColumnsImpl rawEvidenceNamedPresetColumns) {
         this.rawNamedPresetColumns = rawEvidenceNamedPresetColumns;
         mapper = new StringToRawNamedPresetMapper(rawEvidenceNamedPresetColumns, RawEvidenceNamedPreset::new);
     }
