@@ -13,14 +13,14 @@ import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsValidationH
  * @author Tony Wardell
  */
 public class RawEvidenceNamedPresetValidator implements ItemProcessor<RawEvidenceNamedPreset, RawEvidenceNamedPreset> {
-    @Override public RawEvidenceNamedPreset process(RawEvidenceNamedPreset rawNamedPreset) {
-        if (rawNamedPreset == null) {
-            throw new ValidationException("RawDBPreset cannot be null or empty");
+    @Override public RawEvidenceNamedPreset process(RawEvidenceNamedPreset rawEvidenceNamedPreset) {
+        if (rawEvidenceNamedPreset == null) {
+            throw new ValidationException("RawEvidenceNamedPreset cannot be null or empty");
         }
 
-        checkIsNullOrEmpty(rawNamedPreset.name);
+        checkIsNullOrEmpty(rawEvidenceNamedPreset.name);
 
-        return rawNamedPreset;
+        return rawEvidenceNamedPreset;
     }
 
 }
