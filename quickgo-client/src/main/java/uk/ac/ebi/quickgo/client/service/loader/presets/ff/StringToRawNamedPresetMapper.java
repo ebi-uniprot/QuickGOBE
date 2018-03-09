@@ -20,11 +20,11 @@ public class StringToRawNamedPresetMapper implements FieldSetMapper<RawNamedPres
     private final Supplier<RawNamedPreset> rawPresetSupplier;
 
     public StringToRawNamedPresetMapper(RawNamedPresetColumns rawNamedPresetColumns,
-            Supplier<RawNamedPreset> supplier) {
+            Supplier<RawNamedPreset> rawNamedPresetSupplier) {
         checkArgument(rawNamedPresetColumns != null, "RawPresetColumns cannot be null");
 
         this.rawNamedPresetColumns = rawNamedPresetColumns;
-        this.rawPresetSupplier = supplier;
+        this.rawPresetSupplier = rawNamedPresetSupplier;
     }
 
     @Override public RawNamedPreset mapFieldSet(FieldSet fieldSet) {
