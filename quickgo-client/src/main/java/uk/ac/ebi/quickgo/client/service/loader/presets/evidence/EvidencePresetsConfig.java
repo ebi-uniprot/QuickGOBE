@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.client.service.loader.presets.evidence;
 
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
 import uk.ac.ebi.quickgo.client.model.presets.PresetType;
+import uk.ac.ebi.quickgo.client.model.presets.evidence.PresetEvidenceItem;
 import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
 import uk.ac.ebi.quickgo.client.service.loader.presets.LogStepListener;
 import uk.ac.ebi.quickgo.client.service.loader.presets.PresetsCommonConfig;
@@ -71,7 +72,7 @@ public class EvidencePresetsConfig {
                         PresetItem.createWithName(rawItem.name)
                                 .withProperty(PresetItem.Property.ID.getKey(), rawItem.id)
                                 .withRelevancy(rawItem.relevancy)
-                                .withProperty(PresetItem.Property.GO_EVIDENCE.getKey(), rawItem
+                                .withProperty(PresetEvidenceItem.Property.GO_EVIDENCE.getKey(), rawItem
                                         .goEvidence)
                                 .build())
         );
@@ -86,11 +87,10 @@ public class EvidencePresetsConfig {
     }
 
     private RawEvidenceNamedPresetColumnsImpl getColumns() {
-        return (RawEvidenceNamedPresetColumnsImpl)
-                RawEvidenceNamedPresetColumnsBuilder
+        return RawEvidenceNamedPresetColumnsBuilder
                         .createWithNamePosition(1)
-                        .withGoEvidence(2)
                         .withIdPosition(0)
+                .withGoEvidence(2)
                         .withRelevancyPosition(3)
                         .build();
     }
