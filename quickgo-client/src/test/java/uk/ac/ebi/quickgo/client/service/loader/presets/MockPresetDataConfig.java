@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.client.service.loader.presets;
 
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
+import uk.ac.ebi.quickgo.client.model.presets.evidence.PresetEvidenceItem;
 import uk.ac.ebi.quickgo.common.SearchableField;
 import uk.ac.ebi.quickgo.rest.search.RetrievalException;
 
@@ -102,7 +103,7 @@ public class MockPresetDataConfig {
         PRESET_ECO_32 = PresetItem
                 .createWithName("evidence used in manual assertion")
                 .withProperty(PresetItem.Property.ID, "ECO:0000352")
-                .withProperty(PresetItem.Property.GO_EVIDENCE, "Any manual evidence")
+                .withProperty(PresetEvidenceItem.Property.GO_EVIDENCE.getKey(), "Any manual evidence")
                 .withRelevancy(0)
                 .build();
 
