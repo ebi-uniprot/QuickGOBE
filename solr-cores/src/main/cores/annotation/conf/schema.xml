@@ -157,6 +157,11 @@
     <field name="rowNumber" type="row_number" indexed="true" stored="true" multiValued="false"/>
     <copyField source="id" dest="rowNumber"/>
 
+    <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+    <!-- Fields that are used specifically for supplying presets -->
+    <field name="withFrom_db" type="database_id" indexed="true" stored="true" multiValued="false"/>
+    <copyField source="withFrom" dest="withFrom_db"/>
+
     <!--                    End of QuickGO Annotation fields                        -->
     <!-- ========================================================================== -->
 
@@ -257,6 +262,20 @@
                     preserve_original="true"/>
             <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
             <filter class="solr.LowerCaseFilterFactory"/>
+        </analyzer>
+        <analyzer type="query">
+            <tokenizer class="solr.KeywordTokenizerFactory"/>
+            <filter class="solr.LowerCaseFilterFactory"/>
+        </analyzer>
+    </fieldType>
+
+
+    <!-- Get database only from the form DB:XXXXXXX-->
+    <fieldType name="database_id" class="solr.TextField" positionIncrementGap="100">
+        <analyzer type="index">
+            <tokenizer class="solr.KeywordTokenizerFactory"/>
+            <charFilter class="solr.PatternReplaceCharFilterFactory"
+                        pattern="(.*):(.*)" replacement="$1"/>
         </analyzer>
         <analyzer type="query">
             <tokenizer class="solr.KeywordTokenizerFactory"/>
