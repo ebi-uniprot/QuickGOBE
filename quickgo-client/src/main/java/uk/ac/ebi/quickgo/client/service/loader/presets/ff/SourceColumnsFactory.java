@@ -1,5 +1,7 @@
 package uk.ac.ebi.quickgo.client.service.loader.presets.ff;
 
+import uk.ac.ebi.quickgo.client.service.loader.presets.evidence.RawEvidenceNamedPresetColumnsBuilder;
+
 /**
  * Factory for creating {@link RawNamedPresetColumns} instances based on a specified {@link Source}.
  * The supplied {@link Source} indicates the source which is being read.
@@ -47,6 +49,15 @@ public class SourceColumnsFactory {
             default:
                 throw new IllegalStateException("Source type: " + source + " is not handled.");
         }
+    }
+
+    public static RawEvidenceNamedPresetColumnsBuilder.RawEvidenceNamedPresetColumnsImpl createEvidenceColumns() {
+        return RawEvidenceNamedPresetColumnsBuilder
+                .createWithNamePosition(1)
+                .withIdPosition(0)
+                .withGoEvidence(2)
+                .withRelevancyPosition(3)
+                .build();
     }
 
     public enum Source {

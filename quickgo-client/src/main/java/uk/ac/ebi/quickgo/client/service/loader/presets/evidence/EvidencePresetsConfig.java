@@ -6,8 +6,7 @@ import uk.ac.ebi.quickgo.client.model.presets.evidence.PresetEvidenceItem;
 import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
 import uk.ac.ebi.quickgo.client.service.loader.presets.LogStepListener;
 import uk.ac.ebi.quickgo.client.service.loader.presets.PresetsCommonConfig;
-import uk.ac.ebi.quickgo.client.service.loader.presets.evidence.RawEvidenceNamedPresetColumnsBuilder
-        .RawEvidenceNamedPresetColumnsImpl;
+import uk.ac.ebi.quickgo.client.service.loader.presets.ff.SourceColumnsFactory;
 
 import java.util.Optional;
 import org.springframework.batch.core.Step;
@@ -79,20 +78,10 @@ public class EvidencePresetsConfig {
     }
 
     private FieldSetMapper<RawEvidenceNamedPreset> rawPresetFieldSetMapper() {
-        return new StringToRawEvidenceNamedPresetMapper(getColumns());
+        return new StringToRawEvidenceNamedPresetMapper(SourceColumnsFactory.createEvidenceColumns());
     }
 
     private ItemProcessor<RawEvidenceNamedPreset, RawEvidenceNamedPreset> rawPresetValidator() {
         return new RawEvidenceNamedPresetValidator();
     }
-
-    private RawEvidenceNamedPresetColumnsImpl getColumns() {
-        return RawEvidenceNamedPresetColumnsBuilder
-                .createWithNamePosition(1)
-                .withIdPosition(0)
-                .withGoEvidence(2)
-                .withRelevancyPosition(3)
-                .build();
-    }
-
 }
