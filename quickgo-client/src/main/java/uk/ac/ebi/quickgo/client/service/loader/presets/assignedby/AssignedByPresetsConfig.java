@@ -37,6 +37,7 @@ import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfig.SKIP
 import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelper.compositeItemProcessor;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelper.fileReader;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelper.rawPresetMultiFileReader;
+import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelper.topItemsFromRESTReader;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.ff.SourceColumnsFactory.Source.DB_COLUMNS;
 
 /**
@@ -49,46 +50,23 @@ import static uk.ac.ebi.quickgo.client.service.loader.presets.ff.SourceColumnsFa
 @Import({PresetsCommonConfig.class})
 public class AssignedByPresetsConfig {
     public static final String ASSIGNED_BY_LOADING_STEP_NAME = "AssignedByReadingStep";
-    public static final String ASSIGNED_BY = "assignedBy";
-
-    private static final Logger LOGGER = getLogger(AssignedByPresetsConfig.class);
-
-    @Value("#{'${assignedBy.preset.source:}'.split(',')}")
-    private Resource[] assignedByResources;
-    @Value("${assignedBy.preset.header.lines:1}")
-    private int assignedByHeaderLines;
-    private Set<String> duplicatePrevent = new HashSet<>();
+    public static final String REST_KEY = "assignedBy";
 
     @Bean
     public Step assignedByStep(
             StepBuilderFactory stepBuilderFactory,
             Integer chunkSize,
             CompositePresetImpl presets,
-            FilterConfigRetrieval externalFilterConfigRetrieval,
-            RestOperations restOperations) {
+            RESTFilterConverterFactory converterFactory) {
 
-        RESTFilterConverterFactory converterFactory = assignedByConverterFactory(externalFilterConfigRetrieval,
-                                                                                 restOperations);
-
-        FlatFileItemReader<RawNamedPreset> itemReader = fileReader(rawAssignedByPresetFieldSetMapper());
-        itemReader.setLinesToSkip(assignedByHeaderLines);
         return stepBuilderFactory.get(ASSIGNED_BY_LOADING_STEP_NAME)
                 .<RawNamedPreset, RawNamedPreset>chunk(chunkSize)
                 .faultTolerant()
                 .skipLimit(SKIP_LIMIT)
-                .<RawNamedPreset>reader(rawPresetMultiFileReader(assignedByResources, itemReader))
-                .processor(compositeItemProcessor(
-                        assignedByValidator(),
-                        assignedByFilter(converterFactory),
-                        duplicateChecker()))
+                .reader(topItemsFromRESTReader(converterFactory, REST_KEY))
                 .writer(rawPresetWriter(presets))
                 .listener(new LogStepListener())
                 .build();
-    }
-
-    private RESTFilterConverterFactory assignedByConverterFactory(FilterConfigRetrieval filterConfigRetrieval,
-            RestOperations restOperations) {
-        return new RESTFilterConverterFactory(filterConfigRetrieval, restOperations);
     }
 
     /**
@@ -96,41 +74,14 @@ public class AssignedByPresetsConfig {
      * @param presets the presets to write to
      * @return the corresponding {@link ItemWriter}
      */
-    private ItemWriter<RawNamedPreset> rawPresetWriter(CompositePresetImpl presets) {
-        return rawItemList ->
-                rawItemList.forEach(rawItem ->
-                                            presets.addPreset(PresetType.ASSIGNED_BY,
-                                                              PresetItem.createWithName(rawItem.name)
-                                                                        .withProperty(PresetItem.Property.DESCRIPTION.getKey(), rawItem.description)
-                                                                        .withRelevancy(rawItem.relevancy)
-                                                                        .build())
-                );
-    }
-
-    private FieldSetMapper<RawNamedPreset> rawAssignedByPresetFieldSetMapper() {
-        return new StringToRawNamedPresetMapper(SourceColumnsFactory.createFor(DB_COLUMNS));
-    }
-
-    private ItemProcessor<RawNamedPreset, RawNamedPreset> assignedByValidator() {
-        return new RawNamedPresetValidator();
-    }
-
-    private ItemProcessor<RawNamedPreset, RawNamedPreset> assignedByFilter(
-            RESTFilterConverterFactory converterFactory) {
-        FilterRequest assignedByRequest = FilterRequest.newBuilder().addProperty(ASSIGNED_BY).build();
-
-        try {
-            ConvertedFilter<List<String>> convertedFilter = converterFactory.convert(assignedByRequest);
-            final List<String> convertedValues = convertedFilter.getConvertedValue();
-            final Set<String> validValues  = new HashSet<>(convertedValues);
-            return rawNamedPreset -> validValues.contains(rawNamedPreset.name)? rawNamedPreset : null;
-        } catch (RetrievalException | IllegalStateException e) {
-            LOGGER.error("Failed to retrieve via REST call the relevant 'assignedBy' values: ", e);
-        }
-        return  rawNamedPreset -> rawNamedPreset;
-    }
-
-    ItemProcessor<RawNamedPreset, RawNamedPreset> duplicateChecker() {
-        return rawNamedPreset -> duplicatePrevent.add(rawNamedPreset.name.toLowerCase())? rawNamedPreset : null;
+    ItemWriter<RawNamedPreset> rawPresetWriter(CompositePresetImpl presets) {
+        return rawItemList -> {
+            rawItemList.forEach(rawItem -> {
+                presets.addPreset(PresetType.ASSIGNED_BY,
+                        PresetItem.createWithName(rawItem.name)
+                                .withRelevancy(rawItem.relevancy)
+                                .build());
+            });
+        };
     }
 }
