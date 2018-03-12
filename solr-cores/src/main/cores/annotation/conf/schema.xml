@@ -275,7 +275,7 @@
         <analyzer type="index">
             <tokenizer class="solr.KeywordTokenizerFactory"/>
             <charFilter class="solr.PatternReplaceCharFilterFactory"
-                        pattern="(.*):(.*)" replacement="$1"/>
+                        pattern="([^:]+).*" replacement="$1"/>
         </analyzer>
         <analyzer type="query">
             <tokenizer class="solr.KeywordTokenizerFactory"/>
