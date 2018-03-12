@@ -88,11 +88,11 @@ public class EvidencePresetsConfig {
 
     private RawEvidenceNamedPresetColumnsImpl getColumns() {
         return RawEvidenceNamedPresetColumnsBuilder
-                        .createWithNamePosition(1)
-                        .withIdPosition(0)
+                .createWithNamePosition(1)
+                .withIdPosition(0)
                 .withGoEvidence(2)
-                        .withRelevancyPosition(3)
-                        .build();
+                .withRelevancyPosition(3)
+                .build();
     }
 
 }
