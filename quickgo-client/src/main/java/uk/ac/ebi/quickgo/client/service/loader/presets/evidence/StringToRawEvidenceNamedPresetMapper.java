@@ -24,7 +24,8 @@ public class StringToRawEvidenceNamedPresetMapper implements FieldSetMapper<RawE
 
     StringToRawEvidenceNamedPresetMapper(RawEvidenceNamedPresetColumnsImpl rawEvidenceNamedPresetColumns) {
         this.rawNamedPresetColumns = rawEvidenceNamedPresetColumns;
-        mapper = new StringToRawNamedPresetMapper(rawEvidenceNamedPresetColumns, RawEvidenceNamedPreset::new);
+        mapper = StringToRawNamedPresetMapper
+                .createWithSupplier(rawEvidenceNamedPresetColumns, RawEvidenceNamedPreset::new);
     }
 
     @Override

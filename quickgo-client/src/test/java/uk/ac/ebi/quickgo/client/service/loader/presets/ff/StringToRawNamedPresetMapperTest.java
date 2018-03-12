@@ -22,7 +22,7 @@ public class StringToRawNamedPresetMapperTest {
         this.presetColumns = RawNamedPresetColumnsBuilder.createWithNamePosition(0)
                 .withDescriptionPosition(1)
                 .build();
-        this.mapper = new StringToRawNamedPresetMapper(presetColumns, RawNamedPreset::new);
+        this.mapper = StringToRawNamedPresetMapper.create(presetColumns);
     }
 
     @Test(expected = IllegalArgumentException.class)

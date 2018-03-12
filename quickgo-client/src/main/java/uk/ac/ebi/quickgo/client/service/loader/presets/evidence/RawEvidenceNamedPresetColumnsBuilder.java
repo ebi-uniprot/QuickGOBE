@@ -13,7 +13,7 @@ import java.util.stream.Stream;
  * Created 05/03/18
  * @author Tony Wardell
  */
-class RawEvidenceNamedPresetColumnsBuilder extends RawNamedPresetColumnsBuilder {
+public class RawEvidenceNamedPresetColumnsBuilder extends RawNamedPresetColumnsBuilder {
     private int goEvidencePosition;
 
     private RawEvidenceNamedPresetColumnsBuilder(int namePosition) {
@@ -44,11 +44,11 @@ class RawEvidenceNamedPresetColumnsBuilder extends RawNamedPresetColumnsBuilder 
         return this;
     }
 
-    static RawEvidenceNamedPresetColumnsBuilder createWithNamePosition(int namePosition) {
+    public static RawEvidenceNamedPresetColumnsBuilder createWithNamePosition(int namePosition) {
         return new RawEvidenceNamedPresetColumnsBuilder(namePosition);
     }
 
-    protected static class RawEvidenceNamedPresetColumnsImpl extends RawNamedPresetColumnsImpl {
+    public static class RawEvidenceNamedPresetColumnsImpl extends RawNamedPresetColumnsImpl {
         private final int goEvidencePosition;
 
         RawEvidenceNamedPresetColumnsImpl(RawEvidenceNamedPresetColumnsBuilder builder) {

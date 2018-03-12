@@ -84,8 +84,7 @@ public class ExtensionRelationsPresetsConfig {
     }
 
     private FieldSetMapper<RawNamedPreset> rawPresetFieldSetMapper() {
-        return new StringToRawNamedPresetMapper(SourceColumnsFactory.createFor(EXT_RELATION_COLUMNS),
-                RawNamedPreset::new);
+        return StringToRawNamedPresetMapper.create(SourceColumnsFactory.createFor(EXT_RELATION_COLUMNS));
     }
 
     private ItemProcessor<RawNamedPreset, RawNamedPreset> rawPresetValidator() {
