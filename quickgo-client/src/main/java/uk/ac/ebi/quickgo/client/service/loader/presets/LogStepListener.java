@@ -20,7 +20,7 @@ public class LogStepListener implements StepExecutionListener {
 
     @Override public ExitStatus afterStep(StepExecution stepExecution) {
         LOGGER.info("=====================================================");
-        LOGGER.info("              QuickGO Step Statistics                 ");
+        LOGGER.info("              QuickGO Step Statistics      asdfsadfsadf           ");
         LOGGER.info("Step name     : {}", stepExecution.getStepName());
         LOGGER.info("Read count    : {}", stepExecution.getReadCount());
         LOGGER.info("Write count   : {}", stepExecution.getWriteCount());
