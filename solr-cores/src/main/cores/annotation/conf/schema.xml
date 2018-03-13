@@ -159,7 +159,7 @@
 
     <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
     <!-- Fields that are used specifically for supplying presets -->
-    <field name="withFrom_db" type="database_id" indexed="true" stored="true" multiValued="false"/>
+    <field name="withFrom_db" type="database_id" indexed="true" stored="true" multiValued="true"/>
     <copyField source="withFrom" dest="withFrom_db"/>
 
     <!--                    End of QuickGO Annotation fields                        -->
