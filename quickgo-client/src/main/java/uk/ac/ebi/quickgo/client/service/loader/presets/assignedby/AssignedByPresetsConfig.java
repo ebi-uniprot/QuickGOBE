@@ -43,6 +43,12 @@ public class AssignedByPresetsConfig {
             CompositePresetImpl presets,
             RESTFilterConverterFactory converterFactory) {
 
+        if (!logged) {
+            LOGGER.info("Logging db descriptions");
+            DB_DESCRIPTIONS_MAP.forEach((k, e) -> LOGGER.info("Descriptions contains %s, %s", k, e));
+        }
+        logged = true;
+
         return stepBuilderFactory.get(ASSIGNED_BY_LOADING_STEP_NAME)
                 .<RawNamedPreset, RawNamedPreset>chunk(chunkSize)
                 .faultTolerant()
