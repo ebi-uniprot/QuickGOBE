@@ -57,7 +57,7 @@ public class MockPresetDataConfig {
      * Preset items information representing the most relevant, ECO:0000352 term.
      */
     static final PresetItem PRESET_ECO_32;
-    static final PresetItem PRESET_DICTY_BASE;
+    private static final PresetItem PRESET_DICTY_BASE;
     static final PresetItem PRESET_BHF_UCL;
     static final PresetItem PRESET_GO_SLIM_ASPERGILLUS;
     static final PresetItem PRESET_GO_SLIM_METAGENOMICS;
@@ -65,8 +65,8 @@ public class MockPresetDataConfig {
     static final PresetItem PRESET_GO_SLIM_SYNAPSE;
     static final PresetItem PRESET_TAXON_ARABIDOPSIS;
     static final PresetItem PRESET_TAXON_DROSOPHILA;
-    static final String TAXON_HUMAN = "9606";
-    static final String TAXON_BACTERIA = "2";
+    private static final String TAXON_HUMAN = "9606";
+    private static final String TAXON_BACTERIA = "2";
     static final String QUALIFIER_ENABLES = "enables";
     static final String QUALIFIER_INVOLVED_IN = "involved_in";
     private static final RelevancyResponseType DEFAULT_RELEVANT_ASSIGNED_BYS;
