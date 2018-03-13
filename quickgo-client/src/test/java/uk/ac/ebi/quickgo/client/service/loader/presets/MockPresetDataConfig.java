@@ -23,9 +23,10 @@ import static org.mockito.Matchers.matches;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static uk.ac.ebi.quickgo.client.service.loader.presets.assignedby.AssignedByPresetsConfig.ASSIGNED_BY;
+import static uk.ac.ebi.quickgo.client.service.loader.presets.assignedby.AssignedByPresetsConfig.ASSIGNED_BY_REST_KEY;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.qualifier.QualifierPresetsConfig.QUALIFIER;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.taxon.TaxonPresetsConfig.TAXON_ID;
+import static uk.ac.ebi.quickgo.client.service.loader.presets.withFrom.WithFromPresetsConfig.WITH_FROM;
 
 /**
  * Provides configurable properties, beans, etc., used during tests.
@@ -71,8 +72,11 @@ public class MockPresetDataConfig {
     private static final RelevancyResponseType DEFAULT_RELEVANT_ASSIGNED_BYS;
     private static final RelevancyResponseType DEFAULT_RELEVANT_TAXONS;
     private static final RelevancyResponseType DEFAULT_RELEVANT_QUALIFIERS;
+    private static final RelevancyResponseType DEFAULT_RELEVANT_WITH_FROM;
     private static final String SLIM_NAME = "name";
     private static final String SLIM_ASPECT = "aspect";
+
+    public static final String PANTHER = "PANTHER";
 
     static {
         DEFAULT_RELEVANT_ASSIGNED_BYS = new RelevancyResponseType();
@@ -98,6 +102,14 @@ public class MockPresetDataConfig {
         DEFAULT_RELEVANT_QUALIFIERS.terms.relevancies.add("1000");
         DEFAULT_RELEVANT_QUALIFIERS.terms.relevancies.add(QUALIFIER_INVOLVED_IN);
         DEFAULT_RELEVANT_QUALIFIERS.terms.relevancies.add("100");
+
+        DEFAULT_RELEVANT_WITH_FROM = new RelevancyResponseType();
+        DEFAULT_RELEVANT_WITH_FROM.terms = new RelevancyResponseType.Terms();
+        DEFAULT_RELEVANT_WITH_FROM.terms.relevancies = new ArrayList<>();
+        DEFAULT_RELEVANT_WITH_FROM.terms.relevancies.add(UNIPROT_KB);
+        DEFAULT_RELEVANT_WITH_FROM.terms.relevancies.add("1000");
+        DEFAULT_RELEVANT_WITH_FROM.terms.relevancies.add(PANTHER);
+        DEFAULT_RELEVANT_WITH_FROM.terms.relevancies.add("100");
 
         PRESET_ECO_32 = PresetItem
                 .createWithName("All manual codes")
@@ -182,7 +194,7 @@ public class MockPresetDataConfig {
         RestOperations mockRestOperations = mock(RestOperations.class);
 
         when(mockRestOperations.getForObject(
-                anyStringContaining(ASSIGNED_BY),
+                anyStringContaining(ASSIGNED_BY_REST_KEY),
                 isA(Class.class),
                 any(HashMap.class)))
                 .thenReturn(DEFAULT_RELEVANT_ASSIGNED_BYS);
@@ -196,6 +208,11 @@ public class MockPresetDataConfig {
                 isA(Class.class),
                 any(HashMap.class)))
                 .thenReturn(DEFAULT_RELEVANT_QUALIFIERS);
+        when(mockRestOperations.getForObject(
+                anyStringContaining(WITH_FROM),
+                isA(Class.class),
+                any(HashMap.class)))
+                .thenReturn(DEFAULT_RELEVANT_WITH_FROM);
 
         return mockRestOperations;
     }
