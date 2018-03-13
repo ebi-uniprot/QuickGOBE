@@ -7,6 +7,8 @@ import uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPreset;
 import uk.ac.ebi.quickgo.client.service.loader.support.DatabaseDescriptionConfig;
 import uk.ac.ebi.quickgo.rest.search.request.converter.RESTFilterConverterFactory;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.item.ItemProcessor;
@@ -31,6 +33,8 @@ import static uk.ac.ebi.quickgo.client.service.loader.support.DatabaseDescriptio
 public class AssignedByPresetsConfig {
     public static final String ASSIGNED_BY_LOADING_STEP_NAME = "AssignedByReadingStep";
     public static final String ASSIGNED_BY_REST_KEY = "assignedBy";
+    static Logger LOGGER = LoggerFactory.getLogger(DatabaseDescriptionConfig.class);
+    boolean logged = false;
 
     @Bean
     public Step assignedByStep(
@@ -65,8 +69,14 @@ public class AssignedByPresetsConfig {
     }
 
     private ItemProcessor<RawNamedPreset, RawNamedPreset> addDescription() {
+
+        if (!logged) {
+            DB_DESCRIPTIONS_MAP.forEach((k, e) -> LOGGER.info("Descriptions contains %s, %s", k, e));
+        }
+
         return rawNamedPreset -> {
             if (DB_DESCRIPTIONS_MAP.containsKey(rawNamedPreset.id)) {
+                LOGGER.info("Looking for %s", rawNamedPreset.id);
                 rawNamedPreset.description = DB_DESCRIPTIONS_MAP.get(rawNamedPreset.id);
                 return rawNamedPreset;
             } else {
