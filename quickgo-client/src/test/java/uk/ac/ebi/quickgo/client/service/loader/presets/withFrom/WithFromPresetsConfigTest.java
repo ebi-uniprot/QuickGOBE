@@ -1,14 +1,13 @@
 package uk.ac.ebi.quickgo.client.service.loader.presets.withFrom;
 
+import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
 import uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPreset;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.batch.item.ItemProcessor;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.nullValue;
-import static org.hamcrest.core.IsNull.notNullValue;
+import org.springframework.batch.item.ItemWriter;
 
 /**
  * @author Tony Wardell
@@ -18,29 +17,25 @@ import static org.hamcrest.core.IsNull.notNullValue;
  */
 public class WithFromPresetsConfigTest {
 
-    private WithFromPresetsConfig withFromPresetsConfig;
+    private CompositePresetImpl presetBuilder;
 
     @Before
-    public void setup(){
-        withFromPresetsConfig = new WithFromPresetsConfig();
+    public void setUp() {
+        presetBuilder = new CompositePresetImpl();
     }
 
-    @Test
-    public void preventDuplicates() throws Exception {
-        final ItemProcessor<RawNamedPreset, RawNamedPreset> itemProcessor =
-                withFromPresetsConfig.duplicateChecker();
-        RawNamedPreset rawNamedPreset1 = new RawNamedPreset();
-        rawNamedPreset1.name = "AGI_LocusCode ";
-        RawNamedPreset rawNamedPreset2 = new RawNamedPreset();
-        rawNamedPreset2.name = "AspGD";
-        RawNamedPreset rawNamedPreset3 = new RawNamedPreset();
-        rawNamedPreset3.name = "ASPGD";
-        RawNamedPreset rawNamedPreset4 = new RawNamedPreset();
-        rawNamedPreset4.name = "CGD ";
+    @Test(expected = IllegalArgumentException.class)
+    public void avoidsNullPointerExceptionIfNameIsNull() throws Exception {
+        WithFromPresetsConfig config = new WithFromPresetsConfig();
 
-        assertThat(itemProcessor.process(rawNamedPreset1), notNullValue());
-        assertThat(itemProcessor.process(rawNamedPreset2), notNullValue());
-        assertThat(itemProcessor.process(rawNamedPreset3), nullValue());
-        assertThat(itemProcessor.process(rawNamedPreset4), notNullValue());
+        List<RawNamedPreset> rawNamedPresets = new ArrayList<>();
+        final RawNamedPreset raw1 = new RawNamedPreset();
+        raw1.name = null;
+        raw1.id = null;
+        raw1.relevancy = 1;
+        rawNamedPresets.add(raw1);
+
+        ItemWriter<RawNamedPreset> writer = config.rawPresetWriter(presetBuilder);
+        writer.write(rawNamedPresets);
     }
 }
