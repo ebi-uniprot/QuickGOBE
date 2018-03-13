@@ -1,7 +1,6 @@
 package uk.ac.ebi.quickgo.client.service.loader.presets.withFrom;
 
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
-import uk.ac.ebi.quickgo.client.model.presets.PresetType;
 import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
 import uk.ac.ebi.quickgo.client.service.loader.presets.LogStepListener;
 import uk.ac.ebi.quickgo.client.service.loader.presets.PresetsCommonConfig;
@@ -15,6 +14,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
+import static uk.ac.ebi.quickgo.client.model.presets.PresetType.*;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfig.SKIP_LIMIT;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelper.topItemsFromRESTReader;
 
@@ -28,7 +28,7 @@ import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelpe
 @Import({PresetsCommonConfig.class})
 public class WithFromPresetsConfig {
     public static final String WITH_FROM_DB_LOADING_STEP_NAME = "WithFromDBReadingStep";
-    private static final String REST_KEY = "withFrom";
+    public static final String WITH_FROM_REST_KEY = "withFrom";
 
     @Bean
     public Step withFromStep(
@@ -41,7 +41,7 @@ public class WithFromPresetsConfig {
                 .<RawNamedPreset, RawNamedPreset>chunk(chunkSize)
                 .faultTolerant()
                 .skipLimit(SKIP_LIMIT)
-                .reader(topItemsFromRESTReader(converterFactory, REST_KEY))
+                .reader(topItemsFromRESTReader(converterFactory, WITH_FROM_REST_KEY))
                 .writer(rawPresetWriter(presets))
                 .listener(new LogStepListener())
                 .build();
@@ -53,13 +53,11 @@ public class WithFromPresetsConfig {
      * @return the corresponding {@link ItemWriter}
      */
     ItemWriter<RawNamedPreset> rawPresetWriter(CompositePresetImpl presets) {
-        return rawItemList -> {
-            rawItemList.forEach(rawItem -> {
-                presets.addPreset(PresetType.WITH_FROM,
-                        PresetItem.createWithName(rawItem.name)
-                                .withRelevancy(rawItem.relevancy)
-                                .build());
-            });
-        };
+        return rawItemList -> rawItemList.forEach(rawItem -> {
+            presets.addPreset(WITH_FROM,
+                    PresetItem.createWithName(rawItem.name)
+                            .withRelevancy(rawItem.relevancy)
+                            .build());
+        });
     }
 }
