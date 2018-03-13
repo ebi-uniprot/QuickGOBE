@@ -81,7 +81,7 @@ public class DatabaseDescriptionConfig {
 
     private ItemWriter<RawNamedPreset> descriptionsWriter(
             PresetsCommonConfig.DbDescriptions dbDescriptions) {
-        System.out.println(dbDescriptions);
+        LOGGER.error("Loading db descriptions" + dbDescriptions);
         return rawItemList ->
                 rawItemList.forEach(rawItem ->
                         dbDescriptions.dbDescriptions.put(rawItem.name, rawItem.description));
