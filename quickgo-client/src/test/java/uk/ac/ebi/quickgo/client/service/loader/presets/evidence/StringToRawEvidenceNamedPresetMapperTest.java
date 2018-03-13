@@ -1,4 +1,8 @@
-package uk.ac.ebi.quickgo.client.service.loader.presets.ff;
+package uk.ac.ebi.quickgo.client.service.loader.presets.evidence;
+
+import uk.ac.ebi.quickgo.client.service.loader.presets.evidence.RawEvidenceNamedPresetColumnsBuilder
+        .RawEvidenceNamedPresetColumnsImpl;
+import uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPreset;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -10,19 +14,22 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
- * Created 05/09/16
- * @author Edd
+ * @author Tony Wardell
+ * Date: 09/03/2018
+ * Time: 11:19
+ * Created with IntelliJ IDEA.
  */
-public class StringToRawNamedPresetMapperTest {
-    private StringToRawNamedPresetMapper mapper;
-    private RawNamedPresetColumns presetColumns;
+public class StringToRawEvidenceNamedPresetMapperTest {
+
+    private StringToRawEvidenceNamedPresetMapper mapper;
+    private RawEvidenceNamedPresetColumnsImpl presetColumns;
 
     @Before
     public void setUp() {
-        this.presetColumns = RawNamedPresetColumnsBuilder.createWithNamePosition(0)
-                .withDescriptionPosition(1)
+        this.presetColumns = RawEvidenceNamedPresetColumnsBuilder.createWithNamePosition(1).withIdPosition(0)
+                .withGoEvidence(2)
                 .build();
-        this.mapper = StringToRawNamedPresetMapper.create(presetColumns);
+        this.mapper = new StringToRawEvidenceNamedPresetMapper(presetColumns);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -41,47 +48,45 @@ public class StringToRawNamedPresetMapperTest {
     @Test
     public void convertFieldSetWithNullValues() {
         String[] tokens = new String[numColumns()];
-        tokens[presetColumns.getDescriptionPosition()] = null;
+        tokens[presetColumns.getGoEvidencePosition()] = null;
         tokens[presetColumns.getNamePosition()] = null;
-
         FieldSet fieldSet = new DefaultFieldSet(tokens);
 
         RawNamedPreset preset = mapper.mapFieldSet(fieldSet);
 
         assertThat(preset.name, is(tokens[presetColumns.getNamePosition()]));
-        assertThat(preset.description, is(tokens[presetColumns.getDescriptionPosition()]));
+        assertThat(preset.description, is(tokens[presetColumns.getGoEvidencePosition()]));
     }
 
     @Test
     public void convertFieldSetWithValidValues() {
         String[] tokens = new String[numColumns()];
-        tokens[presetColumns.getNamePosition()] = "UniProt";
-        tokens[presetColumns.getDescriptionPosition()] = "The Universal Protein Resource";
-
+        tokens[presetColumns.getIdPosition()] = "ECO:0000247";
+        tokens[presetColumns.getNamePosition()] = "computational combinatorial evidence used in manual assertion";
+        tokens[presetColumns.getGoEvidencePosition()] = "RCA";
         FieldSet fieldSet = new DefaultFieldSet(tokens);
 
-        RawNamedPreset preset = mapper.mapFieldSet(fieldSet);
+        RawEvidenceNamedPreset preset = mapper.mapFieldSet(fieldSet);
 
+        assertThat(preset.id, is(tokens[presetColumns.getIdPosition()]));
         assertThat(preset.name, is(tokens[presetColumns.getNamePosition()]));
-        assertThat(preset.description, is(tokens[presetColumns.getDescriptionPosition()]));
+        assertThat(preset.goEvidence, is(tokens[presetColumns.getGoEvidencePosition()]));
     }
 
     @Test
     public void trimFieldsFromFieldSetWhenConverting() {
         String[] tokens = new String[numColumns()];
-        tokens[presetColumns.getNamePosition()] = "  UniProt";
-        tokens[presetColumns.getDescriptionPosition()] = "   The Universal Protein Resource   ";
-
+        tokens[presetColumns.getNamePosition()] = "  computational combinatorial evidence used in manual assertion";
+        tokens[presetColumns.getGoEvidencePosition()] = "   RCA   ";
         FieldSet fieldSet = new DefaultFieldSet(tokens);
 
-        RawNamedPreset preset = mapper.mapFieldSet(fieldSet);
+        RawEvidenceNamedPreset preset = mapper.mapFieldSet(fieldSet);
 
         assertThat(preset.name, is(tokens[presetColumns.getNamePosition()].trim()));
-        assertThat(preset.description, is(tokens[presetColumns.getDescriptionPosition()].trim()));
+        assertThat(preset.goEvidence, is(tokens[presetColumns.getGoEvidencePosition()].trim()));
     }
 
     private int numColumns() {
         return presetColumns.getMaxRequiredColumnCount();
     }
-
 }

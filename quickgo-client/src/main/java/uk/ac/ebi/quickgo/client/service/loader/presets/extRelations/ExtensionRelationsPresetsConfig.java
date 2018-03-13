@@ -1,5 +1,15 @@
 package uk.ac.ebi.quickgo.client.service.loader.presets.extRelations;
 
+import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
+import uk.ac.ebi.quickgo.client.model.presets.PresetType;
+import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
+import uk.ac.ebi.quickgo.client.service.loader.presets.LogStepListener;
+import uk.ac.ebi.quickgo.client.service.loader.presets.PresetsCommonConfig;
+import uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPreset;
+import uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPresetValidator;
+import uk.ac.ebi.quickgo.client.service.loader.presets.ff.SourceColumnsFactory;
+import uk.ac.ebi.quickgo.client.service.loader.presets.ff.StringToRawNamedPresetMapper;
+
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.item.ItemProcessor;
@@ -11,15 +21,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.Resource;
-import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
-import uk.ac.ebi.quickgo.client.model.presets.PresetType;
-import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
-import uk.ac.ebi.quickgo.client.service.loader.presets.LogStepListener;
-import uk.ac.ebi.quickgo.client.service.loader.presets.PresetsCommonConfig;
-import uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPreset;
-import uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPresetValidator;
-import uk.ac.ebi.quickgo.client.service.loader.presets.ff.SourceColumnsFactory;
-import uk.ac.ebi.quickgo.client.service.loader.presets.ff.StringToRawNamedPresetMapper;
 
 import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfig.SKIP_LIMIT;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelper.fileReader;
@@ -57,7 +58,8 @@ public class ExtensionRelationsPresetsConfig {
                 .<RawNamedPreset, RawNamedPreset>chunk(chunkSize)
                 .faultTolerant()
                 .skipLimit(SKIP_LIMIT)
-                .<RawNamedPreset>reader(rawPresetMultiFileReader(resources, itemReader))
+                .<RawNamedPreset>reader(
+                        rawPresetMultiFileReader(resources, itemReader))
                 .processor(rawPresetValidator())
                 .writer(rawPresetWriter(presets))
                 .listener(new LogStepListener())
@@ -82,7 +84,7 @@ public class ExtensionRelationsPresetsConfig {
     }
 
     private FieldSetMapper<RawNamedPreset> rawPresetFieldSetMapper() {
-        return new StringToRawNamedPresetMapper(SourceColumnsFactory.createFor(EXT_RELATION_COLUMNS));
+        return StringToRawNamedPresetMapper.create(SourceColumnsFactory.createFor(EXT_RELATION_COLUMNS));
     }
 
     private ItemProcessor<RawNamedPreset, RawNamedPreset> rawPresetValidator() {

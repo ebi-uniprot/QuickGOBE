@@ -19,7 +19,7 @@ public class PresetItem implements Comparable<PresetItem> {
     private Integer relevancy;
     private List<PresetItem> associations;
 
-    private PresetItem(Builder builder) {
+    protected PresetItem(Builder builder) {
         this.properties = ImmutableMap.copyOf(builder.properties);
         this.relevancy = builder.relevancy;
         this.associations = builder.associations;

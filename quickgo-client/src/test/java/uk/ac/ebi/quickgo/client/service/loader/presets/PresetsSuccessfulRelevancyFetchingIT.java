@@ -55,7 +55,7 @@ public class PresetsSuccessfulRelevancyFetchingIT {
     private CompositePreset presets;
 
     @Test
-    public void loadAssignedByPresetsAfterSuccessfulRESTInfoFetching() throws Exception {
+    public void loadAssignedByPresetsAfterSuccessfulRESTInfoFetching() {
         assertThat(presets.getAssignedBy(), hasSize(0));
 
         JobExecution jobExecution =
@@ -70,7 +70,7 @@ public class PresetsSuccessfulRelevancyFetchingIT {
 
     @Test
     @DirtiesContext
-    public void loadGenericReferencePresetsAfterSuccessfulRESTInfoFetching() throws Exception {
+    public void loadGenericReferencePresetsAfterSuccessfulRESTInfoFetching() {
         assertThat(presets.getReferences(), hasSize(0));
 
         JobExecution jobExecution =
@@ -85,7 +85,7 @@ public class PresetsSuccessfulRelevancyFetchingIT {
 
     @Test
     @DirtiesContext
-    public void loadSpecificReferencePresetsAfterSuccessfulRESTInfoFetching() throws Exception {
+    public void loadSpecificReferencePresetsAfterSuccessfulRESTInfoFetching() {
         assertThat(presets.getReferences(), hasSize(0));
 
         JobExecution jobExecution =
@@ -99,7 +99,7 @@ public class PresetsSuccessfulRelevancyFetchingIT {
     }
 
     @Test
-    public void loadEvidencesPresets() throws Exception {
+    public void loadEvidencesPresets() {
         assertThat(presets.getEvidences(), hasSize(0));
 
         JobExecution jobExecution =
@@ -107,7 +107,7 @@ public class PresetsSuccessfulRelevancyFetchingIT {
         BatchStatus status = jobExecution.getStatus();
 
         assertThat(status, is(BatchStatus.COMPLETED));
-        assertThat(presets.getEvidences(), hasSize(22));
+        assertThat(presets.getEvidences(), hasSize(27));
 
         PresetItem firstPresetItem = extractFirstPreset(presets.getEvidences());
         assertThat(firstPresetItem.getProperty(NAME), is(MockPresetDataConfig.PRESET_ECO_32.getProperty(NAME)));
@@ -118,7 +118,7 @@ public class PresetsSuccessfulRelevancyFetchingIT {
     }
 
     @Test
-    public void loadWithFromPresets() throws Exception {
+    public void loadWithFromPresets() {
         assertThat(presets.getWithFrom(), hasSize(0));
 
         JobExecution jobExecution =
@@ -138,7 +138,7 @@ public class PresetsSuccessfulRelevancyFetchingIT {
     }
 
     @Test
-    public void loadGeneProductPresets() throws Exception {
+    public void loadGeneProductPresets() {
         assertThat(presets.getGeneProducts(), hasSize(0));
 
         JobExecution jobExecution =
@@ -157,7 +157,7 @@ public class PresetsSuccessfulRelevancyFetchingIT {
     }
 
     @Test
-    public void loadGOSlimSetPresets() throws Exception {
+    public void loadGOSlimSetPresets() {
         assertThat(presets.getGoSlimSets(), hasSize(0));
 
         JobExecution jobExecution =
@@ -175,7 +175,7 @@ public class PresetsSuccessfulRelevancyFetchingIT {
     }
 
     @Test
-    public void loadTaxonPresets() throws Exception {
+    public void loadTaxonPresets() {
         assertThat(presets.getTaxons(), hasSize(0));
 
         JobExecution jobExecution =
@@ -189,7 +189,7 @@ public class PresetsSuccessfulRelevancyFetchingIT {
     }
 
     @Test
-    public void loadQualifierPresetsAfterSuccessfulRESTInfoFetching() throws Exception {
+    public void loadQualifierPresetsAfterSuccessfulRESTInfoFetching() {
         assertThat(presets.getQualifiers(), hasSize(0));
 
         JobExecution jobExecution =

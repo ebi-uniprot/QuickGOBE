@@ -1,0 +1,27 @@
+ECO:0000352	evidence used in manual assertion	Any manual evidence	0
+ECO:0000314	direct assay evidence used in manual assertion	IDA	1
+ECO:0000315	mutant phenotype evidence used in manual assertion	IMP	2
+ECO:0000316	genetic interaction evidence used in manual assertion	IGI	3
+ECO:0000353	physical interaction evidence used in manual assertion	IPI	4
+ECO:0000270	expression evidence used in manual assertion	IEP	5
+ECO:0000269	experimental evidence used in manual assertion	EXP	6
+ECO:0007005	high throughput direct assay evidence used in manual assertion	HDA	7
+ECO:0007001	high throughput mutant phenotype evidence used in manual assertion	HMP	8
+ECO:0007003	high throughput genetic interaction evidence used in manual assertion	HGI	9
+ECO:0007007	high throughput expression pattern evidence used in manual assertion	HEP	10
+ECO:0006056	high throughput evidence used in manual assertion	HTP	11
+ECO:0000250	sequence similarity evidence used in manual assertion	ISS	12
+ECO:0000247	sequence alignment evidence used in manual assertion	ISA	13
+ECO:0000266	sequence orthology evidence used in manual assertion	ISO	14
+ECO:0000318	biological aspect of ancestor evidence used in manual assertion	IBA	15
+ECO:0000319	biological aspect of descendant evidence used in manual assertion	IBD	16
+ECO:0000320	phylogenetic determination of loss of key residues evidence used in manual assertion	IKR	17
+ECO:0000321	rapid divergence from ancestral sequence evidence used in manual assertion	IRD	18
+ECO:0000255	match to sequence model evidence used in manual assertion	ISM	19
+ECO:0000317	genomic context evidence used in manual assertion	IGC	20
+ECO:0000304	traceable author statement used in manual assertion	TAS	21
+ECO:0000303	non-traceable author statement used in manual assertion	NAS	22
+ECO:0000305	curator inference used in manual assertion	IC	23
+ECO:0000245	computational combinatorial evidence used in manual assertion	RCA	24
+ECO:0000501	evidence used in automatic assertion	IEA	25
+ECO:0000307	no biological data found used in manual assertion	ND	26
