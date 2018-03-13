@@ -3,6 +3,7 @@ package uk.ac.ebi.quickgo.client.service.loader.presets.assignedby;
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
 import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
 import uk.ac.ebi.quickgo.client.service.loader.presets.LogStepListener;
+import uk.ac.ebi.quickgo.client.service.loader.presets.PresetsCommonConfig;
 import uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPreset;
 import uk.ac.ebi.quickgo.client.service.loader.support.DatabaseDescriptionConfig;
 import uk.ac.ebi.quickgo.rest.search.request.converter.RESTFilterConverterFactory;
@@ -33,7 +34,7 @@ import static uk.ac.ebi.quickgo.client.service.loader.support.DatabaseDescriptio
 public class AssignedByPresetsConfig {
     public static final String ASSIGNED_BY_LOADING_STEP_NAME = "AssignedByReadingStep";
     public static final String ASSIGNED_BY_REST_KEY = "assignedBy";
-    static Logger LOGGER = LoggerFactory.getLogger(DatabaseDescriptionConfig.class);
+    static Logger LOGGER = LoggerFactory.getLogger(AssignedByPresetsConfig.class);
     boolean logged = false;
 
     @Bean
@@ -41,6 +42,7 @@ public class AssignedByPresetsConfig {
             StepBuilderFactory stepBuilderFactory,
             Integer chunkSize,
             CompositePresetImpl presets,
+            PresetsCommonConfig.DbDescriptions dbDescriptions,
             RESTFilterConverterFactory converterFactory) {
 
         LOGGER.info("Logging db descriptions");
@@ -53,7 +55,7 @@ public class AssignedByPresetsConfig {
                 .faultTolerant()
                 .skipLimit(SKIP_LIMIT)
                 .reader(topItemsFromRESTReader(converterFactory, ASSIGNED_BY_REST_KEY))
-                .processor(addDescription())
+                .processor(addDescription(dbDescriptions))
                 .writer(rawPresetWriter(presets))
                 .listener(new LogStepListener())
                 .build();
@@ -73,16 +75,17 @@ public class AssignedByPresetsConfig {
         });
     }
 
-    private ItemProcessor<RawNamedPreset, RawNamedPreset> addDescription() {
+    private ItemProcessor<RawNamedPreset, RawNamedPreset> addDescription(
+            PresetsCommonConfig.DbDescriptions dbDescriptions) {
 
         if (!logged) {
-            DB_DESCRIPTIONS_MAP.forEach((k, e) -> LOGGER.info("Descriptions contains %s, %s", k, e));
+            dbDescriptions.dbDescriptions.forEach((k, e) -> LOGGER.info("Descriptions contains %s, %s", k, e));
         }
 
         return rawNamedPreset -> {
             if (DB_DESCRIPTIONS_MAP.containsKey(rawNamedPreset.id)) {
                 LOGGER.info("Looking for %s", rawNamedPreset.id);
-                rawNamedPreset.description = DB_DESCRIPTIONS_MAP.get(rawNamedPreset.id);
+                rawNamedPreset.description = dbDescriptions.dbDescriptions.get(rawNamedPreset.id);
                 return rawNamedPreset;
             } else {
                 return rawNamedPreset;

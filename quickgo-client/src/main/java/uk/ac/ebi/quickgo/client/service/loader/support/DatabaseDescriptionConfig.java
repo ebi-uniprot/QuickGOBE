@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.item.ItemProcessor;
@@ -39,7 +41,7 @@ import static uk.ac.ebi.quickgo.client.service.loader.presets.ff.SourceColumnsFa
 @Import({PresetsCommonConfig.class})
 public class DatabaseDescriptionConfig {
     private static final String DB_DESCRIPTIONS_LOADING_STEP_NAME = "DbDescriptionsLoadingStep";
-
+    static Logger LOGGER = LoggerFactory.getLogger(DatabaseDescriptionConfig.class);
     @Value("#{'${dbDescriptions.source:}'.split(',')}")
     private Resource[] dbDescriptionsResources;
     @Value("${dbDescriptions.header.lines:1}")
@@ -50,7 +52,8 @@ public class DatabaseDescriptionConfig {
     @Bean
     public Step dbDescriptionsStep(
             StepBuilderFactory stepBuilderFactory,
-            Integer chunkSize) {
+            Integer chunkSize,
+            PresetsCommonConfig.DbDescriptions dbDescriptions) {
 
         FlatFileItemReader<RawNamedPreset> itemReader = fileReader(dbDescriptionsMapper());
         itemReader.setLinesToSkip(dbDescriptionsHeaderLines);
@@ -59,10 +62,7 @@ public class DatabaseDescriptionConfig {
                 .faultTolerant()
                 .skipLimit(SKIP_LIMIT)
                 .<RawNamedPreset>reader(rawPresetMultiFileReader(dbDescriptionsResources, itemReader))
-                .processor(compositeItemProcessor(
-                        assignedByValidator(),
-                        duplicateChecker()))
-                .writer(descriptionsWriter(DB_DESCRIPTIONS_MAP))
+                .writer(descriptionsWriter(dbDescriptions))
                 .listener(new LogStepListener())
                 .build();
     }
@@ -79,11 +79,12 @@ public class DatabaseDescriptionConfig {
         return rawNamedPreset -> duplicatePrevent.add(rawNamedPreset.name.toLowerCase()) ? rawNamedPreset : null;
     }
 
-    private ItemWriter<RawNamedPreset> descriptionsWriter(Map<String, String> descriptionsMap) {
-        System.out.println(descriptionsMap);
+    private ItemWriter<RawNamedPreset> descriptionsWriter(
+            PresetsCommonConfig.DbDescriptions dbDescriptions) {
+        System.out.println(dbDescriptions);
         return rawItemList ->
                 rawItemList.forEach(rawItem ->
-                        descriptionsMap.put(rawItem.name, rawItem.description));
+                        dbDescriptions.dbDescriptions.put(rawItem.name, rawItem.description));
 
     }
 }
