@@ -26,7 +26,7 @@ import static org.mockito.Mockito.when;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.assignedby.AssignedByPresetsConfig.ASSIGNED_BY_REST_KEY;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.qualifier.QualifierPresetsConfig.QUALIFIER;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.taxon.TaxonPresetsConfig.TAXON_ID;
-import static uk.ac.ebi.quickgo.client.service.loader.presets.withFrom.WithFromPresetsConfig.WITH_FROM;
+import static uk.ac.ebi.quickgo.client.service.loader.presets.withFrom.WithFromPresetsConfig.WITH_FROM_REST_KEY;
 
 /**
  * Provides configurable properties, beans, etc., used during tests.
@@ -57,7 +57,6 @@ public class MockPresetDataConfig {
      * Preset items information representing the most relevant, ECO:0000352 term.
      */
     static final PresetItem PRESET_ECO_32;
-    private static final PresetItem PRESET_DICTY_BASE;
     static final PresetItem PRESET_BHF_UCL;
     static final PresetItem PRESET_GO_SLIM_ASPERGILLUS;
     static final PresetItem PRESET_GO_SLIM_METAGENOMICS;
@@ -125,12 +124,6 @@ public class MockPresetDataConfig {
                                 "Cardiovascular Gene Ontology Annotation Initiative located at University College " +
                                 "London")
                 .withProperty(PresetItem.Property.URL, "http://www.ucl.ac.uk/cardiovasculargeneontology")
-                .build();
-
-        PRESET_DICTY_BASE = PresetItem
-                .createWithName("dictyBase")
-                .withProperty(PresetItem.Property.DESCRIPTION, "dictyBase")
-                .withRelevancy(62)
                 .build();
 
         PRESET_GO_SLIM_ASPERGILLUS = PresetItem
@@ -209,7 +202,7 @@ public class MockPresetDataConfig {
                 any(HashMap.class)))
                 .thenReturn(DEFAULT_RELEVANT_QUALIFIERS);
         when(mockRestOperations.getForObject(
-                anyStringContaining(WITH_FROM),
+                anyStringContaining(WITH_FROM_REST_KEY),
                 isA(Class.class),
                 any(HashMap.class)))
                 .thenReturn(DEFAULT_RELEVANT_WITH_FROM);
