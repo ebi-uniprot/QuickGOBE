@@ -3,12 +3,13 @@ package uk.ac.ebi.quickgo.client.service.loader.presets.assignedby;
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
 import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
 import uk.ac.ebi.quickgo.client.service.loader.presets.LogStepListener;
-import uk.ac.ebi.quickgo.client.service.loader.presets.PresetsCommonConfig;
 import uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPreset;
+import uk.ac.ebi.quickgo.client.service.loader.support.DatabaseDescriptionConfig;
 import uk.ac.ebi.quickgo.rest.search.request.converter.RESTFilterConverterFactory;
 
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,6 +18,7 @@ import org.springframework.context.annotation.Import;
 import static uk.ac.ebi.quickgo.client.model.presets.PresetType.*;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfig.SKIP_LIMIT;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelper.topItemsFromRESTReader;
+import static uk.ac.ebi.quickgo.client.service.loader.support.DatabaseDescriptionConfig.DB_DESCRIPTIONS_MAP;
 
 /**
  * Exposes the {@link Step} bean that is used to read and populate information relating to the assignedBy preset data.
@@ -25,7 +27,7 @@ import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelpe
  * @author Edd
  */
 @Configuration
-@Import({PresetsCommonConfig.class})
+@Import({DatabaseDescriptionConfig.class})
 public class AssignedByPresetsConfig {
     public static final String ASSIGNED_BY_LOADING_STEP_NAME = "AssignedByReadingStep";
     public static final String ASSIGNED_BY_REST_KEY = "assignedBy";
@@ -42,6 +44,7 @@ public class AssignedByPresetsConfig {
                 .faultTolerant()
                 .skipLimit(SKIP_LIMIT)
                 .reader(topItemsFromRESTReader(converterFactory, ASSIGNED_BY_REST_KEY))
+                .processor(addDescription())
                 .writer(rawPresetWriter(presets))
                 .listener(new LogStepListener())
                 .build();
@@ -59,5 +62,16 @@ public class AssignedByPresetsConfig {
                             .withRelevancy(rawItem.relevancy)
                             .build());
         });
+    }
+
+    private ItemProcessor<RawNamedPreset, RawNamedPreset> addDescription() {
+        return rawNamedPreset -> {
+            if (DB_DESCRIPTIONS_MAP.containsKey(rawNamedPreset.id)) {
+                rawNamedPreset.description = DB_DESCRIPTIONS_MAP.get(rawNamedPreset.id);
+                return rawNamedPreset;
+            } else {
+                return rawNamedPreset;
+            }
+        };
     }
 }
