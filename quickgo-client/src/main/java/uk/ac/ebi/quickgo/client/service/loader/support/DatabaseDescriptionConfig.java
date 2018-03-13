@@ -80,8 +80,10 @@ public class DatabaseDescriptionConfig {
     }
 
     private ItemWriter<RawNamedPreset> descriptionsWriter(Map<String, String> descriptionsMap) {
+        System.out.println(descriptionsMap);
         return rawItemList ->
                 rawItemList.forEach(rawItem ->
                         descriptionsMap.put(rawItem.name, rawItem.description));
+
     }
 }
