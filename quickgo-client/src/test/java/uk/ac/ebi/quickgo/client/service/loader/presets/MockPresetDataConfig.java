@@ -75,8 +75,6 @@ public class MockPresetDataConfig {
     private static final String SLIM_NAME = "name";
     private static final String SLIM_ASPECT = "aspect";
 
-    public static final String PANTHER = "PANTHER";
-
     static {
         DEFAULT_RELEVANT_ASSIGNED_BYS = new RelevancyResponseType();
         DEFAULT_RELEVANT_ASSIGNED_BYS.terms = new RelevancyResponseType.Terms();
@@ -107,7 +105,7 @@ public class MockPresetDataConfig {
         DEFAULT_RELEVANT_WITH_FROM.terms.relevancies = new ArrayList<>();
         DEFAULT_RELEVANT_WITH_FROM.terms.relevancies.add(UNIPROT_KB);
         DEFAULT_RELEVANT_WITH_FROM.terms.relevancies.add("1000");
-        DEFAULT_RELEVANT_WITH_FROM.terms.relevancies.add(PANTHER);
+        DEFAULT_RELEVANT_WITH_FROM.terms.relevancies.add(ENSEMBL);
         DEFAULT_RELEVANT_WITH_FROM.terms.relevancies.add("100");
 
         PRESET_ECO_32 = PresetItem
