@@ -47,6 +47,20 @@ public class PresetsFailedRelevancyFetchingIT {
     private CompositePreset presets;
 
     @Test
+    public void loadDefaultAssignedByPresetsAfterFailedRESTInfoFetching() {
+        assertThat(presets.getAssignedBy(), hasSize(0));
+
+        JobExecution jobExecution =
+                jobLauncherTestUtils.launchStep(AssignedByPresetsConfig.ASSIGNED_BY_LOADING_STEP_NAME);
+        BatchStatus status = jobExecution.getStatus();
+
+        assertThat(status, is(BatchStatus.COMPLETED));
+        assertThat(
+                extractPresetValues(presets.getAssignedBy(), p -> p.getProperty(PresetItem.Property.NAME.getKey())),
+                hasSize(24));
+    }
+
+    @Test
     public void loadDefaultQualifierPresetsAfterFailedRESTInfoFetching() {
         assertThat(presets.getQualifiers(), hasSize(0));
 
@@ -61,20 +75,6 @@ public class PresetsFailedRelevancyFetchingIT {
     }
 
     @Test
-    public void loadDefaultAssignedByPresetsAfterFailedRESTInfoFetching() {
-        assertThat(presets.getAssignedBy(), hasSize(0));
-
-        JobExecution jobExecution =
-                jobLauncherTestUtils.launchStep(AssignedByPresetsConfig.ASSIGNED_BY_LOADING_STEP_NAME);
-        BatchStatus status = jobExecution.getStatus();
-
-        assertThat(status, is(BatchStatus.COMPLETED));
-        assertThat(
-                extractPresetValues(presets.getAssignedBy(), p -> p.getProperty(PresetItem.Property.NAME.getKey())),
-                is(empty()));
-    }
-
-    @Test
     public void loadDefaultWithFromPresetsAfterFailedRESTInfoFetching() {
         assertThat(presets.getWithFrom(), hasSize(0));
 
@@ -85,7 +85,7 @@ public class PresetsFailedRelevancyFetchingIT {
         assertThat(status, is(BatchStatus.COMPLETED));
         assertThat(
                 extractPresetValues(presets.getWithFrom(), p -> p.getProperty(PresetItem.Property.NAME.getKey())),
-                is(empty()));
+                hasSize(24));
     }
 
     private <T> List<T> extractPresetValues(List<PresetItem> presets, Function<PresetItem, T> extractor) {
