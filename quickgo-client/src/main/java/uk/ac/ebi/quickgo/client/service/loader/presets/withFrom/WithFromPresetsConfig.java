@@ -124,6 +124,6 @@ public class WithFromPresetsConfig {
         } catch (RetrievalException | IllegalStateException e) {
             LOGGER.error("Failed to retrieve via REST call the relevant 'with/from' values: ", e);
         }
-        return rawNamedPreset -> rawNamedPreset;
+        return rawNamedPreset -> null;
     }
 }
