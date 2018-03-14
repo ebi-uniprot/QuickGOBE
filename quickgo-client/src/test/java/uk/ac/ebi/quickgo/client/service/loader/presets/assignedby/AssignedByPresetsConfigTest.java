@@ -1,13 +1,14 @@
 package uk.ac.ebi.quickgo.client.service.loader.presets.assignedby;
 
-import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
 import uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPreset;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.ItemProcessor;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.core.IsNull.notNullValue;
 
 /**
  * @author Tony Wardell
@@ -16,25 +17,30 @@ import org.springframework.batch.item.ItemWriter;
  * Created with IntelliJ IDEA.
  */
 public class AssignedByPresetsConfigTest {
-    private CompositePresetImpl presetBuilder;
+
+    private AssignedByPresetsConfig assignedByPresetsConfig;
 
     @Before
-    public void setUp() {
-        presetBuilder = new CompositePresetImpl();
+    public void setup() {
+        assignedByPresetsConfig = new AssignedByPresetsConfig();
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void avoidsNullPointerExceptionIfNameIsNull() throws Exception {
-        AssignedByPresetsConfig config = new AssignedByPresetsConfig();
+    @Test
+    public void preventDuplicates() throws Exception {
+        final ItemProcessor<RawNamedPreset, RawNamedPreset> itemProcessor =
+                assignedByPresetsConfig.duplicateChecker();
+        RawNamedPreset rawNamedPreset1 = new RawNamedPreset();
+        rawNamedPreset1.name = "AgBase";
+        RawNamedPreset rawNamedPreset2 = new RawNamedPreset();
+        rawNamedPreset2.name = "AspGD";
+        RawNamedPreset rawNamedPreset3 = new RawNamedPreset();
+        rawNamedPreset3.name = "ASPGD";
+        RawNamedPreset rawNamedPreset4 = new RawNamedPreset();
+        rawNamedPreset4.name = "Alzheimers_University_of_Toronto";
 
-        List<RawNamedPreset> rawNamedPresets = new ArrayList<>();
-        final RawNamedPreset raw1 = new RawNamedPreset();
-        raw1.name = null;
-        raw1.id = null;
-        raw1.relevancy = 1;
-        rawNamedPresets.add(raw1);
-
-        ItemWriter<RawNamedPreset> writer = config.rawPresetWriter(presetBuilder);
-        writer.write(rawNamedPresets);
+        assertThat(itemProcessor.process(rawNamedPreset1), notNullValue());
+        assertThat(itemProcessor.process(rawNamedPreset2), notNullValue());
+        assertThat(itemProcessor.process(rawNamedPreset3), nullValue());
+        assertThat(itemProcessor.process(rawNamedPreset4), notNullValue());
     }
 }
