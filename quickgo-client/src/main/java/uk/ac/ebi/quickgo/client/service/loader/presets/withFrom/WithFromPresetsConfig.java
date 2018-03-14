@@ -120,7 +120,11 @@ public class WithFromPresetsConfig {
             ConvertedFilter<List<String>> convertedFilter = converterFactory.convert(restRequest);
             final List<String> convertedValues = convertedFilter.getConvertedValue();
             final Set<String> validValues = new HashSet<>(convertedValues);
-            return rawNamedPreset -> validValues.contains(rawNamedPreset.name) ? rawNamedPreset : null;
+            validValues.stream().forEach(e -> LOGGER.info(e));
+            return rawNamedPreset -> {
+                LOGGER.info("Match " + rawNamedPreset.name);
+                return validValues.contains(rawNamedPreset.name) ? rawNamedPreset : null;
+            };
         } catch (RetrievalException | IllegalStateException e) {
             LOGGER.error("Failed to retrieve via REST call the relevant 'with/from' values: ", e);
         }
