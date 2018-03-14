@@ -8,5 +8,5 @@ package uk.ac.ebi.quickgo.geneproduct.common;
  * Created with IntelliJ IDEA.
  */
 public enum ProteomeMembership {
-    REFERENCE, COMPLETE, NONE
+    REFERENCE, COMPLETE, NONE, NOT_APPLICABLE
 }
