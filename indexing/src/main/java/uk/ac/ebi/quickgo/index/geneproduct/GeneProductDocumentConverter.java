@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.index.geneproduct;
 
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductDocument;
+import uk.ac.ebi.quickgo.geneproduct.common.GeneProductType;
 import uk.ac.ebi.quickgo.geneproduct.common.ProteomeMembership;
 import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
 
@@ -12,6 +13,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import org.springframework.batch.item.ItemProcessor;
 
+import static uk.ac.ebi.quickgo.geneproduct.common.ProteomeMembership.*;
 import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.convertLinePropertiesToMap;
 import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.splitValue;
 import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductParsingHelper.*;
@@ -70,14 +72,21 @@ public class GeneProductDocumentConverter implements ItemProcessor<GeneProduct, 
         doc.isCompleteProteome = isTrue(properties.get(COMPLETE_PROTEOME_KEY));
         doc.isAnnotated = isTrue(properties.get(IS_ANNOTATED_KEY));
         doc.isIsoform = isTrue(properties.get(IS_ISOFORM_KEY));
-        if (Objects.nonNull(doc.referenceProteome)) {
-            doc.proteomeMembership = ProteomeMembership.REFERENCE;
-        } else if (isTrue(properties.get(COMPLETE_PROTEOME_KEY))) {
-            doc.proteomeMembership = ProteomeMembership.COMPLETE;
-        } else {
-            doc.proteomeMembership = ProteomeMembership.NONE;
-        }
+        doc.proteomeMembership = extractProteomeMembership(geneProduct, properties);
         return doc;
+    }
+
+    private ProteomeMembership extractProteomeMembership(GeneProduct geneProduct, Map<String, String> properties) {
+        if (GeneProductType.PROTEIN.getName().equals(geneProduct.type)) {
+            if (Objects.nonNull(properties.get(REFERENCE_PROTEOME_KEY))) {
+                return REFERENCE;
+            } else if (isTrue(properties.get(COMPLETE_PROTEOME_KEY))) {
+                return COMPLETE;
+            } else {
+                return NONE;
+            }
+        }
+        return NOT_APPLICABLE;
     }
 
     private boolean isTrue(String value) {
