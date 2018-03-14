@@ -122,6 +122,7 @@ public class WithFromPresetsConfig {
             final Set<String> validValues = new HashSet<>(convertedValues);
             validValues.stream().forEach(e -> LOGGER.info(e));
             return rawNamedPreset -> {
+                validValues.stream().forEach(e -> LOGGER.info("Contains " + e));
                 LOGGER.info("Match " + rawNamedPreset.name);
                 return validValues.contains(rawNamedPreset.name) ? rawNamedPreset : null;
             };
