@@ -23,7 +23,7 @@ import static org.mockito.Matchers.matches;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static uk.ac.ebi.quickgo.client.service.loader.presets.assignedby.AssignedByPresetsConfig.ASSIGNED_BY_REST_KEY;
+import static uk.ac.ebi.quickgo.client.service.loader.presets.assignedby.AssignedByPresetsConfig.ASSIGNED_BY;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.qualifier.QualifierPresetsConfig.QUALIFIER;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.taxon.TaxonPresetsConfig.TAXON_ID;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.withFrom.WithFromPresetsConfig.WITH_FROM_REST_KEY;
@@ -187,7 +187,7 @@ public class MockPresetDataConfig {
         RestOperations mockRestOperations = mock(RestOperations.class);
 
         when(mockRestOperations.getForObject(
-                anyStringContaining(ASSIGNED_BY_REST_KEY),
+                anyStringContaining(ASSIGNED_BY),
                 isA(Class.class),
                 any(HashMap.class)))
                 .thenReturn(DEFAULT_RELEVANT_ASSIGNED_BYS);
