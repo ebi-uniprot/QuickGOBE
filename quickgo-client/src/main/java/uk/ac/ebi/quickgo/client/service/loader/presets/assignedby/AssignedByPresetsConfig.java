@@ -1,27 +1,43 @@
 package uk.ac.ebi.quickgo.client.service.loader.presets.assignedby;
 
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
+import uk.ac.ebi.quickgo.client.model.presets.PresetType;
 import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
 import uk.ac.ebi.quickgo.client.service.loader.presets.LogStepListener;
 import uk.ac.ebi.quickgo.client.service.loader.presets.PresetsCommonConfig;
 import uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPreset;
-import uk.ac.ebi.quickgo.client.service.loader.support.DatabaseDescriptionConfig;
+import uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPresetValidator;
+import uk.ac.ebi.quickgo.client.service.loader.presets.ff.SourceColumnsFactory;
+import uk.ac.ebi.quickgo.client.service.loader.presets.ff.StringToRawNamedPresetMapper;
+import uk.ac.ebi.quickgo.rest.search.RetrievalException;
+import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
+import uk.ac.ebi.quickgo.rest.search.request.config.FilterConfigRetrieval;
+import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
 import uk.ac.ebi.quickgo.rest.search.request.converter.RESTFilterConverterFactory;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.file.FlatFileItemReader;
+import org.springframework.batch.item.file.mapping.FieldSetMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.io.Resource;
+import org.springframework.web.client.RestOperations;
 
-import static uk.ac.ebi.quickgo.client.model.presets.PresetType.*;
+import static org.slf4j.LoggerFactory.getLogger;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfig.SKIP_LIMIT;
-import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelper.topItemsFromRESTReader;
-import static uk.ac.ebi.quickgo.client.service.loader.support.DatabaseDescriptionConfig.DB_DESCRIPTIONS_MAP;
+import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelper.compositeItemProcessor;
+import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelper.fileReader;
+import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelper.rawPresetMultiFileReader;
+import static uk.ac.ebi.quickgo.client.service.loader.presets.ff.SourceColumnsFactory.Source.DB_COLUMNS;
 
 /**
  * Exposes the {@link Step} bean that is used to read and populate information relating to the assignedBy preset data.
@@ -30,35 +46,49 @@ import static uk.ac.ebi.quickgo.client.service.loader.support.DatabaseDescriptio
  * @author Edd
  */
 @Configuration
-@Import({DatabaseDescriptionConfig.class})
+@Import({PresetsCommonConfig.class})
 public class AssignedByPresetsConfig {
     public static final String ASSIGNED_BY_LOADING_STEP_NAME = "AssignedByReadingStep";
-    public static final String ASSIGNED_BY_REST_KEY = "assignedBy";
-    static Logger LOGGER = LoggerFactory.getLogger(AssignedByPresetsConfig.class);
-    boolean logged = false;
+    public static final String ASSIGNED_BY = "assignedBy";
+
+    private static final Logger LOGGER = getLogger(AssignedByPresetsConfig.class);
+
+    @Value("#{'${assignedBy.preset.source:}'.split(',')}")
+    private Resource[] assignedByResources;
+    @Value("${assignedBy.preset.header.lines:1}")
+    private int assignedByHeaderLines;
+    private Set<String> duplicatePrevent = new HashSet<>();
 
     @Bean
     public Step assignedByStep(
             StepBuilderFactory stepBuilderFactory,
             Integer chunkSize,
             CompositePresetImpl presets,
-            PresetsCommonConfig.DbDescriptions dbDescriptions,
-            RESTFilterConverterFactory converterFactory) {
+            FilterConfigRetrieval externalFilterConfigRetrieval,
+            RestOperations restOperations) {
 
-        LOGGER.info("Logging db descriptions");
-            DB_DESCRIPTIONS_MAP.forEach((k, e) -> LOGGER.info("Descriptions contains %s, %s", k, e));
+        RESTFilterConverterFactory converterFactory = assignedByConverterFactory(externalFilterConfigRetrieval,
+                restOperations);
 
-        logged = true;
-
+        FlatFileItemReader<RawNamedPreset> itemReader = fileReader(rawAssignedByPresetFieldSetMapper());
+        itemReader.setLinesToSkip(assignedByHeaderLines);
         return stepBuilderFactory.get(ASSIGNED_BY_LOADING_STEP_NAME)
                 .<RawNamedPreset, RawNamedPreset>chunk(chunkSize)
                 .faultTolerant()
                 .skipLimit(SKIP_LIMIT)
-                .reader(topItemsFromRESTReader(converterFactory, ASSIGNED_BY_REST_KEY))
-                .processor(addDescription(dbDescriptions))
+                .<RawNamedPreset>reader(rawPresetMultiFileReader(assignedByResources, itemReader))
+                .processor(compositeItemProcessor(
+                        assignedByValidator(),
+                        assignedByFilter(converterFactory),
+                        duplicateChecker()))
                 .writer(rawPresetWriter(presets))
                 .listener(new LogStepListener())
                 .build();
+    }
+
+    private RESTFilterConverterFactory assignedByConverterFactory(FilterConfigRetrieval filterConfigRetrieval,
+            RestOperations restOperations) {
+        return new RESTFilterConverterFactory(filterConfigRetrieval, restOperations);
     }
 
     /**
@@ -66,30 +96,41 @@ public class AssignedByPresetsConfig {
      * @param presets the presets to write to
      * @return the corresponding {@link ItemWriter}
      */
-    ItemWriter<RawNamedPreset> rawPresetWriter(CompositePresetImpl presets) {
-        return rawItemList -> rawItemList.forEach(rawItem -> {
-            presets.addPreset(ASSIGNED_BY,
-                    PresetItem.createWithName(rawItem.name)
-                            .withRelevancy(rawItem.relevancy)
-                            .build());
-        });
+    private ItemWriter<RawNamedPreset> rawPresetWriter(CompositePresetImpl presets) {
+        return rawItemList ->
+                rawItemList.forEach(rawItem ->
+                        presets.addPreset(PresetType.ASSIGNED_BY,
+                                PresetItem.createWithName(rawItem.name)
+                                        .withProperty(PresetItem.Property.DESCRIPTION.getKey(), rawItem.description)
+                                        .withRelevancy(rawItem.relevancy)
+                                        .build())
+                );
     }
 
-    private ItemProcessor<RawNamedPreset, RawNamedPreset> addDescription(
-            PresetsCommonConfig.DbDescriptions dbDescriptions) {
+    private FieldSetMapper<RawNamedPreset> rawAssignedByPresetFieldSetMapper() {
+        return new StringToRawNamedPresetMapper(SourceColumnsFactory.createFor(DB_COLUMNS));
+    }
 
-        if (!logged) {
-            dbDescriptions.dbDescriptions.forEach((k, e) -> LOGGER.info("Descriptions contains %s, %s", k, e));
+    private ItemProcessor<RawNamedPreset, RawNamedPreset> assignedByValidator() {
+        return new RawNamedPresetValidator();
+    }
+
+    private ItemProcessor<RawNamedPreset, RawNamedPreset> assignedByFilter(
+            RESTFilterConverterFactory converterFactory) {
+        FilterRequest assignedByRequest = FilterRequest.newBuilder().addProperty(ASSIGNED_BY).build();
+
+        try {
+            ConvertedFilter<List<String>> convertedFilter = converterFactory.convert(assignedByRequest);
+            final List<String> convertedValues = convertedFilter.getConvertedValue();
+            final Set<String> validValues = new HashSet<>(convertedValues);
+            return rawNamedPreset -> validValues.contains(rawNamedPreset.name) ? rawNamedPreset : null;
+        } catch (RetrievalException | IllegalStateException e) {
+            LOGGER.error("Failed to retrieve via REST call the relevant 'assignedBy' values: ", e);
         }
+        return rawNamedPreset -> rawNamedPreset;
+    }
 
-        return rawNamedPreset -> {
-            if (DB_DESCRIPTIONS_MAP.containsKey(rawNamedPreset.id)) {
-                LOGGER.info("Looking for %s", rawNamedPreset.id);
-                rawNamedPreset.description = dbDescriptions.dbDescriptions.get(rawNamedPreset.id);
-                return rawNamedPreset;
-            } else {
-                return rawNamedPreset;
-            }
-        };
+    ItemProcessor<RawNamedPreset, RawNamedPreset> duplicateChecker() {
+        return rawNamedPreset -> duplicatePrevent.add(rawNamedPreset.name.toLowerCase()) ? rawNamedPreset : null;
     }
 }
