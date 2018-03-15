@@ -2,14 +2,12 @@ package uk.ac.ebi.quickgo.index.geneproduct;
 
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductDocument;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductType;
-import uk.ac.ebi.quickgo.geneproduct.common.ProteomeMembership;
 import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
 
 import com.google.common.base.Preconditions;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import org.springframework.batch.item.ItemProcessor;
 
@@ -53,8 +51,8 @@ public class GeneProductDocumentConverter implements ItemProcessor<GeneProduct, 
             throw new DocumentReaderException("Gene product object is null");
         }
 
-        Map<String, String> properties =
-                convertLinePropertiesToMap(geneProduct.properties, interValueDelimiter, intraValueDelimiter);
+        GeneProductProperties properties = new GeneProductProperties(geneProduct.properties,
+                interValueDelimiter, intraValueDelimiter);
 
         GeneProductDocument doc = new GeneProductDocument();
         doc.database = geneProduct.database;
@@ -69,28 +67,16 @@ public class GeneProductDocumentConverter implements ItemProcessor<GeneProduct, 
         doc.referenceProteome = properties.get(REFERENCE_PROTEOME_KEY);
         doc.databaseSubset = properties.get(DATABASE_SUBSET_KEY);
         doc.targetSet = convertToList((splitValue(properties.get(TARGET_SET_KEY), specificValueDelimiter)));
-        doc.isCompleteProteome = isTrue(properties.get(COMPLETE_PROTEOME_KEY));
-        doc.isAnnotated = isTrue(properties.get(IS_ANNOTATED_KEY));
-        doc.isIsoform = isTrue(properties.get(IS_ISOFORM_KEY));
-        doc.proteomeMembership = extractProteomeMembership(geneProduct, properties);
+        doc.isCompleteProteome = properties.isTrue(COMPLETE_PROTEOME_KEY);
+        doc.isAnnotated = properties.isTrue(IS_ANNOTATED_KEY);
+        doc.isIsoform = properties.isTrue(IS_ISOFORM_KEY);
+        doc.proteomeMembership = membership(isProtein(geneProduct), properties.specifies(REFERENCE_PROTEOME_KEY),
+                properties.isTrue(COMPLETE_PROTEOME_KEY));
         return doc;
     }
 
-    private ProteomeMembership extractProteomeMembership(GeneProduct geneProduct, Map<String, String> properties) {
-        if (GeneProductType.PROTEIN.getName().equals(geneProduct.type)) {
-            if (Objects.nonNull(properties.get(REFERENCE_PROTEOME_KEY))) {
-                return REFERENCE;
-            } else if (isTrue(properties.get(COMPLETE_PROTEOME_KEY))) {
-                return COMPLETE;
-            } else {
-                return NONE;
-            }
-        }
-        return NOT_APPLICABLE;
-    }
-
-    private boolean isTrue(String value) {
-        return value != null && value.equalsIgnoreCase(TRUE_STRING);
+    private boolean isProtein(GeneProduct geneProduct) {
+        return GeneProductType.PROTEIN.getName().equals(geneProduct.type);
     }
 
     @SafeVarargs private final <T> List<T> convertToList(T... elements) {
@@ -99,5 +85,27 @@ public class GeneProductDocumentConverter implements ItemProcessor<GeneProduct, 
                 .collect(Collectors.toList());
 
         return list.size() == 0 ? null : list;
+    }
+
+    static class GeneProductProperties {
+        Map<String, String> properties;
+
+        private GeneProductProperties(String properties, String interValueDelimiter, String intraValueDelimiter) {
+            this.properties =
+                    convertLinePropertiesToMap(properties, interValueDelimiter, intraValueDelimiter);
+        }
+
+        private boolean isTrue(String key) {
+            String value = properties.get(key);
+            return value != null && value.equalsIgnoreCase(TRUE_STRING);
+        }
+
+        private boolean specifies(String key) {
+            return properties.get(key) != null;
+        }
+
+        private String get(String key) {
+            return properties.get(key);
+        }
     }
 }
