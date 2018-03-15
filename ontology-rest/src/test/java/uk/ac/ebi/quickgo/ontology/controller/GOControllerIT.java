@@ -16,8 +16,7 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -122,6 +121,20 @@ public class GOControllerIT extends OBOControllerIT {
 
     // slimming ------------------
     @Test
+    public void slimmingFromAndToTheSameTermReturnsIdentitySlim() throws Exception {
+        ResultActions response = mockMvc.perform(get(getSlimURL())
+                .param(SLIM_TO_IDS_PARAM, GO_SLIM1)
+                .param(SLIM_FROM_IDS_PARAM, GO_SLIM1));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.numberOfHits").value(1));
+
+        expectIdentitySlims(response, singletonList(GO_SLIM1));
+    }
+
+    @Test
     public void oneIdHasOneSlim() throws Exception {
         ResultActions response = mockMvc.perform(get(getSlimURL())
                 .param(SLIM_TO_IDS_PARAM, GO_SLIM1));
@@ -129,9 +142,10 @@ public class GOControllerIT extends OBOControllerIT {
         response.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.numberOfHits").value(1))
-                .andExpect(jsonPath("$.results.*.slimsFromId", contains(GO_SLIM_CHILD1)))
-                .andExpect(jsonPath("$.results.*.slimsToIds.*", contains(GO_SLIM1)));
+                .andExpect(jsonPath("$.numberOfHits").value(2));
+
+        expectSlimInfo(response, GO_SLIM_CHILD1, singletonList(GO_SLIM1));
+        expectIdentitySlims(response, singletonList(GO_SLIM1));
     }
 
     @Test
@@ -142,9 +156,10 @@ public class GOControllerIT extends OBOControllerIT {
         response.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.numberOfHits").value(1))
-                .andExpect(jsonPath("$.results.*.slimsFromId", contains(GO_SLIM_CHILD1)))
-                .andExpect(jsonPath("$.results.*.slimsToIds.*", contains(GO_SLIM1)));
+                .andExpect(jsonPath("$.numberOfHits").value(2));
+
+        expectSlimInfo(response, GO_SLIM_CHILD1, singletonList(GO_SLIM1));
+        expectIdentitySlims(response, singletonList(GO_SLIM1));
     }
 
     @Test
@@ -155,19 +170,19 @@ public class GOControllerIT extends OBOControllerIT {
         response.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.numberOfHits").value(1))
-                .andExpect(jsonPath("$.results.*.slimsFromId", contains(GO_SLIM_CHILD2)))
-                .andExpect(jsonPath("$.results.*.slimsToIds.*", contains(GO_SLIM2)));
+                .andExpect(jsonPath("$.numberOfHits").value(2));
+        expectSlimInfo(response, GO_SLIM_CHILD2, singletonList(GO_SLIM2));
+        expectIdentitySlims(response, singletonList(GO_SLIM2));
 
-        mockMvc.perform(get(getSlimURL())
+        response = mockMvc.perform(get(getSlimURL())
                 .param(SLIM_TO_IDS_PARAM, GO_SLIM3));
 
         response.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.numberOfHits").value(1))
-                .andExpect(jsonPath("$.results.*.slimsFromId", contains(GO_SLIM_CHILD2)))
-                .andExpect(jsonPath("$.results.*.slimsToIds.*", contains(GO_SLIM2)));
+                .andExpect(jsonPath("$.numberOfHits").value(2));
+        expectSlimInfo(response, GO_SLIM_CHILD2, singletonList(GO_SLIM3));
+        expectIdentitySlims(response, singletonList(GO_SLIM3));
     }
 
     @Test
@@ -178,9 +193,11 @@ public class GOControllerIT extends OBOControllerIT {
         response.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.numberOfHits").value(2))
-                .andExpect(jsonPath("$.results.*.slimsFromId", containsInAnyOrder(GO_SLIM_CHILD3, GO_SLIM_CHILD4)))
-                .andExpect(jsonPath("$.results.*.slimsToIds.*", contains(GO_SLIM4, GO_SLIM4)));
+                .andExpect(jsonPath("$.numberOfHits").value(3));
+
+        expectSlimInfo(response, GO_SLIM_CHILD3, singletonList(GO_SLIM4));
+        expectSlimInfo(response, GO_SLIM_CHILD4, singletonList(GO_SLIM4));
+        expectIdentitySlims(response, singletonList(GO_SLIM4));
     }
 
     @Test
@@ -191,9 +208,11 @@ public class GOControllerIT extends OBOControllerIT {
         response.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.numberOfHits").value(2))
-                .andExpect(jsonPath("$.results.*.slimsFromId", containsInAnyOrder(GO_SLIM_CHILD5, GO_SLIM_CHILD6)))
-                .andExpect(jsonPath("$.results.*.slimsToIds.*", contains(GO_SLIM5, GO_SLIM6, GO_SLIM5, GO_SLIM6)));
+                .andExpect(jsonPath("$.numberOfHits").value(4));
+
+        expectSlimInfo(response, GO_SLIM_CHILD5, asList(GO_SLIM5, GO_SLIM6));
+        expectSlimInfo(response, GO_SLIM_CHILD6, asList(GO_SLIM5, GO_SLIM6));
+        expectIdentitySlims(response, asList(GO_SLIM5, GO_SLIM6));
     }
 
     @Test
@@ -205,9 +224,9 @@ public class GOControllerIT extends OBOControllerIT {
         response.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.numberOfHits").value(1))
-                .andExpect(jsonPath("$.results.*.slimsFromId", containsInAnyOrder(GO_SLIM_CHILD5)))
-                .andExpect(jsonPath("$.results.*.slimsToIds.*", contains(GO_SLIM5, GO_SLIM6)));
+                .andExpect(jsonPath("$.numberOfHits").value(1));
+
+        expectSlimInfo(response, GO_SLIM_CHILD5, asList(GO_SLIM5, GO_SLIM6));
     }
 
     @Test
@@ -288,7 +307,7 @@ public class GOControllerIT extends OBOControllerIT {
     }
 
     @Test
-    public void slimmingOverRelationshipNotInGraphReturnsEmptyResponse() throws Exception {
+    public void slimmingOverRelationshipNotInGraphReturnsIdentitySlim() throws Exception {
         String nonExistentGraphRelationship = "occurs_in";
         ResultActions response = mockMvc.perform(get(getSlimURL())
                 .param(SLIM_TO_IDS_PARAM, GO_SLIM1)
@@ -297,7 +316,9 @@ public class GOControllerIT extends OBOControllerIT {
         response.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.numberOfHits").value(0));
+                .andExpect(jsonPath("$.numberOfHits").value(1));
+
+        expectIdentitySlims(response, asList(GO_SLIM1, GO_SLIM1));
     }
 
     @Test
@@ -413,6 +434,18 @@ public class GOControllerIT extends OBOControllerIT {
         relationships.add(new OntologyRelationship(GO_SLIM_CHILD8, GO_SLIM8, OntologyRelationType.REGULATES));
         relationships.add(new OntologyRelationship(GO_SLIM_CHILD9, GO_SLIM9, OntologyRelationType.NEGATIVE_REGULATES));
         ontologyGraph.addRelationships(relationships);
+    }
+
+    private void expectIdentitySlims(ResultActions response, List<String> slimSet) throws Exception {
+        for (String slim : slimSet) {
+            expectSlimInfo(response, slim, singletonList(slim));
+        }
+    }
+
+    private void expectSlimInfo(ResultActions response, String from, List<String> to) throws Exception {
+        response.andExpect(
+                jsonPath("$..results[?(@.slimsFromId==\"" + from + "\")].slimsToIds.*",
+                        equalTo(to)));
     }
 
     private OntologyRelationship createSlimRelationship(String term, String slimmedUpTerm) {

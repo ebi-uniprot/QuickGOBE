@@ -12,8 +12,8 @@ import static com.google.common.base.Preconditions.checkArgument;
  * Created 13/09/16
  * @author Edd
  */
-class RawNamedPresetColumnsBuilder {
-    static final int UNINITIALIZED_POSITION = -1;
+public class RawNamedPresetColumnsBuilder {
+    protected static final int UNINITIALIZED_POSITION = -1;
     private int idPosition;
 
     private int namePosition;
@@ -22,7 +22,7 @@ class RawNamedPresetColumnsBuilder {
     private int urlPosition;
     private int associationPosition;
 
-    private RawNamedPresetColumnsBuilder(int namePosition) {
+    protected RawNamedPresetColumnsBuilder(int namePosition) {
         checkColumnPosition(namePosition);
         this.namePosition = namePosition;
 
@@ -41,7 +41,7 @@ class RawNamedPresetColumnsBuilder {
         return new RawNamedPresetColumnsBuilder(namePosition);
     }
 
-    RawNamedPresetColumnsBuilder withIdPosition(int idPosition) {
+    public RawNamedPresetColumnsBuilder withIdPosition(int idPosition) {
         checkColumnPosition(idPosition);
         this.idPosition = idPosition;
         return this;
@@ -53,7 +53,7 @@ class RawNamedPresetColumnsBuilder {
         return this;
     }
 
-    RawNamedPresetColumnsBuilder withRelevancyPosition(int relevancyPosition) {
+    public RawNamedPresetColumnsBuilder withRelevancyPosition(int relevancyPosition) {
         checkColumnPosition(relevancyPosition);
         this.relevancyPosition = relevancyPosition;
         return this;
@@ -71,15 +71,15 @@ class RawNamedPresetColumnsBuilder {
         return this;
     }
 
-    private void checkColumnPosition(int columnPosition) {
+    protected void checkColumnPosition(int columnPosition) {
         checkArgument(columnPosition >= 0,
                 "Column position [" + columnPosition + "] must be greater than or equal to 0");
     }
 
-    private static class RawNamedPresetColumnsImpl implements RawNamedPresetColumns {
-        static final int MAX_REQUIRED_COLUMN_POSITION_NOT_INITIALIZED = -1;
-        private static final int DEFAULT_COLUMN_POSITION_NOT_INITIALIZED = 0;
-        private int maxRequiredColumnPosition = MAX_REQUIRED_COLUMN_POSITION_NOT_INITIALIZED;
+    protected static class RawNamedPresetColumnsImpl implements RawNamedPresetColumns {
+        protected static final int MAX_REQUIRED_COLUMN_POSITION_NOT_INITIALIZED = -1;
+        protected static final int DEFAULT_COLUMN_POSITION_NOT_INITIALIZED = 0;
+        protected int maxRequiredColumnPosition = MAX_REQUIRED_COLUMN_POSITION_NOT_INITIALIZED;
 
         private final int urlPosition;
         private int idPosition;
@@ -88,7 +88,7 @@ class RawNamedPresetColumnsBuilder {
         private int relevancyPosition;
         private int associationPosition;
 
-        private RawNamedPresetColumnsImpl(RawNamedPresetColumnsBuilder builder) {
+        protected RawNamedPresetColumnsImpl(RawNamedPresetColumnsBuilder builder) {
             this.idPosition = builder.idPosition;
             this.namePosition = builder.namePosition;
             this.descriptionPosition = builder.descriptionPosition;
