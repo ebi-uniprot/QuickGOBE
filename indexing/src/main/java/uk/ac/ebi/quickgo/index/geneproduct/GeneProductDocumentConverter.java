@@ -8,6 +8,7 @@ import com.google.common.base.Preconditions;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import org.springframework.batch.item.ItemProcessor;
 
@@ -81,14 +82,14 @@ public class GeneProductDocumentConverter implements ItemProcessor<GeneProduct, 
 
     @SafeVarargs private final <T> List<T> convertToList(T... elements) {
         List<T> list = Arrays.stream(elements)
-                .filter(element -> element != null)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
-        return list.size() == 0 ? null : list;
+        return list.isEmpty() ? null : list;
     }
 
     static class GeneProductProperties {
-        Map<String, String> properties;
+        final Map<String, String> properties;
 
         private GeneProductProperties(String properties, String interValueDelimiter, String intraValueDelimiter) {
             this.properties =
