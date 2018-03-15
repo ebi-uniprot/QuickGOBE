@@ -329,9 +329,8 @@ public class GOControllerIT extends OBOControllerIT {
         response.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.numberOfHits").value(1))
-                .andExpect(jsonPath("$.results.*.slimsFromId", contains(GO_SLIM_CHILD8)))
-                .andExpect(jsonPath("$.results.*.slimsToIds.*", contains(GO_SLIM8)));
+                .andExpect(jsonPath("$.numberOfHits").value(2));
+        expectSlimInfo(response, GO_SLIM_CHILD8, asList(GO_SLIM8));
     }
 
     @Test
@@ -342,9 +341,8 @@ public class GOControllerIT extends OBOControllerIT {
         response.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.numberOfHits").value(1))
-                .andExpect(jsonPath("$.results.*.slimsFromId", contains(GO_SLIM_CHILD9)))
-                .andExpect(jsonPath("$.results.*.slimsToIds.*", contains(GO_SLIM9)));
+                .andExpect(jsonPath("$.numberOfHits").value(2));
+        expectSlimInfo(response, GO_SLIM_CHILD9, asList(GO_SLIM9));
     }
 
     @Override
