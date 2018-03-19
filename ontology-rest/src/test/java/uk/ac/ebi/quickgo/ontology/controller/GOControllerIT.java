@@ -49,6 +49,8 @@ public class GOControllerIT extends OBOControllerIT {
     private static final String GO_SLIM_CHILD4 = "GO:9000004";
     private static final String GO_SLIM_CHILD5 = "GO:9000005";
     private static final String GO_SLIM_CHILD6 = "GO:9000006";
+    private static final String GO_SLIM_CHILD8 = "GO:9000008";
+    private static final String GO_SLIM_CHILD9 = "GO:9000009";
 
     private static final String GO_SLIM1 = "GO:1111111";
     private static final String GO_SLIM2 = "GO:2222222";
@@ -57,6 +59,8 @@ public class GOControllerIT extends OBOControllerIT {
     private static final String GO_SLIM5 = "GO:5555555";
     private static final String GO_SLIM6 = "GO:6666666";
     private static final String GO_SLIM7 = "GO:7777777";
+    private static final String GO_SLIM8 = "GO:8888888";
+    private static final String GO_SLIM9 = "GO:9999999";
     private static final String NON_EXISTENT_TERM = "GO:8787878";
 
     private static final String SLIM_RESOURCE = "/slim";
@@ -317,6 +321,30 @@ public class GOControllerIT extends OBOControllerIT {
         expectIdentitySlims(response, asList(GO_SLIM1, GO_SLIM1));
     }
 
+    @Test
+    public void canSlimWhereRelationshipIsRegulates() throws Exception {
+        ResultActions response = mockMvc.perform(get(getSlimURL())
+                .param(SLIM_TO_IDS_PARAM, GO_SLIM8));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.numberOfHits").value(2));
+        expectSlimInfo(response, GO_SLIM_CHILD8, asList(GO_SLIM8));
+    }
+
+    @Test
+    public void canSlimWhereRelationshipIsASubclassOfRegulates() throws Exception {
+        ResultActions response = mockMvc.perform(get(getSlimURL())
+                .param(SLIM_TO_IDS_PARAM, GO_SLIM9));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.numberOfHits").value(2));
+        expectSlimInfo(response, GO_SLIM_CHILD9, asList(GO_SLIM9));
+    }
+
     @Override
     protected String getResourceURL() {
         return RESOURCE_URL;
@@ -401,6 +429,8 @@ public class GOControllerIT extends OBOControllerIT {
         relationships.add(createSlimRelationship(GO_SLIM6, STOP_NODE));
         relationships.add(createSlimRelationship(GO_SLIM7, STOP_NODE));
 
+        relationships.add(new OntologyRelationship(GO_SLIM_CHILD8, GO_SLIM8, OntologyRelationType.REGULATES));
+        relationships.add(new OntologyRelationship(GO_SLIM_CHILD9, GO_SLIM9, OntologyRelationType.NEGATIVE_REGULATES));
         ontologyGraph.addRelationships(relationships);
     }
 
