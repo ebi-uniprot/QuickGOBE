@@ -64,16 +64,16 @@ public class MockPresetDataConfig {
     static final PresetItem PRESET_GO_SLIM_SYNAPSE;
     static final PresetItem PRESET_TAXON_ARABIDOPSIS;
     static final PresetItem PRESET_TAXON_DROSOPHILA;
-    private static final String TAXON_HUMAN = "9606";
-    private static final String TAXON_BACTERIA = "2";
     static final String QUALIFIER_ENABLES = "enables";
     static final String QUALIFIER_INVOLVED_IN = "involved_in";
+    private static final String TAXON_HUMAN = "9606";
+    private static final String TAXON_BACTERIA = "2";
+    private static final String SLIM_NAME = "name";
+    private static final String SLIM_ASPECT = "aspect";
     private static final RelevancyResponseType DEFAULT_RELEVANT_ASSIGNED_BYS;
     private static final RelevancyResponseType DEFAULT_RELEVANT_TAXONS;
     private static final RelevancyResponseType DEFAULT_RELEVANT_QUALIFIERS;
     private static final RelevancyResponseType DEFAULT_RELEVANT_WITH_FROM;
-    private static final String SLIM_NAME = "name";
-    private static final String SLIM_ASPECT = "aspect";
 
     static {
         DEFAULT_RELEVANT_ASSIGNED_BYS = new RelevancyResponseType();
@@ -170,15 +170,6 @@ public class MockPresetDataConfig {
 
     }
 
-    private static PresetItem createPresetItem(String id, String name, String aspect) {
-        return PresetItem
-                .createWithName(id)
-                .withProperty(PresetItem.Property.ID, id)
-                .withProperty(SLIM_NAME, name)
-                .withProperty(SLIM_ASPECT, aspect)
-                .build();
-    }
-
     @Bean(name = "restOperations") @Profile(SUCCESSFUL_FETCHING)
     @SuppressWarnings("unchecked")
     public RestOperations restOperations() {
@@ -221,16 +212,13 @@ public class MockPresetDataConfig {
         return mockRestOperations;
     }
 
-    private String anyStringContaining(String value) {
-        return matches(".*" + value + ".*");
-    }
-
     @Bean @Profile(NO_SEARCH_ATTRIBUTES)
     public SearchableField searchableDocumentFields() {
         return new NoSearchablePresetDocumentFields();
     }
 
     private static class NoSearchablePresetDocumentFields implements SearchableField {
+
         @Override public boolean isSearchable(String field) {
             return false;
         }
@@ -238,5 +226,19 @@ public class MockPresetDataConfig {
         @Override public Stream<String> searchableFields() {
             return Stream.empty();
         }
+
+    }
+
+    private String anyStringContaining(String value) {
+        return matches(".*" + value + ".*");
+    }
+
+    private static PresetItem createPresetItem(String id, String name, String aspect) {
+        return PresetItem
+                .createWithName(id)
+                .withProperty(PresetItem.Property.ID, id)
+                .withProperty(SLIM_NAME, name)
+                .withProperty(SLIM_ASPECT, aspect)
+                .build();
     }
 }
