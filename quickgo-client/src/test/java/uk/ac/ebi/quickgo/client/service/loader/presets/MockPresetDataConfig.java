@@ -217,6 +217,19 @@ public class MockPresetDataConfig {
         return new NoSearchablePresetDocumentFields();
     }
 
+    private static PresetItem createPresetItem(String id, String name, String aspect) {
+        return PresetItem
+                .createWithName(id)
+                .withProperty(PresetItem.Property.ID, id)
+                .withProperty(SLIM_NAME, name)
+                .withProperty(SLIM_ASPECT, aspect)
+                .build();
+    }
+
+    private String anyStringContaining(String value) {
+        return matches(".*" + value + ".*");
+    }
+
     private static class NoSearchablePresetDocumentFields implements SearchableField {
 
         @Override public boolean isSearchable(String field) {
@@ -227,18 +240,5 @@ public class MockPresetDataConfig {
             return Stream.empty();
         }
 
-    }
-
-    private String anyStringContaining(String value) {
-        return matches(".*" + value + ".*");
-    }
-
-    private static PresetItem createPresetItem(String id, String name, String aspect) {
-        return PresetItem
-                .createWithName(id)
-                .withProperty(PresetItem.Property.ID, id)
-                .withProperty(SLIM_NAME, name)
-                .withProperty(SLIM_ASPECT, aspect)
-                .build();
     }
 }
