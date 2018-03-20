@@ -8,13 +8,12 @@ import uk.ac.ebi.quickgo.model.ontology.generic.TermRelation;
 import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
 
 import com.google.common.base.Preconditions;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 
 /**
@@ -61,7 +60,7 @@ public class GenericTermToODocConverter implements Function<GenericTerm,
                             .addField(FlatFieldLeaf.newFlatFieldLeaf(credit.getCode()))
                             .addField(FlatFieldLeaf.newFlatFieldLeaf(credit.getUrl()))
                             .buildString())
-                    .collect(Collectors.toList());
+                    .collect(toList());
         }
 
         return extractedCredits;
@@ -73,7 +72,7 @@ public class GenericTermToODocConverter implements Function<GenericTerm,
                         .addField(FlatFieldLeaf.newFlatFieldLeaf(xref.getDb()))
                         .addField(FlatFieldLeaf.newFlatFieldLeaf(xref.getId()))
                         .buildString())
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 
     private List<String> extractSubsets(GenericTerm term) {
@@ -84,16 +83,17 @@ public class GenericTermToODocConverter implements Function<GenericTerm,
         }
     }
 
+    /**
+     * Create a list of the secondary ids for the term
+     * @param term to be interrogated
+     * @return a list of secondary ids, or null if there are none.
+     */
     private List<String> extractSecondaries(GenericTerm term) {
-        String secondaries = term.secondaries();
-        if (secondaries != null && secondaries.trim().length() != 0) {
-            String[] secondariesArr = secondaries.split(",");
-            if (secondariesArr.length > 0) {
-                return Arrays.asList(secondariesArr);
-            }
-        }
-
-        return null;
+        List<String> secondaryList = term.getAltIds().stream()
+                .filter(xRef -> !xRef.getId().isEmpty())
+                .map(xRef -> xRef.getId())
+                .collect(toList());
+        return secondaryList.isEmpty() ? null : secondaryList;
     }
 
     private List<String> extractReplacements(GenericTerm term) {
@@ -114,7 +114,7 @@ public class GenericTermToODocConverter implements Function<GenericTerm,
                             .addField(FlatFieldLeaf.newFlatFieldLeaf(replaceIdExtractor.apply(replace)))
                             .addField(FlatFieldLeaf.newFlatFieldLeaf(replace.getTypeof().getFormalCode()))
                             .buildString())
-                    .collect(Collectors.toList());
+                    .collect(toList());
         } else {
             return null;
         }
@@ -134,7 +134,7 @@ public class GenericTermToODocConverter implements Function<GenericTerm,
                                     .addField(FlatFieldLeaf.newFlatFieldLeaf(c.getUrl()))
                                     .addField(FlatFieldLeaf.newFlatFieldLeaf(c.getRelation()))
                                     .buildString())
-                    .collect(Collectors.toList());
+                    .collect(toList());
         } else {
             return null;
         }
@@ -152,7 +152,7 @@ public class GenericTermToODocConverter implements Function<GenericTerm,
                                     .addField(FlatFieldLeaf.newFlatFieldLeaf(g.getId()))
                                     .addField(FlatFieldLeaf.newFlatFieldLeaf(g.getName()))
                                     .buildString())
-                    .collect(Collectors.toList());
+                    .collect(toList());
         } else {
             return null;
         }
@@ -172,7 +172,7 @@ public class GenericTermToODocConverter implements Function<GenericTerm,
                                     .addField(FlatFieldLeaf.newFlatFieldLeaf(h.getCategory().description))
                                     .addField(FlatFieldLeaf.newFlatFieldLeaf(h.getText()))
                                     .buildString())
-                    .collect(Collectors.toList());
+                    .collect(toList());
         } else {
             return null;
         }
@@ -182,7 +182,7 @@ public class GenericTermToODocConverter implements Function<GenericTerm,
         if (!isEmpty(term.getSynonyms())) {
             return term.getSynonyms().stream()
 
-                    .map(Synonym::getName).collect(Collectors.toList());
+                    .map(Synonym::getName).collect(toList());
         } else {
             return null;
         }
@@ -199,7 +199,7 @@ public class GenericTermToODocConverter implements Function<GenericTerm,
                                     .addField(FlatFieldLeaf.newFlatFieldLeaf(s.getName()))
                                     .addField(FlatFieldLeaf.newFlatFieldLeaf(s.getType()))
                                     .buildString())
-                    .collect(Collectors.toList());
+                    .collect(toList());
         } else {
             return null;
         }
