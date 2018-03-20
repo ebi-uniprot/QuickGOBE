@@ -84,6 +84,10 @@ public class WithFromPresetsConfig {
                 .build();
     }
 
+    ItemProcessor<RawNamedPreset, RawNamedPreset> duplicateChecker() {
+        return rawNamedPreset -> duplicatePrevent.add(rawNamedPreset.name.toLowerCase()) ? rawNamedPreset : null;
+    }
+
     private RESTFilterConverterFactory converterFactory(FilterConfigRetrieval filterConfigRetrieval,
             RestOperations restOperations) {
         return new RESTFilterConverterFactory(filterConfigRetrieval, restOperations);
@@ -106,10 +110,6 @@ public class WithFromPresetsConfig {
 
     private FieldSetMapper<RawNamedPreset> rawPresetFieldSetMapper() {
         return new StringToRawNamedPresetMapper(SourceColumnsFactory.createFor(DB_COLUMNS));
-    }
-
-    ItemProcessor<RawNamedPreset, RawNamedPreset> duplicateChecker() {
-        return rawNamedPreset -> duplicatePrevent.add(rawNamedPreset.name.toLowerCase()) ? rawNamedPreset : null;
     }
 
     private ItemProcessor<RawNamedPreset, RawNamedPreset> filterUsingRestResults(

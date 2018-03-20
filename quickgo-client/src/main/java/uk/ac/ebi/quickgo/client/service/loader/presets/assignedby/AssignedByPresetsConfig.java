@@ -86,6 +86,10 @@ public class AssignedByPresetsConfig {
                 .build();
     }
 
+    ItemProcessor<RawNamedPreset, RawNamedPreset> duplicateChecker() {
+        return rawNamedPreset -> duplicatePrevent.add(rawNamedPreset.name.toLowerCase()) ? rawNamedPreset : null;
+    }
+
     private RESTFilterConverterFactory assignedByConverterFactory(FilterConfigRetrieval filterConfigRetrieval,
             RestOperations restOperations) {
         return new RESTFilterConverterFactory(filterConfigRetrieval, restOperations);
@@ -128,9 +132,5 @@ public class AssignedByPresetsConfig {
             LOGGER.error("Failed to retrieve via REST call the relevant 'assignedBy' values: ", e);
         }
         return rawNamedPreset -> rawNamedPreset;
-    }
-
-    ItemProcessor<RawNamedPreset, RawNamedPreset> duplicateChecker() {
-        return rawNamedPreset -> duplicatePrevent.add(rawNamedPreset.name.toLowerCase()) ? rawNamedPreset : null;
     }
 }
