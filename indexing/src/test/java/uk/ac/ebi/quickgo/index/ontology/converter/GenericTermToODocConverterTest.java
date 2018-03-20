@@ -337,7 +337,8 @@ public class GenericTermToODocConverterTest {
         when(term.getDefinition()).thenReturn("def1");
         when(term.getName()).thenReturn("name1");
         when(term.getOntologyType()).thenReturn("GO");
-        when(term.secondaries()).thenReturn("sec1,sec2");
+        when(term.getAltIds()).thenReturn(Arrays.asList(new XRef(null, "GO:0005676"), new XRef(null,
+                "GO:0008620")));
         when(term.getSubsetsNames()).thenReturn(Arrays.asList("goslim_generic", "goslim_yeast"));
 
         ArrayList<GenericTerm> replacedBy = new ArrayList<>();
@@ -353,7 +354,7 @@ public class GenericTermToODocConverterTest {
         assertThat(document.definition, is("def1"));
         assertThat(document.name, is("name1"));
         assertThat(document.ontologyType, is("GO"));
-        assertThat(document.secondaryIds, contains("sec1", "sec2"));
+        assertThat(document.secondaryIds, contains("GO:0005676", "GO:0008620"));
         assertThat(document.subsets, contains("goslim_generic", "goslim_yeast"));
     }
 
