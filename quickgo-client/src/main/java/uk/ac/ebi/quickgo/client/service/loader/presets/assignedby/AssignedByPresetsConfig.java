@@ -57,7 +57,7 @@ public class AssignedByPresetsConfig {
     private Resource[] assignedByResources;
     @Value("${assignedBy.preset.header.lines:1}")
     private int assignedByHeaderLines;
-    private Set<String> duplicatePrevent = new HashSet<>();
+    private final Set<String> duplicatePrevent = new HashSet<>();
 
     @Bean
     public Step assignedByStep(

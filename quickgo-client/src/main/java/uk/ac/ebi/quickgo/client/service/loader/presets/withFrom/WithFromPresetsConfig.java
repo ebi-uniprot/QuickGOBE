@@ -54,7 +54,7 @@ public class WithFromPresetsConfig {
     private Resource[] resources;
     @Value("${withfrom.db.preset.header.lines:1}")
     private int headerLines;
-    private Set<String> duplicatePrevent = new HashSet<>();
+    private final Set<String> duplicatePrevent = new HashSet<>();
 
     @Bean
     public Step withFromDbStep(
