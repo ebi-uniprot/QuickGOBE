@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.geneproduct.model;
 
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductType;
+import uk.ac.ebi.quickgo.geneproduct.common.ProteomeMembership;
 
 import java.util.List;
 
@@ -54,7 +55,7 @@ public class GeneProduct {
     public boolean isCompleteProteome;
 
     // The assigned value fromProteomeMembership */
-    public Enum proteomeMembership;
+    public ProteomeMembership proteomeMembership;
 
     @Override public String toString() {
         return "GeneProduct{" +
