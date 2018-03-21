@@ -21,13 +21,13 @@ public class ProteomeMembershipTest {
 
     @Test
     public void checkMembershipCreationRules() {
-        assertThat(ProteomeMembership.membership(() -> false, () -> true, () -> true), is(NOT_APPLICABLE.name()));
-        assertThat(ProteomeMembership.membership(() -> false, () -> false, () -> true), is(NOT_APPLICABLE.name()));
-        assertThat(ProteomeMembership.membership(() -> false, () -> true, () -> false), is(NOT_APPLICABLE.name()));
-        assertThat(ProteomeMembership.membership(() -> true, () -> true, () -> true), is(REFERENCE.name()));
-        assertThat(ProteomeMembership.membership(() -> true, () -> true, () -> false), is(REFERENCE.name()));
-        assertThat(ProteomeMembership.membership(() -> true, () -> false, () -> true), is(COMPLETE.name()));
-        assertThat(ProteomeMembership.membership(() -> true, () -> false, () -> false), is(NONE.name()));
+        assertThat(ProteomeMembership.membership(false, true, true), is(NOT_APPLICABLE.name()));
+        assertThat(ProteomeMembership.membership(false, false, true), is(NOT_APPLICABLE.name()));
+        assertThat(ProteomeMembership.membership(false, true, false), is(NOT_APPLICABLE.name()));
+        assertThat(ProteomeMembership.membership(true, true, true), is(REFERENCE.name()));
+        assertThat(ProteomeMembership.membership(true, true, false), is(REFERENCE.name()));
+        assertThat(ProteomeMembership.membership(true, false, true), is(COMPLETE.name()));
+        assertThat(ProteomeMembership.membership(true, false, false), is(NONE.name()));
     }
 
 }

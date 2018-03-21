@@ -20,14 +20,13 @@ public enum ProteomeMembership {
      * @param isComplete is the gene product a member of a complete proteome.
      * @return the name of the ProteomeMembership matching the applied constraints
      */
-    public static String membership(Supplier<Boolean> isProtein, Supplier<Boolean> isReferenceProteome,
-            Supplier<Boolean> isComplete) {
+    public static String membership(boolean isProtein, boolean isReferenceProteome, boolean isComplete) {
 
-        if (!isProtein.get()) {
+        if (!isProtein) {
             return NOT_APPLICABLE.name();
-        } else if (isReferenceProteome.get()) {
+        } else if (isReferenceProteome) {
             return REFERENCE.name();
-        } else if (isComplete.get()) {
+        } else if (isComplete) {
             return COMPLETE.name();
         }
         return NONE.name();
