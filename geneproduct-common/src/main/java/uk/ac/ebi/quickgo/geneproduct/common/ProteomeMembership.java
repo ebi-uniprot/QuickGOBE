@@ -10,7 +10,7 @@ import java.util.function.Supplier;
  * Created with IntelliJ IDEA.
  */
 public enum ProteomeMembership {
-    REFERENCE, COMPLETE, NONE, NOTAPPLICABLE;
+    REFERENCE, COMPLETE, NONE, NOT_APPLICABLE;
 
     /**
      * Define the predicates required and order of importance to work out which Proteome membership category is
@@ -18,18 +18,18 @@ public enum ProteomeMembership {
      * @param isProtein is the gene product a protein
      * @param isReferenceProteome is the gene product a reference proteome
      * @param isComplete is the gene product a member of a complete proteome.
-     * @return the ProteomeMembership matching the applied constraints
+     * @return the name of the ProteomeMembership matching the applied constraints
      */
-    public static ProteomeMembership membership(Supplier<Boolean> isProtein, Supplier<Boolean> isReferenceProteome,
+    public static String membership(Supplier<Boolean> isProtein, Supplier<Boolean> isReferenceProteome,
             Supplier<Boolean> isComplete) {
 
         if (!isProtein.get()) {
-            return NOTAPPLICABLE;
+            return NOT_APPLICABLE.name();
         } else if (isReferenceProteome.get()) {
-            return REFERENCE;
+            return REFERENCE.name();
         } else if (isComplete.get()) {
-            return COMPLETE;
+            return COMPLETE.name();
         }
-        return NONE;
+        return NONE.name();
     }
 }

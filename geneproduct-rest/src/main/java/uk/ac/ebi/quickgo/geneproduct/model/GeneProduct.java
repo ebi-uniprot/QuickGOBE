@@ -55,7 +55,7 @@ public class GeneProduct {
     public boolean isCompleteProteome;
 
     // The assigned value fromProteomeMembership */
-    public ProteomeMembership proteomeMembership;
+    public String proteomeMembership;
 
     @Override public String toString() {
         return "GeneProduct{" +

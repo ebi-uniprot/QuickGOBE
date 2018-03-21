@@ -49,7 +49,7 @@ public class GeneProductDocument implements QuickGODocument {
     public String referenceProteome;
 
     @Field(PROTEOME_MEMBERSHIP)
-    public ProteomeMembership proteomeMembership;
+    public String proteomeMembership;
 
     @Field(IS_ISOFORM)
     public boolean isIsoform;
