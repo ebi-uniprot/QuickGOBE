@@ -1,56 +1,21 @@
 package uk.ac.ebi.quickgo.ff.files;
 
-import uk.ac.ebi.quickgo.ff.files.ontology.ECOSourceFiles;
-import uk.ac.ebi.quickgo.ff.files.ontology.GOSourceFiles;
 import uk.ac.ebi.quickgo.ff.reader.Progress;
 import uk.ac.ebi.quickgo.ff.reader.RowIterator;
 import uk.ac.ebi.quickgo.ff.reader.TSVRowReader;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 
 public class SourceFiles {
-	public static final String VERSION = "100";
 
 	File baseDirectory;
 
 	public SourceFiles(File directory) {
 		this.baseDirectory = directory;
-		goSourceFiles = new GOSourceFiles(baseDirectory);
-		ecoSourceFiles = new ECOSourceFiles(baseDirectory);
-		gpDataFileList = new NamedFile(baseDirectory, "GPAD_SOURCE_FILES");
-		mappingFileList = new NamedFile(baseDirectory, "MAPPING_FILES");
-		taxonomy = new TSVDataFile<>(baseDirectory, "TAXONOMY");
-		sequenceSource = new TSVDataFile<>(baseDirectory, "sequences");
-		publications = new TSVDataFile<>(baseDirectory, "PUBLICATIONS");
-		annotationGuidelines = new TSVDataFile<>(baseDirectory, "ANNOTATION_GUIDELINES");
-		annotationBlacklist = new TSVDataFile<>(baseDirectory, "ANNOTATION_BLACKLIST");
-		postProcessingRules = new TSVDataFile<>(baseDirectory, "POST_PROCESSING_RULES");
-		xrfAbbsInfo = new TSVDataFile<>(baseDirectory, "XRF_ABBS");
-		//evidenceInfo = new TSVDataFile<>(baseDirectory, "CV_EVIDENCES");
-		evidenceInfo = new TSVDataFile<>(baseDirectory, "CV_ECO2GO");
-	}
-
-	public File getBaseDirectory() {
-		return baseDirectory;
 	}
 
 	public static NamedFile[] holder(NamedFile... files) {
 	    return files;
-	}
-
-	public static NamedFile[] holder(NamedFile[]... files) {
-	    List<NamedFile> list = new ArrayList<>();
-	    for (NamedFile[] f : files) {
-	    	list.addAll(Arrays.asList(f));
-	    }
-	    return list.toArray(new NamedFile[list.size()]);
 	}
 
 	public static class NamedFile {
@@ -70,9 +35,6 @@ public class SourceFiles {
 	        return name;
 	    }
 
-		public File getDirectory() {
-			return directory;
-		}
 	}
 
 	public static class TSVDataFile<X extends Enum<X>> extends NamedFile {
@@ -90,114 +52,4 @@ public class SourceFiles {
 	        return new RowIterator(Progress.monitor(name, new TSVRowReader(file(), names, true, true, null)));
 	    }
 	}
-
-	// source files for the ontologies that we index
-	public GOSourceFiles goSourceFiles;
-	public ECOSourceFiles ecoSourceFiles;
-
-	// Reference information
-
-	// Reference: Source data
-	public enum EPublication { PUBMED_ID, TITLE }
-	public TSVDataFile<EPublication> publications;
-	public enum EInterProEntry { ENTRY_AC, NAME }
-	public TSVDataFile<EInterProEntry> interpro = new TSVDataFile<>(baseDirectory, "ENTRY");
-
-	NamedFile[] referenceSource = holder(publications, interpro);
-
-	// Protein information
-
-	// Protein: Source data
-	public enum ETaxon { TAXON_ID, NAME, ANCESTRY }
-	public TSVDataFile<ETaxon> taxonomy;
-
-	public enum ESequence { protein, sequence }
-	public TSVDataFile<ESequence> sequenceSource;
-
-	NamedFile[] proteinSource = holder(taxonomy, sequenceSource);
-
-	// Controlled vocabularies
-	public enum EEvidenceCode { ECO_ID, NAME, GO_EVIDENCE, SORT_ORDER }
-	public TSVDataFile<EEvidenceCode> evidenceInfo;
-
-	public enum EQualifier { QUALIFIER, DESCRIPTION }
-	public TSVDataFile<EQualifier> qualifierInfo = new TSVDataFile<>(baseDirectory, "CV_QUALIFIERS");
-
-	public enum EGORef { NAME, GO_REF }
-	public TSVDataFile<EGORef> goRefInfo = new TSVDataFile<>(baseDirectory, "CV_GO_REFS");
-
-	public enum EXrfAbbsEntry { ABBREVIATION, DATABASE, GENERIC_URL, URL_SYNTAX }
-	public TSVDataFile<EXrfAbbsEntry> xrfAbbsInfo;
-
-	public enum EProteinSet { NAME, DESCRIPTION, PROJECT_URL }
-	public TSVDataFile<EProteinSet> proteinSetsInfo = new TSVDataFile<>(baseDirectory, "CV_PROTEIN_SETS");
-
-	public enum EGOEvidence2ECOTranslation { CODE, GO_REF, ECO_ID }
-	public TSVDataFile<EGOEvidence2ECOTranslation> evidence2ECO = new TSVDataFile<>(baseDirectory, "EVIDENCE2ECO");
-
-	public enum EAnnotationBlacklistEntry { PROTEIN_AC, TAXON_ID, GO_ID, REASON, METHOD_ID, CATEGORY, ENTRY_TYPE }
-	public TSVDataFile<EAnnotationBlacklistEntry> annotationBlacklist;
-
-	public enum EAnnotationGuidelineEntry { GO_ID, TITLE, URL }
-	public TSVDataFile<EAnnotationGuidelineEntry> annotationGuidelines;
-
-	public enum EPostProcessingRule { RULE_ID, ANCESTOR_GO_ID, ANCESTOR_TERM, RELATIONSHIP, TAXON_NAME, ORIGINAL_GO_ID, ORIGINAL_TERM, CLEANUP_ACTION, AFFECTED_TAX_GROUP, SUBSTITUTED_GO_ID, SUBSTITUTED_TERM, CURATOR_NOTES }
-	public TSVDataFile<EPostProcessingRule> postProcessingRules;
-
-	NamedFile[] controlledVocabs = holder(evidenceInfo, qualifierInfo, goRefInfo, xrfAbbsInfo, proteinSetsInfo, evidence2ECO, annotationBlacklist, postProcessingRules);
-
-	// Controlled vocabularies: derived data
-	public enum EGP2ProteinDB { CODE, IS_DB }
-	public TSVDataFile<EGP2ProteinDB> gp2proteinDb = new TSVDataFile<>(baseDirectory, "GP2PROTEIN_DB");
-
-	NamedFile[] controlledVocabsDerived = holder(gp2proteinDb);
-
-	// Annotation: source data
-	NamedFile gpDataFileList;
-	NamedFile mappingFileList;
-	NamedFile[] annotationSource = holder(gpDataFileList, mappingFileList);
-
-	// Prerequisite file set
-	protected NamedFile[] prerequisite = holder(annotationSource, referenceSource, proteinSource, controlledVocabs);
-
-	// Archive file set
-	protected NamedFile[] archive = holder(controlledVocabs, controlledVocabsDerived);
-
-	public NamedFile[] requiredFiles() {
-		return prerequisite;
-	}
-
-	public NamedFile[] archiveFiles() {
-		return archive;
-	}
-
-	public NamedFile[] getMappingFiles() {
-		return getFiles(mappingFileList, "gp2protein");
-	}
-
-	public NamedFile[] getGPDataFiles() {
-		return getFiles(gpDataFileList, null);
-	}
-
-	public NamedFile[] getFiles(NamedFile listFile, final String prefix) {
-		List<NamedFile> list = new ArrayList<NamedFile>();
-
-		try {
-			BufferedReader reader = new BufferedReader(new FileReader(listFile.file()));
-			String fileName;
-			while ((fileName = reader.readLine()) != null) {
-				if (!"".equals(fileName) && (prefix == null || fileName.startsWith(prefix))) {
-					list.add(new NamedFile(baseDirectory, fileName));
-				}
-			}
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		return list.toArray(new NamedFile[list.size()]);
-	}
-
-	// Download files
-	public final static String stampName = "quickgo-stamp-v" + VERSION + ".txt";
 }
