@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <enumsConfig>
-    <enum name="proteomeMembership">
+    <enum name="proteomeMembershipEnum">
         <value>REFERENCE</value>
         <value>COMPLETE</value>
         <value>NONE</value>
