@@ -1,5 +1,7 @@
 package uk.ac.ebi.quickgo.geneproduct.common;
 
+import java.util.function.Supplier;
+
 /**
  * An enumeration of the possible states of proteome membership a gene product can have.
  * @author Tony Wardell
@@ -18,12 +20,14 @@ public enum ProteomeMembership {
      * @param isComplete is the gene product a member of a complete proteome.
      * @return the ProteomeMembership matching the applied constraints
      */
-    public static ProteomeMembership membership(boolean isProtein, boolean isRef, boolean isComplete) {
-        if (!isProtein) {
+    public static ProteomeMembership membership(Supplier<Boolean> isProtein, Supplier<Boolean> isReferenceProteome,
+            Supplier<Boolean> isComplete) {
+
+        if (!isProtein.get()) {
             return NOT_APPLICABLE;
-        } else if (isRef) {
+        } else if (isReferenceProteome.get()) {
             return REFERENCE;
-        } else if (isComplete) {
+        } else if (isComplete.get()) {
             return COMPLETE;
         }
         return NONE;
