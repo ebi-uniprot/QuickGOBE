@@ -8,7 +8,7 @@ import static org.hamcrest.Matchers.is;
 import static org.springframework.test.util.MatcherAssertionErrors.assertThat;
 import static uk.ac.ebi.quickgo.geneproduct.common.ProteomeMembership.COMPLETE;
 import static uk.ac.ebi.quickgo.geneproduct.common.ProteomeMembership.NONE;
-import static uk.ac.ebi.quickgo.geneproduct.common.ProteomeMembership.NOT_APPLICABLE;
+import static uk.ac.ebi.quickgo.geneproduct.common.ProteomeMembership.NOTAPPLICABLE;
 import static uk.ac.ebi.quickgo.geneproduct.common.ProteomeMembership.REFERENCE;
 
 /**
@@ -21,9 +21,9 @@ public class ProteomeMembershipTest {
 
     @Test
     public void checkMembershipCreationRules() {
-        assertThat(ProteomeMembership.membership(() -> false, () -> true, () -> true), is(NOT_APPLICABLE));
-        assertThat(ProteomeMembership.membership(() -> false, () -> false, () -> true), is(NOT_APPLICABLE));
-        assertThat(ProteomeMembership.membership(() -> false, () -> true, () -> false), is(NOT_APPLICABLE));
+        assertThat(ProteomeMembership.membership(() -> false, () -> true, () -> true), is(NOTAPPLICABLE));
+        assertThat(ProteomeMembership.membership(() -> false, () -> false, () -> true), is(NOTAPPLICABLE));
+        assertThat(ProteomeMembership.membership(() -> false, () -> true, () -> false), is(NOTAPPLICABLE));
         assertThat(ProteomeMembership.membership(() -> true, () -> true, () -> true), is(REFERENCE));
         assertThat(ProteomeMembership.membership(() -> true, () -> true, () -> false), is(REFERENCE));
         assertThat(ProteomeMembership.membership(() -> true, () -> false, () -> true), is(COMPLETE));

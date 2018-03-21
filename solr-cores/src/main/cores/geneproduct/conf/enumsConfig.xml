@@ -4,6 +4,6 @@
         <value>REFERENCE</value>
         <value>COMPLETE</value>
         <value>NONE</value>
-        <value>NOT_APPLICABLE</value>
+        <value>NOTAPPLICABLE</value>
     </enum>
 </enumsConfig>

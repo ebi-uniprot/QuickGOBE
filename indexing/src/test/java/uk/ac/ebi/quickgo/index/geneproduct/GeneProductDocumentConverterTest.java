@@ -195,7 +195,7 @@ public class GeneProductDocumentConverterTest {
         assertThat(doc.isAnnotated, is(false));
         assertThat(doc.isIsoform, is(false));
         assertThat(doc.isCompleteProteome, is(false));
-        assertThat(doc.proteomeMembership, is(NOT_APPLICABLE));
+        assertThat(doc.proteomeMembership, is(NOTAPPLICABLE));
     }
 
     @Test
