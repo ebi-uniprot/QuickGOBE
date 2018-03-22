@@ -20,7 +20,7 @@ import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.M
 import static uk.ac.ebi.quickgo.rest.search.DefaultSearchQueryTemplate.DEFAULT_PAGE_NUMBER;
 
 /**
- * A data structure used to store the input parameters a client can submit to the Ontology search enpoint
+ * A data structure used to store the input parameters a client can submit to the GeneProduct search endpoint
  *
  * Once the comma separated values have been set, then turn then into an object (SimpleFilter) that
  * encapsulates the list and solr field name to use for that argument.
@@ -30,7 +30,8 @@ public class GeneProductRequest {
     private static final String[] TARGET_FIELDS = new String[]{
             GeneProductFields.Searchable.TYPE,
             GeneProductFields.Searchable.TAXON_ID,
-            GeneProductFields.Searchable.DATABASE_SUBSET};
+            GeneProductFields.Searchable.DATABASE_SUBSET,
+            GeneProductFields.Searchable.PROTEOME_MEMBERSHIP};
 
     @ApiModelProperty(value = "Indicates whether the result set should be highlighted", hidden = true)
     private boolean highlighting = false;
@@ -62,9 +63,13 @@ public class GeneProductRequest {
     private String type;
 
     @ApiModelProperty(value = "Filters the results of the main query based on a value chosen from " +
-            "the sbSubset field", allowableValues = "TrEMBL,Swiss-Prot", example = "TrEMBL")
+            "the dbSubset field", allowableValues = "TrEMBL,Swiss-Prot", example = "TrEMBL")
     private String dbSubset;
 
+    @ApiModelProperty(value = "Filters the results of the main query based on a value chosen from the " +
+            "proteomeMembership field", allowableValues = "Reference,Complete,None,Not-applicable", example =
+            "Reference")
+    private String proteomeMembership;
 
     private Map<String, String[]> filterMap = new HashMap<>();
 
@@ -150,6 +155,19 @@ public class GeneProductRequest {
     public void setDbSubset(String dbSubset) {
         if (dbSubset != null) {
             filterMap.put(GeneProductFields.Searchable.DATABASE_SUBSET, new String[]{dbSubset});
+        }
+    }
+
+    @Pattern(regexp = "Reference|Complete|None|Not-applicable", flags = CASE_INSENSITIVE,
+            message = "Provided dbSubset is invalid: ${validatedValue}")
+    public String getProteomeMembership() {
+        return filterMap.get(GeneProductFields.Searchable.PROTEOME_MEMBERSHIP) == null ? null :
+                filterMap.get(GeneProductFields.Searchable.PROTEOME_MEMBERSHIP)[0];
+    }
+
+    public void setProteomeMembership(String proteomeMembership) {
+        if (proteomeMembership != null) {
+            filterMap.put(GeneProductFields.Searchable.PROTEOME_MEMBERSHIP, new String[]{proteomeMembership});
         }
     }
 
