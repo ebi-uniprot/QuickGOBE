@@ -1,6 +1,5 @@
 package uk.ac.ebi.quickgo.geneproduct.common;
 
-import java.util.function.Supplier;
 
 /**
  * An enumeration of the possible states of proteome membership a gene product can have.
@@ -10,7 +9,20 @@ import java.util.function.Supplier;
  * Created with IntelliJ IDEA.
  */
 public enum ProteomeMembership {
-    REFERENCE, COMPLETE, NONE, NOT_APPLICABLE;
+    REFERENCE("Reference"),
+    COMPLETE("Complete"),
+    NONE("None"),
+    NOT_APPLICABLE("Not-applicable");
+
+    private String value;
+
+    ProteomeMembership(String value) {
+        this.value = value;
+    }
+
+    public String getValue() {
+        return value;
+    }
 
     /**
      * Define the predicates required and order of importance to work out which Proteome membership category is
@@ -18,17 +30,17 @@ public enum ProteomeMembership {
      * @param isProtein is the gene product a protein
      * @param isReferenceProteome is the gene product a reference proteome
      * @param isComplete is the gene product a member of a complete proteome.
-     * @return the name of the ProteomeMembership matching the applied constraints
+     * @return the String representation of the ProteomeMembership matching the applied constraints
      */
     public static String membership(boolean isProtein, boolean isReferenceProteome, boolean isComplete) {
 
         if (!isProtein) {
-            return NOT_APPLICABLE.name();
+            return NOT_APPLICABLE.getValue();
         } else if (isReferenceProteome) {
-            return REFERENCE.name();
+            return REFERENCE.getValue();
         } else if (isComplete) {
-            return COMPLETE.name();
+            return COMPLETE.getValue();
         }
-        return NONE.name();
+        return NONE.getValue();
     }
 }
