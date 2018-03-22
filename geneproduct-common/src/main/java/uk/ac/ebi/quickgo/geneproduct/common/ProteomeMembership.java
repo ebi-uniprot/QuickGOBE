@@ -20,7 +20,7 @@ public enum ProteomeMembership {
         this.value = value;
     }
 
-    public String getValue() {
+    public String toString() {
         return value;
     }
 
@@ -35,12 +35,12 @@ public enum ProteomeMembership {
     public static String membership(boolean isProtein, boolean isReferenceProteome, boolean isComplete) {
 
         if (!isProtein) {
-            return NOT_APPLICABLE.getValue();
+            return NOT_APPLICABLE.toString();
         } else if (isReferenceProteome) {
-            return REFERENCE.getValue();
+            return REFERENCE.toString();
         } else if (isComplete) {
-            return COMPLETE.getValue();
+            return COMPLETE.toString();
         }
-        return NONE.getValue();
+        return NONE.toString();
     }
 }
