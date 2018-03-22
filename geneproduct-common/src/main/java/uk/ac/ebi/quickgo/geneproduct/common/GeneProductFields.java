@@ -46,7 +46,7 @@ public class GeneProductFields {
         public static final String TYPE = storeAndGet(VALUES, GeneProductFields.TYPE);
         public static final String TAXON_ID = storeAndGet(VALUES, GeneProductFields.TAXON_ID);
         public static final String DATABASE_SUBSET = storeAndGet(VALUES, GeneProductFields.DATABASE_SUBSET);
-
+        public static final String PROTEOME_MEMBERSHIP = storeAndGet(VALUES, GeneProductFields.PROTEOME_MEMBERSHIP);
         public static boolean isRetrievable(String field) {
             return VALUES.contains(field);
         }
@@ -64,6 +64,7 @@ public class GeneProductFields {
         public static final String TAXON_ID = storeAndGet(VALUES, GeneProductFields.TAXON_ID);
         public static final String DATABASE_SUBSET = storeAndGet(VALUES, "dbSubset_lowercase");
         public static final String TARGET_SET = storeAndGet(VALUES, GeneProductFields.TARGET_SET);
+        public static final String PROTEOME_MEMBERSHIP = storeAndGet(VALUES, GeneProductFields.PROTEOME_MEMBERSHIP);
 
         public static boolean isSearchable(String field) {
             return VALUES.contains(field);
