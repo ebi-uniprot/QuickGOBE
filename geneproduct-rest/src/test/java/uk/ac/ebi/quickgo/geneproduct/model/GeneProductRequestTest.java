@@ -149,6 +149,21 @@ public class GeneProductRequestTest {
         assertValueInFilter(filterRequest, protein);
     }
 
+    @Test
+    public void createsFilterForProteomeMembership() {
+        String proteomeStatus = "reference";
+
+        geneProductRequest.setProteomeMembership(proteomeStatus);
+
+        List<FilterRequest> filters = geneProductRequest.createFilterRequests();
+
+        assertThat(filters, hasSize(1));
+
+        FilterRequest filterRequest = filters.get(0);
+
+        assertValueInFilter(filterRequest, proteomeStatus);
+    }
+
     private void assertValueInFilter(FilterRequest filterRequest, String filterValue) {
         assertThat(filterRequest.getValues(), is(not(empty())));
 
