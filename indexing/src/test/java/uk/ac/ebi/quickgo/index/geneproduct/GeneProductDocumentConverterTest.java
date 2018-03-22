@@ -167,7 +167,7 @@ public class GeneProductDocumentConverterTest {
         assertThat(doc.isAnnotated, is(true));
         assertThat(doc.isIsoform, is(true));
         assertThat(doc.isCompleteProteome, is(true));
-        assertThat(doc.proteomeMembership, is(COMPLETE.name()));
+        assertThat(doc.proteomeMembership, is(COMPLETE.toString()));
     }
 
     @Test
@@ -183,7 +183,7 @@ public class GeneProductDocumentConverterTest {
         assertThat(doc.isAnnotated, is(false));
         assertThat(doc.isIsoform, is(false));
         assertThat(doc.isCompleteProteome, is(false));
-        assertThat(doc.proteomeMembership, is(NONE.name()));
+        assertThat(doc.proteomeMembership, is(NONE.toString()));
     }
 
     @Test
@@ -195,7 +195,7 @@ public class GeneProductDocumentConverterTest {
         assertThat(doc.isAnnotated, is(false));
         assertThat(doc.isIsoform, is(false));
         assertThat(doc.isCompleteProteome, is(false));
-        assertThat(doc.proteomeMembership, is(NOT_APPLICABLE.name()));
+        assertThat(doc.proteomeMembership, is(NOT_APPLICABLE.toString()));
     }
 
     @Test
@@ -207,7 +207,7 @@ public class GeneProductDocumentConverterTest {
         GeneProductDocument doc = converter.process(geneProduct);
 
         assertThat(doc.referenceProteome, is(referenceProteome));
-        assertThat(doc.proteomeMembership, is(REFERENCE.name()));
+        assertThat(doc.proteomeMembership, is(REFERENCE.toString()));
     }
 
     @Test
