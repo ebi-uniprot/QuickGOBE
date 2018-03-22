@@ -159,7 +159,7 @@ public class GeneProductRequest {
     }
 
     @Pattern(regexp = "Reference|Complete|None|Not-applicable", flags = CASE_INSENSITIVE,
-            message = "Provided dbSubset is invalid: ${validatedValue}")
+            message = "Provided proteomeMembership is invalid: ${validatedValue}")
     public String getProteomeMembership() {
         return filterMap.get(GeneProductFields.Searchable.PROTEOME_MEMBERSHIP) == null ? null :
                 filterMap.get(GeneProductFields.Searchable.PROTEOME_MEMBERSHIP)[0];
