@@ -12,7 +12,7 @@ public enum ProteomeMembership {
     REFERENCE("Reference"),
     COMPLETE("Complete"),
     NONE("None"),
-    NOT_APPLICABLE("Not-applicable");
+    NOT_APPLICABLE("Not applicable");
 
     private String value;
 
