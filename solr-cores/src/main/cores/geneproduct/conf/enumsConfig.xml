@@ -1,9 +1,0 @@
-<?xml version="1.0" ?>
-<enumsConfig>
-    <enum name="proteomeMembershipEnum">
-        <value>REFERENCE</value>
-        <value>COMPLETE</value>
-        <value>NONE</value>
-        <value>NOTAPPLICABLE</value>
-    </enum>
-</enumsConfig>
