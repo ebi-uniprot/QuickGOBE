@@ -88,16 +88,6 @@ public class GeneProductRequestTest {
     }
 
     @Test
-    public void createDbSubsetFilter() {
-        String queryStr = "I am a query";
-        QuickGOQuery query = QuickGOQuery.createQuery(queryStr);
-
-        geneProductRequest.setQuery(queryStr);
-
-        assertThat(geneProductRequest.createQuery(), is(query));
-    }
-
-    @Test
     public void emptyGeneProductCreatesNoFilterRequests() {
         List<FilterRequest> filters = geneProductRequest.createFilterRequests();
 
