@@ -18,7 +18,7 @@ public interface GeneProductRepository extends SolrCrudRepository<GeneProductDoc
 
     @Query(value = ID + ":?0",
             fields = {ID, DATABASE, NAME, SYMBOL, SYNONYM, TYPE, TAXON_ID, DATABASE_SUBSET,
-                    COMPLETE_PROTEOME, REFERENCE_PROTEOME, IS_ISOFORM, IS_ANNOTATED, PARENT_ID})
+                    COMPLETE_PROTEOME, REFERENCE_PROTEOME, IS_ISOFORM, IS_ANNOTATED, PARENT_ID, PROTEOME_MEMBERSHIP})
     List<GeneProductDocument> findById(List<String> ids);
 
     List<GeneProductDocument> findByTargetSet(String name);
