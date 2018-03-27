@@ -50,12 +50,11 @@ public class GeneProduct {
 
     public boolean isAnnotated;
 
-    //todo maybe.. this value could be replaced with the UPID (as we have for referenceProteome)
     @Deprecated //replaced by proteomeMembership
     public boolean isCompleteProteome;
 
     // The assigned value fromProteomeMembership */
-    public String proteomeMembership;
+    public ProteomeMembership proteomeMembership;
 
     @Override public String toString() {
         return "GeneProduct{" +
