@@ -58,7 +58,7 @@ public class GeneProductRequestValidationIT {
     private GeneProductRequest geneProductRequest;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         geneProductRequest = new GeneProductRequest();
         geneProductRequest.setQuery("query");
     }
@@ -217,7 +217,7 @@ public class GeneProductRequestValidationIT {
     }
 
     @Test
-    public void emotyTaxonIdMixedWithPositiveTaxonIdsIsInvalid() {
+    public void emptyTaxonIdMixedWithPositiveTaxonIdsIsInvalid() {
         String[] taxonId = {"1","","2"};
 
         geneProductRequest.setTaxonId(taxonId);
@@ -229,6 +229,77 @@ public class GeneProductRequestValidationIT {
                 containsString(createTaxonIdErrorMessage()));
     }
 
+    @Test
+    public void successfullyValidateNotApplicableForProteomeMembership() {
+        String proteomeMembership = "not applicable";
+
+        geneProductRequest.setProteomeMembership(proteomeMembership);
+
+        assertThat(validator.validate(geneProductRequest), hasSize(0));
+    }
+
+    @Test
+    public void successfullyValidateNotApplicableForProteomeMembershipWhenCaseInsensitive() {
+        String proteomeMembership = "not aPPlicable";
+
+        geneProductRequest.setProteomeMembership(proteomeMembership);
+
+        assertThat(validator.validate(geneProductRequest), hasSize(0));
+    }
+
+    @Test
+    public void successfullyValidateNoneForProteomeMembership() {
+        String proteomeMembership = "None";
+
+        geneProductRequest.setProteomeMembership(proteomeMembership);
+
+        assertThat(validator.validate(geneProductRequest), hasSize(0));
+    }
+
+    @Test
+    public void successfullyValidateReferenceForProteomeMembership() {
+        String proteomeMembership = "reference";
+
+        geneProductRequest.setProteomeMembership(proteomeMembership);
+
+        assertThat(validator.validate(geneProductRequest), hasSize(0));
+    }
+
+    @Test
+    public void successfullyValidateCompleteForProteomeMembership() {
+        String proteomeMembership = "complete";
+
+        geneProductRequest.setProteomeMembership(proteomeMembership);
+
+        assertThat(validator.validate(geneProductRequest), hasSize(0));
+    }
+
+    @Test
+    public void emptyProteomeMembershipIsInvalid() {
+        String proteomeMembership = "";
+
+        geneProductRequest.setProteomeMembership(proteomeMembership);
+
+        Set<ConstraintViolation<GeneProductRequest>> violations = validator.validate(geneProductRequest);
+        assertThat(validator.validate(geneProductRequest), hasSize(1));
+
+        assertThat(violations.iterator().next().getMessage(),
+                containsString(createGenericErrorMessage("proteomeMembership", "")));
+    }
+
+    @Test
+    public void proteomeMembershipIsInvalid() {
+        String proteomeMembership = "asdfasdgfas";
+
+        geneProductRequest.setProteomeMembership(proteomeMembership);
+
+        Set<ConstraintViolation<GeneProductRequest>> violations = validator.validate(geneProductRequest);
+        assertThat(validator.validate(geneProductRequest), hasSize(1));
+
+        assertThat(violations.iterator().next().getMessage(),
+                containsString(createGenericErrorMessage("proteomeMembership", proteomeMembership)));
+    }
+
     private String createGenericErrorMessage(String field, String value) {
         return "Provided " + field + " is invalid: " + value;
     }
@@ -236,4 +307,5 @@ public class GeneProductRequestValidationIT {
     private String createTaxonIdErrorMessage() {
         return "The 'taxonId' parameter contains invalid values: ";
     }
+
 }
