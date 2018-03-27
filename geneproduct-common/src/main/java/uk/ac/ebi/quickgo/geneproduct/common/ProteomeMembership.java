@@ -1,5 +1,7 @@
 package uk.ac.ebi.quickgo.geneproduct.common;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+import java.util.Arrays;
 
 /**
  * An enumeration of the possible states of proteome membership a gene product can have.
@@ -20,9 +22,22 @@ public enum ProteomeMembership {
         this.value = value;
     }
 
+    @JsonValue
     @Override
     public String toString() {
         return value;
+    }
+
+    /**
+     * Provide a ProteomeMembership derived from a string representation.
+     * @param value string tested for ProteomeMembership equivalence.
+     * @return ProteomeMembership
+     */
+    public static ProteomeMembership fromString(String value) {
+        return Arrays.stream(values())
+                .filter(v -> v.toString().equals(value))
+                .findFirst()
+                .orElse(NOT_APPLICABLE);
     }
 
     /**
