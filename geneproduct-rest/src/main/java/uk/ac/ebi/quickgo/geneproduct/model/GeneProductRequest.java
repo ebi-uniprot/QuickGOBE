@@ -158,7 +158,7 @@ public class GeneProductRequest {
         }
     }
 
-    @Pattern(regexp = "Reference|Complete|None|Not-applicable", flags = CASE_INSENSITIVE,
+    @Pattern(regexp = "Reference|Complete|None|Not applicable", flags = CASE_INSENSITIVE,
             message = "Provided proteomeMembership is invalid: ${validatedValue}")
     public String getProteomeMembership() {
         return filterMap.get(GeneProductFields.Searchable.PROTEOME_MEMBERSHIP) == null ? null :
