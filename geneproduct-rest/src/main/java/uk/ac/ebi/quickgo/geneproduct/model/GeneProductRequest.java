@@ -67,7 +67,22 @@ public class GeneProductRequest {
     private String dbSubset;
 
     @ApiModelProperty(value = "Filters the results of the main query based on a value chosen from the " +
-            "proteomeMembership field", allowableValues = "Reference,Complete,None,Not applicable", example =
+            "proteomeMembership field. Proteins with a proteomeMembership of 'Reference' are part of a subset " +
+            "of proteomes that have been selected either manually or algorithmically according to a number of " +
+            "criteria to provide a broad coverage of the tree of life and a representative cross-section of the " +
+            "taxonomic diversity found within UniProtKB, as well as the proteomes of well-studied model organisms and" +
+            " other species of interest for biomedical research. Proteins with a proteomeMembership of 'Complete' " +
+            "are part of a proteome. A proteome is the set of protein sequences that can be derived by translation of" +
+            " all protein coding genes of a completely sequenced genome, including alternative products such as " +
+            "splice" +
+            " variants for those species in which these may occur. If a gene product is in a reference proteome it is" +
+            " always part of a complete proteome but not vice-versa. A proteomeMembership of 'None' means the gene" +
+            " product is not assigned to a proteome, but is a protein. A proteomeMembership of 'Not applicable'" +
+            " means the gene product is not a protein, and cannot be part of a proteome.",
+            allowableValues =
+                    "Reference," +
+                            "Complete,None,Not applicable",
+            example =
             "Reference")
     private String proteomeMembership;
 
