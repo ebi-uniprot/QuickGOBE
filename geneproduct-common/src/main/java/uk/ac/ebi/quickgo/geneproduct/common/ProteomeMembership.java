@@ -35,7 +35,7 @@ public enum ProteomeMembership {
      */
     public static ProteomeMembership fromString(String value) {
         return Arrays.stream(values())
-                .filter(v -> v.toString().equals(value))
+                .filter(v -> v.toString().equalsIgnoreCase(value))
                 .findFirst()
                 .orElse(NOT_APPLICABLE);
     }
