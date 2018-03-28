@@ -274,6 +274,23 @@
     <fieldType name="database_id" class="solr.TextField" positionIncrementGap="100">
         <analyzer type="index">
             <tokenizer class="solr.KeywordTokenizerFactory"/>
+            <!--
+            Turn
+                UniProtKB:A0A0K3AYF5|UniProtKB:A0A0K3AYF5,UniProtKB:P41855|UniProtKB:A0A0K3AYF5,UniProtKB:P41855,
+                UniProtKB:Q6F3C9|UniProtKB:A0A0K3AYF5,UniProtKB:Q6F3C9|UniProtKB:A0A0K3AYF5,UniProtKB:Q6F3C9,
+                UniProtKB:Q9N4V0|UniProtKB:P41855,UniProtKB:Q18534|UniProtKB:P41855,UniProtKB:Q18534,
+                UniProtKB:Q6F3C9|UniProtKB:P41855,UniProtKB:Q6F3C9|UniProtKB:Q18534|UniProtKB:Q18534,
+                UniProtKB:Q6F3C9|UniProtKB:Q18534,UniProtKB:Q6F3C9,UniProtKB:Q9N4V0|UniProtKB:Q18534,
+                UniProtKB:Q9N4V0|UniProtKB:Q6F3C9|UniProtKB:Q6F3C9,UniProtKB:Q9N4V0
+            into
+                UniProtKB:
+                UniProtKB:
+                UniProtKB:
+                UniProtKB:
+            -->
+            <filter class="solr.PatternCaptureGroupFilterFactory"
+                    pattern="([A-Za-z_-]*:)*"
+                    preserve_original="false"/>
             <charFilter class="solr.PatternReplaceCharFilterFactory"
                         pattern="([^:]+).*" replacement="$1"/>
         </analyzer>
