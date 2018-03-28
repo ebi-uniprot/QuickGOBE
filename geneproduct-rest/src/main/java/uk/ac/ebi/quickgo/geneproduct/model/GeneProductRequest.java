@@ -67,7 +67,7 @@ public class GeneProductRequest {
     private String dbSubset;
 
     @ApiModelProperty(value = "Filters the results of the main query based on a value chosen from the " +
-            "proteomeMembership field", allowableValues = "Reference,Complete,None,Not-applicable", example =
+            "proteomeMembership field", allowableValues = "Reference,Complete,None,Not applicable", example =
             "Reference")
     private String proteomeMembership;
 
