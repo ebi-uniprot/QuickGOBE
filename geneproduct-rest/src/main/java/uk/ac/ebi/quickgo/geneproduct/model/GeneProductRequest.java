@@ -20,7 +20,7 @@ import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.M
 import static uk.ac.ebi.quickgo.rest.search.DefaultSearchQueryTemplate.DEFAULT_PAGE_NUMBER;
 
 /**
- * A data structure used to store the input parameters a client can submit to the Ontology search enpoint
+ * A data structure used to store the input parameters a client can submit to the GeneProduct search endpoint
  *
  * Once the comma separated values have been set, then turn then into an object (SimpleFilter) that
  * encapsulates the list and solr field name to use for that argument.
@@ -30,7 +30,8 @@ public class GeneProductRequest {
     private static final String[] TARGET_FIELDS = new String[]{
             GeneProductFields.Searchable.TYPE,
             GeneProductFields.Searchable.TAXON_ID,
-            GeneProductFields.Searchable.DATABASE_SUBSET};
+            GeneProductFields.Searchable.DATABASE_SUBSET,
+            GeneProductFields.Searchable.PROTEOME_MEMBERSHIP};
 
     @ApiModelProperty(value = "Indicates whether the result set should be highlighted", hidden = true)
     private boolean highlighting = false;
@@ -62,9 +63,28 @@ public class GeneProductRequest {
     private String type;
 
     @ApiModelProperty(value = "Filters the results of the main query based on a value chosen from " +
-            "the sbSubset field", allowableValues = "TrEMBL,Swiss-Prot", example = "TrEMBL")
+            "the dbSubset field", allowableValues = "TrEMBL,Swiss-Prot", example = "TrEMBL")
     private String dbSubset;
 
+    @ApiModelProperty(value = "Filters the results of the main query based on a value chosen from the " +
+            "proteomeMembership field. Proteins with a proteomeMembership of 'Reference' are part of a subset " +
+            "of proteomes that have been selected either manually or algorithmically according to a number of " +
+            "criteria to provide a broad coverage of the tree of life and a representative cross-section of the " +
+            "taxonomic diversity found within UniProtKB, as well as the proteomes of well-studied model organisms and" +
+            " other species of interest for biomedical research. Proteins with a proteomeMembership of 'Complete' " +
+            "are part of a proteome. A proteome is the set of protein sequences that can be derived by translation of" +
+            " all protein coding genes of a completely sequenced genome, including alternative products such as " +
+            "splice" +
+            " variants for those species in which these may occur. If a gene product is in a reference proteome it is" +
+            " always part of a complete proteome but not vice-versa. A proteomeMembership of 'None' means the gene" +
+            " product is not assigned to a proteome, but is a protein. A proteomeMembership of 'Not applicable'" +
+            " means the gene product is not a protein, and cannot be part of a proteome.",
+            allowableValues =
+                    "Reference," +
+                            "Complete,None,Not applicable",
+            example =
+            "Reference")
+    private String proteomeMembership;
 
     private Map<String, String[]> filterMap = new HashMap<>();
 
@@ -150,6 +170,19 @@ public class GeneProductRequest {
     public void setDbSubset(String dbSubset) {
         if (dbSubset != null) {
             filterMap.put(GeneProductFields.Searchable.DATABASE_SUBSET, new String[]{dbSubset});
+        }
+    }
+
+    @Pattern(regexp = "Reference|Complete|None|Not applicable", flags = CASE_INSENSITIVE,
+            message = "Provided proteomeMembership is invalid: ${validatedValue}")
+    public String getProteomeMembership() {
+        return filterMap.get(GeneProductFields.Searchable.PROTEOME_MEMBERSHIP) == null ? null :
+                filterMap.get(GeneProductFields.Searchable.PROTEOME_MEMBERSHIP)[0];
+    }
+
+    public void setProteomeMembership(String proteomeMembership) {
+        if (proteomeMembership != null) {
+            filterMap.put(GeneProductFields.Searchable.PROTEOME_MEMBERSHIP, new String[]{proteomeMembership});
         }
     }
 

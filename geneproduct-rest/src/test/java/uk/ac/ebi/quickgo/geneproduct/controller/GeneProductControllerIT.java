@@ -189,8 +189,8 @@ public class GeneProductControllerIT {
                 .andExpect(jsonPath(path + "isCompleteProteome").value(true))
                 .andExpect(jsonPath(path + "name").value("moeA5"))
                 .andExpect(jsonPath(path + "referenceProteome").value("AAAA"))
-                .andExpect(jsonPath(path + "synonyms[0]").value("3SSW23"));
-
+                .andExpect(jsonPath(path + "synonyms[0]").value("3SSW23"))
+                .andExpect(jsonPath(path + "proteomeMembership").value("Complete"));
     }
 
     private String buildGeneProductURL(String id) {

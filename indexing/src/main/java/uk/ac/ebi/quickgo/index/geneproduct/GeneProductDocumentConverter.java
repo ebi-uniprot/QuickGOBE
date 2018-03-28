@@ -1,15 +1,18 @@
 package uk.ac.ebi.quickgo.index.geneproduct;
 
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductDocument;
+import uk.ac.ebi.quickgo.geneproduct.common.GeneProductType;
 import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
 
 import com.google.common.base.Preconditions;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import org.springframework.batch.item.ItemProcessor;
 
+import static uk.ac.ebi.quickgo.geneproduct.common.ProteomeMembership.*;
 import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.convertLinePropertiesToMap;
 import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.splitValue;
 import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductParsingHelper.*;
@@ -44,13 +47,13 @@ public class GeneProductDocumentConverter implements ItemProcessor<GeneProduct, 
         this.specificValueDelimiter = specificValueDelimiter;
     }
 
-    @Override public GeneProductDocument process(GeneProduct geneProduct) throws Exception {
+    @Override public GeneProductDocument process(GeneProduct geneProduct) {
         if (geneProduct == null) {
             throw new DocumentReaderException("Gene product object is null");
         }
 
-        Map<String, String> properties =
-                convertLinePropertiesToMap(geneProduct.properties, interValueDelimiter, intraValueDelimiter);
+        GeneProductProperties properties = new GeneProductProperties(geneProduct.properties,
+                interValueDelimiter, intraValueDelimiter);
 
         GeneProductDocument doc = new GeneProductDocument();
         doc.database = geneProduct.database;
@@ -65,22 +68,46 @@ public class GeneProductDocumentConverter implements ItemProcessor<GeneProduct, 
         doc.referenceProteome = properties.get(REFERENCE_PROTEOME_KEY);
         doc.databaseSubset = properties.get(DATABASE_SUBSET_KEY);
         doc.targetSet = convertToList((splitValue(properties.get(TARGET_SET_KEY), specificValueDelimiter)));
-        doc.isCompleteProteome = isTrue(properties.get(COMPLETE_PROTEOME_KEY));
-        doc.isAnnotated = isTrue(properties.get(IS_ANNOTATED_KEY));
-        doc.isIsoform = isTrue(properties.get(IS_ISOFORM_KEY));
-
+        doc.isCompleteProteome = properties.isTrue(COMPLETE_PROTEOME_KEY);
+        doc.isAnnotated = properties.isTrue(IS_ANNOTATED_KEY);
+        doc.isIsoform = properties.isTrue(IS_ISOFORM_KEY);
+        doc.proteomeMembership = membership(isProtein(geneProduct),
+                properties.specifies(REFERENCE_PROTEOME_KEY),
+                properties.isTrue(COMPLETE_PROTEOME_KEY));
         return doc;
     }
 
-    private boolean isTrue(String value) {
-        return value != null && value.equalsIgnoreCase(TRUE_STRING);
+    private boolean isProtein(GeneProduct geneProduct) {
+        return GeneProductType.PROTEIN.getName().equals(geneProduct.type);
     }
 
     @SafeVarargs private final <T> List<T> convertToList(T... elements) {
         List<T> list = Arrays.stream(elements)
-                .filter(element -> element != null)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
-        return list.size() == 0 ? null : list;
+        return list.isEmpty() ? null : list;
+    }
+
+    static class GeneProductProperties {
+        final Map<String, String> properties;
+
+        private GeneProductProperties(String properties, String interValueDelimiter, String intraValueDelimiter) {
+            this.properties =
+                    convertLinePropertiesToMap(properties, interValueDelimiter, intraValueDelimiter);
+        }
+
+        private boolean isTrue(String key) {
+            String value = properties.get(key);
+            return value != null && value.equalsIgnoreCase(TRUE_STRING);
+        }
+
+        private boolean specifies(String key) {
+            return properties.get(key) != null;
+        }
+
+        private String get(String key) {
+            return properties.get(key);
+        }
     }
 }

@@ -6,7 +6,8 @@ package uk.ac.ebi.quickgo.geneproduct;
 public enum GeneProductParameters {
     TYPE_PARAM("type"),
     TAXON_ID_PARAM("taxonId"),
-    DB_SUBSET_PARAM("dbSubset");
+    DB_SUBSET_PARAM("dbSubset"),
+    PROTEOME_MEMBERSHIP_PARAM("proteomeMembership");
 
     private String name;
 

@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.index.geneproduct;
 
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductDocument;
+import uk.ac.ebi.quickgo.geneproduct.common.GeneProductType;
 import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
 import uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingUtil;
 
@@ -14,6 +15,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
+import static uk.ac.ebi.quickgo.geneproduct.common.ProteomeMembership.*;
 import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingUtil.concatStrings;
 import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductParsingHelper.*;
 import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductUtil.createUnconvertedTaxonId;
@@ -31,13 +33,13 @@ public class GeneProductDocumentConverterTest {
     private GeneProduct geneProduct;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         converter = new GeneProductDocumentConverter(INTER_VALUE_DELIMITER_REGEX, INTRA_VALUE_DELIMITER, SPECIFIC_VALUE_DELIMITER);
         geneProduct = new GeneProduct();
     }
 
     @Test
-    public void nullInterValueDelimiterThrowsException() throws Exception {
+    public void nullInterValueDelimiterThrowsException() {
         String interValueDelimiter = null;
         String intraValueDelimiter = INTRA_VALUE_DELIMITER;
 
@@ -49,7 +51,7 @@ public class GeneProductDocumentConverterTest {
     }
 
     @Test
-    public void nullIntraValueDelimiterThrowsException() throws Exception {
+    public void nullIntraValueDelimiterThrowsException() {
         String interValueDelimiter = INTER_VALUE_DELIMITER;
         String intraValueDelimiter = null;
 
@@ -61,12 +63,12 @@ public class GeneProductDocumentConverterTest {
     }
 
     @Test(expected = DocumentReaderException.class)
-    public void nullGeneProductThrowsException() throws Exception {
+    public void nullGeneProductThrowsException() {
         converter.process(null);
     }
 
     @Test
-    public void convertsDirectlyTranslatableFieldsInGeneProduct() throws Exception {
+    public void convertsDirectlyTranslatableFieldsInGeneProduct() {
         geneProduct.database = "UniProtKB";
         geneProduct.id = "A0A000";
         geneProduct.symbol = "moeA5";
@@ -75,6 +77,7 @@ public class GeneProductDocumentConverterTest {
         geneProduct.parentId = "A0A001";
 
         GeneProductDocument doc = converter.process(geneProduct);
+
         assertThat(doc.database, is(geneProduct.database));
         assertThat(doc.id, is(geneProduct.id));
         assertThat(doc.symbol, is(geneProduct.symbol));
@@ -84,122 +87,152 @@ public class GeneProductDocumentConverterTest {
     }
 
     @Test
-    public void convertsEmptyTaxonIdInGeneProductTo0() throws Exception {
+    public void convertsEmptyTaxonIdInGeneProductTo0() {
         geneProduct.taxonId = null;
+
         GeneProductDocument doc = converter.process(geneProduct);
+
         assertThat(doc.taxonId, is(0));
     }
 
     @Test
-    public void convertsTaxonIdInGeneProduct() throws Exception {
+    public void convertsTaxonIdInGeneProduct() {
         int taxonId = 35758;
         geneProduct.taxonId = createUnconvertedTaxonId(taxonId);
+
         GeneProductDocument doc = converter.process(geneProduct);
+
         assertThat(doc.taxonId, is(taxonId));
     }
 
     @Test
-    public void convertsTaxonNameInPropertiesInGeneProductToField() throws Exception {
+    public void convertsTaxonNameInPropertiesInGeneProductToField() {
         String taxonName = "Homo sapiens";
         geneProduct.properties = concatProperty(TAXON_NAME_KEY, taxonName);
+
         GeneProductDocument doc = converter.process(geneProduct);
+
         assertThat(doc.taxonName, is(taxonName));
     }
 
     @Test
-    public void convertsAbsenceOfTaxonNameInPropertiesInGeneProductToNull() throws Exception {
+    public void convertsAbsenceOfTaxonNameInPropertiesInGeneProductToNull() {
         geneProduct.properties = "";
+
         GeneProductDocument doc = converter.process(geneProduct);
+
         assertThat(doc.taxonName, is(nullValue()));
     }
 
     @Test
-    public void convertsNoSynonymsInGeneProductToNullList() throws Exception {
+    public void convertsNoSynonymsInGeneProductToNullList() {
         geneProduct.synonym = null;
+
         GeneProductDocument doc = converter.process(geneProduct);
+
         assertThat(doc.synonyms, is(nullValue()));
     }
 
     @Test
-    public void converts3SynonymsInGeneProductToListWith3Synonyms() throws Exception {
+    public void converts3SynonymsInGeneProductToListWith3Synonyms() {
         List<String> synonyms = Arrays.asList("A0A009DWW0_ACIBA", "J503_3808", "J503_4252");
         geneProduct.synonym = concatStrings(synonyms, INTER_VALUE_DELIMITER);
+
         GeneProductDocument doc = converter.process(geneProduct);
+
         assertThat(doc.synonyms, containsInAnyOrder(synonyms.toArray(new String[synonyms.size()])));
     }
 
     @Test
-    public void converts3TargetSetValuesInPropertiesToListWith3TargetSets() throws Exception {
+    public void converts3TargetSetValuesInPropertiesToListWith3TargetSets() {
         List<String> targetSets = Arrays.asList("KRUK", "Parkinsons", "BHF-UCL");
         String targetSet = concatProperty(TARGET_SET_KEY, concatStrings(targetSets, SPECIFIC_VALUE_DELIMITER));
         geneProduct.properties = concatStrings(Collections.singletonList(targetSet), INTER_VALUE_DELIMITER);
+
         GeneProductDocument doc = converter.process(geneProduct);
+
         assertThat(doc.targetSet, containsInAnyOrder(targetSets.toArray()));
     }
 
-
     @Test
-    public void convertsYValuePropertiesInGeneProductToTrueBooleanFields() throws Exception {
+    public void convertsYValuePropertiesInGeneProductToTrueBooleanFields() {
         String isAnnotated = concatProperty(IS_ANNOTATED_KEY, "Y");
         String isIsoform = concatProperty(IS_ISOFORM_KEY, "Y");
         String proteome = concatProperty(COMPLETE_PROTEOME_KEY, "Y");
+        geneProduct.type = GeneProductType.PROTEIN.getName();
         geneProduct.properties = concatStrings(Arrays.asList(isAnnotated, isIsoform, proteome), INTER_VALUE_DELIMITER);
 
         GeneProductDocument doc = converter.process(geneProduct);
+
         assertThat(doc.isAnnotated, is(true));
         assertThat(doc.isIsoform, is(true));
         assertThat(doc.isCompleteProteome, is(true));
+        assertThat(doc.proteomeMembership, is(COMPLETE.toString()));
     }
 
     @Test
-    public void convertsNValuePropertiesInGeneProductToTrueBooleanFields() throws Exception {
+    public void convertsNValuePropertiesInGeneProductToTrueBooleanFields() {
         String isAnnotated = concatProperty(IS_ANNOTATED_KEY, "N");
         String isIsoform = concatProperty(IS_ISOFORM_KEY, "N");
         String proteome = concatProperty(COMPLETE_PROTEOME_KEY, "N");
+        geneProduct.type = GeneProductType.PROTEIN.getName();
         geneProduct.properties = concatStrings(Arrays.asList(isAnnotated, isIsoform, proteome), INTER_VALUE_DELIMITER);
 
         GeneProductDocument doc = converter.process(geneProduct);
+
         assertThat(doc.isAnnotated, is(false));
         assertThat(doc.isIsoform, is(false));
         assertThat(doc.isCompleteProteome, is(false));
+        assertThat(doc.proteomeMembership, is(NONE.toString()));
     }
 
     @Test
-    public void convertsAbsenceOfBooleanValuePropertiesInGeneProductToFalseBooleanFields() throws Exception {
+    public void convertsAbsenceOfBooleanValuePropertiesInGeneProductToFalseBooleanFields() {
         geneProduct.properties = "";
+
         GeneProductDocument doc = converter.process(geneProduct);
+
         assertThat(doc.isAnnotated, is(false));
         assertThat(doc.isIsoform, is(false));
         assertThat(doc.isCompleteProteome, is(false));
+        assertThat(doc.proteomeMembership, is(NOT_APPLICABLE.toString()));
     }
 
     @Test
-    public void convertsReferenceProteomeInPropertiesInGeneProduct() throws Exception {
+    public void convertsReferenceProteomeInPropertiesInGeneProduct() {
         String referenceProteome = "UP000005640";
         geneProduct.properties = concatProperty(REFERENCE_PROTEOME_KEY, referenceProteome);
+        geneProduct.type = GeneProductType.PROTEIN.getName();
+
         GeneProductDocument doc = converter.process(geneProduct);
+
         assertThat(doc.referenceProteome, is(referenceProteome));
+        assertThat(doc.proteomeMembership, is(REFERENCE.toString()));
     }
 
     @Test
-    public void convertsAbsenceReferenceProteomeInPropertiesInGeneProductToNullField() throws Exception {
+    public void convertsAbsenceReferenceProteomeInPropertiesInGeneProductToNullField() {
         geneProduct.properties = "";
         GeneProductDocument doc = converter.process(geneProduct);
         assertThat(doc.referenceProteome, is(nullValue()));
     }
 
     @Test
-    public void convertsDBSubsetInPropertiesInGeneProductToList() throws Exception {
+    public void convertsDBSubsetInPropertiesInGeneProductToList() {
         String db = "UniProtKB";
         geneProduct.properties = concatProperty(DATABASE_SUBSET_KEY, db);
+
         GeneProductDocument doc = converter.process(geneProduct);
+
         assertThat(doc.databaseSubset, is(db));
     }
 
     @Test
-    public void convertsAbsenceOfDBSubsetInPropertiesInGeneProductToNullList() throws Exception {
+    public void convertsAbsenceOfDBSubsetInPropertiesInGeneProductToNullList() {
         geneProduct.properties = "";
+
         GeneProductDocument doc = converter.process(geneProduct);
+
         assertThat(doc.databaseSubset, is(nullValue()));
     }
 
