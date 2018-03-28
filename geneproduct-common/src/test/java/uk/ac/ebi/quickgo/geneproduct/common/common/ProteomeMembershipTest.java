@@ -20,7 +20,7 @@ import static uk.ac.ebi.quickgo.geneproduct.common.ProteomeMembership.REFERENCE;
 public class ProteomeMembershipTest {
 
     @Test
-    public void checkMembershipCreationRules() {
+    public void membershipCreationPermutations() {
         assertThat(ProteomeMembership.membership(false, true, true), is(NOT_APPLICABLE.toString()));
         assertThat(ProteomeMembership.membership(false, false, true), is(NOT_APPLICABLE.toString()));
         assertThat(ProteomeMembership.membership(false, true, false), is(NOT_APPLICABLE.toString()));
@@ -28,6 +28,23 @@ public class ProteomeMembershipTest {
         assertThat(ProteomeMembership.membership(true, true, false), is(REFERENCE.toString()));
         assertThat(ProteomeMembership.membership(true, false, true), is(COMPLETE.toString()));
         assertThat(ProteomeMembership.membership(true, false, false), is(NONE.toString()));
+        assertThat(ProteomeMembership.membership(true, true, true), is(REFERENCE.toString()));
+    }
+
+    @Test
+    public void fromString() {
+        assertThat(ProteomeMembership.fromString("Not applicable"), is(NOT_APPLICABLE));
+        assertThat(ProteomeMembership.fromString("Not aPPlicable"), is(NOT_APPLICABLE));
+
+        assertThat(ProteomeMembership.fromString("Reference"), is(REFERENCE));
+        assertThat(ProteomeMembership.fromString("referEnce"), is(REFERENCE));
+
+        assertThat(ProteomeMembership.fromString("Complete"), is(COMPLETE));
+        assertThat(ProteomeMembership.fromString("CompLete"), is(COMPLETE));
+
+        assertThat(ProteomeMembership.fromString("None"), is(NONE));
+        assertThat(ProteomeMembership.fromString("NoNe"), is(NONE));
+
     }
 
 }
