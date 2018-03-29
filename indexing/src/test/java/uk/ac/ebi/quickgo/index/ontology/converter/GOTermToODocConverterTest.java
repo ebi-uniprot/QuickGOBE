@@ -17,7 +17,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
@@ -301,27 +300,25 @@ public class GOTermToODocConverterTest {
 
     @Test
     public void historyCategoryIsSlim() {
-        when(term.getUsage()).thenReturn(GOTerm.ETermUsage.E);
-        when(term.getAspect()).thenReturn(GOTerm.EGOAspect.C);
         when(term.getHistory()).thenReturn(termOntologyHistoryForSlim());
 
         OntologyDocument result = converter.apply(term);
-        OntologyDocument document = result;
 
-        assertThat(document.history, contains("{--reproduction;;;2017-03-04;;;Added;;;SLIM;;;goslim_agr--}"));
+        final List<String> history = result.history;
+        assertThat(history, hasSize(1));
+        assertThat(history.get(0), containsString("SLIM"));
     }
 
     @Test
     public void historyCategoryIsConstraint() {
-        when(term.getUsage()).thenReturn(GOTerm.ETermUsage.E);
-        when(term.getAspect()).thenReturn(GOTerm.EGOAspect.C);
         when(term.getHistory()).thenReturn(termOntologyHistoryForConstraint());
 
         OntologyDocument result = converter.apply(term);
         OntologyDocument document = result;
 
-        assertThat(document.history, contains("{--incipient cellular bud site;;;2008-05-13;;;Added;;;CONSTRAINT;;;" +
-                "never_in_taxon NCBITaxon:4930 (Saccharomyces)--}"));
+        final List<String> history = document.history;
+        assertThat(history, hasSize(1));
+        assertThat(history.get(0), containsString("CONSTRAINT"));
     }
 
     private TermOntologyHistory termOntologyHistoryForSlim() {
