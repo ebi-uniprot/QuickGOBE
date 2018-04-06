@@ -55,8 +55,8 @@ public class AnnotationToGAF extends AnnotationTo implements BiFunction<Annotati
             new HashSet<>(asList("NOT|enables", "NOT|part_of", "NOT|involved_in"));
     private static final Set<String> VALID_GAF_QUALIFIERS =
             new HashSet<>(asList("contributes_to", "NOT|contributes_to", "colocalizes_with", "NOT|colocalizes_with"));
-    private final Function<String, String> toCanonical = new IdCanonicaliser();
-    private final Function<String, String> createCanonical = toCanonical.compose(nullToEmptyString);
+    private final Function<String, GeneProduct> toCanonical = new IdCanonicaliser();
+    //    private final Function<String, String> createCanonical = toCanonical.compose(nullToEmptyString);
 
     /**
      * Convert an {@link Annotation} to a String representation.
@@ -80,24 +80,30 @@ public class AnnotationToGAF extends AnnotationTo implements BiFunction<Annotati
         String[] idElements = idToComponents(annotation.geneProductId);
         StringJoiner tsvJoiner = new StringJoiner(OUTPUT_DELIMITER);
 
+        final GeneProduct geneProduct = toCanonical.apply(annotation.geneProductId);
         return tsvJoiner.add(idElements[0])
-                .add(createCanonical.apply(annotation.geneProductId))
+                //1	DB	required	1	UniProtKB
+                .add(geneProduct.db.orElse(""))
+
+                //2	DB Object ID	required	1	P12345
+
                 .add(nullToEmptyString.apply(annotation.symbol))
                 .add(gafQualifierAsString(annotation.qualifier))
                 .add(nullToEmptyString.apply(goId))
                 .add(nullToEmptyString.apply(annotation.reference))
-                .add(nullToEmptyString.apply(annotation.evidenceCode))
+                .add(nullToEmptyString.apply(annotation.goEvidence))
                 .add(withFromAsString(annotation.withFrom))
                 .add(aspectAsString(annotation.goAspect))
-                .add("")   // name    - in GP core optional not used
-                .add("")   // synonym - in GP core  e.g. 'Nit79A3_0905' optional not used
+                .add(annotation.name)
+                .add(nullToEmptyString.apply(annotation.synonyms))
                 .add(nullToEmptyString.apply(toGeneProductType(idElements[DB])))
                 .add(TAXON + annotation.taxonId)
                 .add(toYMD(annotation.date))
                 .add(nullToEmptyString.apply(annotation.assignedBy))
                 .add(extensionsAsString(annotation.extensions))
-                .add(UNIPROT_KB.equals(idElements[0]) ? String.format("%s:%s", UNIPROT_KB,
-                        idElements[1]) : "").toString();
+                .add(idElements[1].contains("-") ? annotation.geneProductId : "").toString();
+        //                .add(UNIPROT_KB.equals(idElements[0]) ? String.format("%s:%s", UNIPROT_KB,
+        //                        idElements[1]) : "").toString();
     }
 
     private String gafQualifierAsString(String qualifier) {
@@ -119,8 +125,10 @@ public class AnnotationToGAF extends AnnotationTo implements BiFunction<Annotati
         return Aspect.fromScientificName(goAspect).map(Aspect::getCharacter).orElse("");
     }
 
-    private static class IdCanonicaliser implements Function<String, String> {
+    private static class IdCanonicaliser implements Function<String, GeneProduct> {
+        private static final int CANONICAL_DB_NUMBER = 2;
         private static final int CANONICAL_GROUP_NUMBER = 2;
+        private static final int INTACT_DB_NUMBER = 1;
         private static final int INTACT_GROUP_NUMBER = 1;
         private static final String UNIPROT_CANONICAL_REGEX = "^(?:UniProtKB:)?(([OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z]" +
                 "([0-9][A-Z][A-Z0-9]{2}){1,2}[0-9])((-[0-9]+)|:PRO_[0-9]{10}|:VAR_[0-9]{6}){0,1})$";
@@ -132,25 +140,41 @@ public class AnnotationToGAF extends AnnotationTo implements BiFunction<Annotati
 
         /**
          * Extract the canonical version of the id, removing the variation or isoform suffix if it exists.
-         * @param id Annotation id, could had isoform or variant suffix.
+         * @param fullId Annotation id, could had isoform or variant suffix.
          * @return canonical form of the id with the isoform or variant suffix removed.
          */
-        @Override public String apply(String id) {
-            Matcher uniprotMatcher = UNIPROT_CANONICAL_PATTERN.matcher(id);
+        @Override public GeneProduct apply(String fullId) {
+            Matcher uniprotMatcher = UNIPROT_CANONICAL_PATTERN.matcher(fullId);
             if (uniprotMatcher.matches()) {
-                return uniprotMatcher.group(CANONICAL_GROUP_NUMBER);
+                String db = uniprotMatcher.group(CANONICAL_DB_NUMBER);
+                String id = uniprotMatcher.group(CANONICAL_GROUP_NUMBER);
+                return new GeneProduct(db, id);
             }
-            Matcher rnaMatcher = RNA_CENTRAL_CANONICAL_PATTERN.matcher(id);
+            Matcher rnaMatcher = RNA_CENTRAL_CANONICAL_PATTERN.matcher(fullId);
             if (rnaMatcher.matches()) {
-                return rnaMatcher.group(CANONICAL_GROUP_NUMBER);
+                String db = rnaMatcher.group(CANONICAL_DB_NUMBER);
+                String id = rnaMatcher.group(CANONICAL_GROUP_NUMBER);
+                return new GeneProduct(db, id);
             }
 
-            Matcher intactMatcher = INTACT_CANONICAL_PATTERN.matcher(id);
+            Matcher intactMatcher = INTACT_CANONICAL_PATTERN.matcher(fullId);
             if (intactMatcher.matches()) {
-                return intactMatcher.group(INTACT_GROUP_NUMBER);
+                String db = intactMatcher.group(INTACT_DB_NUMBER);
+                String id = intactMatcher.group(INTACT_GROUP_NUMBER);
+                return new GeneProduct(db, id);
             }
-            LOGGER.error(String.format("Cannot extract the canonical version of the id from \"%s\"", id));
-            return "";
+            LOGGER.error(String.format("Cannot extract the canonical version of the id from \"%s\"", fullId));
+            return new GeneProduct(null, null);
+        }
+    }
+
+    static class GeneProduct {
+        final Optional<String> db;
+        final Optional<String> id;
+
+        GeneProduct(String db, String id) {
+            this.db = Optional.ofNullable(db);
+            this.id = Optional.ofNullable(id);
         }
     }
 }
