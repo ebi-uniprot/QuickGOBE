@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.annotation.download.converter;
 
-import uk.ac.ebi.quickgo.annotation.download.converter.helpers.ConnectedXRefs;
+import uk.ac.ebi.quickgo.annotation.download.converter.helpers.AnnotationExtensions;
+import uk.ac.ebi.quickgo.annotation.download.converter.helpers.WithFrom;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.common.model.Aspect;
 import uk.ac.ebi.quickgo.annotation.download.converter.helpers.GeneProductId;
@@ -62,10 +63,10 @@ public class AnnotationToGAF implements BiFunction<Annotation, List<String>, Lis
 
     /**
      * Convert an {@link Annotation} to a String representation.
-     * @param annotation instance
+     *
+     * @param annotation     instance
      * @param selectedFields ignore for GAF
      * @return String TSV delimited representation of an annotation in GAF format.
-     *
      */
     @Override
     public List<String> apply(Annotation annotation, List<String> selectedFields) {
@@ -89,7 +90,7 @@ public class AnnotationToGAF implements BiFunction<Annotation, List<String>, Lis
                 .add(nullToEmptyString(goId))
                 .add(nullToEmptyString(annotation.reference))
                 .add(nullToEmptyString(annotation.goEvidence))
-                .add(ConnectedXRefs.asString(annotation.withFrom))
+                .add(WithFrom.nullOrEmptyListToString(annotation.withFrom))
                 .add(fromScientificName(annotation.goAspect).map(Aspect::getCharacter).orElse(""))
                 .add(nullToEmptyString(annotation.name))
                 .add(nullToEmptyString(annotation.synonyms))
@@ -97,7 +98,7 @@ public class AnnotationToGAF implements BiFunction<Annotation, List<String>, Lis
                 .add(gafTaxonAsString(annotation))
                 .add(nonNull(annotation.date) ? toYYYYMMDD.apply(annotation.date) : "")
                 .add(nullToEmptyString(annotation.assignedBy))
-                .add(nullOrEmptyListToEmptyString(annotation.extensions, ConnectedXRefs::asString))
+                .add(AnnotationExtensions.nullOrEmptyListToEmptyString(annotation.extensions))
                 .add(nullToEmptyString(geneProductId.withIsoFormOrVariant))
                 .toString();
     }
