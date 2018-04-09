@@ -1,6 +1,5 @@
 package uk.ac.ebi.quickgo.annotation.download.converter;
 
-import uk.ac.ebi.quickgo.annotation.download.converter.helpers.Extensions;
 import uk.ac.ebi.quickgo.annotation.download.converter.helpers.ConnectedXRefs;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.common.model.Aspect;
@@ -10,10 +9,11 @@ import java.util.*;
 import java.util.function.BiFunction;
 
 import static java.util.Arrays.asList;
-import static java.util.Optional.ofNullable;
+import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
 import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.Date.toYYYYMMDD;
 import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.GeneProductType.toGpType;
+import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.Helper.nullOrEmptyListToEmptyString;
 import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.Helper.nullToEmptyString;
 import static uk.ac.ebi.quickgo.common.model.Aspect.fromScientificName;
 
@@ -82,26 +82,23 @@ public class AnnotationToGAF implements BiFunction<Annotation, List<String>, Lis
         StringJoiner tsvJoiner = new StringJoiner(OUTPUT_DELIMITER);
         final GeneProductId geneProductId = GeneProductId.fromString(annotation.geneProductId);
         return tsvJoiner
-                //1	DB	required	1	UniProtKB
-                .add(ofNullable(geneProductId.db).orElse(""))
-
-                //2	DB Object ID	required	1	P12345
-                .add(ofNullable(geneProductId.id).orElse(""))
-                .add(ofNullable(annotation.symbol).orElse(""))
+                .add(nullToEmptyString(geneProductId.db))
+                .add(nullToEmptyString(geneProductId.id))
+                .add(nullToEmptyString(annotation.symbol))
                 .add(gafQualifierAsString(annotation.qualifier))
-                .add(ofNullable(goId).orElse(""))
-                .add(ofNullable(annotation.reference).orElse(""))
-                .add(ofNullable(annotation.goEvidence).orElse(""))
+                .add(nullToEmptyString(goId))
+                .add(nullToEmptyString(annotation.reference))
+                .add(nullToEmptyString(annotation.goEvidence))
                 .add(ConnectedXRefs.asString(annotation.withFrom))
                 .add(fromScientificName(annotation.goAspect).map(Aspect::getCharacter).orElse(""))
-                .add(ofNullable(annotation.name).orElse(""))
-                .add(ofNullable(annotation.synonyms).orElse(""))
-                .add(ofNullable(geneProductId.db).map(toGpType).orElse(""))
-                .add(asGafTaxonString(annotation))
-                .add(ofNullable(annotation.date).map(toYYYYMMDD).orElse(""))
-                .add(ofNullable(annotation.assignedBy).orElse(""))
-                .add(Extensions.asString(annotation.extensions))
-                .add(ofNullable(geneProductId.withIsoFormOrVariant).orElse(""))
+                .add(nullToEmptyString(annotation.name))
+                .add(nullToEmptyString(annotation.synonyms))
+                .add(nonNull(geneProductId.db) ? toGpType.apply(geneProductId.db) : "")
+                .add(gafTaxonAsString(annotation))
+                .add(nonNull(annotation.date) ? toYYYYMMDD.apply(annotation.date) : "")
+                .add(nullToEmptyString(annotation.assignedBy))
+                .add(nullOrEmptyListToEmptyString(annotation.extensions, ConnectedXRefs::asString))
+                .add(nullToEmptyString(geneProductId.withIsoFormOrVariant))
                 .toString();
     }
 
@@ -120,7 +117,7 @@ public class AnnotationToGAF implements BiFunction<Annotation, List<String>, Lis
         return gafQualifier;
     }
 
-    String asGafTaxonString(Annotation annotation) {
+    String gafTaxonAsString(Annotation annotation) {
         StringBuilder taxonBuilder = new StringBuilder();
         taxonBuilder.append(TAXON)
                 .append(annotation.taxonId)
