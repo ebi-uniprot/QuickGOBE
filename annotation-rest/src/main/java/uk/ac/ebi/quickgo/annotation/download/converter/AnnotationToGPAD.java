@@ -1,6 +1,8 @@
 package uk.ac.ebi.quickgo.annotation.download.converter;
 
+import uk.ac.ebi.quickgo.annotation.download.converter.helpers.Extensions;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
+import uk.ac.ebi.quickgo.annotation.download.converter.helpers.GeneProductId;
 
 import java.util.Collections;
 import java.util.List;
@@ -8,7 +10,11 @@ import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.function.BiFunction;
 
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
+import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.Date.toYYYYMMDD;
+import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.Helper.nullToEmptyString;
+import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.ConnectedXRefs.asString;
 
 /**
  * Convert an Annotation to the GPAD format.
@@ -28,9 +34,10 @@ import static java.util.stream.Collectors.toList;
  * Time: 11:24
  * Created with IntelliJ IDEA.
  */
-public class AnnotationToGPAD extends AnnotationTo implements BiFunction<Annotation, List<String>, List<String>> {
+public class AnnotationToGPAD implements BiFunction<Annotation, List<String>, List<String>> {
 
     private static final String GO_EVIDENCE = "goEvidence=";
+    private static final String OUTPUT_DELIMITER = "\t";
 
     @Override
     public List<String> apply(Annotation annotation, List<String> selectedFields) {
@@ -45,18 +52,26 @@ public class AnnotationToGPAD extends AnnotationTo implements BiFunction<Annotat
 
     private String toOutputRecord(Annotation annotation, String goId) {
         StringJoiner tsvJoiner = new StringJoiner(OUTPUT_DELIMITER);
-        String[] idElements = idToComponents(annotation.geneProductId);
-        return tsvJoiner.add(idElements[0])
-                        .add(idElements[1])
+        final GeneProductId geneProductId = GeneProductId.fromString(annotation.geneProductId);
+        return tsvJoiner
+                .add(ofNullable(geneProductId.db).orElse(""))
+                .add(ofNullable(geneProductId.id).orElse(""))
                         .add(nullToEmptyString.apply(annotation.qualifier))
                         .add(nullToEmptyString.apply(goId))
                         .add(nullToEmptyString.apply(annotation.reference))
                         .add(nullToEmptyString.apply(annotation.evidenceCode))
-                        .add(withFromAsString(annotation.withFrom))
+                .add(asString(annotation.withFrom))
                         .add(taxonIdAsString(annotation.interactingTaxonId))
-                        .add(toYMD(annotation.date))
+                .add(ofNullable(annotation.date).map(toYYYYMMDD).orElse(""))
                         .add(nullToEmptyString.apply(annotation.assignedBy))
-                        .add(extensionsAsString(annotation.extensions))
+                .add(Extensions.asString(annotation.extensions))
                         .add(GO_EVIDENCE + nullToEmptyString.apply(annotation.goEvidence)).toString();
     }
+
+    private static final int LOWEST_VALID_TAXON_ID = 1;
+
+    private String taxonIdAsString(int taxonId) {
+        return taxonId < LOWEST_VALID_TAXON_ID ? "" : Integer.toString(taxonId);
+    }
+
 }
