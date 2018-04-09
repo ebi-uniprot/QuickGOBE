@@ -1,18 +1,21 @@
 package uk.ac.ebi.quickgo.annotation.download.converter;
 
+import uk.ac.ebi.quickgo.annotation.download.converter.helpers.Extensions;
+import uk.ac.ebi.quickgo.annotation.download.converter.helpers.ConnectedXRefs;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.common.model.Aspect;
+import uk.ac.ebi.quickgo.annotation.download.converter.helpers.GeneProductId;
 
 import java.util.*;
 import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static java.util.Arrays.asList;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
+import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.Date.toYYYYMMDD;
+import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.GeneProductType.toGpType;
+import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.Helper.nullToEmptyString;
+import static uk.ac.ebi.quickgo.common.model.Aspect.fromScientificName;
 
 /**
  * Convert an {@link Annotation}  to a String representation.
@@ -47,16 +50,15 @@ import static java.util.stream.Collectors.toList;
  * Time: 11:54
  * Created with IntelliJ IDEA.
  */
-public class AnnotationToGAF extends AnnotationTo implements BiFunction<Annotation, List<String>, List<String>> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(AnnotationToGAF.class);
-    private static final String UNIPROT_KB = "UniProtKB";
+public class AnnotationToGAF implements BiFunction<Annotation, List<String>, List<String>> {
+
+    static final String OUTPUT_DELIMITER = "\t";
+    private static final String PIPE = "|";
     private static final String TAXON = "taxon:";
     private static final Set<String> NOT_GAF_QUALIFIERS =
             new HashSet<>(asList("NOT|enables", "NOT|part_of", "NOT|involved_in"));
     private static final Set<String> VALID_GAF_QUALIFIERS =
             new HashSet<>(asList("contributes_to", "NOT|contributes_to", "colocalizes_with", "NOT|colocalizes_with"));
-    private final Function<String, GeneProduct> toCanonical = new IdCanonicaliser();
-    //    private final Function<String, String> createCanonical = toCanonical.compose(nullToEmptyString);
 
     /**
      * Convert an {@link Annotation} to a String representation.
@@ -77,33 +79,30 @@ public class AnnotationToGAF extends AnnotationTo implements BiFunction<Annotati
     }
 
     private String toOutputRecord(Annotation annotation, String goId) {
-        String[] idElements = idToComponents(annotation.geneProductId);
         StringJoiner tsvJoiner = new StringJoiner(OUTPUT_DELIMITER);
-
-        final GeneProduct geneProduct = toCanonical.apply(annotation.geneProductId);
-        return tsvJoiner.add(idElements[0])
+        final GeneProductId geneProductId = GeneProductId.fromString(annotation.geneProductId);
+        return tsvJoiner
                 //1	DB	required	1	UniProtKB
-                .add(geneProduct.db.orElse(""))
+                .add(ofNullable(geneProductId.db).orElse(""))
 
                 //2	DB Object ID	required	1	P12345
-
-                .add(nullToEmptyString.apply(annotation.symbol))
+                .add(ofNullable(geneProductId.id).orElse(""))
+                .add(ofNullable(annotation.symbol).orElse(""))
                 .add(gafQualifierAsString(annotation.qualifier))
-                .add(nullToEmptyString.apply(goId))
-                .add(nullToEmptyString.apply(annotation.reference))
-                .add(nullToEmptyString.apply(annotation.goEvidence))
-                .add(withFromAsString(annotation.withFrom))
-                .add(aspectAsString(annotation.goAspect))
-                .add(annotation.name)
-                .add(nullToEmptyString.apply(annotation.synonyms))
-                .add(nullToEmptyString.apply(toGeneProductType(idElements[DB])))
-                .add(TAXON + annotation.taxonId)
-                .add(toYMD(annotation.date))
-                .add(nullToEmptyString.apply(annotation.assignedBy))
-                .add(extensionsAsString(annotation.extensions))
-                .add(idElements[1].contains("-") ? annotation.geneProductId : "").toString();
-        //                .add(UNIPROT_KB.equals(idElements[0]) ? String.format("%s:%s", UNIPROT_KB,
-        //                        idElements[1]) : "").toString();
+                .add(ofNullable(goId).orElse(""))
+                .add(ofNullable(annotation.reference).orElse(""))
+                .add(ofNullable(annotation.goEvidence).orElse(""))
+                .add(ConnectedXRefs.asString(annotation.withFrom))
+                .add(fromScientificName(annotation.goAspect).map(Aspect::getCharacter).orElse(""))
+                .add(ofNullable(annotation.name).orElse(""))
+                .add(ofNullable(annotation.synonyms).orElse(""))
+                .add(ofNullable(geneProductId.db).map(toGpType).orElse(""))
+                .add(asGafTaxonString(annotation))
+                .add(ofNullable(annotation.date).map(toYYYYMMDD).orElse(""))
+                .add(ofNullable(annotation.assignedBy).orElse(""))
+                .add(Extensions.asString(annotation.extensions))
+                .add(ofNullable(geneProductId.withIsoFormOrVariant).orElse(""))
+                .toString();
     }
 
     private String gafQualifierAsString(String qualifier) {
@@ -121,60 +120,12 @@ public class AnnotationToGAF extends AnnotationTo implements BiFunction<Annotati
         return gafQualifier;
     }
 
-    private String aspectAsString(String goAspect) {
-        return Aspect.fromScientificName(goAspect).map(Aspect::getCharacter).orElse("");
+    String asGafTaxonString(Annotation annotation) {
+        StringBuilder taxonBuilder = new StringBuilder();
+        taxonBuilder.append(TAXON)
+                .append(annotation.taxonId)
+                .append(annotation.interactingTaxonId > 0 ? PIPE + annotation.interactingTaxonId : "");
+        return taxonBuilder.toString();
     }
 
-    private static class IdCanonicaliser implements Function<String, GeneProduct> {
-        private static final int CANONICAL_DB_NUMBER = 2;
-        private static final int CANONICAL_GROUP_NUMBER = 2;
-        private static final int INTACT_DB_NUMBER = 1;
-        private static final int INTACT_GROUP_NUMBER = 1;
-        private static final String UNIPROT_CANONICAL_REGEX = "^(?:UniProtKB:)?(([OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z]" +
-                "([0-9][A-Z][A-Z0-9]{2}){1,2}[0-9])((-[0-9]+)|:PRO_[0-9]{10}|:VAR_[0-9]{6}){0,1})$";
-        private static final Pattern UNIPROT_CANONICAL_PATTERN = Pattern.compile(UNIPROT_CANONICAL_REGEX);
-        private static final String RNA_CENTRAL_REGEX = "^(?:RNAcentral:)?((URS[0-9A-F]{10})(_[0-9]+){0,1})$";
-        private static final Pattern RNA_CENTRAL_CANONICAL_PATTERN = Pattern.compile(RNA_CENTRAL_REGEX);
-        private static final String INTACT_CANONICAL_REGEX = "^(?:IntAct:)(EBI-[0-9]+)$";
-        private static final Pattern INTACT_CANONICAL_PATTERN = Pattern.compile(INTACT_CANONICAL_REGEX);
-
-        /**
-         * Extract the canonical version of the id, removing the variation or isoform suffix if it exists.
-         * @param fullId Annotation id, could had isoform or variant suffix.
-         * @return canonical form of the id with the isoform or variant suffix removed.
-         */
-        @Override public GeneProduct apply(String fullId) {
-            Matcher uniprotMatcher = UNIPROT_CANONICAL_PATTERN.matcher(fullId);
-            if (uniprotMatcher.matches()) {
-                String db = uniprotMatcher.group(CANONICAL_DB_NUMBER);
-                String id = uniprotMatcher.group(CANONICAL_GROUP_NUMBER);
-                return new GeneProduct(db, id);
-            }
-            Matcher rnaMatcher = RNA_CENTRAL_CANONICAL_PATTERN.matcher(fullId);
-            if (rnaMatcher.matches()) {
-                String db = rnaMatcher.group(CANONICAL_DB_NUMBER);
-                String id = rnaMatcher.group(CANONICAL_GROUP_NUMBER);
-                return new GeneProduct(db, id);
-            }
-
-            Matcher intactMatcher = INTACT_CANONICAL_PATTERN.matcher(fullId);
-            if (intactMatcher.matches()) {
-                String db = intactMatcher.group(INTACT_DB_NUMBER);
-                String id = intactMatcher.group(INTACT_GROUP_NUMBER);
-                return new GeneProduct(db, id);
-            }
-            LOGGER.error(String.format("Cannot extract the canonical version of the id from \"%s\"", fullId));
-            return new GeneProduct(null, null);
-        }
-    }
-
-    static class GeneProduct {
-        final Optional<String> db;
-        final Optional<String> id;
-
-        GeneProduct(String db, String id) {
-            this.db = Optional.ofNullable(db);
-            this.id = Optional.ofNullable(id);
-        }
-    }
 }
