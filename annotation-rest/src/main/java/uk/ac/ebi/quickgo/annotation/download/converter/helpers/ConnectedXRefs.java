@@ -17,7 +17,7 @@ public class ConnectedXRefs {
     private static final String PIPE = "|";
     private static final String COMMA = ",";
 
-    public ConnectedXRefs() {}
+    private ConnectedXRefs() {}
 
     public static String asString(List<Annotation.ConnectedXRefs<Annotation.SimpleXRef>> connectedXRefs) {
         if (connectedXRefs == null || connectedXRefs.isEmpty()) {
