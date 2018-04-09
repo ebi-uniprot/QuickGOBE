@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.annotation.download.converter;
 
 import uk.ac.ebi.quickgo.annotation.download.converter.helpers.Extensions;
+import uk.ac.ebi.quickgo.annotation.download.converter.helpers.WithFrom;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.common.model.Aspect;
 import uk.ac.ebi.quickgo.annotation.download.converter.helpers.GeneProductId;
@@ -15,7 +16,6 @@ import static uk.ac.ebi.quickgo.annotation.download.TSVDownload.*;
 import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.Date.toYYYYMMDD;
 import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.GeneProductType.toGpType;
 import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.Helper.nullToEmptyString;
-import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.ConnectedXRefs.asString;
 
 /**
  * Convert an {@link Annotation} to a String representation of the view seen in QuickGO front end.
@@ -81,7 +81,7 @@ public class AnnotationToTSV implements BiFunction<Annotation, List<String>, Lis
         selected2Content.put(GO_EVIDENCE_CODE_FIELD_NAME,
                 (c, j) -> j.add(nullToEmptyString.apply(c.annotation.goEvidence)));
         selected2Content.put(REFERENCE_FIELD_NAME, (c, j) -> j.add(nullToEmptyString.apply(c.annotation.reference)));
-        selected2Content.put(WITH_FROM_FIELD_NAME, (c, j) -> j.add(asString(c.annotation.withFrom)));
+        selected2Content.put(WITH_FROM_FIELD_NAME, (c, j) -> j.add(WithFrom.nullOrEmptyListToString(c.annotation.withFrom)));
         selected2Content.put(TAXON_ID_FIELD_NAME,
                 (c, j) -> j.add(c.annotation.taxonId == 0 ? "" : Integer.toString(c.annotation.taxonId)));
         selected2Content.put(ASSIGNED_BY_FIELD_NAME, (c, j) -> j.add(nullToEmptyString.apply(c.annotation.assignedBy)));

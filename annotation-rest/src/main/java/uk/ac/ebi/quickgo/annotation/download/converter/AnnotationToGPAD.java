@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.annotation.download.converter;
 
 import uk.ac.ebi.quickgo.annotation.download.converter.helpers.Extensions;
+import uk.ac.ebi.quickgo.annotation.download.converter.helpers.WithFrom;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.download.converter.helpers.GeneProductId;
 
@@ -14,7 +15,6 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.Date.toYYYYMMDD;
 import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.Helper.nullToEmptyString;
-import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.ConnectedXRefs.asString;
 
 /**
  * Convert an Annotation to the GPAD format.
@@ -60,7 +60,7 @@ public class AnnotationToGPAD implements BiFunction<Annotation, List<String>, Li
                         .add(nullToEmptyString.apply(goId))
                         .add(nullToEmptyString.apply(annotation.reference))
                         .add(nullToEmptyString.apply(annotation.evidenceCode))
-                .add(asString(annotation.withFrom))
+                .add(WithFrom.nullOrEmptyListToString(annotation.withFrom))
                         .add(taxonIdAsString(annotation.interactingTaxonId))
                 .add(ofNullable(annotation.date).map(toYYYYMMDD).orElse(""))
                         .add(nullToEmptyString.apply(annotation.assignedBy))
