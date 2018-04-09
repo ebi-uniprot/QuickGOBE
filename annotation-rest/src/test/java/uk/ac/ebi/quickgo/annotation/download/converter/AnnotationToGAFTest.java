@@ -14,6 +14,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
+import static uk.ac.ebi.quickgo.annotation.download.converter.AnnotationToGAF.OUTPUT_DELIMITER;
 import static uk.ac.ebi.quickgo.annotation.model.AnnotationMocker.*;
 
 /**
@@ -48,6 +49,7 @@ public class AnnotationToGAFTest {
     @Before
     public void setup() {
         annotation = AnnotationMocker.createValidAnnotation();
+        annotation.interactingTaxonId = 0;  //most annotation records don't have an interacting taxon version.
         annotationToGAF = new AnnotationToGAF();
     }
 
@@ -61,11 +63,11 @@ public class AnnotationToGAFTest {
         assertThat(elements[COL_QUALIFIER], is(QUALIFIER));
         assertThat(elements[COL_GO_ID], is(GO_ID));
         assertThat(elements[COL_REFERENCE], is(REFERENCE));
-        assertThat(elements[COL_EVIDENCE], is(ECO_ID));
+        assertThat(elements[COL_EVIDENCE], is(GO_EVIDENCE));
         assertThat(elements[COL_WITH], equalTo(WITH_FROM_AS_STRING));
         assertThat(elements[COL_ASPECT], is("F"));
-        assertThat(elements[COL_DB_OBJECT_NAME], is(""));        //name
-        assertThat(elements[COL_DB_OBJECT_SYNONYM], is(""));       //synonym
+        assertThat(elements[COL_DB_OBJECT_NAME], is(NAME));        //name
+        assertThat(elements[COL_DB_OBJECT_SYNONYM], is(SYNONYMS));       //synonym
         assertThat(elements[COL_DB_OBJECT_TYPE], is(gpType));
         assertThat(elements[COL_TAXON], is("taxon:" + TAXON_ID));
         assertThat(elements[COL_DATE], equalTo(DATE_AS_STRING));
@@ -74,7 +76,37 @@ public class AnnotationToGAFTest {
     }
 
     @Test
-    public void createGAFStringFromAnnotationModelContainingUniProtGeneProductWithVariantOrIsoForm() {
+    public void createGAFStringFromAnnotationModelContainingUniProtGeneProductWITHOUTVariantOrIsoForm() {
+        String gpId = "P04637";
+        String gpIdCanonical = "P04637";
+        String db = "UniProtKB";
+        String gpType = "protein";
+        annotation.id = String.format("%s:%s", db, gpId);
+        annotation.geneProductId = String.format("%s:%s", db, gpId);
+        annotation.assignedBy = db;
+        annotation.symbol = gpId;
+        String[] elements = annotationToElements(annotation);
+        assertThat(elements[COL_DB], is(db));
+        assertThat(elements[COL_DB_OBJECT_ID], is(gpIdCanonical));
+        assertThat(elements[COL_DB_OBJECT_SYMBOL], is(gpId));
+        assertThat(elements[COL_QUALIFIER], is(QUALIFIER));
+        assertThat(elements[COL_GO_ID], is(GO_ID));
+        assertThat(elements[COL_REFERENCE], is(REFERENCE));
+        assertThat(elements[COL_EVIDENCE], is(GO_EVIDENCE));
+        assertThat(elements[COL_WITH], equalTo(WITH_FROM_AS_STRING));
+        assertThat(elements[COL_ASPECT], is("F"));
+        assertThat(elements[COL_DB_OBJECT_NAME], is(NAME));        //name
+        assertThat(elements[COL_DB_OBJECT_SYNONYM], is(SYNONYMS));       //synonym
+        assertThat(elements[COL_DB_OBJECT_TYPE], is(gpType));
+        assertThat(elements[COL_TAXON], is("taxon:" + TAXON_ID));
+        assertThat(elements[COL_DATE], equalTo(DATE_AS_STRING));
+        assertThat(elements[COL_ASSIGNED_BY], equalTo(db));
+        assertThat(elements[COL_ANNOTATION_EXTENSION], is(EXTENSIONS_AS_STRING));
+        assertThat(elements[COL_GENE_PRODUCT_FORM_ID], is(""));
+    }
+
+    @Test
+    public void createGAFStringFromAnnotationModelContainingUniProtGeneProductWITHVariantOrIsoForm() {
         String gpId = "P04637-2";
         String gpIdCanonical = "P04637";
         String db = "UniProtKB";
@@ -90,11 +122,11 @@ public class AnnotationToGAFTest {
         assertThat(elements[COL_QUALIFIER], is(QUALIFIER));
         assertThat(elements[COL_GO_ID], is(GO_ID));
         assertThat(elements[COL_REFERENCE], is(REFERENCE));
-        assertThat(elements[COL_EVIDENCE], is(ECO_ID));
+        assertThat(elements[COL_EVIDENCE], is(GO_EVIDENCE));
         assertThat(elements[COL_WITH], equalTo(WITH_FROM_AS_STRING));
         assertThat(elements[COL_ASPECT], is("F"));
-        assertThat(elements[COL_DB_OBJECT_NAME], is(""));        //name
-        assertThat(elements[COL_DB_OBJECT_SYNONYM], is(""));       //synonym
+        assertThat(elements[COL_DB_OBJECT_NAME], is(NAME));        //name
+        assertThat(elements[COL_DB_OBJECT_SYNONYM], is(SYNONYMS));       //synonym
         assertThat(elements[COL_DB_OBJECT_TYPE], is(gpType));
         assertThat(elements[COL_TAXON], is("taxon:" + TAXON_ID));
         assertThat(elements[COL_DATE], equalTo(DATE_AS_STRING));
@@ -120,11 +152,11 @@ public class AnnotationToGAFTest {
         assertThat(elements[COL_QUALIFIER], is(QUALIFIER));
         assertThat(elements[COL_GO_ID], is(GO_ID));
         assertThat(elements[COL_REFERENCE], is(REFERENCE));
-        assertThat(elements[COL_EVIDENCE], is(ECO_ID));
+        assertThat(elements[COL_EVIDENCE], is(GO_EVIDENCE));
         assertThat(elements[COL_WITH], equalTo(WITH_FROM_AS_STRING));
         assertThat(elements[COL_ASPECT], is("F"));
-        assertThat(elements[COL_DB_OBJECT_NAME], is(""));        //name
-        assertThat(elements[COL_DB_OBJECT_SYNONYM], is(""));       //synonym
+        assertThat(elements[COL_DB_OBJECT_NAME], is(NAME));        //name
+        assertThat(elements[COL_DB_OBJECT_SYNONYM], is(SYNONYMS));       //synonym
         assertThat(elements[COL_DB_OBJECT_TYPE], is(gpType));
         assertThat(elements[COL_TAXON], is("taxon:" + TAXON_ID));
         assertThat(elements[COL_DATE], equalTo(DATE_AS_STRING));
@@ -147,11 +179,11 @@ public class AnnotationToGAFTest {
         assertThat(elements[COL_QUALIFIER], is(QUALIFIER));
         assertThat(elements[COL_GO_ID], is(GO_ID));
         assertThat(elements[COL_REFERENCE], is(REFERENCE));
-        assertThat(elements[COL_EVIDENCE], is(ECO_ID));
+        assertThat(elements[COL_EVIDENCE], is(GO_EVIDENCE));
         assertThat(elements[COL_WITH], equalTo(WITH_FROM_AS_STRING));
         assertThat(elements[COL_ASPECT], is("F"));
-        assertThat(elements[COL_DB_OBJECT_NAME], is(""));        //name
-        assertThat(elements[COL_DB_OBJECT_SYNONYM], is(""));       //synonym
+        assertThat(elements[COL_DB_OBJECT_NAME], is(NAME));        //name
+        assertThat(elements[COL_DB_OBJECT_SYNONYM], is(SYNONYMS));       //synonym
         assertThat(elements[COL_DB_OBJECT_TYPE], is(gpType));
         assertThat(elements[COL_TAXON], is("taxon:" + TAXON_ID));
         assertThat(elements[COL_DATE], equalTo(DATE_AS_STRING));
@@ -278,8 +310,8 @@ public class AnnotationToGAFTest {
     }
 
     @Test
-    public void nullEvidenceCode() {
-        annotation.evidenceCode = null;
+    public void nullGoEvidence() {
+        annotation.goEvidence = null;
         String[] elements = annotationToElements(annotation);
         assertThat(elements[COL_EVIDENCE], is(""));
     }
@@ -347,13 +379,27 @@ public class AnnotationToGAFTest {
         assertThat(elements[COL_GENE_PRODUCT_FORM_ID], is(""));
     }
 
+    @Test
+    public void nullName() {
+        annotation.name = null;
+        String[] elements = annotationToElements(annotation);
+        assertThat(elements[COL_DB_OBJECT_NAME], is(""));
+    }
+
+    @Test
+    public void taxonHasInteractingValueAlso() {
+        annotation.interactingTaxonId = 777;
+        String[] elements = annotationToElements(annotation);
+        assertThat(elements[COL_TAXON], is("taxon:" + TAXON_ID + "|777"));
+    }
+
     private void checkReturned(String slimmedToGoId, String converted) {
-        String[] elements = converted.split(AnnotationToGAF.OUTPUT_DELIMITER, -1);
+        String[] elements = converted.split(OUTPUT_DELIMITER, -1);
         assertThat(elements[COL_GO_ID], is(slimmedToGoId));
     }
 
     private String[] annotationToElements(Annotation annotation) {
         return annotationToGAF.apply(annotation, null).get(0)
-                .split(AnnotationToGAF.OUTPUT_DELIMITER, -1);
+                .split(OUTPUT_DELIMITER, -1);
     }
 }
