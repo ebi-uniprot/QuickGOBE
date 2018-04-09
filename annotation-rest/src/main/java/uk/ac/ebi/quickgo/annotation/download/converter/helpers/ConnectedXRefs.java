@@ -3,6 +3,8 @@ package uk.ac.ebi.quickgo.annotation.download.converter.helpers;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -19,10 +21,9 @@ public class ConnectedXRefs {
 
     private ConnectedXRefs() {}
 
+
     public static String asString(List<Annotation.ConnectedXRefs<Annotation.SimpleXRef>> connectedXRefs) {
-        if (connectedXRefs == null || connectedXRefs.isEmpty()) {
-            return "";
-        }
+        Objects.requireNonNull(connectedXRefs);
         return connectedXRefs.stream()
                 .map(ConnectedXRefs::simpleRefAndToString)
                 .collect(Collectors.joining(PIPE));
