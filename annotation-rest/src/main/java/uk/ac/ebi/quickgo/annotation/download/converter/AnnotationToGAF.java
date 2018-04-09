@@ -1,10 +1,10 @@
 package uk.ac.ebi.quickgo.annotation.download.converter;
 
 import uk.ac.ebi.quickgo.annotation.download.converter.helpers.AnnotationExtensions;
+import uk.ac.ebi.quickgo.annotation.download.converter.helpers.GeneProduct;
 import uk.ac.ebi.quickgo.annotation.download.converter.helpers.WithFrom;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.common.model.Aspect;
-import uk.ac.ebi.quickgo.annotation.download.converter.helpers.GeneProductId;
 
 import java.util.*;
 import java.util.function.BiFunction;
@@ -13,8 +13,6 @@ import static java.util.Arrays.asList;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
 import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.Date.toYYYYMMDD;
-import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.GeneProductType.toGpType;
-import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.Helper.nullOrEmptyListToEmptyString;
 import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.Helper.nullToEmptyString;
 import static uk.ac.ebi.quickgo.common.model.Aspect.fromScientificName;
 
@@ -81,10 +79,10 @@ public class AnnotationToGAF implements BiFunction<Annotation, List<String>, Lis
 
     private String toOutputRecord(Annotation annotation, String goId) {
         StringJoiner tsvJoiner = new StringJoiner(OUTPUT_DELIMITER);
-        final GeneProductId geneProductId = GeneProductId.fromString(annotation.geneProductId);
+        final GeneProduct geneProduct = GeneProduct.fromString(annotation.geneProductId);
         return tsvJoiner
-                .add(nullToEmptyString(geneProductId.db))
-                .add(nullToEmptyString(geneProductId.id))
+                .add(nullToEmptyString(geneProduct.db()))
+                .add(nullToEmptyString(geneProduct.id()))
                 .add(nullToEmptyString(annotation.symbol))
                 .add(gafQualifierAsString(annotation.qualifier))
                 .add(nullToEmptyString(goId))
@@ -94,12 +92,12 @@ public class AnnotationToGAF implements BiFunction<Annotation, List<String>, Lis
                 .add(fromScientificName(annotation.goAspect).map(Aspect::getCharacter).orElse(""))
                 .add(nullToEmptyString(annotation.name))
                 .add(nullToEmptyString(annotation.synonyms))
-                .add(nonNull(geneProductId.db) ? toGpType.apply(geneProductId.db) : "")
+                .add(nullToEmptyString(geneProduct.type()))
                 .add(gafTaxonAsString(annotation))
                 .add(nonNull(annotation.date) ? toYYYYMMDD.apply(annotation.date) : "")
                 .add(nullToEmptyString(annotation.assignedBy))
                 .add(AnnotationExtensions.nullOrEmptyListToEmptyString(annotation.extensions))
-                .add(nullToEmptyString(geneProductId.withIsoFormOrVariant))
+                .add(nullToEmptyString(geneProduct.withIsoformOrVariant()))
                 .toString();
     }
 

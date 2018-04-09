@@ -1,10 +1,10 @@
 package uk.ac.ebi.quickgo.annotation.download.converter;
 
 import uk.ac.ebi.quickgo.annotation.download.converter.helpers.Extensions;
+import uk.ac.ebi.quickgo.annotation.download.converter.helpers.GeneProduct;
 import uk.ac.ebi.quickgo.annotation.download.converter.helpers.WithFrom;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.common.model.Aspect;
-import uk.ac.ebi.quickgo.annotation.download.converter.helpers.GeneProductId;
 
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -14,7 +14,6 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static uk.ac.ebi.quickgo.annotation.download.TSVDownload.*;
 import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.Date.toYYYYMMDD;
-import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.GeneProductType.toGpType;
 import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.Helper.nullToEmptyString;
 
 /**
@@ -95,8 +94,8 @@ public class AnnotationToTSV implements BiFunction<Annotation, List<String>, Lis
                 (c, j) -> j.add(nullToEmptyString.apply(c.annotation.synonyms)));
         selected2Content.put(GENE_PRODUCT_TYPE_FIELD_NAME,
                 (c, j) -> {
-                    GeneProductId geneProductId = GeneProductId.fromString(c.annotation.geneProductId);
-                    j.add(ofNullable(geneProductId.db).map(toGpType).orElse(""));
+                    GeneProduct geneProduct= GeneProduct.fromString(c.annotation.geneProductId);
+                    j.add(nullToEmptyString(geneProduct.type()));
                 });
     }
 
