@@ -15,9 +15,11 @@ public class Qualifier {
 
     private static final String EMPTY_STRING = "";
 
+    private Qualifier() {}
+
     /**
      * For GAF, there are a limited set of usable values, otherwise show a empty string.
-     * @param qualifier
+     * @param qualifier input string
      * @return string representation for GAF format.
      */
     public static String gafQualifierAsString(String qualifier) {
