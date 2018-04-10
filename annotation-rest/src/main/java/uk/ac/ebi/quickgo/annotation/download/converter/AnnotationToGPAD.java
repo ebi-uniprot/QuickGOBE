@@ -56,16 +56,16 @@ public class AnnotationToGPAD implements BiFunction<Annotation, List<String>, Li
         return tsvJoiner
                 .add(ofNullable(geneProduct.db()).orElse(""))
                 .add(ofNullable(geneProduct.id()).orElse(""))
-                        .add(nullToEmptyString.apply(annotation.qualifier))
-                        .add(nullToEmptyString.apply(goId))
-                        .add(nullToEmptyString.apply(annotation.reference))
-                        .add(nullToEmptyString.apply(annotation.evidenceCode))
+                .add(nullToEmptyString(annotation.qualifier))
+                .add(nullToEmptyString(goId))
+                .add(nullToEmptyString(annotation.reference))
+                .add(nullToEmptyString(annotation.evidenceCode))
                 .add(WithFrom.nullOrEmptyListToString(annotation.withFrom))
                         .add(taxonIdAsString(annotation.interactingTaxonId))
                 .add(ofNullable(annotation.date).map(toYYYYMMDD).orElse(""))
-                        .add(nullToEmptyString.apply(annotation.assignedBy))
+                .add(nullToEmptyString(annotation.assignedBy))
                 .add(Extensions.asString(annotation.extensions))
-                        .add(GO_EVIDENCE + nullToEmptyString.apply(annotation.goEvidence)).toString();
+                .add(GO_EVIDENCE + nullToEmptyString(annotation.goEvidence)).toString();
     }
 
     private static final int LOWEST_VALID_TAXON_ID = 1;

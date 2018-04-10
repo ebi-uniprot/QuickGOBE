@@ -54,7 +54,7 @@ public class AnnotationToTSV implements BiFunction<Annotation, List<String>, Lis
     private void initialiseContentMappings() {
         selected2Content.put(GENE_PRODUCT_FIELD_NAME,
                 (c, j) -> {
-                    String[] elements = nullToEmptyString.apply(c.annotation.geneProductId).split(":");
+                    String[] elements = nullToEmptyString(c.annotation.geneProductId).split(":");
                     if (elements.length == 2) {
                         j.add(elements[0]);
                         j.add(elements[1]);
@@ -63,35 +63,35 @@ public class AnnotationToTSV implements BiFunction<Annotation, List<String>, Lis
                         j.add("");
                     }
                 });
-        selected2Content.put(SYMBOL_FIELD_NAME, (c, j) -> j.add(nullToEmptyString.apply(c.annotation.symbol)));
-        selected2Content.put(QUALIFIER_FIELD_NAME, (c, j) -> j.add(nullToEmptyString.apply(c.annotation.qualifier)));
+        selected2Content.put(SYMBOL_FIELD_NAME, (c, j) -> j.add(nullToEmptyString(c.annotation.symbol)));
+        selected2Content.put(QUALIFIER_FIELD_NAME, (c, j) -> j.add(nullToEmptyString(c.annotation.qualifier)));
         selected2Content.put(GO_TERM_FIELD_NAME, (c, j) -> {
             if (Objects.nonNull(c.slimmedToGoId)) {
                 j.add(c.slimmedToGoId);
             }
-            j.add(nullToEmptyString.apply(c.annotation.goId));
+            j.add(nullToEmptyString(c.annotation.goId));
         });
         selected2Content.put(GO_ASPECT_FIELD_NAME,
                 (c, j) -> j.add(Aspect.fromScientificName(c.annotation.goAspect)
                         .map(Aspect::getCharacter)
                         .orElse("")));
-        selected2Content.put(GO_NAME_FIELD_NAME, (c, j) -> j.add(nullToEmptyString.apply(c.annotation.goName)));
-        selected2Content.put(ECO_ID_FIELD_NAME, (c, j) -> j.add(nullToEmptyString.apply(c.annotation.evidenceCode)));
+        selected2Content.put(GO_NAME_FIELD_NAME, (c, j) -> j.add(nullToEmptyString(c.annotation.goName)));
+        selected2Content.put(ECO_ID_FIELD_NAME, (c, j) -> j.add(nullToEmptyString(c.annotation.evidenceCode)));
         selected2Content.put(GO_EVIDENCE_CODE_FIELD_NAME,
-                (c, j) -> j.add(nullToEmptyString.apply(c.annotation.goEvidence)));
-        selected2Content.put(REFERENCE_FIELD_NAME, (c, j) -> j.add(nullToEmptyString.apply(c.annotation.reference)));
+                (c, j) -> j.add(nullToEmptyString(c.annotation.goEvidence)));
+        selected2Content.put(REFERENCE_FIELD_NAME, (c, j) -> j.add(nullToEmptyString(c.annotation.reference)));
         selected2Content.put(WITH_FROM_FIELD_NAME, (c, j) -> j.add(WithFrom.nullOrEmptyListToString(c.annotation.withFrom)));
         selected2Content.put(TAXON_ID_FIELD_NAME,
                 (c, j) -> j.add(c.annotation.taxonId == 0 ? "" : Integer.toString(c.annotation.taxonId)));
-        selected2Content.put(ASSIGNED_BY_FIELD_NAME, (c, j) -> j.add(nullToEmptyString.apply(c.annotation.assignedBy)));
+        selected2Content.put(ASSIGNED_BY_FIELD_NAME, (c, j) -> j.add(nullToEmptyString(c.annotation.assignedBy)));
         selected2Content.put(ANNOTATION_EXTENSION_FIELD_NAME,
                 (c, j) -> j.add(Extensions.asString(c.annotation.extensions)));
         selected2Content
                 .put(DATE_FIELD_NAME, (c, j) -> j.add(ofNullable(c.annotation.date).map(toYYYYMMDD).orElse("")));
-        selected2Content.put(TAXON_NAME_FIELD_NAME, (c, j) -> j.add(nullToEmptyString.apply(c.annotation.taxonName)));
-        selected2Content.put(GENE_PRODUCT_NAME_FIELD_NAME, (c, j) -> j.add(nullToEmptyString.apply(c.annotation.name)));
+        selected2Content.put(TAXON_NAME_FIELD_NAME, (c, j) -> j.add(nullToEmptyString(c.annotation.taxonName)));
+        selected2Content.put(GENE_PRODUCT_NAME_FIELD_NAME, (c, j) -> j.add(nullToEmptyString(c.annotation.name)));
         selected2Content.put(GENE_PRODUCT_SYNONYMS_FIELD_NAME,
-                (c, j) -> j.add(nullToEmptyString.apply(c.annotation.synonyms)));
+                (c, j) -> j.add(nullToEmptyString(c.annotation.synonyms)));
         selected2Content.put(GENE_PRODUCT_TYPE_FIELD_NAME,
                 (c, j) -> {
                     GeneProduct geneProduct= GeneProduct.fromString(c.annotation.geneProductId);

@@ -102,7 +102,7 @@ public class AnnotationToGAF implements BiFunction<Annotation, List<String>, Lis
     }
 
     private String gafQualifierAsString(String qualifier) {
-        String annotationQualifier = nullToEmptyString.apply(qualifier);
+        String annotationQualifier = nullToEmptyString(qualifier);
 
         String gafQualifier;
         if (NOT_GAF_QUALIFIERS.contains(annotationQualifier)) {
