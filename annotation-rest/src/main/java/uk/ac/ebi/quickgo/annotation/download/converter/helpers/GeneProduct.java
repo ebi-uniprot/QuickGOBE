@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.annotation.download.converter.helpers;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,10 +42,11 @@ public class GeneProduct {
      * @param fullId Annotation id, could had isoform or variant suffix if it is a UniProt gene product.
      * @return a GeneProduct representation.
      */
-    public static GeneProduct fromString(String fullId) {
+    public static Optional<GeneProduct> fromString(String fullId) {
 
         if (Objects.isNull(fullId) || fullId.isEmpty()) {
-            return nullObject();
+            //            return nullObject();
+            return Optional.empty();
         }
 
         Matcher uniprotMatcher = UNIPROT_CANONICAL_PATTERN.matcher(fullId);
@@ -52,23 +54,23 @@ public class GeneProduct {
             String db = "UniProtKB";
             String id = uniprotMatcher.group(CANONICAL_GROUP_NUMBER);
             String withIsoFormOrVariant = fullId.contains("-") ? fullId : null;
-            return new GeneProduct(new GeneProductId(db, id, withIsoFormOrVariant), PROTEIN);
+            return Optional.of(new GeneProduct(new GeneProductId(db, id, withIsoFormOrVariant), PROTEIN));
         }
 
         Matcher rnaMatcher = RNA_CENTRAL_CANONICAL_PATTERN.matcher(fullId);
         if (rnaMatcher.matches()) {
             String db = "RNAcentral";
             String id = rnaMatcher.group(RNA_ID_GROUP);
-            return new GeneProduct(new GeneProductId(db, id, null), MI_RNA);
+            return Optional.of(new GeneProduct(new GeneProductId(db, id, null), MI_RNA));
         }
 
         Matcher intactMatcher = INTACT_CANONICAL_PATTERN.matcher(fullId);
         if (intactMatcher.matches()) {
             String db = "IntAct";
             String id = intactMatcher.group(INTACT_ID_NUMBER);
-            return new GeneProduct(new GeneProductId(db, id, null), COMPLEX);
+            return Optional.of(new GeneProduct(new GeneProductId(db, id, null), COMPLEX));
         }
-        return nullObject();
+        return Optional.empty();
     }
 
     public String id() {
@@ -88,9 +90,9 @@ public class GeneProduct {
     }
 
     //Create an empty version of the gene product
-    private static GeneProduct nullObject() {
-        return new GeneProduct(new GeneProductId(null, null, null), null);
-    }
+    //    private static GeneProduct nullObject() {
+    //        return new GeneProduct(new GeneProductId(null, null, null), null);
+    //    }
 
     /**
      * A representation of the GeneProduct Id.

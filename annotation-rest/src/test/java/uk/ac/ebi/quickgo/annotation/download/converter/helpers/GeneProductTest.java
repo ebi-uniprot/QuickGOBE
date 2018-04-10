@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.download.converter.helpers;
 
+import java.util.Optional;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.equalTo;
@@ -19,7 +20,7 @@ public class GeneProductTest {
     public void uniprot() {
         final String fullId = "UniProtKB:A0A000";
 
-        GeneProduct uniprot = GeneProduct.fromString(fullId);
+        GeneProduct uniprot = GeneProduct.fromString(fullId).get();
 
         assertThat(uniprot.db(), is("UniProtKB"));
         assertThat(uniprot.id(), is("A0A000"));
@@ -31,7 +32,7 @@ public class GeneProductTest {
     public void uniprotWithIsoformOrVarient() {
         final String fullId = "UniProtKB:A0A000-2";
 
-        GeneProduct uniprot = GeneProduct.fromString(fullId);
+        GeneProduct uniprot = GeneProduct.fromString(fullId).get();
 
         assertThat(uniprot.db(), is("UniProtKB"));
         assertThat(uniprot.id(), is("A0A000"));
@@ -43,7 +44,7 @@ public class GeneProductTest {
     public void rna() {
         final String fullId = "RNAcentral:URS00000064B1_559292";
 
-        GeneProduct uniprot = GeneProduct.fromString(fullId);
+        GeneProduct uniprot = GeneProduct.fromString(fullId).get();
 
         assertThat(uniprot.db(), is("RNAcentral"));
         assertThat(uniprot.id(), is("URS00000064B1_559292"));
@@ -55,7 +56,7 @@ public class GeneProductTest {
     public void intact() {
         final String fullId = "IntAct:EBI-10043081";
 
-        GeneProduct uniprot = GeneProduct.fromString(fullId);
+        GeneProduct uniprot = GeneProduct.fromString(fullId).get();
 
         assertThat(uniprot.db(), is("IntAct"));
         assertThat(uniprot.id(), is("EBI-10043081"));
@@ -66,45 +67,33 @@ public class GeneProductTest {
     @Test
     public void nullKeptAsNull() {
 
-        GeneProduct uniprot = GeneProduct.fromString(null);
+        Optional<GeneProduct> uniprot = GeneProduct.fromString(null);
 
-        assertThat(uniprot.db(), equalTo(null));
-        assertThat(uniprot.id(), equalTo(null));
-        assertThat(uniprot.withIsoformOrVariant(), equalTo(null));
-        assertThat(uniprot.type(), equalTo(null));
+        assertThat(uniprot, equalTo(Optional.empty()));
     }
 
     @Test
     public void emptyStringAsNull() {
 
-        GeneProduct uniprot = GeneProduct.fromString("");
+        Optional<GeneProduct> uniprot = GeneProduct.fromString("");
 
-        assertThat(uniprot.db(), equalTo(null));
-        assertThat(uniprot.id(), equalTo(null));
-        assertThat(uniprot.withIsoformOrVariant(), equalTo(null));
-        assertThat(uniprot.type(), equalTo(null));
+        assertThat(uniprot, equalTo(Optional.empty()));
     }
 
     @Test
     public void garbageAsNull() {
 
-        GeneProduct uniprot = GeneProduct.fromString("siasdfia'sif'a");
+        Optional<GeneProduct> uniprot = GeneProduct.fromString("siasdfia'sif'a");
 
-        assertThat(uniprot.db(), equalTo(null));
-        assertThat(uniprot.id(), equalTo(null));
-        assertThat(uniprot.withIsoformOrVariant(), equalTo(null));
-        assertThat(uniprot.type(), equalTo(null));
+        assertThat(uniprot, equalTo(Optional.empty()));
     }
 
     @Test
     public void uniprotIdIsBroken() {
         final String fullId = "UniProtKB:123444444444444";
 
-        GeneProduct uniprot = GeneProduct.fromString(fullId);
+        Optional<GeneProduct> uniprot = GeneProduct.fromString(fullId);
 
-        assertThat(uniprot.db(), equalTo(null));
-        assertThat(uniprot.id(), equalTo(null));
-        assertThat(uniprot.withIsoformOrVariant(), equalTo(null));
-        assertThat(uniprot.type(), equalTo(null));
+        assertThat(uniprot, equalTo(Optional.empty()));
     }
 }
