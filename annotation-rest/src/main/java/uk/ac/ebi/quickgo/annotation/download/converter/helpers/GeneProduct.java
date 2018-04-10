@@ -1,21 +1,19 @@
 package uk.ac.ebi.quickgo.annotation.download.converter.helpers;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.GeneProduct.GeneProductType.COMPLEX;
 import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.GeneProduct.GeneProductType.PROTEIN;
-import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.GeneProduct.GeneProductType.miRNA;
+import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.GeneProduct.GeneProductType.MI_RNA;
 
 /**
  *  The state for GeneProduct information used for downloading, with logic to create.
  */
 public class GeneProduct {
 
+    private static final int RNA_ID_GROUP = 1;
     private final GeneProductId geneProductId;
     private final GeneProductType geneProductType;
 
@@ -35,9 +33,9 @@ public class GeneProduct {
     private static final Pattern INTACT_CANONICAL_PATTERN = Pattern.compile(INTACT_CANONICAL_REGEX);
 
     /**
-     * Extract the canonical version of the id, removing the variation or isoform suffix if it exists.
-     * @param fullId Annotation id, could had isoform or variant suffix.
-     * @return canonical form of the id with the isoform or variant suffix removed.
+     * Determine the correctness of the argument as a gene product id and if valid build a GeneProduct representation.
+     * @param fullId Annotation id, could had isoform or variant suffix if it is a UniProt gene product.
+     * @return a GeneProduct representation.
      */
     public static GeneProduct fromString(String fullId) {
 
@@ -56,8 +54,8 @@ public class GeneProduct {
         Matcher rnaMatcher = RNA_CENTRAL_CANONICAL_PATTERN.matcher(fullId);
         if (rnaMatcher.matches()) {
             String db = "RNAcentral";
-            String id = rnaMatcher.group(CANONICAL_GROUP_NUMBER);
-            return new GeneProduct(new GeneProductId(db, id, null), miRNA);
+            String id = rnaMatcher.group(RNA_ID_GROUP);
+            return new GeneProduct(new GeneProductId(db, id, null), MI_RNA);
         }
 
         Matcher intactMatcher = INTACT_CANONICAL_PATTERN.matcher(fullId);
@@ -67,10 +65,6 @@ public class GeneProduct {
             return new GeneProduct(new GeneProductId(db, id, null), COMPLEX);
         }
         return nullObject();
-    }
-
-    private static GeneProduct nullObject() {
-        return new GeneProduct(new GeneProductId(null, null, null), null);
     }
 
     public String id() {
@@ -89,12 +83,18 @@ public class GeneProduct {
         return  geneProductType != null ? geneProductType.getName() : null;
     }
 
-    public static class GeneProductId {
-        private static final Logger LOGGER = LoggerFactory.getLogger(GeneProductId.class);
+    //Create an empty version of the gene product
+    private static GeneProduct nullObject() {
+        return new GeneProduct(new GeneProductId(null, null, null), null);
+    }
 
-        public final String db;
-        public final String id;
-        public final String withIsoFormOrVariant;
+    /**
+     * A representation of the GeneProduct Id.
+     */
+    private static class GeneProductId {
+        private final String db;
+        private final String id;
+        private final String withIsoFormOrVariant;
 
         private GeneProductId(String db, String id, String wthIsoFormOrVariant) {
             this.db = db;
@@ -103,10 +103,13 @@ public class GeneProduct {
         }
     }
 
-     public enum GeneProductType {
+    /**
+     * A representation of the GeneProduct type.
+     */
+    public enum GeneProductType {
         COMPLEX("complex"),
         PROTEIN("protein"),
-        miRNA("miRNA");
+        MI_RNA("miRNA");
 
         private String name;
 
