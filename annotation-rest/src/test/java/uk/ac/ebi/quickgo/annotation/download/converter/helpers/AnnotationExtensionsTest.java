@@ -5,7 +5,6 @@ import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import org.junit.Test;
 
 import static java.util.Arrays.asList;
@@ -18,9 +17,10 @@ import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.Annotation
         .OCCURS_IN_CL_2;
 import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.AnnotationExtensionsTest.FakeExtensionItem
         .OCCURS_IN_CL_3;
+import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.TestHelper.connectedXrefs;
 
 /**
- * Can the AnnotationExtensions properly create a string representation of the references handed to it?
+ * Can the AnnotationExtensions helper class properly create a string representation of the references handed to it?
  *
  * @author Tony Wardell
  * Date: 10/04/2018
@@ -50,16 +50,6 @@ public class AnnotationExtensionsTest {
     public void annotationExtensionsWithoutOrs() {
         List<Annotation.ConnectedXRefs<Annotation.QualifiedXref>> extensionsModel = connectedXrefs(EXTENSIONS);
         assertThat(AnnotationExtensions.nullOrEmptyListToEmptyString(extensionsModel), is(EXPECTED_EXTENSION));
-    }
-
-    private static <T extends Annotation.AbstractXref> List<Annotation.ConnectedXRefs<T>> connectedXrefs(
-            List<List<Supplier<T>>> items) {
-        return items.stream().map(itemList -> {
-                    Annotation.ConnectedXRefs<T> xrefs = new Annotation.ConnectedXRefs<>();
-                    itemList.stream().map(Supplier::get).forEach(xrefs::addXref);
-                    return xrefs;
-                }
-        ).collect(Collectors.toList());
     }
 
     enum FakeExtensionItem implements Supplier<Annotation.QualifiedXref> {
