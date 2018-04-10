@@ -116,12 +116,11 @@ public class AnnotationToGAF implements BiFunction<Annotation, List<String>, Lis
         return gafQualifier;
     }
 
-    String gafTaxonAsString(Annotation annotation) {
+    private String gafTaxonAsString(Annotation annotation) {
         StringBuilder taxonBuilder = new StringBuilder();
         taxonBuilder.append(TAXON)
                 .append(annotation.taxonId)
                 .append(annotation.interactingTaxonId > 0 ? PIPE + annotation.interactingTaxonId : "");
         return taxonBuilder.toString();
     }
-
 }
