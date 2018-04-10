@@ -205,19 +205,6 @@ public class AnnotationToGAFTest {
     }
 
     @Test
-    public void createGAFQualifierNOTAppropriately() {
-        String notQualifier = "NOT";
-
-        List<String> qualifiersToBeEmptyForGaf = asList("NOT|enables", "NOT|part_of", "NOT|involved_in");
-
-        for (String qualifierToBeEmptyInGaf : qualifiersToBeEmptyForGaf) {
-            annotation.qualifier = qualifierToBeEmptyInGaf;
-            String[] elements = annotationToElements(annotation);
-            assertThat(elements[COL_QUALIFIER], is(notQualifier));
-        }
-    }
-
-    @Test
     public void createValidGAFQualifiers() {
         List<String> qualifiersToBeSetForGaf = asList(
                 "contributes_to", "NOT|contributes_to",
@@ -390,6 +377,13 @@ public class AnnotationToGAFTest {
         annotation.interactingTaxonId = 777;
         String[] elements = annotationToElements(annotation);
         assertThat(elements[COL_TAXON], is("taxon:" + TAXON_ID + "|777"));
+    }
+
+    @Test
+    public void qualifierContainsNot() {
+        annotation.qualifier = "not|part_of";
+        String[] elements = annotationToElements(annotation);
+        assertThat(elements[COL_QUALIFIER], is("NOT"));
     }
 
     private void checkReturned(String slimmedToGoId, String converted) {

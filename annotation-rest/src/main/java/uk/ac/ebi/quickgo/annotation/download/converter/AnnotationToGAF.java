@@ -9,11 +9,11 @@ import uk.ac.ebi.quickgo.common.model.Aspect;
 import java.util.*;
 import java.util.function.BiFunction;
 
-import static java.util.Arrays.asList;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
 import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.Date.toYYYYMMDD;
 import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.Helper.nullToEmptyString;
+import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.Qualifier.gafQualifierAsString;
 import static uk.ac.ebi.quickgo.common.model.Aspect.fromScientificName;
 
 /**
@@ -54,10 +54,6 @@ public class AnnotationToGAF implements BiFunction<Annotation, List<String>, Lis
     static final String OUTPUT_DELIMITER = "\t";
     private static final String PIPE = "|";
     private static final String TAXON = "taxon:";
-    private static final Set<String> NOT_GAF_QUALIFIERS =
-            new HashSet<>(asList("NOT|enables", "NOT|part_of", "NOT|involved_in"));
-    private static final Set<String> VALID_GAF_QUALIFIERS =
-            new HashSet<>(asList("contributes_to", "NOT|contributes_to", "colocalizes_with", "NOT|colocalizes_with"));
 
     /**
      * Convert an {@link Annotation} to a String representation.
@@ -99,21 +95,6 @@ public class AnnotationToGAF implements BiFunction<Annotation, List<String>, Lis
                 .add(AnnotationExtensions.nullOrEmptyListToEmptyString(annotation.extensions))
                 .add(geneProduct.map(GeneProduct::withIsoformOrVariant).orElse(""))
                 .toString();
-    }
-
-    private String gafQualifierAsString(String qualifier) {
-        String annotationQualifier = nullToEmptyString(qualifier);
-
-        String gafQualifier;
-        if (NOT_GAF_QUALIFIERS.contains(annotationQualifier)) {
-            gafQualifier = "NOT";
-        } else if (VALID_GAF_QUALIFIERS.contains(annotationQualifier)) {
-            gafQualifier = annotationQualifier;
-        } else {
-            gafQualifier = "";
-        }
-
-        return gafQualifier;
     }
 
     private String gafTaxonAsString(Annotation annotation) {
