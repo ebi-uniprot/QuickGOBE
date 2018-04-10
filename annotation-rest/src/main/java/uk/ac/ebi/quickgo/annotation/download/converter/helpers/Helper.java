@@ -1,8 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.download.converter.helpers;
 
-import java.util.List;
 import java.util.Objects;
-import java.util.function.Function;
 
 /**
  * A holder for general helper code.
@@ -15,14 +13,12 @@ import java.util.function.Function;
 public class Helper {
     private Helper() {}
 
-    public static final Function<String, String> nullToEmptyString = s -> s == null ? "" : s;
-
+    /**
+     * Return the reference if it is no null or empty, otherwise return an empty string.
+     * @param reference a string value.
+     * @return the reference or empty string.
+     */
     public static String nullToEmptyString(String reference){
         return Objects.nonNull(reference) ? reference : "";
     }
-
-    public static String nullOrEmptyListToEmptyString(List reference, Function<List, String> mapper){
-        return Objects.nonNull(reference) || !reference.isEmpty() ? mapper.apply(reference) : "";
-    }
-
 }
