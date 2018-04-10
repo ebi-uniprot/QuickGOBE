@@ -136,9 +136,8 @@ public class AnnotationToGAFTest {
     }
 
     @Test
-    public void createGAFStringFromAnnotationModelContainingRNACentralWithVariantOrIsoForm() {
+    public void createGAFStringFromAnnotationModelContainingRNACentral() {
         String gpId = "URS00000064B1_559292";
-        String gpIdCanonical = "URS00000064B1";
         String db = "RNAcentral";
         String gpType = "miRNA";
         annotation.id = String.format("%s:%s", db, gpId);
@@ -147,7 +146,7 @@ public class AnnotationToGAFTest {
         annotation.symbol = gpId;
         String[] elements = annotationToElements(annotation);
         assertThat(elements[COL_DB], is(db));
-        assertThat(elements[COL_DB_OBJECT_ID], is(gpIdCanonical));
+        assertThat(elements[COL_DB_OBJECT_ID], is(gpId));
         assertThat(elements[COL_DB_OBJECT_SYMBOL], is(gpId));
         assertThat(elements[COL_QUALIFIER], is(QUALIFIER));
         assertThat(elements[COL_GO_ID], is(GO_ID));
