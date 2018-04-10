@@ -12,17 +12,8 @@ import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.GeneProduc
  *  The state for GeneProduct information used for downloading, with logic to create.
  */
 public class GeneProduct {
-
-    private static final int RNA_ID_GROUP = 1;
-    private final GeneProductId geneProductId;
-    private final GeneProductType geneProductType;
-
-    private GeneProduct(GeneProductId geneProductId, GeneProductType geneProductType) {
-        this.geneProductId = geneProductId;
-        this.geneProductType = geneProductType;
-    }
-
     private static final int CANONICAL_GROUP_NUMBER = 2;
+    private static final int RNA_ID_GROUP = 1;
     private static final int INTACT_ID_NUMBER = 1;
     private static final String UNIPROT_CANONICAL_REGEX = "^(?:UniProtKB:)?(([OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z]" +
             "([0-9][A-Z][A-Z0-9]{2}){1,2}[0-9])((-[0-9]+)|:PRO_[0-9]{10}|:VAR_[0-9]{6}){0,1})$";
@@ -31,6 +22,19 @@ public class GeneProduct {
     private static final Pattern RNA_CENTRAL_CANONICAL_PATTERN = Pattern.compile(RNA_CENTRAL_REGEX);
     private static final String INTACT_CANONICAL_REGEX = "^(?:IntAct:)(EBI-[0-9]+)$";
     private static final Pattern INTACT_CANONICAL_PATTERN = Pattern.compile(INTACT_CANONICAL_REGEX);
+
+    private final GeneProductId geneProductId;
+    private final GeneProductType geneProductType;
+
+    /**
+     * Constructor
+     * @param geneProductId
+     * @param geneProductType
+     */
+    private GeneProduct(GeneProductId geneProductId, GeneProductType geneProductType) {
+        this.geneProductId = geneProductId;
+        this.geneProductType = geneProductType;
+    }
 
     /**
      * Determine the correctness of the argument as a gene product id and if valid build a GeneProduct representation.
