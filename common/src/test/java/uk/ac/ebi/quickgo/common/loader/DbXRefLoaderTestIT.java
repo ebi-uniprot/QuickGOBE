@@ -21,7 +21,6 @@ public class DbXRefLoaderTestIT {
 	private static final String NOWHERE_CANTFIND = "OVER/RAINBOW";
 	private static final String FIND_IT_HERE = "src/test/resources/DB_XREFS_ENTITIES.dat.gz";
 	private static final boolean CASE_SENSITIVE_MATCHING  = false;
-    public static final int NO_OF_DB_XREFS = 142;
 
 	@Test
 	public void loadFileUnsuccessfully(){
@@ -35,7 +34,7 @@ public class DbXRefLoaderTestIT {
 	public void loadFileSuccessfully(){
 		DbXRefLoader dbXRefLoader = new DbXRefLoader(FIND_IT_HERE, CASE_SENSITIVE_MATCHING );
 		List<DbXRefEntity> list = dbXRefLoader.load();
-        assertThat(list, hasSize(NO_OF_DB_XREFS));
+        assertThat(list, hasSize(119));
 		assertThat(list.get(0).toString(), is("GeneProductXrefEntity{database='AGI_LocusCode', " +
 				"entityType='SO:0000704', entityTypeName='gene', idValidationPattern=A[Tt][MmCc0-5][Gg][0-9]{5}(\\\\" +
 				".[0-9]{1})?, databaseURL='http://arabidopsis.org/servlets/TairObject?type=locus&name=[example_id]'}"));
