@@ -41,5 +41,7 @@ public class ValidationEntityCheckerIT {
         JobExecution jobExecution = jobLauncherTestUtils.launchStep(LOAD_ANNOTATION_DBX_REF_ENTITIES_STEP_NAME);
         assertThat(jobExecution.getStatus(), Is.is(BatchStatus.COMPLETED));
         assertThat(validator.isValid("PMID:123456"), is(true));
+        assertThat(validator.isValid("IntAct:EBI-10043081"), is(true));
+        assertThat(validator.isValid("ComplexPortal:CPX-101"), is(true));
     }
 }
