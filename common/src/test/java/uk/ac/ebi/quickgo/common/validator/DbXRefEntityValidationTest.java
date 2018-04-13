@@ -51,6 +51,10 @@ public class DbXRefEntityValidationTest {
 		when(intactEntity.getEntityType()).thenReturn("GO:0043234");
 		when(intactEntity.matches("EBI-11166735")).thenReturn(true);
 
+        when(intactEntity.getDatabase()).thenReturn("ComplexPortal");
+        when(intactEntity.getEntityType()).thenReturn("GO:0032991");
+        when(intactEntity.matches("CPX-101")).thenReturn(true);
+
 		when(uniprotEntity.getDatabase()).thenReturn("UniProtKB");
 		when(uniprotEntity.getEntityType()).thenReturn("PR:000000001");
 		when(uniprotEntity.matches("A0A000")).thenReturn(true);
@@ -69,9 +73,14 @@ public class DbXRefEntityValidationTest {
 		assertThat(dbXrefEntities.test("71URS0000000001_733"), is(true));
 	}
 
+    @Test
+    public void isValidIntActID() {
+        assertThat(dbXrefEntities.test("EBI-11166735"), is(true));
+    }
+
 	@Test
-	public void isValidIntActID(){
-		assertThat(dbXrefEntities.test("EBI-11166735"), is(true));
+    public void isValidWasIntActIDNowComplex() {
+        assertThat(dbXrefEntities.test("CPX-101"), is(true));
 	}
 
 	@Test
