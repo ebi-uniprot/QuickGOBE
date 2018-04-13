@@ -34,7 +34,7 @@ public class DbXRefLoaderTestIT {
 	public void loadFileSuccessfully(){
 		DbXRefLoader dbXRefLoader = new DbXRefLoader(FIND_IT_HERE, CASE_SENSITIVE_MATCHING );
 		List<DbXRefEntity> list = dbXRefLoader.load();
-        assertThat(list, hasSize(119));
+		assertThat(list, hasSize(142));
 		assertThat(list.get(0).toString(), is("GeneProductXrefEntity{database='AGI_LocusCode', " +
 				"entityType='SO:0000704', entityTypeName='gene', idValidationPattern=A[Tt][MmCc0-5][Gg][0-9]{5}(\\\\" +
 				".[0-9]{1})?, databaseURL='http://arabidopsis.org/servlets/TairObject?type=locus&name=[example_id]'}"));
