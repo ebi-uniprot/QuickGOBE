@@ -852,49 +852,30 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterByUniProtKBAndIntactAndRNACentralGeneProductIDSuccessfully() throws Exception {
-        repository.deleteAll();
-        String uniprotGp = "A1E959";
-        String intactGp = "EBI-10043081";
-        String rnaGp = "URS00000064B1_559292";
-        repository.save(AnnotationDocMocker.createAnnotationDoc(uniprotGp));
-        repository.save(AnnotationDocMocker.createAnnotationDoc(intactGp));
-        repository.save(AnnotationDocMocker.createAnnotationDoc(rnaGp));
-        StringJoiner sj = new StringJoiner(",");
-        sj.add(uniprotGp).add(intactGp).add(rnaGp);
-        ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(GENE_PRODUCT_ID_PARAM.getName(), sj.toString()));
-
-        response.andExpect(status().isOk())
-                .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(3))
-                .andExpect(fieldsInAllResultsExist(3))
-                .andExpect(itemExistsExpectedTimes(GENEPRODUCT_ID_FIELD, uniprotGp, 1))
-                .andExpect(itemExistsExpectedTimes(GENEPRODUCT_ID_FIELD, intactGp, 1))
-                .andExpect(itemExistsExpectedTimes(GENEPRODUCT_ID_FIELD, rnaGp, 1));
-    }
-
-    @Test
-    public void filterByUniProtKBAndIntactAndRNACentralGeneProductIDCaseInsensitiveSuccessfully() throws Exception {
+    public void filterByUniProtKBAndIntactAndRNACentralAndComplexPortalWithCaseInsensitivity() throws
+                                                                                               Exception {
         repository.deleteAll();
         String uniprotGp = "A1E959".toLowerCase();
-        String intactGp = "EBI-10043081".toLowerCase();
+        String intactGp = "EBI-10043081".toUpperCase();
         String rnaGp = "URS00000064B1_559292".toLowerCase();
+        String complexPortalGp = "CPX-101".toLowerCase();
         repository.save(AnnotationDocMocker.createAnnotationDoc(uniprotGp));
         repository.save(AnnotationDocMocker.createAnnotationDoc(intactGp));
         repository.save(AnnotationDocMocker.createAnnotationDoc(rnaGp));
+        repository.save(AnnotationDocMocker.createAnnotationDoc(complexPortalGp));
         StringJoiner sj = new StringJoiner(",");
-        sj.add(uniprotGp).add(intactGp).add(rnaGp);
+        sj.add(uniprotGp).add(intactGp).add(complexPortalGp).add(rnaGp);
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(GENE_PRODUCT_ID_PARAM.getName(), sj.toString()));
 
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(3))
-                .andExpect(fieldsInAllResultsExist(3))
+                .andExpect(totalNumOfResults(4))
+                .andExpect(fieldsInAllResultsExist(4))
                 .andExpect(itemExistsExpectedTimes(GENEPRODUCT_ID_FIELD, uniprotGp, 1))
                 .andExpect(itemExistsExpectedTimes(GENEPRODUCT_ID_FIELD, intactGp, 1))
-                .andExpect(itemExistsExpectedTimes(GENEPRODUCT_ID_FIELD, rnaGp, 1));
+                .andExpect(itemExistsExpectedTimes(GENEPRODUCT_ID_FIELD, rnaGp, 1))
+                .andExpect(itemExistsExpectedTimes(GENEPRODUCT_ID_FIELD, complexPortalGp, 1));
     }
 
     @Test
