@@ -25,48 +25,48 @@ public class AnnotationValidatorTest {
 
     // check required fields -------------------------------------------------
     @Test(expected = DocumentReaderException.class)
-    public void nullAnnotationThrowsException() throws Exception {
+    public void nullAnnotationThrowsException() {
         validator.validate(null);
     }
 
     @Test(expected = ValidationException.class)
-    public void nullDatabaseThrowsException() throws Exception {
+    public void nullDatabaseThrowsException() {
         annotation.db = null;
         validator.validate(annotation);
     }
 
     @Test(expected = ValidationException.class)
-    public void nullDatabaseIDThrowsException() throws Exception {
+    public void nullDatabaseIDThrowsException() {
         annotation.dbObjectId = null;
         validator.validate(annotation);
     }
 
     @Test(expected = ValidationException.class)
-    public void nullQualifierThrowsException() throws Exception {
+    public void nullQualifierThrowsException() {
         annotation.qualifier = null;
         validator.validate(annotation);
     }
 
     @Test(expected = ValidationException.class)
-    public void nullGODIThrowsException() throws Exception {
+    public void nullGODIThrowsException() {
         annotation.goId = null;
         validator.validate(annotation);
     }
 
     @Test(expected = ValidationException.class)
-    public void nullDatabaseReferencesException() throws Exception {
+    public void nullDatabaseReferencesException() {
         annotation.dbReferences = null;
         validator.validate(annotation);
     }
 
     @Test(expected = ValidationException.class)
-    public void nullEcoEvidenceThrowsException() throws Exception {
+    public void nullEcoEvidenceThrowsException() {
         annotation.evidenceCode = null;
         validator.validate(annotation);
     }
 
     @Test(expected = ValidationException.class)
-    public void nullAssignedByThrowsException() throws Exception {
+    public void nullAssignedByThrowsException() {
         annotation.assignedBy = null;
         validator.validate(annotation);
     }
@@ -270,17 +270,18 @@ public class AnnotationValidatorTest {
         validator.validate(annotation);
     }
 
+    @Test
+    public void complexPortalAnnotationsCanBeMissingGoEvidenceIdsAndThatsOK() {
+        annotation.annotationProperties =
+                "go_aspect=cellular_component|taxon_id=10090|db_object_symbol=methylosome_mouse" +
+                        "|db_object_type=complex|taxon_lineage=10090";
+        validator.validate(annotation);
+    }
+
     // bad annotation properties field -------------------------------------------------
     @Test(expected = ValidationException.class)
     public void invalidSingleTermedComponentAnnotationProperty() {
         annotation.annotationProperties = "go_evidence:IPI";
-        validator.validate(annotation);
-    }
-
-    @Test(expected = ValidationException.class)
-    public void invalidAnnotationPropertyDueToMissingGOEvidence() {
-        annotation.annotationProperties =
-                "taxon_id=35758|db_subset=TrEMBL|db_object_symbol=moeA5|db_object_type=protein|taxon_lineage=1,2";
         validator.validate(annotation);
     }
 
