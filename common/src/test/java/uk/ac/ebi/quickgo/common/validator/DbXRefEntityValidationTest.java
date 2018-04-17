@@ -79,7 +79,7 @@ public class DbXRefEntityValidationTest {
     }
 
 	@Test
-    public void isValidWasIntActIDNowComplex() {
+    public void isValidComplexID() {
         assertThat(dbXrefEntities.test("CPX-101"), is(true));
 	}
 

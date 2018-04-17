@@ -1,12 +1,10 @@
 package uk.ac.ebi.quickgo.index.annotation;
 
 import com.google.common.base.Strings;
-import org.slf4j.Logger;
 import org.springframework.batch.item.validator.ValidationException;
 import org.springframework.batch.item.validator.Validator;
 import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
 
-import static org.slf4j.LoggerFactory.getLogger;
 import static uk.ac.ebi.quickgo.index.annotation.AnnotationParsingHelper.*;
 import static uk.ac.ebi.quickgo.index.annotation.Columns.*;
 import static uk.ac.ebi.quickgo.index.common.validation.ValidationHelper.checkIsNullOrEmpty;
@@ -21,8 +19,6 @@ import static uk.ac.ebi.quickgo.index.common.validation.ValidationHelper.handleF
  * @author Edd
  */
 class AnnotationValidator implements Validator<Annotation> {
-
-    private static final Logger LOGGER = getLogger(AnnotationValidator.class);
 
     @Override public void validate(Annotation annotation) throws ValidationException {
         if (annotation == null) {
@@ -85,14 +81,12 @@ class AnnotationValidator implements Validator<Annotation> {
 
     private void checkMandatoryPropertiesFieldsExist(Annotation annotation) {
         if (!(PROPS_TAXON_REGEX.matcher(annotation.annotationProperties).find() &&
-                      PROPS_GO_EVIDENCE_REGEX.matcher(annotation.annotationProperties).find() &&
                       PROPS_DB_OBJECT_TYPE_REGEX.matcher(annotation.annotationProperties).find() &&
                       PROPS_TAXON_ANCESTORS_REGEX.matcher(annotation.annotationProperties).find())) {
             handleFieldPatternMismatchError(
                     "Annotation Properties: required field not found",
                     annotation.annotationProperties,
                     PROPS_TAXON_REGEX.pattern()
-                            + " AND " + PROPS_GO_EVIDENCE_REGEX.pattern()
                             + " AND " + PROPS_DB_OBJECT_TYPE_REGEX.pattern()
                             + " AND " + PROPS_TAXON_ANCESTORS_REGEX.pattern(),
                     annotation);
