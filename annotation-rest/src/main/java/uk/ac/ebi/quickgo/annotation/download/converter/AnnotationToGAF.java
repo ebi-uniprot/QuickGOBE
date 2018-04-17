@@ -11,7 +11,7 @@ import java.util.function.BiFunction;
 
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
-import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.Date.toYYYYMMDD;
+import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.DateConverter.toYYYYMMDD;
 import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.Helper.nullToEmptyString;
 import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.Qualifier.gafQualifierAsString;
 import static uk.ac.ebi.quickgo.common.model.Aspect.fromScientificName;
