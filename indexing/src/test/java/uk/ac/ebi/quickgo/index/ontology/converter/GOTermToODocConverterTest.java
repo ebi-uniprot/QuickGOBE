@@ -313,8 +313,7 @@ public class GOTermToODocConverterTest {
     public void historyCategoryIsConstraint() {
         when(term.getHistory()).thenReturn(termOntologyHistoryForConstraint());
 
-        OntologyDocument result = converter.apply(term);
-        OntologyDocument document = result;
+        OntologyDocument document = converter.apply(term);
 
         final List<String> history = document.history;
         assertThat(history, hasSize(1));
