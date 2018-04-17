@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.annotation.download.converter.helpers;
 
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.function.Function;
 
 /**
@@ -23,7 +24,7 @@ public class DateConverter {
     public static final Function<java.util.Date, String> toYYYYMMDD =
             d -> d.toInstant().atZone(ZoneId.systemDefault()).format(YYYYMMDD_DATE_FORMAT);
 
-    public static String toYearMonthDay(DateConverter date) {
+    public static String toYearMonthDay(Date date) {
         return toYYYYMMDD.apply(date);
     }
 
