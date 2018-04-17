@@ -1,9 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.download.converter;
 
-import uk.ac.ebi.quickgo.annotation.download.converter.helpers.AnnotationExtensions;
-import uk.ac.ebi.quickgo.annotation.download.converter.helpers.GeneProduct;
-import uk.ac.ebi.quickgo.annotation.download.converter.helpers.Helper;
-import uk.ac.ebi.quickgo.annotation.download.converter.helpers.WithFrom;
+import uk.ac.ebi.quickgo.annotation.download.converter.helpers.*;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.common.model.Aspect;
 
@@ -15,7 +12,7 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
-import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.Date.toYYYYMMDD;
+import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.DateConverter.toYYYYMMDD;
 import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.Helper.nullToEmptyString;
 import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.Qualifier.gafQualifierAsString;
 import static uk.ac.ebi.quickgo.common.model.Aspect.fromScientificName;
@@ -78,8 +75,7 @@ public class AnnotationToGAFFunctionalStyle implements BiFunction<Annotation, Li
         Function<GeneProduct,String> x = GeneProduct::db;
         x.compose()
 
-        return tsvJoiner
-                .add(gP -> gP.db())
+        return tsvJoiner.add(GeneProduct.db())
                 .add(geneProduct.map(GeneProduct::id).orElse(""))
                 .add(nullToEmptyString(annotation.symbol))
                 .add(gafQualifierAsString(annotation.qualifier))
@@ -107,22 +103,37 @@ public class AnnotationToGAFFunctionalStyle implements BiFunction<Annotation, Li
 
     }
 
-    static List<Function<AnnotationToGAF.GafSource,String>> opsO;
+    static List<Function<AnnotationToGAFFunctionalStyle.GafSource, String>> opsO;
 
     static {
-        Function<AnnotationToGAF.GafSource, GeneProduct>  gpSource = AnnotationToGAF.GafSource::getGeneProduct;
-        Function<AnnotationToGAF.GafSource, Annotation>  annotationSource = AnnotationToGAF.GafSource::getAnnotation;
+        Function<AnnotationToGAFFunctionalStyle.GafSource, GeneProduct> gpSource =
+                AnnotationToGAFFunctionalStyle.GafSource::getGeneProduct;
+        Function<AnnotationToGAFFunctionalStyle.GafSource, Annotation> annotationSource =
+                AnnotationToGAFFunctionalStyle.GafSource::getAnnotation;
+
+        //Functions to access or convert annotation or related data to GAF formatted data.
         opsO.add(gpSource.andThen(GeneProduct::db));
-        opsO.add(gpSource.andThen(gP -> gP.id()));
-        opsO.add(annotationSource.andThen((a) -> a.symbol) );
-        opsO.add(annotationSource.andThen((a) -> a.qualifier) );
-        opsO.add(AnnotationToGAF.GafSource::getGoId);
+        opsO.add(gpSource.andThen(GeneProduct::id));
+        opsO.add(annotationSource.andThen(a -> a.symbol));
+        opsO.add(annotationSource.andThen(a -> a.qualifier));
+        opsO.add(AnnotationToGAFFunctionalStyle.GafSource::getGoId);
         opsO.add(annotationSource.andThen(a -> a.reference));
-        opsO.add(annotationSource.andThen(AnnotationToGAF::aspectAsSingleCharacter));
+        opsO.add(annotationSource.andThen(a -> a.goEvidence));
+        opsO.add(annotationSource.andThen(a -> a.withFrom).andThen(WithFrom::nullOrEmptyListToString));
+        opsO.add(annotationSource.andThen(AnnotationToGAFFunctionalStyle::aspectAsSingleCharacter));
+        opsO.add(annotationSource.andThen(a -> a.name));
+        opsO.add(annotationSource.andThen(a -> a.synonyms));
+        opsO.add(gpSource.andThen(GeneProduct::type));
+        opsO.add(annotationSource.andThen(AnnotationToGAFFunctionalStyle::gafTaxonAsString));
+        opsO.add(annotationSource.andThen(a -> a.date).andThen(DateConverter::toYearMonthDay));
+        opsO.add(annotationSource.andThen(a -> a.assignedBy));
+        opsO.add((annotationSource.andThen(a -> a.extensions)
+                          .andThen(AnnotationExtensions::nullOrEmptyListToEmptyString)));
+        opsO.add(gpSource.andThen(GeneProduct::withIsoformOrVariant));
 
     }
 
-    private String toOutputRecordUsingSupplier(AnnotationToGAF.GafSource gafSource) {
+    private String toOutputRecordUsingSupplier(AnnotationToGAFFunctionalStyle.GafSource gafSource) {
 
 //        List<Function<GeneProduct,String>> ops = new ArrayList<>();
 
@@ -159,8 +170,7 @@ public class AnnotationToGAFFunctionalStyle implements BiFunction<Annotation, Li
 
     }
 
-
-    private String gafTaxonAsString(Annotation annotation) {
+    private static String gafTaxonAsString(Annotation annotation) {
         StringBuilder taxonBuilder = new StringBuilder();
         taxonBuilder.append(TAXON)
                 .append(annotation.taxonId)
