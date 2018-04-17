@@ -74,7 +74,7 @@ public class ServiceConfig {
     }
 
     private DbXRefEntityValidation idValidator() {
-        //jflasjfdlasjdfl
+        //jflasjfdlasjdfl sdfgsdgfsdfgsdg
         final List<DbXRefEntity> validationList = geneProductLoader().load();
         LOGGER.info("Here is the contents of the file used for gene product validation");
         validationList.stream().forEach(v -> LOGGER.info(v.toString()));
