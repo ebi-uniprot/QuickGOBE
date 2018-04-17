@@ -13,12 +13,18 @@ import java.util.function.Function;
  * Created with IntelliJ IDEA.
 
  */
-public class Date {
+public class DateConverter {
 
-    private Date() {}
+    private DateConverter() {
+    }
 
     private static final DateTimeFormatter YYYYMMDD_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd");
+
     public static final Function<java.util.Date, String> toYYYYMMDD =
             d -> d.toInstant().atZone(ZoneId.systemDefault()).format(YYYYMMDD_DATE_FORMAT);
+
+    public static String toYearMonthDay(DateConverter date) {
+        return toYYYYMMDD.apply(date);
+    }
 
 }
