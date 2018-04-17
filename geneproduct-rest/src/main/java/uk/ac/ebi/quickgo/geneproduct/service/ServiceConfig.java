@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.geneproduct.service;
 
 import uk.ac.ebi.quickgo.common.loader.DbXRefLoader;
+import uk.ac.ebi.quickgo.common.validator.DbXRefEntity;
 import uk.ac.ebi.quickgo.common.validator.DbXRefEntityValidation;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepoConfig;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepository;
@@ -13,6 +14,9 @@ import uk.ac.ebi.quickgo.rest.search.SolrQueryStringSanitizer;
 import uk.ac.ebi.quickgo.rest.service.ServiceHelper;
 import uk.ac.ebi.quickgo.rest.service.ServiceHelperImpl;
 
+import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -36,6 +40,7 @@ import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.M
 @ComponentScan({"uk.ac.ebi.quickgo.geneproduct.service"})
 @Import({GeneProductRepoConfig.class})
 public class ServiceConfig {
+    Logger LOGGER = LoggerFactory.getLogger(ServiceConfig.class);
 
     private static final boolean DEFAULT_XREF_VALIDATION_IS_CASE_SENSITIVE = true;
     @Value("${geneproduct.db.xref.valid.casesensitive:"+DEFAULT_XREF_VALIDATION_IS_CASE_SENSITIVE+"}")
@@ -69,7 +74,10 @@ public class ServiceConfig {
     }
 
     private DbXRefEntityValidation idValidator() {
-        return DbXRefEntityValidation.createWithData(geneProductLoader().load());
+        final List<DbXRefEntity> validationList = geneProductLoader().load();
+        LOGGER.info("Here is the contents of the file used for gene product validation");
+        validationList.stream().forEach(v -> LOGGER.info(v.toString()));
+        return DbXRefEntityValidation.createWithData(validationList);
     }
 
     private DbXRefLoader geneProductLoader() {
