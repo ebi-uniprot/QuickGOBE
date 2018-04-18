@@ -25,7 +25,7 @@ public class DateConverter {
             d -> d.toInstant().atZone(ZoneId.systemDefault()).format(YYYYMMDD_DATE_FORMAT);
 
     public static String toYearMonthDay(Date date) {
-        return toYYYYMMDD.apply(date);
+        return date != null ? toYYYYMMDD.apply(date) : "";
     }
 
 }
