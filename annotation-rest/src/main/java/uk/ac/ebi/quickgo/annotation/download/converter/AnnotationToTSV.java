@@ -94,8 +94,8 @@ public class AnnotationToTSV implements BiFunction<Annotation, List<String>, Lis
                 (c, j) -> j.add(nullToEmptyString(c.annotation.synonyms)));
         selected2Content.put(GENE_PRODUCT_TYPE_FIELD_NAME,
                 (c, j) -> {
-                    Optional<GeneProduct> geneProduct = GeneProduct.fromString(c.annotation.geneProductId);
-                    j.add(geneProduct.map(GeneProduct::type).orElse(""));
+                    GeneProduct geneProduct = GeneProduct.fromString(c.annotation.geneProductId);
+                    j.add(geneProduct.type());
                 });
     }
 

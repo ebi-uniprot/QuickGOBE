@@ -253,18 +253,16 @@ public class AnnotationToGAFTest {
         checkReturned(slimmedToGoId2, converted.get(2));
     }
 
-    @Test
+    @Test(expected = IllegalArgumentException.class)
     public void nullGeneProductId() {
         annotation.geneProductId = null;
         String[] elements = annotationToElements(annotation);
-        assertThat(elements[COL_DB_OBJECT_ID], is(""));
     }
 
-    @Test
+    @Test(expected = IllegalArgumentException.class)
     public void emptyGeneProductId() {
         annotation.geneProductId = "";
         String[] elements = annotationToElements(annotation);
-        assertThat(elements[COL_DB_OBJECT_ID], is(""));
     }
 
     @Test
@@ -323,11 +321,10 @@ public class AnnotationToGAFTest {
         assertThat(elements[COL_ASPECT], is(""));
     }
 
-    @Test
+    @Test(expected = IllegalArgumentException.class)
     public void nullGeneProductType() {
         annotation.geneProductId = null;
-        String[] elements = annotationToElements(annotation);
-        assertThat(elements[COL_DB_OBJECT_TYPE], is(""));
+        annotationToElements(annotation);
     }
 
     @Test
@@ -356,13 +353,6 @@ public class AnnotationToGAFTest {
         annotation.extensions = new ArrayList<>();
         String[] elements = annotationToElements(annotation);
         assertThat(elements[COL_ANNOTATION_EXTENSION], is(""));
-    }
-
-    @Test
-    public void nullGeneProductIdCreatesEmptyGeneProductFormId() {
-        annotation.geneProductId = null;
-        String[] elements = annotationToElements(annotation);
-        assertThat(elements[COL_GENE_PRODUCT_FORM_ID], is(""));
     }
 
     @Test

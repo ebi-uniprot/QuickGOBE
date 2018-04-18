@@ -75,10 +75,9 @@ public class AnnotationToGAF implements BiFunction<Annotation, List<String>, Lis
 
     private String toOutputRecord(Annotation annotation, String goId) {
         StringJoiner tsvJoiner = new StringJoiner(OUTPUT_DELIMITER);
-        final Optional<GeneProduct> geneProduct = GeneProduct.fromString(annotation.geneProductId);
-        return tsvJoiner
-                .add(geneProduct.map(GeneProduct::db).orElse(""))
-                .add(geneProduct.map(GeneProduct::id).orElse(""))
+        final GeneProduct geneProduct = GeneProduct.fromString(annotation.geneProductId);
+        return tsvJoiner.add(geneProduct.db())
+                .add(geneProduct.id())
                 .add(nullToEmptyString(annotation.symbol))
                 .add(gafQualifierAsString(annotation.qualifier))
                 .add(nullToEmptyString(goId))
@@ -88,12 +87,12 @@ public class AnnotationToGAF implements BiFunction<Annotation, List<String>, Lis
                 .add(fromScientificName(annotation.goAspect).map(Aspect::getCharacter).orElse(""))
                 .add(nullToEmptyString(annotation.name))
                 .add(nullToEmptyString(annotation.synonyms))
-                .add(geneProduct.map(GeneProduct::type).orElse(""))
+                .add(geneProduct.type())
                 .add(gafTaxonAsString(annotation))
                 .add(nonNull(annotation.date) ? toYYYYMMDD.apply(annotation.date) : "")
                 .add(nullToEmptyString(annotation.assignedBy))
                 .add(AnnotationExtensions.nullOrEmptyListToEmptyString(annotation.extensions))
-                .add(geneProduct.map(GeneProduct::withIsoformOrVariant).orElse(""))
+                .add(nullToEmptyString(geneProduct.withIsoformOrVariant()))
                 .toString();
     }
 
