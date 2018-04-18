@@ -1,19 +1,16 @@
 package uk.ac.ebi.quickgo.annotation.download.converter;
 
-import uk.ac.ebi.quickgo.annotation.download.converter.helpers.AnnotationExtensions;
-import uk.ac.ebi.quickgo.annotation.download.converter.helpers.GeneProduct;
-import uk.ac.ebi.quickgo.annotation.download.converter.helpers.WithFrom;
+import uk.ac.ebi.quickgo.annotation.download.converter.helpers.*;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.common.model.Aspect;
 
 import java.util.*;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
-import static java.util.Objects.nonNull;
+import static java.util.Objects.isNull;
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
-import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.DateConverter.toYYYYMMDD;
-import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.Helper.nullToEmptyString;
-import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.Qualifier.gafQualifierAsString;
 import static uk.ac.ebi.quickgo.common.model.Aspect.fromScientificName;
 
 /**
@@ -54,6 +51,36 @@ public class AnnotationToGAF implements BiFunction<Annotation, List<String>, Lis
     static final String OUTPUT_DELIMITER = "\t";
     private static final String PIPE = "|";
     private static final String TAXON = "taxon:";
+    private static List<Function<AnnotationToGAF.GafSource, String>> gafColumnFunctions = new ArrayList<>();
+
+    static {
+        Function<AnnotationToGAF.GafSource, GeneProduct> gpSource = AnnotationToGAF.GafSource::getGeneProduct;
+        Function<AnnotationToGAF.GafSource, Annotation> annotationSource = AnnotationToGAF.GafSource::getAnnotation;
+
+        //Functions to access or convert annotation or related data to GAF formatted data.
+        gafColumnFunctions.add(gpSource.andThen(GeneProduct::db));
+        gafColumnFunctions.add(gpSource.andThen(GeneProduct::id));
+        gafColumnFunctions.add(annotationSource.andThen(a -> a.symbol));
+        gafColumnFunctions.add(annotationSource.andThen(a -> a.qualifier).andThen(Qualifier::gafQualifierAsString));
+        gafColumnFunctions.add(AnnotationToGAF.GafSource::getGoId);
+        gafColumnFunctions.add(annotationSource.andThen(a -> a.reference));
+        gafColumnFunctions.add(annotationSource.andThen(a -> a.goEvidence));
+        gafColumnFunctions.add(annotationSource.andThen(a -> a.withFrom).andThen(WithFrom::nullOrEmptyListToString));
+        gafColumnFunctions.add(annotationSource.andThen(AnnotationToGAF::aspectAsSingleCharacter));
+        gafColumnFunctions.add(annotationSource.andThen(a -> a.name));
+        gafColumnFunctions.add(annotationSource.andThen(a -> a.synonyms));
+        gafColumnFunctions.add(gpSource.andThen(GeneProduct::type));
+        gafColumnFunctions.add(annotationSource.andThen(AnnotationToGAF::gafTaxonAsString));
+        gafColumnFunctions.add(annotationSource.andThen(a -> a.date).andThen(DateConverter::toYearMonthDay));
+        gafColumnFunctions.add(annotationSource.andThen(a -> a.assignedBy));
+        gafColumnFunctions.add((annotationSource.andThen(a -> a.extensions)
+                                        .andThen(AnnotationExtensions::nullOrEmptyListToEmptyString)));
+        gafColumnFunctions.add(gpSource.andThen(GeneProduct::withIsoformOrVariant));
+    }
+
+    private static String aspectAsSingleCharacter(Annotation a) {
+        return fromScientificName(a.goAspect).map(Aspect::getCharacter).orElse(null);
+    }
 
     /**
      * Convert an {@link Annotation} to a String representation.
@@ -64,43 +91,61 @@ public class AnnotationToGAF implements BiFunction<Annotation, List<String>, Lis
      */
     @Override
     public List<String> apply(Annotation annotation, List<String> selectedFields) {
-        if (Objects.isNull(annotation.slimmedIds) || annotation.slimmedIds.isEmpty()) {
-            return Collections.singletonList(toOutputRecord(annotation, annotation.goId));
+        if (isNull(annotation.slimmedIds) || annotation.slimmedIds.isEmpty()) {
+            AnnotationToGAF.GafSource gafSource = createGAFSource(annotation, annotation.goId);
+            return Collections.singletonList(toOutputRecord(gafSource));
         } else {
             return annotation.slimmedIds.stream()
-                    .map(goId -> this.toOutputRecord(annotation, goId))
+                    .map(goId -> createGAFSource(annotation, goId))
+                    .map(this::toOutputRecord)
                     .collect(toList());
         }
     }
 
-    private String toOutputRecord(Annotation annotation, String goId) {
-        StringJoiner tsvJoiner = new StringJoiner(OUTPUT_DELIMITER);
+    private AnnotationToGAF.GafSource createGAFSource(Annotation annotation, String goId) {
         final GeneProduct geneProduct = GeneProduct.fromString(annotation.geneProductId);
-        return tsvJoiner.add(geneProduct.db())
-                .add(geneProduct.id())
-                .add(nullToEmptyString(annotation.symbol))
-                .add(gafQualifierAsString(annotation.qualifier))
-                .add(nullToEmptyString(goId))
-                .add(nullToEmptyString(annotation.reference))
-                .add(nullToEmptyString(annotation.goEvidence))
-                .add(WithFrom.nullOrEmptyListToString(annotation.withFrom))
-                .add(fromScientificName(annotation.goAspect).map(Aspect::getCharacter).orElse(""))
-                .add(nullToEmptyString(annotation.name))
-                .add(nullToEmptyString(annotation.synonyms))
-                .add(geneProduct.type())
-                .add(gafTaxonAsString(annotation))
-                .add(nonNull(annotation.date) ? toYYYYMMDD.apply(annotation.date) : "")
-                .add(nullToEmptyString(annotation.assignedBy))
-                .add(AnnotationExtensions.nullOrEmptyListToEmptyString(annotation.extensions))
-                .add(nullToEmptyString(geneProduct.withIsoformOrVariant()))
-                .toString();
+        return new AnnotationToGAF.GafSource(geneProduct, annotation, goId);
     }
 
-    private String gafTaxonAsString(Annotation annotation) {
+    private String toOutputRecord(AnnotationToGAF.GafSource gafSource) {
+        return gafColumnFunctions.stream()
+                .map(f -> f.apply(gafSource))
+                .map(Helper::nullToEmptyString)
+                .collect(joining(OUTPUT_DELIMITER));
+    }
+
+    private static String gafTaxonAsString(Annotation annotation) {
         StringBuilder taxonBuilder = new StringBuilder();
         taxonBuilder.append(TAXON)
                 .append(annotation.taxonId)
                 .append(annotation.interactingTaxonId > 0 ? PIPE + annotation.interactingTaxonId : "");
         return taxonBuilder.toString();
+    }
+
+    /**
+     * A class to hold the date to be outputted
+     */
+    static class GafSource {
+        final GeneProduct geneProduct;
+        final Annotation annotation;
+        final String goId;
+
+        private GafSource(GeneProduct geneProduct, Annotation annotation, String goId) {
+            this.geneProduct = geneProduct;
+            this.annotation = annotation;
+            this.goId = goId;
+        }
+
+        public GeneProduct getGeneProduct() {
+            return geneProduct;
+        }
+
+        public Annotation getAnnotation() {
+            return annotation;
+        }
+
+        public String getGoId() {
+            return goId;
+        }
     }
 }
