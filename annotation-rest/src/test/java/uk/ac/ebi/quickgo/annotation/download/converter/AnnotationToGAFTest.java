@@ -110,7 +110,7 @@ public class AnnotationToGAFTest {
         assertThat(elements[COL_DATE], equalTo(DATE_AS_STRING));
         assertThat(elements[COL_ASSIGNED_BY], equalTo(db));
         assertThat(elements[COL_ANNOTATION_EXTENSION], is(EXTENSIONS_AS_STRING));
-        assertThat(elements[COL_GENE_PRODUCT_FORM_ID], is(gpId));
+        assertThat(elements[COL_GENE_PRODUCT_FORM_ID], is(annotation.id));
     }
 
     @Test
