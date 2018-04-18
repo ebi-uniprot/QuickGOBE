@@ -29,8 +29,8 @@ public class GeneProduct {
 
     /**
      * Constructor
-     * @param geneProductId
-     * @param geneProductType
+     * @param geneProductId a type to define gene product id
+     * @param geneProductType a type to define gene product type
      */
     private GeneProduct(GeneProductId geneProductId, GeneProductType geneProductType) {
         this.geneProductId = geneProductId;
@@ -42,11 +42,10 @@ public class GeneProduct {
      * @param fullId Annotation id, could had isoform or variant suffix if it is a UniProt gene product.
      * @return a GeneProduct representation.
      */
-    public static Optional<GeneProduct> fromString(String fullId) {
+    public static GeneProduct fromString(String fullId) {
 
         if (Objects.isNull(fullId) || fullId.isEmpty()) {
-            //            return nullObject();
-            return Optional.empty();
+            throw new IllegalArgumentException("Gene Product Id is null or empty");
         }
 
         Matcher uniprotMatcher = UNIPROT_CANONICAL_PATTERN.matcher(fullId);
@@ -54,23 +53,23 @@ public class GeneProduct {
             String db = "UniProtKB";
             String id = uniprotMatcher.group(CANONICAL_GROUP_NUMBER);
             String withIsoFormOrVariant = fullId.contains("-") ? fullId : null;
-            return Optional.of(new GeneProduct(new GeneProductId(db, id, withIsoFormOrVariant), PROTEIN));
+            return new GeneProduct(new GeneProductId(db, id, withIsoFormOrVariant), PROTEIN);
         }
 
         Matcher rnaMatcher = RNA_CENTRAL_CANONICAL_PATTERN.matcher(fullId);
         if (rnaMatcher.matches()) {
             String db = "RNAcentral";
             String id = rnaMatcher.group(RNA_ID_GROUP);
-            return Optional.of(new GeneProduct(new GeneProductId(db, id, null), MI_RNA));
+            return new GeneProduct(new GeneProductId(db, id, null), MI_RNA);
         }
 
         Matcher intactMatcher = INTACT_CANONICAL_PATTERN.matcher(fullId);
         if (intactMatcher.matches()) {
             String db = "IntAct";
             String id = intactMatcher.group(INTACT_ID_NUMBER);
-            return Optional.of(new GeneProduct(new GeneProductId(db, id, null), COMPLEX));
+            return new GeneProduct(new GeneProductId(db, id, null), COMPLEX);
         }
-        return Optional.empty();
+        throw new IllegalArgumentException(String.format("Gene Product Id %s is not valid", fullId));
     }
 
     public String id() {
@@ -88,11 +87,6 @@ public class GeneProduct {
     public String type() {
         return  geneProductType != null ? geneProductType.getName() : null;
     }
-
-    //Create an empty version of the gene product
-    //    private static GeneProduct nullObject() {
-    //        return new GeneProduct(new GeneProductId(null, null, null), null);
-    //    }
 
     /**
      * A representation of the GeneProduct Id.
