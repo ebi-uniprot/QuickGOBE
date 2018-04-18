@@ -54,29 +54,7 @@ public class AnnotationToGAFTest {
     }
 
     @Test
-    public void createGAFStringFromAnnotationModelContainingIntAct() {
-        final String gpType = "complex";
-        String[] elements = annotationToElements(annotation);
-        assertThat(elements[COL_DB], is(DB));
-        assertThat(elements[COL_DB_OBJECT_ID], is(ID));
-        assertThat(elements[COL_DB_OBJECT_SYMBOL], is(SYMBOL));
-        assertThat(elements[COL_QUALIFIER], is(QUALIFIER));
-        assertThat(elements[COL_GO_ID], is(GO_ID));
-        assertThat(elements[COL_REFERENCE], is(REFERENCE));
-        assertThat(elements[COL_EVIDENCE], is(GO_EVIDENCE));
-        assertThat(elements[COL_WITH], equalTo(WITH_FROM_AS_STRING));
-        assertThat(elements[COL_ASPECT], is("F"));
-        assertThat(elements[COL_DB_OBJECT_NAME], is(NAME));        //name
-        assertThat(elements[COL_DB_OBJECT_SYNONYM], is(SYNONYMS));       //synonym
-        assertThat(elements[COL_DB_OBJECT_TYPE], is(gpType));
-        assertThat(elements[COL_TAXON], is("taxon:" + TAXON_ID));
-        assertThat(elements[COL_DATE], equalTo(DATE_AS_STRING));
-        assertThat(elements[COL_ASSIGNED_BY], equalTo(DB));
-        assertThat(elements[COL_ANNOTATION_EXTENSION], is(EXTENSIONS_AS_STRING));
-    }
-
-    @Test
-    public void createGAFStringFromAnnotationModelContainingUniProtGeneProductWITHOUTVariantOrIsoForm() {
+    public void uniProtGeneProductWITHOUTVariantOrIsoForm() {
         String gpId = "P04637";
         String gpIdCanonical = "P04637";
         String db = "UniProtKB";
@@ -95,8 +73,8 @@ public class AnnotationToGAFTest {
         assertThat(elements[COL_EVIDENCE], is(GO_EVIDENCE));
         assertThat(elements[COL_WITH], equalTo(WITH_FROM_AS_STRING));
         assertThat(elements[COL_ASPECT], is("F"));
-        assertThat(elements[COL_DB_OBJECT_NAME], is(NAME));        //name
-        assertThat(elements[COL_DB_OBJECT_SYNONYM], is(SYNONYMS));       //synonym
+        assertThat(elements[COL_DB_OBJECT_NAME], is(NAME));
+        assertThat(elements[COL_DB_OBJECT_SYNONYM], is(SYNONYMS));
         assertThat(elements[COL_DB_OBJECT_TYPE], is(gpType));
         assertThat(elements[COL_TAXON], is("taxon:" + TAXON_ID));
         assertThat(elements[COL_DATE], equalTo(DATE_AS_STRING));
@@ -106,7 +84,7 @@ public class AnnotationToGAFTest {
     }
 
     @Test
-    public void createGAFStringFromAnnotationModelContainingUniProtGeneProductWITHVariantOrIsoForm() {
+    public void uniProtGeneProductWITHVariantOrIsoForm() {
         String gpId = "P04637-2";
         String gpIdCanonical = "P04637";
         String db = "UniProtKB";
@@ -125,14 +103,36 @@ public class AnnotationToGAFTest {
         assertThat(elements[COL_EVIDENCE], is(GO_EVIDENCE));
         assertThat(elements[COL_WITH], equalTo(WITH_FROM_AS_STRING));
         assertThat(elements[COL_ASPECT], is("F"));
-        assertThat(elements[COL_DB_OBJECT_NAME], is(NAME));        //name
-        assertThat(elements[COL_DB_OBJECT_SYNONYM], is(SYNONYMS));       //synonym
+        assertThat(elements[COL_DB_OBJECT_NAME], is(NAME));
+        assertThat(elements[COL_DB_OBJECT_SYNONYM], is(SYNONYMS));
         assertThat(elements[COL_DB_OBJECT_TYPE], is(gpType));
         assertThat(elements[COL_TAXON], is("taxon:" + TAXON_ID));
         assertThat(elements[COL_DATE], equalTo(DATE_AS_STRING));
         assertThat(elements[COL_ASSIGNED_BY], equalTo(db));
         assertThat(elements[COL_ANNOTATION_EXTENSION], is(EXTENSIONS_AS_STRING));
-        assertThat(elements[COL_GENE_PRODUCT_FORM_ID], is(annotation.id));
+        assertThat(elements[COL_GENE_PRODUCT_FORM_ID], is(gpId));
+    }
+
+    @Test
+    public void createGAFStringFromAnnotationModelContainingIntAct() {
+        final String gpType = "complex";
+        String[] elements = annotationToElements(annotation);
+        assertThat(elements[COL_DB], is(DB));
+        assertThat(elements[COL_DB_OBJECT_ID], is(ID));
+        assertThat(elements[COL_DB_OBJECT_SYMBOL], is(SYMBOL));
+        assertThat(elements[COL_QUALIFIER], is(QUALIFIER));
+        assertThat(elements[COL_GO_ID], is(GO_ID));
+        assertThat(elements[COL_REFERENCE], is(REFERENCE));
+        assertThat(elements[COL_EVIDENCE], is(GO_EVIDENCE));
+        assertThat(elements[COL_WITH], equalTo(WITH_FROM_AS_STRING));
+        assertThat(elements[COL_ASPECT], is("F"));
+        assertThat(elements[COL_DB_OBJECT_NAME], is(NAME));
+        assertThat(elements[COL_DB_OBJECT_SYNONYM], is(SYNONYMS));
+        assertThat(elements[COL_DB_OBJECT_TYPE], is(gpType));
+        assertThat(elements[COL_TAXON], is("taxon:" + TAXON_ID));
+        assertThat(elements[COL_DATE], equalTo(DATE_AS_STRING));
+        assertThat(elements[COL_ASSIGNED_BY], equalTo(DB));
+        assertThat(elements[COL_ANNOTATION_EXTENSION], is(EXTENSIONS_AS_STRING));
     }
 
     @Test
@@ -154,8 +154,8 @@ public class AnnotationToGAFTest {
         assertThat(elements[COL_EVIDENCE], is(GO_EVIDENCE));
         assertThat(elements[COL_WITH], equalTo(WITH_FROM_AS_STRING));
         assertThat(elements[COL_ASPECT], is("F"));
-        assertThat(elements[COL_DB_OBJECT_NAME], is(NAME));        //name
-        assertThat(elements[COL_DB_OBJECT_SYNONYM], is(SYNONYMS));       //synonym
+        assertThat(elements[COL_DB_OBJECT_NAME], is(NAME));
+        assertThat(elements[COL_DB_OBJECT_SYNONYM], is(SYNONYMS));
         assertThat(elements[COL_DB_OBJECT_TYPE], is(gpType));
         assertThat(elements[COL_TAXON], is("taxon:" + TAXON_ID));
         assertThat(elements[COL_DATE], equalTo(DATE_AS_STRING));
@@ -193,24 +193,22 @@ public class AnnotationToGAFTest {
 
     @Test
     public void createGAFStringWithEmptyQualifier() {
-        String emptyGafQualifier = "";
+        List<String> undisplayableQualifiers = asList("enables", "part_of", "involved_in", "spurious_value");
 
-        List<String> qualifiersToBeEmptyForGaf = asList("enables", "part_of", "involved_in", "spurious_value");
-
-        for (String qualifierToBeEmptyInGaf : qualifiersToBeEmptyForGaf) {
+        for (String qualifierToBeEmptyInGaf : undisplayableQualifiers) {
             annotation.qualifier = qualifierToBeEmptyInGaf;
             String[] elements = annotationToElements(annotation);
-            assertThat(elements[COL_QUALIFIER], is(emptyGafQualifier));
+            assertThat(elements[COL_QUALIFIER], is(""));
         }
     }
 
     @Test
     public void createValidGAFQualifiers() {
-        List<String> qualifiersToBeSetForGaf = asList(
+        List<String> displayableQualifiersForGAF = asList(
                 "contributes_to", "NOT|contributes_to",
                 "colocalizes_with", "NOT|colocalizes_with");
 
-        for (String qualifier : qualifiersToBeSetForGaf) {
+        for (String qualifier : displayableQualifiersForGAF) {
             annotation.qualifier = qualifier;
             String[] elements = annotationToElements(annotation);
             assertThat(elements[COL_QUALIFIER], is(qualifier));
@@ -254,15 +252,17 @@ public class AnnotationToGAFTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void nullGeneProductId() {
+    public void nullGeneProductIdThrowsException() {
         annotation.geneProductId = null;
-        String[] elements = annotationToElements(annotation);
+
+        annotationToElements(annotation);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void emptyGeneProductId() {
+    public void emptyGeneProductIdThrowsException() {
         annotation.geneProductId = "";
-        String[] elements = annotationToElements(annotation);
+
+        annotationToElements(annotation);
     }
 
     @Test
