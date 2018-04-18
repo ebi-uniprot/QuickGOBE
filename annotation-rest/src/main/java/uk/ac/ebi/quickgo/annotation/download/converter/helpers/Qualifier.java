@@ -30,15 +30,20 @@ public class Qualifier {
 
         if (qualifier.contains("contributes_to") || qualifier.contains("colocalizes_with")) {
             if (qualifier.contains("not")) {
-                return qualifier.replace("not", "NOT");
+                return showNotInUpperCase(qualifier);
             } else {
                 return qualifier;
             }
         } else {
+            //For the qualifiers that are not displayed, if they are negated, then show (only the not as) NOT
             if (qualifier.contains("not")) {
                 return "NOT";
             }
         }
         return EMPTY_STRING;
+    }
+
+    private static String showNotInUpperCase(String qualifier) {
+        return qualifier.replace("not", "NOT");
     }
 }
