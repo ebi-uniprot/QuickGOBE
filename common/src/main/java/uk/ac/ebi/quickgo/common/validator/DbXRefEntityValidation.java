@@ -23,8 +23,9 @@ public class DbXRefEntityValidation implements Predicate<String> {
     // Default list of databases and entity types to validate against.
     private static final Key[] targetDBs = new Key[]{
             new Key("UniProtKB", "PR:000000001"),
-            new Key("IntAct", "GO:0043234"),
-            new Key("RNAcentral", "CHEBI:33697")};
+            new Key("ComplexPortal", "GO:0032991"),
+            new Key("RNAcentral", "CHEBI:33697"),
+            new Key("IntAct", "GO:0032991")};
 
     // A list of entries loaded from 'DB_XREFS_ENTITIES.dat.gz' keyed by database and entity type id.
     private final Map<DbXRefEntityValidation.Key, DbXRefEntity> entityList;
