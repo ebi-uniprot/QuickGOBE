@@ -52,13 +52,13 @@ public class GeneProductTest {
     }
 
     @Test
-    public void intact() {
-        final String fullId = "IntAct:EBI-10043081";
+    public void complexPortal() {
+        final String fullId = "ComplexPortal:CPX-1004";
 
         GeneProduct uniprot = GeneProduct.fromString(fullId);
 
-        assertThat(uniprot.db(), is("IntAct"));
-        assertThat(uniprot.id(), is("EBI-10043081"));
+        assertThat(uniprot.db(), is("ComplexPortal"));
+        assertThat(uniprot.id(), is("CPX-1004"));
         assertThat(uniprot.withIsoformOrVariant(), equalTo(null));
         assertThat(uniprot.type(), is("complex"));
     }
