@@ -9,9 +9,6 @@ import uk.ac.ebi.quickgo.annotation.model.About;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
 import uk.ac.ebi.quickgo.annotation.model.StatisticsGroup;
-import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.completablevalue.EvidenceNameInjector;
-import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.completablevalue.OntologyNameInjector;
-import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.completablevalue.TaxonomyNameInjector;
 import uk.ac.ebi.quickgo.annotation.service.search.NameService;
 import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.annotation.service.statistics.StatisticsService;
@@ -254,39 +251,76 @@ public class AnnotationController {
     public ResponseEntity<ResponseBodyEmitter> downloadLookup(
             @Valid @ModelAttribute AnnotationRequest request,
             BindingResult bindingResult,
-            @RequestHeader(ACCEPT) MediaType mediaTypeAcceptHeader,
-            HttpServletRequest servletRequest) {
+            @RequestHeader(ACCEPT) MediaType mediaTypeAcceptHeader, HttpServletRequest servletRequest) {
         LOGGER.info("Download Request:: " + request + ", " + mediaTypeAcceptHeader);
-
         checkBindingErrors(bindingResult);
+
+        if (mediaTypeAcceptHeader.getSubtype().equals("gaf")) {
+            //            request.setSelectedFields(ensureArrayContains(request.getSelectedFields(),"synonyms"));
+            request.setIncludeFields(ensureArrayContains(request.getIncludeFields(), "synonyms"));
+        }
+
         FilterQueryInfo filterQueryInfo = extractFilterQueryInfo(request);
+        final int pageLimit = getPageLimit(request);
 
-        final int pageLimit = request.getDownloadLimit() < this.annotationRetrievalConfig.getDownloadPageSize() ?
-                request.getDownloadLimit() : this.annotationRetrievalConfig.getDownloadPageSize();
-        QueryRequest queryRequest = downloadQueryTemplate.newBuilder()
-                .setQuery(QuickGOQuery.createAllQuery())
-                .addFilters(filterQueryInfo.getFilterQueries())
-                .setPage(createFirstCursorPage(pageLimit))
-                .build();
-
+        QueryRequest queryRequest = createQueryRequest(filterQueryInfo, pageLimit);
         ResponseBodyEmitter emitter = new ResponseBodyEmitter();
 
-        HeaderCreator headerCreator = headerCreatorFactory.provide(mediaTypeAcceptHeader.getSubtype());
         final List<String> selectedFields = selectedFieldList(request);
-        HeaderContent headerContent = buildHeaderContent(servletRequest, selectedFields);
-        headerCreator.write(emitter, headerContent);
+        writeHeader(mediaTypeAcceptHeader, servletRequest, emitter, selectedFields);
+        writeBody(request, mediaTypeAcceptHeader, filterQueryInfo, queryRequest, emitter, selectedFields);
 
+        return ResponseEntity.ok().headers(createHttpDownloadHeader(mediaTypeAcceptHeader, TO_DOWNLOAD_FILENAME)).body(emitter);
+    }
+
+    private String[] ensureArrayContains(String[] fields, String field) {
+        if (fields == null) {
+            return new String[]{field};
+        } else {
+            List<String> selectedFieldList = Arrays.asList(fields);
+            if (selectedFieldList.contains(field)) {
+                return fields;
+            } else {
+                selectedFieldList.add(field);
+                return selectedFieldList.toArray(new String[selectedFieldList.size()]);
+            }
+        }
+    }
+
+    private void writeBody(@Valid @ModelAttribute AnnotationRequest request,
+                           @RequestHeader(ACCEPT) MediaType mediaTypeAcceptHeader,
+                           FilterQueryInfo filterQueryInfo,
+                           QueryRequest queryRequest,
+                           ResponseBodyEmitter emitter,
+                           List<String> selectedFields) {
         taskExecutor.execute(() -> {
             final Stream<QueryResult<Annotation>> annotationResultStream =
                     getQueryResultStream(request, filterQueryInfo, queryRequest);
             DownloadContent downloadContent = new DownloadContent(annotationResultStream, selectedFields);
             emitDownloadWithMediaType(emitter, downloadContent, mediaTypeAcceptHeader);
         });
+    }
 
-        return ResponseEntity
-                .ok()
-                .headers(createHttpDownloadHeader(mediaTypeAcceptHeader, TO_DOWNLOAD_FILENAME))
-                .body(emitter);
+    private QueryRequest createQueryRequest(FilterQueryInfo filterQueryInfo, int pageLimit) {
+        return downloadQueryTemplate.newBuilder()
+                .setQuery(QuickGOQuery.createAllQuery())
+                .addFilters(filterQueryInfo.getFilterQueries())
+                .setPage(createFirstCursorPage(pageLimit))
+                .build();
+    }
+
+    private void writeHeader(@RequestHeader(ACCEPT) MediaType mediaTypeAcceptHeader,
+                             HttpServletRequest servletRequest,
+                             ResponseBodyEmitter emitter,
+                             List<String> selectedFields) {
+        HeaderCreator headerCreator = headerCreatorFactory.provide(mediaTypeAcceptHeader.getSubtype());
+        HeaderContent headerContent = buildHeaderContent(servletRequest, selectedFields);
+        headerCreator.write(emitter, headerContent);
+    }
+
+    private int getPageLimit(@Valid @ModelAttribute AnnotationRequest request) {
+        return request.getDownloadLimit() < this.annotationRetrievalConfig.getDownloadPageSize() ?
+                request.getDownloadLimit() : this.annotationRetrievalConfig.getDownloadPageSize();
     }
 
     /**
