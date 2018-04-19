@@ -1,7 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.download.converter.helpers;
 
 import java.util.Objects;
-import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,14 +14,14 @@ import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.GeneProduc
 public class GeneProduct {
     private static final int CANONICAL_GROUP_NUMBER = 2;
     private static final int RNA_ID_GROUP = 1;
-    private static final int INTACT_ID_NUMBER = 1;
+    private static final int COMPLEX_PORTAL_ID_NUMBER = 1;
     private static final String UNIPROT_CANONICAL_REGEX = "^(?:UniProtKB:)?(([OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z]" +
             "([0-9][A-Z][A-Z0-9]{2}){1,2}[0-9])((-[0-9]+)|:PRO_[0-9]{10}|:VAR_[0-9]{6}){0,1})$";
     private static final Pattern UNIPROT_CANONICAL_PATTERN = Pattern.compile(UNIPROT_CANONICAL_REGEX);
     private static final String RNA_CENTRAL_REGEX = "^(?:RNAcentral:)?((URS[0-9A-F]{10})(_[0-9]+){0,1})$";
     private static final Pattern RNA_CENTRAL_CANONICAL_PATTERN = Pattern.compile(RNA_CENTRAL_REGEX);
-    private static final String INTACT_CANONICAL_REGEX = "^(?:IntAct:)(EBI-[0-9]+)$";
-    private static final Pattern INTACT_CANONICAL_PATTERN = Pattern.compile(INTACT_CANONICAL_REGEX);
+    private static final String COMPLEX_PORTAL_CANONICAL_REGEX = "^(?:ComplexPortal:)?(CPX-[0-9]+)$";
+    private static final Pattern COMPLEX_PORTAL_CANONICAL_PATTERN = Pattern.compile(COMPLEX_PORTAL_CANONICAL_REGEX);
 
     private final GeneProductId geneProductId;
     private final GeneProductType geneProductType;
@@ -63,10 +62,10 @@ public class GeneProduct {
             return new GeneProduct(new GeneProductId(db, id, null), MI_RNA);
         }
 
-        Matcher intactMatcher = INTACT_CANONICAL_PATTERN.matcher(fullId);
-        if (intactMatcher.matches()) {
-            String db = "IntAct";
-            String id = intactMatcher.group(INTACT_ID_NUMBER);
+        Matcher complexPortalMatcher = COMPLEX_PORTAL_CANONICAL_PATTERN.matcher(fullId);
+        if (complexPortalMatcher.matches()) {
+            String db = "ComplexPortal";
+            String id = complexPortalMatcher.group(COMPLEX_PORTAL_ID_NUMBER);
             return new GeneProduct(new GeneProductId(db, id, null), COMPLEX);
         }
         throw new IllegalArgumentException(String.format("Gene Product Id %s is not valid", fullId));
