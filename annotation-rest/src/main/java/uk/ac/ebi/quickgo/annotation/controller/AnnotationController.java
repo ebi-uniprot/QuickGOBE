@@ -256,7 +256,9 @@ public class AnnotationController {
         checkBindingErrors(bindingResult);
 
         if (mediaTypeAcceptHeader.getSubtype().equals("gaf")) {
-            //For gaf, synonyms must be present, so make sure it appears in the list of  include fields.
+            //For gaf, gene product name and synonyms must be present, so make sure it appears in the list of  include
+            // fields.
+            request.setIncludeFields(ensureArrayContains(request.getIncludeFields(), "name"));
             request.setIncludeFields(ensureArrayContains(request.getIncludeFields(), "synonyms"));
         } else if (mediaTypeAcceptHeader.getSubtype().equals("tsv")) {
             //If synonyms are requested, insure synonyms is in the list of include fields.
@@ -297,7 +299,7 @@ public class AnnotationController {
                 List<String> fullList = new ArrayList<>(fields.length + 1);
                 fullList.addAll(fieldList);
                 fullList.add(value);
-                return fieldList.toArray(new String[fieldList.size()]);
+                return fullList.toArray(new String[fullList.size()]);
             }
         }
     }
