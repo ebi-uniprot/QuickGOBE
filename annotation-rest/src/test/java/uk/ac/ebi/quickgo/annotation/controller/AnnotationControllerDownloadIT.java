@@ -7,6 +7,7 @@ import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker;
 import uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory;
+import uk.ac.ebi.quickgo.annotation.model.AnnotationMocker;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.geneproduct.model.BasicGeneProduct;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.BasicOntology;
 import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
@@ -129,8 +130,11 @@ public class AnnotationControllerDownloadIT {
     @Test
     public void canDownloadAnAnnotationAmountFewerThanPageSize() throws Exception {
         int expectedDownloadCount = 1;
-        genericDocs.forEach(e -> expectToLoadSynoymsViaRest(singletonList(e.geneProductId), singletonList(
-                "DR1:KAT14:KAT2B:MBIP:SGF29:TADA2A:TADA3:WDR5:YEATS2:ZZZ3,ADA2A-containing complex,Ada2/PCAF/Ada3")));
+        genericDocs.forEach(e -> {
+            expectToLoadGeneProductValuesViaRest(singletonList(e.geneProductId),
+                    singletonList(AnnotationMocker.SYNONYMS));
+            expectToLoadGeneProductValuesViaRest(singletonList(e.geneProductId), singletonList(AnnotationMocker.NAME));
+        });
         ResultActions response = mockMvc.perform(
                 get(DOWNLOAD_SEARCH_URL)
                         .header(ACCEPT, GAF_MEDIA_TYPE)
@@ -143,23 +147,32 @@ public class AnnotationControllerDownloadIT {
 
     @Test
     public void canDownloadInGafFormat() throws Exception {
-        genericDocs.forEach(e -> expectToLoadSynoymsViaRest(singletonList(e.geneProductId), singletonList(
-                "DR1:KAT14:KAT2B:MBIP:SGF29:TADA2A:TADA3:WDR5:YEATS2:ZZZ3,ADA2A-containing complex,Ada2/PCAF/Ada3")));
+        genericDocs.forEach(e -> {
+            expectToLoadGeneProductValuesViaRest(singletonList(e.geneProductId),
+                    singletonList(AnnotationMocker.SYNONYMS));
+            expectToLoadGeneProductValuesViaRest(singletonList(e.geneProductId), singletonList(AnnotationMocker.NAME));
+        });
         canDownload(GAF_MEDIA_TYPE);
 
     }
 
     @Test
     public void canDownloadWithFilterInGafFormat() throws Exception {
-        genericDocs.forEach(e -> expectToLoadSynoymsViaRest(singletonList(e.geneProductId), singletonList(
-                "DR1:KAT14:KAT2B:MBIP:SGF29:TADA2A:TADA3:WDR5:YEATS2:ZZZ3,ADA2A-containing complex,Ada2/PCAF/Ada3")));
+        genericDocs.forEach(e -> {
+            expectToLoadGeneProductValuesViaRest(singletonList(e.geneProductId),
+                    singletonList(AnnotationMocker.SYNONYMS));
+            expectToLoadGeneProductValuesViaRest(singletonList(e.geneProductId), singletonList(AnnotationMocker.NAME));
+        });
         canDownloadWithFilter(GAF_MEDIA_TYPE);
     }
 
     @Test
     public void canDownloadWithFilterAllAvailableItemsInGafFormat() throws Exception {
-        genericDocs.forEach(e -> expectToLoadSynoymsViaRest(singletonList(e.geneProductId), singletonList(
-                "DR1:KAT14:KAT2B:MBIP:SGF29:TADA2A:TADA3:WDR5:YEATS2:ZZZ3,ADA2A-containing complex,Ada2/PCAF/Ada3")));
+        genericDocs.forEach(e -> {
+            expectToLoadGeneProductValuesViaRest(singletonList(e.geneProductId),
+                    singletonList(AnnotationMocker.SYNONYMS));
+            expectToLoadGeneProductValuesViaRest(singletonList(e.geneProductId), singletonList(AnnotationMocker.NAME));
+        });
         canDownloadWithFilterAllAvailableItems(GAF_MEDIA_TYPE);
     }
 
@@ -375,13 +388,10 @@ public class AnnotationControllerDownloadIT {
                              .andRespond(withSuccess(response, MediaType.APPLICATION_JSON));
     }
 
-    private void expectGoTermsHaveGoNamesViaRest(
-            List<String> termIds,
-            List<String> termNames) {
+    private void expectGoTermsHaveGoNamesViaRest(List<String> termIds, List<String> termNames) {
         checkArgument(termIds != null, "termIds cannot be null");
         checkArgument(termNames != null, "termIds cannot be null");
-        checkArgument(termIds.size() == termNames.size(),
-                      "termIds and termNames lists must be the same size");
+        checkArgument(termIds.size() == termNames.size(), "termIds and termNames lists must be the same size");
 
         for (int i = 0; i < termIds.size(); i++) {
             String termId = termIds.get(i);
@@ -391,17 +401,13 @@ public class AnnotationControllerDownloadIT {
         }
     }
 
-    private void expectToLoadSynoymsViaRest(List<String> geneProductIds, List<String> synonymList) {
-        checkArgument(geneProductIds != null, "termIds cannot be null");
-        checkArgument(synonymList != null, "termIds cannot be null");
-        checkArgument(geneProductIds.size() == synonymList.size(), "termIds and termNames lists must be the same size");
-
+    private void expectToLoadGeneProductValuesViaRest(List<String> geneProductIds, List<String> valueList) {
         for (int i = 0; i < geneProductIds.size(); i++) {
             String geneProductId = geneProductIds.get(i);
-            String synonyms = synonymList.get(i);
+            String values = valueList.get(i);
             String withoutDB = geneProductId.substring(geneProductId.indexOf(":") + 1);
             expectRestCallSuccess(buildGeneProductResource(withoutDB),
-                    constructGeneProductResponseObject(geneProductId, synonyms));
+                    constructGeneProductResponseObject(geneProductId, values));
         }
     }
 
