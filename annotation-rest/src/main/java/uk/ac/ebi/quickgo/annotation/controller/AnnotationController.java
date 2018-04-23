@@ -256,8 +256,15 @@ public class AnnotationController {
         checkBindingErrors(bindingResult);
 
         if (mediaTypeAcceptHeader.getSubtype().equals("gaf")) {
-            //            request.setSelectedFields(ensureArrayContains(request.getSelectedFields(),"synonyms"));
+            //For gaf, synonyms must be present, so make sure it appears in the list of  include fields.
             request.setIncludeFields(ensureArrayContains(request.getIncludeFields(), "synonyms"));
+        } else if (mediaTypeAcceptHeader.getSubtype().equals("tsv")) {
+            //If synonyms are requested, insure synonyms is in the list of include fields.
+            request.setIncludeFields(
+                    updateFieldsWithCheckFields(request.getSelectedFields(), request.getIncludeFields(), "synonyms"));
+            //If gene product name is requested, insure name is in the list of include fields.
+            request.setIncludeFields(
+                    updateFieldsWithCheckFields(request.getSelectedFields(), request.getIncludeFields(), "name"));
         }
 
         FilterQueryInfo filterQueryInfo = extractFilterQueryInfo(request);
@@ -273,16 +280,44 @@ public class AnnotationController {
         return ResponseEntity.ok().headers(createHttpDownloadHeader(mediaTypeAcceptHeader, TO_DOWNLOAD_FILENAME)).body(emitter);
     }
 
-    private String[] ensureArrayContains(String[] fields, String field) {
+    /**
+     * If the fields array doesn't contain the field, then add it, else do nothing.
+     * @param fields field array to check and update if necessary.
+     * @param value to check for, update with.
+     * @return a String array that WILL contain the value.
+     */
+    private String[] ensureArrayContains(String[] fields, String value) {
         if (fields == null) {
-            return new String[]{field};
+            return new String[]{value};
         } else {
-            List<String> selectedFieldList = Arrays.asList(fields);
-            if (selectedFieldList.contains(field)) {
+            List<String> fieldList = Arrays.asList(fields);
+            if (fieldList.contains(value)) {
                 return fields;
             } else {
-                selectedFieldList.add(field);
-                return selectedFieldList.toArray(new String[selectedFieldList.size()]);
+                List<String> fullList = new ArrayList<>(fields.length + 1);
+                fullList.addAll(fieldList);
+                fullList.add(value);
+                return fieldList.toArray(new String[fieldList.size()]);
+            }
+        }
+    }
+
+    /**
+     * If checkFields contains a value, make sure it exists in updateFields.
+     * @param checkFields the array of fields to check if field exists.
+     * @param updateFields the array of fields to add the field too (if it does already exist).
+     * @param value to check for and update to updateFields (if it does already exist).
+     * @return updateFields content, including field if checkFields contains field.
+     */
+    private String[] updateFieldsWithCheckFields(String[] checkFields, String[] updateFields, String value) {
+        if (checkFields == null) {
+            return updateFields;
+        } else {
+            List<String> checkList = Arrays.asList(checkFields);
+            if (checkList.contains(value)) {
+                return ensureArrayContains(updateFields, value);
+            } else {
+                return updateFields;
             }
         }
     }
