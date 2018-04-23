@@ -72,7 +72,7 @@ public class AnnotationToGAFTest {
         assertThat(elements[COL_REFERENCE], is(REFERENCE));
         assertThat(elements[COL_EVIDENCE], is(GO_EVIDENCE));
         assertThat(elements[COL_WITH], equalTo(WITH_FROM_AS_STRING));
-        assertThat(elements[COL_ASPECT], is("F"));
+        assertThat(elements[COL_ASPECT], is("C"));
         assertThat(elements[COL_DB_OBJECT_NAME], is(NAME));
         assertThat(elements[COL_DB_OBJECT_SYNONYM], is(SYNONYMS));
         assertThat(elements[COL_DB_OBJECT_TYPE], is(gpType));
@@ -102,7 +102,7 @@ public class AnnotationToGAFTest {
         assertThat(elements[COL_REFERENCE], is(REFERENCE));
         assertThat(elements[COL_EVIDENCE], is(GO_EVIDENCE));
         assertThat(elements[COL_WITH], equalTo(WITH_FROM_AS_STRING));
-        assertThat(elements[COL_ASPECT], is("F"));
+        assertThat(elements[COL_ASPECT], is("C"));
         assertThat(elements[COL_DB_OBJECT_NAME], is(NAME));
         assertThat(elements[COL_DB_OBJECT_SYNONYM], is(SYNONYMS));
         assertThat(elements[COL_DB_OBJECT_TYPE], is(gpType));
@@ -125,7 +125,7 @@ public class AnnotationToGAFTest {
         assertThat(elements[COL_REFERENCE], is(REFERENCE));
         assertThat(elements[COL_EVIDENCE], is(GO_EVIDENCE));
         assertThat(elements[COL_WITH], equalTo(WITH_FROM_AS_STRING));
-        assertThat(elements[COL_ASPECT], is("F"));
+        assertThat(elements[COL_ASPECT], is("C"));
         assertThat(elements[COL_DB_OBJECT_NAME], is(NAME));
         assertThat(elements[COL_DB_OBJECT_SYNONYM], is(SYNONYMS));
         assertThat(elements[COL_DB_OBJECT_TYPE], is(gpType));
@@ -153,7 +153,7 @@ public class AnnotationToGAFTest {
         assertThat(elements[COL_REFERENCE], is(REFERENCE));
         assertThat(elements[COL_EVIDENCE], is(GO_EVIDENCE));
         assertThat(elements[COL_WITH], equalTo(WITH_FROM_AS_STRING));
-        assertThat(elements[COL_ASPECT], is("F"));
+        assertThat(elements[COL_ASPECT], is("C"));
         assertThat(elements[COL_DB_OBJECT_NAME], is(NAME));
         assertThat(elements[COL_DB_OBJECT_SYNONYM], is(SYNONYMS));
         assertThat(elements[COL_DB_OBJECT_TYPE], is(gpType));
@@ -167,9 +167,9 @@ public class AnnotationToGAFTest {
     @Test
     public void createGAFStringFromAnnotationModelContainingIntActWithVariantOrIsoForm() {
         final String gpType = "complex";
-        String gpId = "EBI-10043081";
-        String gpIdCanonical = "EBI-10043081";
-        String db = "IntAct";
+        String gpId = "CPX-1004";
+        String gpIdCanonical = "CPX-1004";
+        String db = "ComplexPortal";
         annotation.id = String.format("%s:%s", db, gpId);
         String[] elements = annotationToElements(annotation);
         assertThat(elements[COL_DB], is(DB));
@@ -180,7 +180,7 @@ public class AnnotationToGAFTest {
         assertThat(elements[COL_REFERENCE], is(REFERENCE));
         assertThat(elements[COL_EVIDENCE], is(GO_EVIDENCE));
         assertThat(elements[COL_WITH], equalTo(WITH_FROM_AS_STRING));
-        assertThat(elements[COL_ASPECT], is("F"));
+        assertThat(elements[COL_ASPECT], is("C"));
         assertThat(elements[COL_DB_OBJECT_NAME], is(NAME));        //name
         assertThat(elements[COL_DB_OBJECT_SYNONYM], is(SYNONYMS));       //synonym
         assertThat(elements[COL_DB_OBJECT_TYPE], is(gpType));
