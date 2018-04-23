@@ -17,28 +17,25 @@ import static uk.ac.ebi.quickgo.common.model.Aspect.fromScientificName;
  * Convert an {@link Annotation}  to a String representation.
  * See http://geneontology.org/page/go-annotation-file-gaf-format-21}
  *
- * An excerpt from a GAF file is below:
+ * The columns that constitute a GAF file are:
  <pre>
- UniProtKB	Q4VCS5	AMOT		GO:0001570	GO_REF:0000107	IEA	UniProtKB:Q8VHG2|ensembl:ENSMUSP00000108455	P
- Angiomotin	AMOT_HUMAN|AMOT|KIAA1071	protein	taxon:9606	20170107	Ensembl
- UniProtKB	Q4VCS5	AMOT		GO:0001701	GO_REF:0000107	IEA	UniProtKB:Q8VHG2|ensembl:ENSMUSP00000108455	P
- Angiomotin	AMOT_HUMAN|AMOT|KIAA1071	protein	taxon:9606	20170107	Ensembl
- UniProtKB	Q4VCS5	AMOT		GO:0001702	GO_REF:0000107	IEA	UniProtKB:Q8VHG2|ensembl:ENSMUSP00000108455	P
- Angiomotin	AMOT_HUMAN|AMOT|KIAA1071	protein	taxon:9606	20170107	Ensembl
- UniProtKB	Q4VCS5	AMOT		GO:0001725	PMID:16043488	IDA		C	Angiomotin	AMOT_HUMAN|AMOT|KIAA1071
- protein	taxon:9606	20051207	UniProt		UniProtKB:Q4VCS5-1
- UniProtKB	Q4VCS5	AMOT		GO:0001726	PMID:11257124	IDA		C	Angiomotin	AMOT_HUMAN|AMOT|KIAA1071
- protein	taxon:9606	20091109	MGI
- UniProtKB	Q4VCS5	AMOT		GO:0003365	GO_REF:0000107	IEA	UniProtKB:Q8VHG2|ensembl:ENSMUSP00000108455	P
- Angiomotin	AMOT_HUMAN|AMOT|KIAA1071	protein	taxon:9606	20170107	Ensembl
- UniProtKB	Q4VCS5	AMOT		GO:0004872	PMID:11257124	IDA		F	Angiomotin	AMOT_HUMAN|AMOT|KIAA1071
- protein	taxon:9606	20091109	MGI
- UniProtKB	Q4VCS5	AMOT		GO:0005515	PMID:11257124	IPI	UniProtKB:P00747	F	Angiomotin
- AMOT_HUMAN|AMOT|KIAA1071	protein	taxon:9606	20051212	HGNC
- UniProtKB	Q4VCS5	AMOT		GO:0005515	PMID:16043488	IPI	UniProtKB:Q6RHR9-2	F	Angiomotin
- AMOT_HUMAN|AMOT|KIAA1071	protein	taxon:9606	20051207	UniProt		UniProtKB:Q4VCS5-1
- UniProtKB	Q4VCS5	AMOT		GO:0005515	PMID:19615732	IPI	UniProtKB:P35240	F	Angiomotin
- AMOT_HUMAN|AMOT|KIAA1071	protein	taxon:9606	20170108	IntAct
+ DB
+ ID
+ SYMBOL
+ QUALIFIER
+ GO TERM
+ REFERENCE
+ EVIDENCE
+ WITH FROM
+ ASPECT
+ GENE PRODUCT NAME
+ GENE PRODUCT SYNONYMS
+ GENE PRODUCT TYPE
+ TAXON
+ DATE
+ ASSIGNED BY
+ ANNOTATION EXTENSIONS
+ GENE PRODUCT FORM ID (non canonical format i.e. with isoform or variant information)
  </pre>
  *
  * @author Tony Wardell
