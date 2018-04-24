@@ -28,15 +28,17 @@ public class Qualifier {
             return EMPTY_STRING;
         }
 
-        if (qualifier.contains("contributes_to") || qualifier.contains("colocalizes_with")) {
-            if (qualifier.contains("not")) {
+        String lcQualifier = qualifier.toLowerCase();
+
+        if (lcQualifier.contains("contributes_to") || lcQualifier.contains("colocalizes_with")) {
+            if (lcQualifier.contains("not")) {
                 return showNotInUpperCase(qualifier);
             } else {
                 return qualifier;
             }
         } else {
             //For the qualifiers that are not displayed, if they are negated, then show (only the not as) NOT
-            if (qualifier.contains("not")) {
+            if (lcQualifier.contains("not")) {
                 return "NOT";
             }
         }

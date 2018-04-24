@@ -26,6 +26,11 @@ public class QualifierTest {
     }
 
     @Test
+    public void notPart_ofUppercase() {
+        assertThat(Qualifier.gafQualifierAsString("NOT|part_of"), is("NOT"));
+    }
+
+    @Test
     public void contributesTo() {
         assertThat(Qualifier.gafQualifierAsString("contributes_to"), is("contributes_to"));
     }
