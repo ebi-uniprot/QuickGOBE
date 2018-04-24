@@ -299,7 +299,7 @@ public class AnnotationController {
                 List<String> fullList = new ArrayList<>(fields.length + 1);
                 fullList.addAll(fieldList);
                 fullList.add(value);
-                return fullList.toArray(new String[fullList.size()]);
+                return fullList.toArray(new String[0]);
             }
         }
     }
