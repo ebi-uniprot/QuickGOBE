@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Concrete implementation of the {@link AnnotationDocConverter}.
+ * Converter the persisted version of the Annotation to our model of the Annotation
  *
  * @author Tony Wardell
  * Date: 26/04/2016
@@ -34,7 +34,7 @@ public class AnnotationDocConverterImpl implements AnnotationDocConverter {
         annotation.taxonId = annotationDocument.taxonId;
         annotation.symbol = annotationDocument.symbol;
         annotation.assignedBy = annotationDocument.assignedBy;
-
+        annotation.interactingTaxonId = annotationDocument.interactingTaxonId;
         annotation.targetSets = asUnmodifiableList(annotationDocument.targetSets);
         annotation.withFrom = asWithFromXRefList(annotationDocument.withFrom, this::createSimpleXRef);
         annotation.extensions = asExtensionsXRefList(annotationDocument.extensions, this::createQualifiedXRef);

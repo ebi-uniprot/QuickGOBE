@@ -251,6 +251,14 @@ public class AnnotationToGAFTest {
         checkReturned(slimmedToGoId2, converted.get(2));
     }
 
+    @Test
+    public void interactingTaxId() {
+        annotation.interactingTaxonId = 9877;
+        String[] elements = annotationToElements(annotation);
+        assertThat(elements[COL_TAXON], is("taxon:" + TAXON_ID + "|" + 9877));
+    }
+
+
     @Test(expected = IllegalArgumentException.class)
     public void nullGeneProductIdThrowsException() {
         annotation.geneProductId = null;

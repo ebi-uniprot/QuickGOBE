@@ -57,11 +57,12 @@ public class AnnotationDocConverterImplTest {
     private static final Date DATE = Date.from(
             LocalDate.of(2012, 10, 2).atStartOfDay(ZoneId.systemDefault()).toInstant());
     private static final String GENE_PRODUCT_TYPE = "protein";
+    private static final int interactingTaxId = 3234;
     private static final AnnotationDocument DOCUMENT = createStubDocument();
     private AnnotationDocConverter docConverter;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         docConverter = new AnnotationDocConverterImpl();
     }
 
@@ -179,6 +180,11 @@ public class AnnotationDocConverterImplTest {
         assertThat(model.date, is(nullValue()));
     }
 
+    @Test
+    public void convertsInteractingTaxIdSuccessfully() {
+        Annotation model = docConverter.convert(DOCUMENT);
+        assertThat(model.interactingTaxonId, is(interactingTaxId));
+    }
 
     private static <T extends Annotation.AbstractXref> List<Annotation.ConnectedXRefs<T>> connectedXrefs(
             List<List<Supplier<T>>> items) {
@@ -215,7 +221,7 @@ public class AnnotationDocConverterImplTest {
         doc.goAspect = GO_ASPECT;
         doc.date = DATE;
         doc.geneProductType = GENE_PRODUCT_TYPE;
-
+        doc.interactingTaxonId = interactingTaxId;
         return doc;
     }
 
