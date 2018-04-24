@@ -31,7 +31,7 @@ import static uk.ac.ebi.quickgo.common.model.Aspect.fromScientificName;
  GENE PRODUCT NAME
  GENE PRODUCT SYNONYMS
  GENE PRODUCT TYPE
- TAXON
+ TAXON (& interacting taxon)
  DATE
  ASSIGNED BY
  ANNOTATION EXTENSIONS
