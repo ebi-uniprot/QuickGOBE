@@ -47,7 +47,7 @@ public class AnnotationExtensionsTest {
     }
 
     @Test
-    public void annotationExtensionsWithoutOrs() {
+    public void mixOfOrAndAnd() {
         List<Annotation.ConnectedXRefs<Annotation.QualifiedXref>> extensionsModel = connectedXrefs(EXTENSIONS);
         assertThat(AnnotationExtensions.nullOrEmptyListToEmptyString(extensionsModel), is(EXPECTED_EXTENSION));
     }
