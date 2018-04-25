@@ -64,6 +64,8 @@ import static uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transforme
         .OntologyNameInjector.GO_ID;
 import static uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.completablevalue
         .TaxonomyNameInjector.TAXON_ID;
+import static uk.ac.ebi.quickgo.common.array.ArrayPopulation.ensureArrayContains;
+import static uk.ac.ebi.quickgo.common.array.ArrayPopulation.updateFieldsWithCheckFields;
 import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.searchAndTransform;
 import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.streamSearchResults;
 import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.createFirstCursorPage;
@@ -280,48 +282,6 @@ public class AnnotationController {
         writeBody(request, mediaTypeAcceptHeader, filterQueryInfo, queryRequest, emitter, selectedFields);
 
         return ResponseEntity.ok().headers(createHttpDownloadHeader(mediaTypeAcceptHeader, TO_DOWNLOAD_FILENAME)).body(emitter);
-    }
-
-    /**
-     * If the fields array doesn't contain the field, then add it, else do nothing.
-     * @param fields field array to check and update if necessary.
-     * @param value to check for, update with.
-     * @return a String array that WILL contain the value.
-     */
-    private String[] ensureArrayContains(String[] fields, String value) {
-        if (fields == null) {
-            return new String[]{value};
-        } else {
-            List<String> fieldList = Arrays.asList(fields);
-            if (fieldList.contains(value)) {
-                return fields;
-            } else {
-                List<String> fullList = new ArrayList<>(fields.length + 1);
-                fullList.addAll(fieldList);
-                fullList.add(value);
-                return fullList.toArray(new String[0]);
-            }
-        }
-    }
-
-    /**
-     * If checkFields contains a value, make sure it exists in updateFields.
-     * @param checkFields the array of fields to check if field exists.
-     * @param updateFields the array of fields to add the field too (if it does already exist).
-     * @param value to check for and update to updateFields (if it does already exist).
-     * @return updateFields content, including field if checkFields contains field.
-     */
-    private String[] updateFieldsWithCheckFields(String[] checkFields, String[] updateFields, String value) {
-        if (checkFields == null) {
-            return updateFields;
-        } else {
-            List<String> checkList = Arrays.asList(checkFields);
-            if (checkList.contains(value)) {
-                return ensureArrayContains(updateFields, value);
-            } else {
-                return updateFields;
-            }
-        }
     }
 
     private void writeBody(@Valid @ModelAttribute AnnotationRequest request,
