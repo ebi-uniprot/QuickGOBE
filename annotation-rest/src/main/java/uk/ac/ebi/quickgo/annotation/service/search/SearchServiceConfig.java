@@ -80,7 +80,7 @@ public class SearchServiceConfig {
     private static final String DEFAULT_ANNOTATION_SEARCH_RETURN_FIELDS =
             "id,geneProductId,qualifier,goId,goEvidence," +
                     "evidenceCode,reference,withFrom,taxonId,assignedBy,extensions,symbol,geneProductId," +
-                    "interactingTaxonId";
+                    "interactingTaxonId,date";
     private static final String SOLR_ANNOTATION_QUERY_REQUEST_HANDLER = "/query";
     private static final String DEFAULT_DOWNLOAD_SORT_FIELDS = "rowNumber,id";
     private static final int DEFAULT_DOWNLOAD_PAGE_SIZE = 500;
