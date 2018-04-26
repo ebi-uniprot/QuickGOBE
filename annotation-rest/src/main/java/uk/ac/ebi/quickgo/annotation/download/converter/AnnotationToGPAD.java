@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.annotation.download.converter;
 
 import uk.ac.ebi.quickgo.annotation.download.converter.helpers.Extensions;
 import uk.ac.ebi.quickgo.annotation.download.converter.helpers.GeneProduct;
+import uk.ac.ebi.quickgo.annotation.download.converter.helpers.Taxon;
 import uk.ac.ebi.quickgo.annotation.download.converter.helpers.WithFrom;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 
@@ -54,18 +55,11 @@ public class AnnotationToGPAD implements BiFunction<Annotation, List<String>, Li
                 .add(nullToEmptyString(annotation.reference))
                 .add(nullToEmptyString(annotation.evidenceCode))
                 .add(WithFrom.nullOrEmptyListToString(annotation.withFrom))
-                .add(taxonIdAsString(annotation.interactingTaxonId))
+                .add(Taxon.taxonIdToCurie(0, annotation.interactingTaxonId))
                 .add(ofNullable(annotation.date).map(toYYYYMMDD).orElse(""))
                 .add(nullToEmptyString(annotation.assignedBy))
                 .add(Extensions.asString(annotation.extensions))
                 .add(GO_EVIDENCE + nullToEmptyString(annotation.goEvidence))
                 .toString();
     }
-
-    private static final int LOWEST_VALID_TAXON_ID = 1;
-
-    private String taxonIdAsString(int taxonId) {
-        return taxonId < LOWEST_VALID_TAXON_ID ? "" : Integer.toString(taxonId);
-    }
-
 }

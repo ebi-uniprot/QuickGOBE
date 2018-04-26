@@ -67,7 +67,7 @@ public class AnnotationToGAF implements BiFunction<Annotation, List<String>, Lis
         gafColumnFunctions.add(annotationSource.andThen(a -> a.name));
         gafColumnFunctions.add(annotationSource.andThen(a -> a.synonyms));
         gafColumnFunctions.add(gpSource.andThen(GeneProduct::type));
-        gafColumnFunctions.add(annotationSource.andThen(AnnotationToGAF::gafTaxonAsString));
+        gafColumnFunctions.add(annotationSource.andThen(a -> Taxon.taxonIdToCurie(a.taxonId, a.interactingTaxonId)));
         gafColumnFunctions.add(annotationSource.andThen(a -> a.date).andThen(DateConverter::toYearMonthDay));
         gafColumnFunctions.add(annotationSource.andThen(a -> a.assignedBy));
         gafColumnFunctions.add((annotationSource.andThen(a -> a.extensions)
@@ -109,14 +109,6 @@ public class AnnotationToGAF implements BiFunction<Annotation, List<String>, Lis
                 .map(f -> f.apply(gafSource))
                 .map(Helper::nullToEmptyString)
                 .collect(joining(OUTPUT_DELIMITER));
-    }
-
-    private static String gafTaxonAsString(Annotation annotation) {
-        StringBuilder taxonBuilder = new StringBuilder();
-        taxonBuilder.append(TAXON)
-                .append(annotation.taxonId)
-                .append(annotation.interactingTaxonId > 0 ? PIPE + annotation.interactingTaxonId : "");
-        return taxonBuilder.toString();
     }
 
     /**

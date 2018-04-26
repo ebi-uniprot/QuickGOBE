@@ -255,7 +255,7 @@ public class AnnotationToGAFTest {
     public void interactingTaxId() {
         annotation.interactingTaxonId = 9877;
         String[] elements = annotationToElements(annotation);
-        assertThat(elements[COL_TAXON], is("taxon:" + TAXON_ID + "|" + 9877));
+        assertThat(elements[COL_TAXON], is("taxon:" + TAXON_ID + "|taxon:" + 9877));
     }
 
 
@@ -374,7 +374,7 @@ public class AnnotationToGAFTest {
     public void taxonHasInteractingValueAlso() {
         annotation.interactingTaxonId = 777;
         String[] elements = annotationToElements(annotation);
-        assertThat(elements[COL_TAXON], is("taxon:" + TAXON_ID + "|777"));
+        assertThat(elements[COL_TAXON], is("taxon:" + TAXON_ID + "|taxon:777"));
     }
 
     @Test
