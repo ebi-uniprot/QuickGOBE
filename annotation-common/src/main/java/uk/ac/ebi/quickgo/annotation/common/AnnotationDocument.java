@@ -59,8 +59,8 @@ public class AnnotationDocument implements QuickGODocument {
     @Field(AnnotationFields.ASSIGNED_BY)
     public String assignedBy;
 
-    @Field(AnnotationFields.EXTENSION)
-    public List<String> extensions;
+    //todo there is a mis-match here between singular and plural that is confusing - it would be nice ot fix this
+    @Field(AnnotationFields.EXTENSION) public List<String> extensions;
 
     @Field(AnnotationFields.TARGET_SET)
     public List<String> targetSets;
