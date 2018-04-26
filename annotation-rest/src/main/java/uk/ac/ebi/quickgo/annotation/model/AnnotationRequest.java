@@ -224,7 +224,7 @@ public class AnnotationRequest {
     @ApiModelProperty(
             value = "For TSV downloads only: fields to be downloaded. Accepts comma separated values.",
             allowableValues = "geneProductId,symbol,qualifier,goId,goAspect,goName,evidenceCode,goEvidence,reference," +
-                    "withFrom,taxonId,assignedBy,extensions,date,taxonName,synonym,name,type",
+                    "withFrom,taxonId,assignedBy,extension,date,taxonName,synonym,name,type",
             hidden = true)
     private String[] selectedFields;
 
