@@ -1,7 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.download.converter;
 
 import uk.ac.ebi.quickgo.annotation.download.converter.helpers.Extensions;
-import uk.ac.ebi.quickgo.annotation.download.converter.helpers.GeneProduct;
 import uk.ac.ebi.quickgo.annotation.download.converter.helpers.WithFrom;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.common.model.Aspect;
@@ -94,8 +93,7 @@ public class AnnotationToTSV implements BiFunction<Annotation, List<String>, Lis
                 (c, j) -> j.add(nullToEmptyString(c.annotation.synonyms)));
         selected2Content.put(GENE_PRODUCT_TYPE_FIELD_NAME,
                 (c, j) -> {
-                    GeneProduct geneProduct = GeneProduct.fromString(c.annotation.geneProductId);
-                    j.add(geneProduct.type());
+                    j.add(c.annotation.getGeneProduct().type());
                 });
     }
 
