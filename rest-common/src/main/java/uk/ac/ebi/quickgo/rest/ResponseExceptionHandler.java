@@ -36,6 +36,12 @@ public class ResponseExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(NullPointerException.class)
+    protected ResponseEntity<ErrorInfo> handleNullPointerException(RuntimeException ex, HttpServletRequest request) {
+        ErrorInfo error = new ErrorInfo(request.getRequestURL().toString(), ex.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
     @ExceptionHandler(ParameterException.class)
     protected ResponseEntity<ErrorInfo> handleParameterErrorRequest(ParameterException ex, HttpServletRequest request) {
         ErrorInfo error = new ErrorInfo(request.getRequestURL().toString(),
