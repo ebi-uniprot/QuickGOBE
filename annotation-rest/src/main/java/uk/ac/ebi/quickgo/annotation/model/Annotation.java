@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.ArrayList;
@@ -20,6 +21,10 @@ public class Annotation {
     public String id;
 
     public String geneProductId;
+
+    @JsonIgnore public String canonicalId;
+
+    @JsonIgnore private GeneProduct geneProduct;
 
     public String qualifier;
 
@@ -69,6 +74,15 @@ public class Annotation {
      */
     public String synonyms;
     public String name;
+
+    public void setGeneProduct(GeneProduct geneProduct) {
+        this.geneProduct = geneProduct;
+    }
+
+    @JsonIgnore
+    public GeneProduct getGeneProduct() {
+        return geneProduct;
+    }
 
     @Override public String toString() {
         return "Annotation{" +
