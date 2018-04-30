@@ -1,12 +1,14 @@
 package uk.ac.ebi.quickgo.annotation.download.converter;
 
 import uk.ac.ebi.quickgo.annotation.download.converter.helpers.Extensions;
-import uk.ac.ebi.quickgo.annotation.download.converter.helpers.GeneProduct;
 import uk.ac.ebi.quickgo.annotation.download.converter.helpers.Taxon;
 import uk.ac.ebi.quickgo.annotation.download.converter.helpers.WithFrom;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.StringJoiner;
 import java.util.function.BiFunction;
 
 import static java.util.Optional.ofNullable;
@@ -47,9 +49,7 @@ public class AnnotationToGPAD implements BiFunction<Annotation, List<String>, Li
 
     private String toOutputRecord(Annotation annotation, String goId) {
         StringJoiner tsvJoiner = new StringJoiner(OUTPUT_DELIMITER);
-        final GeneProduct geneProduct = GeneProduct.fromString(annotation.geneProductId);
-        return tsvJoiner.add(geneProduct.db())
-                .add(geneProduct.id())
+        return tsvJoiner.add(annotation.getGeneProduct().db()).add(annotation.getGeneProduct().canonicalId())
                 .add(nullToEmptyString(annotation.qualifier))
                 .add(nullToEmptyString(goId))
                 .add(nullToEmptyString(annotation.reference))
