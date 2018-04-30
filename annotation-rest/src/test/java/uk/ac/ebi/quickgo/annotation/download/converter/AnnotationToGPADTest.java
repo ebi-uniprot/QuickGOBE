@@ -71,10 +71,10 @@ public class AnnotationToGPADTest {
         assertThat(elements[COL_GO_ID], is(slimmedToGoId));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NullPointerException.class)
     public void nullGeneProductId() {
         annotation.geneProductId = null;
-
+        annotation.setGeneProduct(null);
         annotationToElements(annotation);
 
     }
