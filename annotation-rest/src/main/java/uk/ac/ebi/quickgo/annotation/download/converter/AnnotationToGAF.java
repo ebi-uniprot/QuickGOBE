@@ -2,9 +2,13 @@ package uk.ac.ebi.quickgo.annotation.download.converter;
 
 import uk.ac.ebi.quickgo.annotation.download.converter.helpers.*;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
+import uk.ac.ebi.quickgo.annotation.model.GeneProduct;
 import uk.ac.ebi.quickgo.common.model.Aspect;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -46,8 +50,6 @@ import static uk.ac.ebi.quickgo.common.model.Aspect.fromScientificName;
 public class AnnotationToGAF implements BiFunction<Annotation, List<String>, List<String>> {
 
     static final String OUTPUT_DELIMITER = "\t";
-    private static final String PIPE = "|";
-    private static final String TAXON = "taxon:";
     private static List<Function<AnnotationToGAF.GafSource, String>> gafColumnFunctions = new ArrayList<>();
 
     static {
@@ -56,7 +58,7 @@ public class AnnotationToGAF implements BiFunction<Annotation, List<String>, Lis
 
         //Functions to access or convert annotation or related data to GAF formatted data.
         gafColumnFunctions.add(gpSource.andThen(GeneProduct::db));
-        gafColumnFunctions.add(gpSource.andThen(GeneProduct::id));
+        gafColumnFunctions.add(gpSource.andThen(GeneProduct::canonicalId));
         gafColumnFunctions.add(annotationSource.andThen(a -> a.symbol));
         gafColumnFunctions.add(annotationSource.andThen(a -> a.qualifier).andThen(Qualifier::gafQualifierAsString));
         gafColumnFunctions.add(AnnotationToGAF.GafSource::getGoId);
@@ -72,11 +74,7 @@ public class AnnotationToGAF implements BiFunction<Annotation, List<String>, Lis
         gafColumnFunctions.add(annotationSource.andThen(a -> a.assignedBy));
         gafColumnFunctions.add((annotationSource.andThen(a -> a.extensions)
                                         .andThen(AnnotationExtensions::nullOrEmptyListToEmptyString)));
-        gafColumnFunctions.add(gpSource.andThen(GeneProduct::withIsoformOrVariant));
-    }
-
-    private static String aspectAsSingleCharacter(Annotation a) {
-        return fromScientificName(a.goAspect).map(Aspect::getCharacter).orElse(null);
+        gafColumnFunctions.add(gpSource.andThen(AnnotationToGAF::fullIdIfCanonicalNotEqualToCanonicalId));
     }
 
     /**
@@ -99,8 +97,16 @@ public class AnnotationToGAF implements BiFunction<Annotation, List<String>, Lis
         }
     }
 
+    private static String aspectAsSingleCharacter(Annotation a) {
+        return fromScientificName(a.goAspect).map(Aspect::getCharacter).orElse(null);
+    }
+
+    private static String fullIdIfCanonicalNotEqualToCanonicalId(GeneProduct g) {
+        return Objects.isNull(g.nonCanonicalId()) ? "" : g.fullId();
+    }
+
     private AnnotationToGAF.GafSource createGAFSource(Annotation annotation, String goId) {
-        final GeneProduct geneProduct = GeneProduct.fromString(annotation.geneProductId);
+        final GeneProduct geneProduct = annotation.getGeneProduct();
         return new AnnotationToGAF.GafSource(geneProduct, annotation, goId);
     }
 
@@ -120,6 +126,8 @@ public class AnnotationToGAF implements BiFunction<Annotation, List<String>, Lis
         final String goId;
 
         private GafSource(GeneProduct geneProduct, Annotation annotation, String goId) {
+            Objects.requireNonNull(geneProduct);
+            Objects.requireNonNull(annotation);
             this.geneProduct = geneProduct;
             this.annotation = annotation;
             this.goId = goId;
