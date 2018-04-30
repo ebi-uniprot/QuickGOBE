@@ -50,18 +50,18 @@ import static uk.ac.ebi.quickgo.common.model.Aspect.fromScientificName;
 public class AnnotationToGAF implements BiFunction<Annotation, List<String>, List<String>> {
 
     static final String OUTPUT_DELIMITER = "\t";
-    private static List<Function<AnnotationToGAF.GafSource, String>> gafColumnFunctions = new ArrayList<>();
+    private static List<Function<GafSource, String>> gafColumnFunctions = new ArrayList<>();
 
     static {
-        Function<AnnotationToGAF.GafSource, GeneProduct> gpSource = AnnotationToGAF.GafSource::getGeneProduct;
-        Function<AnnotationToGAF.GafSource, Annotation> annotationSource = AnnotationToGAF.GafSource::getAnnotation;
+        Function<GafSource, GeneProduct> gpSource = GafSource::getGeneProduct;
+        Function<GafSource, Annotation> annotationSource = GafSource::getAnnotation;
 
         //Functions to access or convert annotation or related data to GAF formatted data.
         gafColumnFunctions.add(gpSource.andThen(GeneProduct::db));
         gafColumnFunctions.add(gpSource.andThen(GeneProduct::canonicalId));
         gafColumnFunctions.add(annotationSource.andThen(a -> a.symbol));
         gafColumnFunctions.add(annotationSource.andThen(a -> a.qualifier).andThen(Qualifier::gafQualifierAsString));
-        gafColumnFunctions.add(AnnotationToGAF.GafSource::getGoId);
+        gafColumnFunctions.add(GafSource::getGoId);
         gafColumnFunctions.add(annotationSource.andThen(a -> a.reference));
         gafColumnFunctions.add(annotationSource.andThen(a -> a.goEvidence));
         gafColumnFunctions.add(annotationSource.andThen(a -> a.withFrom).andThen(WithFrom::nullOrEmptyListToString));
@@ -87,7 +87,7 @@ public class AnnotationToGAF implements BiFunction<Annotation, List<String>, Lis
     @Override
     public List<String> apply(Annotation annotation, List<String> selectedFields) {
         if (isNull(annotation.slimmedIds) || annotation.slimmedIds.isEmpty()) {
-            AnnotationToGAF.GafSource gafSource = createGAFSource(annotation, annotation.goId);
+            GafSource gafSource = createGAFSource(annotation, annotation.goId);
             return Collections.singletonList(toOutputRecord(gafSource));
         } else {
             return annotation.slimmedIds.stream()
@@ -105,12 +105,12 @@ public class AnnotationToGAF implements BiFunction<Annotation, List<String>, Lis
         return Objects.isNull(g.nonCanonicalId()) ? "" : g.fullId();
     }
 
-    private AnnotationToGAF.GafSource createGAFSource(Annotation annotation, String goId) {
+    private GafSource createGAFSource(Annotation annotation, String goId) {
         final GeneProduct geneProduct = annotation.getGeneProduct();
-        return new AnnotationToGAF.GafSource(geneProduct, annotation, goId);
+        return new GafSource(geneProduct, annotation, goId);
     }
 
-    private String toOutputRecord(AnnotationToGAF.GafSource gafSource) {
+    private String toOutputRecord(GafSource gafSource) {
         return gafColumnFunctions.stream()
                 .map(f -> f.apply(gafSource))
                 .map(Helper::nullToEmptyString)
