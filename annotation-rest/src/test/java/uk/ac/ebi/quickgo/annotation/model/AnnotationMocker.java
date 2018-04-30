@@ -64,6 +64,7 @@ public class AnnotationMocker {
     public static Annotation createValidAnnotation() {
         Annotation annotation = new Annotation();
         annotation.id = DB + ":" + ID;
+        annotation.setGeneProduct(GeneProduct.fromCurieId(annotation.id));
         annotation.extensions = connectedXrefs(EXTENSIONS);
         annotation.taxonId = TAXON_ID;
         annotation.goAspect = GO_ASPECT;     //todo is this populated
