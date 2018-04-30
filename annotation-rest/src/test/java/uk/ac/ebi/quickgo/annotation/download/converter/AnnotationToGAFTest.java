@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.annotation.download.converter;
 
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationMocker;
+import uk.ac.ebi.quickgo.annotation.model.GeneProduct;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -60,6 +61,7 @@ public class AnnotationToGAFTest {
         String db = "UniProtKB";
         String gpType = "protein";
         annotation.id = String.format("%s:%s", db, gpId);
+        annotation.setGeneProduct(GeneProduct.fromCurieId(annotation.id));
         annotation.geneProductId = String.format("%s:%s", db, gpId);
         annotation.assignedBy = db;
         annotation.symbol = gpId;
@@ -90,6 +92,7 @@ public class AnnotationToGAFTest {
         String db = "UniProtKB";
         String gpType = "protein";
         annotation.id = String.format("%s:%s", db, gpId);
+        annotation.setGeneProduct(GeneProduct.fromCurieId(annotation.id));
         annotation.geneProductId = String.format("%s:%s", db, gpId);
         annotation.assignedBy = db;
         annotation.symbol = gpId;
@@ -141,6 +144,7 @@ public class AnnotationToGAFTest {
         String db = "RNAcentral";
         String gpType = "miRNA";
         annotation.id = String.format("%s:%s", db, gpId);
+        annotation.setGeneProduct(GeneProduct.fromCurieId(annotation.id));
         annotation.geneProductId = String.format("%s:%s", db, gpId);
         annotation.assignedBy = db;
         annotation.symbol = gpId;
@@ -171,6 +175,7 @@ public class AnnotationToGAFTest {
         String gpIdCanonical = "CPX-1004";
         String db = "ComplexPortal";
         annotation.id = String.format("%s:%s", db, gpId);
+        annotation.setGeneProduct(GeneProduct.fromCurieId(annotation.id));
         String[] elements = annotationToElements(annotation);
         assertThat(elements[COL_DB], is(DB));
         assertThat(elements[COL_DB_OBJECT_ID], is(gpIdCanonical));
@@ -258,19 +263,13 @@ public class AnnotationToGAFTest {
         assertThat(elements[COL_TAXON], is("taxon:" + TAXON_ID + "|taxon:" + 9877));
     }
 
-
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NullPointerException.class)
     public void nullGeneProductIdThrowsException() {
         annotation.geneProductId = null;
+        annotation.setGeneProduct(null);
 
         annotationToElements(annotation);
-    }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void emptyGeneProductIdThrowsException() {
-        annotation.geneProductId = "";
-
-        annotationToElements(annotation);
     }
 
     @Test
@@ -327,12 +326,6 @@ public class AnnotationToGAFTest {
         annotation.goAspect = null;
         String[] elements = annotationToElements(annotation);
         assertThat(elements[COL_ASPECT], is(""));
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void nullGeneProductType() {
-        annotation.geneProductId = null;
-        annotationToElements(annotation);
     }
 
     @Test
