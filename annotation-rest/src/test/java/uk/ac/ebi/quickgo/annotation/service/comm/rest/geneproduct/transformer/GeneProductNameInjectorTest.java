@@ -22,7 +22,7 @@ import static org.hamcrest.core.IsNull.nullValue;
 import static uk.ac.ebi.quickgo.annotation.service.comm.rest.geneproduct.transformer.GeneProductNameInjector
         .GENE_PRODUCT_NAME;
 import static uk.ac.ebi.quickgo.annotation.service.comm.rest.geneproduct.transformer.GeneProductSynonymsInjector
-        .GENE_PRODUCT_ID;
+        .CANONICAL_ID;
 
 /**
  * Created 11/04/17
@@ -58,12 +58,11 @@ public class GeneProductNameInjectorTest {
     @Test
     public void correctFilterRequestIsBuilt() {
         Annotation annotation = new Annotation();
-        String geneProductId = "UniProtKB:A0A000";
-        annotation.geneProductId = geneProductId;
+        annotation.canonicalId = "A0A000";
         FilterRequest filterRequest = nameInjector.buildFilterRequest(annotation);
 
         assertThat(filterRequest.getProperties(), hasEntry(nameInjector.getId(), emptyList()));
-        assertThat(filterRequest.getProperties(), hasEntry(GENE_PRODUCT_ID, singletonList("A0A000")));
+        assertThat(filterRequest.getProperties(), hasEntry(CANONICAL_ID, singletonList("A0A000")));
     }
 
     private BasicGeneProduct createBasicGeneProduct() {
