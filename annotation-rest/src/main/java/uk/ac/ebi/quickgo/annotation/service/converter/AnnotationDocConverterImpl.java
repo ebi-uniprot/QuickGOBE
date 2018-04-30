@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.annotation.service.converter;
 
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
+import uk.ac.ebi.quickgo.annotation.model.GeneProduct;
 
 import java.util.Collections;
 import java.util.List;
@@ -25,6 +26,9 @@ public class AnnotationDocConverterImpl implements AnnotationDocConverter {
         Annotation annotation = new Annotation();
         annotation.id = annotationDocument.id;
         annotation.geneProductId = annotationDocument.geneProductId;
+        GeneProduct geneProduct = GeneProduct.fromCurieId(annotationDocument.geneProductId);
+        annotation.setGeneProduct(geneProduct);
+        annotation.canonicalId = geneProduct.canonicalId();
         annotation.qualifier = annotationDocument.qualifier;
         annotation.goId = annotationDocument.goId;
         annotation.goEvidence = annotationDocument.goEvidence;
