@@ -1,25 +1,28 @@
-package uk.ac.ebi.quickgo.annotation.download.converter.helpers;
+package uk.ac.ebi.quickgo.annotation.model;
 
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.GeneProduct.GeneProductType.COMPLEX;
-import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.GeneProduct.GeneProductType.PROTEIN;
-import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.GeneProduct.GeneProductType.MI_RNA;
+import static uk.ac.ebi.quickgo.annotation.model.GeneProduct.GeneProductType.COMPLEX;
+import static uk.ac.ebi.quickgo.annotation.model.GeneProduct.GeneProductType.MI_RNA;
+import static uk.ac.ebi.quickgo.annotation.model.GeneProduct.GeneProductType.PROTEIN;
 
 /**
  *  The state for GeneProduct information used for downloading, with logic to create.
  */
 public class GeneProduct {
-    private static final int CANONICAL_GROUP_NUMBER = 2;
-    private static final int RNA_ID_GROUP = 1;
-    private static final int COMPLEX_PORTAL_ID_NUMBER = 1;
+    private static final int UNIPROT_CANONICAL_GROUP_NUMBER = 2;
+    private static final int UNIPROT_NON_CANONICAL_GROUP_NUMBER = 4;
     private static final String UNIPROT_CANONICAL_REGEX = "^(?:UniProtKB:)?(([OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z]" +
             "([0-9][A-Z][A-Z0-9]{2}){1,2}[0-9])((-[0-9]+)|:PRO_[0-9]{10}|:VAR_[0-9]{6}){0,1})$";
     private static final Pattern UNIPROT_CANONICAL_PATTERN = Pattern.compile(UNIPROT_CANONICAL_REGEX);
+
+    private static final int RNA_ID_GROUP = 1;
     private static final String RNA_CENTRAL_REGEX = "^(?:RNAcentral:)?((URS[0-9A-F]{10})(_[0-9]+){0,1})$";
     private static final Pattern RNA_CENTRAL_CANONICAL_PATTERN = Pattern.compile(RNA_CENTRAL_REGEX);
+
+    private static final int COMPLEX_PORTAL_ID_NUMBER = 1;
     private static final String COMPLEX_PORTAL_CANONICAL_REGEX = "^(?:ComplexPortal:)?(CPX-[0-9]+)$";
     private static final Pattern COMPLEX_PORTAL_CANONICAL_PATTERN = Pattern.compile(COMPLEX_PORTAL_CANONICAL_REGEX);
 
@@ -38,49 +41,54 @@ public class GeneProduct {
 
     /**
      * Determine the correctness of the argument as a gene product id and if valid build a GeneProduct representation.
-     * @param fullId Annotation id, could had isoform or variant suffix if it is a UniProt gene product.
+     * @param curieId Annotation id, could had isoform or variant suffix if it is a UniProt gene product.
      * @return a GeneProduct representation.
      */
-    public static GeneProduct fromString(String fullId) {
+    public static GeneProduct fromCurieId(String curieId) {
 
-        if (Objects.isNull(fullId) || fullId.isEmpty()) {
-            throw new IllegalArgumentException("Gene Product Id is null or empty");
+        if (Objects.isNull(curieId) || curieId.isEmpty()) {
+            throw new IllegalStateException("Gene Product Id is null or empty");
         }
 
-        Matcher uniprotMatcher = UNIPROT_CANONICAL_PATTERN.matcher(fullId);
+        Matcher uniprotMatcher = UNIPROT_CANONICAL_PATTERN.matcher(curieId);
         if (uniprotMatcher.matches()) {
             String db = "UniProtKB";
-            String id = uniprotMatcher.group(CANONICAL_GROUP_NUMBER);
-            String withIsoFormOrVariant = fullId.contains("-") ? fullId : null;
-            return new GeneProduct(new GeneProductId(db, id, withIsoFormOrVariant), PROTEIN);
+            String canonical = uniprotMatcher.group(UNIPROT_CANONICAL_GROUP_NUMBER);
+            String nonDb = uniprotMatcher.group(UNIPROT_NON_CANONICAL_GROUP_NUMBER);
+            String nonCanonical = canonical.equals(nonDb) ? null : nonDb;
+            return new GeneProduct(new GeneProductId(db, canonical, curieId, nonCanonical), PROTEIN);
         }
 
-        Matcher rnaMatcher = RNA_CENTRAL_CANONICAL_PATTERN.matcher(fullId);
+        Matcher rnaMatcher = RNA_CENTRAL_CANONICAL_PATTERN.matcher(curieId);
         if (rnaMatcher.matches()) {
             String db = "RNAcentral";
             String id = rnaMatcher.group(RNA_ID_GROUP);
-            return new GeneProduct(new GeneProductId(db, id, null), MI_RNA);
+            return new GeneProduct(new GeneProductId(db, id, curieId, null), MI_RNA);
         }
 
-        Matcher complexPortalMatcher = COMPLEX_PORTAL_CANONICAL_PATTERN.matcher(fullId);
+        Matcher complexPortalMatcher = COMPLEX_PORTAL_CANONICAL_PATTERN.matcher(curieId);
         if (complexPortalMatcher.matches()) {
             String db = "ComplexPortal";
             String id = complexPortalMatcher.group(COMPLEX_PORTAL_ID_NUMBER);
-            return new GeneProduct(new GeneProductId(db, id, null), COMPLEX);
+            return new GeneProduct(new GeneProductId(db, id, curieId, null), COMPLEX);
         }
-        throw new IllegalArgumentException(String.format("Gene Product Id %s is not valid", fullId));
+        throw new IllegalStateException(String.format("Gene Product Id %s is not valid", curieId));
     }
 
-    public String id() {
+    public String canonicalId() {
         return  geneProductId != null ? geneProductId.id : null;
+    }
+
+    public String nonCanonicalId() {
+        return geneProductId != null ? geneProductId.nonCanonical : null;
     }
 
     public String db() {
         return  geneProductId != null ? geneProductId.db : null;
     }
 
-    public String withIsoformOrVariant() {
-        return  geneProductId != null ? geneProductId.withIsoFormOrVariant : null;
+    public String fullId() {
+        return geneProductId != null ? geneProductId.fullId : null;
     }
 
     public String type() {
@@ -93,12 +101,18 @@ public class GeneProduct {
     private static class GeneProductId {
         private final String db;
         private final String id;
-        private final String withIsoFormOrVariant;
+        private final String fullId;
+        private final String nonCanonical;
 
-        private GeneProductId(String db, String id, String wthIsoFormOrVariant) {
+        private GeneProductId(String db, String canonical, String fullId, String nonCanonical) {
+            Objects.requireNonNull(db);
+            Objects.requireNonNull(canonical);
+            Objects.requireNonNull(fullId);
+
             this.db = db;
-            this.id = id;
-            this.withIsoFormOrVariant = wthIsoFormOrVariant;
+            this.id = canonical;
+            this.fullId = fullId;
+            this.nonCanonical = nonCanonical;
         }
     }
 
