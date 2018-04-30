@@ -31,12 +31,11 @@ import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.Helper.nul
  */
 public class AnnotationToTSV implements BiFunction<Annotation, List<String>, List<String>> {
 
-    private final Map<String, BiConsumer<OutputContent, StringJoiner>> selected2Content;
+    private static final Map<String, BiConsumer<OutputContent, StringJoiner>> selected2Content =
+            initialiseContentMappings();
     static final String OUTPUT_DELIMITER = "\t";
 
     public AnnotationToTSV() {
-        selected2Content = new HashMap<>();
-        initialiseContentMappings();
     }
 
     @Override public List<String> apply(Annotation annotation, List<String> selectedFields) {
@@ -50,7 +49,8 @@ public class AnnotationToTSV implements BiFunction<Annotation, List<String>, Lis
         }
     }
 
-    private void initialiseContentMappings() {
+    private static Map<String, BiConsumer<OutputContent, StringJoiner>> initialiseContentMappings() {
+        Map<String, BiConsumer<OutputContent, StringJoiner>> selected2Content = new HashMap<>();
         selected2Content.put(GENE_PRODUCT_FIELD_NAME,
                 (c, j) -> {
                     String[] elements = nullToEmptyString(c.annotation.geneProductId).split(":");
@@ -91,10 +91,8 @@ public class AnnotationToTSV implements BiFunction<Annotation, List<String>, Lis
         selected2Content.put(GENE_PRODUCT_NAME_FIELD_NAME, (c, j) -> j.add(nullToEmptyString(c.annotation.name)));
         selected2Content.put(GENE_PRODUCT_SYNONYMS_FIELD_NAME,
                 (c, j) -> j.add(nullToEmptyString(c.annotation.synonyms)));
-        selected2Content.put(GENE_PRODUCT_TYPE_FIELD_NAME,
-                (c, j) -> {
-                    j.add(c.annotation.getGeneProduct().type());
-                });
+        selected2Content.put(GENE_PRODUCT_TYPE_FIELD_NAME, (c, j) -> j.add(c.annotation.getGeneProduct().type()));
+        return selected2Content;
     }
 
     private boolean isSlimmedRequest(Annotation annotation) {
