@@ -76,7 +76,7 @@ public class StringToAnnotationMapperTest {
         tokens[COLUMN_DB_REFERENCES.getPosition()] = "PMID:12871976";
         tokens[COLUMN_EVIDENCE_CODE.getPosition()] = "ECO:0000353";
         tokens[COLUMN_WITH.getPosition()] = "GO:0036376,GO:1990573";
-        tokens[COLUMN_INTERACTING_TAXON_ID.getPosition()] = null;
+        tokens[COLUMN_INTERACTING_TAXON_ID.getPosition()] = "1234";
         tokens[COLUMN_DATE.getPosition()] = "20150122";
         tokens[COLUMN_ASSIGNED_BY.getPosition()] = "IntAct";
         tokens[COLUMN_ANNOTATION_EXTENSION.getPosition()] = "occurs_in(CL:1000428)";
@@ -100,7 +100,7 @@ public class StringToAnnotationMapperTest {
         tokens[COLUMN_DB_REFERENCES.getPosition()] = "PMID:12871976";
         tokens[COLUMN_EVIDENCE_CODE.getPosition()] = "ECO:0000353  ";
         tokens[COLUMN_WITH.getPosition()] = "  GO:0036376,GO:1990573";
-        tokens[COLUMN_INTERACTING_TAXON_ID.getPosition()] = null;
+        tokens[COLUMN_INTERACTING_TAXON_ID.getPosition()] = "1234";
         tokens[COLUMN_DATE.getPosition()] = "  20150122";
         tokens[COLUMN_ASSIGNED_BY.getPosition()] = "IntAct";
         tokens[COLUMN_ANNOTATION_EXTENSION.getPosition()] = "occurs_in(CL:1000428)   ";
