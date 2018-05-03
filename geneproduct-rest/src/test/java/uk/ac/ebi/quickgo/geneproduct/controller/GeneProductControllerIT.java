@@ -7,6 +7,7 @@ import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepository;
 import uk.ac.ebi.quickgo.geneproduct.common.common.GeneProductDocMocker;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.Before;
@@ -89,6 +90,20 @@ public class GeneProductControllerIT {
     @Test
     public void canRetrieveOneGeneProductById() throws Exception {
         ResultActions response = mockMvc.perform(get(buildGeneProductURL(validId)));
+
+        response.andDo(print())
+                .andExpect(jsonPath("$.results.*.id", hasSize(1)))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void canRetrieveOneGeneProductByComplexPortalId() throws Exception {
+        geneProductRepository.deleteAll();
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        List<GeneProductDocument> basicDocs = createBasicComplexPortalDocs();
+        geneProductRepository.save(basicDocs);
+        ResultActions response = mockMvc.perform(get(buildGeneProductURL(basicDocs.get(0).id)));
 
         response.andDo(print())
                 .andExpect(jsonPath("$.results.*.id", hasSize(1)))
@@ -206,5 +221,9 @@ public class GeneProductControllerIT {
                 GeneProductDocMocker.createDocWithId("A0A000"),
                 GeneProductDocMocker.createDocWithId("A0A001"),
                 GeneProductDocMocker.createDocWithId("A0A002"));
+    }
+
+    private List<GeneProductDocument> createBasicComplexPortalDocs() {
+        return Collections.singletonList(GeneProductDocMocker.createDocWithId("CPX-1004"));
     }
 }
