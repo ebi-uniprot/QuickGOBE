@@ -150,18 +150,6 @@
         </analyzer>
     </fieldType>
 
-    <!--<fieldType name="text_ignorecase_classic" class="solr.TextField" positionIncrementGap="100">-->
-    <!--<analyzer type="index">-->
-    <!--<tokenizer class="solr.ClassicTokenizerFactory"/>-->
-    <!--<filter class="solr.LowerCaseFilterFactory"/>-->
-    <!--</analyzer>-->
-    <!--<analyzer type="query">-->
-    <!--<tokenizer class="solr.ClassicTokenizerFactory"/>-->
-    <!--<filter class="solr.LowerCaseFilterFactory"/>-->
-    <!--</analyzer>-->
-    <!--</fieldType>-->
-
-
     <!-- field type definitions. The "name" attribute is
        just a label to be used by field definitions.  The "class"
      attribute and any other attributes determine the real
