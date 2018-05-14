@@ -2,7 +2,6 @@ package uk.ac.ebi.quickgo.annotation.download.converter.helpers;
 
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.function.Function;
 
 /**
@@ -15,17 +14,11 @@ import java.util.function.Function;
 
  */
 public class DateConverter {
+    private static final String ISO_8601_DATE_FORMAT = "yyyyMMdd";
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern(ISO_8601_DATE_FORMAT);
+    public static final Function<java.util.Date, String> ISO_8601_FORMATTER =
+            d -> d.toInstant().atZone(ZoneId.systemDefault()).format(DATE_FORMATTER);
 
     private DateConverter() {
     }
-
-    private static final DateTimeFormatter YYYYMMDD_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd");
-
-    public static final Function<java.util.Date, String> toYYYYMMDD =
-            d -> d.toInstant().atZone(ZoneId.systemDefault()).format(YYYYMMDD_DATE_FORMAT);
-
-    public static String toYearMonthDay(Date date) {
-        return date != null ? toYYYYMMDD.apply(date) : "";
-    }
-
 }
