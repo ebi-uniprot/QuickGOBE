@@ -14,6 +14,10 @@ import java.util.Objects;
 public class Qualifier {
 
     private static final String EMPTY_STRING = "";
+    private static final String CONTRIBUTES_TO = "contributes_to";
+    private static final String COLOCALIZES_WITH = "colocalizes_with";
+    private static final String NOT_LOWERCASE = "not";
+    private static final String NOT_UPPERCASE = "NOT";
 
     private Qualifier() {}
 
@@ -30,22 +34,22 @@ public class Qualifier {
 
         String lcQualifier = qualifier.toLowerCase();
 
-        if (lcQualifier.contains("contributes_to") || lcQualifier.contains("colocalizes_with")) {
-            if (lcQualifier.contains("not")) {
+        if (lcQualifier.contains(CONTRIBUTES_TO) || lcQualifier.contains(COLOCALIZES_WITH)) {
+            if (lcQualifier.contains(NOT_LOWERCASE)) {
                 return showNotInUpperCase(qualifier);
             } else {
                 return qualifier;
             }
         } else {
             //For the qualifiers that are not displayed, if they are negated, then show (only the not as) NOT
-            if (lcQualifier.contains("not")) {
-                return "NOT";
+            if (lcQualifier.contains(NOT_LOWERCASE)) {
+                return NOT_UPPERCASE;
             }
         }
         return EMPTY_STRING;
     }
 
     private static String showNotInUpperCase(String qualifier) {
-        return qualifier.replace("not", "NOT");
+        return qualifier.replace(NOT_LOWERCASE, NOT_UPPERCASE);
     }
 }
