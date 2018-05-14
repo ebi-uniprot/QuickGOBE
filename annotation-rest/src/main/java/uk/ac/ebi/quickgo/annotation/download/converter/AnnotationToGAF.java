@@ -15,6 +15,7 @@ import java.util.function.Function;
 import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
+import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.DateConverter.ISO_8601_FORMATTER;
 import static uk.ac.ebi.quickgo.common.model.Aspect.fromScientificName;
 
 /**
@@ -70,7 +71,7 @@ public class AnnotationToGAF implements BiFunction<Annotation, List<String>, Lis
         gafColumnFunctions.add(annotationSource.andThen(a -> a.synonyms));
         gafColumnFunctions.add(gpSource.andThen(GeneProduct::type));
         gafColumnFunctions.add(annotationSource.andThen(a -> Taxon.taxonIdToCurie(a.taxonId, a.interactingTaxonId)));
-        gafColumnFunctions.add(annotationSource.andThen(a -> a.date).andThen(DateConverter::toYearMonthDay));
+        gafColumnFunctions.add(annotationSource.andThen(a -> a.date).andThen(ISO_8601_FORMATTER));
         gafColumnFunctions.add(annotationSource.andThen(a -> a.assignedBy));
         gafColumnFunctions.add((annotationSource.andThen(a -> a.extensions)
                                         .andThen(AnnotationExtensions::nullOrEmptyListToEmptyString)));
