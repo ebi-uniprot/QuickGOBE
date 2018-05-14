@@ -1,10 +1,10 @@
 package uk.ac.ebi.quickgo.annotation.common;
 
-import org.apache.solr.client.solrj.beans.Field;
 import uk.ac.ebi.quickgo.common.QuickGODocument;
 
 import java.util.Date;
 import java.util.List;
+import org.apache.solr.client.solrj.beans.Field;
 
 /**
  * Solr document class defining all fields within the annotation core.
@@ -59,7 +59,6 @@ public class AnnotationDocument implements QuickGODocument {
     @Field(AnnotationFields.ASSIGNED_BY)
     public String assignedBy;
 
-    //todo there is a mis-match here between singular and plural that is confusing - it would be nice ot fix this
     @Field(AnnotationFields.EXTENSION) public List<String> extensions;
 
     @Field(AnnotationFields.TARGET_SET)
