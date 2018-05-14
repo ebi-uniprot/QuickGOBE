@@ -13,7 +13,7 @@ import java.util.function.BiFunction;
 
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
-import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.DateConverter.toYYYYMMDD;
+import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.DateConverter.ISO_8601_FORMATTER;
 import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.Helper.nullToEmptyString;
 
 /**
@@ -56,7 +56,7 @@ public class AnnotationToGPAD implements BiFunction<Annotation, List<String>, Li
                 .add(nullToEmptyString(annotation.evidenceCode))
                 .add(WithFrom.nullOrEmptyListToString(annotation.withFrom))
                 .add(Taxon.taxonIdToCurie(0, annotation.interactingTaxonId))
-                .add(ofNullable(annotation.date).map(toYYYYMMDD).orElse(""))
+                .add(ofNullable(annotation.date).map(ISO_8601_FORMATTER).orElse(""))
                 .add(nullToEmptyString(annotation.assignedBy))
                 .add(Extensions.asString(annotation.extensions))
                 .add(GO_EVIDENCE + nullToEmptyString(annotation.goEvidence))

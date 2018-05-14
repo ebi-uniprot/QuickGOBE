@@ -12,7 +12,7 @@ import java.util.function.BiFunction;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static uk.ac.ebi.quickgo.annotation.download.TSVDownload.*;
-import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.DateConverter.toYYYYMMDD;
+import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.DateConverter.ISO_8601_FORMATTER;
 import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.Helper.nullToEmptyString;
 
 /**
@@ -85,8 +85,8 @@ public class AnnotationToTSV implements BiFunction<Annotation, List<String>, Lis
         selected2Content.put(ASSIGNED_BY_FIELD_NAME, (c, j) -> j.add(nullToEmptyString(c.annotation.assignedBy)));
         selected2Content.put(ANNOTATION_EXTENSION_FIELD_NAME,
                 (c, j) -> j.add(Extensions.asString(c.annotation.extensions)));
-        selected2Content
-                .put(DATE_FIELD_NAME, (c, j) -> j.add(ofNullable(c.annotation.date).map(toYYYYMMDD).orElse("")));
+        selected2Content.put(DATE_FIELD_NAME,
+                (c, j) -> j.add(ofNullable(c.annotation.date).map(ISO_8601_FORMATTER).orElse("")));
         selected2Content.put(TAXON_NAME_FIELD_NAME, (c, j) -> j.add(nullToEmptyString(c.annotation.taxonName)));
         selected2Content.put(GENE_PRODUCT_NAME_FIELD_NAME, (c, j) -> j.add(nullToEmptyString(c.annotation.name)));
         selected2Content.put(GENE_PRODUCT_SYNONYMS_FIELD_NAME,
