@@ -3,7 +3,8 @@ package uk.ac.ebi.quickgo.common.array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
+
+import static java.util.Objects.isNull;
 
 /**
  * New class to repopulate arrays depending on requirements.
@@ -21,7 +22,7 @@ public class ArrayPopulation {
      * @return a String array that WILL contain the value.
      */
     public static String[] ensureArrayContains(String[] targetArray, String value) {
-        if (targetArray == null) {
+        if (isNull(targetArray)) {
             return new String[]{value};
         } else {
             List<String> targetList = Arrays.asList(targetArray);
@@ -44,14 +45,14 @@ public class ArrayPopulation {
      * @return targetArray content, including value if checkArray contains value.
      */
     public static String[] updateFieldsWithCheckFields(String[] checkArray, String[] targetArray, String value) {
-        if (checkArray == null) {
+        if (isNull(checkArray)) {
             return targetArray;
         } else {
             List<String> checkList = Arrays.asList(checkArray);
             if (checkList.contains(value)) {
                 return ensureArrayContains(targetArray, value);
             } else {
-                return Objects.isNull(targetArray) ? new String[0] : targetArray;
+                return isNull(targetArray) ? new String[0] : targetArray;
             }
         }
     }
