@@ -263,10 +263,10 @@ public class AnnotationController {
             request.setIncludeFields(ensureArrayContains(request.getIncludeFields(), "name"));
             request.setIncludeFields(ensureArrayContains(request.getIncludeFields(), "synonyms"));
         } else if (mediaTypeAcceptHeader.getSubtype().equals("tsv")) {
-            //If synonyms are requested, insure synonyms is in the list of include fields.
+            //If synonyms are requested, ensure synonyms is in the list of include fields.
             request.setIncludeFields(
                     updateFieldsWithCheckFields(request.getSelectedFields(), request.getIncludeFields(), "synonyms"));
-            //If gene product name is requested, insure name is in the list of include fields.
+            //If gene product name is requested, ensure name is in the list of include fields.
             request.setIncludeFields(
                     updateFieldsWithCheckFields(request.getSelectedFields(), request.getIncludeFields(), "name"));
         }
