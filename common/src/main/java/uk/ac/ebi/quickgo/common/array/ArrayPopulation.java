@@ -39,7 +39,7 @@ public class ArrayPopulation {
     /**
      * If checkArray contains a value, make sure it exists in targetArray.
      * @param checkArray the array of values to check if value exists.
-     * @param targetArray the array of values to add the value too (if it does already exist).
+     * @param targetArray the array of values to add the value to (if it does already exist).
      * @param value to check for and update to targetArray (if it does already exist).
      * @return targetArray content, including value if checkArray contains value.
      */
