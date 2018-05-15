@@ -44,7 +44,7 @@ public class ArrayPopulation {
      * @param value to check for and update to targetArray (if it does already exist).
      * @return targetArray content, including value if checkArray contains value.
      */
-    public static String[] updateFieldsWithCheckFields(String[] checkArray, String[] targetArray, String value) {
+    public static String[] ensureArrayContainsCommonValue(String[] checkArray, String[] targetArray, String value) {
         if (isNull(checkArray)) {
             return targetArray;
         } else {
