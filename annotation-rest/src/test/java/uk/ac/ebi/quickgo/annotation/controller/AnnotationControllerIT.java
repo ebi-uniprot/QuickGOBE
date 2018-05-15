@@ -941,19 +941,6 @@ public class AnnotationControllerIT {
                 .andExpect(totalNumOfResults(0));
     }
 
-    @Test
-    public void filteringUsingGeneOntologyIdButGeneProductIdIsNullCausesInternalServerError() throws Exception {
-        String geneProductId = null;
-        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc(geneProductId);
-        repository.save(doc);
-
-        ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(GO_ID_PARAM.getName(), AnnotationDocMocker.GO_ID)
-                        .param(GO_USAGE_PARAM.getName(), EXACT_USAGE));
-
-        response.andDo(print()).andExpect(status().isInternalServerError());
-    }
-
     //---------- Gene Ontology Id
     @Test
     public void successfullyLookupAnnotationsByGoId() throws Exception {
