@@ -4,10 +4,11 @@ import java.util.Arrays;
 import java.util.List;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 import static uk.ac.ebi.quickgo.common.array.ArrayPopulation.ensureArrayContains;
-import static uk.ac.ebi.quickgo.common.array.ArrayPopulation.updateFieldsWithCheckFields;
+import static uk.ac.ebi.quickgo.common.array.ArrayPopulation.ensureArrayContainsCommonValue;
 
 public class ArrayPopulationTest {
 
@@ -57,7 +58,7 @@ public class ArrayPopulationTest {
         assertThat(updatedList, contains("irritation"));
     }
 
-    // ------ updateFieldsWithCheckFields
+    // ------ ensureArrayContainsCommonValue
 
     @Test
     public void updateFieldsWithCheckFieldsWithoutValue() {
@@ -65,7 +66,7 @@ public class ArrayPopulationTest {
         String[] arrayTarget = new String[0];
         String value = "irritation";
 
-        String[] updated = updateFieldsWithCheckFields(arrayToCheck, arrayTarget, value);
+        String[] updated = ensureArrayContainsCommonValue(arrayToCheck, arrayTarget, value);
 
         assertThat(updated.length, is(0));
     }
@@ -76,7 +77,7 @@ public class ArrayPopulationTest {
         String[] arrayTarget = new String[0];
         String value = "irritation";
 
-        String[] updated = updateFieldsWithCheckFields(arrayToCheck, arrayTarget, value);
+        String[] updated = ensureArrayContainsCommonValue(arrayToCheck, arrayTarget, value);
 
         assertThat(updated.length, is(1));
         List<String> updatedList = Arrays.asList(updated);
@@ -89,7 +90,7 @@ public class ArrayPopulationTest {
         String[] arrayTarget = new String[]{"irritation"};
         String value = "irritation";
 
-        String[] updated = updateFieldsWithCheckFields(arrayToCheck, arrayTarget, value);
+        String[] updated = ensureArrayContainsCommonValue(arrayToCheck, arrayTarget, value);
 
         assertThat(updated.length, is(1));
         List<String> updatedList = Arrays.asList(updated);
@@ -102,7 +103,7 @@ public class ArrayPopulationTest {
         String[] arrayTarget = new String[]{"irritation"};
         String value = "irritation";
 
-        String[] updated = updateFieldsWithCheckFields(arrayToCheck, arrayTarget, value);
+        String[] updated = ensureArrayContainsCommonValue(arrayToCheck, arrayTarget, value);
 
         assertThat(updated.length, is(1));
         List<String> updatedList = Arrays.asList(updated);
@@ -115,7 +116,7 @@ public class ArrayPopulationTest {
         String[] arrayTarget = new String[0];
         String value = "irritation";
 
-        String[] updated = updateFieldsWithCheckFields(arrayToCheck, arrayTarget, value);
+        String[] updated = ensureArrayContainsCommonValue(arrayToCheck, arrayTarget, value);
 
         assertThat(updated.length, is(0));
     }
@@ -126,7 +127,7 @@ public class ArrayPopulationTest {
         String[] arrayTarget = null;
         String value = "irritation";
 
-        String[] updated = updateFieldsWithCheckFields(arrayToCheck, arrayTarget, value);
+        String[] updated = ensureArrayContainsCommonValue(arrayToCheck, arrayTarget, value);
 
         assertThat(updated.length, is(0));
     }
@@ -137,7 +138,7 @@ public class ArrayPopulationTest {
         String[] arrayTarget = null;
         String value = "irritation";
 
-        String[] updated = updateFieldsWithCheckFields(arrayToCheck, arrayTarget, value);
+        String[] updated = ensureArrayContainsCommonValue(arrayToCheck, arrayTarget, value);
 
         assertThat(updated.length, is(1));
         List<String> updatedList = Arrays.asList(updated);
