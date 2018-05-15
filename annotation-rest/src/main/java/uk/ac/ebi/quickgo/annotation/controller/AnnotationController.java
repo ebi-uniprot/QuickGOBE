@@ -65,7 +65,7 @@ import static uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transforme
 import static uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.completablevalue
         .TaxonomyNameInjector.TAXON_ID;
 import static uk.ac.ebi.quickgo.common.array.ArrayPopulation.ensureArrayContains;
-import static uk.ac.ebi.quickgo.common.array.ArrayPopulation.updateFieldsWithCheckFields;
+import static uk.ac.ebi.quickgo.common.array.ArrayPopulation.ensureArrayContainsCommonValue;
 import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.searchAndTransform;
 import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.streamSearchResults;
 import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.createFirstCursorPage;
@@ -265,10 +265,11 @@ public class AnnotationController {
         } else if (mediaTypeAcceptHeader.getSubtype().equals("tsv")) {
             //If synonyms are requested, ensure synonyms is in the list of include fields.
             request.setIncludeFields(
-                    updateFieldsWithCheckFields(request.getSelectedFields(), request.getIncludeFields(), "synonyms"));
+                    ensureArrayContainsCommonValue(request.getSelectedFields(), request.getIncludeFields(),
+                            "synonyms"));
             //If gene product name is requested, ensure name is in the list of include fields.
             request.setIncludeFields(
-                    updateFieldsWithCheckFields(request.getSelectedFields(), request.getIncludeFields(), "name"));
+                    ensureArrayContainsCommonValue(request.getSelectedFields(), request.getIncludeFields(), "name"));
         }
 
         FilterQueryInfo filterQueryInfo = extractFilterQueryInfo(request);
