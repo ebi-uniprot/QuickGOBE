@@ -4,12 +4,15 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static java.util.Objects.nonNull;
 import static uk.ac.ebi.quickgo.annotation.model.GeneProduct.GeneProductType.COMPLEX;
 import static uk.ac.ebi.quickgo.annotation.model.GeneProduct.GeneProductType.MI_RNA;
 import static uk.ac.ebi.quickgo.annotation.model.GeneProduct.GeneProductType.PROTEIN;
 
 /**
  *  The state for GeneProduct information used for downloading, with logic to create.
+ *
+ * @author twardell
  */
 public class GeneProduct {
     private static final int UNIPROT_CANONICAL_GROUP_NUMBER = 2;
@@ -105,9 +108,9 @@ public class GeneProduct {
         private final String nonCanonical;
 
         private GeneProductId(String db, String canonical, String fullId, String nonCanonical) {
-            Objects.requireNonNull(db);
-            Objects.requireNonNull(canonical);
-            Objects.requireNonNull(fullId);
+            assert nonNull(db);
+            assert nonNull(canonical);
+            assert nonNull(fullId);
 
             this.db = db;
             this.id = canonical;
