@@ -5,6 +5,7 @@ import org.junit.Test;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.DateConverter.ISO_8601_FORMATTER;
 
 public class DateConverterTest {
 
@@ -13,15 +14,18 @@ public class DateConverterTest {
         Date date = new Date();
         date.setTime(0);
 
-        String formattedDate = DateConverter.ISO_8601_FORMATTER.apply(date);
+        String formattedDate = ISO_8601_FORMATTER.apply(date);
 
         assertThat(formattedDate, is("19700101"));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void nullDate() {
+        Date date = null;
 
-        DateConverter.ISO_8601_FORMATTER.apply(null);
+        String formattedDate = ISO_8601_FORMATTER.apply(date);
+
+        assertThat(formattedDate, is(""));
 
     }
 
