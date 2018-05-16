@@ -144,22 +144,6 @@ public class AnnotationToTSVTest {
     }
 
     @Test
-    public void nullGeneProductId() {
-        annotation.geneProductId = null;
-        String[] elements = annotationToElements(annotation);
-        assertThat(elements[DefaultColumns.COL_GENE_PRODUCT_DB], is(""));
-        assertThat(elements[DefaultColumns.COL_GENE_PRODUCT_ID], is(""));
-    }
-
-    @Test
-    public void emptyGeneProductId() {
-        annotation.geneProductId = "";
-        String[] elements = annotationToElements(annotation);
-        assertThat(elements[DefaultColumns.COL_GENE_PRODUCT_DB], is(""));
-        assertThat(elements[DefaultColumns.COL_GENE_PRODUCT_ID], is(""));
-    }
-
-    @Test
     public void nullSymbol() {
         annotation.symbol = null;
         String[] elements = annotationToElements(annotation);
