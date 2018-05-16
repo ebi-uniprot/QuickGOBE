@@ -16,4 +16,8 @@ public class Taxon {
                 .append(interactingTaxonId > MINIMUM_TAX_ID ? TAXON + interactingTaxonId : "");
         return taxonBuilder.toString();
     }
+
+    public static String taxonIdToString(int taxId) {
+        return taxId > MINIMUM_TAX_ID ? Integer.toString(taxId) : "";
+    }
 }
