@@ -27,6 +27,7 @@ import static uk.ac.ebi.quickgo.annotation.model.AnnotationMocker.FakeWithFromIt
 public class AnnotationMocker {
 
     //Common
+    private static final int NO_INTERACTING_TAXON_ID = 0;
     private static final String SLIMMED_FROM_GO_ID = "GO:0071840";
     private static final List<List<Supplier<Annotation.SimpleXRef>>> WITH_FROM =
             asList(singletonList(IPR_1), asList(IPR_2, IPR_3));
@@ -52,7 +53,6 @@ public class AnnotationMocker {
     public static final int TAXON_ID = 12345;
     public static final String TAXON_NAME = "Hipdedipdiflorous";
     public static final int INTERACTING_TAXON_ID = 54321;
-    public static final int NO_INTERACTING_TAXON_ID = 0;
     public static final String GO_ID = "GO:0003824";
     public static final String GO_NAME = "catalytic activity";
     public static final String DATE_AS_STRING = "20121002";
