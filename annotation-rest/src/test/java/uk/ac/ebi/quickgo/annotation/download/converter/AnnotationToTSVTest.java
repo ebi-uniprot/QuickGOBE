@@ -118,7 +118,7 @@ public class AnnotationToTSVTest {
     }
 
     @Test
-    public void outputForIndividualSelectedFieldsWithNoSlimming() throws Exception {
+    public void outputForIndividualSelectedFieldsWithNoSlimming() {
         for(String[] fieldName2Data : unSlimmedFieldNames2Data){
 
             String[] elements = annotationToElements(annotation, Collections.singletonList(fieldName2Data[0]));
