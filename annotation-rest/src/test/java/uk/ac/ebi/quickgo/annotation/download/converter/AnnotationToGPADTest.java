@@ -56,7 +56,7 @@ public class AnnotationToGPADTest {
         assertThat(elements[COL_REFERENCE], is(REFERENCE));
         assertThat(elements[COL_EVIDENCE], is(ECO_ID));
         assertThat(elements[COL_WITH], equalTo(WITH_FROM_AS_STRING));
-        assertThat(elements[COL_INTERACTING_DB], is(Integer.toString(INTERACTING_TAXON_ID)));
+        assertThat(elements[COL_INTERACTING_DB], is("taxon:" + Integer.toString(INTERACTING_TAXON_ID)));
         assertThat(elements[COL_DATE], equalTo(DATE_AS_STRING));
         assertThat(elements[COL_ASSIGNED_BY], equalTo(DB));
         assertThat(elements[COL_ANNOTATION_EXTENSION], is(EXTENSIONS_AS_STRING));
@@ -71,12 +71,12 @@ public class AnnotationToGPADTest {
         assertThat(elements[COL_GO_ID], is(slimmedToGoId));
     }
 
-    @Test
+    @Test(expected = NullPointerException.class)
     public void nullGeneProductId() {
         annotation.geneProductId = null;
-        String[] elements = annotationToElements(annotation);
-        assertThat(elements[COL_DB], is(""));
-        assertThat(elements[COL_DB_OBJECT_ID], is(""));
+        annotation.setGeneProduct(null);
+        annotationToElements(annotation);
+
     }
 
     @Test
@@ -132,7 +132,7 @@ public class AnnotationToGPADTest {
     public void lowestInteractingTaxonIdIsPopulatedCorrectly() {
         annotation.interactingTaxonId = 1;
         String[] elements = annotationToElements(annotation);
-        assertThat(elements[COL_INTERACTING_DB], is("1"));
+        assertThat(elements[COL_INTERACTING_DB], is("taxon:1"));
     }
 
     @Test

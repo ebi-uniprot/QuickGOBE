@@ -36,8 +36,8 @@ public class AnnotationMocker {
     public static final int TAXON_ID = 12345;
     public static final String TAXON_NAME = "Hipdedipdiflorous";
     public static final int INTERACTING_TAXON_ID = 54321;
-    public static final String DB = "IntAct";
-    public static final String ID = "EBI-10043081";
+    public static final String DB = "ComplexPortal";
+    public static final String ID = "CPX-1004";
     public static final String GO_ID = "GO:0003824";
     public static final String GO_NAME = "catalytic activity";
     public static final String DATE_AS_STRING = "20121002";
@@ -49,18 +49,22 @@ public class AnnotationMocker {
     private static final List<List<Supplier<Annotation.QualifiedXref>>> EXTENSIONS = asList(
             singletonList(OCCURS_IN_CL_1),
             asList(OCCURS_IN_CL_2, OCCURS_IN_CL_3));
-    private static final String GENE_PRODUCT_ID = "IntAct:EBI-10043081";
-    private static final String ASSIGNED_BY = "IntAct";
-    public static final String GO_ASPECT = "molecular_function";
+    private static final String GENE_PRODUCT_ID = "ComplexPortal:CPX-1004";
+    private static final String ASSIGNED_BY = "ComplexPortal";
+    public static final String GO_ASPECT = "cellular_component";
     private static final Date DATE = Date.from(
             LocalDate.of(2012, 10, 2).atStartOfDay(ZoneId.systemDefault()).toInstant());
-    public static final String SYNONYMS = "A0A000_9ACTN,moeA5";
+    public static final String SYNONYMS =
+            "DR1:KAT14:KAT2B:MBIP:SGF29:TADA2A:TADA3:WDR5:YEATS2:ZZZ3,ADA2A-containing complex,Ada2/PCAF/Ada3 " +
+                    "transcription activator complex,KAT2B-containing ATAC complex,ATAC complex,P-ATAC complex,Ada " +
+                    "two A containing complex";
     public static final String NAME = "MoeA5";
     public static final String TYPE = "complex";
 
     public static Annotation createValidAnnotation() {
         Annotation annotation = new Annotation();
         annotation.id = DB + ":" + ID;
+        annotation.setGeneProduct(GeneProduct.fromCurieId(annotation.id));
         annotation.extensions = connectedXrefs(EXTENSIONS);
         annotation.taxonId = TAXON_ID;
         annotation.goAspect = GO_ASPECT;     //todo is this populated

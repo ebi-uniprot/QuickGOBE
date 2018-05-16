@@ -20,7 +20,7 @@ import static uk.ac.ebi.quickgo.common.converter.HelpfulConverter.toCSV;
  */
 public class GeneProductSynonymsInjector extends AbstractValueInjector<BasicGeneProduct, Annotation> {
 
-    static final String GENE_PRODUCT_ID = "geneProductId";
+    static final String CANONICAL_ID = "canonicalId";
     static final String GENE_PRODUCT_SYNONYMS= "synonyms";
 
     @Override
@@ -30,9 +30,7 @@ public class GeneProductSynonymsInjector extends AbstractValueInjector<BasicGene
 
     @Override
     public FilterRequest buildFilterRequest(Annotation annotation) {
-        return FilterRequest.newBuilder()
-                            .addProperty(getId())
-                            .addProperty(GENE_PRODUCT_ID, annotation.geneProductId.split(":")[1])
+        return FilterRequest.newBuilder().addProperty(getId()).addProperty(CANONICAL_ID, annotation.canonicalId)
                             .build();
     }
 
