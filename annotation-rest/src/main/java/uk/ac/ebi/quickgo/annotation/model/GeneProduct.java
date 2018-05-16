@@ -57,8 +57,8 @@ public class GeneProduct {
         if (uniprotMatcher.matches()) {
             String db = "UniProtKB";
             String canonical = uniprotMatcher.group(UNIPROT_CANONICAL_GROUP_NUMBER);
-            String nonDb = uniprotMatcher.group(UNIPROT_NON_CANONICAL_GROUP_NUMBER);
-            String nonCanonical = canonical.equals(nonDb) ? null : nonDb;
+            String nonCanonicalPart = uniprotMatcher.group(UNIPROT_NON_CANONICAL_GROUP_NUMBER);
+            String nonCanonical = nonNull(nonCanonicalPart) ? canonical + nonCanonicalPart : null;
             return new GeneProduct(new GeneProductId(db, canonical, curieId, nonCanonical), PROTEIN);
         }
 
@@ -90,12 +90,24 @@ public class GeneProduct {
         return  geneProductId != null ? geneProductId.db : null;
     }
 
+    /**
+     * The curie form of the gene product id e.g. UniProtKB:Q4VCS5
+     * @return Db:id
+     */
     public String fullId() {
         return geneProductId != null ? geneProductId.fullId : null;
     }
 
     public String type() {
         return  geneProductType != null ? geneProductType.getName() : null;
+    }
+
+    /**
+     * Return non-canonical if populated, else canonical id
+     * @return gene product id used for the annotation
+     */
+    public String annotatedGeneProduct() {
+        return nonNull(nonCanonicalId()) ? nonCanonicalId() : canonicalId();
     }
 
     /**
