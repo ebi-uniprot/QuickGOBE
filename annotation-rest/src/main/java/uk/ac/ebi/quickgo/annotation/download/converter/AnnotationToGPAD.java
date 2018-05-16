@@ -49,8 +49,7 @@ public class AnnotationToGPAD implements BiFunction<Annotation, List<String>, Li
 
     private String toOutputRecord(Annotation annotation, String goId) {
         StringJoiner tsvJoiner = new StringJoiner(OUTPUT_DELIMITER);
-        return tsvJoiner.add(annotation.getGeneProduct().db())
-                .add(annotation.getGeneProduct().populatedGeneProductId())
+        return tsvJoiner.add(annotation.getGeneProduct().db()).add(annotation.getGeneProduct().annotatedGeneProduct())
                 .add(nullToEmptyString(annotation.qualifier))
                 .add(nullToEmptyString(goId))
                 .add(nullToEmptyString(annotation.reference))
