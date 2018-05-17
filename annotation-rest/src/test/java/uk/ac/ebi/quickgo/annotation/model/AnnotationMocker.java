@@ -26,6 +26,23 @@ import static uk.ac.ebi.quickgo.annotation.model.AnnotationMocker.FakeWithFromIt
  */
 public class AnnotationMocker {
 
+    //Common
+    private static final int NO_INTERACTING_TAXON_ID = 0;
+    private static final String SLIMMED_FROM_GO_ID = "GO:0071840";
+    private static final List<List<Supplier<Annotation.SimpleXRef>>> WITH_FROM =
+            asList(singletonList(IPR_1), asList(IPR_2, IPR_3));
+    private static final List<List<Supplier<Annotation.QualifiedXref>>> EXTENSIONS =
+            asList(singletonList(OCCURS_IN_CL_1), asList(OCCURS_IN_CL_2, OCCURS_IN_CL_3));
+    private static final Date DATE =
+            Date.from(LocalDate.of(2012, 10, 2).atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+    //Test specific
+    private static final String COMPLEX_PORTAL_PRODUCT_ID = "ComplexPortal:CPX-1004";
+    private static final String UNIPROT_PRODUCT_ID_WITH_ISOFORM = "UniProtKB:Q4VCS5-2";
+    private static final String UNIPROT_PRODUCT_ID_WITHOUT_ISOFORM = "UniProtKB:Q4VCS5";
+    private static final String RNA_CENTAL_PRODUCT_ID = "RNAcentral:URS00000064B1_559292";
+
+    //Common
     public static final String WITH_FROM_AS_STRING = IPR_1 + "|" + IPR_2 + "," + IPR_3;
     public static final String EXTENSIONS_AS_STRING = OCCURS_IN_CL_1 + "|" + OCCURS_IN_CL_2 + "," + OCCURS_IN_CL_3;
     public static final String SYMBOL = "atf4-creb1_mouse";
@@ -36,54 +53,93 @@ public class AnnotationMocker {
     public static final int TAXON_ID = 12345;
     public static final String TAXON_NAME = "Hipdedipdiflorous";
     public static final int INTERACTING_TAXON_ID = 54321;
-    public static final String DB = "ComplexPortal";
-    public static final String ID = "CPX-1004";
     public static final String GO_ID = "GO:0003824";
     public static final String GO_NAME = "catalytic activity";
     public static final String DATE_AS_STRING = "20121002";
-    private static final String SLIMMED_FROM_GO_ID = "GO:0071840";
     public static final List<String> SLIMMED_TO_IDS = Collections.singletonList(SLIMMED_FROM_GO_ID);
-    private static final String COMMA = ",";
-    private static final List<List<Supplier<Annotation.SimpleXRef>>> WITH_FROM = asList(
-            singletonList(IPR_1), asList(IPR_2, IPR_3));
-    private static final List<List<Supplier<Annotation.QualifiedXref>>> EXTENSIONS = asList(
-            singletonList(OCCURS_IN_CL_1),
-            asList(OCCURS_IN_CL_2, OCCURS_IN_CL_3));
-    private static final String GENE_PRODUCT_ID = "ComplexPortal:CPX-1004";
-    private static final String ASSIGNED_BY = "ComplexPortal";
     public static final String GO_ASPECT = "cellular_component";
-    private static final Date DATE = Date.from(
-            LocalDate.of(2012, 10, 2).atStartOfDay(ZoneId.systemDefault()).toInstant());
     public static final String SYNONYMS =
             "DR1:KAT14:KAT2B:MBIP:SGF29:TADA2A:TADA3:WDR5:YEATS2:ZZZ3,ADA2A-containing complex,Ada2/PCAF/Ada3 " +
                     "transcription activator complex,KAT2B-containing ATAC complex,ATAC complex,P-ATAC complex,Ada " +
                     "two A containing complex";
     public static final String NAME = "MoeA5";
     public static final String TYPE = "complex";
+    public static final String ASSIGNED_BY = "Dorna";
 
-    public static Annotation createValidAnnotation() {
+    //UniProtKB
+    public static final String DB_UNIPROTKB = "UniProtKB";
+    public static final String ID_UNIPROTKB_WITH_ISOFORM = "Q4VCS5-2";
+    public static final String ID_UNIPROTKB_WITHOUT_ISOFORM = "Q4VCS5";
+    public static final String ID_UNIPROTKB_CANONICAL = "Q4VCS5";
+
+    //ComplexPortal
+    public static final String DB_COMPLEX_PORTAL = "ComplexPortal";
+    public static final String ID_COMPLEX_PORTAL = "CPX-1004";
+
+    //RNACentral
+    public static final String DB_RNA_CENTRAL = "RNAcentral";
+    public static final String ID_RNA_CENTRAL = "URS00000064B1_559292";
+    //    String gpType = "miRNA";
+    //    annotation.id = String.format("%s:%s", db, gpId);
+    //        annotation.setGeneProduct(GeneProduct.fromCurieId(annotation.id));
+    //    annotation.geneProductId = String.format("%s:%s", db, gpId);
+    //    annotation.assignedBy = db;
+    //    annotation.symbol = gpId;
+
+    public static Annotation createValidComplexPortalAnnotation() {
         Annotation annotation = new Annotation();
-        annotation.id = DB + ":" + ID;
+        annotation.id = DB_COMPLEX_PORTAL + ":" + ID_COMPLEX_PORTAL;
         annotation.setGeneProduct(GeneProduct.fromCurieId(annotation.id));
+        annotation.geneProductId = COMPLEX_PORTAL_PRODUCT_ID;
+        populateCommon(annotation);
+        return annotation;
+    }
+
+    public static Annotation createValidUniProtAnnotationWithoutIsoForm() {
+        Annotation annotation = new Annotation();
+        annotation.id = DB_UNIPROTKB + ":" + ID_UNIPROTKB_WITHOUT_ISOFORM;
+        annotation.setGeneProduct(GeneProduct.fromCurieId(UNIPROT_PRODUCT_ID_WITHOUT_ISOFORM));
+        annotation.geneProductId = UNIPROT_PRODUCT_ID_WITHOUT_ISOFORM;
+        populateCommon(annotation);
+        return annotation;
+    }
+
+    public static Annotation createValidUniProtAnnotationWithIsoForm() {
+        Annotation annotation = new Annotation();
+        annotation.id = DB_UNIPROTKB + ":" + ID_UNIPROTKB_WITH_ISOFORM;
+        annotation.setGeneProduct(GeneProduct.fromCurieId(UNIPROT_PRODUCT_ID_WITH_ISOFORM));
+        annotation.geneProductId = UNIPROT_PRODUCT_ID_WITH_ISOFORM;
+        populateCommon(annotation);
+        return annotation;
+    }
+
+    public static Annotation createValidRNACentralAnnotation() {
+        Annotation annotation = new Annotation();
+        annotation.id = DB_RNA_CENTRAL + ":" + ID_RNA_CENTRAL;
+        annotation.setGeneProduct(GeneProduct.fromCurieId(RNA_CENTAL_PRODUCT_ID));
+        annotation.geneProductId = RNA_CENTAL_PRODUCT_ID;
+        populateCommon(annotation);
+        return annotation;
+    }
+
+    private static void populateCommon(Annotation annotation) {
         annotation.extensions = connectedXrefs(EXTENSIONS);
         annotation.taxonId = TAXON_ID;
-        annotation.goAspect = GO_ASPECT;     //todo is this populated
+        annotation.goAspect = GO_ASPECT;
         annotation.goEvidence = GO_EVIDENCE;
         annotation.assignedBy = ASSIGNED_BY;
         annotation.date = DATE;
         annotation.evidenceCode = ECO_ID;
-        annotation.geneProductId = GENE_PRODUCT_ID;
         annotation.qualifier = QUALIFIER;
         annotation.symbol = SYMBOL;
         annotation.reference = REFERENCE;
         annotation.withFrom = connectedXrefs(WITH_FROM);
         annotation.goId = GO_ID;
-        annotation.interactingTaxonId = INTERACTING_TAXON_ID;
+        annotation.interactingTaxonId = NO_INTERACTING_TAXON_ID;
         annotation.goName = GO_NAME;
         annotation.taxonName = TAXON_NAME;
         annotation.name = NAME;
         annotation.synonyms = SYNONYMS;
-        return annotation;
     }
 
     private static <T extends Annotation.AbstractXref> List<Annotation.ConnectedXRefs<T>> connectedXrefs(
