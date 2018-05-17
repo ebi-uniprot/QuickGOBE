@@ -14,7 +14,7 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.DateConverter.ISO_8601_FORMATTER;
 import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.Helper.nullToEmptyString;
-import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.Taxon.taxonIdToString;
+import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.Taxon.taxonIdToCurie;
 
 /**
  * Convert an Annotation to the GPAD format.
@@ -55,7 +55,7 @@ public class AnnotationToGPAD implements BiFunction<Annotation, List<String>, Li
                 .add(nullToEmptyString(annotation.reference))
                 .add(nullToEmptyString(annotation.evidenceCode))
                 .add(WithFrom.nullOrEmptyListToString(annotation.withFrom))
-                .add(taxonIdToString(annotation.interactingTaxonId))
+                .add(taxonIdToCurie(0, annotation.interactingTaxonId))
                 .add(ofNullable(annotation.date).map(ISO_8601_FORMATTER).orElse(""))
                 .add(nullToEmptyString(annotation.assignedBy))
                 .add(Extensions.asString(annotation.extensions))

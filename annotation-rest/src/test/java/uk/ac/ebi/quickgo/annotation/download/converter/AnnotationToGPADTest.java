@@ -171,7 +171,7 @@ public class AnnotationToGPADTest {
 
         String[] elements = annotationToDownloadColumns(annotation);
 
-        assertThat(elements[COL_INTERACTING_DB], is(Integer.toString(INTERACTING_TAXON_ID)));
+        assertThat(elements[COL_INTERACTING_DB], is(("taxon:" + INTERACTING_TAXON_ID)));
     }
 
     @Test
@@ -181,7 +181,7 @@ public class AnnotationToGPADTest {
 
         String[] elements = annotationToDownloadColumns(annotation);
 
-        assertThat(elements[COL_INTERACTING_DB], is("1"));
+        assertThat(elements[COL_INTERACTING_DB], is("taxon:1"));
     }
 
     @Test
