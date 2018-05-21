@@ -75,7 +75,7 @@
     <field name="symbol" type="string" indexed="false" stored="true" multiValued="false"/>
     <field name="date" type="tdate" indexed="false" stored="true" multiValued="false"/>
     <field name="evidenceCode" type="string" indexed="true" stored="true" multiValued="false" docValues="true"/>
-    <field name="extension" type="string" indexed="false" stored="true" multiValued="true"/>
+    <field name="extension" type="string" indexed="false" stored="true" multiValued="false"/>
     <field name="geneProductId" type="string" indexed="true" stored="true" multiValued="false" docValues="true"/>
     <field name="geneProductType" type="string" indexed="true" stored="false" multiValued="false"/>
     <field name="geneProductSubset" type="string" indexed="true" stored="false" multiValued="false"/>
@@ -135,6 +135,9 @@
     <field name="taxonAncestors_unsorted" type="int" indexed="true" stored="false" multiValued="true"/>
     <copyField source="taxonAncestors" dest="taxonAncestors_unsorted"/>
 
+    <field name="extension_unsorted" type="lowercase" indexed="true" stored="false" multiValued="false"/>
+    <copyField source="extension" dest="extension_unsorted"/>
+
     <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
     <!-- Fields that are used specifically for search -->
     <field name="reference_search" type="reference_ignorecase" indexed="true" stored="false" multiValued="false"/>
@@ -148,9 +151,6 @@
 
     <field name="goAspect_search" type="lowercase" indexed="true" stored="false" multiValued="false"/>
     <copyField source="goAspect" dest="goAspect_search"/>
-
-    <field name="extension_search" type="extension_ignorecase" indexed="true" stored="false" multiValued="true"/>
-    <copyField source="extension" dest="extension_search"/>
 
     <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
     <!-- Fields that are used specifically for Ordering -->
