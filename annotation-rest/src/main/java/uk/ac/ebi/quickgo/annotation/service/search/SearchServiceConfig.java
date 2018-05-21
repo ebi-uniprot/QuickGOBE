@@ -76,7 +76,7 @@ public class SearchServiceConfig {
     private static final String DEFAULT_UNSORTED_QUERY_FIELDS =
             "assignedBy_unsorted,dbSubset_unsorted,evidenceCode_unsorted,goEvidence_unsorted," +
                     "goId_unsorted,geneProductId_unsorted,geneProductType_unsorted," +
-                    "qualifier_unsorted,targetSet_unsorted,taxonId_unsorted";
+                    "qualifier_unsorted,targetSet_unsorted,taxonId_unsorted,extension_unsorted";
     private static final String DEFAULT_ANNOTATION_SEARCH_RETURN_FIELDS =
             "id,geneProductId,qualifier,goId,goEvidence," +
                     "evidenceCode,reference,withFrom,taxonId,assignedBy,extension,symbol,geneProductId," +
