@@ -8,7 +8,10 @@ import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import org.slf4j.Logger;
@@ -54,7 +57,7 @@ class AnnotationDocumentConverter implements ItemProcessor<Annotation, Annotatio
         doc.reference = annotation.dbReferences;
         doc.assignedBy = annotation.assignedBy;
         doc.evidenceCode = annotation.evidenceCode;
-        doc.extensions = constructExtensions(annotation);
+        doc.extensions = annotation.annotationExtension;
 
         doc.withFrom = constructWithFrom(annotation);
         doc.interactingTaxonId = extractInteractingTaxonId(annotation);
@@ -130,9 +133,9 @@ class AnnotationDocumentConverter implements ItemProcessor<Annotation, Annotatio
         return value == null ? null : splitValueToIntegerList(value, delimiter);
     }
 
-    private List<String> constructExtensions(Annotation annotation) {
-        return createNullableStringListFromDelimitedValues(annotation.annotationExtension, PIPE);
-    }
+    //    private List<String> constructExtensions(Annotation annotation) {
+    //        return createNullableStringListFromDelimitedValues(annotation.annotationExtension, PIPE);
+    //    }
 
     private List<String> constructWithFrom(Annotation annotation) {
         return createNullableStringListFromDelimitedValues(annotation.with, PIPE);
