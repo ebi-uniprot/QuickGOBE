@@ -253,7 +253,7 @@ public class AnnotationDocumentConverterTest {
 
         AnnotationDocument doc = converter.process(annotation);
 
-        assertThat(doc.extensions, containsInAnyOrder("x,y", "z"));
+        assertThat(doc.extensions, is(annotation.annotationExtension));
     }
 
     // annotation properties: target sets
