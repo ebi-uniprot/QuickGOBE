@@ -4,11 +4,15 @@ import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.model.GeneProduct;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * Converter the persisted version of the Annotation to our model of the Annotation
@@ -21,6 +25,7 @@ public class AnnotationDocConverterImpl implements AnnotationDocConverter {
 
     private static final String COMMA = ",";
     private static final String COLON = ":";
+    private static final String PIPE = "|";
 
     @Override public Annotation convert(AnnotationDocument annotationDocument) {
         Annotation annotation = new Annotation();
@@ -72,11 +77,12 @@ public class AnnotationDocConverterImpl implements AnnotationDocConverter {
         }
     }
 
-    private List<Annotation.ConnectedXRefs<Annotation.QualifiedXref>> asExtensionsXRefList(
-            List<String> csvs,
-            Function<String, Annotation.QualifiedXref> xrefCreator) {
-        if (csvs != null && !csvs.isEmpty()) {
-
+    private List<Annotation.ConnectedXRefs<Annotation.QualifiedXref>> asExtensionsXRefList(String extension,
+                                                                                           Function<String,
+                                                                                                   Annotation
+                                                                                                           .QualifiedXref> xrefCreator) {
+        if (extension != null && !extension.isEmpty()) {
+            List<String> csvs = constructExtensions(extension);
             return csvs.stream()
                        .map(xrefs -> createConnectedXRefs(xrefCreator, xrefs))
                        .collect(Collectors.toList());
@@ -133,5 +139,25 @@ public class AnnotationDocConverterImpl implements AnnotationDocConverter {
         }
 
         return new String[]{database, signature};
+    }
+
+    private List<String> constructExtensions(String extension) {
+        return createNullableStringListFromDelimitedValues(extension, PIPE);
+    }
+
+    private List<String> createNullableStringListFromDelimitedValues(String value, String delimiter) {
+        return value == null ? null : Arrays.asList(splitValue(value, delimiter));
+    }
+
+    /**
+     * Splits a {@link String} value on occurrences of a {@link String} delimiter.
+     * @param value the value to split
+     * @param delimiter the delimiter on which splitting takes place
+     * @return an array of {@link String} values
+     */
+    private static String[] splitValue(String value, String delimiter) {
+        checkArgument(delimiter != null, "Delimiter cannot be null");
+
+        return Optional.ofNullable(value).filter(v -> !v.isEmpty()).map(v -> v.split(delimiter)).orElse(new String[0]);
     }
 }
