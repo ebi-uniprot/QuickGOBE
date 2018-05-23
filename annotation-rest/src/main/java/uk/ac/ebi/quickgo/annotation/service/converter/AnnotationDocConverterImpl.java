@@ -4,13 +4,13 @@ import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.model.GeneProduct;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
@@ -23,9 +23,12 @@ import static com.google.common.base.Preconditions.checkArgument;
  */
 public class AnnotationDocConverterImpl implements AnnotationDocConverter {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(AnnotationDocConverterImpl.class);
+
     private static final String COMMA = ",";
     private static final String COLON = ":";
-    private static final String PIPE = "|";
+    private static final String PIPE = "[|]";
+    private static Predicate<String> notPopulated = String::isEmpty;
 
     @Override public Annotation convert(AnnotationDocument annotationDocument) {
         Annotation annotation = new Annotation();
@@ -83,7 +86,7 @@ public class AnnotationDocConverterImpl implements AnnotationDocConverter {
                                                                                                            .QualifiedXref> xrefCreator) {
         if (extension != null && !extension.isEmpty()) {
             List<String> csvs = constructExtensions(extension);
-            return csvs.stream()
+            return csvs.stream().filter(Objects::nonNull).filter(notPopulated.negate())
                        .map(xrefs -> createConnectedXRefs(xrefCreator, xrefs))
                        .collect(Collectors.toList());
         } else {
@@ -97,7 +100,7 @@ public class AnnotationDocConverterImpl implements AnnotationDocConverter {
         Annotation.ConnectedXRefs<T> connectedXRefs = new Annotation.ConnectedXRefs<>();
 
         streamCSV(xrefs)
-                .map(xrefCreator)
+                .map(xrefCreator).peek(System.out::println)
                 .forEach(connectedXRefs::addXref);
 
         return connectedXRefs;
@@ -119,6 +122,7 @@ public class AnnotationDocConverterImpl implements AnnotationDocConverter {
     }
 
     private String extractContentsWithinParenthesis(String unformattedXref) {
+        LOGGER.info("extractContentsWithinParenthesis" + unformattedXref);
         return unformattedXref.substring(unformattedXref.indexOf("(") + 1, unformattedXref.indexOf(")"));
     }
 

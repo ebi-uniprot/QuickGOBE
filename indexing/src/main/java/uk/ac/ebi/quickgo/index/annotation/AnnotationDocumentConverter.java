@@ -41,7 +41,8 @@ class AnnotationDocumentConverter implements ItemProcessor<Annotation, Annotatio
         this.dateTimeFormatter = DateTimeFormatter.ofPattern(ANNOTATION_DATE_FORMAT);
     }
 
-    @Override public AnnotationDocument process(Annotation annotation) throws Exception {
+    @Override
+    public AnnotationDocument process(Annotation annotation) {
         if (annotation == null) {
             throw new DocumentReaderException("Annotation object is null");
         }
@@ -58,10 +59,8 @@ class AnnotationDocumentConverter implements ItemProcessor<Annotation, Annotatio
         doc.assignedBy = annotation.assignedBy;
         doc.evidenceCode = annotation.evidenceCode;
         doc.extensions = annotation.annotationExtension;
-
         doc.withFrom = constructWithFrom(annotation);
         doc.interactingTaxonId = extractInteractingTaxonId(annotation);
-
         doc.goEvidence = propertiesMap.get(GO_EVIDENCE);
         doc.geneProductSubset = propertiesMap.get(DB_OBJECT_SUBSET);
         doc.symbol = propertiesMap.get(DB_OBJECT_SYMBOL);
@@ -132,10 +131,6 @@ class AnnotationDocumentConverter implements ItemProcessor<Annotation, Annotatio
     private List<Integer> createNullableIntegerListFromDelimitedValues(String value, String delimiter) {
         return value == null ? null : splitValueToIntegerList(value, delimiter);
     }
-
-    //    private List<String> constructExtensions(Annotation annotation) {
-    //        return createNullableStringListFromDelimitedValues(annotation.annotationExtension, PIPE);
-    //    }
 
     private List<String> constructWithFrom(Annotation annotation) {
         return createNullableStringListFromDelimitedValues(annotation.with, PIPE);

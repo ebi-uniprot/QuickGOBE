@@ -50,9 +50,10 @@ public class AnnotationDocConverterImplTest {
     private static final List<List<Supplier<Annotation.SimpleXRef>>> WITH_FROM = asList(
             singletonList(GO_1), asList(GO_2, GO_3));
     private static final String ASSIGNED_BY = "InterPro";
-    private static final List<List<Supplier<Annotation.QualifiedXref>>> EXTENSIONS = asList(
+    private static final List<List<Supplier<Annotation.QualifiedXref>>> EXTENSIONS_CONVERTED = asList(
             singletonList(OCCURS_IN_CL_1),
             asList(OCCURS_IN_CL_2, OCCURS_IN_CL_3));
+    private static final String EXTENSIONS = OCCURS_IN_CL_1 + "|" + OCCURS_IN_CL_2 + "," + OCCURS_IN_CL_3;
     private static final List<String> TARGET_SETS = asList("KRUK", "BHF-UCL", "Exosome");
     private static final String SYMBOL = "moeA5";
     private static final String GO_ASPECT = "cellular_component";
@@ -116,7 +117,10 @@ public class AnnotationDocConverterImplTest {
 
     @Test
     public void convertExtensionSuccessfully() {
-        assertThat(model.extensions, is(connectedXrefs(EXTENSIONS)));
+        List<Annotation.ConnectedXRefs<Annotation.QualifiedXref>> convertedExtensions =
+                connectedXrefs(EXTENSIONS_CONVERTED);
+
+        assertThat(model.extensions, is(convertedExtensions));
     }
 
     @Test
@@ -188,12 +192,15 @@ public class AnnotationDocConverterImplTest {
 
     private static <T extends Annotation.AbstractXref> List<Annotation.ConnectedXRefs<T>> connectedXrefs(
             List<List<Supplier<T>>> items) {
-        return items.stream().map(itemList -> {
-                    Annotation.ConnectedXRefs<T> xrefs = new Annotation.ConnectedXRefs<>();
-                    itemList.stream().map(Supplier::get).forEach(xrefs::addXref);
-                    return xrefs;
-                }
-        ).collect(Collectors.toList());
+        return items.stream().map(itemList -> toConnectedXRefs(itemList)).collect(Collectors.toList());
+    }
+
+    private static <T extends Annotation.AbstractXref> Annotation.ConnectedXRefs<T> toConnectedXRefs
+            (List<Supplier<T>> itemList) {
+        Annotation.ConnectedXRefs<T> xrefs = new Annotation.ConnectedXRefs<>();
+        itemList.stream().map(Supplier::get).forEach(xrefs::addXref);
+
+        return xrefs;
     }
 
     private static <T extends Annotation.AbstractXref> List<String> stringsForConnectedXrefs(
@@ -215,7 +222,8 @@ public class AnnotationDocConverterImplTest {
         doc.evidenceCode = ECO_ID;
         doc.withFrom = stringsForConnectedXrefs(WITH_FROM);
         doc.assignedBy = ASSIGNED_BY;
-        doc.extensions = stringsForConnectedXrefs(EXTENSIONS);
+        //        doc.extensions = stringsForConnectedXrefs(EXTENSIONS);
+        doc.extensions = EXTENSIONS;
         doc.targetSets = TARGET_SETS;
         doc.symbol = SYMBOL;
         doc.goAspect = GO_ASPECT;

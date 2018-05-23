@@ -11,6 +11,7 @@ import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformationReq
 
 import io.swagger.annotations.ApiModelProperty;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -503,18 +504,19 @@ public class AnnotationRequest {
     }
 
     /**
-     * A list of extension relationship values, separated by commas
-     * In the format extension=occurs_in(PomBase:SPBP23A10.14c),RGD:621207 etc
-     * Users can supply just the database (e.g. PomBase) or id SPBP23A10.14c
+     * A single annotation extension value - commas represent part of the extension, and are not to be used as
+     * delimiters between values.
+     * In the format extension=occurs_in(PomBase:SPBP23A10.14c),RGD:621207
      */
     public void setExtension(String... extension) {
-        filterMap.put(Searchable.EXTENSION, extension);
+        String singleExtension = Arrays.stream(extension).collect(Collectors.joining(","));
+        filterMap.put(Searchable.EXTENSION, new String[]{singleExtension});
     }
 
     /**
-     * Return a list of annotation extension values, separated by commas
+     * Return an AnnotationExtensionValue
      *
-     * @return String array containing comma separated list of extension values.
+     * @return Extension value.
      */
     public String[] getExtension() {
         return filterMap.get(Searchable.EXTENSION);
