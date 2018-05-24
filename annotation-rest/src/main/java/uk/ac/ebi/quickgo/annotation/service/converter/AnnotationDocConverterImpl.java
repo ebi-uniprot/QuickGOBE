@@ -99,8 +99,7 @@ public class AnnotationDocConverterImpl implements AnnotationDocConverter {
             String xrefs) {
         Annotation.ConnectedXRefs<T> connectedXRefs = new Annotation.ConnectedXRefs<>();
 
-        streamCSV(xrefs)
-                .map(xrefCreator).peek(System.out::println)
+        streamCSV(xrefs).map(xrefCreator)
                 .forEach(connectedXRefs::addXref);
 
         return connectedXRefs;
