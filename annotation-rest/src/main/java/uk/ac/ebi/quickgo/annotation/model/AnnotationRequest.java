@@ -514,7 +514,7 @@ public class AnnotationRequest {
     }
 
     /**
-     * Return an AnnotationExtensionValue
+     * Return an AnnotationExtension value
      *
      * @return Extension value.
      */
