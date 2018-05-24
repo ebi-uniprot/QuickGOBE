@@ -37,12 +37,12 @@ public class AnnotationDocumentConverterTest {
     }
 
     @Test(expected = DocumentReaderException.class)
-    public void nullAnnotationThrowsException() throws Exception {
+    public void nullAnnotationThrowsException() {
         converter.process(null);
     }
 
     @Test
-    public void convertsDirectlyTranslatableFieldsInAnnotation() throws Exception {
+    public void convertsDirectlyTranslatableFieldsInAnnotation() {
         annotation.db = "IntAct";
         annotation.dbObjectId = "EBI-10043081";
         annotation.dbReferences = "PMID:12871976";
@@ -73,7 +73,7 @@ public class AnnotationDocumentConverterTest {
 
     // interacting taxon
     @Test
-    public void convertsEmptyInteractingTaxonToDefaultTaxon() throws Exception {
+    public void convertsEmptyInteractingTaxonToDefaultTaxon() {
         annotation.interactingTaxonId = null;
 
         AnnotationDocument doc = converter.process(annotation);
@@ -82,7 +82,7 @@ public class AnnotationDocumentConverterTest {
     }
 
     @Test
-    public void convertsValidNonEmptyInteractingTaxon() throws Exception {
+    public void convertsValidNonEmptyInteractingTaxon() {
         annotation.interactingTaxonId = "taxon:12345";
 
         AnnotationDocument doc = converter.process(annotation);
@@ -91,7 +91,7 @@ public class AnnotationDocumentConverterTest {
     }
 
     @Test
-    public void convertsInvalidNonEmptyInteractingTaxon() throws Exception {
+    public void convertsInvalidNonEmptyInteractingTaxon() {
         annotation.interactingTaxonId = "taxon:12345d";
 
         AnnotationDocument doc = converter.process(annotation);
@@ -101,7 +101,7 @@ public class AnnotationDocumentConverterTest {
 
     // with
     @Test
-    public void convertsEmptyWithToNullValue() throws Exception {
+    public void convertsEmptyWithToNullValue() {
         annotation.with = null;
 
         AnnotationDocument doc = converter.process(annotation);
@@ -110,7 +110,7 @@ public class AnnotationDocumentConverterTest {
     }
 
     @Test
-    public void convertsSingleValuedWithToListOfSize1() throws Exception {
+    public void convertsSingleValuedWithToListOfSize1() {
         annotation.with = "GO:0036376";
 
         AnnotationDocument doc = converter.process(annotation);
@@ -119,7 +119,7 @@ public class AnnotationDocumentConverterTest {
     }
 
     @Test
-    public void convertsMultiValuedWithToCorrectListOfSize2() throws Exception {
+    public void convertsMultiValuedWithToCorrectListOfSize2() {
         annotation.with = "GO:0036376|GO:0036377";
 
         AnnotationDocument doc = converter.process(annotation);
@@ -129,7 +129,7 @@ public class AnnotationDocumentConverterTest {
 
     // annotation properties: go evidence
     @Test
-    public void convertsNullGOEvidenceAnnotationPropertiesToNullValue() throws Exception {
+    public void convertsNullGOEvidenceAnnotationPropertiesToNullValue() {
         annotation.annotationProperties = null;
 
         AnnotationDocument doc = converter.process(annotation);
@@ -138,7 +138,7 @@ public class AnnotationDocumentConverterTest {
     }
 
     @Test
-    public void convertsGOEvidenceAnnotationProperties() throws Exception {
+    public void convertsGOEvidenceAnnotationProperties() {
         String evidence = "FIND_ME";
         annotation.annotationProperties = buildKeyValuesPair(GO_EVIDENCE, evidence);
 
@@ -149,7 +149,7 @@ public class AnnotationDocumentConverterTest {
 
     // annotation properties: taxon id
     @Test
-    public void convertsNullTaxonIdAnnotationPropertiesToDefaultTaxon() throws Exception {
+    public void convertsNullTaxonIdAnnotationPropertiesToDefaultTaxon() {
         annotation.annotationProperties = null;
 
         AnnotationDocument doc = converter.process(annotation);
@@ -158,7 +158,7 @@ public class AnnotationDocumentConverterTest {
     }
 
     @Test
-    public void convertsTaxonIdAnnotationProperties() throws Exception {
+    public void convertsTaxonIdAnnotationProperties() {
         int taxon = 12345;
         annotation.annotationProperties = buildKeyValuesPair(TAXON_ID, String.valueOf(taxon));
 
@@ -168,7 +168,7 @@ public class AnnotationDocumentConverterTest {
     }
 
     @Test
-    public void convertsInvalidTaxonIdAnnotationPropertiesToDefaultTaxon() throws Exception {
+    public void convertsInvalidTaxonIdAnnotationPropertiesToDefaultTaxon() {
         String taxon = "12345a";
         annotation.annotationProperties = buildKeyValuesPair(TAXON_ID, taxon);
 
@@ -179,7 +179,7 @@ public class AnnotationDocumentConverterTest {
 
     // annotation properties: db object type
     @Test
-    public void convertsNullDbObjectTypeAnnotationPropertiesToNullValue() throws Exception {
+    public void convertsNullDbObjectTypeAnnotationPropertiesToNullValue() {
         annotation.annotationProperties = null;
 
         AnnotationDocument doc = converter.process(annotation);
@@ -188,7 +188,7 @@ public class AnnotationDocumentConverterTest {
     }
 
     @Test
-    public void convertsDbObjectTypeAnnotationProperties() throws Exception {
+    public void convertsDbObjectTypeAnnotationProperties() {
         String value = "FINDME";
         annotation.annotationProperties = buildKeyValuesPair(DB_OBJECT_TYPE, value);
 
@@ -199,7 +199,7 @@ public class AnnotationDocumentConverterTest {
 
     // annotation properties: db object symbol
     @Test
-    public void convertsNullDbObjectSymbolAnnotationPropertiesToNullValue() throws Exception {
+    public void convertsNullDbObjectSymbolAnnotationPropertiesToNullValue() {
         annotation.annotationProperties = null;
 
         AnnotationDocument doc = converter.process(annotation);
@@ -208,7 +208,7 @@ public class AnnotationDocumentConverterTest {
     }
 
     @Test
-    public void convertsDbObjectSymbolAnnotationProperties() throws Exception {
+    public void convertsDbObjectSymbolAnnotationProperties() {
         String value = "FINDME";
         annotation.annotationProperties = buildKeyValuesPair(DB_OBJECT_SYMBOL, value);
 
@@ -219,7 +219,7 @@ public class AnnotationDocumentConverterTest {
 
     // annotation properties: db subset
     @Test
-    public void convertsNullDbSubsetAnnotationPropertiesToNullValue() throws Exception {
+    public void convertsNullDbSubsetAnnotationPropertiesToNullValue() {
         annotation.annotationProperties = null;
 
         AnnotationDocument doc = converter.process(annotation);
@@ -228,7 +228,7 @@ public class AnnotationDocumentConverterTest {
     }
 
     @Test
-    public void convertsDbSubsetAnnotationProperties() throws Exception {
+    public void convertsDbSubsetAnnotationProperties() {
         String value = "FINDME";
         annotation.annotationProperties = buildKeyValuesPair(DB_OBJECT_SUBSET, value);
 
@@ -239,7 +239,7 @@ public class AnnotationDocumentConverterTest {
 
     // annotation extensions
     @Test
-    public void convertsNullAnnotationExtensionToNullValue() throws Exception {
+    public void convertsNullAnnotationExtensionToNullValue() {
         annotation.annotationExtension = null;
 
         AnnotationDocument doc = converter.process(annotation);
@@ -248,17 +248,18 @@ public class AnnotationDocumentConverterTest {
     }
 
     @Test
-    public void convertsAnnotationExtensionsToRawExtension() throws Exception {
-        annotation.annotationExtension = "x,y|z";
+    public void convertsAnnotationExtensionsToRawExtension() {
+        String annotationExtension = "x,y|z";
+        annotation.annotationExtension = annotationExtension;
 
         AnnotationDocument doc = converter.process(annotation);
 
-        assertThat(doc.extensions, is(annotation.annotationExtension));
+        assertThat(doc.extensions, is(annotationExtension));
     }
 
     // annotation properties: target sets
     @Test
-    public void convertsEmptyTargetSetToNullValue() throws Exception {
+    public void convertsEmptyTargetSetToNullValue() {
         annotation.annotationProperties = mergeKeyValuesPairs(
                 buildKeyValuesPair(DB_OBJECT_TYPE, "protein"),
                 buildKeyValuesPair(DB_OBJECT_SYMBOL, "moeA5"));
@@ -269,7 +270,7 @@ public class AnnotationDocumentConverterTest {
 
     // annotation properties: go aspect
     @Test
-    public void convertsNullGoAspectAnnotationPropertiesToNullValue() throws Exception {
+    public void convertsNullGoAspectAnnotationPropertiesToNullValue() {
         annotation.annotationProperties = null;
 
         AnnotationDocument doc = converter.process(annotation);
@@ -278,7 +279,7 @@ public class AnnotationDocumentConverterTest {
     }
 
     @Test
-    public void convertsGoAspectAnnotationProperties() throws Exception {
+    public void convertsGoAspectAnnotationProperties() {
         String value = "cellular_component";
         annotation.annotationProperties = buildKeyValuesPair(GO_ASPECT, value);
 
@@ -289,7 +290,7 @@ public class AnnotationDocumentConverterTest {
 
     // annotation properties: taxon ancestors
     @Test
-    public void convertsNullAnnotationPropertiesToDefaultTaxonAncestorsList() throws Exception {
+    public void convertsNullAnnotationPropertiesToDefaultTaxonAncestorsList() {
         annotation.annotationProperties = null;
 
         AnnotationDocument doc = converter.process(annotation);
@@ -298,7 +299,7 @@ public class AnnotationDocumentConverterTest {
     }
 
     @Test
-    public void convertsNullTaxonAncestorsAnnotationPropertiesToDefaultTaxonAncestorsList() throws Exception {
+    public void convertsNullTaxonAncestorsAnnotationPropertiesToDefaultTaxonAncestorsList() {
         String value = null;
         annotation.annotationProperties = buildKeyValuesPair(TAXON_ANCESTORS, value);
 
@@ -308,7 +309,7 @@ public class AnnotationDocumentConverterTest {
     }
 
     @Test
-    public void convertsEmptyTaxonAncestorsAnnotationPropertiesToDefaultTaxonAncestorsList() throws Exception {
+    public void convertsEmptyTaxonAncestorsAnnotationPropertiesToDefaultTaxonAncestorsList() {
         String value = "";
         annotation.annotationProperties = buildKeyValuesPair(TAXON_ANCESTORS, value);
 
@@ -318,7 +319,7 @@ public class AnnotationDocumentConverterTest {
     }
 
     @Test
-    public void convertsInvalidTaxonAncestorsAnnotationPropertiesToDefaultTaxonAncestorsList() throws Exception {
+    public void convertsInvalidTaxonAncestorsAnnotationPropertiesToDefaultTaxonAncestorsList() {
         String value = "1234d";
         annotation.annotationProperties = buildKeyValuesPair(TAXON_ANCESTORS, value);
 
@@ -328,7 +329,7 @@ public class AnnotationDocumentConverterTest {
     }
 
     @Test
-    public void convertsSingleTaxonAncestorsAnnotationProperties() throws Exception {
+    public void convertsSingleTaxonAncestorsAnnotationProperties() {
         String value = "1234";
         annotation.annotationProperties = buildKeyValuesPair(TAXON_ANCESTORS, value);
 
@@ -338,7 +339,7 @@ public class AnnotationDocumentConverterTest {
     }
 
     @Test
-    public void convertsMultipleTaxonAncestorsAnnotationProperties() throws Exception {
+    public void convertsMultipleTaxonAncestorsAnnotationProperties() {
         String taxon1 = "1234";
         String taxon2 = "55";
         String value = taxon1 + "," + taxon2;
@@ -351,7 +352,7 @@ public class AnnotationDocumentConverterTest {
 
     // date
     @Test
-    public void convertsValidDateSuccessfully() throws Exception {
+    public void convertsValidDateSuccessfully() {
         annotation.date = "20150122";
         LocalDate expectedLocalDate = LocalDate.of(2015, 1, 22);
         Date expectedDate = Date.from(expectedLocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
@@ -362,7 +363,7 @@ public class AnnotationDocumentConverterTest {
     }
 
     @Test
-    public void convertsInvalidDateToNull() throws Exception {
+    public void convertsInvalidDateToNull() {
         annotation.date = "3dd333stopAskingMeForADate320150122";
 
         AnnotationDocument doc = converter.process(annotation);
@@ -371,7 +372,7 @@ public class AnnotationDocumentConverterTest {
     }
 
     @Test
-    public void convertsEmptyDateToNull() throws Exception {
+    public void convertsEmptyDateToNull() {
         annotation.date = "";
 
         AnnotationDocument doc = converter.process(annotation);
@@ -380,7 +381,7 @@ public class AnnotationDocumentConverterTest {
     }
 
     @Test
-    public void convertsSpaceFilledDateToNull() throws Exception {
+    public void convertsSpaceFilledDateToNull() {
         annotation.date = "    ";
 
         AnnotationDocument doc = converter.process(annotation);
@@ -389,7 +390,7 @@ public class AnnotationDocumentConverterTest {
     }
 
     @Test
-    public void convertsNullDateToNull() throws Exception {
+    public void convertsNullDateToNull() {
         annotation.date = null;
 
         AnnotationDocument doc = converter.process(annotation);
