@@ -203,15 +203,11 @@ public class AnnotationDocConverterImplTest {
 
     private static <T extends Annotation.AbstractXref> List<Annotation.ConnectedXRefs<T>> connectedXrefs(
             List<List<Supplier<T>>> items) {
-        return items.stream().map(itemList -> toConnectedXRefs(itemList)).collect(Collectors.toList());
-    }
-
-    private static <T extends Annotation.AbstractXref> Annotation.ConnectedXRefs<T> toConnectedXRefs
-            (List<Supplier<T>> itemList) {
-        Annotation.ConnectedXRefs<T> xrefs = new Annotation.ConnectedXRefs<>();
-        itemList.stream().map(Supplier::get).forEach(xrefs::addXref);
-
-        return xrefs;
+        return items.stream().map(itemList -> {
+            Annotation.ConnectedXRefs<T> xrefs = new Annotation.ConnectedXRefs<>();
+            itemList.stream().map(Supplier::get).forEach(xrefs::addXref);
+            return xrefs;
+        }).collect(Collectors.toList());
     }
 
     private static <T extends Annotation.AbstractXref> List<String> stringsForConnectedXrefs(
@@ -233,7 +229,6 @@ public class AnnotationDocConverterImplTest {
         doc.evidenceCode = ECO_ID;
         doc.withFrom = stringsForConnectedXrefs(WITH_FROM);
         doc.assignedBy = ASSIGNED_BY;
-        //        doc.extensions = stringsForConnectedXrefs(EXTENSIONS);
         doc.extensions = EXTENSIONS;
         doc.targetSets = TARGET_SETS;
         doc.symbol = SYMBOL;
