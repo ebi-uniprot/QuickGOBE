@@ -71,7 +71,7 @@ public class AnnotationDocConverterImplTest {
     private static final AnnotationDocument DOCUMENT = createStubDocument();
 
     //Instance to be tested
-    private AnnotationDocConverter docConverter = new AnnotationDocConverterImpl();
+    private final AnnotationDocConverter docConverter = new AnnotationDocConverterImpl();
 
     //Output model
     private Annotation model;
