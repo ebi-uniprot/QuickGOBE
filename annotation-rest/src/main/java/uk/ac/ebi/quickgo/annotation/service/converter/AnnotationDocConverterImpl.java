@@ -125,11 +125,11 @@ public class AnnotationDocConverterImpl implements AnnotationDocConverter {
     }
 
     private String extractQualifier(String unformattedXref) {
-        return unformattedXref.substring(0, unformattedXref.indexOf("("));
+        return unformattedXref.substring(0, unformattedXref.indexOf('('));
     }
 
     private String extractContentsWithinParenthesis(String unformattedXref) {
-        return unformattedXref.substring(unformattedXref.indexOf("(") + 1, unformattedXref.indexOf(")"));
+        return unformattedXref.substring(unformattedXref.indexOf('(') + 1, unformattedXref.indexOf(')'));
     }
 
     private String[] extractDBAndSignature(String xref) {
