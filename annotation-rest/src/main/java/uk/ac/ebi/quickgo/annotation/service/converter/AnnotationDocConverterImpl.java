@@ -2,17 +2,17 @@ package uk.ac.ebi.quickgo.annotation.service.converter;
 
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
+import uk.ac.ebi.quickgo.annotation.model.Annotation.AbstractXref;
+import uk.ac.ebi.quickgo.annotation.model.Annotation.ConnectedXRefs;
 import uk.ac.ebi.quickgo.annotation.model.GeneProduct;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * Converter the persisted version of the Annotation to our model of the Annotation
@@ -23,14 +23,13 @@ import static com.google.common.base.Preconditions.checkArgument;
  */
 public class AnnotationDocConverterImpl implements AnnotationDocConverter {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AnnotationDocConverterImpl.class);
-
     private static final String COMMA = ",";
     private static final String COLON = ":";
     private static final String PIPE = "[|]";
-    private static Predicate<String> notPopulated = String::isEmpty;
+    private static Predicate<String> empty = String::isEmpty;
 
-    @Override public Annotation convert(AnnotationDocument annotationDocument) {
+    @Override
+    public Annotation convert(AnnotationDocument annotationDocument) {
         Annotation annotation = new Annotation();
         annotation.id = annotationDocument.id;
         annotation.geneProductId = annotationDocument.geneProductId;
@@ -67,7 +66,7 @@ public class AnnotationDocConverterImpl implements AnnotationDocConverter {
         return unmodifiableList;
     }
 
-    private List<Annotation.ConnectedXRefs<Annotation.SimpleXRef>> asWithFromXRefList(
+    private List<ConnectedXRefs<Annotation.SimpleXRef>> asWithFromXRefList(
             List<String> csvs,
             Function<String, Annotation.SimpleXRef> xrefCreator) {
         if (csvs != null && !csvs.isEmpty()) {
@@ -80,26 +79,35 @@ public class AnnotationDocConverterImpl implements AnnotationDocConverter {
         }
     }
 
-    private List<Annotation.ConnectedXRefs<Annotation.QualifiedXref>> asExtensionsXRefList(String extension,
-                                                                                           Function<String,
-                                                                                                   Annotation
-                                                                                                           .QualifiedXref> xrefCreator) {
+    private List<ConnectedXRefs<Annotation.QualifiedXref>> asExtensionsXRefList(String extension,
+                                                                                Function<String, Annotation
+                                                                                        .QualifiedXref> xrefCreator) {
         if (extension != null && !extension.isEmpty()) {
-            List<String> csvs = constructExtensions(extension);
-            return csvs.stream().filter(Objects::nonNull).filter(notPopulated.negate())
-                       .map(xrefs -> createConnectedXRefs(xrefCreator, xrefs))
-                       .collect(Collectors.toList());
+            return Stream.of(ordElements(extension))
+                    .filter(Objects::nonNull)
+                    .filter(empty.negate())
+                    .map(xrefs -> createConnectedXRefs(xrefCreator, xrefs))
+                    .collect(Collectors.toList());
         } else {
             return null;
         }
     }
 
-    private <T extends Annotation.AbstractXref> Annotation.ConnectedXRefs<T> createConnectedXRefs(
-            Function<String, T> xrefCreator,
-            String xrefs) {
-        Annotation.ConnectedXRefs<T> connectedXRefs = new Annotation.ConnectedXRefs<>();
+    /**
+     * Break up the annotation extension into its or'd components i.e. those separated by a pipe symbol
+     *
+     * r(d:i),r(d:i)|r(d:i) -> 1. r(d:i),r(d:i) 2. r(d:i)
+     */
 
-        streamCSV(xrefs).map(xrefCreator)
+    private String[] ordElements(String extension) {
+        return Objects.nonNull(extension) ? extension.split(PIPE) : new String[0];
+    }
+
+    private <T extends AbstractXref> ConnectedXRefs<T> createConnectedXRefs(Function<String, T> xrefCreator,
+                                                                            String xrefs) {
+        ConnectedXRefs<T> connectedXRefs = new ConnectedXRefs<>();
+
+        Stream.of(xrefs.split(COMMA)).map(xrefCreator)
                 .forEach(connectedXRefs::addXref);
 
         return connectedXRefs;
@@ -121,11 +129,8 @@ public class AnnotationDocConverterImpl implements AnnotationDocConverter {
     }
 
     private String extractContentsWithinParenthesis(String unformattedXref) {
-        LOGGER.info("extractContentsWithinParenthesis" + unformattedXref);
         return unformattedXref.substring(unformattedXref.indexOf("(") + 1, unformattedXref.indexOf(")"));
     }
-
-    private Stream<String> streamCSV(String xrefs) {return Stream.of(xrefs.split(COMMA));}
 
     private String[] extractDBAndSignature(String xref) {
         int colonPos = xref.indexOf(COLON);
@@ -142,25 +147,5 @@ public class AnnotationDocConverterImpl implements AnnotationDocConverter {
         }
 
         return new String[]{database, signature};
-    }
-
-    private List<String> constructExtensions(String extension) {
-        return createNullableStringListFromDelimitedValues(extension, PIPE);
-    }
-
-    private List<String> createNullableStringListFromDelimitedValues(String value, String delimiter) {
-        return value == null ? null : Arrays.asList(splitValue(value, delimiter));
-    }
-
-    /**
-     * Splits a {@link String} value on occurrences of a {@link String} delimiter.
-     * @param value the value to split
-     * @param delimiter the delimiter on which splitting takes place
-     * @return an array of {@link String} values
-     */
-    private static String[] splitValue(String value, String delimiter) {
-        checkArgument(delimiter != null, "Delimiter cannot be null");
-
-        return Optional.ofNullable(value).filter(v -> !v.isEmpty()).map(v -> v.split(delimiter)).orElse(new String[0]);
     }
 }
