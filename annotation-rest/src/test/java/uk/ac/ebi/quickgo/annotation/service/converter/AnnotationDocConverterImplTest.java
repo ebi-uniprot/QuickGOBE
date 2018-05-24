@@ -40,19 +40,18 @@ import static uk.ac.ebi.quickgo.annotation.service.converter.AnnotationDocConver
  */
 @RunWith(MockitoJUnitRunner.class)
 public class AnnotationDocConverterImplTest {
+
+    //Formatting
     private static final String COMMA = ",";
+
+    //Test data
     private static final String ID = "1";
     private static final String GENE_PRODUCT_ID = "P99999";
     private static final String QUALIFIER = "enables";
     private static final String GO_ID = "GO:0000977";
     private static final int TAXON_ID = 2;
     private static final String ECO_ID = "ECO:0000353";
-    private static final List<List<Supplier<Annotation.SimpleXRef>>> WITH_FROM = asList(
-            singletonList(GO_1), asList(GO_2, GO_3));
     private static final String ASSIGNED_BY = "InterPro";
-    private static final List<List<Supplier<Annotation.QualifiedXref>>> EXTENSIONS_CONVERTED = asList(
-            singletonList(OCCURS_IN_CL_1),
-            asList(OCCURS_IN_CL_2, OCCURS_IN_CL_3));
     private static final String EXTENSIONS = OCCURS_IN_CL_1 + "|" + OCCURS_IN_CL_2 + "," + OCCURS_IN_CL_3;
     private static final List<String> TARGET_SETS = asList("KRUK", "BHF-UCL", "Exosome");
     private static final String SYMBOL = "moeA5";
@@ -61,8 +60,20 @@ public class AnnotationDocConverterImplTest {
             LocalDate.of(2012, 10, 2).atStartOfDay(ZoneId.systemDefault()).toInstant());
     private static final String GENE_PRODUCT_TYPE = "protein";
     private static final int interactingTaxId = 3234;
+
+    //Expected data
+    private static final List<List<Supplier<Annotation.SimpleXRef>>> WITH_FROM =
+            asList(singletonList(GO_1), asList(GO_2, GO_3));
+    private static final List<List<Supplier<Annotation.QualifiedXref>>> EXTENSIONS_CONVERTED =
+            asList(singletonList(OCCURS_IN_CL_1), asList(OCCURS_IN_CL_2, OCCURS_IN_CL_3));
+
+    //Test input model
     private static final AnnotationDocument DOCUMENT = createStubDocument();
+
+    //Instance to be tested
     private AnnotationDocConverter docConverter = new AnnotationDocConverterImpl();
+
+    //Output model
     private Annotation model;
 
     @Before
