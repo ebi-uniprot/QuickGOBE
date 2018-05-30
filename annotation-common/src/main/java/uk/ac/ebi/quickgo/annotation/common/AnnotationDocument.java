@@ -59,7 +59,7 @@ public class AnnotationDocument implements QuickGODocument {
     @Field(AnnotationFields.ASSIGNED_BY)
     public String assignedBy;
 
-    @Field(AnnotationFields.EXTENSION) public List<String> extensions;
+    @Field(AnnotationFields.EXTENSION) public String extensions;
 
     @Field(AnnotationFields.TARGET_SET)
     public List<String> targetSets;

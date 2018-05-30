@@ -40,19 +40,19 @@ import static uk.ac.ebi.quickgo.annotation.service.converter.AnnotationDocConver
  */
 @RunWith(MockitoJUnitRunner.class)
 public class AnnotationDocConverterImplTest {
+
+    //Formatting
     private static final String COMMA = ",";
+
+    //Test data
     private static final String ID = "1";
     private static final String GENE_PRODUCT_ID = "P99999";
     private static final String QUALIFIER = "enables";
     private static final String GO_ID = "GO:0000977";
     private static final int TAXON_ID = 2;
     private static final String ECO_ID = "ECO:0000353";
-    private static final List<List<Supplier<Annotation.SimpleXRef>>> WITH_FROM = asList(
-            singletonList(GO_1), asList(GO_2, GO_3));
     private static final String ASSIGNED_BY = "InterPro";
-    private static final List<List<Supplier<Annotation.QualifiedXref>>> EXTENSIONS = asList(
-            singletonList(OCCURS_IN_CL_1),
-            asList(OCCURS_IN_CL_2, OCCURS_IN_CL_3));
+    private static final String EXTENSIONS = OCCURS_IN_CL_1 + "|" + OCCURS_IN_CL_2 + "," + OCCURS_IN_CL_3;
     private static final List<String> TARGET_SETS = asList("KRUK", "BHF-UCL", "Exosome");
     private static final String SYMBOL = "moeA5";
     private static final String GO_ASPECT = "cellular_component";
@@ -60,8 +60,20 @@ public class AnnotationDocConverterImplTest {
             LocalDate.of(2012, 10, 2).atStartOfDay(ZoneId.systemDefault()).toInstant());
     private static final String GENE_PRODUCT_TYPE = "protein";
     private static final int interactingTaxId = 3234;
+
+    //Expected data
+    private static final List<List<Supplier<Annotation.SimpleXRef>>> WITH_FROM =
+            asList(singletonList(GO_1), asList(GO_2, GO_3));
+    private static final List<List<Supplier<Annotation.QualifiedXref>>> EXTENSIONS_CONVERTED =
+            asList(singletonList(OCCURS_IN_CL_1), asList(OCCURS_IN_CL_2, OCCURS_IN_CL_3));
+
+    //Test input model
     private static final AnnotationDocument DOCUMENT = createStubDocument();
-    private AnnotationDocConverter docConverter = new AnnotationDocConverterImpl();
+
+    //Instance to be tested
+    private final AnnotationDocConverter docConverter = new AnnotationDocConverterImpl();
+
+    //Output model
     private Annotation model;
 
     @Before
@@ -116,7 +128,10 @@ public class AnnotationDocConverterImplTest {
 
     @Test
     public void convertExtensionSuccessfully() {
-        assertThat(model.extensions, is(connectedXrefs(EXTENSIONS)));
+        List<Annotation.ConnectedXRefs<Annotation.QualifiedXref>> convertedExtensions =
+                connectedXrefs(EXTENSIONS_CONVERTED);
+
+        assertThat(model.extensions, is(convertedExtensions));
     }
 
     @Test
@@ -189,11 +204,10 @@ public class AnnotationDocConverterImplTest {
     private static <T extends Annotation.AbstractXref> List<Annotation.ConnectedXRefs<T>> connectedXrefs(
             List<List<Supplier<T>>> items) {
         return items.stream().map(itemList -> {
-                    Annotation.ConnectedXRefs<T> xrefs = new Annotation.ConnectedXRefs<>();
-                    itemList.stream().map(Supplier::get).forEach(xrefs::addXref);
-                    return xrefs;
-                }
-        ).collect(Collectors.toList());
+            Annotation.ConnectedXRefs<T> xrefs = new Annotation.ConnectedXRefs<>();
+            itemList.stream().map(Supplier::get).forEach(xrefs::addXref);
+            return xrefs;
+        }).collect(Collectors.toList());
     }
 
     private static <T extends Annotation.AbstractXref> List<String> stringsForConnectedXrefs(
@@ -215,7 +229,7 @@ public class AnnotationDocConverterImplTest {
         doc.evidenceCode = ECO_ID;
         doc.withFrom = stringsForConnectedXrefs(WITH_FROM);
         doc.assignedBy = ASSIGNED_BY;
-        doc.extensions = stringsForConnectedXrefs(EXTENSIONS);
+        doc.extensions = EXTENSIONS;
         doc.targetSets = TARGET_SETS;
         doc.symbol = SYMBOL;
         doc.goAspect = GO_ASPECT;

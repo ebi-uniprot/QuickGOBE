@@ -89,7 +89,7 @@ search:
           timeout: 15000
         }
   wildcard:
-    fields: extension_search
+    fields: extension_unsorted
 model:
   repo2domainFieldNameTransformations:
     transformations: {

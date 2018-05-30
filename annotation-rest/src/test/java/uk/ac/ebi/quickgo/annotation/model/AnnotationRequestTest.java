@@ -503,6 +503,24 @@ public class AnnotationRequestTest {
         assertThat(annotationRequest.getDownloadLimit(), is(limit));
     }
 
+    @Test
+    public void setAndGetExtension() {
+        String extension = "part_of(CL:0000023),part_of(UBERON:0001305)|part_of(CL:0000501),part_of(UBERON:0001305)";
+
+        annotationRequest.setExtension(extension);
+
+        assertThat(annotationRequest.getExtension(), arrayContaining(extension));
+    }
+
+    @Test
+    public void setAndGetExtensionForWildcard() {
+        String extension = "*";
+
+        annotationRequest.setExtension(extension);
+
+        assertThat(annotationRequest.getExtension(), arrayContaining(extension));
+    }
+
     //-----------------
     @Test
     public void setAndGetIncludeFields() {

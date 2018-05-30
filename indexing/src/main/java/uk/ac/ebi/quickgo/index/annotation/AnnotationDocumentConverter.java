@@ -8,7 +8,10 @@ import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import org.slf4j.Logger;
@@ -38,7 +41,8 @@ class AnnotationDocumentConverter implements ItemProcessor<Annotation, Annotatio
         this.dateTimeFormatter = DateTimeFormatter.ofPattern(ANNOTATION_DATE_FORMAT);
     }
 
-    @Override public AnnotationDocument process(Annotation annotation) throws Exception {
+    @Override
+    public AnnotationDocument process(Annotation annotation) {
         if (annotation == null) {
             throw new DocumentReaderException("Annotation object is null");
         }
@@ -54,11 +58,9 @@ class AnnotationDocumentConverter implements ItemProcessor<Annotation, Annotatio
         doc.reference = annotation.dbReferences;
         doc.assignedBy = annotation.assignedBy;
         doc.evidenceCode = annotation.evidenceCode;
-        doc.extensions = constructExtensions(annotation);
-
+        doc.extensions = annotation.annotationExtension;
         doc.withFrom = constructWithFrom(annotation);
         doc.interactingTaxonId = extractInteractingTaxonId(annotation);
-
         doc.goEvidence = propertiesMap.get(GO_EVIDENCE);
         doc.geneProductSubset = propertiesMap.get(DB_OBJECT_SUBSET);
         doc.symbol = propertiesMap.get(DB_OBJECT_SYMBOL);
@@ -128,10 +130,6 @@ class AnnotationDocumentConverter implements ItemProcessor<Annotation, Annotatio
 
     private List<Integer> createNullableIntegerListFromDelimitedValues(String value, String delimiter) {
         return value == null ? null : splitValueToIntegerList(value, delimiter);
-    }
-
-    private List<String> constructExtensions(Annotation annotation) {
-        return createNullableStringListFromDelimitedValues(annotation.annotationExtension, PIPE);
     }
 
     private List<String> constructWithFrom(Annotation annotation) {
