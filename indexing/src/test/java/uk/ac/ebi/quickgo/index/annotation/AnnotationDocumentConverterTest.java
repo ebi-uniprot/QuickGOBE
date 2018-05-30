@@ -248,7 +248,7 @@ public class AnnotationDocumentConverterTest {
     }
 
     @Test
-    public void convertsAnnotationExtensionsToRawExtension() {
+    public void keepsRawExtensionUnchanged() {
         String annotationExtension = "x,y|z";
         annotation.annotationExtension = annotationExtension;
 
