@@ -19,7 +19,7 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 import static java.util.Optional.of;
-import static uk.ac.ebi.quickgo.annotation.common.AnnotationFields.Searchable;
+import static uk.ac.ebi.quickgo.annotation.common.AnnotationFields.Searchable.*;
 import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.*;
 import static uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern.Flag.CASE_INSENSITIVE;
 
@@ -83,18 +83,9 @@ public class AnnotationRequest {
     /**
      * indicates which fields should be looked at when creating filters
      */
-    private static final String[] FILTER_REQUEST_FIELDS = new String[]{
-            Searchable.GO_ASPECT,
-            Searchable.ASSIGNED_BY,
-            Searchable.GENE_PRODUCT_SUBSET,
-            Searchable.GENE_PRODUCT_ID,
-            Searchable.GENE_PRODUCT_TYPE,
-            Searchable.GO_EVIDENCE,
-            Searchable.QUALIFIER,
-            Searchable.REFERENCE,
-            Searchable.TARGET_SET,
-            Searchable.WITH_FROM,
-            Searchable.EXTENSION
+    private static final String[] FILTER_REQUEST_FIELDS = new String[]{GO_ASPECT, ASSIGNED_BY, GENE_PRODUCT_SUBSET,
+            GENE_PRODUCT_ID, GENE_PRODUCT_TYPE, GO_EVIDENCE, QUALIFIER, REFERENCE, TARGET_SET, WITH_FROM, EXTENSION,
+            PROTEOME
     };
 
     @ApiModelProperty(
@@ -229,6 +220,14 @@ public class AnnotationRequest {
             hidden = true)
     private String[] selectedFields;
 
+    @ApiModelProperty(value = "The Database associated with the annotation." + " proteins only",
+            allowableValues = "TrEMBL,Swiss-Prot", hidden = true) private String[] databaseSubset;
+
+    @ApiModelProperty(
+            value = "The proteomic classification of the annotated gene product, if applicable - this is relevant for" +
+                    " proteins only", allowableValues = "complete,none,gcrpCan,gcrpIso", hidden = true) private String[]
+            proteome;
+
     private final Map<String, String[]> filterMap = new HashMap<>();
 
     /**
@@ -237,13 +236,13 @@ public class AnnotationRequest {
      */
     public void setAssignedBy(String... assignedBy) {
         if (assignedBy != null) {
-            filterMap.put(Searchable.ASSIGNED_BY, assignedBy);
+            filterMap.put(ASSIGNED_BY, assignedBy);
         }
     }
 
     @ArrayPattern(regexp = "^[A-Za-z][A-Za-z\\-_]+$", paramName = ASSIGNED_BY_PARAM)
     public String[] getAssignedBy() {
-        return filterMap.get(Searchable.ASSIGNED_BY);
+        return filterMap.get(ASSIGNED_BY);
     }
 
     /**
@@ -251,26 +250,26 @@ public class AnnotationRequest {
      * GO_REF:0000037 etc
      */
     public void setReference(String... reference) {
-        filterMap.put(Searchable.REFERENCE, reference);
+        filterMap.put(REFERENCE, reference);
     }
 
     @ReferenceValidator
     @Size(max = MAX_REFERENCES,
             message = "Number of items in '" + REFERENCE_PARAM + "' is larger than: {max}")
     public String[] getReference() {
-        return filterMap.get(Searchable.REFERENCE);
+        return filterMap.get(REFERENCE);
     }
 
     public void setAspect(String... aspect) {
         if (aspect != null) {
-            filterMap.put(Searchable.GO_ASPECT, aspect);
+            filterMap.put(GO_ASPECT, aspect);
         }
     }
 
     @ArrayPattern(regexp = "^biological_process|molecular_function|cellular_component$", flags = CASE_INSENSITIVE,
             paramName = ASPECT_PARAM)
     public String[] getAspect() {
-        return filterMap.get(Searchable.GO_ASPECT);
+        return filterMap.get(GO_ASPECT);
     }
 
     /**
@@ -278,7 +277,7 @@ public class AnnotationRequest {
      */
     public void setGeneProductId(String... listOfGeneProductIDs) {
         if (listOfGeneProductIDs != null) {
-            filterMap.put(Searchable.GENE_PRODUCT_ID, listOfGeneProductIDs);
+            filterMap.put(GENE_PRODUCT_ID, listOfGeneProductIDs);
         }
     }
 
@@ -286,7 +285,7 @@ public class AnnotationRequest {
     @Size(max = MAX_GENE_PRODUCT_IDS,
             message = "Number of items in '" + GENE_PRODUCT_PARAM + "' is larger than: {max}")
     public String[] getGeneProductId() {
-        return filterMap.get(Searchable.GENE_PRODUCT_ID);
+        return filterMap.get(GENE_PRODUCT_ID);
     }
 
     /**
@@ -297,24 +296,24 @@ public class AnnotationRequest {
      * @param evidence the evidence code
      */
     public void setGoIdEvidence(String... evidence) {
-        filterMap.put(Searchable.GO_EVIDENCE, evidence);
+        filterMap.put(GO_EVIDENCE, evidence);
     }
 
     @ArrayPattern(regexp = "^[A-Za-z]{2,3}$", paramName = GO_EVIDENCE_PARAM)
     public String[] getGoIdEvidence() {
-        return filterMap.get(Searchable.GO_EVIDENCE);
+        return filterMap.get(GO_EVIDENCE);
     }
 
     /**
      * NOT, enables etc
      */
     public void setQualifier(String... qualifier) {
-        filterMap.put(Searchable.QUALIFIER, qualifier);
+        filterMap.put(QUALIFIER, qualifier);
     }
 
     @ArrayPattern(regexp = "^(NOT\\|)?[A-Z_]+$", flags = CASE_INSENSITIVE, paramName = QUALIFIER_PARAM)
     public String[] getQualifier() {
-        return filterMap.get(Searchable.QUALIFIER);
+        return filterMap.get(QUALIFIER);
     }
 
     /**
@@ -325,7 +324,7 @@ public class AnnotationRequest {
      * @param withFrom comma separated with/from values
      */
     public void setWithFrom(String... withFrom) {
-        filterMap.put(Searchable.WITH_FROM, withFrom);
+        filterMap.put(WITH_FROM, withFrom);
     }
 
     /**
@@ -335,7 +334,7 @@ public class AnnotationRequest {
      */
     @WithFromValidator
     public String[] getWithFrom() {
-        return filterMap.get(Searchable.WITH_FROM);
+        return filterMap.get(WITH_FROM);
     }
 
     public void setTaxonId(String... taxId) {
@@ -365,14 +364,14 @@ public class AnnotationRequest {
      * Will receive a list of eco ids thus: evidenceCode=ECO:0000256,ECO:0000323
      */
     public void setEvidenceCode(String... evidenceCode) {
-        filterMap.put(Searchable.EVIDENCE_CODE, evidenceCode);
+        filterMap.put(EVIDENCE_CODE, evidenceCode);
     }
 
     @ArrayPattern(regexp = "^ECO:[0-9]{7}$", paramName = EVIDENCE_CODE_PARAM, flags = CASE_INSENSITIVE)
     @Size(max = MAX_EVIDENCE_CODE,
             message = "Number of items in '" + EVIDENCE_CODE_PARAM + "' is larger than: {max}")
     public String[] getEvidenceCode() {
-        return filterMap.get(Searchable.EVIDENCE_CODE);
+        return filterMap.get(EVIDENCE_CODE);
     }
 
     public void setEvidenceCodeUsage(String usage) {
@@ -405,14 +404,14 @@ public class AnnotationRequest {
      * List of Gene Ontology ids in CSV format
      */
     public void setGoId(String... goId) {
-        filterMap.put(Searchable.GO_ID, goId);
+        filterMap.put(GO_ID, goId);
     }
 
     @ArrayPattern(regexp = "^GO:[0-9]{7}$", flags = CASE_INSENSITIVE, paramName = GO_ID_PARAM)
     @Size(max = MAX_GO_IDS,
             message = "Number of items in '" + GO_ID_PARAM + "' is larger than: {max}")
     public String[] getGoId() {
-        return filterMap.get(Searchable.GO_ID);
+        return filterMap.get(GO_ID);
     }
 
     public void setGoUsage(String goUsage) {
@@ -441,32 +440,32 @@ public class AnnotationRequest {
     }
 
     public void setGeneProductType(String... geneProductType) {
-        filterMap.put(Searchable.GENE_PRODUCT_TYPE, geneProductType);
+        filterMap.put(GENE_PRODUCT_TYPE, geneProductType);
     }
 
     @ArrayPattern(regexp = "^complex|miRNA|protein$", flags = CASE_INSENSITIVE, paramName = GENE_PRODUCT_TYPE_PARAM)
     public String[] getGeneProductType() {
-        return filterMap.get(Searchable.GENE_PRODUCT_TYPE);
+        return filterMap.get(GENE_PRODUCT_TYPE);
     }
 
     /**
      * Filter by Target Sets e.g. BHF-UCK, KRUK, Parkinsons etc
      */
     public void setTargetSet(String... targetSet) {
-        filterMap.put(Searchable.TARGET_SET, targetSet);
+        filterMap.put(TARGET_SET, targetSet);
     }
 
     public String[] getTargetSet() {
-        return filterMap.get(Searchable.TARGET_SET);
+        return filterMap.get(TARGET_SET);
     }
 
     public void setGeneProductSubset(String... geneProductSubset) {
-        filterMap.put(Searchable.GENE_PRODUCT_SUBSET, geneProductSubset);
+        filterMap.put(GENE_PRODUCT_SUBSET, geneProductSubset);
     }
 
     @ArrayPattern(regexp = "^[A-Za-z-]+$", paramName = GENE_PRODUCT_SUBSET_PARAM)
     public String[] getGeneProductSubset() {
-        return filterMap.get(Searchable.GENE_PRODUCT_SUBSET);
+        return filterMap.get(GENE_PRODUCT_SUBSET);
     }
 
     @Min(value = MIN_ENTRIES_PER_PAGE, message = "Number of entries per page cannot be less than {value} but " +
@@ -510,7 +509,7 @@ public class AnnotationRequest {
      */
     public void setExtension(String... extension) {
         String singleExtension = Arrays.stream(extension).collect(Collectors.joining(","));
-        filterMap.put(Searchable.EXTENSION, new String[]{singleExtension});
+        filterMap.put(EXTENSION, new String[]{singleExtension});
     }
 
     /**
@@ -519,7 +518,7 @@ public class AnnotationRequest {
      * @return Extension value.
      */
     public String[] getExtension() {
-        return filterMap.get(Searchable.EXTENSION);
+        return filterMap.get(EXTENSION);
     }
 
     /**
@@ -558,6 +557,14 @@ public class AnnotationRequest {
             SELECT_FIELD_PARAM)
     public String[] getSelectedFields() {
         return this.selectedFields;
+    }
+
+    public void setProteome(String... proteome) {
+        filterMap.put(PROTEOME, proteome);
+    }
+
+    public String[] getProteome() {
+        return filterMap.get(PROTEOME);
     }
 
     /**
@@ -647,11 +654,11 @@ public class AnnotationRequest {
         if (filterMap.containsKey(TAXON_USAGE_ID)) {
             switch (getTaxonUsage()) {
                 case DESCENDANTS_USAGE:
-                    field = of(Searchable.TAXON_ANCESTORS);
+                    field = of(TAXON_ANCESTORS);
                     break;
                 case EXACT_USAGE:
                 default:
-                    field = of(Searchable.TAXON_ID);
+                    field = of(TAXON_ID);
                     break;
             }
         } else {
@@ -670,12 +677,12 @@ public class AnnotationRequest {
     }
 
     private Optional<FilterRequest> createGoUsageFilter() {
-        return createUsageFilter(GO_USAGE_FIELD, getGoUsage(), GO_USAGE_ID, Searchable.GO_ID, GO_USAGE_RELATIONSHIPS);
+        return createUsageFilter(GO_USAGE_FIELD, getGoUsage(), GO_USAGE_ID, GO_ID, GO_USAGE_RELATIONSHIPS);
     }
 
     private Optional<FilterRequest> createEvidenceCodeUsageFilter() {
         return createUsageFilter(EVIDENCE_CODE_USAGE_FIELD, getEvidenceCodeUsage(), EVIDENCE_CODE_USAGE_ID,
-                Searchable.EVIDENCE_CODE, EVIDENCE_CODE_USAGE_RELATIONSHIPS);
+                EVIDENCE_CODE, EVIDENCE_CODE_USAGE_RELATIONSHIPS);
     }
 
     private Optional<FilterRequest> createUsageFilter(String usageParam, String usageValue, String idParam, String
