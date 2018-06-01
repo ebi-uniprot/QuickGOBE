@@ -70,6 +70,7 @@ public class AnnotationDocument implements QuickGODocument {
     @Field(AnnotationFields.DATE)
     public Date date;
 
+    @Field(AnnotationFields.PROTEOME) public String proteome;
 
     @Override public String getUniqueName() {
         return id;

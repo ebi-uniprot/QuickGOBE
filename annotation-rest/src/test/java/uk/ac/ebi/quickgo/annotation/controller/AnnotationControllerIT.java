@@ -1695,6 +1695,24 @@ public class AnnotationControllerIT {
                 .andExpect(status().isBadRequest());
     }
 
+    // ------------------------------- Filter by proteome -------------------------------
+
+    @Test
+    public void filterByProteome() throws Exception {
+        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A123");
+        doc.proteome = "gcrpCan";
+        repository.save(doc);
+
+        ResultActions response =
+                mockMvc.perform(get(RESOURCE_URL + "/search").param(PROTEOME_PARAM.getName(), "gcrpCan"));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(1))
+                .andExpect(fieldsInAllResultsExist(1));
+    }
+
     // ------------------------------- Check date format -------------------------------
     @Test
     public void checkDateFormatIsCorrect() throws Exception {

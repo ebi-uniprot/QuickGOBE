@@ -521,6 +521,15 @@ public class AnnotationRequestTest {
         assertThat(annotationRequest.getExtension(), arrayContaining(extension));
     }
 
+    @Test
+    public void setAndGetProteome() {
+        String proteome = "none";
+
+        annotationRequest.setProteome(proteome);
+
+        assertThat(annotationRequest.getProteome(), arrayContaining(proteome));
+    }
+
     //-----------------
     @Test
     public void setAndGetIncludeFields() {
