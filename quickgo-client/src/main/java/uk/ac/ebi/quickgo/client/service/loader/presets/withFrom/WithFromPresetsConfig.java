@@ -5,7 +5,10 @@ import uk.ac.ebi.quickgo.client.model.presets.PresetType;
 import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
 import uk.ac.ebi.quickgo.client.service.loader.presets.LogStepListener;
 import uk.ac.ebi.quickgo.client.service.loader.presets.PresetsCommonConfig;
-import uk.ac.ebi.quickgo.client.service.loader.presets.ff.*;
+import uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPreset;
+import uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPresetValidator;
+import uk.ac.ebi.quickgo.client.service.loader.presets.ff.SourceColumnsFactory;
+import uk.ac.ebi.quickgo.client.service.loader.presets.ff.StringToRawNamedPresetMapper;
 import uk.ac.ebi.quickgo.rest.search.RetrievalException;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 import uk.ac.ebi.quickgo.rest.search.request.config.FilterConfigRetrieval;
@@ -118,13 +121,26 @@ public class WithFromPresetsConfig {
         FilterRequest restRequest = FilterRequest.newBuilder().addProperty(WITH_FROM_REST_KEY).build();
 
         try {
-            ConvertedFilter<List<String>> convertedFilter = converterFactory.convert(restRequest);
-            final List<String> convertedValues = convertedFilter.getConvertedValue();
-            final Set<String> validValues = new HashSet<>(convertedValues);
-            return rawNamedPreset -> validValues.contains(rawNamedPreset.name) ? rawNamedPreset : null;
+            final Set<String> usedDbs = retrieveSolrWithFromValues(converterFactory, restRequest);
+
+            return rawNamedPreset -> {
+                boolean contains = usedDbs.contains(rawNamedPreset.name);
+                LOGGER.info("The value %s is used in a withFrom value true or false - %s", rawNamedPreset.name,
+                        contains);
+                return contains ? rawNamedPreset : null;
+            };
         } catch (RetrievalException | IllegalStateException e) {
             LOGGER.error("Failed to retrieve via REST call the relevant 'with/from' values: ", e);
         }
         return rawNamedPreset -> rawNamedPreset;
+    }
+
+    private Set<String> retrieveSolrWithFromValues(RESTFilterConverterFactory converterFactory,
+                                                   FilterRequest restRequest) {
+        ConvertedFilter<List<String>> convertedFilter = converterFactory.convert(restRequest);
+        final List<String> convertedValues = convertedFilter.getConvertedValue();
+        LOGGER.info("The list of DBs used in WithFrom values is as follows:");
+        convertedValues.stream().forEach(v -> LOGGER.info(v));
+        return new HashSet<>(convertedValues);
     }
 }
