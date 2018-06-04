@@ -220,9 +220,6 @@ public class AnnotationRequest {
             hidden = true)
     private String[] selectedFields;
 
-    @ApiModelProperty(value = "The Database associated with the annotation." + " proteins only",
-            allowableValues = "TrEMBL,Swiss-Prot", hidden = true) private String[] databaseSubset;
-
     @ApiModelProperty(
             value = "The proteomic classification of the annotated gene product, if applicable - this is relevant for" +
                     " proteins only", allowableValues = "complete,none,gcrpCan,gcrpIso", hidden = true) private String[]
@@ -559,10 +556,18 @@ public class AnnotationRequest {
         return this.selectedFields;
     }
 
+    /**
+     * Filter by the annotations by their proteomic classification.
+     * @param proteome filtering value(s)
+     */
     public void setProteome(String... proteome) {
         filterMap.put(PROTEOME, proteome);
     }
 
+    /**
+     * An array of filtering values for proteomic classification.
+     * @return
+     */
     public String[] getProteome() {
         return filterMap.get(PROTEOME);
     }
