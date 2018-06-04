@@ -61,7 +61,8 @@ public class ExtensionDatabasesPresetsConfig {
                 .<RawNamedPreset, RawNamedPreset>chunk(chunkSize)
                 .faultTolerant()
                 .skipLimit(SKIP_LIMIT)
-                .<RawNamedPreset>reader(rawPresetMultiFileReader(resources, itemReader))
+                .<RawNamedPreset>reader(
+                        rawPresetMultiFileReader(resources, itemReader))
                 .processor(compositeRawPresetProcessor())
                 .writer(rawPresetWriter(presets))
                 .listener(new LogStepListener())
@@ -83,7 +84,7 @@ public class ExtensionDatabasesPresetsConfig {
     }
 
     private FieldSetMapper<RawNamedPreset> rawPresetFieldSetMapper() {
-        return new StringToRawNamedPresetMapper(SourceColumnsFactory.createFor(EXT_DATABASE_COLUMNS));
+        return StringToRawNamedPresetMapper.create(SourceColumnsFactory.createFor(EXT_DATABASE_COLUMNS));
     }
 
     private ItemProcessor<RawNamedPreset, RawNamedPreset> compositeRawPresetProcessor() {
@@ -106,7 +107,7 @@ public class ExtensionDatabasesPresetsConfig {
      */
     private class DatabaseFilterItemProcessor implements ItemProcessor<RawNamedPreset, RawNamedPreset> {
 
-        private Set<String> seenDatabases = new HashSet<String>();
+        private Set<String> seenDatabases = new HashSet<>();
 
         public RawNamedPreset process(RawNamedPreset rawNamedPreset) {
             if(seenDatabases.add(rawNamedPreset.name)) {

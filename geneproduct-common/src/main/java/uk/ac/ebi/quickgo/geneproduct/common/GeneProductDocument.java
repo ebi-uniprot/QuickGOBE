@@ -3,6 +3,7 @@ package uk.ac.ebi.quickgo.geneproduct.common;
 import uk.ac.ebi.quickgo.common.QuickGODocument;
 
 import java.util.List;
+import java.util.Objects;
 import org.apache.solr.client.solrj.beans.Field;
 
 import static uk.ac.ebi.quickgo.geneproduct.common.GeneProductFields.*;
@@ -41,10 +42,14 @@ public class GeneProductDocument implements QuickGODocument {
     public String databaseSubset;
 
     @Field(COMPLETE_PROTEOME)
+    @Deprecated
     public boolean isCompleteProteome;
 
     @Field(REFERENCE_PROTEOME)
     public String referenceProteome;
+
+    @Field(PROTEOME_MEMBERSHIP)
+    public String proteomeMembership;
 
     @Field(IS_ISOFORM)
     public boolean isIsoform;
@@ -69,73 +74,31 @@ public class GeneProductDocument implements QuickGODocument {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-
         GeneProductDocument that = (GeneProductDocument) o;
-
-        if (taxonId != that.taxonId) {
-            return false;
-        }
-        if (isCompleteProteome != that.isCompleteProteome) {
-            return false;
-        }
-        if (isIsoform != that.isIsoform) {
-            return false;
-        }
-        if (isAnnotated != that.isAnnotated) {
-            return false;
-        }
-        if (id != null ? !id.equals(that.id) : that.id != null) {
-            return false;
-        }
-        if (database != null ? !database.equals(that.database) : that.database != null) {
-            return false;
-        }
-        if (symbol != null ? !symbol.equals(that.symbol) : that.symbol != null) {
-            return false;
-        }
-        if (name != null ? !name.equals(that.name) : that.name != null) {
-            return false;
-        }
-        if (synonyms != null ? !synonyms.equals(that.synonyms) : that.synonyms != null) {
-            return false;
-        }
-        if (type != null ? !type.equals(that.type) : that.type != null) {
-            return false;
-        }
-        if (taxonName != null ? !taxonName.equals(that.taxonName) : that.taxonName != null) {
-            return false;
-        }
-        if (databaseSubset != null ? !databaseSubset.equals(that.databaseSubset) : that.databaseSubset != null) {
-            return false;
-        }
-        if (referenceProteome != null ? !referenceProteome.equals(that.referenceProteome) :
-                that.referenceProteome != null) {
-            return false;
-        }
-        if (parentId != null ? !parentId.equals(that.parentId) : that.parentId != null) {
-            return false;
-        }
-        return targetSet != null ? targetSet.equals(that.targetSet) : that.targetSet == null;
-
+        return taxonId == that.taxonId &&
+                isCompleteProteome == that.isCompleteProteome &&
+                isIsoform == that.isIsoform &&
+                isAnnotated == that.isAnnotated &&
+                Objects.equals(id, that.id) &&
+                Objects.equals(database, that.database) &&
+                Objects.equals(symbol, that.symbol) &&
+                Objects.equals(name, that.name) &&
+                Objects.equals(synonyms, that.synonyms) &&
+                Objects.equals(type, that.type) &&
+                Objects.equals(taxonName, that.taxonName) &&
+                Objects.equals(databaseSubset, that.databaseSubset) &&
+                Objects.equals(referenceProteome, that.referenceProteome) &&
+                Objects.equals(proteomeMembership, that.proteomeMembership) &&
+                Objects.equals(parentId, that.parentId) &&
+                Objects.equals(targetSet, that.targetSet);
     }
 
     @Override public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + (database != null ? database.hashCode() : 0);
-        result = 31 * result + (symbol != null ? symbol.hashCode() : 0);
-        result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (synonyms != null ? synonyms.hashCode() : 0);
-        result = 31 * result + (type != null ? type.hashCode() : 0);
-        result = 31 * result + taxonId;
-        result = 31 * result + (taxonName != null ? taxonName.hashCode() : 0);
-        result = 31 * result + (databaseSubset != null ? databaseSubset.hashCode() : 0);
-        result = 31 * result + (isCompleteProteome ? 1 : 0);
-        result = 31 * result + (referenceProteome != null ? referenceProteome.hashCode() : 0);
-        result = 31 * result + (isIsoform ? 1 : 0);
-        result = 31 * result + (isAnnotated ? 1 : 0);
-        result = 31 * result + (parentId != null ? parentId.hashCode() : 0);
-        result = 31 * result + (targetSet != null ? targetSet.hashCode() : 0);
-        return result;
+
+        return Objects
+                .hash(id, database, symbol, name, synonyms, type, taxonId, taxonName, databaseSubset,
+                        isCompleteProteome,
+                        referenceProteome, proteomeMembership, isIsoform, isAnnotated, parentId, targetSet);
     }
 
     @Override public String toString() {
@@ -151,6 +114,7 @@ public class GeneProductDocument implements QuickGODocument {
                 ", databaseSubset='" + databaseSubset + '\'' +
                 ", isCompleteProteome=" + isCompleteProteome +
                 ", referenceProteome='" + referenceProteome + '\'' +
+                ", proteomeMembership=" + proteomeMembership +
                 ", isIsoform=" + isIsoform +
                 ", isAnnotated=" + isAnnotated +
                 ", parentId='" + parentId + '\'' +

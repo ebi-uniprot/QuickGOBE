@@ -61,7 +61,8 @@ public class TaxonPresetsConfig {
                 .<RawNamedPreset, RawNamedPreset>chunk(chunkSize)
                 .faultTolerant()
                 .skipLimit(SKIP_LIMIT)
-                .<RawNamedPreset>reader(rawPresetMultiFileReader(taxonResources, itemReader))
+                .<RawNamedPreset>reader(
+                        rawPresetMultiFileReader(taxonResources, itemReader))
                 .processor(compositeItemProcessor(
                         rawPresetValidator()))
                 .writer(rawPresetWriter(presets))
@@ -88,7 +89,7 @@ public class TaxonPresetsConfig {
     }
 
     private FieldSetMapper<RawNamedPreset> fieldSetMapper(SourceColumnsFactory.Source source) {
-        return new StringToRawNamedPresetMapper(SourceColumnsFactory.createFor(source));
+        return StringToRawNamedPresetMapper.create(SourceColumnsFactory.createFor(source));
     }
 
     private ItemProcessor<RawNamedPreset, RawNamedPreset> rawPresetValidator() {

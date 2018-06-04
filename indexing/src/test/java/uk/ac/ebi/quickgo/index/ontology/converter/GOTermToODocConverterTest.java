@@ -1,5 +1,7 @@
 package uk.ac.ebi.quickgo.index.ontology.converter;
 
+import uk.ac.ebi.quickgo.model.ontology.generic.AuditRecord;
+import uk.ac.ebi.quickgo.model.ontology.generic.TermOntologyHistory;
 import uk.ac.ebi.quickgo.model.ontology.go.GOTerm;
 import uk.ac.ebi.quickgo.model.ontology.go.GOTermBlacklist;
 import uk.ac.ebi.quickgo.model.ontology.go.TaxonConstraint;
@@ -294,5 +296,53 @@ public class GOTermToODocConverterTest {
                         && expectedDiscussionText.contains(proteinComplex.symbol)
                         && expectedDiscussionText.contains(proteinComplex.name))
                 .findFirst().isPresent();
+    }
+
+    @Test
+    public void historyCategoryIsSlim() {
+        when(term.getHistory()).thenReturn(termOntologyHistoryForSlim());
+
+        OntologyDocument result = converter.apply(term);
+
+        final List<String> history = result.history;
+        assertThat(history, hasSize(1));
+        assertThat(history.get(0), containsString("SLIM"));
+    }
+
+    @Test
+    public void historyCategoryIsConstraint() {
+        when(term.getHistory()).thenReturn(termOntologyHistoryForConstraint());
+
+        OntologyDocument document = converter.apply(term);
+
+        final List<String> history = document.history;
+        assertThat(history, hasSize(1));
+        assertThat(history.get(0), containsString("CONSTRAINT"));
+    }
+
+    private TermOntologyHistory termOntologyHistoryForSlim() {
+        TermOntologyHistory termOntologyHistory = new TermOntologyHistory();
+        String goId = "GO:0000003";
+        String termName = "reproduction";
+        String timeStamp = "2017-03-04";
+        String action = "Added";
+        String category = "SLIM";
+        String text = "goslim_agr";
+        AuditRecord auditRecord = new AuditRecord(goId, termName, timeStamp, action, category, text);
+        termOntologyHistory.add(auditRecord);
+        return termOntologyHistory;
+    }
+
+    private TermOntologyHistory termOntologyHistoryForConstraint() {
+        TermOntologyHistory termOntologyHistory = new TermOntologyHistory();
+        String goId = "GO:0000131";
+        String termName = "incipient cellular bud site";
+        String timeStamp = "2008-05-13";
+        String action = "Added";
+        String category = "CONSTRAINT";
+        String text = "never_in_taxon NCBITaxon:4930 (Saccharomyces)";
+        AuditRecord auditRecord = new AuditRecord(goId, termName, timeStamp, action, category, text);
+        termOntologyHistory.add(auditRecord);
+        return termOntologyHistory;
     }
 }

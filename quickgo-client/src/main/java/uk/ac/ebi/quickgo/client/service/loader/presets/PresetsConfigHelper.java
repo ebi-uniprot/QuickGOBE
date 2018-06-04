@@ -8,7 +8,9 @@ import uk.ac.ebi.quickgo.rest.search.request.converter.RESTFilterConverterFactor
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.GZIPInputStream;
@@ -48,27 +50,36 @@ public class PresetsConfigHelper {
     }
 
     public static <T> MultiResourceItemReader<T> rawPresetMultiFileReader(
-            Resource[] resources,
-            FlatFileItemReader<T> itemReader) {
+            Resource[] resources, FlatFileItemReader<T> itemReader) {
+        return rawPresetMultiFileReader(resources, itemReader, PresetsConfigHelper::getGzipResources);
+    }
+
+    public static <T> MultiResourceItemReader<T> rawPresetMultiFileReader(
+            Resource[] resources, FlatFileItemReader<T> itemReader, Function<Resource[], Optional<Resource[]>>
+            resourceRefiner) {
         MultiResourceItemReader<T> reader = new MultiResourceItemReader<>();
-
         setResourceComparator(reader);
+        Optional<Resource[]> refinedResources = resourceRefiner.apply(resources);
+        if (refinedResources.isPresent()) {
+            reader.setResources(refinedResources.get());
+            reader.setDelegate(itemReader);
+        }
+        return reader;
+    }
 
+    private static Optional<Resource[]> getGzipResources(Resource[] resources) {
         try {
             GZIPResource[] zippedResources = new GZIPResource[resources.length];
             for (int i = 0; i < resources.length; i++) {
                 zippedResources[i] = new GZIPResource(resources[i]);
             }
-
-            reader.setResources(zippedResources);
-            reader.setDelegate(itemReader);
+            return Optional.of(zippedResources);
         } catch (IOException e) {
             LOGGER.error(
                     "Failed to load preset information for " + Stream.of(resources) + ". " +
                             "No corresponding information for this preset will be available.", e);
         }
-
-        return reader;
+        return Optional.empty();
     }
 
     public static <T> FlatFileItemReader<T> fileReader(FieldSetMapper<T> fieldSetMapper) {

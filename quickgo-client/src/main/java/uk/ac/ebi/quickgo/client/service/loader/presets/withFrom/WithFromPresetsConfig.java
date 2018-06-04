@@ -74,7 +74,8 @@ public class WithFromPresetsConfig {
                 .<RawNamedPreset, RawNamedPreset>chunk(chunkSize)
                 .faultTolerant()
                 .skipLimit(SKIP_LIMIT)
-                .<RawNamedPreset>reader(rawPresetMultiFileReader(resources, itemReader))
+                .<RawNamedPreset>reader(
+                        rawPresetMultiFileReader(resources, itemReader))
                 .processor(compositeItemProcessor(
                         new RawNamedPresetValidator(),
                         filterUsingRestResults(converterFactory),
@@ -109,7 +110,7 @@ public class WithFromPresetsConfig {
     }
 
     private FieldSetMapper<RawNamedPreset> rawPresetFieldSetMapper() {
-        return new StringToRawNamedPresetMapper(SourceColumnsFactory.createFor(DB_COLUMNS));
+        return StringToRawNamedPresetMapper.create(SourceColumnsFactory.createFor(DB_COLUMNS));
     }
 
     private ItemProcessor<RawNamedPreset, RawNamedPreset> filterUsingRestResults(

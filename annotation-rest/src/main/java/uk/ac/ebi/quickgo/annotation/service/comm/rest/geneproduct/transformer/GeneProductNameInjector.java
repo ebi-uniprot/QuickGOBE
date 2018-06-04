@@ -18,7 +18,7 @@ import java.util.List;
  */
 public class GeneProductNameInjector extends AbstractValueInjector<BasicGeneProduct, Annotation> {
 
-    private static final String GENE_PRODUCT_ID = "geneProductId";
+    private static final String CANONICAL_ID = "canonicalId";
     static final String GENE_PRODUCT_NAME = "name";
 
     @Override
@@ -28,9 +28,7 @@ public class GeneProductNameInjector extends AbstractValueInjector<BasicGeneProd
 
     @Override
     public FilterRequest buildFilterRequest(Annotation annotation) {
-        return FilterRequest.newBuilder()
-                            .addProperty(getId())
-                            .addProperty(GENE_PRODUCT_ID, annotation.geneProductId.split(":")[1])
+        return FilterRequest.newBuilder().addProperty(getId()).addProperty(CANONICAL_ID, annotation.canonicalId)
                             .build();
     }
 

@@ -107,7 +107,7 @@ public class PresetsSuccessfulRelevancyFetchingIT {
         BatchStatus status = jobExecution.getStatus();
 
         assertThat(status, is(BatchStatus.COMPLETED));
-        assertThat(presets.getEvidences(), hasSize(22));
+        assertThat(presets.getEvidences(), hasSize(27));
 
         PresetItem firstPresetItem = extractFirstPreset(presets.getEvidences());
         assertThat(firstPresetItem.getProperty(NAME), is(MockPresetDataConfig.PRESET_ECO_32.getProperty(NAME)));

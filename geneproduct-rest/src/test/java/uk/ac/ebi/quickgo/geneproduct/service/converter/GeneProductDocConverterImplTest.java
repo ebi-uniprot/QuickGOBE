@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.geneproduct.service.converter;
 
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductDocument;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductType;
+import uk.ac.ebi.quickgo.geneproduct.common.ProteomeMembership;
 import uk.ac.ebi.quickgo.geneproduct.model.GeneProduct;
 
 import java.util.Arrays;
@@ -31,7 +32,7 @@ public class GeneProductDocConverterImplTest {
     private static final String PARENT_ID = "QWERTY";
     private static final String REF_PROTEOME = "P1234";
     private static final String DATABASE_SUBSET = "SUB1";
-
+    private static final String PROTEOME_MEMBERSHIP = "Reference";
     private static final List<String> SYNONYMS = Arrays.asList("Q1234", "R1234", "S1234");
 
     private GeneProductDocConverter geneProductDocConverter;
@@ -56,6 +57,7 @@ public class GeneProductDocConverterImplTest {
         geneProductDocument.symbol = SYMBOL;
         geneProductDocument.taxonId = TAX_ID;
         geneProductDocument.type = TYPE;
+        geneProductDocument.proteomeMembership = PROTEOME_MEMBERSHIP;
     }
 
     @Test
@@ -75,6 +77,7 @@ public class GeneProductDocConverterImplTest {
         assertThat(convertedGeneProduct.taxonId, is(TAX_ID));
         assertThat(convertedGeneProduct.type, is(GeneProductType.PROTEIN));
         assertThat(convertedGeneProduct.isAnnotated, is(true));
+        assertThat(convertedGeneProduct.proteomeMembership, is(ProteomeMembership.REFERENCE));
     }
 
     @Test

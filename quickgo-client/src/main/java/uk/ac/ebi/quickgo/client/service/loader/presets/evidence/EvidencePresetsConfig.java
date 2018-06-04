@@ -2,14 +2,13 @@ package uk.ac.ebi.quickgo.client.service.loader.presets.evidence;
 
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
 import uk.ac.ebi.quickgo.client.model.presets.PresetType;
+import uk.ac.ebi.quickgo.client.model.presets.evidence.PresetEvidenceItem;
 import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
 import uk.ac.ebi.quickgo.client.service.loader.presets.LogStepListener;
 import uk.ac.ebi.quickgo.client.service.loader.presets.PresetsCommonConfig;
-import uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPreset;
-import uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPresetValidator;
 import uk.ac.ebi.quickgo.client.service.loader.presets.ff.SourceColumnsFactory;
-import uk.ac.ebi.quickgo.client.service.loader.presets.ff.StringToRawNamedPresetMapper;
 
+import java.util.Optional;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.item.ItemProcessor;
@@ -25,7 +24,6 @@ import org.springframework.core.io.Resource;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfig.SKIP_LIMIT;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelper.fileReader;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelper.rawPresetMultiFileReader;
-import static uk.ac.ebi.quickgo.client.service.loader.presets.ff.SourceColumnsFactory.Source.ECO2GO_COLUMNS;
 
 /**
  * Exposes the {@link Step} bean that is used to read and populate information relating to the evidence preset data.
@@ -48,14 +46,14 @@ public class EvidencePresetsConfig {
             StepBuilderFactory stepBuilderFactory,
             Integer chunkSize,
             CompositePresetImpl presets) {
-        FlatFileItemReader<RawNamedPreset> itemReader = fileReader(rawPresetFieldSetMapper());
+        FlatFileItemReader<RawEvidenceNamedPreset> itemReader = fileReader(rawPresetFieldSetMapper());
         itemReader.setLinesToSkip(headerLines);
 
         return stepBuilderFactory.get(EVIDENCE_LOADING_STEP_NAME)
-                .<RawNamedPreset, RawNamedPreset>chunk(chunkSize)
+                .<RawEvidenceNamedPreset, RawEvidenceNamedPreset>chunk(chunkSize)
                 .faultTolerant()
                 .skipLimit(SKIP_LIMIT)
-                .<RawNamedPreset>reader(rawPresetMultiFileReader(resources, itemReader))
+                .<RawEvidenceNamedPreset>reader(rawPresetMultiFileReader(resources, itemReader, Optional::of))
                 .processor(rawPresetValidator())
                 .writer(rawPresetWriter(presets))
                 .listener(new LogStepListener())
@@ -63,26 +61,27 @@ public class EvidencePresetsConfig {
     }
 
     /**
-     * Write the list of {@link RawNamedPreset}s to the {@link CompositePresetImpl}
+     * Write the list of {@link RawEvidenceNamedPreset}s to the {@link CompositePresetImpl}
      * @param presets the presets to write to
      * @return the corresponding {@link ItemWriter}
      */
-    private ItemWriter<RawNamedPreset> rawPresetWriter(CompositePresetImpl presets) {
+    private ItemWriter<RawEvidenceNamedPreset> rawPresetWriter(CompositePresetImpl presets) {
         return rawItemList -> rawItemList.forEach(rawItem ->
-            presets.addPreset(PresetType.EVIDENCES,
-                    PresetItem.createWithName(rawItem.name)
-                            .withProperty(PresetItem.Property.ID.getKey(), rawItem.id)
-                            .withRelevancy(rawItem.relevancy)
-                            .withProperty(PresetItem.Property.DESCRIPTION.getKey(), rawItem.description)
-                            .build())
+                presets.addPreset(PresetType.EVIDENCES,
+                        PresetItem.createWithName(rawItem.name)
+                                .withProperty(PresetItem.Property.ID.getKey(), rawItem.id)
+                                .withRelevancy(rawItem.relevancy)
+                                .withProperty(PresetEvidenceItem.Property.GO_EVIDENCE.getKey(), rawItem
+                                        .goEvidence)
+                                .build())
         );
     }
 
-    private FieldSetMapper<RawNamedPreset> rawPresetFieldSetMapper() {
-        return new StringToRawNamedPresetMapper(SourceColumnsFactory.createFor(ECO2GO_COLUMNS));
+    private FieldSetMapper<RawEvidenceNamedPreset> rawPresetFieldSetMapper() {
+        return new StringToRawEvidenceNamedPresetMapper(SourceColumnsFactory.createEvidenceColumns());
     }
 
-    private ItemProcessor<RawNamedPreset, RawNamedPreset> rawPresetValidator() {
-        return new RawNamedPresetValidator();
+    private ItemProcessor<RawEvidenceNamedPreset, RawEvidenceNamedPreset> rawPresetValidator() {
+        return new RawEvidenceNamedPresetValidator();
     }
 }

@@ -18,6 +18,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static uk.ac.ebi.quickgo.geneproduct.GeneProductParameters.DB_SUBSET_PARAM;
+import static uk.ac.ebi.quickgo.geneproduct.GeneProductParameters.PROTEOME_MEMBERSHIP_PARAM;
 import static uk.ac.ebi.quickgo.geneproduct.GeneProductParameters.TAXON_ID_PARAM;
 import static uk.ac.ebi.quickgo.geneproduct.GeneProductParameters.TYPE_PARAM;
 import static uk.ac.ebi.quickgo.geneproduct.common.common.GeneProductDocMocker.createDocWithId;
@@ -31,7 +32,7 @@ public class GeneProductSearchIT extends SearchControllerSetup {
     private static final String GENE_PRODUCT_RESOURCE_URL = "/geneproduct/search";
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         repository.deleteAll();
         resourceUrl = GENE_PRODUCT_RESOURCE_URL;
     }
@@ -50,11 +51,8 @@ public class GeneProductSearchIT extends SearchControllerSetup {
     public void pageRequestHigherThanPaginationLimitReturns400() throws Exception {
         int totalEntries = MAX_PAGE_NUMBER + 1;
         int pageSize = 1;
-        int pageNumWhichIsTooHigh = totalEntries;
 
-        saveNDocs(totalEntries);
-
-        checkInvalidPageInfoInResponse("aaaa", pageNumWhichIsTooHigh, pageSize, HttpStatus.SC_BAD_REQUEST);
+        checkInvalidPageInfoInResponse("aaaa", totalEntries, pageSize, HttpStatus.SC_BAD_REQUEST);
     }
 
     @Test
@@ -212,6 +210,23 @@ public class GeneProductSearchIT extends SearchControllerSetup {
         checkValidFacetResponse(name, DB_SUBSET_PARAM.getName());
     }
 
+    @Test
+    public void requestWithProteomeMembershipFacetFieldReturnsResponseWithFacetInResult() throws Exception {
+        String proteomeMembership = "Complete";
+        String name = "name";
+
+        GeneProductDocument doc1 =
+                createGeneProductDocWithNameAndProteomeMembership("A0A0F8CSS1", name, proteomeMembership);
+        GeneProductDocument doc2 =
+                createGeneProductDocWithNameAndProteomeMembership("A0A0F8CSS2", name, proteomeMembership);
+        GeneProductDocument doc3 =
+                createGeneProductDocWithNameAndProteomeMembership("A0A0F8CSS3", name, proteomeMembership);
+
+        saveToRepository(doc1, doc2, doc3);
+
+        checkValidFacetResponse(name, PROTEOME_MEMBERSHIP_PARAM.getName());
+    }
+
     // filter queries ---------------------------------------------------------
     @Test
     public void requestWithInvalidFilterQueryIgnoresTheFilter() throws Exception {
@@ -294,6 +309,21 @@ public class GeneProductSearchIT extends SearchControllerSetup {
         checkValidFilterQueryResponse("glycine", 3, fq);
     }
 
+    @Test
+    public void requestWithAProteomeMembershipFilterQueryReturnsFilteredResponse() throws Exception {
+        String proteomeMembership = "Complete";
+        String name = "glycine metabolic process";
+        GeneProductDocument doc1 =
+                createGeneProductDocWithNameAndProteomeMembership("A0A0F8CSS1", name, proteomeMembership);
+        GeneProductDocument doc2 =
+                createGeneProductDocWithNameAndProteomeMembership("A0A0F8CSS2", name, proteomeMembership);
+        GeneProductDocument doc3 = createGeneProductDocWithNameAndProteomeMembership("A0A0F8CSS3", name, "Reference");
+        saveToRepository(doc1, doc2, doc3);
+        Param fq = new Param(PROTEOME_MEMBERSHIP_PARAM.getName(), proteomeMembership);
+
+        checkValidFilterQueryResponse("metabolic", 2, fq);
+    }
+
     // highlighting ------------------------------------------------
     @Test
     public void requestWithHighlightingOnAndOneHitReturnsValidResponse() throws Exception {
@@ -368,12 +398,6 @@ public class GeneProductSearchIT extends SearchControllerSetup {
         }
     }
 
-    private void saveNDocs(int n) {
-        IntStream.range(1, n + 1)
-                .mapToObj(i -> createDocWithId(String.valueOf(i)))
-                .collect(Collectors.toList());
-    }
-
     private GeneProductDocument createGeneProductDocWithName(String id, String name) {
         GeneProductDocument geneProductDocument = createDocWithId(id);
         geneProductDocument.name = name;
@@ -401,6 +425,15 @@ public class GeneProductSearchIT extends SearchControllerSetup {
         GeneProductDocument geneProductDocument = createDocWithId(id);
         geneProductDocument.name = name;
         geneProductDocument.databaseSubset = dbSubset;
+
+        return geneProductDocument;
+    }
+
+    private GeneProductDocument createGeneProductDocWithNameAndProteomeMembership(String id, String name, String
+            proteomeMembership) {
+        GeneProductDocument geneProductDocument = createDocWithId(id);
+        geneProductDocument.name = name;
+        geneProductDocument.proteomeMembership = proteomeMembership;
 
         return geneProductDocument;
     }

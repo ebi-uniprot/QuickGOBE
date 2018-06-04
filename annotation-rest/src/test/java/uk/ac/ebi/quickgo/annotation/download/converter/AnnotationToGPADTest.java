@@ -1,7 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.download.converter;
 
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
-import uk.ac.ebi.quickgo.annotation.model.AnnotationMocker;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,146 +36,214 @@ public class AnnotationToGPADTest {
     private static final int COL_ANNOTATION_EXTENSION = 10;
     private static final int COL_GO_EVIDENCE = 11;
 
-    private Annotation annotation;
     private AnnotationToGPAD annotationToGPAD;
 
     @Before
     public void setup() {
-        annotation = AnnotationMocker.createValidAnnotation();
         annotationToGPAD = new AnnotationToGPAD();
     }
 
     @Test
-    public void createGAFStringFromAnnotationModelContainingIntAct() {
-        String[] elements = annotationToElements(annotation);
-        assertThat(elements[COL_DB], is(DB));
-        assertThat(elements[COL_DB_OBJECT_ID], is(ID));
+    public void createGAFStringFromAnnotationModelContainingComplex() {
+        Annotation annotation = createValidComplexPortalAnnotation();
+
+        String[] elements = annotationToDownloadColumns(annotation);
+
+        assertThat(elements[COL_DB], is(DB_COMPLEX_PORTAL));
+        assertThat(elements[COL_DB_OBJECT_ID], is(ID_COMPLEX_PORTAL));
         assertThat(elements[COL_QUALIFIER], is(QUALIFIER));
         assertThat(elements[COL_GO_ID], is(GO_ID));
         assertThat(elements[COL_REFERENCE], is(REFERENCE));
         assertThat(elements[COL_EVIDENCE], is(ECO_ID));
         assertThat(elements[COL_WITH], equalTo(WITH_FROM_AS_STRING));
-        assertThat(elements[COL_INTERACTING_DB], is(Integer.toString(INTERACTING_TAXON_ID)));
+        assertThat(elements[COL_INTERACTING_DB], is(""));
         assertThat(elements[COL_DATE], equalTo(DATE_AS_STRING));
-        assertThat(elements[COL_ASSIGNED_BY], equalTo(DB));
+        assertThat(elements[COL_ASSIGNED_BY], equalTo(ASSIGNED_BY));
         assertThat(elements[COL_ANNOTATION_EXTENSION], is(EXTENSIONS_AS_STRING));
         assertThat(elements[COL_GO_EVIDENCE], is("goEvidence=" + GO_EVIDENCE));
     }
 
     @Test
-    public void slimmedToGoIdReplacesGoIdIfItExists() {
-        final String slimmedToGoId = "GO:0005524";
-        annotation.slimmedIds = Collections.singletonList(slimmedToGoId);
-        String[] elements = annotationToElements(annotation);
-        assertThat(elements[COL_GO_ID], is(slimmedToGoId));
+    public void uniProtGeneProductAnnotationWithIsoForm() {
+        Annotation annotation = createValidUniProtAnnotationWithIsoForm();
+
+        String[] elements = annotationToDownloadColumns(annotation);
+
+        assertThat(elements[COL_DB], is(DB_UNIPROTKB));
+        assertThat(elements[COL_DB_OBJECT_ID], is(ID_UNIPROTKB_WITH_ISOFORM));
     }
 
     @Test
+    public void uniProtGeneProductAnnotationWithoutGeneProductIsoForm() {
+        Annotation annotation = createValidUniProtAnnotationWithoutIsoForm();
+
+        String[] elements = annotationToDownloadColumns(annotation);
+
+        assertThat(elements[COL_DB], is(DB_UNIPROTKB));
+        assertThat(elements[COL_DB_OBJECT_ID], is(ID_UNIPROTKB_WITHOUT_ISOFORM));
+    }
+
+    @Test
+    public void slimmedToGoIdReplacesGoIdIfItExists() {
+        Annotation annotation = createValidComplexPortalAnnotation();
+        final String slimmedToGoId = "GO:0005524";
+        annotation.slimmedIds = Collections.singletonList(slimmedToGoId);
+
+        String[] elements = annotationToDownloadColumns(annotation);
+
+        assertThat(elements[COL_GO_ID], is(slimmedToGoId));
+    }
+
+    @Test(expected = NullPointerException.class)
     public void nullGeneProductId() {
+        Annotation annotation = createValidComplexPortalAnnotation();
         annotation.geneProductId = null;
-        String[] elements = annotationToElements(annotation);
-        assertThat(elements[COL_DB], is(""));
-        assertThat(elements[COL_DB_OBJECT_ID], is(""));
+        annotation.setGeneProduct(null);
+
+        annotationToDownloadColumns(annotation);
+
     }
 
     @Test
     public void nullQualifier() {
+        Annotation annotation = createValidComplexPortalAnnotation();
         annotation.qualifier = null;
-        String[] elements = annotationToElements(annotation);
+
+        String[] elements = annotationToDownloadColumns(annotation);
+
         assertThat(elements[COL_QUALIFIER], is(""));
     }
 
     @Test
     public void nullGoId() {
+        Annotation annotation = createValidComplexPortalAnnotation();
         annotation.goId = null;
-        String[] elements = annotationToElements(annotation);
+
+        String[] elements = annotationToDownloadColumns(annotation);
+
         assertThat(elements[COL_GO_ID], is(""));
     }
 
     @Test
     public void nullReference() {
+        Annotation annotation = createValidComplexPortalAnnotation();
         annotation.reference = null;
-        String[] elements = annotationToElements(annotation);
+
+        String[] elements = annotationToDownloadColumns(annotation);
+
         assertThat(elements[COL_REFERENCE], is(""));
     }
 
     @Test
     public void nullEvidence() {
+        Annotation annotation = createValidComplexPortalAnnotation();
         annotation.evidenceCode = null;
-        String[] elements = annotationToElements(annotation);
+
+        String[] elements = annotationToDownloadColumns(annotation);
+
         assertThat(elements[COL_EVIDENCE], is(""));
     }
 
     @Test
     public void nullWithFrom() {
+        Annotation annotation = createValidComplexPortalAnnotation();
         annotation.withFrom = null;
-        String[] elements = annotationToElements(annotation);
+
+        String[] elements = annotationToDownloadColumns(annotation);
+
         assertThat(elements[COL_WITH], is(""));
     }
 
     @Test
     public void emptyWithFrom() {
+        Annotation annotation = createValidComplexPortalAnnotation();
         annotation.withFrom = new ArrayList<>();
-        String[] elements = annotationToElements(annotation);
+
+        String[] elements = annotationToDownloadColumns(annotation);
+
         assertThat(elements[COL_WITH], is(""));
     }
 
     @Test
-    public void emptyInteractingTaxonId() {
-        annotation.interactingTaxonId = 0;
-        String[] elements = annotationToElements(annotation);
-        assertThat(elements[COL_INTERACTING_DB], is(""));
+    public void specifiedInteractingTaxonId() {
+        Annotation annotation = createValidComplexPortalAnnotation();
+        annotation.interactingTaxonId = INTERACTING_TAXON_ID;
+
+        String[] elements = annotationToDownloadColumns(annotation);
+
+        assertThat(elements[COL_INTERACTING_DB], is(("taxon:" + INTERACTING_TAXON_ID)));
     }
 
     @Test
     public void lowestInteractingTaxonIdIsPopulatedCorrectly() {
+        Annotation annotation = createValidComplexPortalAnnotation();
         annotation.interactingTaxonId = 1;
-        String[] elements = annotationToElements(annotation);
-        assertThat(elements[COL_INTERACTING_DB], is("1"));
+
+        String[] elements = annotationToDownloadColumns(annotation);
+
+        assertThat(elements[COL_INTERACTING_DB], is("taxon:1"));
     }
 
     @Test
     public void nullDate() {
+        Annotation annotation = createValidComplexPortalAnnotation();
         annotation.date = null;
-        String[] elements = annotationToElements(annotation);
+
+        String[] elements = annotationToDownloadColumns(annotation);
+
         assertThat(elements[COL_DATE], is(""));
     }
 
     @Test
     public void nullAssignedBy() {
+        Annotation annotation = createValidComplexPortalAnnotation();
         annotation.assignedBy = null;
-        String[] elements = annotationToElements(annotation);
+
+        String[] elements = annotationToDownloadColumns(annotation);
+
         assertThat(elements[COL_ASSIGNED_BY], is(""));
     }
 
     @Test
     public void nullGoEvidence() {
+        Annotation annotation = createValidComplexPortalAnnotation();
         annotation.goEvidence = null;
-        String[] elements = annotationToElements(annotation);
+
+        String[] elements = annotationToDownloadColumns(annotation);
+
         assertThat(elements[COL_GO_EVIDENCE], is("goEvidence="));
     }
 
     @Test
     public void emptyExtensions() {
+        Annotation annotation = createValidComplexPortalAnnotation();
         annotation.extensions = new ArrayList<>();
-        String[] elements = annotationToElements(annotation);
+
+        String[] elements = annotationToDownloadColumns(annotation);
+
         assertThat(elements[COL_ANNOTATION_EXTENSION], is(""));
     }
 
     @Test
     public void nullInExtensions() {
+        Annotation annotation = createValidComplexPortalAnnotation();
         annotation.extensions = null;
-        String[] elements = annotationToElements(annotation);
+
+        String[] elements = annotationToDownloadColumns(annotation);
+
         assertThat(elements[COL_ANNOTATION_EXTENSION], is(""));
     }
 
     @Test
     public void multipleSlimmedToGoIdsCreatesEqualQuantityOfAnnotationRecords() {
+        Annotation annotation = createValidComplexPortalAnnotation();
         final String slimmedToGoId0 = "GO:0005524";
         final String slimmedToGoId1 = "GO:1005524";
         final String slimmedToGoId2 = "GO:2005524";
         annotation.slimmedIds = Arrays.asList(slimmedToGoId0, slimmedToGoId1, slimmedToGoId2);
+
         List<String> converted = annotationToGPAD.apply(annotation, null);
+
         assertThat(converted, hasSize(annotation.slimmedIds.size()));
         checkReturned(slimmedToGoId0, converted.get(0));
         checkReturned(slimmedToGoId1, converted.get(1));
@@ -185,10 +252,11 @@ public class AnnotationToGPADTest {
 
     private void checkReturned(String slimmedToGoId, String converted) {
         String[] elements = converted.split(AnnotationToGAF.OUTPUT_DELIMITER, -1);
+
         assertThat(elements[COL_GO_ID], is(slimmedToGoId));
     }
 
-    private String[] annotationToElements(Annotation annotation) {
+    private String[] annotationToDownloadColumns(Annotation annotation) {
         return annotationToGPAD.apply(annotation, null)
                 .get(0)
                 .split(AnnotationToGAF.OUTPUT_DELIMITER, -1);

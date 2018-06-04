@@ -43,7 +43,9 @@ class DownloadResponseVerifier {
 
 
     static class GAFMandatoryFieldMatcher extends TypeSafeMatcher<String> {
-        private static final List<Integer> MANDATORY_INDICES = asList(0, 1, 2, 4, 5, 6, 8, 11, 12, 13, 14);
+        //THE LIST BELOW IS OFF BY ONE!
+        private static final List<Integer> MANDATORY_INDICES = asList(0, 1, 2, 4, 5, 6, 7, 8, 11, 12, 13, 14, 15);
+        public static final int NO_OF_FIELDS = 16;
 
         @Override public void describeTo(Description description) {
             description.appendText("mandatory indices were not populated: " + MANDATORY_INDICES);
@@ -54,8 +56,9 @@ class DownloadResponseVerifier {
             for (String line : lines) {
                 if (!line.startsWith("!")) {
                     String[] components = line.split("\t");
-                    if (components.length != 17) {
-                        LOGGER.error("GAF line should contain 17 fields, but found: " + components.length);
+                    if (components.length != NO_OF_FIELDS) {
+                        LOGGER.error(String.format("GAF line should contain %d fields, but found: %d", NO_OF_FIELDS,
+                                components.length));
                         return false;
                     }
                     for (Integer mandatoryIndex : MANDATORY_INDICES) {

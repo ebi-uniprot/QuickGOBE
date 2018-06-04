@@ -70,8 +70,26 @@ search:
           responseConverter: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.BasicOntologyIdentityFilterConverter",
           timeout: 15000
         }
+      - signature: canonicalId,name
+        execution: REST_COMM
+        properties: {
+          ip: "https://localhost",
+          resourceFormat: "/QuickGO/services/geneproduct/{canonicalId}",
+          responseClass: "uk.ac.ebi.quickgo.annotation.service.comm.rest.geneproduct.model.BasicGeneProduct",
+          responseConverter: "uk.ac.ebi.quickgo.annotation.service.comm.rest.geneproduct.converter.GeneProductFilterConverter",
+          timeout: 15000
+        }
+      - signature: canonicalId,synonyms
+        execution: REST_COMM
+        properties: {
+          ip: "https://localhost",
+          resourceFormat: "/QuickGO/services/geneproduct/{canonicalId}",
+          responseClass: "uk.ac.ebi.quickgo.annotation.service.comm.rest.geneproduct.model.BasicGeneProduct",
+          responseConverter: "uk.ac.ebi.quickgo.annotation.service.comm.rest.geneproduct.converter.GeneProductFilterConverter",
+          timeout: 15000
+        }
   wildcard:
-    fields: extension_search
+    fields: extension_unsorted
 model:
   repo2domainFieldNameTransformations:
     transformations: {

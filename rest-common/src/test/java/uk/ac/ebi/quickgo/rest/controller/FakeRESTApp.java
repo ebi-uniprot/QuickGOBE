@@ -12,26 +12,23 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * A fake RESTful application that returns a single resource, which is configurable via the
- * constructor.
+ * A fake RESTful application that returns a single configurable resource.
  *
  * Created 15/12/16
  * @author Edd
  */
-@Profile("cors-config-integration-test")
+@Profile("allow-origins-integration-test")
 @SpringBootApplication
 @ComponentScan({"uk.ac.ebi.quickgo.rest"})
-@Import({FakeCORSFilteringRESTApp.FakeController.class})
-public class FakeCORSFilteringRESTApp {
+@Import({FakeRESTApp.FakeController.class})
+public class FakeRESTApp {
     static final String RESOURCE_1_URL = "/resource1";
-    static final String RESOURCE_2_URL = "/resource2";
-    static final String RESOURCE_2_SUB_RESOURCE_URL = "/resource2/sub-resource";
 
     public static void main(String[] args) {
-        SpringApplication.run(FakeCORSFilteringRESTApp.class, args);
+        SpringApplication.run(FakeRESTApp.class, args);
     }
 
-    @Profile("cors-config-integration-test")
+    @Profile("allow-origins-integration-test")
     @RestController static class FakeController {
         private String value;
         private final static String DEFAULT_VALUE = "value";
@@ -53,21 +50,9 @@ public class FakeCORSFilteringRESTApp {
         public String getResource1() {
             return "{ resource1Attribute : " + this.value+" }";
         }
-
-        @RequestMapping(value = RESOURCE_2_URL, method = {RequestMethod.GET},
-                produces = {MediaType.APPLICATION_JSON_VALUE})
-        public String getResource2() {
-            return "{ resource2Attribute : " + this.value+" }";
-        }
-
-        @RequestMapping(value = RESOURCE_2_SUB_RESOURCE_URL, method = {RequestMethod.GET},
-                produces = {MediaType.APPLICATION_JSON_VALUE})
-        public String getSubResource2() {
-            return "{ sub-resource2Attribute : " + this.value+" }";
-        }
     }
 
-    @Profile("cors-config-integration-test")
+    @Profile("allow-origins-integration-test")
     @Configuration static class FakeAppConfig {
         @Bean SearchableField searchableField() {
             return new SearchableField() {
