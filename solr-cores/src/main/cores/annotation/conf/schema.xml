@@ -285,7 +285,7 @@
 -->
     <fieldType name="database_id" class="solr.TextField" positionIncrementGap="100">
         <analyzer type="index">
-            <tokenizer class="solr.SimplePatternSplitTokenizerFactory" pattern="[|,]+"/>
+            <tokenizer class="solr.PatternTokenizerFactory" pattern="[|,]+" group="-1"/>
             <filter class="solr.PatternCaptureGroupFilterFactory" pattern="([A-Za-z_-]+)[:]" preserve_original="false"/>
         </analyzer>
 
