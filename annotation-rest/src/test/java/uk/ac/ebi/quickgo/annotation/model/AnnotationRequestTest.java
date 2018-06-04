@@ -522,6 +522,15 @@ public class AnnotationRequestTest {
     }
 
     @Test
+    public void setAndGetGeneProductSubset() {
+        String geneProductSubset = "TrEMBL";
+
+        annotationRequest.setGeneProductSubset(geneProductSubset);
+
+        assertThat(annotationRequest.getGeneProductSubset(), arrayContaining(geneProductSubset));
+    }
+
+    @Test
     public void setAndGetProteome() {
         String proteome = "none";
 
