@@ -5,21 +5,14 @@ import uk.ac.ebi.quickgo.client.model.presets.PresetType;
 import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
 import uk.ac.ebi.quickgo.client.service.loader.presets.LogStepListener;
 import uk.ac.ebi.quickgo.client.service.loader.presets.PresetsCommonConfig;
+import uk.ac.ebi.quickgo.client.service.loader.presets.RestValuesRetriever;
 import uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPreset;
 import uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPresetValidator;
 import uk.ac.ebi.quickgo.client.service.loader.presets.ff.SourceColumnsFactory;
 import uk.ac.ebi.quickgo.client.service.loader.presets.ff.StringToRawNamedPresetMapper;
-import uk.ac.ebi.quickgo.rest.search.RetrievalException;
-import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
-import uk.ac.ebi.quickgo.rest.search.request.config.FilterConfigRetrieval;
-import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
-import uk.ac.ebi.quickgo.rest.search.request.converter.RESTFilterConverterFactory;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.item.ItemProcessor;
@@ -31,7 +24,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.Resource;
-import org.springframework.web.client.RestOperations;
 
 import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfig.SKIP_LIMIT;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelper.compositeItemProcessor;
@@ -48,7 +40,6 @@ import static uk.ac.ebi.quickgo.client.service.loader.presets.ff.SourceColumnsFa
 @Configuration
 @Import({PresetsCommonConfig.class})
 public class WithFromPresetsConfig {
-    private static final Logger LOGGER = LoggerFactory.getLogger(WithFromPresetsConfig.class);
 
     public static final String WITH_FROM_DB_LOADING_STEP_NAME = "WithFromDBReadingStep";
     public static final String WITH_FROM_REST_KEY = "withFrom";
@@ -63,12 +54,7 @@ public class WithFromPresetsConfig {
     public Step withFromDbStep(
             StepBuilderFactory stepBuilderFactory,
             Integer chunkSize,
-            CompositePresetImpl presets,
-            FilterConfigRetrieval externalFilterConfigRetrieval,
-            RestOperations restOperations) {
-
-        RESTFilterConverterFactory converterFactory = converterFactory(externalFilterConfigRetrieval,
-                restOperations);
+            CompositePresetImpl presets, RestValuesRetriever restValuesRetriever) {
 
         FlatFileItemReader<RawNamedPreset> itemReader = fileReader(rawPresetFieldSetMapper());
         itemReader.setLinesToSkip(headerLines);
@@ -76,12 +62,9 @@ public class WithFromPresetsConfig {
         return stepBuilderFactory.get(WITH_FROM_DB_LOADING_STEP_NAME)
                 .<RawNamedPreset, RawNamedPreset>chunk(chunkSize)
                 .faultTolerant()
-                .skipLimit(SKIP_LIMIT)
-                .<RawNamedPreset>reader(
-                        rawPresetMultiFileReader(resources, itemReader))
+                .skipLimit(SKIP_LIMIT).<RawNamedPreset>reader(rawPresetMultiFileReader(resources, itemReader))
                 .processor(compositeItemProcessor(
-                        new RawNamedPresetValidator(),
-                        filterUsingRestResults(converterFactory),
+                        new RawNamedPresetValidator(), checkPresetIsUsedItemProcessor(restValuesRetriever),
                         duplicateChecker()))
                 .writer(rawPresetWriter(presets))
                 .listener(new LogStepListener())
@@ -90,11 +73,6 @@ public class WithFromPresetsConfig {
 
     ItemProcessor<RawNamedPreset, RawNamedPreset> duplicateChecker() {
         return rawNamedPreset -> duplicatePrevent.add(rawNamedPreset.name.toLowerCase()) ? rawNamedPreset : null;
-    }
-
-    private RESTFilterConverterFactory converterFactory(FilterConfigRetrieval filterConfigRetrieval,
-            RestOperations restOperations) {
-        return new RESTFilterConverterFactory(filterConfigRetrieval, restOperations);
     }
 
     /**
@@ -116,31 +94,17 @@ public class WithFromPresetsConfig {
         return StringToRawNamedPresetMapper.create(SourceColumnsFactory.createFor(DB_COLUMNS));
     }
 
-    private ItemProcessor<RawNamedPreset, RawNamedPreset> filterUsingRestResults(
-            RESTFilterConverterFactory converterFactory) {
-        FilterRequest restRequest = FilterRequest.newBuilder().addProperty(WITH_FROM_REST_KEY).build();
-
-        try {
-            final Set<String> usedDbs = retrieveSolrWithFromValues(converterFactory, restRequest);
-
-            return rawNamedPreset -> {
-                boolean contains = usedDbs.contains(rawNamedPreset.name);
-                LOGGER.info("The value %s is used in a withFrom value true or false - %s", rawNamedPreset.name,
-                        contains);
+    private ItemProcessor<RawNamedPreset, RawNamedPreset> checkPresetIsUsedItemProcessor(RestValuesRetriever
+                                                                                                 restValuesRetriever) {
+        return rawNamedPreset -> {
+            Set<String> usedValues = restValuesRetriever.retrieveValues(WITH_FROM_REST_KEY);
+            if (!usedValues.isEmpty()) {
+                boolean contains = usedValues.contains(rawNamedPreset.name);
                 return contains ? rawNamedPreset : null;
-            };
-        } catch (RetrievalException | IllegalStateException e) {
-            LOGGER.error("Failed to retrieve via REST call the relevant 'with/from' values: ", e);
-        }
-        return rawNamedPreset -> rawNamedPreset;
-    }
-
-    private Set<String> retrieveSolrWithFromValues(RESTFilterConverterFactory converterFactory,
-                                                   FilterRequest restRequest) {
-        ConvertedFilter<List<String>> convertedFilter = converterFactory.convert(restRequest);
-        final List<String> convertedValues = convertedFilter.getConvertedValue();
-        LOGGER.info("The list of DBs used in WithFrom values is as follows:");
-        convertedValues.stream().forEach(v -> LOGGER.info(v));
-        return new HashSet<>(convertedValues);
+            }
+            //Wasn't possible to load from values used from source and check usage, so OK preset value so we have
+            // something to show.
+            return rawNamedPreset;
+        };
     }
 }
