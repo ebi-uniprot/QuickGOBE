@@ -14,15 +14,15 @@ import static org.junit.Assert.assertThat;
  * Created 01/09/16
  * @author Edd
  */
-public class RawNamedPresetRelevanceCheckerTest {
+public class RawNamedPresetRelevanceAssignationTest {
     private static final String UNIPARC = "UniParc";
     private static final String UNIPROT = "UniProt";
     private final static List<String> UNIPROT_OR_UNIPARC = asList(UNIPROT, UNIPARC);
-    private RawNamedPresetRelevanceChecker relevanceChecker;
+    private RawNamedPresetRelevanceAssignation relevanceChecker;
 
     @Before
     public void setUp() {
-        this.relevanceChecker = new RawNamedPresetRelevanceChecker(UNIPROT_OR_UNIPARC);
+        this.relevanceChecker = new RawNamedPresetRelevanceAssignation(UNIPROT_OR_UNIPARC);
     }
 
     @Test
