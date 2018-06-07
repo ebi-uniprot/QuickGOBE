@@ -54,8 +54,8 @@ public class GeneProductPresetsConfig {
                 .<RawNamedPreset, RawNamedPreset>chunk(chunkSize)
                 .faultTolerant()
                 .skipLimit(SKIP_LIMIT)
-                .<RawNamedPreset>reader(
-                        rawPresetMultiFileReader(resources, itemReader)).processor(validatingItemProcessor())
+                .<RawNamedPreset>reader(rawPresetMultiFileReader(resources, itemReader)).processor(
+                        validatingItemProcessor())
                 .writer(rawPresetWriter(presets))
                 .listener(new LogStepListener())
                 .build();
