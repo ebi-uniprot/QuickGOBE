@@ -2,8 +2,9 @@ package uk.ac.ebi.quickgo.client.service.loader.presets.ff;
 
 import uk.ac.ebi.quickgo.client.service.loader.presets.RestValuesRetriever;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
@@ -107,8 +108,8 @@ public class ItemProcessorFactoryTest {
 
         @Test
         public void rawItemFound() throws Exception {
-            Set<String> returnSet = new HashSet<>(singletonList("UnionMills"));
-            when(restValuesRetriever.<String>retrieveValues(RETRIEVE_KEY)).thenReturn(returnSet);
+            List<String> returnList = singletonList("UnionMills");
+            when(restValuesRetriever.retrieveValues(RETRIEVE_KEY)).thenReturn(Optional.ofNullable(returnList));
             this.checkUsed = ItemProcessorFactory.checkPresetIsUsedItemProcessor(restValuesRetriever, RETRIEVE_KEY);
 
             RawNamedPreset rawItemReturned = checkUsed.process(rawItem);
@@ -118,8 +119,8 @@ public class ItemProcessorFactoryTest {
 
         @Test
         public void rawItemNotFound() throws Exception {
-            Set<String> returnSet = new HashSet<>(singletonList("GlenHelen"));
-            when(restValuesRetriever.<String>retrieveValues(RETRIEVE_KEY)).thenReturn(returnSet);
+            List<String> returnList = singletonList("GlenHelen");
+            when(restValuesRetriever.retrieveValues(RETRIEVE_KEY)).thenReturn(Optional.ofNullable(returnList));
             this.checkUsed = ItemProcessorFactory.checkPresetIsUsedItemProcessor(restValuesRetriever, RETRIEVE_KEY);
 
             RawNamedPreset rawItemReturned = checkUsed.process(rawItem);
@@ -129,7 +130,8 @@ public class ItemProcessorFactoryTest {
 
         @Test
         public void noResultsFound() throws Exception {
-            when(restValuesRetriever.retrieveValues(RETRIEVE_KEY)).thenReturn(new HashSet<>());
+            List<String> returnList = Collections.emptyList();
+            when(restValuesRetriever.retrieveValues(RETRIEVE_KEY)).thenReturn(Optional.ofNullable(returnList));
             this.checkUsed = ItemProcessorFactory.checkPresetIsUsedItemProcessor(restValuesRetriever, RETRIEVE_KEY);
 
             RawNamedPreset rawItemReturned = checkUsed.process(rawItem);
