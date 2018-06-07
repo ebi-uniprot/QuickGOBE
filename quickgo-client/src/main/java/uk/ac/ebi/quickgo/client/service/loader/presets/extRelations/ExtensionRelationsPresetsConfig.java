@@ -56,9 +56,8 @@ public class ExtensionRelationsPresetsConfig {
         return stepBuilderFactory.get(EXTENSION_RELATIONS_LOADING_STEP_NAME)
                 .<RawNamedPreset, RawNamedPreset>chunk(chunkSize)
                 .faultTolerant()
-                .skipLimit(SKIP_LIMIT)
-                .<RawNamedPreset>reader(rawPresetMultiFileReader(resources, itemReader)).processor(
-                        validatingItemProcessor())
+                .skipLimit(SKIP_LIMIT).<RawNamedPreset>reader(
+                        rawPresetMultiFileReader(resources, itemReader)).processor(validatingItemProcessor())
                 .writer(rawPresetWriter(presets))
                 .listener(new LogStepListener())
                 .build();
