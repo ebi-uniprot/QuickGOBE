@@ -7,15 +7,11 @@ import uk.ac.ebi.quickgo.client.service.loader.presets.LogStepListener;
 import uk.ac.ebi.quickgo.client.service.loader.presets.PresetsCommonConfig;
 import uk.ac.ebi.quickgo.client.service.loader.presets.RestValuesRetriever;
 import uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPreset;
-import uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPresetValidator;
 import uk.ac.ebi.quickgo.client.service.loader.presets.ff.SourceColumnsFactory;
 import uk.ac.ebi.quickgo.client.service.loader.presets.ff.StringToRawNamedPresetMapper;
 
-import java.util.HashSet;
-import java.util.Set;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
-import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
@@ -29,6 +25,9 @@ import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfig.SKIP
 import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelper.compositeItemProcessor;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelper.fileReader;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelper.rawPresetMultiFileReader;
+import static uk.ac.ebi.quickgo.client.service.loader.presets.ff.ItemProcessorFactory.checkPresetIsUsedItemProcessor;
+import static uk.ac.ebi.quickgo.client.service.loader.presets.ff.ItemProcessorFactory.duplicateCheckingItemProcessor;
+import static uk.ac.ebi.quickgo.client.service.loader.presets.ff.ItemProcessorFactory.validatingItemProcessor;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.ff.SourceColumnsFactory.Source.DB_COLUMNS;
 
 /**
@@ -48,13 +47,11 @@ public class WithFromPresetsConfig {
     private Resource[] resources;
     @Value("${withfrom.db.preset.header.lines:1}")
     private int headerLines;
-    private final Set<String> duplicatePrevent = new HashSet<>();
 
     @Bean
     public Step withFromDbStep(
             StepBuilderFactory stepBuilderFactory,
-            Integer chunkSize,
-            CompositePresetImpl presets, RestValuesRetriever restValuesRetriever) {
+            Integer chunkSize, CompositePresetImpl presets, RestValuesRetriever restValuesRetriever) {
 
         FlatFileItemReader<RawNamedPreset> itemReader = fileReader(rawPresetFieldSetMapper());
         itemReader.setLinesToSkip(headerLines);
@@ -63,16 +60,12 @@ public class WithFromPresetsConfig {
                 .<RawNamedPreset, RawNamedPreset>chunk(chunkSize)
                 .faultTolerant()
                 .skipLimit(SKIP_LIMIT).<RawNamedPreset>reader(rawPresetMultiFileReader(resources, itemReader))
-                .processor(compositeItemProcessor(
-                        new RawNamedPresetValidator(), checkPresetIsUsedItemProcessor(restValuesRetriever),
-                        duplicateChecker()))
+                .processor(compositeItemProcessor(validatingItemProcessor(),
+                        checkPresetIsUsedItemProcessor(restValuesRetriever, WITH_FROM_REST_KEY),
+                        duplicateCheckingItemProcessor()))
                 .writer(rawPresetWriter(presets))
                 .listener(new LogStepListener())
                 .build();
-    }
-
-    ItemProcessor<RawNamedPreset, RawNamedPreset> duplicateChecker() {
-        return rawNamedPreset -> duplicatePrevent.add(rawNamedPreset.name.toLowerCase()) ? rawNamedPreset : null;
     }
 
     /**
@@ -92,19 +85,5 @@ public class WithFromPresetsConfig {
 
     private FieldSetMapper<RawNamedPreset> rawPresetFieldSetMapper() {
         return StringToRawNamedPresetMapper.create(SourceColumnsFactory.createFor(DB_COLUMNS));
-    }
-
-    private ItemProcessor<RawNamedPreset, RawNamedPreset> checkPresetIsUsedItemProcessor(RestValuesRetriever
-                                                                                                 restValuesRetriever) {
-        return rawNamedPreset -> {
-            Set<String> usedValues = restValuesRetriever.retrieveValues(WITH_FROM_REST_KEY);
-            if (!usedValues.isEmpty()) {
-                boolean contains = usedValues.contains(rawNamedPreset.name);
-                return contains ? rawNamedPreset : null;
-            }
-            //Wasn't possible to load from values used from source and check usage, so OK preset value so we have
-            // something to show.
-            return rawNamedPreset;
-        };
     }
 }
