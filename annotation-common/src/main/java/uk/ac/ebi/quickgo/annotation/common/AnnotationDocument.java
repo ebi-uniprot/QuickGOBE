@@ -70,9 +70,6 @@ public class AnnotationDocument implements QuickGODocument {
     @Field(AnnotationFields.DATE)
     public Date date;
 
-    @Field(AnnotationFields.WITH_FROM_DB)
-    public List<String> withFromDb;
-
     @Override public String getUniqueName() {
         return id;
     }
