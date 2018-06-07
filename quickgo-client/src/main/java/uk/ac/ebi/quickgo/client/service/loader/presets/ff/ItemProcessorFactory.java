@@ -2,8 +2,7 @@ package uk.ac.ebi.quickgo.client.service.loader.presets.ff;
 
 import uk.ac.ebi.quickgo.client.service.loader.presets.RestValuesRetriever;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.validator.ValidationException;
 
@@ -23,7 +22,7 @@ public class ItemProcessorFactory {
             private final Set<String> duplicatePrevent = new HashSet<>();
 
             @Override
-            public RawNamedPreset process(RawNamedPreset rawNamedPreset) throws Exception {
+            public RawNamedPreset process(RawNamedPreset rawNamedPreset) {
                 return duplicatePrevent.add(rawNamedPreset.name.toLowerCase()) ? rawNamedPreset : null;
             }
         };
@@ -57,7 +56,11 @@ public class ItemProcessorFactory {
     public static ItemProcessor<RawNamedPreset, RawNamedPreset> checkPresetIsUsedItemProcessor(RestValuesRetriever
                                                                                                        restValuesRetriever,
                                                                                                String retrieveKey) {
-        final Set<String> usedValues = restValuesRetriever.retrieveValues(retrieveKey);
+
+        final Optional<List<String>> returnedValues = restValuesRetriever.retrieveValues(retrieveKey);
+        List<String> usableList = returnedValues.orElse(Collections.emptyList());
+        Set<String> usedValues = new HashSet<>(usableList);
+
         return rawNamedPreset -> {
             if (usedValues.isEmpty()) {
                 //Wasn't possible to load from values used from source and check usage, so OK preset value so we have
