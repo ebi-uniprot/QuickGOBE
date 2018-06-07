@@ -4,7 +4,6 @@ import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
 import uk.ac.ebi.quickgo.rest.search.request.config.FilterConfigRetrieval;
 import uk.ac.ebi.quickgo.rest.search.request.converter.RESTFilterConverterFactory;
 
-import java.util.HashMap;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
@@ -39,10 +38,6 @@ public class PresetsCommonConfig {
         return chunkSize;
     }
 
-    @Bean DbDescriptions dbDescriptions() {
-        return new DbDescriptions();
-    }
-
     @Bean
     public CompositePresetImpl presets() {
         return new CompositePresetImpl();
@@ -51,11 +46,6 @@ public class PresetsCommonConfig {
     @Bean
     static PropertySourcesPlaceholderConfigurer propertyPlaceHolderConfigurer() {
         return new PropertySourcesPlaceholderConfigurer();
-    }
-
-    public static class DbDescriptions {
-        public final HashMap<String, String> dbDescriptions = new HashMap<>();
-
     }
 
     @Bean
