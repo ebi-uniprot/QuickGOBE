@@ -61,6 +61,13 @@ public class RestValuesRetrieverTest {
         assertThat(retrievedValues.get(), hasSize(0));
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void nullLookupKeyResultsInIllegalArgumentExceptionThrown() {
+        when(converterFactory.<List<String>>convert(any(FilterRequest.class))).thenReturn(convertedValuesNotFound);
+
+        retriever.retrieveValues(null);
+    }
+
     @Test
     public void illegalStateExceptionThrownDuringRetrieval() {
         when(converterFactory.<List<String>>convert(any(FilterRequest.class))).thenThrow(IllegalStateException.class);
@@ -77,6 +84,13 @@ public class RestValuesRetrieverTest {
         Optional<List<String>> retrievedValues = retriever.retrieveValues(RETRIEVE_KEY);
 
         assertThat(retrievedValues.isPresent(), is(false));
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void anyOtherExceptionsArePastOn() {
+        when(converterFactory.<List<String>>convert(any(FilterRequest.class))).thenThrow(NullPointerException.class);
+
+        retriever.retrieveValues(RETRIEVE_KEY);
     }
 
 }
