@@ -286,14 +286,8 @@
     <fieldType name="database_id" class="solr.TextField" positionIncrementGap="100">
         <analyzer type="index">
             <tokenizer class="solr.PatternTokenizerFactory" pattern="[|,]+" group="-1"/>
-            <filter class="solr.PatternCaptureGroupFilterFactory" pattern="(^[A-Za-z_-]*)[:]"
+            <filter class="solr.PatternCaptureGroupFilterFactory" pattern="^([A-Za-z][A-Za-z_-]*):.*"
                     preserve_original="false"/>
-        </analyzer>
-
-        <!-- Can we drop this analyzer?-->
-        <analyzer type="query">
-            <tokenizer class="solr.KeywordTokenizerFactory"/>
-            <filter class="solr.LowerCaseFilterFactory"/>
         </analyzer>
     </fieldType>
 
