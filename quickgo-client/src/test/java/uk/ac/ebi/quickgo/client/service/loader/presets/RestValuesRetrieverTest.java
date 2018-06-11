@@ -25,12 +25,12 @@ import static org.mockito.Mockito.when;
 public class RestValuesRetrieverTest {
 
     private static final String RETRIEVE_KEY = "BogusKey";
-    RestValuesRetriever retriever;
+    private RestValuesRetriever retriever;
 
-    @Mock RESTFilterConverterFactory converterFactory;
+    @Mock private RESTFilterConverterFactory converterFactory;
 
-    ConvertedFilter<List<String>> convertedValuesFound;
-    ConvertedFilter<List<String>> convertedValuesNotFound;
+    private ConvertedFilter<List<String>> convertedValuesFound;
+    private ConvertedFilter<List<String>> convertedValuesNotFound;
 
     @Before
     public void setup() {
