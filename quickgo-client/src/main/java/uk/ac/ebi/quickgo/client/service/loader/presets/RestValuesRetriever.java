@@ -5,9 +5,12 @@ import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
 import uk.ac.ebi.quickgo.rest.search.request.converter.RESTFilterConverterFactory;
 
+import java.util.Objects;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * Simple to use implementation to retrieve values from an external restful service.
@@ -27,6 +30,7 @@ public class RestValuesRetriever {
      * @return a set of retrieved values.
      */
     public <T> Optional<T> retrieveValues(String lookupKey) {
+        checkArgument(Objects.nonNull(lookupKey), "The lookupKey passed to the RestValuesRetriever is " + "null");
         FilterRequest restRequest = FilterRequest.newBuilder().addProperty(lookupKey).build();
         try {
             ConvertedFilter<T> convertedFilter = converterFactory.convert(restRequest);
