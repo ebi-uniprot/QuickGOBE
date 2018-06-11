@@ -41,7 +41,7 @@ import static uk.ac.ebi.quickgo.client.service.loader.presets.ff.SourceColumnsFa
 public class WithFromPresetsConfig {
 
     public static final String WITH_FROM_DB_LOADING_STEP_NAME = "WithFromDBReadingStep";
-    public static final String WITH_FROM_REST_KEY = "withFrom";
+    public static final String WITH_FROM_REST_KEY = "withFromPreset";
 
     @Value("#{'${withfrom.db.preset.source:}'.split(',')}")
     private Resource[] resources;

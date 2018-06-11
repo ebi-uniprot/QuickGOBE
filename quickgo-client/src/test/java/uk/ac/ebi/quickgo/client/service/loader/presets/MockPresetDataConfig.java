@@ -27,7 +27,6 @@ import static org.mockito.Mockito.when;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.assignedby.AssignedByPresetsConfig.ASSIGNED_BY;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.qualifier.QualifierPresetsConfig.QUALIFIER;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.taxon.TaxonPresetsConfig.TAXON_ID;
-import static uk.ac.ebi.quickgo.client.service.loader.presets.withFrom.WithFromPresetsConfig.WITH_FROM_REST_KEY;
 
 /**
  * Provides configurable properties, beans, etc., used during tests.
@@ -191,8 +190,7 @@ public class MockPresetDataConfig {
                 isA(Class.class),
                 any(HashMap.class)))
                 .thenReturn(DEFAULT_RELEVANT_QUALIFIERS);
-        when(mockRestOperations.getForObject(
-                anyStringContaining(WITH_FROM_REST_KEY),
+        when(mockRestOperations.getForObject(anyStringContaining("withFrom"),
                 isA(Class.class),
                 any(HashMap.class)))
                 .thenReturn(DEFAULT_RELEVANT_WITH_FROM);
