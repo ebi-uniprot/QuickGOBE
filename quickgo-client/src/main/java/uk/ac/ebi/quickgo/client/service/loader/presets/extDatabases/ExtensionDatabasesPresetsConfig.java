@@ -6,7 +6,6 @@ import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
 import uk.ac.ebi.quickgo.client.service.loader.presets.LogStepListener;
 import uk.ac.ebi.quickgo.client.service.loader.presets.PresetsCommonConfig;
 import uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPreset;
-import uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPresetValidator;
 import uk.ac.ebi.quickgo.client.service.loader.presets.ff.SourceColumnsFactory;
 import uk.ac.ebi.quickgo.client.service.loader.presets.ff.StringToRawNamedPresetMapper;
 
@@ -29,6 +28,7 @@ import org.springframework.core.io.Resource;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfig.SKIP_LIMIT;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelper.fileReader;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelper.rawPresetMultiFileReader;
+import static uk.ac.ebi.quickgo.client.service.loader.presets.ff.ItemProcessorFactory.validatingItemProcessor;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.ff.SourceColumnsFactory.Source.EXT_DATABASE_COLUMNS;
 
 /**
@@ -89,12 +89,8 @@ public class ExtensionDatabasesPresetsConfig {
 
     private ItemProcessor<RawNamedPreset, RawNamedPreset> compositeRawPresetProcessor() {
         CompositeItemProcessor<RawNamedPreset,RawNamedPreset> compositeItemProcessor = new CompositeItemProcessor<>();
-        compositeItemProcessor.setDelegates(Arrays.asList(rawPresetValidator(),rawPresetUniqueifier() ));
+        compositeItemProcessor.setDelegates(Arrays.asList(validatingItemProcessor(), rawPresetUniqueifier()));
         return compositeItemProcessor;
-    }
-
-    private ItemProcessor<RawNamedPreset, RawNamedPreset> rawPresetValidator() {
-        return new RawNamedPresetValidator();
     }
 
     private ItemProcessor<RawNamedPreset, RawNamedPreset> rawPresetUniqueifier() {

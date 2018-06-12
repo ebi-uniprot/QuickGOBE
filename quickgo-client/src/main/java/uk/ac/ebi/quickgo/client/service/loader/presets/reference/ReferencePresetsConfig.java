@@ -6,7 +6,6 @@ import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
 import uk.ac.ebi.quickgo.client.service.loader.presets.LogStepListener;
 import uk.ac.ebi.quickgo.client.service.loader.presets.PresetsCommonConfig;
 import uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPreset;
-import uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPresetValidator;
 import uk.ac.ebi.quickgo.client.service.loader.presets.ff.SourceColumnsFactory;
 import uk.ac.ebi.quickgo.client.service.loader.presets.ff.StringToRawNamedPresetMapper;
 
@@ -28,6 +27,7 @@ import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfig.SKIP
 import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelper.compositeItemProcessor;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelper.fileReader;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelper.rawPresetMultiFileReader;
+import static uk.ac.ebi.quickgo.client.service.loader.presets.ff.ItemProcessorFactory.validatingItemProcessor;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.ff.SourceColumnsFactory.Source.DB_COLUMNS;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.ff.SourceColumnsFactory.Source.REF_COLUMNS;
 
@@ -77,8 +77,7 @@ public class ReferencePresetsConfig {
                 .skipLimit(SKIP_LIMIT)
                 .<RawNamedPreset>reader(
                         rawPresetMultiFileReader(dbResources, itemReader))
-                .processor(compositeItemProcessor(
-                        rawPresetValidator(),
+                .processor(compositeItemProcessor(validatingItemProcessor(),
                         rawPresetFilter(dbDefaults)))
                 .writer(rawPresetWriter(
                         presets,
@@ -103,8 +102,7 @@ public class ReferencePresetsConfig {
                 .faultTolerant()
                 .skipLimit(SKIP_LIMIT)
                 .<RawNamedPreset>reader(rawPresetMultiFileReader(specificResources, itemReader))
-                .processor(compositeItemProcessor(
-                        rawPresetValidator(),
+                .processor(compositeItemProcessor(validatingItemProcessor(),
                         rawPresetFilter(specificDBDefaults)))
                 .writer(rawPresetWriter(
                         presets,
@@ -143,7 +141,4 @@ public class ReferencePresetsConfig {
         return StringToRawNamedPresetMapper.create(SourceColumnsFactory.createFor(source));
     }
 
-    private ItemProcessor<RawNamedPreset, RawNamedPreset> rawPresetValidator() {
-        return new RawNamedPresetValidator();
-    }
 }

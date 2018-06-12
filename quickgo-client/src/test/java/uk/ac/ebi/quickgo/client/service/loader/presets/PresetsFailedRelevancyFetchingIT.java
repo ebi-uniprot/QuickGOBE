@@ -4,11 +4,11 @@ import uk.ac.ebi.quickgo.client.model.presets.CompositePreset;
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
 import uk.ac.ebi.quickgo.client.service.loader.presets.assignedby.AssignedByPresetsConfig;
 import uk.ac.ebi.quickgo.client.service.loader.presets.qualifier.QualifierPresetsConfig;
+import uk.ac.ebi.quickgo.client.service.loader.presets.withFrom.WithFromPresetsConfig;
 
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import org.hamcrest.collection.IsIterableContainingInOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.BatchStatus;
@@ -47,7 +47,7 @@ public class PresetsFailedRelevancyFetchingIT {
     private CompositePreset presets;
 
     @Test
-    public void loadDefaultAssignedByPresetsAfterFailedRESTInfoFetching() throws Exception {
+    public void loadDefaultAssignedByPresetsAfterFailedRESTInfoFetching() {
         assertThat(presets.getAssignedBy(), hasSize(0));
 
         JobExecution jobExecution =
@@ -61,7 +61,7 @@ public class PresetsFailedRelevancyFetchingIT {
     }
 
     @Test
-    public void loadDefaultQualifierPresetsAfterFailedRESTInfoFetching() throws Exception {
+    public void loadDefaultQualifierPresetsAfterFailedRESTInfoFetching() {
         assertThat(presets.getQualifiers(), hasSize(0));
 
         JobExecution jobExecution =
@@ -72,6 +72,20 @@ public class PresetsFailedRelevancyFetchingIT {
         assertThat(
                 extractPresetValues(presets.getQualifiers(), p -> p.getProperty(PresetItem.Property.NAME.getKey())),
                 is(empty()));
+    }
+
+    @Test
+    public void loadDefaultWithFromPresetsAfterFailedRESTInfoFetching() {
+        assertThat(presets.getWithFrom(), hasSize(0));
+
+        JobExecution jobExecution =
+                jobLauncherTestUtils.launchStep(WithFromPresetsConfig.WITH_FROM_DB_LOADING_STEP_NAME);
+        BatchStatus status = jobExecution.getStatus();
+
+        assertThat(status, is(BatchStatus.COMPLETED));
+        assertThat(
+                extractPresetValues(presets.getWithFrom(), p -> p.getProperty(PresetItem.Property.NAME.getKey())),
+                hasSize(24));
     }
 
     private <T> List<T> extractPresetValues(List<PresetItem> presets, Function<PresetItem, T> extractor) {

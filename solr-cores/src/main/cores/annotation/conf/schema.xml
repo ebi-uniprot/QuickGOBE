@@ -161,6 +161,11 @@
     <field name="rowNumber" type="row_number" indexed="true" stored="true" multiValued="false"/>
     <copyField source="id" dest="rowNumber"/>
 
+    <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+    <!-- Fields that are used specifically for supplying presets -->
+    <field name="withFrom_db" type="database_id" indexed="true" stored="true" multiValued="true"/>
+    <copyField source="withFrom" dest="withFrom_db"/>
+
     <!--                    End of QuickGO Annotation fields                        -->
     <!-- ========================================================================== -->
 
@@ -265,6 +270,28 @@
         <analyzer type="query">
             <tokenizer class="solr.KeywordTokenizerFactory"/>
             <filter class="solr.LowerCaseFilterFactory"/>
+        </analyzer>
+    </fieldType>
+
+
+    <!-- Get database only from the form DB:XXXXXXX-->
+    <!--
+        Turn
+            UniProtKB:A0A0K3AYF5|UniProtKB:A0A0K3AYF5,UniProtKB:P41855|UniProtKB:A0A0K3AYF5,UniProtKB:P41855,
+            UniProtKB:Q6F3C9|UniProtKB:A0A0K3AYF5,UniProtKB:Q6F3C9|UniProtKB:A0A0K3AYF5,UniProtKB:Q6F3C9,
+            UniProtKB:Q9N4V0|UniProtKB:P41855,UniProtKB:Q18534|UniProtKB:P41855,UniProtKB:Q18534,
+            UniProtKB:Q6F3C9|UniProtKB:P41855,UniProtKB:Q6F3C9|UniProtKB:Q18534|UniProtKB:Q18534,
+            UniProtKB:Q6F3C9|UniProtKB:Q18534,UniProtKB:Q6F3C9,UniProtKB:Q9N4V0|UniProtKB:Q18534,
+            UniProtKB:Q9N4V0|ComplexPortal:CPX-1000|UniProtKB:Q6F3C9,UniProtKB:Q9N4V0
+        into
+            UniProtKB
+            ComplexPortal
+-->
+    <fieldType name="database_id" class="solr.TextField" positionIncrementGap="100">
+        <analyzer type="index">
+            <tokenizer class="solr.PatternTokenizerFactory" pattern="[|,]+" group="-1"/>
+            <filter class="solr.PatternCaptureGroupFilterFactory" pattern="^([A-Za-z][A-Za-z_-]*):.*"
+                    preserve_original="false"/>
         </analyzer>
     </fieldType>
 

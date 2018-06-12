@@ -36,7 +36,6 @@ public class AnnotationFields {
     static final String INTERACTING_TAXON_ID = "interactingTaxonId";
     static final String PROTEOME = "proteome";
 
-
     /**
      * Annotation fields that are indexed, and can therefore be searched.
      */

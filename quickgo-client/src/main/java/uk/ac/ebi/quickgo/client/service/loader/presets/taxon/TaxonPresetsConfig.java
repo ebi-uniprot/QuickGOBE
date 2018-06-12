@@ -6,14 +6,12 @@ import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
 import uk.ac.ebi.quickgo.client.service.loader.presets.LogStepListener;
 import uk.ac.ebi.quickgo.client.service.loader.presets.PresetsCommonConfig;
 import uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPreset;
-import uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPresetValidator;
 import uk.ac.ebi.quickgo.client.service.loader.presets.ff.SourceColumnsFactory;
 import uk.ac.ebi.quickgo.client.service.loader.presets.ff.StringToRawNamedPresetMapper;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
-import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
@@ -27,6 +25,7 @@ import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfig.SKIP
 import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelper.compositeItemProcessor;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelper.fileReader;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelper.rawPresetMultiFileReader;
+import static uk.ac.ebi.quickgo.client.service.loader.presets.ff.ItemProcessorFactory.validatingItemProcessor;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.ff.SourceColumnsFactory.Source.TAXON_COLUMNS;
 
 /**
@@ -63,8 +62,7 @@ public class TaxonPresetsConfig {
                 .skipLimit(SKIP_LIMIT)
                 .<RawNamedPreset>reader(
                         rawPresetMultiFileReader(taxonResources, itemReader))
-                .processor(compositeItemProcessor(
-                        rawPresetValidator()))
+                .processor(compositeItemProcessor(validatingItemProcessor()))
                 .writer(rawPresetWriter(presets))
                 .listener(new LogStepListener())
                 .build();
@@ -90,9 +88,5 @@ public class TaxonPresetsConfig {
 
     private FieldSetMapper<RawNamedPreset> fieldSetMapper(SourceColumnsFactory.Source source) {
         return StringToRawNamedPresetMapper.create(SourceColumnsFactory.createFor(source));
-    }
-
-    private ItemProcessor<RawNamedPreset, RawNamedPreset> rawPresetValidator() {
-        return new RawNamedPresetValidator();
     }
 }
