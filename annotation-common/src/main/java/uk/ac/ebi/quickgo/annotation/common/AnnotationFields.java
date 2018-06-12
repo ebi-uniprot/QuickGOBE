@@ -35,7 +35,6 @@ public class AnnotationFields {
     static final String WITH_FROM = "withFrom";
     static final String INTERACTING_TAXON_ID = "interactingTaxonId";
 
-
     /**
      * Annotation fields that are indexed, and can therefore be searched.
      */

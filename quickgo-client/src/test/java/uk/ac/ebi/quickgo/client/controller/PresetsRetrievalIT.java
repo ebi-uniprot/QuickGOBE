@@ -8,7 +8,6 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.ac.ebi.quickgo.client.QuickGOREST;
@@ -33,7 +32,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class PresetsRetrievalIT {
     private static final String RESOURCE_URL = "/internal/presets";
     private static final String FIELDS_PARAM = "fields";
-    private static final int ASSIGNED_BY_PRESETS_WITHOUT_DUPLICATES = 24;
 
     @Autowired private WebApplicationContext webApplicationContext;
 
@@ -49,9 +47,7 @@ public class PresetsRetrievalIT {
         mockMvc.perform(get(RESOURCE_URL))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.assignedBy").exists())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.assignedBy.*", hasSize(
-                        ASSIGNED_BY_PRESETS_WITHOUT_DUPLICATES)));
+                .andExpect(jsonPath("$.assignedBy").exists());
     }
 
     @Test
@@ -75,7 +71,7 @@ public class PresetsRetrievalIT {
         mockMvc.perform(get(RESOURCE_URL))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.withFrom.*", hasSize(greaterThan(0))));
+                .andExpect(jsonPath("$.withFrom").exists());
     }
 
     @Test

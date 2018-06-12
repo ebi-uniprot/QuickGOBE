@@ -118,7 +118,7 @@ public class PresetsSuccessfulRelevancyFetchingIT {
     }
 
     @Test
-    public void loadWithFromPresets() {
+    public void loadWithFromPresetsAfterSuccessfulRESTInfoFetching() {
         assertThat(presets.getWithFrom(), hasSize(0));
 
         JobExecution jobExecution =
@@ -126,15 +126,10 @@ public class PresetsSuccessfulRelevancyFetchingIT {
         BatchStatus status = jobExecution.getStatus();
 
         assertThat(status, is(BatchStatus.COMPLETED));
-        assertThat(presets.getWithFrom(), hasSize(7));
-
-        PresetItem lastPresetItem = extractLastPreset(presets.getWithFrom());
-        assertThat(lastPresetItem.getProperty(NAME), is(MockPresetDataConfig.PRESET_DICTY_BASE.getProperty(NAME)));
-        assertThat(lastPresetItem.getProperty(ID), is(MockPresetDataConfig.PRESET_DICTY_BASE.getProperty(ID)));
-        assertThat(lastPresetItem.getProperty(DESCRIPTION),
-                is(MockPresetDataConfig.PRESET_DICTY_BASE.getProperty(DESCRIPTION)));
-        assertThat(lastPresetItem.getRelevancy(),
-                is(MockPresetDataConfig.PRESET_DICTY_BASE.getRelevancy()));
+        assertThat(
+                extractPresetValues(presets.getWithFrom(), p -> p.getProperty(NAME)),
+                IsIterableContainingInOrder
+                        .contains(MockPresetDataConfig.ENSEMBL, MockPresetDataConfig.UNIPROT_KB));
     }
 
     @Test
@@ -209,9 +204,5 @@ public class PresetsSuccessfulRelevancyFetchingIT {
 
     private PresetItem extractFirstPreset(List<PresetItem> presets) {
         return presets.stream().findFirst().orElse(null);
-    }
-
-    private PresetItem extractLastPreset(List<PresetItem> presets) {
-        return presets.stream().reduce((first, second) -> second).orElse(null);
     }
 }
