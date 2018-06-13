@@ -55,8 +55,10 @@ public class AnnotationDocumentConverterTest {
                 mergeKeyValuesPairs(
                         buildKeyValuesPair(GO_EVIDENCE, "IEA"),
                         buildKeyValuesPair(TAXON_ID, "35758"),
-                        buildKeyValuesPair(DB_OBJECT_SUBSET, "TrEMBL"), buildKeyValuesPair(DB_OBJECT_SYMBOL, "moeA5"),
-                        buildKeyValuesPair(DB_OBJECT_TYPE, "protein"), buildKeyValuesPair(PROTEOME, "gcrpIso"),
+                        buildKeyValuesPair(DB_OBJECT_SUBSET, "TrEMBL"),
+                        buildKeyValuesPair(DB_OBJECT_SYMBOL, "moeA5"),
+                        buildKeyValuesPair(DB_OBJECT_TYPE, "protein"),
+                        buildKeyValuesPair(PROTEOME, "gcrpIso"),
                         buildKeyValuesPair(TARGET_SET, "BHF-UCL", "Exosome", "KRUK"));
 
         AnnotationDocument doc = converter.process(annotation);
