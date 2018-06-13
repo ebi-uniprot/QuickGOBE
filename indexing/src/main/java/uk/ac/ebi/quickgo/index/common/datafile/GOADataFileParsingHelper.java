@@ -16,7 +16,7 @@ import static java.util.Collections.emptyList;
 public class GOADataFileParsingHelper {
     public static final String TAB = "\t";
     public static final String PIPE = "|";
-    public static final String PIPE_SPLITER = "[|]";
+    public static final String PIPE_SPLITTER = "[|]";
     public static final String COMMA = ",";
     public static final String EQUALS = "=";
     public static final String COLON = ":";

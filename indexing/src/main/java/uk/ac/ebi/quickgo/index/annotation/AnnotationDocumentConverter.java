@@ -48,7 +48,7 @@ class AnnotationDocumentConverter implements ItemProcessor<Annotation, Annotatio
         }
 
         Map<String, String> propertiesMap =
-                convertLinePropertiesToMap(annotation.annotationProperties, PIPE_SPLITER, EQUALS);
+                convertLinePropertiesToMap(annotation.annotationProperties, PIPE_SPLITTER, EQUALS);
 
         AnnotationDocument doc = new AnnotationDocument();
 
@@ -135,7 +135,7 @@ class AnnotationDocumentConverter implements ItemProcessor<Annotation, Annotatio
     }
 
     private List<String> constructWithFrom(Annotation annotation) {
-        return createNullableStringListFromDelimitedValues(annotation.with, PIPE_SPLITER);
+        return createNullableStringListFromDelimitedValues(annotation.with, PIPE_SPLITTER);
     }
 
     private List<String> createNullableStringListFromDelimitedValues(String value, String delimiter) {
