@@ -222,7 +222,9 @@ public class AnnotationRequest {
 
     @ApiModelProperty(
             value = "The proteomic classification of the annotated gene product, if applicable - this is relevant for" +
-                    " proteins only", allowableValues = "complete,none,gcrpCan,gcrpIso", hidden = true) private String[]
+                    " proteins only. The allowed values are complete; none; gcrpCan (Gene Centric Reference Proteome " +
+                    "Canonical) & gcrpIso (Gene Centric Reference Proteome IsoForm).",
+            allowableValues = "complete," + "none,gcrpCan,gcrpIso", hidden = true) private String[]
             proteome;
 
     private final Map<String, String[]> filterMap = new HashMap<>();
