@@ -21,9 +21,9 @@ public enum AnnotationParameters {
     WITHFROM_PARAM("withFrom"),
     GENE_PRODUCT_ID_PARAM("geneProductId"),
     GENE_PRODUCT_TYPE_PARAM("geneProductType"),
-    GP_SUBSET_PARAM("geneProductSubset"),
-    TARGET_SET_PARAM("targetSet"), GO_ASPECT_PARAM("aspect"), EXTENSION_PARAM("extension"),
-    INCLUDE_FIELD_PARAM("includeFields"), SELECTED_FIELD_PARAM("selectedFields"), PROTEOME_PARAM("proteome");
+    GP_SUBSET_PARAM("geneProductSubset"), TARGET_SET_PARAM("targetSet"), GO_ASPECT_PARAM("aspect"),
+    EXTENSION_PARAM("extension"), INCLUDE_FIELD_PARAM("includeFields"), SELECTED_FIELD_PARAM("selectedFields"),
+    PROTEOME_PARAM("proteome");
 
     private String name;
 
