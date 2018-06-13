@@ -1765,6 +1765,35 @@ public class AnnotationControllerIT {
                 .andExpect(fieldsInAllResultsExist(1));
     }
 
+    @Test
+    public void filterByMultipleProteomeParameters() throws Exception {
+        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A123");
+        doc.proteome = "gcrpCan";
+        repository.save(doc);
+
+        ResultActions response =
+                mockMvc.perform(get(RESOURCE_URL + "/search").param(PROTEOME_PARAM.getName(), "none,gcrpCan"));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(4))
+                .andExpect(fieldsInAllResultsExist(4));
+    }
+
+
+    @Test
+    public void filterByInvalidProteomeValueProducesNoResults() throws Exception {
+        ResultActions response =
+                mockMvc.perform(get(RESOURCE_URL + "/search").param(PROTEOME_PARAM.getName(), "pancake"));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(0));
+    }
+
+
     // ------------------------------- Check date format -------------------------------
     @Test
     public void checkDateFormatIsCorrect() throws Exception {
