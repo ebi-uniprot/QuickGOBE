@@ -34,6 +34,7 @@ public class AnnotationFields {
     static final String TAXON_ANCESTORS = "taxonAncestors";
     static final String WITH_FROM = "withFrom";
     static final String INTERACTING_TAXON_ID = "interactingTaxonId";
+    static final String PROTEOME = "proteome";
 
     /**
      * Annotation fields that are indexed, and can therefore be searched.
@@ -56,6 +57,7 @@ public class AnnotationFields {
         public static final String TAXON_ANCESTORS = storeAndGet(VALUES, "taxonAncestors_unsorted");
         public static final String WITH_FROM = storeAndGet(VALUES, "withFrom_search");
         public static final String EXTENSION = storeAndGet(VALUES, "extension_unsorted");
+        public static final String PROTEOME = storeAndGet(VALUES, "proteome_unsorted");
 
         public static boolean isSearchable(String field) {
             return VALUES.contains(field);

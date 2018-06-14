@@ -1695,6 +1695,105 @@ public class AnnotationControllerIT {
                 .andExpect(status().isBadRequest());
     }
 
+    // ------------------------------- Filter by geneProductSubset -------------------------------
+    // Holds values TrEMBL, Swiss-Prot and maybe more
+    @Test
+    public void filterByGeneProductSubset() throws Exception {
+        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A842");
+        String geneProductSubset = "Swiss-Prot";
+        doc.geneProductSubset = geneProductSubset;
+        repository.save(doc);
+
+        ResultActions response =
+                mockMvc.perform(get(RESOURCE_URL + "/search").param(GP_SUBSET_PARAM.getName(), geneProductSubset));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(1))
+                .andExpect(fieldsInAllResultsExist(1));
+    }
+
+    @Test
+    public void filterByGeneProductSubsetMixedCaseSearchValue() throws Exception {
+        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A849");
+        doc.geneProductSubset = "Swiss-Prot";
+        repository.save(doc);
+
+        ResultActions response =
+                mockMvc.perform(get(RESOURCE_URL + "/search").param(GP_SUBSET_PARAM.getName(), "swisS-proT"));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(1))
+                .andExpect(fieldsInAllResultsExist(1));
+    }
+
+
+    // ------------------------------- Filter by proteome -------------------------------
+
+    @Test
+    public void filterByProteome() throws Exception {
+        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A123");
+        doc.proteome = "gcrpCan";
+        repository.save(doc);
+
+        ResultActions response =
+                mockMvc.perform(get(RESOURCE_URL + "/search").param(PROTEOME_PARAM.getName(), "gcrpCan"));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(1))
+                .andExpect(fieldsInAllResultsExist(1));
+    }
+
+    @Test
+    public void filterByProteomeMixedCaseSearchValue() throws Exception {
+        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A772");
+        doc.proteome = "gcrpCan";
+        repository.save(doc);
+
+        ResultActions response =
+                mockMvc.perform(get(RESOURCE_URL + "/search").param(PROTEOME_PARAM.getName(), "GcrPcan"));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(1))
+                .andExpect(fieldsInAllResultsExist(1));
+    }
+
+    @Test
+    public void filterByMultipleProteomeParameters() throws Exception {
+        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A123");
+        doc.proteome = "gcrpCan";
+        repository.save(doc);
+
+        ResultActions response =
+                mockMvc.perform(get(RESOURCE_URL + "/search").param(PROTEOME_PARAM.getName(), "none,gcrpCan"));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(4))
+                .andExpect(fieldsInAllResultsExist(4));
+    }
+
+
+    @Test
+    public void filterByInvalidProteomeValueProducesNoResults() throws Exception {
+        ResultActions response =
+                mockMvc.perform(get(RESOURCE_URL + "/search").param(PROTEOME_PARAM.getName(), "pancake"));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(0));
+    }
+
+
     // ------------------------------- Check date format -------------------------------
     @Test
     public void checkDateFormatIsCorrect() throws Exception {

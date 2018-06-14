@@ -2,7 +2,9 @@ package uk.ac.ebi.quickgo.index.annotation;
 
 import java.util.regex.Pattern;
 
-import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.*;
+import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.KEY_EQUALS_VALUE_FORMAT;
+import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.PIPE_SEPARATED_CSVs_FORMAT;
+import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.WORD_LBRACE_WORD_RBRACE_FORMAT;
 
 /**
  * This class defines common constants used during annotation indexing, when parsing the input files.
@@ -21,6 +23,7 @@ class AnnotationParsingHelper {
     static final String TARGET_SET = "target_set";
     static final String GO_ASPECT = "go_aspect";
     static final String TAXON_ANCESTORS = "taxon_lineage";
+    static final String PROTEOME = "proteome";
 
     // string regex representations
     private static final String DB_COLON_REF_FORMAT = "[A-Za-z0-9_\\.-]+(:[A-Za-z0-9_\\.-]+){1,}";

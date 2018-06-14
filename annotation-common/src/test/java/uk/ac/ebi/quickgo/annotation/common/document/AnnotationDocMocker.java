@@ -58,6 +58,7 @@ public class AnnotationDocMocker {
     private static final int INTERACTING_TAXON_ID = 35758;
     private static final String ASSIGNED_BY = "InterPro";
     private static final String SYMBOL = "moeA5";
+    private static final String PROTEOME = "none";
 
     private AnnotationDocMocker() {
     }
@@ -89,6 +90,7 @@ public class AnnotationDocMocker {
         doc.geneProductSubset = GP_SUBSET;
         doc.goAspect = GO_ASPECT;
         doc.date = DATE;
+        doc.proteome = PROTEOME;
 
         return doc;
     }

@@ -47,7 +47,8 @@ class AnnotationDocumentConverter implements ItemProcessor<Annotation, Annotatio
             throw new DocumentReaderException("Annotation object is null");
         }
 
-        Map<String, String> propertiesMap = convertLinePropertiesToMap(annotation.annotationProperties, PIPE, EQUALS);
+        Map<String, String> propertiesMap =
+                convertLinePropertiesToMap(annotation.annotationProperties, PIPE_SPLITTER, EQUALS);
 
         AnnotationDocument doc = new AnnotationDocument();
 
@@ -70,6 +71,7 @@ class AnnotationDocumentConverter implements ItemProcessor<Annotation, Annotatio
         doc.goAspect = propertiesMap.get(GO_ASPECT);
         doc.date = createDateFromString(annotation);
         doc.taxonAncestors = constructTaxonAncestors(propertiesMap.get(TAXON_ANCESTORS));
+        doc.proteome = propertiesMap.get(PROTEOME);
 
         return doc;
     }
@@ -133,7 +135,7 @@ class AnnotationDocumentConverter implements ItemProcessor<Annotation, Annotatio
     }
 
     private List<String> constructWithFrom(Annotation annotation) {
-        return createNullableStringListFromDelimitedValues(annotation.with, PIPE);
+        return createNullableStringListFromDelimitedValues(annotation.with, PIPE_SPLITTER);
     }
 
     private List<String> createNullableStringListFromDelimitedValues(String value, String delimiter) {

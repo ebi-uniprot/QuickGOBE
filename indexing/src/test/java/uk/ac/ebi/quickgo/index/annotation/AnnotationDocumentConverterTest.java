@@ -58,6 +58,7 @@ public class AnnotationDocumentConverterTest {
                         buildKeyValuesPair(DB_OBJECT_SUBSET, "TrEMBL"),
                         buildKeyValuesPair(DB_OBJECT_SYMBOL, "moeA5"),
                         buildKeyValuesPair(DB_OBJECT_TYPE, "protein"),
+                        buildKeyValuesPair(PROTEOME, "gcrpIso"),
                         buildKeyValuesPair(TARGET_SET, "BHF-UCL", "Exosome", "KRUK"));
 
         AnnotationDocument doc = converter.process(annotation);
@@ -68,6 +69,7 @@ public class AnnotationDocumentConverterTest {
         assertThat(doc.assignedBy, is(annotation.assignedBy));
         assertThat(doc.qualifier, is(annotation.qualifier));
         assertThat(doc.reference, is(annotation.dbReferences));
+        assertThat(doc.proteome, is("gcrpIso"));
         assertThat(doc.targetSets, contains("BHF-UCL", "Exosome", "KRUK"));
     }
 
