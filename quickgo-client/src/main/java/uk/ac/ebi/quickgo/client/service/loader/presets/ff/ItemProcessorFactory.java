@@ -3,6 +3,7 @@ package uk.ac.ebi.quickgo.client.service.loader.presets.ff;
 import uk.ac.ebi.quickgo.client.service.loader.presets.RestValuesRetriever;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.validator.ValidationException;
 
@@ -68,6 +69,18 @@ public class ItemProcessorFactory {
                 return rawNamedPreset;
             }
             return usedValues.contains(rawNamedPreset.name) ? rawNamedPreset : null;
+        };
+    }
+
+    public static ItemProcessor<RawNamedPreset, RawNamedPreset> fifoRelevancyItemProcessor() {
+        return new ItemProcessor<RawNamedPreset, RawNamedPreset>() {
+            private final AtomicInteger relevanceyCounter = new AtomicInteger(0);
+
+            @Override
+            public RawNamedPreset process(RawNamedPreset rawNamedPreset) {
+                rawNamedPreset.relevancy = relevanceyCounter.getAndIncrement();
+                return rawNamedPreset;
+            }
         };
     }
 }

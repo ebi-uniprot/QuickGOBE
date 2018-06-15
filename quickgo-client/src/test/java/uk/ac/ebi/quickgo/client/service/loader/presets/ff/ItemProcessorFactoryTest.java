@@ -20,6 +20,10 @@ import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static uk.ac.ebi.quickgo.client.service.loader.presets.ff.ItemProcessorFactory.checkPresetIsUsedItemProcessor;
+import static uk.ac.ebi.quickgo.client.service.loader.presets.ff.ItemProcessorFactory.duplicateCheckingItemProcessor;
+import static uk.ac.ebi.quickgo.client.service.loader.presets.ff.ItemProcessorFactory.fifoRelevancyItemProcessor;
+import static uk.ac.ebi.quickgo.client.service.loader.presets.ff.ItemProcessorFactory.validatingItemProcessor;
 
 @RunWith(Enclosed.class)
 public class ItemProcessorFactoryTest {
@@ -29,7 +33,7 @@ public class ItemProcessorFactoryTest {
 
         @Before()
         public void setUp() {
-            this.duplicateChecker = ItemProcessorFactory.duplicateCheckingItemProcessor();
+            this.duplicateChecker = duplicateCheckingItemProcessor();
         }
 
         @Test
@@ -55,7 +59,7 @@ public class ItemProcessorFactoryTest {
 
         @Before()
         public void setUp() {
-            this.validator = ItemProcessorFactory.validatingItemProcessor();
+            this.validator = validatingItemProcessor();
         }
 
         @Test(expected = ValidationException.class)
@@ -110,7 +114,7 @@ public class ItemProcessorFactoryTest {
         public void rawItemFound() throws Exception {
             List<String> returnList = singletonList("UnionMills");
             when(restValuesRetriever.retrieveValues(RETRIEVE_KEY)).thenReturn(Optional.ofNullable(returnList));
-            this.checkUsed = ItemProcessorFactory.checkPresetIsUsedItemProcessor(restValuesRetriever, RETRIEVE_KEY);
+            this.checkUsed = checkPresetIsUsedItemProcessor(restValuesRetriever, RETRIEVE_KEY);
 
             RawNamedPreset rawItemReturned = checkUsed.process(rawItem);
 
@@ -121,7 +125,7 @@ public class ItemProcessorFactoryTest {
         public void rawItemNotFound() throws Exception {
             List<String> returnList = singletonList("GlenHelen");
             when(restValuesRetriever.retrieveValues(RETRIEVE_KEY)).thenReturn(Optional.ofNullable(returnList));
-            this.checkUsed = ItemProcessorFactory.checkPresetIsUsedItemProcessor(restValuesRetriever, RETRIEVE_KEY);
+            this.checkUsed = checkPresetIsUsedItemProcessor(restValuesRetriever, RETRIEVE_KEY);
 
             RawNamedPreset rawItemReturned = checkUsed.process(rawItem);
 
@@ -132,11 +136,46 @@ public class ItemProcessorFactoryTest {
         public void noResultsFound() throws Exception {
             List<String> returnList = Collections.emptyList();
             when(restValuesRetriever.retrieveValues(RETRIEVE_KEY)).thenReturn(Optional.ofNullable(returnList));
-            this.checkUsed = ItemProcessorFactory.checkPresetIsUsedItemProcessor(restValuesRetriever, RETRIEVE_KEY);
+            this.checkUsed = checkPresetIsUsedItemProcessor(restValuesRetriever, RETRIEVE_KEY);
 
             RawNamedPreset rawItemReturned = checkUsed.process(rawItem);
 
             assertThat(rawItemReturned, equalTo(rawItem));
+        }
+    }
+
+    public static class FifoRelevancyItemProcessorTest {
+        private ItemProcessor<RawNamedPreset, RawNamedPreset> fifoRelevancy;
+        private RawNamedPreset rawItem0;
+        private RawNamedPreset rawItem1;
+        private RawNamedPreset rawItem2;
+
+        @Before()
+        public void setUp() {
+            this.fifoRelevancy = fifoRelevancyItemProcessor();
+
+            rawItem0 = new RawNamedPreset();
+            rawItem0.name = "UnionMills";
+            rawItem0.relevancy = 0;
+
+            rawItem1 = new RawNamedPreset();
+            rawItem1.name = "GlenHelen";
+            rawItem1.relevancy = 0;
+
+            rawItem2 = new RawNamedPreset();
+            rawItem2.name = "RamseyHairPin";
+            rawItem2.relevancy = 0;
+        }
+
+        @Test
+        public void relevancyIncrementsPerCall() throws Exception{
+           RawNamedPreset processed0 = fifoRelevancy.process(rawItem0);
+           RawNamedPreset processed1 = fifoRelevancy.process(rawItem1);
+           RawNamedPreset processed2 = fifoRelevancy.process(rawItem2);
+
+           assertThat(processed0.relevancy, is(0));
+           assertThat(processed1.relevancy, is(1));
+           assertThat(processed2.relevancy, is(2));
         }
     }
 }
