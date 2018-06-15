@@ -27,6 +27,7 @@ import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelpe
 import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfigHelper.rawPresetMultiFileReader;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.ff.ItemProcessorFactory.checkPresetIsUsedItemProcessor;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.ff.ItemProcessorFactory.duplicateCheckingItemProcessor;
+import static uk.ac.ebi.quickgo.client.service.loader.presets.ff.ItemProcessorFactory.fifoRelevancyItemProcessor;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.ff.ItemProcessorFactory.validatingItemProcessor;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.ff.SourceColumnsFactory.Source.DB_COLUMNS;
 
@@ -62,7 +63,8 @@ public class WithFromPresetsConfig {
                 .skipLimit(SKIP_LIMIT).<RawNamedPreset>reader(rawPresetMultiFileReader(resources, itemReader))
                 .processor(compositeItemProcessor(validatingItemProcessor(),
                         checkPresetIsUsedItemProcessor(restValuesRetriever, WITH_FROM_REST_KEY),
-                        duplicateCheckingItemProcessor()))
+                        duplicateCheckingItemProcessor(),
+                        fifoRelevancyItemProcessor()))
                 .writer(rawPresetWriter(presets))
                 .listener(new LogStepListener())
                 .build();
