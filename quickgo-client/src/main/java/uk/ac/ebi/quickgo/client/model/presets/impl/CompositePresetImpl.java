@@ -62,8 +62,6 @@ public class CompositePresetImpl implements CompositePreset {
         for (PresetType presetType : PresetType.values()) {
             presetsMap.put(presetType, new LinkedHashSet<>());
         }
-
-        initialiseStaticPresets();
     }
 
     public void addPreset(PresetType presetType, PresetItem presetItem) {
@@ -104,14 +102,6 @@ public class CompositePresetImpl implements CompositePreset {
         return sortedPresetItems(QUALIFIERS);
     }
 
-    @Override public List<PresetItem> getAspects() {
-        return sortedPresetItems(ASPECTS);
-    }
-
-    @Override public List<PresetItem> getGeneProductTypes() {
-        return sortedPresetItems(GENE_PRODUCT_TYPES);
-    }
-
     @Override
     public List<PresetItem> getExtRelations() {
         return sortedPresetItems(EXT_RELATIONS);
@@ -120,11 +110,6 @@ public class CompositePresetImpl implements CompositePreset {
     @Override
     public List<PresetItem> getExtDatabases() {
         return sortedPresetItems(EXT_DATABASES);
-    }
-
-    private void initialiseStaticPresets() {
-        presetsMap.put(ASPECTS, StaticAspects.createAspects());
-        presetsMap.put(GENE_PRODUCT_TYPES, StaticGeneProductTypes.createGeneProductTypes());
     }
 
     /**
@@ -229,51 +214,5 @@ public class CompositePresetImpl implements CompositePreset {
                 .filter(presetPredicate)
                 .findFirst()
                 .ifPresent(itemConsumer);
-    }
-
-    private static class StaticAspects {
-
-        static Set<PresetItem> createAspects() {
-            Set<PresetItem> presetAspects = new HashSet<>();
-            Arrays.stream(Aspect.values())
-                    .forEach(aspect -> insertAspect(presetAspects, aspect));
-            return presetAspects;
-        }
-
-        private static void insertAspect(Set<PresetItem> presets, Aspect aspect) {
-            presets.add(PresetItem
-                    .createWithName(aspect.getFullName())
-                    .withProperty(PresetItem.Property.ID.getKey(), aspect.getScientificName()).build());
-        }
-    }
-
-    private static class StaticGeneProductTypes {
-
-        private enum GeneProductType {
-            PROTEINS("Proteins", "protein"),
-            RNA("RNA", "miRNA"),
-            COMPLEXES("Complexes", "complex");
-
-            private final String name;
-            private final String shortName;
-
-            GeneProductType(String name, String shortName) {
-                this.name = name;
-                this.shortName = shortName;
-            }
-        }
-
-        static Set<PresetItem> createGeneProductTypes() {
-            Set<PresetItem> presetAspects = new HashSet<>();
-            Arrays.stream(GeneProductType.values())
-                    .forEach(aspect -> insertGeneProductType(presetAspects, aspect));
-            return presetAspects;
-        }
-
-        private static void insertGeneProductType(Set<PresetItem> presets, GeneProductType geneProductType) {
-            presets.add(PresetItem
-                    .createWithName(geneProductType.name)
-                    .withProperty(PresetItem.Property.ID.getKey(), geneProductType.shortName).build());
-        }
     }
 }
