@@ -20,19 +20,19 @@ public class Extensions {
 
     private Extensions() {}
 
-    public static String asString(List<Annotation.ConnectedXRefs<Annotation.QualifiedXref>> connectedXRefs) {
+    public static String asString(List<Annotation.ConnectedXRefs<Annotation.RelationXref>> connectedXRefs) {
         if (connectedXRefs == null || connectedXRefs.isEmpty()) {
             return "";
         }
         return connectedXRefs.stream()
-                .map(Extensions::qualifiedRefAndToString)
+                .map(Extensions::relationRefAndToString)
                 .collect(Collectors.joining(PIPE));
     }
 
-    private static String qualifiedRefAndToString(Annotation.ConnectedXRefs<Annotation.QualifiedXref> itemList) {
+    private static String relationRefAndToString(Annotation.ConnectedXRefs<Annotation.RelationXref> itemList) {
         return itemList.getConnectedXrefs()
                 .stream()
-                .map(Annotation.QualifiedXref::asXref)
+                .map(Annotation.RelationXref::asXref)
                 .collect(Collectors.joining(COMMA));
     }
 }

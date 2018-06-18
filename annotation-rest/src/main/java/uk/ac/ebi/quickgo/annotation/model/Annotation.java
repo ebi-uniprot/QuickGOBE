@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -55,7 +55,7 @@ public class Annotation {
 
     public String assignedBy;
 
-    public List<ConnectedXRefs<Annotation.QualifiedXref>> extensions;
+    public List<ConnectedXRefs<RelationXref>> extensions;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public List<String> slimmedIds;
@@ -316,53 +316,53 @@ public class Annotation {
     }
 
     /**
-     * Class that represents a cross-reference (database name and entry id) with an associated qualifier
-     * containing just the database name. Qualified Xrefs can be found in the extension state attribute.
+     * Class that represents a cross-reference (database name and entry id) with an associated relation
+     * containing just the database name. Relation Xrefs can be found in the extension state attribute.
      */
-    public static class QualifiedXref extends AbstractXref {
-        private String qualifier;
+    public static class RelationXref extends AbstractXref {
+        private String relation;
 
-        public QualifiedXref(String database, String signature, String qualifier) {
+        public RelationXref(String database, String signature, String relation) {
             super(database, signature);
-            this.qualifier = qualifier;
+            this.relation = relation;
         }
 
-        public String getQualifier() {
-            return qualifier;
+        public String getRelation() {
+            return relation;
         }
 
         @Override public boolean equals(Object o) {
             if (this == o) {
                 return true;
             }
-            if (!(o instanceof QualifiedXref)) {
+            if (!(o instanceof RelationXref)) {
                 return false;
             }
             if (!super.equals(o)) {
                 return false;
             }
 
-            QualifiedXref that = (QualifiedXref) o;
+            RelationXref that = (RelationXref) o;
 
-            return qualifier != null ? qualifier.equals(that.qualifier) : that.qualifier == null;
+            return relation != null ? relation.equals(that.relation) : that.relation == null;
         }
 
         @Override
         public String asXref() {
-            return String.format("%s(%s:%s)", qualifier, db, id);
+            return String.format("%s(%s:%s)", relation, db, id);
         }
 
         @Override public int hashCode() {
             int result = super.hashCode();
-            result = 31 * result + (qualifier != null ? qualifier.hashCode() : 0);
+            result = 31 * result + (relation != null ? relation.hashCode() : 0);
             return result;
         }
 
         @Override public String toString() {
-            return "QualifiedXref{" +
+            return "RelationXref{" +
                     "database='" + db + '\'' +
                     ", id='" + id + '\'' +
-                    ", qualifier='" + qualifier + '\'' +
+                    ", relation='" + relation + '\'' +
                     '}';
         }
     }

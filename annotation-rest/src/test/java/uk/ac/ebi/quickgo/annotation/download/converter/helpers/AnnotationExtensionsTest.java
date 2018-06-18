@@ -10,7 +10,7 @@ import org.junit.Test;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.AnnotationExtensionsTest.FakeExtensionItem
         .OCCURS_IN_CL_1;
 import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.AnnotationExtensionsTest.FakeExtensionItem
@@ -30,7 +30,7 @@ import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.TestHelper
 public class AnnotationExtensionsTest {
 
     private static final String EMPTY_STRING = "";
-    private static final List<List<Supplier<Annotation.QualifiedXref>>> EXTENSIONS = asList(
+    private static final List<List<Supplier<Annotation.RelationXref>>> EXTENSIONS = asList(
             singletonList(OCCURS_IN_CL_1),
             asList(OCCURS_IN_CL_2, OCCURS_IN_CL_3));
     private static final String EXPECTED_EXTENSION = "occurs_in(CL:0000001)|occurs_in(CL:0000002),occurs_in" +
@@ -48,11 +48,11 @@ public class AnnotationExtensionsTest {
 
     @Test
     public void mixOfOrAndAnd() {
-        List<Annotation.ConnectedXRefs<Annotation.QualifiedXref>> extensionsModel = connectedXrefs(EXTENSIONS);
+        List<Annotation.ConnectedXRefs<Annotation.RelationXref>> extensionsModel = connectedXrefs(EXTENSIONS);
         assertThat(AnnotationExtensions.nullOrEmptyListToEmptyString(extensionsModel), is(EXPECTED_EXTENSION));
     }
 
-    enum FakeExtensionItem implements Supplier<Annotation.QualifiedXref> {
+    enum FakeExtensionItem implements Supplier<Annotation.RelationXref> {
         OCCURS_IN_CL_1("occurs_in", "CL", "0000001"),
         OCCURS_IN_CL_2("occurs_in", "CL", "0000002"),
         OCCURS_IN_CL_3("occurs_in", "CL", "0000003");
@@ -67,8 +67,8 @@ public class AnnotationExtensionsTest {
             this.id = id;
         }
 
-        @Override public Annotation.QualifiedXref get() {
-            return new Annotation.QualifiedXref(db, id, qualifier);
+        @Override public Annotation.RelationXref get() {
+            return new Annotation.RelationXref(db, id, qualifier);
         }
 
         @Override public String toString() {
