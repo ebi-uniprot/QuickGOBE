@@ -28,7 +28,10 @@ class AnnotationParsingHelper {
     // string regex representations
     private static final String DB_COLON_REF_FORMAT = "[A-Za-z0-9_\\.-]+(:[A-Za-z0-9_\\.-]+){1,}";
     private static final String QUALIFIERS_FORMAT =
-            "^(NOT\\|)?(involved_in|enables|part_of|contributes_to|colocalizes_with)$";
+            "^(NOT\\|)?(involved_in|enables|part_of|contributes_to|colocalizes_with|" +
+                    "acts_upstream_of|acts_upstream_of_positive_effect|acts_upstream_of_negative_effect|" +
+                    "acts_upstream_of_or_within|acts_upstream_of_or_within_positive_effect|" +
+                    "acts_upstream_of_or_within_negative_effect|is_active_in)$";
     private static final String RAW_TAXON_FORMAT = "([1-9]+[0-9]*)";
     private static final String RAW_TAXON_ANCESTORS_FORMAT = "([1-9]+[0-9]*)(,[1-9]+[0-9]*)*";
     private static final String INTERACTING_TAXON_FORMAT = "taxon:" + RAW_TAXON_FORMAT;
