@@ -206,14 +206,16 @@ public class CompositePresetImplTest {
 
         @Test
         public void qualifiersAreReturnedInAlphabeticalOrder() {
-            presetBuilder.addPreset(QUALIFIERS, createWithName("B").withProperty(ID, anyId()).build());
+            presetBuilder.addPreset(QUALIFIERS, createWithName("BZZZ").withProperty(ID, anyId()).build());
             presetBuilder.addPreset(QUALIFIERS, createWithName("C").withProperty(ID, anyId()).build());
+            presetBuilder.addPreset(QUALIFIERS, createWithName("A3423").withProperty(ID, anyId()).build());
+            presetBuilder.addPreset(QUALIFIERS, createWithName("C0").withProperty(ID, anyId()).build());
             presetBuilder.addPreset(QUALIFIERS, createWithName("A").withProperty(ID, anyId()).build());
 
             Collection<PresetItem> presets = presetBuilder.getQualifiers();
 
             assertThat(presets.stream().map(p -> p.getProperty(NAME)).collect(Collectors.toList()),
-                    contains("A", "B", "C"));
+                    contains("A", "A3423", "BZZZ", "C", "C0"));
         }
     }
 
