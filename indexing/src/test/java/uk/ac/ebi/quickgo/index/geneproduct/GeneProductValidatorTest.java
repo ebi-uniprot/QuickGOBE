@@ -15,10 +15,7 @@ import org.junit.rules.ExpectedException;
 import org.springframework.batch.item.validator.ValidationException;
 
 import static uk.ac.ebi.quickgo.index.geneproduct.Columns.*;
-import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductParsingHelper.COMPLETE_PROTEOME_KEY;
 import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductParsingHelper.IS_ANNOTATED_KEY;
-import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductParsingHelper.IS_ISOFORM_KEY;
-import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductParsingHelper.REFERENCE_PROTEOME_KEY;
 import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductUtil.createUnconvertedTaxonId;
 
 /**
@@ -257,36 +254,6 @@ public class GeneProductValidatorTest {
     }
 
     @Test
-    public void emptyIsIsoformThrowsException() throws Exception {
-        String pair = concatProperty(IS_ISOFORM_KEY, "");
-
-        geneProduct.properties = appendToProperties(geneProduct.properties, Collections.singletonList(pair));
-
-        assertExceptionThrown(createValidationException(String.format(INVALID_FIELD_MESSAGE, IS_ISOFORM_KEY)));
-        validator.validate(geneProduct);
-    }
-
-    @Test
-    public void isIsoformWithInvalidValueThrowsException() throws Exception {
-        String pair = concatProperty(IS_ISOFORM_KEY, "invalid");
-
-        geneProduct.properties = appendToProperties(geneProduct.properties, Collections.singletonList(pair));
-
-        assertExceptionThrown(createValidationException(String.format(INVALID_FIELD_MESSAGE, IS_ISOFORM_KEY)));
-        validator.validate(geneProduct);
-    }
-
-    @Test
-    public void isIsoformWithYValueIsValid() throws Exception {
-        assertYValue(IS_ISOFORM_KEY);
-    }
-
-    @Test
-    public void isIsoformWithNValueIsValid() throws Exception {
-        assertNValue(IS_ISOFORM_KEY);
-    }
-
-    @Test
     public void noIsAnnotatedIsValid() throws Exception {
         validator.validate(geneProduct);
     }
@@ -327,46 +294,7 @@ public class GeneProductValidatorTest {
     }
 
     @Test
-    public void emptyCompleteProteomeThrowsException() throws Exception {
-        String pair = concatProperty(COMPLETE_PROTEOME_KEY, "");
-
-        geneProduct.properties = appendToProperties(geneProduct.properties, Collections.singletonList(pair));
-
-        assertExceptionThrown(createValidationException(String.format(INVALID_FIELD_MESSAGE, COMPLETE_PROTEOME_KEY)));
-        validator.validate(geneProduct);
-    }
-
-    @Test
-    public void completeProteomeWithInvalidValueThrowsException() throws Exception {
-        String pair = concatProperty(COMPLETE_PROTEOME_KEY, "invalid");
-
-        geneProduct.properties = appendToProperties(geneProduct.properties, Collections.singletonList(pair));
-
-        assertExceptionThrown(createValidationException(String.format(INVALID_FIELD_MESSAGE, COMPLETE_PROTEOME_KEY)));
-        validator.validate(geneProduct);
-    }
-
-    @Test
-    public void completeProteomeWithYValueIsValid() throws Exception {
-        assertYValue(COMPLETE_PROTEOME_KEY);
-    }
-
-    @Test
-    public void completeProteomeWithNValueIsValid() throws Exception {
-        assertNValue(COMPLETE_PROTEOME_KEY);
-    }
-
-    @Test
     public void noReferenceProteomeIsValid() throws Exception {
-        validator.validate(geneProduct);
-    }
-
-    @Test
-    public void populatedReferenceProteomeIsValid() throws Exception {
-        String pair = concatProperty(REFERENCE_PROTEOME_KEY, "ref prodt id");
-
-        geneProduct.properties = appendToProperties(geneProduct.properties, Collections.singletonList(pair));
-
         validator.validate(geneProduct);
     }
 

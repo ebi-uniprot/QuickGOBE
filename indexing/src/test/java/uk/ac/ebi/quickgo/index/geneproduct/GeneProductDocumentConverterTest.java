@@ -15,7 +15,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
-import static uk.ac.ebi.quickgo.geneproduct.common.ProteomeMembership.*;
 import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingUtil.concatStrings;
 import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductParsingHelper.*;
 import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductUtil.createUnconvertedTaxonId;
@@ -157,33 +156,23 @@ public class GeneProductDocumentConverterTest {
     @Test
     public void convertsYValuePropertiesInGeneProductToTrueBooleanFields() {
         String isAnnotated = concatProperty(IS_ANNOTATED_KEY, "Y");
-        String isIsoform = concatProperty(IS_ISOFORM_KEY, "Y");
-        String proteome = concatProperty(COMPLETE_PROTEOME_KEY, "Y");
         geneProduct.type = GeneProductType.PROTEIN.getName();
-        geneProduct.properties = concatStrings(Arrays.asList(isAnnotated, isIsoform, proteome), INTER_VALUE_DELIMITER);
+        geneProduct.properties = concatStrings(Arrays.asList(isAnnotated), INTER_VALUE_DELIMITER);
 
         GeneProductDocument doc = converter.process(geneProduct);
 
         assertThat(doc.isAnnotated, is(true));
-        assertThat(doc.isIsoform, is(true));
-        assertThat(doc.isCompleteProteome, is(true));
-        assertThat(doc.proteomeMembership, is(COMPLETE.toString()));
     }
 
     @Test
     public void convertsNValuePropertiesInGeneProductToTrueBooleanFields() {
         String isAnnotated = concatProperty(IS_ANNOTATED_KEY, "N");
-        String isIsoform = concatProperty(IS_ISOFORM_KEY, "N");
-        String proteome = concatProperty(COMPLETE_PROTEOME_KEY, "N");
         geneProduct.type = GeneProductType.PROTEIN.getName();
-        geneProduct.properties = concatStrings(Arrays.asList(isAnnotated, isIsoform, proteome), INTER_VALUE_DELIMITER);
+        geneProduct.properties = concatStrings(Arrays.asList(isAnnotated), INTER_VALUE_DELIMITER);
 
         GeneProductDocument doc = converter.process(geneProduct);
 
         assertThat(doc.isAnnotated, is(false));
-        assertThat(doc.isIsoform, is(false));
-        assertThat(doc.isCompleteProteome, is(false));
-        assertThat(doc.proteomeMembership, is(NONE.toString()));
     }
 
     @Test
@@ -193,28 +182,24 @@ public class GeneProductDocumentConverterTest {
         GeneProductDocument doc = converter.process(geneProduct);
 
         assertThat(doc.isAnnotated, is(false));
-        assertThat(doc.isIsoform, is(false));
-        assertThat(doc.isCompleteProteome, is(false));
-        assertThat(doc.proteomeMembership, is(NOT_APPLICABLE.toString()));
     }
 
     @Test
     public void convertsReferenceProteomeInPropertiesInGeneProduct() {
-        String referenceProteome = "UP000005640";
-        geneProduct.properties = concatProperty(REFERENCE_PROTEOME_KEY, referenceProteome);
+        String referenceProteome = "gcrpCan";
+        geneProduct.properties = concatProperty(PROTEOME_KEY, referenceProteome);
         geneProduct.type = GeneProductType.PROTEIN.getName();
 
         GeneProductDocument doc = converter.process(geneProduct);
 
-        assertThat(doc.referenceProteome, is(referenceProteome));
-        assertThat(doc.proteomeMembership, is(REFERENCE.toString()));
+        assertThat(doc.proteome, is(referenceProteome));
     }
 
     @Test
     public void convertsAbsenceReferenceProteomeInPropertiesInGeneProductToNullField() {
         geneProduct.properties = "";
         GeneProductDocument doc = converter.process(geneProduct);
-        assertThat(doc.referenceProteome, is(nullValue()));
+        assertThat(doc.proteome, is(nullValue()));
     }
 
     @Test
