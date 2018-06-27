@@ -3,7 +3,7 @@ package uk.ac.ebi.quickgo.annotation.download.converter.helpers;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 
 /**
  * Does the Qualifier class do everything expected of it?
@@ -60,4 +60,38 @@ public class QualifierTest {
         assertThat(Qualifier.gafQualifierAsString(""), is(""));
     }
 
+    @Test
+    public void actsUpstreamOf() {
+        assertThat(Qualifier.gafQualifierAsString("acts_upstream_of"), is(""));
+    }
+
+    @Test
+    public void actsUpstreamOfPositiveEffect() {
+        assertThat(Qualifier.gafQualifierAsString("acts_upstream_of_positive_effect"), is(""));
+    }
+
+    @Test
+    public void actsUpstreamOfNegativeEffect() {
+        assertThat(Qualifier.gafQualifierAsString("acts_upstream_of_negative_effect"), is(""));
+    }
+
+    @Test
+    public void actsUpstreamOfOrWithin() {
+        assertThat(Qualifier.gafQualifierAsString("acts_upstream_of_or_within"), is(""));
+    }
+
+    @Test
+    public void actsUpstreamOfOrWithinPositiveEffect() {
+        assertThat(Qualifier.gafQualifierAsString("acts_upstream_of_or_within_positive_effect"), is(""));
+    }
+
+    @Test
+    public void actsUpstreamOfOrWithinNegativeEffect() {
+        assertThat(Qualifier.gafQualifierAsString("acts_upstream_of_or_within_negative_effect"), is(""));
+    }
+
+    @Test
+    public void is_active_in() {
+        assertThat(Qualifier.gafQualifierAsString("is_active_in"), is(""));
+    }
 }

@@ -18,6 +18,7 @@ import static org.hamcrest.core.Is.is;
 import static uk.ac.ebi.quickgo.client.model.presets.PresetItem.createWithName;
 import static uk.ac.ebi.quickgo.client.model.presets.PresetType.ASSIGNED_BY;
 import static uk.ac.ebi.quickgo.client.model.presets.PresetType.GO_SLIMS_SETS;
+import static uk.ac.ebi.quickgo.client.model.presets.PresetType.QUALIFIERS;
 
 /**
  * Created 03/10/16
@@ -201,6 +202,21 @@ public class CompositePresetImplTest {
             List<String> presetsNames =
                     presets.stream().map(p -> p.getProperty(NAME)).collect(Collectors.toList());
             assertThat(presetsNames, Matchers.contains(name(1), name(2), name(3), name(4)));
+        }
+
+        @Test
+        public void qualifiersAreReturnedInAlphabeticalOrder() {
+            presetBuilder.addPreset(QUALIFIERS, createWithName("A2").withProperty(ID, anyId()).build());
+            presetBuilder.addPreset(QUALIFIERS, createWithName("BZZZ").withProperty(ID, anyId()).build());
+            presetBuilder.addPreset(QUALIFIERS, createWithName("C").withProperty(ID, anyId()).build());
+            presetBuilder.addPreset(QUALIFIERS, createWithName("A10").withProperty(ID, anyId()).build());
+            presetBuilder.addPreset(QUALIFIERS, createWithName("C0").withProperty(ID, anyId()).build());
+            presetBuilder.addPreset(QUALIFIERS, createWithName("A1").withProperty(ID, anyId()).build());
+
+            Collection<PresetItem> presets = presetBuilder.getQualifiers();
+
+            assertThat(presets.stream().map(p -> p.getProperty(NAME)).collect(Collectors.toList()),
+                    contains("A1", "A10", "A2", "BZZZ", "C", "C0"));
         }
     }
 

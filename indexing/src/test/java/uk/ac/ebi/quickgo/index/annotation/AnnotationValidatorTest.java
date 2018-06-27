@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.index.annotation;
 
 import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
 
+import java.util.Arrays;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.item.validator.ValidationException;
@@ -155,6 +156,38 @@ public class AnnotationValidatorTest {
     public void validatesNotColocalizesWithQualifier() {
         annotation.qualifier = "NOT|colocalizes_with";
         validator.validate(annotation);
+    }
+
+    @Test
+    public void qualifierValidation(){
+        String[] qualifier = new String[] {"acts_upstream_of","acts_upstream_of_positive_effect",
+                "acts_upstream_of_negative_effect",
+                "acts_upstream_of_or_within",
+                "acts_upstream_of_or_within_positive_effect",
+                "acts_upstream_of_or_within_negative_effect",
+                "is_active_in"};
+
+        Arrays.stream(qualifier).forEach(q -> {
+            annotation.qualifier = q;
+
+            validator.validate(annotation);
+        });
+    }
+
+    @Test
+    public void negatedQualifierValidation(){
+        String[] qualifier = new String[] {"NOT|acts_upstream_of","NOT|acts_upstream_of_positive_effect",
+                "NOT|acts_upstream_of_negative_effect",
+                "NOT|acts_upstream_of_or_within",
+                "NOT|acts_upstream_of_or_within_positive_effect",
+                "NOT|acts_upstream_of_or_within_negative_effect",
+                "NOT|is_active_in"};
+
+        Arrays.stream(qualifier).forEach(q -> {
+            annotation.qualifier = q;
+
+            validator.validate(annotation);
+        });
     }
 
     // good with field -------------------------------------------------

@@ -54,6 +54,7 @@ import static uk.ac.ebi.quickgo.client.model.presets.PresetType.*;
  * @author Edd
  */
 public class CompositePresetImpl implements CompositePreset {
+    public static final String QUALIFIER_NEGATE = "NOT|";
     private final EnumMap<PresetType, Set<PresetItem>> presetsMap;
 
     public CompositePresetImpl() {
@@ -101,7 +102,7 @@ public class CompositePresetImpl implements CompositePreset {
     }
 
     @Override public List<PresetItem> getQualifiers() {
-        return sortedPresetItems(QUALIFIERS);
+        return simpleSort(QUALIFIERS, qualifierComparator());
     }
 
     @Override public List<PresetItem> getAspects() {
@@ -143,17 +144,47 @@ public class CompositePresetImpl implements CompositePreset {
      * @param groupingFunction the specific function used to group the {@link PresetItem} instances.
      * @return the list of {@link PresetItem}s corresponding to the specified {@code presetType}.
      */
-    private List<PresetItem> sortedPresetItems(
-            PresetType presetType,
-            Function<Map.Entry<String, List<PresetItem>>, PresetItem> groupingFunction) {
-        return presetsMap.get(presetType).stream()
-                .collect(Collectors.groupingBy(
-                        p -> p.getProperty(PresetItem.Property.NAME),
-                        mapping(Function.identity(), Collectors.toList())))
-                .entrySet().stream()
+    private List<PresetItem> sortedPresetItems(PresetType presetType,
+                                               Function<Map.Entry<String, List<PresetItem>>, PresetItem>
+                                                       groupingFunction) {
+
+        Map<String, List<PresetItem>> selectedPresets = presetsMap.get(presetType)
+                .stream()
+                .collect(Collectors.groupingBy(p -> p.getProperty(PresetItem.Property.NAME),
+                        mapping(Function.identity(), Collectors.toList())));
+
+        return selectedPresets
+                .entrySet()
+                .stream()
                 .map(groupingFunction)
                 .sorted()
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Sort the preset list for return to the client, using the provided comparator.
+     * @param presetType the {@link PresetType} whose list of {@link PresetItem}s are to be to returned.
+     * @param comparator the {@link Comparator} to use for sorting the preset items
+     * @return the list of {@link PresetItem}s corresponding to the specified {@code presetType}, in order.
+     */
+    private List<PresetItem> simpleSort(PresetType presetType, Comparator<PresetItem> comparator) {
+        return presetsMap.get(presetType)
+                .stream()
+                .sorted(comparator)
+                .collect(Collectors.toList());
+    }
+
+    private static Comparator<PresetItem> qualifierComparator() {
+        return Comparator.comparing(presetItem -> {
+            String name = presetItem.getProperty(PresetItem.Property.NAME);
+            String returnVal;
+            if (name.contains(QUALIFIER_NEGATE)) {
+                returnVal = name.substring(name.indexOf(QUALIFIER_NEGATE) + QUALIFIER_NEGATE.length());
+            } else {
+                returnVal = name;
+            }
+            return returnVal;
+        });
     }
 
     /**
