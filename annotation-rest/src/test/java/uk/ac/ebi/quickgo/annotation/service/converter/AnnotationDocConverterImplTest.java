@@ -64,7 +64,7 @@ public class AnnotationDocConverterImplTest {
     //Expected data
     private static final List<List<Supplier<Annotation.SimpleXRef>>> WITH_FROM =
             asList(singletonList(GO_1), asList(GO_2, GO_3));
-    private static final List<List<Supplier<Annotation.QualifiedXref>>> EXTENSIONS_CONVERTED =
+    private static final List<List<Supplier<Annotation.RelationXref>>> EXTENSIONS_CONVERTED =
             asList(singletonList(OCCURS_IN_CL_1), asList(OCCURS_IN_CL_2, OCCURS_IN_CL_3));
 
     //Test input model
@@ -128,7 +128,7 @@ public class AnnotationDocConverterImplTest {
 
     @Test
     public void convertExtensionSuccessfully() {
-        List<Annotation.ConnectedXRefs<Annotation.QualifiedXref>> convertedExtensions =
+        List<Annotation.ConnectedXRefs<Annotation.RelationXref>> convertedExtensions =
                 connectedXrefs(EXTENSIONS_CONVERTED);
 
         assertThat(model.extensions, is(convertedExtensions));
@@ -261,7 +261,7 @@ public class AnnotationDocConverterImplTest {
         }
     }
 
-    enum FakeExtensionItem implements Supplier<Annotation.QualifiedXref> {
+    enum FakeExtensionItem implements Supplier<Annotation.RelationXref> {
         OCCURS_IN_CL_1("occurs_in", "CL", "0000001"),
         OCCURS_IN_CL_2("occurs_in", "CL", "0000002"),
         OCCURS_IN_CL_3("occurs_in", "CL", "0000003");
@@ -276,8 +276,8 @@ public class AnnotationDocConverterImplTest {
             this.id = id;
         }
 
-        @Override public Annotation.QualifiedXref get() {
-            return new Annotation.QualifiedXref(db, id, qualifier);
+        @Override public Annotation.RelationXref get() {
+            return new Annotation.RelationXref(db, id, qualifier);
         }
 
         @Override public String toString() {

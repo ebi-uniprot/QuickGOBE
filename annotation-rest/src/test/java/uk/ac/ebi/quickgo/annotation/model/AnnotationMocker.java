@@ -31,7 +31,7 @@ public class AnnotationMocker {
     private static final String SLIMMED_FROM_GO_ID = "GO:0071840";
     private static final List<List<Supplier<Annotation.SimpleXRef>>> WITH_FROM =
             asList(singletonList(IPR_1), asList(IPR_2, IPR_3));
-    private static final List<List<Supplier<Annotation.QualifiedXref>>> EXTENSIONS =
+    private static final List<List<Supplier<Annotation.RelationXref>>> EXTENSIONS =
             asList(singletonList(OCCURS_IN_CL_1), asList(OCCURS_IN_CL_2, OCCURS_IN_CL_3));
     private static final Date DATE =
             Date.from(LocalDate.of(2012, 10, 2).atStartOfDay(ZoneId.systemDefault()).toInstant());
@@ -174,7 +174,7 @@ public class AnnotationMocker {
         }
     }
 
-    enum FakeExtensionItem implements Supplier<Annotation.QualifiedXref> {
+    enum FakeExtensionItem implements Supplier<Annotation.RelationXref> {
         OCCURS_IN_CL_1("occurs_in", "CL", "0000001"),
         OCCURS_IN_CL_2("occurs_in", "CL", "0000002"),
         OCCURS_IN_CL_3("occurs_in", "CL", "0000003");
@@ -189,8 +189,8 @@ public class AnnotationMocker {
             this.id = id;
         }
 
-        @Override public Annotation.QualifiedXref get() {
-            return new Annotation.QualifiedXref(db, id, qualifier);
+        @Override public Annotation.RelationXref get() {
+            return new Annotation.RelationXref(db, id, qualifier);
         }
 
         @Override public String toString() {

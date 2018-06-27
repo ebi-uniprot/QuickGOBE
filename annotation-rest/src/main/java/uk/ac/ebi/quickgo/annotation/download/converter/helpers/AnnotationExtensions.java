@@ -20,22 +20,22 @@ public class AnnotationExtensions {
 
     private AnnotationExtensions() {}
 
-    public static String nullOrEmptyListToEmptyString(List<Annotation.ConnectedXRefs<Annotation.QualifiedXref>>
+    public static String nullOrEmptyListToEmptyString(List<Annotation.ConnectedXRefs<Annotation.RelationXref>>
                                                               connectedXRefs) {
         return Objects.nonNull(connectedXRefs) && !connectedXRefs.isEmpty() ? asString(connectedXRefs) : "";
     }
 
-    private static String asString(List<Annotation.ConnectedXRefs<Annotation.QualifiedXref>> connectedXRefs) {
+    private static String asString(List<Annotation.ConnectedXRefs<Annotation.RelationXref>> connectedXRefs) {
         Objects.requireNonNull(connectedXRefs);
         return connectedXRefs.stream()
                 .map(AnnotationExtensions::simpleRefAndToString)
                 .collect(Collectors.joining(PIPE));
     }
 
-    private static String simpleRefAndToString(Annotation.ConnectedXRefs<Annotation.QualifiedXref> itemList) {
+    private static String simpleRefAndToString(Annotation.ConnectedXRefs<Annotation.RelationXref> itemList) {
         return itemList.getConnectedXrefs()
                 .stream()
-                .map(Annotation.QualifiedXref::asXref)
+                .map(Annotation.RelationXref::asXref)
                 .collect(Collectors.joining(COMMA));
     }
 

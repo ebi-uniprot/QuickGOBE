@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Converter the persisted version of the Annotation to our model of the Annotation
+ * Convert the persisted version of the Annotation to our model of the Annotation
  *
  * @author Tony Wardell
  * Date: 26/04/2016
@@ -79,9 +79,8 @@ public class AnnotationDocConverterImpl implements AnnotationDocConverter {
         }
     }
 
-    private List<ConnectedXRefs<Annotation.QualifiedXref>> asExtensionsXRefList(String extension,
-                                                                                Function<String, Annotation
-                                                                                        .QualifiedXref> xrefCreator) {
+    private List<ConnectedXRefs<Annotation.RelationXref>> asExtensionsXRefList(String extension,
+                                                                               Function<String, Annotation.RelationXref> xrefCreator) {
         if (extension != null && !extension.isEmpty()) {
             return Stream.of(ordElements(extension))
                     .filter(Objects::nonNull)
@@ -118,10 +117,10 @@ public class AnnotationDocConverterImpl implements AnnotationDocConverter {
         return new Annotation.SimpleXRef(dbAndSig[0], dbAndSig[1]);
     }
 
-    private Annotation.QualifiedXref createQualifiedXRef(String xref) {
+    private Annotation.RelationXref createQualifiedXRef(String xref) {
         String[] dbAndSig = extractDBAndSignature(extractContentsWithinParenthesis(xref));
         String qualifier = extractQualifier(xref);
-        return new Annotation.QualifiedXref(dbAndSig[0], dbAndSig[1], qualifier);
+        return new Annotation.RelationXref(dbAndSig[0], dbAndSig[1], qualifier);
     }
 
     private String extractQualifier(String unformattedXref) {
