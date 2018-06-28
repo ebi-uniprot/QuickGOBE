@@ -31,7 +31,7 @@ public class GeneProductRequest {
             GeneProductFields.Searchable.TYPE,
             GeneProductFields.Searchable.TAXON_ID,
             GeneProductFields.Searchable.DATABASE_SUBSET,
-            GeneProductFields.Searchable.PROTEOME_MEMBERSHIP};
+            GeneProductFields.Searchable.PROTEOME};
 
     @ApiModelProperty(value = "Indicates whether the result set should be highlighted", hidden = true)
     private boolean highlighting = false;
@@ -66,25 +66,22 @@ public class GeneProductRequest {
             "the dbSubset field", allowableValues = "TrEMBL,Swiss-Prot", example = "TrEMBL")
     private String dbSubset;
 
-    @ApiModelProperty(value = "Filters the results of the main query based on a value chosen from the " +
-            "proteomeMembership field. Proteins with a proteomeMembership of 'Reference' are part of a subset " +
-            "of proteomes that have been selected either manually or algorithmically according to a number of " +
-            "criteria to provide a broad coverage of the tree of life and a representative cross-section of the " +
-            "taxonomic diversity found within UniProtKB, as well as the proteomes of well-studied model organisms and" +
-            " other species of interest for biomedical research. Proteins with a proteomeMembership of 'Complete' " +
-            "are part of a proteome. A proteome is the set of protein sequences that can be derived by translation of" +
-            " all protein coding genes of a completely sequenced genome, including alternative products such as " +
-            "splice" +
-            " variants for those species in which these may occur. If a gene product is in a reference proteome it is" +
-            " always part of a complete proteome but not vice-versa. A proteomeMembership of 'None' means the gene" +
-            " product is not assigned to a proteome, but is a protein. A proteomeMembership of 'Not applicable'" +
-            " means the gene product is not a protein, and cannot be part of a proteome.",
-            allowableValues =
-                    "Reference," +
-                            "Complete,None,Not applicable",
-            example =
-            "Reference")
-    private String proteomeMembership;
+    @ApiModelProperty(value = "Filters the results of the main query based on a value chosen from the proteome field." +
+            " Proteins with a proteome 'gcrpCan' (aka reference) are part of a subset of proteomes that have been " +
+            "selected either manually or algorithmically according to a number of criteria to provide a broad " +
+            "coverage of the tree of life and a representative cross-section of the taxonomic diversity found within " +
+            "UniProtKB, as well as the proteomes of well-studied model organisms and other species of interest for " +
+            "biomedical research. Proteins with a proteome of 'complete' are part of a proteome. A proteome is the " +
+            "set of protein sequences that can be derived by translation of all protein coding genes of a completely " +
+            "sequenced genome, including alternative products such as splice variants for those species in which " +
+            "these may occur. If a gene product is in a reference proteome it is always part of a complete proteome " +
+            "but not vice-versa. A proteome of 'none' means the gene product is not assigned to a proteome, but is a " +
+            "protein. A proteome with 'gcrpIso' will get isoform entries. If proteome value not given as a part of " +
+            "request it will consider 'Not applicable' means the gene product is not a protein, and cannot be part of" +
+            " a proteome.",
+            allowableValues = "gcrpCan, gcrpIso, complete, none",
+            example = "complete")
+    private String proteome;
 
     private Map<String, String[]> filterMap = new HashMap<>();
 
@@ -173,16 +170,16 @@ public class GeneProductRequest {
         }
     }
 
-    @Pattern(regexp = "Reference|Complete|None|Not applicable", flags = CASE_INSENSITIVE,
-            message = "Provided proteomeMembership is invalid: ${validatedValue}")
-    public String getProteomeMembership() {
-        return filterMap.get(GeneProductFields.Searchable.PROTEOME_MEMBERSHIP) == null ? null :
-                filterMap.get(GeneProductFields.Searchable.PROTEOME_MEMBERSHIP)[0];
+    @Pattern(regexp = "gcrpCan|complete|none|gcrpIso", flags = CASE_INSENSITIVE,
+            message = "Provided proteome is invalid: ${validatedValue}")
+    public String getProteome() {
+        return filterMap.get(GeneProductFields.Searchable.PROTEOME) == null ? null :
+                filterMap.get(GeneProductFields.Searchable.PROTEOME)[0];
     }
 
-    public void setProteomeMembership(String proteomeMembership) {
-        if (proteomeMembership != null) {
-            filterMap.put(GeneProductFields.Searchable.PROTEOME_MEMBERSHIP, new String[]{proteomeMembership});
+    public void setProteome(String proteome) {
+        if (proteome != null) {
+            filterMap.put(GeneProductFields.Searchable.PROTEOME, new String[]{proteome});
         }
     }
 
