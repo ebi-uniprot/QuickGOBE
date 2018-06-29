@@ -202,7 +202,7 @@ public class GeneProductControllerIT {
                 .andExpect(jsonPath(path + "isAnnotated").value(true))
                 .andExpect(jsonPath(path + "name").value("moeA5"))
                 .andExpect(jsonPath(path + "synonyms[0]").value("3SSW23"))
-                .andExpect(jsonPath(path + "proteome").value("Complete"));
+                .andExpect(jsonPath(path + "proteome").value("complete"));
     }
 
     private String buildGeneProductURL(String id) {
