@@ -246,6 +246,15 @@ public class GeneProductRequestValidationIT {
     }
 
     @Test
+    public void successfullyValidateProteomeCaseInsensitive() {
+        String proteome = "GcrPiso";
+
+        geneProductRequest.setProteome(proteome);
+
+        assertThat(validator.validate(geneProductRequest), hasSize(0));
+    }
+
+    @Test
     public void successfullyValidateNoneForProteome() {
         String proteome = "None";
 

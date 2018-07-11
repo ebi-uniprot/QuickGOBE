@@ -67,18 +67,15 @@ public class GeneProductRequest {
     private String dbSubset;
 
     @ApiModelProperty(value = "Filters the results of the main query based on a value chosen from the proteome field." +
-            " Proteins with a proteome 'gcrpCan' (aka reference) are part of a subset of proteomes that have been " +
-            "selected either manually or algorithmically according to a number of criteria to provide a broad " +
-            "coverage of the tree of life and a representative cross-section of the taxonomic diversity found within " +
-            "UniProtKB, as well as the proteomes of well-studied model organisms and other species of interest for " +
-            "biomedical research. Proteins with a proteome of 'complete' are part of a proteome. A proteome is the " +
-            "set of protein sequences that can be derived by translation of all protein coding genes of a completely " +
-            "sequenced genome, including alternative products such as splice variants for those species in which " +
-            "these may occur. If a gene product is in a reference proteome it is always part of a complete proteome " +
-            "but not vice-versa. A proteome of 'none' means the gene product is not assigned to a proteome, but is a " +
-            "protein. A proteome with 'gcrpIso' will get isoform entries. If proteome value not given as a part of " +
-            "request it will consider 'Not applicable' means the gene product is not a protein, and cannot be part of" +
-            " a proteome.",
+            " Proteins with a proteome 'gcrpCan' (aka reference or Gene Centric Reference Proteome Canonical) are " +
+            "part of a subset of proteomes that have been selected either manually or algorithmically according to a " +
+            "number of criteria to provide a broad UniProtKB, as well as the proteomes of well-studied model " +
+            "organisms and other species of interest for biomedical research. Proteins with a proteome of 'complete' " +
+            "are part of a proteome. A proteome is the set of protein sequences that can be derived by translation of" +
+            " all protein coding genes of a completely sequenced genome, including alternative products such as " +
+            "splice variants for those species in which these may occur. If a gene product is in a reference proteome" +
+            " it is always part of a complete proteome protein. A proteome with 'gcrpIso' (aka Gene Centric Reference" +
+            " Proteome ISO form) will get isoform entries.",
             allowableValues = "gcrpCan, gcrpIso, complete, none",
             example = "complete")
     private String proteome;

@@ -186,13 +186,13 @@ public class GeneProductDocumentConverterTest {
 
     @Test
     public void convertsReferenceProteomeInPropertiesInGeneProduct() {
-        String referenceProteome = "gcrpCan";
-        geneProduct.properties = concatProperty(PROTEOME_KEY, referenceProteome);
+        String proteome = "gcrpCan";
+        geneProduct.properties = concatProperty(PROTEOME_KEY, proteome);
         geneProduct.type = GeneProductType.PROTEIN.getName();
 
         GeneProductDocument doc = converter.process(geneProduct);
 
-        assertThat(doc.proteome, is(referenceProteome));
+        assertThat(doc.proteome, is(proteome));
     }
 
     @Test
