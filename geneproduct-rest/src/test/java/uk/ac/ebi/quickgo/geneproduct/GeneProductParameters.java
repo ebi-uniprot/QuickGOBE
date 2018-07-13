@@ -7,7 +7,7 @@ public enum GeneProductParameters {
     TYPE_PARAM("type"),
     TAXON_ID_PARAM("taxonId"),
     DB_SUBSET_PARAM("dbSubset"),
-    PROTEOME_MEMBERSHIP_PARAM("proteomeMembership");
+    PROTEOME_PARAM("proteome");
 
     private String name;
 

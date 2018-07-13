@@ -140,10 +140,10 @@ public class GeneProductRequestTest {
     }
 
     @Test
-    public void createsFilterForProteomeMembership() {
-        String proteomeStatus = "reference";
+    public void createsFilterForProteome() {
+        String proteomeStatus = "complete";
 
-        geneProductRequest.setProteomeMembership(proteomeStatus);
+        geneProductRequest.setProteome(proteomeStatus);
 
         List<FilterRequest> filters = geneProductRequest.createFilterRequests();
 

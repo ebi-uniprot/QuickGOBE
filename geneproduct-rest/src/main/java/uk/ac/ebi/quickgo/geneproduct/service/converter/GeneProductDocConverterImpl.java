@@ -2,7 +2,6 @@ package uk.ac.ebi.quickgo.geneproduct.service.converter;
 
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductDocument;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductType;
-import uk.ac.ebi.quickgo.geneproduct.common.ProteomeMembership;
 import uk.ac.ebi.quickgo.geneproduct.model.GeneProduct;
 
 /**
@@ -33,11 +32,8 @@ public class GeneProductDocConverterImpl implements GeneProductDocConverter {
         geneProduct.databaseSubset = geneProductDocument.databaseSubset;
         geneProduct.isAnnotated = geneProductDocument.isAnnotated;
         geneProduct.synonyms = geneProductDocument.synonyms;
-        geneProduct.isIsoform = geneProductDocument.isIsoform;
         geneProduct.name = geneProductDocument.name;
-        geneProduct.referenceProteome = geneProductDocument.referenceProteome;
-        geneProduct.isCompleteProteome = geneProductDocument.isCompleteProteome;
-        geneProduct.proteomeMembership = ProteomeMembership.fromString(geneProductDocument.proteomeMembership);
+        geneProduct.proteome = geneProductDocument.proteome;
         geneProduct.parentId = geneProductDocument.parentId;
         geneProduct.symbol = geneProductDocument.symbol;
         geneProduct.taxonId = geneProductDocument.taxonId;

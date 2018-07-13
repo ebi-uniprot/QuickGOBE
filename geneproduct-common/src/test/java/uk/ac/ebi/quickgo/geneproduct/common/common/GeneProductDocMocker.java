@@ -1,7 +1,6 @@
 package uk.ac.ebi.quickgo.geneproduct.common.common;
 
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductDocument;
-import uk.ac.ebi.quickgo.geneproduct.common.ProteomeMembership;
 
 import java.util.Collections;
 
@@ -22,13 +21,10 @@ public final class GeneProductDocMocker {
         doc.database = "UniProt";
         doc.databaseSubset = "RRR";
         doc.isAnnotated = true;
-        doc.isIsoform = true;
-        doc.isCompleteProteome = true;
         doc.name = "moeA5";
-        doc.referenceProteome = "AAAA";
         doc.synonyms = Collections.singletonList("3SSW23");
         doc.targetSet = Collections.singletonList("KRUK");
-        doc.proteomeMembership = ProteomeMembership.COMPLETE.toString();
+        doc.proteome = "complete";
         return doc;
     }
 }
