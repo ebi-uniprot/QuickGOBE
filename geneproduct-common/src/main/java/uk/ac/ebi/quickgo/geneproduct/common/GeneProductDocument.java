@@ -41,24 +41,14 @@ public class GeneProductDocument implements QuickGODocument {
     @Field(DATABASE_SUBSET)
     public String databaseSubset;
 
-    @Field(COMPLETE_PROTEOME)
-    @Deprecated
-    public boolean isCompleteProteome;
-
-    @Field(REFERENCE_PROTEOME)
-    public String referenceProteome;
-
-    @Field(PROTEOME_MEMBERSHIP)
-    public String proteomeMembership;
-
-    @Field(IS_ISOFORM)
-    public boolean isIsoform;
-
     @Field(IS_ANNOTATED)
     public boolean isAnnotated;
 
     @Field(PARENT_ID)
     public String parentId;
+
+    @Field(PROTEOME)
+    public String proteome;
 
     @Field(GeneProductFields.TARGET_SET)
     public List<String> targetSet;
@@ -76,8 +66,6 @@ public class GeneProductDocument implements QuickGODocument {
         }
         GeneProductDocument that = (GeneProductDocument) o;
         return taxonId == that.taxonId &&
-                isCompleteProteome == that.isCompleteProteome &&
-                isIsoform == that.isIsoform &&
                 isAnnotated == that.isAnnotated &&
                 Objects.equals(id, that.id) &&
                 Objects.equals(database, that.database) &&
@@ -87,8 +75,7 @@ public class GeneProductDocument implements QuickGODocument {
                 Objects.equals(type, that.type) &&
                 Objects.equals(taxonName, that.taxonName) &&
                 Objects.equals(databaseSubset, that.databaseSubset) &&
-                Objects.equals(referenceProteome, that.referenceProteome) &&
-                Objects.equals(proteomeMembership, that.proteomeMembership) &&
+                Objects.equals(proteome, that.proteome) &&
                 Objects.equals(parentId, that.parentId) &&
                 Objects.equals(targetSet, that.targetSet);
     }
@@ -97,8 +84,7 @@ public class GeneProductDocument implements QuickGODocument {
 
         return Objects
                 .hash(id, database, symbol, name, synonyms, type, taxonId, taxonName, databaseSubset,
-                        isCompleteProteome,
-                        referenceProteome, proteomeMembership, isIsoform, isAnnotated, parentId, targetSet);
+                        proteome, isAnnotated, parentId, targetSet);
     }
 
     @Override public String toString() {
@@ -112,10 +98,7 @@ public class GeneProductDocument implements QuickGODocument {
                 ", taxonId=" + taxonId +
                 ", taxonName='" + taxonName + '\'' +
                 ", databaseSubset='" + databaseSubset + '\'' +
-                ", isCompleteProteome=" + isCompleteProteome +
-                ", referenceProteome='" + referenceProteome + '\'' +
-                ", proteomeMembership=" + proteomeMembership +
-                ", isIsoform=" + isIsoform +
+                ", proteome='" + proteome + '\'' +
                 ", isAnnotated=" + isAnnotated +
                 ", parentId='" + parentId + '\'' +
                 ", targetSet=" + targetSet +

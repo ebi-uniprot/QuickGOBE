@@ -200,12 +200,9 @@ public class GeneProductControllerIT {
                 .andExpect(jsonPath(path + "parentId").value("UniProtKB:OK0206"))
                 .andExpect(jsonPath(path + "databaseSubset").value("RRR"))
                 .andExpect(jsonPath(path + "isAnnotated").value(true))
-                .andExpect(jsonPath(path + "isIsoform").value(true))
-                .andExpect(jsonPath(path + "isCompleteProteome").value(true))
                 .andExpect(jsonPath(path + "name").value("moeA5"))
-                .andExpect(jsonPath(path + "referenceProteome").value("AAAA"))
                 .andExpect(jsonPath(path + "synonyms[0]").value("3SSW23"))
-                .andExpect(jsonPath(path + "proteomeMembership").value("Complete"));
+                .andExpect(jsonPath(path + "proteome").value("complete"));
     }
 
     private String buildGeneProductURL(String id) {

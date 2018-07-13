@@ -25,13 +25,10 @@ public class GeneProductFields {
     static final String TAXON_ID = "taxonId";
     static final String TAXON_NAME = "taxonName";
     static final String DATABASE_SUBSET = "dbSubset";
-    static final String COMPLETE_PROTEOME = "isCompleteProteome";
-    static final String REFERENCE_PROTEOME = "referenceProteome";
-    static final String PROTEOME_MEMBERSHIP = "proteomeMembership";
-    static final String IS_ISOFORM = "isIsoform";
     static final String IS_ANNOTATED = "isAnnotated";
     static final String PARENT_ID = "parentId";
     static final String TARGET_SET = "targetSet";
+    static final String PROTEOME = "proteome";
     /**
      * GeneProduct fields that are stored, and can therefore be retrieved.
      */
@@ -46,7 +43,7 @@ public class GeneProductFields {
         public static final String TYPE = storeAndGet(VALUES, GeneProductFields.TYPE);
         public static final String TAXON_ID = storeAndGet(VALUES, GeneProductFields.TAXON_ID);
         public static final String DATABASE_SUBSET = storeAndGet(VALUES, GeneProductFields.DATABASE_SUBSET);
-        public static final String PROTEOME_MEMBERSHIP = storeAndGet(VALUES, GeneProductFields.PROTEOME_MEMBERSHIP);
+        public static final String PROTEOME = storeAndGet(VALUES, GeneProductFields.PROTEOME);
         public static boolean isRetrievable(String field) {
             return VALUES.contains(field);
         }
@@ -64,7 +61,7 @@ public class GeneProductFields {
         public static final String TAXON_ID = storeAndGet(VALUES, GeneProductFields.TAXON_ID);
         public static final String DATABASE_SUBSET = storeAndGet(VALUES, "dbSubset_lowercase");
         public static final String TARGET_SET = storeAndGet(VALUES, GeneProductFields.TARGET_SET);
-        public static final String PROTEOME_MEMBERSHIP = storeAndGet(VALUES, GeneProductFields.PROTEOME_MEMBERSHIP);
+        public static final String PROTEOME = storeAndGet(VALUES, GeneProductFields.PROTEOME);
 
         public static boolean isSearchable(String field) {
             return VALUES.contains(field);
@@ -81,7 +78,7 @@ public class GeneProductFields {
         public static final String TYPE = storeAndGet(VALUES, GeneProductFields.TYPE);
         public static final String TAXON_ID = storeAndGet(VALUES, GeneProductFields.TAXON_ID);
         public static final String DATABASE_SUBSET = storeAndGet(VALUES, GeneProductFields.DATABASE_SUBSET);
-        public static final String PROTEOME_MEMBERSHIP = storeAndGet(VALUES, GeneProductFields.PROTEOME_MEMBERSHIP);
+        public static final String PROTEOME = storeAndGet(VALUES, GeneProductFields.PROTEOME);
         public static boolean isFacetable(String field) {
             return VALUES.contains(field);
         }

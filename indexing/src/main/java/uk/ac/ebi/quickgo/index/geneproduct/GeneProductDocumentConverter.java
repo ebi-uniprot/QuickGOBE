@@ -12,7 +12,6 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import org.springframework.batch.item.ItemProcessor;
 
-import static uk.ac.ebi.quickgo.geneproduct.common.ProteomeMembership.*;
 import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.convertLinePropertiesToMap;
 import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.splitValue;
 import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductParsingHelper.*;
@@ -65,15 +64,10 @@ public class GeneProductDocumentConverter implements ItemProcessor<GeneProduct, 
         doc.taxonId = extractTaxonIdFromValue(geneProduct.taxonId);
         doc.taxonName = properties.get(TAXON_NAME_KEY);
         doc.parentId = geneProduct.parentId;
-        doc.referenceProteome = properties.get(REFERENCE_PROTEOME_KEY);
+        doc.proteome = properties.get(PROTEOME_KEY);
         doc.databaseSubset = properties.get(DATABASE_SUBSET_KEY);
         doc.targetSet = convertToList((splitValue(properties.get(TARGET_SET_KEY), specificValueDelimiter)));
-        doc.isCompleteProteome = properties.isTrue(COMPLETE_PROTEOME_KEY);
         doc.isAnnotated = properties.isTrue(IS_ANNOTATED_KEY);
-        doc.isIsoform = properties.isTrue(IS_ISOFORM_KEY);
-        doc.proteomeMembership = membership(isProtein(geneProduct),
-                properties.specifies(REFERENCE_PROTEOME_KEY),
-                properties.isTrue(COMPLETE_PROTEOME_KEY));
         return doc;
     }
 

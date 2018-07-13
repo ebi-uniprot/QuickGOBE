@@ -230,74 +230,81 @@ public class GeneProductRequestValidationIT {
     }
 
     @Test
-    public void successfullyValidateNotApplicableForProteomeMembership() {
-        String proteomeMembership = "not applicable";
-
-        geneProductRequest.setProteomeMembership(proteomeMembership);
+    public void successfullyValidateNullForProteome() {
+        geneProductRequest.setProteome(null);
 
         assertThat(validator.validate(geneProductRequest), hasSize(0));
     }
 
     @Test
-    public void successfullyValidateNotApplicableForProteomeMembershipWhenCaseInsensitive() {
-        String proteomeMembership = "not aPPlicable";
+    public void successfullyValidateIsoFormForProteome() {
+        String proteome = "gcrpIso";
 
-        geneProductRequest.setProteomeMembership(proteomeMembership);
-
-        assertThat(validator.validate(geneProductRequest), hasSize(0));
-    }
-
-    @Test
-    public void successfullyValidateNoneForProteomeMembership() {
-        String proteomeMembership = "None";
-
-        geneProductRequest.setProteomeMembership(proteomeMembership);
+        geneProductRequest.setProteome(proteome);
 
         assertThat(validator.validate(geneProductRequest), hasSize(0));
     }
 
     @Test
-    public void successfullyValidateReferenceForProteomeMembership() {
-        String proteomeMembership = "reference";
+    public void successfullyValidateProteomeCaseInsensitive() {
+        String proteome = "GcrPiso";
 
-        geneProductRequest.setProteomeMembership(proteomeMembership);
-
-        assertThat(validator.validate(geneProductRequest), hasSize(0));
-    }
-
-    @Test
-    public void successfullyValidateCompleteForProteomeMembership() {
-        String proteomeMembership = "complete";
-
-        geneProductRequest.setProteomeMembership(proteomeMembership);
+        geneProductRequest.setProteome(proteome);
 
         assertThat(validator.validate(geneProductRequest), hasSize(0));
     }
 
     @Test
-    public void emptyProteomeMembershipIsInvalid() {
-        String proteomeMembership = "";
+    public void successfullyValidateNoneForProteome() {
+        String proteome = "None";
 
-        geneProductRequest.setProteomeMembership(proteomeMembership);
+        geneProductRequest.setProteome(proteome);
+
+        assertThat(validator.validate(geneProductRequest), hasSize(0));
+    }
+
+    @Test
+    public void successfullyValidateReferenceForProteome() {
+        String proteome = "gcrpCan";
+
+        geneProductRequest.setProteome(proteome);
+
+        assertThat(validator.validate(geneProductRequest), hasSize(0));
+    }
+
+    @Test
+    public void successfullyValidateCompleteForProteome() {
+        String proteome = "complete";
+
+        geneProductRequest.setProteome(proteome);
+
+        assertThat(validator.validate(geneProductRequest), hasSize(0));
+    }
+
+    @Test
+    public void emptyProteomeIsInvalid() {
+        String proteome = "";
+
+        geneProductRequest.setProteome(proteome);
 
         Set<ConstraintViolation<GeneProductRequest>> violations = validator.validate(geneProductRequest);
         assertThat(validator.validate(geneProductRequest), hasSize(1));
 
         assertThat(violations.iterator().next().getMessage(),
-                containsString(createGenericErrorMessage("proteomeMembership", "")));
+                containsString(createGenericErrorMessage("proteome", "")));
     }
 
     @Test
-    public void proteomeMembershipIsInvalid() {
-        String proteomeMembership = "asdfasdgfas";
+    public void proteomeIsInvalid() {
+        String proteome = "asdfasdgfas";
 
-        geneProductRequest.setProteomeMembership(proteomeMembership);
+        geneProductRequest.setProteome(proteome);
 
         Set<ConstraintViolation<GeneProductRequest>> violations = validator.validate(geneProductRequest);
         assertThat(validator.validate(geneProductRequest), hasSize(1));
 
         assertThat(violations.iterator().next().getMessage(),
-                containsString(createGenericErrorMessage("proteomeMembership", proteomeMembership)));
+                containsString(createGenericErrorMessage("proteome", proteome)));
     }
 
     private String createGenericErrorMessage(String field, String value) {

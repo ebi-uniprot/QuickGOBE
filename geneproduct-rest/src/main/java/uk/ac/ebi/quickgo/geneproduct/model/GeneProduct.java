@@ -1,7 +1,6 @@
 package uk.ac.ebi.quickgo.geneproduct.model;
 
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductType;
-import uk.ac.ebi.quickgo.geneproduct.common.ProteomeMembership;
 
 import java.util.List;
 
@@ -40,21 +39,12 @@ public class GeneProduct {
 
     public String databaseSubset;
 
-    // UPID
-    public String referenceProteome;
-
     // The id of the gene product from which this gene product was derived
     public String parentId;
 
-    public boolean isIsoform;
-
     public boolean isAnnotated;
 
-    @Deprecated //replaced by proteomeMembership
-    public boolean isCompleteProteome;
-
-    // The assigned value fromProteomeMembership */
-    public ProteomeMembership proteomeMembership;
+    public String proteome;
 
     @Override public String toString() {
         return "GeneProduct{" +
@@ -66,12 +56,9 @@ public class GeneProduct {
                 ", type=" + type +
                 ", taxonId=" + taxonId +
                 ", databaseSubset='" + databaseSubset + '\'' +
-                ", referenceProteome='" + referenceProteome + '\'' +
                 ", parentId='" + parentId + '\'' +
-                ", isIsoform=" + isIsoform +
                 ", isAnnotated=" + isAnnotated +
-                ", isCompleteProteome=" + isCompleteProteome +
-                ", proteomeMembership=" + proteomeMembership +
+                ", proteome=" + proteome +
                 '}';
     }
 }
