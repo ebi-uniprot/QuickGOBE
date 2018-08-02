@@ -26,7 +26,7 @@ public class HelpfulConverter {
     }
 
     public static String toCSV(List<String> values) {
-        return toCSV(values.stream());
+        return values == null ? "" : toCSV(values.stream());
     }
 
     public static String toCSV(Stream<String> stream){
