@@ -15,7 +15,8 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter
  */
 public abstract class GeneTypeHeaderCreator extends AbstractHeaderCreator {
     static final String PROJECT_NAME = "Project_name: UniProt GO Annotation (UniProt-GOA)";
-    static final String URL = "URL: http://www.ebi.ac.uk/GOA";
+    static final String URL = "URL: https://www.ebi.ac.uk/GOA";
+    static final String ANNOTATION_URL = "https://www.ebi.ac.uk/QuickGO/annotations";
     static final String EMAIL = "Contact Email: goa@ebi.ac.uk";
     static final String DATE = "Date downloaded from QuickGO: ";
     static final String FILTERS_INTRO = "Filtering parameters selected to generate file:";
@@ -44,12 +45,18 @@ public abstract class GeneTypeHeaderCreator extends AbstractHeaderCreator {
             send(emitter, s);
         }
         send(emitter, FILTERS_INTRO);
-        send(emitter, content.getUri());
+        send(emitter, ANNOTATION_URL + getURLParams(content.getUri()));
     }
 
     abstract String version();
 
     private void send(ResponseBodyEmitter emitter, String content) throws IOException {
         emitter.send(PREFIX + content + "\n", MediaType.TEXT_PLAIN);
+    }
+
+    private String getURLParams(String uri){
+        uri = uri == null ? "" : uri.trim();
+        final int index = uri.indexOf("?");
+        return index < 0 ? "" : uri.substring(index, uri.length());
     }
 }

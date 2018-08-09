@@ -79,6 +79,7 @@ public class AnnotationToTSV implements BiFunction<Annotation, List<String>, Lis
         selected2Content.put(REFERENCE_FIELD_NAME, (c, j) -> j.add(nullToEmptyString(c.annotation.reference)));
         selected2Content.put(WITH_FROM_FIELD_NAME, (c, j) -> j.add(WithFrom.nullOrEmptyListToString(c.annotation.withFrom)));
         selected2Content.put(TAXON_ID_FIELD_NAME, (c, j) -> j.add(taxonIdToString(c.annotation.taxonId)));
+        selected2Content.put(INTERACTING_TAXON_ID_FIELD_NAME, (c, j) -> j.add(taxonIdToString(c.annotation.interactingTaxonId)));
         selected2Content.put(ASSIGNED_BY_FIELD_NAME, (c, j) -> j.add(nullToEmptyString(c.annotation.assignedBy)));
         selected2Content.put(ANNOTATION_EXTENSION_FIELD_NAME,
                 (c, j) -> j.add(Extensions.asString(c.annotation.extensions)));
