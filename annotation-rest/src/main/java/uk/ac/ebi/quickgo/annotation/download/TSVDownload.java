@@ -23,6 +23,7 @@ public class TSVDownload {
     public static final String REFERENCE_FIELD_NAME = "reference";
     public static final String WITH_FROM_FIELD_NAME = "withfrom";
     public static final String TAXON_ID_FIELD_NAME = "taxonid";
+    public static final String INTERACTING_TAXON_ID_FIELD_NAME = "interactingtaxonid";
     public static final String ASSIGNED_BY_FIELD_NAME = "assignedby";
     public static final String ANNOTATION_EXTENSION_FIELD_NAME = "extensions";
     public static final String DATE_FIELD_NAME = "date";

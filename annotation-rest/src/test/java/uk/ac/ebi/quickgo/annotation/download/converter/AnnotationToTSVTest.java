@@ -51,11 +51,12 @@ public class AnnotationToTSVTest {
         unSlimmedFieldNames2Data.add(new String[]{GENE_PRODUCT_NAME_FIELD_NAME, NAME});
         unSlimmedFieldNames2Data.add(new String[]{GENE_PRODUCT_SYNONYMS_FIELD_NAME, SYNONYMS});
         unSlimmedFieldNames2Data.add(new String[]{GENE_PRODUCT_TYPE_FIELD_NAME,TYPE});
+        unSlimmedFieldNames2Data.add(new String[]{INTERACTING_TAXON_ID_FIELD_NAME, Integer.toString(INTERACTING_TAXON_ID)});
     }
 
     @Before
     public void setup() {
-        annotation = AnnotationMocker.createValidComplexPortalAnnotation();
+        annotation = AnnotationMocker.createValidComplexPortalAnnotationWithInteractingTaxon();
         annotationToTSV = new AnnotationToTSV();
     }
 
@@ -240,6 +241,13 @@ public class AnnotationToTSVTest {
         annotation.taxonId = 0;
         String[] elements = annotationToElements(annotation);
         assertThat(elements[DefaultColumns.COL_TAXON], is(""));
+    }
+
+    @Test
+    public void emptyInteractingTaxonId() {
+        annotation.interactingTaxonId = 0;
+        String[] elements = annotationToElements(annotation, Collections.singletonList("interactingtaxonid"));
+        assertThat(elements[0], is(""));
     }
 
     @Test

@@ -216,7 +216,7 @@ public class AnnotationRequest {
     @ApiModelProperty(
             value = "For TSV downloads only: fields to be downloaded. Accepts comma separated values.",
             allowableValues = "geneProductId,symbol,qualifier,goId,goAspect,goName,evidenceCode,goEvidence,reference," +
-                    "withFrom,taxonId,assignedBy,extension,date,taxonName,synonym,name,type",
+                    "withFrom,taxonId,assignedBy,extension,date,taxonName,synonym,name,type,interactingTaxonId",
             hidden = true)
     private String[] selectedFields;
 
@@ -551,7 +551,7 @@ public class AnnotationRequest {
      * @return the array of fields from external resources to include in the response
      */
     @ArrayPattern(regexp = "^geneProductId|symbol|qualifier|goId|goAspect|goName|evidenceCode|goEvidence|reference" +
-            "|withFrom|taxonId|taxonName|assignedBy|extensions|date|name|synonyms|type$", flags = CASE_INSENSITIVE,
+            "|withFrom|taxonId|interactingTaxonId|taxonName|assignedBy|extensions|date|name|synonyms|type$", flags = CASE_INSENSITIVE,
             paramName =
             SELECT_FIELD_PARAM)
     public String[] getSelectedFields() {

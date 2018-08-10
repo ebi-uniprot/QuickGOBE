@@ -24,7 +24,7 @@ public class GeneTypeHeaderCreatorTest {
 
     private static final String DATE = "2017-05-23";
     private static final String REQUEST_URI =
-            "/QuickGO/services/annotation/downloadSearch?downloadLimit=7&geneProductId" +
+            "https://www.ebi.ac.uk/QuickGO/annotations?downloadLimit=7&geneProductId" +
                     "=UniProtKB:A0A000&includeFields=goName,taxonName";
     private final String FORMAT_VERSION_1 = "test-version_1";
     private final String FORMAT_VERSION_2 = "test-version_2";

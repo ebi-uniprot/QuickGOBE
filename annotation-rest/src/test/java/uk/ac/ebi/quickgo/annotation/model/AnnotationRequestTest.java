@@ -552,7 +552,7 @@ public class AnnotationRequestTest {
         List<String> selectedFields = Arrays.asList("geneProductId", "symbol", "qualifier", "goId", "goName",
                                                "evidenceCode", "goEvidence","reference","withFrom","taxonId",
                                                     "taxonName", "assignedBy", "extensions", "date", "name", "synonyms",
-                                                    "type");
+                                                    "type", "interactingTaxonId");
         for (String field : selectedFields) {
             annotationRequest.setSelectedFields(field);
             assertThat(annotationRequest.getSelectedFields(), arrayContaining(field));

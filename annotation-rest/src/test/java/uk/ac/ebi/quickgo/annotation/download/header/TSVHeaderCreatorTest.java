@@ -178,5 +178,6 @@ public class TSVHeaderCreatorTest {
         fields2Columns.add(new String[]{GENE_PRODUCT_NAME_FIELD_NAME, GENE_PRODUCT_NAME});
         fields2Columns.add(new String[]{GENE_PRODUCT_SYNONYMS_FIELD_NAME, GENE_PRODUCT_SYNONYMS});
         fields2Columns.add(new String[]{GENE_PRODUCT_TYPE_FIELD_NAME, GENE_PRODUCT_TYPE});
+        fields2Columns.add(new String[]{INTERACTING_TAXON_ID_FIELD_NAME, INTERACTING_TAXON_ID});
     }
 }

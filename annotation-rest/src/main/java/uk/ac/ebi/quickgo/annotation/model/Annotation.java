@@ -67,6 +67,7 @@ public class Annotation {
     @JsonFormat(shape= JsonFormat.Shape.STRING, pattern = "yyyyMMdd")
     public Date date;
 
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     public int interactingTaxonId;
 
     /**

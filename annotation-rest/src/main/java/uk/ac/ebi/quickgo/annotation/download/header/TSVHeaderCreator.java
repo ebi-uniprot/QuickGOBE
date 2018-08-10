@@ -37,6 +37,7 @@ public class TSVHeaderCreator extends AbstractHeaderCreator {
     static final String REFERENCE = "REFERENCE";
     static final String WITH_FROM = "WITH/FROM";
     static final String TAXON_ID = "TAXON ID";
+    static final String INTERACTING_TAXON_ID = "INTERACTING TAXON ID";
     static final String ASSIGNED_BY = "ASSIGNED BY";
     static final String ANNOTATION_EXTENSION = "ANNOTATION EXTENSION";
     static final String DATE = "DATE";
@@ -73,6 +74,7 @@ public class TSVHeaderCreator extends AbstractHeaderCreator {
         selected2Content.put(REFERENCE_FIELD_NAME, (hc, j) -> j.add(REFERENCE));
         selected2Content.put(WITH_FROM_FIELD_NAME, (hc, j) -> j.add(WITH_FROM));
         selected2Content.put(TAXON_ID_FIELD_NAME, (hc, j) -> j.add(TAXON_ID));
+        selected2Content.put(INTERACTING_TAXON_ID_FIELD_NAME, (hc, j) -> j.add(INTERACTING_TAXON_ID));
         selected2Content.put(ASSIGNED_BY_FIELD_NAME, (hc, j) -> j.add(ASSIGNED_BY));
         selected2Content.put(ANNOTATION_EXTENSION_FIELD_NAME, (hc, j) -> j.add(ANNOTATION_EXTENSION));
         selected2Content.put(DATE_FIELD_NAME, (hc, j) -> j.add(DATE));

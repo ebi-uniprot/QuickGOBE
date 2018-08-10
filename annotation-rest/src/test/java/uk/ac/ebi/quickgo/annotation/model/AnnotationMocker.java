@@ -95,6 +95,13 @@ public class AnnotationMocker {
         return annotation;
     }
 
+    public static Annotation createValidComplexPortalAnnotationWithInteractingTaxon() {
+        final Annotation annotation = createValidComplexPortalAnnotation();
+        annotation.interactingTaxonId = INTERACTING_TAXON_ID;
+        return annotation;
+    }
+
+
     public static Annotation createValidUniProtAnnotationWithoutIsoForm() {
         Annotation annotation = new Annotation();
         annotation.id = DB_UNIPROTKB + ":" + ID_UNIPROTKB_WITHOUT_ISOFORM;
