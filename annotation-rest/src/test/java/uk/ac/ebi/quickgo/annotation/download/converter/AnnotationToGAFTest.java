@@ -7,6 +7,7 @@ import uk.ac.ebi.quickgo.annotation.model.GeneProduct;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -285,13 +286,18 @@ public class AnnotationToGAFTest {
     }
 
     @Test
-    public void nullGoEvidence() {
+    public void nullOrEmptyGoEvidenceIsNotValidGafRecord() {
         Annotation annotation = AnnotationMocker.createValidComplexPortalAnnotation();
+
         annotation.goEvidence = null;
+        List<String> records = annotationToGAF.apply(annotation, null);
+        assertThat(records, Matchers.notNullValue());
+        assertThat(records, Matchers.empty());
 
-        String[] elements = annotationToDownloadColumns(annotation);
-
-        assertThat(elements[COL_EVIDENCE], is(""));
+        annotation.goEvidence = "";
+        records = annotationToGAF.apply(annotation, null);
+        assertThat(records, Matchers.notNullValue());
+        assertThat(records, Matchers.empty());
     }
 
     @Test

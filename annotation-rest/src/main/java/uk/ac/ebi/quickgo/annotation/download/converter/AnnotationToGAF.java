@@ -5,10 +5,7 @@ import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.model.GeneProduct;
 import uk.ac.ebi.quickgo.common.model.Aspect;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -89,10 +86,11 @@ public class AnnotationToGAF implements BiFunction<Annotation, List<String>, Lis
     public List<String> apply(Annotation annotation, List<String> selectedFields) {
         if (isNull(annotation.slimmedIds) || annotation.slimmedIds.isEmpty()) {
             GafSource gafSource = createGAFSource(annotation, annotation.goId);
-            return Collections.singletonList(toOutputRecord(gafSource));
+            return isValidGafRecord(gafSource) ? Collections.singletonList(toOutputRecord(gafSource)) : Collections.emptyList();
         } else {
             return annotation.slimmedIds.stream()
                     .map(goId -> createGAFSource(annotation, goId))
+                    .filter(this::isValidGafRecord)
                     .map(this::toOutputRecord)
                     .collect(toList());
         }
@@ -116,6 +114,17 @@ public class AnnotationToGAF implements BiFunction<Annotation, List<String>, Lis
                 .map(f -> f.apply(gafSource))
                 .map(Helper::nullToEmptyString)
                 .collect(joining(OUTPUT_DELIMITER));
+    }
+
+    private boolean isValidGafRecord(GafSource gafSource){
+        if(gafSource == null)
+            return false;
+        // GOA-3253: annotations with an ECO code that has no mapping to a GO evidence code should not be output in GAF files
+        // See details in jira comments
+        if (gafSource.annotation !=null)
+            return gafSource.annotation.goEvidence != null && !gafSource.annotation.goEvidence.trim().isEmpty();
+        //Everything else is good to go
+        return true;
     }
 
     /**
