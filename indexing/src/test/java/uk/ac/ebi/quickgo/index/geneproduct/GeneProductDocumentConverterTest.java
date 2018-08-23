@@ -154,37 +154,6 @@ public class GeneProductDocumentConverterTest {
     }
 
     @Test
-    public void convertsYValuePropertiesInGeneProductToTrueBooleanFields() {
-        String isAnnotated = concatProperty(IS_ANNOTATED_KEY, "Y");
-        geneProduct.type = GeneProductType.PROTEIN.getName();
-        geneProduct.properties = concatStrings(Arrays.asList(isAnnotated), INTER_VALUE_DELIMITER);
-
-        GeneProductDocument doc = converter.process(geneProduct);
-
-        assertThat(doc.isAnnotated, is(true));
-    }
-
-    @Test
-    public void convertsNValuePropertiesInGeneProductToTrueBooleanFields() {
-        String isAnnotated = concatProperty(IS_ANNOTATED_KEY, "N");
-        geneProduct.type = GeneProductType.PROTEIN.getName();
-        geneProduct.properties = concatStrings(Arrays.asList(isAnnotated), INTER_VALUE_DELIMITER);
-
-        GeneProductDocument doc = converter.process(geneProduct);
-
-        assertThat(doc.isAnnotated, is(false));
-    }
-
-    @Test
-    public void convertsAbsenceOfBooleanValuePropertiesInGeneProductToFalseBooleanFields() {
-        geneProduct.properties = "";
-
-        GeneProductDocument doc = converter.process(geneProduct);
-
-        assertThat(doc.isAnnotated, is(false));
-    }
-
-    @Test
     public void convertsReferenceProteomeInPropertiesInGeneProduct() {
         String proteome = "gcrpCan";
         geneProduct.properties = concatProperty(PROTEOME_KEY, proteome);

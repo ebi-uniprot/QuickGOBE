@@ -1698,7 +1698,7 @@ public class AnnotationControllerIT {
     // ------------------------------- Filter by geneProductSubset -------------------------------
     // Holds values TrEMBL, Swiss-Prot and maybe more
     @Test
-    public void filterByGeneProductSubset() throws Exception {
+    public void filterByGeneProductSubsetWillNotWorkWhenGeneProductTypeIsNotProteinPartOfRequest() throws Exception {
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A842");
         String geneProductSubset = "Swiss-Prot";
         doc.geneProductSubset = geneProductSubset;
@@ -1706,6 +1706,22 @@ public class AnnotationControllerIT {
 
         ResultActions response =
                 mockMvc.perform(get(RESOURCE_URL + "/search").param(GP_SUBSET_PARAM.getName(), geneProductSubset));
+
+        response.andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(contentTypeToBeJson());
+    }
+
+    @Test
+    public void filterByGeneProductSubset() throws Exception {
+        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A842");
+        String geneProductSubset = "Swiss-Prot";
+        doc.geneProductSubset = geneProductSubset;
+        repository.save(doc);
+
+        ResultActions response =
+                mockMvc.perform(get(RESOURCE_URL + "/search").param(GP_SUBSET_PARAM.getName(), geneProductSubset)
+                        .param(GENE_PRODUCT_TYPE_PARAM.getName(), "protein"));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -1721,7 +1737,8 @@ public class AnnotationControllerIT {
         repository.save(doc);
 
         ResultActions response =
-                mockMvc.perform(get(RESOURCE_URL + "/search").param(GP_SUBSET_PARAM.getName(), "swisS-proT"));
+                mockMvc.perform(get(RESOURCE_URL + "/search").param(GP_SUBSET_PARAM.getName(), "swisS-proT").param
+                        (GENE_PRODUCT_TYPE_PARAM.getName(), "protein"));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -1734,13 +1751,28 @@ public class AnnotationControllerIT {
     // ------------------------------- Filter by proteome -------------------------------
 
     @Test
-    public void filterByProteome() throws Exception {
+    public void filterByProteomeWillNotWorkWhenGeneProductTypeIsNotProteinPartOfRequest() throws Exception {
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A123");
         doc.proteome = "gcrpCan";
         repository.save(doc);
 
         ResultActions response =
                 mockMvc.perform(get(RESOURCE_URL + "/search").param(PROTEOME_PARAM.getName(), "gcrpCan"));
+
+        response.andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(contentTypeToBeJson());
+    }
+
+    @Test
+    public void filterByProteome() throws Exception {
+        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A123");
+        doc.proteome = "gcrpCan";
+        repository.save(doc);
+
+        ResultActions response =
+                mockMvc.perform(get(RESOURCE_URL + "/search").param(PROTEOME_PARAM.getName(), "gcrpCan").param
+                        (GENE_PRODUCT_TYPE_PARAM.getName(), "protein"));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -1756,7 +1788,8 @@ public class AnnotationControllerIT {
         repository.save(doc);
 
         ResultActions response =
-                mockMvc.perform(get(RESOURCE_URL + "/search").param(PROTEOME_PARAM.getName(), "GcrPcan"));
+                mockMvc.perform(get(RESOURCE_URL + "/search").param(PROTEOME_PARAM.getName(), "GcrPcan").param
+                        (GENE_PRODUCT_TYPE_PARAM.getName(), "protein"));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -1772,7 +1805,8 @@ public class AnnotationControllerIT {
         repository.save(doc);
 
         ResultActions response =
-                mockMvc.perform(get(RESOURCE_URL + "/search").param(PROTEOME_PARAM.getName(), "none,gcrpCan"));
+                mockMvc.perform(get(RESOURCE_URL + "/search").param(PROTEOME_PARAM.getName(), "none,gcrpCan").param
+                        (GENE_PRODUCT_TYPE_PARAM.getName(), "protein"));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -1785,12 +1819,40 @@ public class AnnotationControllerIT {
     @Test
     public void filterByInvalidProteomeValueProducesNoResults() throws Exception {
         ResultActions response =
-                mockMvc.perform(get(RESOURCE_URL + "/search").param(PROTEOME_PARAM.getName(), "pancake"));
+                mockMvc.perform(get(RESOURCE_URL + "/search").param(PROTEOME_PARAM.getName(), "pancake").param
+                        (GENE_PRODUCT_TYPE_PARAM.getName(), "protein"));
 
         response.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(0));
+    }
+
+    // GOA-3266
+    @Test
+    public void filterByMultipleGeneProductAndProteinSpecificProperties() throws Exception {
+        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A842");
+        AnnotationDocument doc2 = AnnotationDocMocker.createAnnotationDoc("A0A843");
+
+        doc.proteome = "gcrpCan";
+        doc.geneProductSubset = "swiss-prot";
+        doc2.proteome= "";
+        doc2.geneProductSubset="";
+        doc2.geneProductType="miRNA";
+        repository.save(doc);
+        repository.save(doc2);
+
+        ResultActions response =
+                mockMvc.perform(get(RESOURCE_URL + "/search").param(GP_SUBSET_PARAM.getName(), "swiss-prot")
+                        .param(GENE_PRODUCT_TYPE_PARAM.getName(), "protein,miRNA")
+                        .param(PROTEOME_PARAM.getName(), "gcrpCan")
+                );
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(2))
+                .andExpect(fieldsInAllResultsExist(2));
     }
 
 

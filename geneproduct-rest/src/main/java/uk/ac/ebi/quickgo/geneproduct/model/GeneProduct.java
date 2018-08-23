@@ -42,8 +42,6 @@ public class GeneProduct {
     // The id of the gene product from which this gene product was derived
     public String parentId;
 
-    public boolean isAnnotated;
-
     public String proteome;
 
     @Override public String toString() {
@@ -57,7 +55,6 @@ public class GeneProduct {
                 ", taxonId=" + taxonId +
                 ", databaseSubset='" + databaseSubset + '\'' +
                 ", parentId='" + parentId + '\'' +
-                ", isAnnotated=" + isAnnotated +
                 ", proteome=" + proteome +
                 '}';
     }

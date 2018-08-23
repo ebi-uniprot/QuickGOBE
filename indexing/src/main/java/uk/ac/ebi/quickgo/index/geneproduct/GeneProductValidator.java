@@ -50,7 +50,6 @@ public class GeneProductValidator implements Validator<GeneProduct> {
             Map<String, String> properties =
                     convertLinePropertiesToMap(geneProduct.properties, interValueDelimiter, intraValueDelimiter);
 
-            checkBooleanValue(properties.get(IS_ANNOTATED_KEY), IS_ANNOTATED_KEY);
         } catch (ValidationException e) {
             throw new ValidationException("Error occurred in database: " + geneProduct.database + ", for entry: " +
                     geneProduct.id, e);

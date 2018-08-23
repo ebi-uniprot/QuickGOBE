@@ -12,6 +12,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.and;
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.or;
 
 /**
@@ -45,11 +46,8 @@ public class SimpleFilterConverterTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void requestWithMultiplePropertiesThrowsException() {
-        FilterRequest request = FilterRequest.newBuilder()
-                .addProperty(FIELD1, FIELD_VALUE_1)
-                .addProperty(FIELD2, FIELD_VALUE_2)
-                .build();
+    public void requestNoPropertyThrowsException() {
+        FilterRequest request = FilterRequest.newBuilder().build();
         converter.transform(request);
     }
 
@@ -71,6 +69,45 @@ public class SimpleFilterConverterTest {
                 or(
                         QuickGOQuery.createQuery(FIELD1, FIELD_VALUE_1),
                         QuickGOQuery.createQuery(FIELD1, FIELD_VALUE_2));
+
+        assertThat(resultingQuery, is(expectedQuery));
+    }
+
+    @Test
+    public void transformsRequestWithMultiplePropertiesIntoAQuickGOQuery() {
+        FilterRequest request = FilterRequest.newBuilder()
+                .addProperty(FIELD1, FIELD_VALUE_1)
+                .addProperty(FIELD2, FIELD_VALUE_2)
+                .build();
+        QuickGOQuery resultingQuery = converter.transform(request).getConvertedValue();
+
+        QuickGOQuery expectedQuery =
+                and(
+                        QuickGOQuery.createQuery(FIELD1, FIELD_VALUE_1),
+                        QuickGOQuery.createQuery(FIELD2, FIELD_VALUE_2));
+
+        assertThat(resultingQuery, is(expectedQuery));
+    }
+
+    @Test
+    public void transformsRequestWithMultiplePropertiesAndMultipleValuesIntoAQuickGOQuery() {
+        FilterRequest request = FilterRequest.newBuilder()
+                .addProperty(FIELD1, FIELD_VALUE_1, FIELD_VALUE_2)
+                .addProperty(FIELD2, FIELD_VALUE_2, FIELD_VALUE_1)
+                .build();
+        QuickGOQuery resultingQuery = converter.transform(request).getConvertedValue();
+
+        QuickGOQuery expectedQuery =
+                and(
+                        or(
+                                QuickGOQuery.createQuery(FIELD1, FIELD_VALUE_1),
+                                QuickGOQuery.createQuery(FIELD1, FIELD_VALUE_2)
+                        ),
+                        or(
+                                QuickGOQuery.createQuery(FIELD2, FIELD_VALUE_2),
+                                QuickGOQuery.createQuery(FIELD2, FIELD_VALUE_1)
+                        )
+                );
 
         assertThat(resultingQuery, is(expectedQuery));
     }

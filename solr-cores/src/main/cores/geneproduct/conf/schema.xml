@@ -31,7 +31,6 @@
     <field name="taxonName" type="string" indexed="false" stored="false"/>
     <field name="dbSubset" type="string" indexed="true" stored="true"/>
     <field name="isCompleteProteome" type="boolean" indexed="false" stored="true"/>
-    <field name="isAnnotated" type="boolean" indexed="false" stored="true"/>
     <field name="parentId" type="string" indexed="false" stored="true"/>
     <field name="targetSet" type="string" indexed="true" stored="false" multiValued="true"/>
     <field name="proteome" type="string" indexed="true" stored="true"/>

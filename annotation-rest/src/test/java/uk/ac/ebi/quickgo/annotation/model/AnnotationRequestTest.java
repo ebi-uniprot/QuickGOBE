@@ -591,6 +591,46 @@ public class AnnotationRequestTest {
         assertThat(requestIds, containsInAnyOrder(goName, taxonName));
     }
 
+    //// GOA-3266 and GOA-3130
+    @Test(expected = ParameterException.class)
+    public void cannotCreateFilterWithGeneProductSubsetAndNoGeneProductType() {
+        annotationRequest.setGeneProductSubset("Swiss-Prot");
+        annotationRequest.createFilterRequests();
+    }
+
+    @Test(expected = ParameterException.class)
+    public void cannotCreateFilterWithProteomeAndNoGeneProductType() {
+        annotationRequest.setProteome("none");
+        annotationRequest.createFilterRequests();
+    }
+
+    @Test(expected = ParameterException.class)
+    public void cannotCreateFilterWithProteomeAndGeneProductSubsetAndGeneProductTypeValueOtherThanProtein() {
+        annotationRequest.setGeneProductSubset("TrEMBL");
+        annotationRequest.setProteome("complete");
+        annotationRequest.setGeneProductType("miRNA");
+        annotationRequest.createFilterRequests();
+    }
+
+    @Test
+    public void canCreateFilterWithProteomeAndGeneProductSubsetAndWhenGeneProductTypeValueIsProtein() {
+        String type = "protein";
+        String proteome = "gcrpIso";
+        String gpSubset = "TrEMBL";
+        annotationRequest.setGeneProductSubset(gpSubset);
+        annotationRequest.setProteome(proteome);
+        annotationRequest.setGeneProductType(type);
+
+        FilterRequest request = FilterRequest.newBuilder()
+                .addProperty(AnnotationFields.Searchable.GENE_PRODUCT_TYPE, type)
+                .addProperty(AnnotationFields.Searchable.PROTEOME, proteome)
+                .addProperty(AnnotationFields.Searchable.GENE_PRODUCT_SUBSET, gpSubset)
+                .build();
+
+        List<FilterRequest> filterRequests = annotationRequest.createFilterRequests();
+        assertThat(filterRequests, contains(request));
+    }
+
     //----------------- helpers
     private String getDefaultTaxonSearchField() {
         String field;

@@ -41,9 +41,6 @@ public class GeneProductDocument implements QuickGODocument {
     @Field(DATABASE_SUBSET)
     public String databaseSubset;
 
-    @Field(IS_ANNOTATED)
-    public boolean isAnnotated;
-
     @Field(PARENT_ID)
     public String parentId;
 
@@ -66,7 +63,6 @@ public class GeneProductDocument implements QuickGODocument {
         }
         GeneProductDocument that = (GeneProductDocument) o;
         return taxonId == that.taxonId &&
-                isAnnotated == that.isAnnotated &&
                 Objects.equals(id, that.id) &&
                 Objects.equals(database, that.database) &&
                 Objects.equals(symbol, that.symbol) &&
@@ -84,7 +80,7 @@ public class GeneProductDocument implements QuickGODocument {
 
         return Objects
                 .hash(id, database, symbol, name, synonyms, type, taxonId, taxonName, databaseSubset,
-                        proteome, isAnnotated, parentId, targetSet);
+                        proteome, parentId, targetSet);
     }
 
     @Override public String toString() {
@@ -99,7 +95,6 @@ public class GeneProductDocument implements QuickGODocument {
                 ", taxonName='" + taxonName + '\'' +
                 ", databaseSubset='" + databaseSubset + '\'' +
                 ", proteome='" + proteome + '\'' +
-                ", isAnnotated=" + isAnnotated +
                 ", parentId='" + parentId + '\'' +
                 ", targetSet=" + targetSet +
                 '}';

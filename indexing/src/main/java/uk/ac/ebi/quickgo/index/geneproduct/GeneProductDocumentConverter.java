@@ -67,7 +67,6 @@ public class GeneProductDocumentConverter implements ItemProcessor<GeneProduct, 
         doc.proteome = properties.get(PROTEOME_KEY);
         doc.databaseSubset = properties.get(DATABASE_SUBSET_KEY);
         doc.targetSet = convertToList((splitValue(properties.get(TARGET_SET_KEY), specificValueDelimiter)));
-        doc.isAnnotated = properties.isTrue(IS_ANNOTATED_KEY);
         return doc;
     }
 

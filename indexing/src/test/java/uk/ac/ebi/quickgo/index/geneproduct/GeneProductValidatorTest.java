@@ -15,7 +15,6 @@ import org.junit.rules.ExpectedException;
 import org.springframework.batch.item.validator.ValidationException;
 
 import static uk.ac.ebi.quickgo.index.geneproduct.Columns.*;
-import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductParsingHelper.IS_ANNOTATED_KEY;
 import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductUtil.createUnconvertedTaxonId;
 
 /**
@@ -251,41 +250,6 @@ public class GeneProductValidatorTest {
     @Test
     public void noIsIsoformIsValid() throws Exception {
         validator.validate(geneProduct);
-    }
-
-    @Test
-    public void noIsAnnotatedIsValid() throws Exception {
-        validator.validate(geneProduct);
-    }
-
-    @Test
-    public void emptyIsAnnotatedThrowsException() throws Exception {
-        String pair = concatProperty(IS_ANNOTATED_KEY, "");
-
-        geneProduct.properties = appendToProperties(geneProduct.properties, Collections.singletonList(pair));
-
-        assertExceptionThrown(createValidationException(String.format(INVALID_FIELD_MESSAGE, IS_ANNOTATED_KEY)));
-        validator.validate(geneProduct);
-    }
-
-    @Test
-    public void isAnnotatedWithInvalidValueThrowsException() throws Exception {
-        String pair = concatProperty(IS_ANNOTATED_KEY, "invalid");
-
-        geneProduct.properties = appendToProperties(geneProduct.properties, Collections.singletonList(pair));
-
-        assertExceptionThrown(createValidationException(String.format(INVALID_FIELD_MESSAGE, IS_ANNOTATED_KEY)));
-        validator.validate(geneProduct);
-    }
-
-    @Test
-    public void isAnnotatedWithYValueIsValid() throws Exception {
-        assertYValue(IS_ANNOTATED_KEY);
-    }
-
-    @Test
-    public void isAnnotatedWithNValueIsValid() throws Exception {
-        assertNValue(IS_ANNOTATED_KEY);
     }
 
     @Test
