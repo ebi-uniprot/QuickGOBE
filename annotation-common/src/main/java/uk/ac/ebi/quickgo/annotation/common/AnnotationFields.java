@@ -13,6 +13,7 @@ import static uk.ac.ebi.quickgo.common.DocumentFieldsHelper.storeAndGet;
  * @author Edd
  */
 public class AnnotationFields {
+    private static final String COMMA = ",";
 
     // fields from annotations's schema.xml
     static final String ID = "id";
@@ -58,6 +59,13 @@ public class AnnotationFields {
         public static final String WITH_FROM = storeAndGet(VALUES, "withFrom_search");
         public static final String EXTENSION = storeAndGet(VALUES, "extension_unsorted");
         public static final String PROTEOME = storeAndGet(VALUES, "proteome_unsorted");
+
+        public static final String GENE_PRODUCT_TYPE_AND_PROTEOME = storeAndGet(VALUES, GENE_PRODUCT_TYPE + COMMA +
+                PROTEOME);
+        public static final String GENE_PRODUCT_TYPE_AND_SUBSET = storeAndGet(VALUES, GENE_PRODUCT_TYPE + COMMA +
+                GENE_PRODUCT_SUBSET);
+        public static final String GENE_PRODUCT_TYPE_AND_SUBSET_AND_RPOTEOME =
+                storeAndGet(VALUES, GENE_PRODUCT_TYPE + COMMA + GENE_PRODUCT_SUBSET + COMMA + PROTEOME);
 
         public static boolean isSearchable(String field) {
             return VALUES.contains(field);

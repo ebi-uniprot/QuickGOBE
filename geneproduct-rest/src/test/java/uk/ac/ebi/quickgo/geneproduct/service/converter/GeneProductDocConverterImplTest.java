@@ -46,7 +46,6 @@ public class GeneProductDocConverterImplTest {
         geneProductDocument.id = ID;
         geneProductDocument.database = DATABASE;
         geneProductDocument.databaseSubset = DATABASE_SUBSET;
-        geneProductDocument.isAnnotated = true;
         geneProductDocument.synonyms = SYNONYMS;
         geneProductDocument.name = NAME;
         geneProductDocument.parentId = PARENT_ID;
@@ -69,7 +68,6 @@ public class GeneProductDocConverterImplTest {
         assertThat(convertedGeneProduct.symbol, is(SYMBOL));
         assertThat(convertedGeneProduct.taxonId, is(TAX_ID));
         assertThat(convertedGeneProduct.type, is(GeneProductType.PROTEIN));
-        assertThat(convertedGeneProduct.isAnnotated, is(true));
         assertThat(convertedGeneProduct.proteome, is(PROTEOME));
     }
 

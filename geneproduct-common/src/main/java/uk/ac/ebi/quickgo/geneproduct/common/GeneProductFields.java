@@ -25,7 +25,6 @@ public class GeneProductFields {
     static final String TAXON_ID = "taxonId";
     static final String TAXON_NAME = "taxonName";
     static final String DATABASE_SUBSET = "dbSubset";
-    static final String IS_ANNOTATED = "isAnnotated";
     static final String PARENT_ID = "parentId";
     static final String TARGET_SET = "targetSet";
     static final String PROTEOME = "proteome";

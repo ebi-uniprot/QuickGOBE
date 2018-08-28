@@ -83,9 +83,8 @@ public class AnnotationRequest {
     /**
      * indicates which fields should be looked at when creating filters
      */
-    private static final String[] FILTER_REQUEST_FIELDS = new String[]{GO_ASPECT, ASSIGNED_BY, GENE_PRODUCT_SUBSET,
-            GENE_PRODUCT_ID, GENE_PRODUCT_TYPE, GO_EVIDENCE, QUALIFIER, REFERENCE, TARGET_SET, WITH_FROM, EXTENSION,
-            PROTEOME
+    private static final String[] FILTER_REQUEST_FIELDS = new String[]{GO_ASPECT, ASSIGNED_BY,
+            GENE_PRODUCT_ID, GO_EVIDENCE, QUALIFIER, REFERENCE, TARGET_SET, WITH_FROM, EXTENSION
     };
 
     @ApiModelProperty(
@@ -580,6 +579,9 @@ public class AnnotationRequest {
      * @return a list of {@link FilterRequest}
      */
     public List<FilterRequest> createFilterRequests() {
+
+        validateFilter();
+
         List<FilterRequest> filterRequests = new ArrayList<>();
 
         Stream.of(FILTER_REQUEST_FIELDS)
@@ -588,6 +590,7 @@ public class AnnotationRequest {
                 .map(Optional::get)
                 .forEach(filterRequests::add);
 
+        createGeneProductTypeFilter().ifPresent(filterRequests::add);
         createGoUsageFilter().ifPresent(filterRequests::add);
         createEvidenceCodeUsageFilter().ifPresent(filterRequests::add);
         createTaxonFilter().ifPresent(filterRequests::add);
@@ -679,6 +682,25 @@ public class AnnotationRequest {
                 .build());
     }
 
+    private Optional<FilterRequest> createGeneProductTypeFilter() {
+        Optional<FilterRequest> retVal = Optional.empty();
+        if (filterMap.containsKey(GENE_PRODUCT_TYPE)) {
+            final FilterRequest.Builder builder = FilterRequest.newBuilder();
+            builder.addProperty(GENE_PRODUCT_TYPE, filterMap.get(GENE_PRODUCT_TYPE));
+
+            if (filterMap.containsKey(GENE_PRODUCT_SUBSET)) {
+                builder.addProperty(GENE_PRODUCT_SUBSET, filterMap.get(GENE_PRODUCT_SUBSET));
+            }
+
+            if (filterMap.containsKey(PROTEOME)) {
+                builder.addProperty(PROTEOME, filterMap.get(PROTEOME));
+            }
+
+            retVal = of(builder.build());
+        }
+        return retVal;
+    }
+
     private void throwUsageWithoutIdException(String idParam, String usageParam) {
         throw new ParameterException("Annotation " + usageParam + " requires '" + idParam + "' to be set.");
     }
@@ -729,5 +751,23 @@ public class AnnotationRequest {
         return Stream.of(args)
                 .map(String::toLowerCase)
                 .toArray(String[]::new);
+    }
+
+    private void validateFilter(){
+        // GOA-3266 and GOA-3130
+
+        final Optional<String> protein = Stream.of(filterMap.getOrDefault(GENE_PRODUCT_TYPE, new String[0]))
+                .filter(p -> GeneProduct.GeneProductType.PROTEIN.getName().equals(p)).findFirst();
+
+        // gene product subset filter only valid when geneProductType protein is set
+        if(filterMap.containsKey(GENE_PRODUCT_SUBSET) && !protein.isPresent()){
+            throw new ParameterException("Annotation " + GENE_PRODUCT_SUBSET + " requires '" + GENE_PRODUCT_TYPE +
+                    "=" + GeneProduct.GeneProductType.PROTEIN.getName()+"' to be set.");
+        }
+        // proteome filter only valid when geneProductType protein is set
+        if(filterMap.containsKey(PROTEOME) && !protein.isPresent()){
+            throw new ParameterException("Annotation " + PROTEOME + " requires '" + GENE_PRODUCT_TYPE +
+                    "=" + GeneProduct.GeneProductType.PROTEIN.getName()+"' to be set.");
+        }
     }
 }

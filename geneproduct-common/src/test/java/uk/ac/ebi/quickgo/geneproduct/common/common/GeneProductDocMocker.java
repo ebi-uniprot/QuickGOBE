@@ -20,7 +20,6 @@ public final class GeneProductDocMocker {
         doc.parentId = "UniProtKB:OK0206";
         doc.database = "UniProt";
         doc.databaseSubset = "RRR";
-        doc.isAnnotated = true;
         doc.name = "moeA5";
         doc.synonyms = Collections.singletonList("3SSW23");
         doc.targetSet = Collections.singletonList("KRUK");
