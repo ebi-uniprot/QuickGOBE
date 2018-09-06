@@ -137,4 +137,11 @@ public class QuickGOQueryTest {
 
         assertThat(query, instanceOf(AllNonEmptyFieldQuery.class));
     }
+
+    @Test
+    public void canCreateContainFieldQuery() {
+        QuickGOQuery query = QuickGOQuery.createContainQuery("field1", "value1");
+
+        assertThat(query, instanceOf(ContainFieldQuery.class));
+    }
 }

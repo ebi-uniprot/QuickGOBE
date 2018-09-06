@@ -11,6 +11,7 @@ import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import org.apache.commons.lang.StringUtils;
@@ -1658,6 +1659,85 @@ public class AnnotationControllerIT {
                 .andExpect(fieldsInAllResultsExist(1));
     }
 
+    //GOA-3246
+    @Test
+    public void filterBySingleAndExtension() throws Exception {
+        String extension = "results_in_development_of(UBERON:1234567)";
+        String extensionQuery= extension + " and happy_about(P01234:QWE_90hy)" ;
+        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A123");
+        doc.extensions = extension;
+        repository.save(doc);
+
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
+                .param(EXTENSION_PARAM.getName(), extensionQuery));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(0));
+    }
+
+    @Test
+    public void filterBySingleOrExtension() throws Exception {
+        String extension = "results_in_development_of(UBERON:1234567)";
+        String extensionQuery= extension + " or happy_about(PO1234:QWE_90hy)" ;
+        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A123");
+        doc.extensions = extension;
+        repository.save(doc);
+
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
+                .param(EXTENSION_PARAM.getName(), extensionQuery));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS + 1))
+                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS + 1));
+    }
+
+    @Test
+    public void filterByMultipleOrExtension() throws Exception {
+        String extensionQuery= Stream.of(EXTENSIONS.split(",|\\|")).collect(Collectors.joining(" or "));
+
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
+                .param(EXTENSION_PARAM.getName(), extensionQuery));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
+                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS));
+    }
+
+    @Test
+    public void filterByMultipleAndExtension() throws Exception {
+        String extensionQuery= Stream.of(EXTENSIONS.split(",|\\|")).collect(Collectors.joining(" and "));
+
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
+                .param(EXTENSION_PARAM.getName(), extensionQuery));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
+                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS));
+    }
+
+    @Test
+    public void filterByAndOrExtension() throws Exception {
+        String[] extensions = EXTENSIONS.split(",|\\|");
+        String extensionQuery=  extensions[0] + " And " + extensions[1] + " oR " + extensions[2] + " AND "+ extensions[3];
+
+        ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
+                .param(EXTENSION_PARAM.getName(), extensionQuery));
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
+                .andExpect(fieldsInAllResultsExist(NUMBER_OF_GENERIC_DOCS));
+    }
+
     // ------------------------------- Wildcard searches  -------------------------------
 
     @Test
@@ -1855,6 +1935,32 @@ public class AnnotationControllerIT {
                 .andExpect(fieldsInAllResultsExist(2));
     }
 
+    // GOA-3246
+    @Test
+    public void filterByAn() throws Exception {
+        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A842");
+        AnnotationDocument doc2 = AnnotationDocMocker.createAnnotationDoc("A0A843");
+
+        doc.proteome = "gcrpCan";
+        doc.geneProductSubset = "swiss-prot";
+        doc2.proteome= "";
+        doc2.geneProductSubset="";
+        doc2.geneProductType="miRNA";
+        repository.save(doc);
+        repository.save(doc2);
+
+        ResultActions response =
+                mockMvc.perform(get(RESOURCE_URL + "/search").param(GP_SUBSET_PARAM.getName(), "swiss-prot")
+                        .param(GENE_PRODUCT_TYPE_PARAM.getName(), "protein,miRNA")
+                        .param(PROTEOME_PARAM.getName(), "gcrpCan")
+                );
+
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(contentTypeToBeJson())
+                .andExpect(totalNumOfResults(2))
+                .andExpect(fieldsInAllResultsExist(2));
+    }
 
     // ------------------------------- Check date format -------------------------------
     @Test

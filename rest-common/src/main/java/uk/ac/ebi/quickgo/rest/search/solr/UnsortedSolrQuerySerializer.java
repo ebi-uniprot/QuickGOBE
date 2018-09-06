@@ -142,6 +142,10 @@ public class UnsortedSolrQuerySerializer implements QueryVisitor<String> {
         @Override public TermQueryTransformationResult visit(AllNonEmptyFieldQuery query) {
             return failedTransformationResult();
         }
+
+        @Override public TermQueryTransformationResult visit(ContainFieldQuery query) {
+            return failedTransformationResult();
+        }
     }
 
     /**
@@ -221,6 +225,10 @@ public class UnsortedSolrQuerySerializer implements QueryVisitor<String> {
     }
 
     @Override public String visit(AllNonEmptyFieldQuery query) {
+        return sortedQuerySerializer.visit(query);
+    }
+
+    @Override public String visit(ContainFieldQuery query) {
         return sortedQuerySerializer.visit(query);
     }
 }

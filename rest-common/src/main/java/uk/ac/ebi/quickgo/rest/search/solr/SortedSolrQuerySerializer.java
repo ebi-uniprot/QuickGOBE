@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import static com.google.common.base.Preconditions.checkArgument;
 import static uk.ac.ebi.quickgo.rest.search.solr.SolrQueryConverter.CROSS_CORE_JOIN_SYNTAX;
 import static uk.ac.ebi.quickgo.rest.search.solr.SolrQueryConverter.SOLR_FIELD_SEPARATOR;
+import static uk.ac.ebi.quickgo.rest.search.solr.SolrQueryConverter.SOLR_FIELD_STAR;
 
 /**
  * <p>This class defines an algorithm for serializing {@link QuickGOQuery}s into a corresponding
@@ -85,5 +86,9 @@ public class SortedSolrQuerySerializer implements QueryVisitor<String> {
             return "(" + query.field() + SOLR_FIELD_SEPARATOR + RETRIEVE_ALL_NON_EMPTY + ")";
         }
         throw new IllegalArgumentException("It's invalid to search for all non-empty values of " + query.field());
+    }
+
+    @Override public String visit(ContainFieldQuery query) {
+        return "(" + query.field() + SOLR_FIELD_SEPARATOR + SOLR_FIELD_STAR + queryStringSanitizer.sanitize(query.value()) + SOLR_FIELD_STAR + ")";
     }
 }
