@@ -1935,33 +1935,6 @@ public class AnnotationControllerIT {
                 .andExpect(fieldsInAllResultsExist(2));
     }
 
-    // GOA-3246
-    @Test
-    public void filterByAn() throws Exception {
-        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A842");
-        AnnotationDocument doc2 = AnnotationDocMocker.createAnnotationDoc("A0A843");
-
-        doc.proteome = "gcrpCan";
-        doc.geneProductSubset = "swiss-prot";
-        doc2.proteome= "";
-        doc2.geneProductSubset="";
-        doc2.geneProductType="miRNA";
-        repository.save(doc);
-        repository.save(doc2);
-
-        ResultActions response =
-                mockMvc.perform(get(RESOURCE_URL + "/search").param(GP_SUBSET_PARAM.getName(), "swiss-prot")
-                        .param(GENE_PRODUCT_TYPE_PARAM.getName(), "protein,miRNA")
-                        .param(PROTEOME_PARAM.getName(), "gcrpCan")
-                );
-
-        response.andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(2))
-                .andExpect(fieldsInAllResultsExist(2));
-    }
-
     // ------------------------------- Check date format -------------------------------
     @Test
     public void checkDateFormatIsCorrect() throws Exception {

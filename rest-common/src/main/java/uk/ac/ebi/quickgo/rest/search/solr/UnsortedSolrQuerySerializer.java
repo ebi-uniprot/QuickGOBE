@@ -143,7 +143,7 @@ public class UnsortedSolrQuerySerializer implements QueryVisitor<String> {
             return failedTransformationResult();
         }
 
-        @Override public TermQueryTransformationResult visit(ContainFieldQuery query) {
+        @Override public TermQueryTransformationResult visit(ContainsFieldQuery query) {
             return failedTransformationResult();
         }
     }
@@ -228,7 +228,7 @@ public class UnsortedSolrQuerySerializer implements QueryVisitor<String> {
         return sortedQuerySerializer.visit(query);
     }
 
-    @Override public String visit(ContainFieldQuery query) {
+    @Override public String visit(ContainsFieldQuery query) {
         return sortedQuerySerializer.visit(query);
     }
 }

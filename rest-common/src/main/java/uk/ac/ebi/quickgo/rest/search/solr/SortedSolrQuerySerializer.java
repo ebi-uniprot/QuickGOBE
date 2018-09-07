@@ -88,7 +88,7 @@ public class SortedSolrQuerySerializer implements QueryVisitor<String> {
         throw new IllegalArgumentException("It's invalid to search for all non-empty values of " + query.field());
     }
 
-    @Override public String visit(ContainFieldQuery query) {
+    @Override public String visit(ContainsFieldQuery query) {
         return "(" + query.field() + SOLR_FIELD_SEPARATOR + SOLR_FIELD_STAR + queryStringSanitizer.sanitize(query.value()) + SOLR_FIELD_STAR + ")";
     }
 }

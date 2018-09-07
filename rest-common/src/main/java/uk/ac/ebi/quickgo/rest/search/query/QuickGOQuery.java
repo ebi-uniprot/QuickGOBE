@@ -71,7 +71,7 @@ public abstract class QuickGOQuery {
     }
 
     public static QuickGOQuery createContainQuery(String field, String value) {
-        return new ContainFieldQuery(field, value);
+        return new ContainsFieldQuery(field, value);
     }
 
     public static QuickGOQuery createJoinQuery(String joinFromTable, String joinFromAttribute, String joinToTable,

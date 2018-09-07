@@ -195,7 +195,7 @@ public class SortedSolrQuerySerializerTest {
     public void visitTransformsContainFieldQueryToString() throws Exception {
         String field = "field1";
         String value = "value1";
-        ContainFieldQuery fieldQuery = new ContainFieldQuery(field, value);
+        ContainsFieldQuery fieldQuery = new ContainsFieldQuery(field, value);
 
         String queryString = serializer.visit(fieldQuery);
 
@@ -206,7 +206,7 @@ public class SortedSolrQuerySerializerTest {
     public void visitTransformsContainFieldQueryWithSolrEscape() throws Exception {
         String field = "field1";
         String value = "*value1*";
-        ContainFieldQuery fieldQuery = new ContainFieldQuery(field, value);
+        ContainsFieldQuery fieldQuery = new ContainsFieldQuery(field, value);
 
         String queryString = serializer.visit(fieldQuery);
 

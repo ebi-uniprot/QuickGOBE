@@ -16,5 +16,5 @@ public interface QueryVisitor<T> {
 
     T visit(AllNonEmptyFieldQuery query);
 
-    T visit(ContainFieldQuery query);
+    T visit(ContainsFieldQuery query);
 }

@@ -11,10 +11,10 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.verify;
 
 /**
- * Tests the behaviour of the {@link ContainFieldQuery}.
+ * Tests the behaviour of the {@link ContainsFieldQuery}.
  */
 @RunWith(MockitoJUnitRunner.class)
-public class ContainFieldQueryTest {
+public class ContainsFieldQueryTest {
     @Mock
     private uk.ac.ebi.quickgo.rest.search.query.QueryVisitor visitor;
 
@@ -23,7 +23,7 @@ public class ContainFieldQueryTest {
         String field = null;
         String value = "value";
 
-        new ContainFieldQuery(field, value);
+        new ContainsFieldQuery(field, value);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -31,7 +31,7 @@ public class ContainFieldQueryTest {
         String field = "";
         String value = "value";
 
-        new ContainFieldQuery(field, value);
+        new ContainsFieldQuery(field, value);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -39,7 +39,7 @@ public class ContainFieldQueryTest {
         String field = "field";
         String value = null;
 
-        new ContainFieldQuery(field, value);
+        new ContainsFieldQuery(field, value);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -47,7 +47,7 @@ public class ContainFieldQueryTest {
         String field = "field";
         String value = "";
 
-        new ContainFieldQuery(field, value);
+        new ContainsFieldQuery(field, value);
     }
 
     @Test
@@ -55,8 +55,8 @@ public class ContainFieldQueryTest {
         String field = "field";
         String value = "myName";
 
-        ContainFieldQuery
-                query = new ContainFieldQuery(field, value);
+        ContainsFieldQuery
+                query = new ContainsFieldQuery(field, value);
 
         assertThat(query.field(), is(equalTo(field)));
         assertThat(query.value(), is(equalTo(value)));
@@ -64,8 +64,8 @@ public class ContainFieldQueryTest {
 
     @Test
     public void visitorIsCalledCorrectly() throws Exception {
-        ContainFieldQuery
-                query = new ContainFieldQuery("field1", "value1");
+        ContainsFieldQuery
+                query = new ContainsFieldQuery("field1", "value1");
         query.accept(visitor);
         verify(visitor).visit(query);
     }

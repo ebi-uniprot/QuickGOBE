@@ -75,7 +75,7 @@ public class UnsortedSolrQuerySerializerTest {
         public void visitTransformsContainFieldQueryToString() throws Exception {
             String field = TERMS_INCOMPATIBLE_FIELD_1;
             String value = "value1";
-            ContainFieldQuery fieldQuery = new ContainFieldQuery(field, value);
+            ContainsFieldQuery fieldQuery = new ContainsFieldQuery(field, value);
 
             String queryString = serializer.visit(fieldQuery);
 

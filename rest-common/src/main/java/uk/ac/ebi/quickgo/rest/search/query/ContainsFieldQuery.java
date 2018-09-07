@@ -4,9 +4,9 @@ package uk.ac.ebi.quickgo.rest.search.query;
  * A version of {@link FieldQuery}, the use of which signifies that the requester is not looking for specific or exact values
  * from a field, but a contain or like operation needed same in SQL. This will apply * in front and back of value
  */
-public class ContainFieldQuery  extends FieldQuery {
+public class ContainsFieldQuery extends FieldQuery {
 
-    public ContainFieldQuery(String field, String value) {
+    public ContainsFieldQuery(String field, String value) {
         super(field, value);
     }
 
@@ -22,7 +22,7 @@ public class ContainFieldQuery  extends FieldQuery {
             return false;
         }
 
-        ContainFieldQuery that = (ContainFieldQuery) o;
+        ContainsFieldQuery that = (ContainsFieldQuery) o;
 
         if (!field.equals(that.field)) {
             return false;
@@ -38,6 +38,6 @@ public class ContainFieldQuery  extends FieldQuery {
     }
 
     @Override public String toString() {
-        return "ContainFieldQuery{field='" + field + "', value='*" + value + "*'}";
+        return "ContainsFieldQuery{field='" + field + "', value='*" + value + "*'}";
     }
 }
