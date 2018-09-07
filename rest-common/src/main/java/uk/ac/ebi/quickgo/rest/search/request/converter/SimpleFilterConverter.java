@@ -7,6 +7,7 @@ import uk.ac.ebi.quickgo.rest.search.request.config.FilterConfig;
 import com.google.common.base.Preconditions;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.or;
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.and;
@@ -22,6 +23,7 @@ class SimpleFilterConverter implements FilterConverter<FilterRequest, QuickGOQue
     private static final String GENE_PRODUCT_TYPE = "geneProductType_unsorted";
     private static final String GENE_PRODUCT_SUBSET = "geneProductSubset_unsorted";
     private static final String PROTEOME = "proteome_unsorted";
+    private static final String EXTENSION = "extension_unsorted";
 
     private final FilterConfig filterConfig;
 
@@ -61,6 +63,11 @@ class SimpleFilterConverter implements FilterConverter<FilterRequest, QuickGOQue
      * @return the corresponding {@link QuickGOQuery}
      */
     private QuickGOQuery getQuickGOQuery(FilterRequest request) {
+
+        if(request.getSignature().size() ==1 && request.getSignature().contains(EXTENSION)){
+            return handleExtensionPropertyFilter(request);
+        }
+
         Set<QuickGOQuery> queries = request.getValues()
                                            .stream()
                                            .flatMap(Collection::stream)
@@ -131,4 +138,55 @@ class SimpleFilterConverter implements FilterConverter<FilterRequest, QuickGOQue
         );
         return and(andQuerySet.toArray(new QuickGOQuery[andQuerySet.size()]));
     }
+
+    private QuickGOQuery handleExtensionPropertyFilter(FilterRequest request) {
+        //Executing this method assuming, values already verified when creating filter request
+        final String AND = " and ";
+        final String OR = " or ";
+        final String STAR = "*";
+        final Set<QuickGOQuery> orSet = new HashSet<>();
+        final Set<QuickGOQuery> andSet = new HashSet<>();
+
+        List<String> requestValues = request.getProperties().get(EXTENSION);
+
+        // query for everything
+        if(requestValues.contains(STAR)){
+            return QuickGOQuery.createQuery(EXTENSION, STAR);
+        }
+
+        // get the values from request query string
+        // user should only send single value, but handling multiple values as well
+        requestValues.stream().map(String::toLowerCase).forEach(
+                // sQuery is a string containing and or
+                sQuery -> {
+                    // split string using or
+                    Stream.of(sQuery.split(OR)).forEach(
+                            //combination of simple value + and values
+                            sQueryAnd -> {
+                                // go for values which have and in it
+                                if (sQueryAnd.contains(AND))
+                                    andSet.addAll(Stream.of(sQueryAnd.split(AND)).map(String::trim).map(value -> QuickGOQuery.createContainQuery(EXTENSION, value)).collect(Collectors.toSet()));
+                                else
+                                    orSet.add(QuickGOQuery.createContainQuery(EXTENSION, sQueryAnd.trim()));
+                            }
+                    );
+                }
+        );
+
+        // there should be at least 1 and or query
+        QuickGOQuery andQueries = null, orQueries = null, retQuries = null;
+        if(!andSet.isEmpty()){
+            andQueries = and(andSet.toArray(new QuickGOQuery[andSet.size()]));
+            retQuries = andQueries;
+        }
+
+        if(!orSet.isEmpty()) {
+            orQueries = or(orSet.toArray(new QuickGOQuery[orSet.size()]));
+            retQuries = andQueries == null ? orQueries : or (orQueries, andQueries);
+        }
+
+        // retQuries should never be null practically
+        return retQuries;
+    }
+
 }

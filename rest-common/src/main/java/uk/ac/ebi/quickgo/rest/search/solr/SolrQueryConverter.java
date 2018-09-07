@@ -14,6 +14,7 @@ import org.apache.solr.common.params.CursorMarkParams;
  */
 public class SolrQueryConverter implements QueryRequestConverter<SolrQuery> {
     public static final String SOLR_FIELD_SEPARATOR = ":";
+    public static final String SOLR_FIELD_STAR = "*";
     public static final String CROSS_CORE_JOIN_SYNTAX = "{!join from=%s to=%s fromIndex=%s} %s";
 
     static final String FACET_ANALYTICS_ID = "json.facet";

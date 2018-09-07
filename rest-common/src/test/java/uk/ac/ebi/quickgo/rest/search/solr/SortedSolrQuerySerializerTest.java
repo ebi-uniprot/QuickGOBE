@@ -191,6 +191,28 @@ public class SortedSolrQuerySerializerTest {
         new SortedSolrQuerySerializer(null);
     }
 
+    @Test
+    public void visitTransformsContainFieldQueryToString() throws Exception {
+        String field = "field1";
+        String value = "value1";
+        ContainsFieldQuery fieldQuery = new ContainsFieldQuery(field, value);
+
+        String queryString = serializer.visit(fieldQuery);
+
+        assertThat(queryString, is(buildContainFieldQueryString(field, value)));
+    }
+
+    @Test
+    public void visitTransformsContainFieldQueryWithSolrEscape() throws Exception {
+        String field = "field1";
+        String value = "*value1*";
+        ContainsFieldQuery fieldQuery = new ContainsFieldQuery(field, value);
+
+        String queryString = serializer.visit(fieldQuery);
+
+        assertThat(queryString, is(buildContainFieldQueryString(field, "\\*value1\\*")));
+    }
+
     private String buildFieldQueryString(String field, String value) {
         return "(" + field + SolrQueryConverter.SOLR_FIELD_SEPARATOR + value + ")";
     }
@@ -208,6 +230,10 @@ public class SortedSolrQuerySerializerTest {
         FieldQuery query3 = new FieldQuery("field3", "value3");
 
         return new CompositeQuery(asSet(andQuery, query3), CompositeQuery.QueryOp.OR);
+    }
+
+    private String buildContainFieldQueryString(String field, String value) {
+        return "(" + field + SolrQueryConverter.SOLR_FIELD_SEPARATOR + SolrQueryConverter.SOLR_FIELD_STAR + value + SolrQueryConverter.SOLR_FIELD_STAR + ")";
     }
 
 }
