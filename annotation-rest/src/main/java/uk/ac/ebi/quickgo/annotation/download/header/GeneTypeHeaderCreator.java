@@ -14,7 +14,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter
  * Created with IntelliJ IDEA.
  */
 public abstract class GeneTypeHeaderCreator extends AbstractHeaderCreator {
-    static final String PROJECT_NAME = "Project_name: UniProt GO Annotation (UniProt-GOA)";
+    static final String PROJECT_NAME = "Project_name: EBI GO Annotation program (GOA)";
     static final String URL = "URL: https://www.ebi.ac.uk/GOA";
     static final String ANNOTATION_URL = "https://www.ebi.ac.uk/QuickGO/annotations";
     static final String EMAIL = "Contact Email: goa@ebi.ac.uk";
