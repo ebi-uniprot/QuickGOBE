@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.index.annotation;
 
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepoConfig;
+import uk.ac.ebi.quickgo.index.common.GZipBufferedReaderFactory;
 import uk.ac.ebi.quickgo.index.common.SolrServerWriter;
 
 import java.util.function.Function;
@@ -59,6 +60,7 @@ public class AnnotationConfig {
     @Bean
     FlatFileItemReader<Annotation> annotationSingleFileReader() {
         FlatFileItemReader<Annotation> reader = new FlatFileItemReader<>();
+        reader.setBufferedReaderFactory(new GZipBufferedReaderFactory());
         reader.setLineMapper(annotationLineMapper());
         reader.setLinesToSkip(headerLines);
         return reader;
