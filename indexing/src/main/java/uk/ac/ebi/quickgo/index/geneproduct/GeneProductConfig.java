@@ -3,6 +3,7 @@ package uk.ac.ebi.quickgo.index.geneproduct;
 import uk.ac.ebi.quickgo.common.QuickGODocument;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductDocument;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepoConfig;
+import uk.ac.ebi.quickgo.index.common.GZipBufferedReaderFactory;
 import uk.ac.ebi.quickgo.index.common.SolrServerWriter;
 import uk.ac.ebi.quickgo.index.common.listener.ItemRateWriterListener;
 import uk.ac.ebi.quickgo.index.common.listener.LogJobListener;
@@ -133,6 +134,7 @@ public class GeneProductConfig {
     @Bean
     FlatFileItemReader<GeneProduct> geneProductSingleFileReader() {
         FlatFileItemReader<GeneProduct> reader = new FlatFileItemReader<>();
+        reader.setBufferedReaderFactory(new GZipBufferedReaderFactory());
         reader.setLineMapper(geneProductLineMapper());
         reader.setLinesToSkip(headerLines);
         return reader;
