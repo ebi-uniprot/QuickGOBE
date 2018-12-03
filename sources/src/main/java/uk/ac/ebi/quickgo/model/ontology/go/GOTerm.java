@@ -23,30 +23,6 @@ public class GOTerm extends GenericTerm {
 
     public static final String GO = "GO";
 
-    public static class ProteinComplex {
-        public String db;
-        public String id;
-        public String symbol;
-        public String name;
-
-        public ProteinComplex(String db, String id, String symbol, String name) {
-            this.db = db;
-            this.id = id;
-            this.symbol = symbol;
-            this.name = name;
-        }
-
-        @Override
-        public String toString() {
-            return "ProteinComplex{" +
-                    "db='" + db + '\'' +
-                    ", id='" + id + '\'' +
-                    ", symbol='" + symbol + '\'' +
-                    ", name='" + name + '\'' +
-                    '}';
-        }
-    }
-
     public static class NamedURL {
         public String title;
         public String url;
@@ -161,7 +137,6 @@ public class GOTerm extends GenericTerm {
 
     public int code;
 
-    public List<ProteinComplex> proteinComplexes = new ArrayList<>();
     public List<TaxonConstraint> taxonConstraints = new ArrayList<>();
     public List<NamedURL> guidelines = new ArrayList<>();
     public List<NamedURL> plannedChanges = new ArrayList<>();
@@ -175,10 +150,6 @@ public class GOTerm extends GenericTerm {
         this.aspect = EGOAspect.valueOf(aspect);
         this.code = Integer.parseInt(id.substring(3));
         this.usage = ETermUsage.U;
-    }
-
-    public void associateProteinComplex(String db, String id, String symbol, String name) {
-        proteinComplexes.add(new ProteinComplex(db, id, symbol, name));
     }
 
     public void addTaxonConstraint(TaxonConstraint constraint) {
@@ -258,14 +229,6 @@ public class GOTerm extends GenericTerm {
 
     public void setCode(int code) {
         this.code = code;
-    }
-
-    public List<ProteinComplex> getProteinComplexes() {
-        return proteinComplexes;
-    }
-
-    public void setProteinComplexes(List<ProteinComplex> proteinComplexes) {
-        this.proteinComplexes = proteinComplexes;
     }
 
     public List<TaxonConstraint> getTaxonConstraints() {

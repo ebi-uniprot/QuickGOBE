@@ -14,9 +14,6 @@ public class GOSourceFiles extends OntologySourceFiles {
 	public enum EGOTerm { GO_ID, CATEGORY, NAME, IS_OBSOLETE }
 	public SourceFiles.TSVDataFile<EGOTerm> goTerms;
 
-	public enum EProteinComplex { GO_ID, DB, DB_OBJECT_ID, DB_OBJECT_SYMBOL, DB_OBJECT_NAME }
-	public SourceFiles.TSVDataFile<EProteinComplex> proteinComplexes;
-
 	public enum ETaxonUnion { UNION_ID, NAME, TAXA }
 	public SourceFiles.TSVDataFile<ETaxonUnion> taxonUnions;
 
@@ -74,7 +71,6 @@ public class GOSourceFiles extends OntologySourceFiles {
 		history = new SourceFiles.TSVDataFile<>(directory, "TERM_HISTORY");
 		credits = new SourceFiles.TSVDataFile<>(directory, "TERM_CREDITS");
 		fundingBodies = new SourceFiles.TSVDataFile<>(directory, "FUNDING_BODIES");
-		proteinComplexes = new SourceFiles.TSVDataFile<>(directory, "PROTEIN_COMPLEXES");
 		taxonUnions = new SourceFiles.TSVDataFile<>(directory, "TAXON_UNIONS");
 		taxonConstraints = new SourceFiles.TSVDataFile<>(directory, "TAXON_CONSTRAINTS");
 		termTaxonConstraints = new SourceFiles.TSVDataFile<>(directory, "TERM_TAXON_CONSTRAINTS");
@@ -96,7 +92,7 @@ public class GOSourceFiles extends OntologySourceFiles {
 	public SourceFiles.NamedFile[] requiredFiles() {
 		return SourceFiles.holder(
 				goTerms, definitions, synonyms, comments, relations, xrefs, definitionXrefs, subsets, history, credits,
-				fundingBodies, proteinComplexes, taxonUnions, taxonConstraints, termTaxonConstraints,
+				fundingBodies, taxonUnions, taxonConstraints, termTaxonConstraints,
 				annotationGuidelines, plannedGOChanges,
 				annExtRelations, aerRelations, aerSecondaries, aerSubsets, aerDomains, aerRanges, aerRangeDefaults, aerEntitySyntax
 			);

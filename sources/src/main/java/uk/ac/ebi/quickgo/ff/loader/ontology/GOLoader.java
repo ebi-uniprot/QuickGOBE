@@ -30,18 +30,6 @@ public class GOLoader extends AbstractGenericOLoader<GOSourceFiles, GeneOntology
         // add generic ontology info
         createWithGenericOInfo(GeneOntology.NAME_SPACE, GeneOntology.root);
 
-        // add GO specific info
-        for (String[] row : sourceFiles.proteinComplexes.reader(GOSourceFiles.EProteinComplex.GO_ID,
-                GOSourceFiles.EProteinComplex.DB,
-                GOSourceFiles.EProteinComplex.DB_OBJECT_ID,
-                GOSourceFiles.EProteinComplex.DB_OBJECT_SYMBOL,
-                GOSourceFiles.EProteinComplex.DB_OBJECT_NAME)) {
-            GOTerm term = (GOTerm) go.getTerm(row[0]);
-            if (term != null) {
-                term.associateProteinComplex(row[1], row[2], row[3], row[4]);
-            }
-        }
-
         for (String[] row : sourceFiles.taxonUnions.reader(GOSourceFiles.ETaxonUnion.UNION_ID,
                 GOSourceFiles.ETaxonUnion.NAME,
                 GOSourceFiles.ETaxonUnion.TAXA)) {
