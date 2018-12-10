@@ -238,63 +238,10 @@ public class GOTermToODocConverterTest {
         assertThat(goDiscussionExists(plannedChange2, extractedGoDiscussions), is(true));
     }
 
-    //Protein complexes
-    @Test
-    public void extracts2ProteinComplexFromProteinComplexList() {
-        String db = "Intact";
-        String id1 = "EBI-2410732";
-        String symbol1 = "nef1_yeast";
-        String name1 = "Nucleotide-excision repair factor 1 complex";
-
-        GOTerm.ProteinComplex proteinComplex1 = new GOTerm.ProteinComplex(db, id1, symbol1, name1);
-
-        String id2 = "EBI-2353861";
-        String symbol2 = "hat-b_yeast";
-        String name2 = "Histone acetyltransferase B";
-        GOTerm.ProteinComplex proteinComplex2 = new GOTerm.ProteinComplex(db, id2, symbol2, name2);
-
-        when(term.getProteinComplexes()).thenReturn(Arrays.asList(proteinComplex1, proteinComplex2));
-
-        OntologyDocument docConverted = converter.apply(term);
-        List<String> extractedProteinComplexes =
-                extractFieldFromDocument(docConverted, (OntologyDocument doc) -> doc.proteinComplexes);
-
-        assertThat(extractedProteinComplexes, hasSize(2));
-
-        assertThat(proteinComplexExists(proteinComplex1, extractedProteinComplexes), is(true));
-        assertThat(proteinComplexExists(proteinComplex2, extractedProteinComplexes), is(true));
-    }
-
-    @Test
-    public void extractingProteinComplexesFromEmptyProteinComplexesListReturnsNull() {
-        when(term.getProteinComplexes()).thenReturn(null);
-
-        OntologyDocument docConverted = converter.apply(term);
-        List<String> extractedProteinComplexes =
-                extractFieldFromDocument(docConverted, (OntologyDocument doc) -> doc.proteinComplexes);
-
-        assertThat(extractedProteinComplexes, is(nullValue()));
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void cannotConvertNullGOTerm() {
-        converter.apply(null);
-    }
-
     private boolean goDiscussionExists(GOTerm.NamedURL goDiscussion, Collection<String> expectedGoDiscussions) {
         return expectedGoDiscussions.stream()
                 .filter(expectedDiscussionText -> expectedDiscussionText.contains(goDiscussion.getTitle()) &&
                         expectedDiscussionText.contains(goDiscussion.getUrl()))
-                .findFirst().isPresent();
-    }
-
-    private boolean proteinComplexExists(GOTerm.ProteinComplex proteinComplex,
-            Collection<String> expectedProteinComplexes) {
-        return expectedProteinComplexes.stream()
-                .filter(expectedDiscussionText -> expectedDiscussionText.contains(proteinComplex.db)
-                        && expectedDiscussionText.contains(proteinComplex.id)
-                        && expectedDiscussionText.contains(proteinComplex.symbol)
-                        && expectedDiscussionText.contains(proteinComplex.name))
                 .findFirst().isPresent();
     }
 

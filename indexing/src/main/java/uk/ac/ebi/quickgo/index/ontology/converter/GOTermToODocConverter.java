@@ -32,7 +32,6 @@ public class GOTermToODocConverter implements Function<GOTerm, OntologyDocument>
                 null : term.getUsage().getText();
         doc.blacklist = extractBlacklist(term);
         doc.goDiscussions = extractGoDiscussions(term);
-        doc.proteinComplexes = extractProteinComplexes(term);
         return doc;
     }
 
@@ -111,24 +110,6 @@ public class GOTermToODocConverter implements Function<GOTerm, OntologyDocument>
                     .map(change -> newFlatField()
                             .addField(newFlatFieldLeaf(change.getTitle()))
                             .addField(newFlatFieldLeaf(change.getUrl()))
-                            .buildString())
-                    .collect(Collectors.toList());
-        } else {
-            return null;
-        }
-    }
-
-    /*
-     * format: database|database_identifier|symbol|name
-     */
-    private List<String> extractProteinComplexes(GOTerm goTerm) {
-        if (!isEmpty(goTerm.getProteinComplexes())) {
-            return goTerm.getProteinComplexes().stream()
-                    .map(pc -> newFlatField()
-                            .addField(newFlatFieldLeaf(pc.db))
-                            .addField(newFlatFieldLeaf(pc.id))
-                            .addField(newFlatFieldLeaf(pc.symbol))
-                            .addField(newFlatFieldLeaf(pc.name))
                             .buildString())
                     .collect(Collectors.toList());
         } else {

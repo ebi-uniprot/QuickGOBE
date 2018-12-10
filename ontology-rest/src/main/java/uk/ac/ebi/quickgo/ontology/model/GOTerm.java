@@ -22,7 +22,6 @@ public class GOTerm extends OBOTerm {
 
     public List<BlacklistItem> blacklist;
     public List<GODiscussion> goDiscussions;
-    public List<ExtendedXRef> proteinComplexes;
 
     public enum Usage {
         UNRESTRICTED("Unrestricted", "U"),
@@ -77,10 +76,5 @@ public class GOTerm extends OBOTerm {
     public static class GODiscussion implements FieldType {
         public String title;
         public String url;
-    }
-
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    public static class ExtendedXRef extends XRef implements FieldType {
-        public String symbol;
     }
 }

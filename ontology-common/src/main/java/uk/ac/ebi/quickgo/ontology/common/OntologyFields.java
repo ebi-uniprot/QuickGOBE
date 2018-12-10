@@ -39,7 +39,6 @@ public class OntologyFields {
     static final String BLACKLIST = "blacklist";
     static final String GO_DISCUSSIONS = "goDiscussions";
     static final String CREDITS = "credits";
-    static final String PROTEIN_COMPLEXES = "proteinComplexes";
 
     /*
      * The following fields are declared solely for use by the OntologyRepository queries. These are necessary given

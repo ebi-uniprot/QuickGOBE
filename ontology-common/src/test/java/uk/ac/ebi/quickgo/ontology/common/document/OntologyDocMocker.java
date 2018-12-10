@@ -62,20 +62,6 @@ public final class OntologyDocMocker {
                 .addField(newFlatFieldLeaf("http://wiki.geneontology.org/index.php/Signaling"))
                 .buildString());
 
-        od.proteinComplexes = new ArrayList<>();
-        od.proteinComplexes.add(newFlatField()
-                .addField(newFlatFieldLeaf("Intact"))
-                .addField(newFlatFieldLeaf("EBI-2410732"))
-                .addField(newFlatFieldLeaf("nef1_yeast"))
-                .addField(newFlatFieldLeaf("Nucleotide-excision repair factor 1 complex"))
-                .buildString());
-        od.proteinComplexes.add(newFlatField()
-                .addField(newFlatFieldLeaf("Intact"))
-                .addField(newFlatFieldLeaf("EBI-2353861"))
-                .addField(newFlatFieldLeaf("hat-b_yeast"))
-                .addField(newFlatFieldLeaf("Histone acetyltransferase B"))
-                .buildString());
-
         return od;
     }
 

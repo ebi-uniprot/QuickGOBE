@@ -45,7 +45,6 @@
     <field name="blacklist" type="string" indexed="false" stored="true" multiValued="true"/>
     <field name="goDiscussions" type="string" indexed="false" stored="true" multiValued="true"/>
     <field name="credits" type="string" indexed="false" stored="true" multiValued="true"/>
-    <field name="proteinComplexes" type="string" indexed="false" stored="true" multiValued="true"/>
 
     <!-- ========================================================================== -->
     <!-- Following fields are for search purposes -->

@@ -82,9 +82,6 @@ public class OntologyDocument implements QuickGODocument {
     @Field(OntologyFields.CREDITS)
     public List<String> credits;
 
-    @Field(OntologyFields.PROTEIN_COMPLEXES)
-    public List<String> proteinComplexes;
-
     @Override
     public String getUniqueName() {
         return this.id;
@@ -168,10 +165,6 @@ public class OntologyDocument implements QuickGODocument {
             return false;
         }
 
-        if (proteinComplexes != null ? !proteinComplexes.equals(that.proteinComplexes) : that.proteinComplexes != null) {
-            return false;
-        }
-
         return !(xRelations != null ? !xRelations.equals(that.xRelations) : that.xRelations != null);
     }
 
@@ -198,7 +191,6 @@ public class OntologyDocument implements QuickGODocument {
         result = 31 * result + (xRelations != null ? xRelations.hashCode() : 0);
         result = 31 * result + (goDiscussions != null ? goDiscussions.hashCode() : 0);
         result = 31 * result + (credits != null ? credits.hashCode() : 0);
-        result = 31 * result + (proteinComplexes != null ? proteinComplexes.hashCode() : 0);
 
         return result;
     }
@@ -227,7 +219,6 @@ public class OntologyDocument implements QuickGODocument {
                 ", xRelations=" + xRelations +
                 ", goDiscussions=" + goDiscussions +
                 ", credits=" + credits +
-                ", proteinComplexes=" + proteinComplexes +
                 '}';
     }
 }

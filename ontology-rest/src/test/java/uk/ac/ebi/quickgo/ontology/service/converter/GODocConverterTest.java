@@ -67,9 +67,4 @@ public class GODocConverterTest {
     public void convertsGoDiscussionsWithoutError() throws Exception {
         assertThat(goTerm.goDiscussions, hasSize(2));
     }
-
-    @Test
-    public void convertsProteinComplexesWithoutError() throws Exception {
-        assertThat(goTerm.proteinComplexes, hasSize(2));
-    }
 }
