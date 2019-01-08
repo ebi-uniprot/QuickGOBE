@@ -897,7 +897,7 @@
             <str name="wt">json</str>
             <str name="indent">true</str>
             <str name="df">text</str>
-            <str name="sort">rowNumber asc</str>
+            <str name="sort"> asc</str>
         </lst>
     </requestHandler>
 
