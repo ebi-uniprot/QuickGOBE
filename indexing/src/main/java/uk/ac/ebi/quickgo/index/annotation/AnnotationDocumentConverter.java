@@ -54,6 +54,7 @@ class AnnotationDocumentConverter implements ItemProcessor<Annotation, Annotatio
 
         doc.id = Long.toString(documentCounter.getAndIncrement());
         doc.geneProductId = constructGeneProductId(annotation);
+        doc.defaultSort = constructDefaultSort(annotation);
         doc.qualifier = annotation.qualifier;
         doc.goId = annotation.goId;
         doc.reference = annotation.dbReferences;
@@ -144,6 +145,17 @@ class AnnotationDocumentConverter implements ItemProcessor<Annotation, Annotatio
 
     private String constructGeneProductId(Annotation annotation) {
         return annotation.db + COLON + annotation.dbObjectId;
+    }
+
+    private String constructDefaultSort(Annotation annotation) {
+        if("UniProtKB".equalsIgnoreCase(annotation.db))
+            return "3" + annotation.dbObjectId;
+        else if("ComplexPortal".equalsIgnoreCase(annotation.db))
+            return "5" + annotation.dbObjectId;
+        else if("RNAcentral".equalsIgnoreCase(annotation.db))
+            return "7" + annotation.dbObjectId;
+        else
+            return "9" + annotation.dbObjectId;
     }
 
     private List<String> constructTargetSets(String value) {

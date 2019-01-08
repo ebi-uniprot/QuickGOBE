@@ -82,7 +82,7 @@ public class SearchServiceConfig {
                     "evidenceCode,reference,withFrom,taxonId,assignedBy,extension,symbol,geneProductId," +
                     "interactingTaxonId,date";
     private static final String SOLR_ANNOTATION_QUERY_REQUEST_HANDLER = "/query";
-    private static final String DEFAULT_DOWNLOAD_SORT_FIELDS = "id";
+    private static final String DEFAULT_DOWNLOAD_SORT_FIELDS = "defaultSort";
     private static final int DEFAULT_DOWNLOAD_PAGE_SIZE = 500;
     private static final String CACHE_CONFIG_FILE = "ehcache.xml";
 

@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.index.annotation;
 
+import org.junit.Assert;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
 import uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper;
@@ -71,6 +72,7 @@ public class AnnotationDocumentConverterTest {
         assertThat(doc.reference, is(annotation.dbReferences));
         assertThat(doc.proteome, is("gcrpIso"));
         assertThat(doc.targetSets, contains("BHF-UCL", "Exosome", "KRUK"));
+        assertThat(doc.defaultSort, is("9EBI-10043081"));
     }
 
     // interacting taxon
@@ -398,6 +400,76 @@ public class AnnotationDocumentConverterTest {
         AnnotationDocument doc = converter.process(annotation);
 
         assertThat(doc.date, is(CoreMatchers.nullValue()));
+    }
+
+    @Test
+    public void forUniProtKBDefaultSortStartsWith3AndRemainingIsTheIdentifier() {
+        annotation.db = "UniProtKB";
+
+        AnnotationDocument doc = converter.process(annotation);
+
+        Assert.assertTrue(doc.defaultSort.startsWith("3"));
+        assertThat(doc.defaultSort, is("3" + annotation.dbObjectId));
+    }
+
+    @Test
+    public void forUniprotkbIgnoreCaseDefaultSortStartsWith3AndRemainingIsTheIdentifier() {
+        annotation.db = "uniprotkb";
+
+        AnnotationDocument doc = converter.process(annotation);
+
+        Assert.assertTrue(doc.defaultSort.startsWith("3"));
+        assertThat(doc.defaultSort, is("3" + annotation.dbObjectId));
+    }
+
+    @Test
+    public void forComplexPortalDefaultSortStartsWith5AndRemainingIsTheIdentifier() {
+        annotation.db = "ComplexPortal";
+
+        AnnotationDocument doc = converter.process(annotation);
+
+        Assert.assertTrue(doc.defaultSort.startsWith("5"));
+        assertThat(doc.defaultSort, is("5" + annotation.dbObjectId));
+    }
+
+    @Test
+    public void forComplexportalIgnoreCaseDefaultSortStartsWith5AndRemainingIsTheIdentifier() {
+        annotation.db = "complexportal";
+
+        AnnotationDocument doc = converter.process(annotation);
+
+        Assert.assertTrue(doc.defaultSort.startsWith("5"));
+        assertThat(doc.defaultSort, is("5" + annotation.dbObjectId));
+    }
+
+    @Test
+    public void forRNAcentralDefaultSortStartsWith7AndRemainingIsTheIdentifier() {
+        annotation.db = "RNAcentral";
+
+        AnnotationDocument doc = converter.process(annotation);
+
+        Assert.assertTrue(doc.defaultSort.startsWith("7"));
+        assertThat(doc.defaultSort, is("7" + annotation.dbObjectId));
+    }
+
+    @Test
+    public void forRnacentralIgnoreCaseDefaultSortStartsWith7AndRemainingIsTheIdentifier() {
+        annotation.db = "rnacentral";
+
+        AnnotationDocument doc = converter.process(annotation);
+
+        Assert.assertTrue(doc.defaultSort.startsWith("7"));
+        assertThat(doc.defaultSort, is("7" + annotation.dbObjectId));
+    }
+
+    @Test
+    public void forAnyOtherDatabaseDefaultSortStartsWith9AndRemainingIsTheIdentifier() {
+        annotation.db = "anyDb";
+
+        AnnotationDocument doc = converter.process(annotation);
+
+        Assert.assertTrue(doc.defaultSort.startsWith("9"));
+        assertThat(doc.defaultSort, is("9" + annotation.dbObjectId));
     }
 
     private String constructGeneProductId(Annotation annotation) {return annotation.db + ":" + annotation.dbObjectId;}
