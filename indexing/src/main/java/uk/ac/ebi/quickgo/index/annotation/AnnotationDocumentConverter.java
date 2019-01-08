@@ -148,14 +148,20 @@ class AnnotationDocumentConverter implements ItemProcessor<Annotation, Annotatio
     }
 
     private String constructDefaultSort(Annotation annotation) {
-        if("UniProtKB".equalsIgnoreCase(annotation.db))
-            return "3" + annotation.dbObjectId;
-        else if("ComplexPortal".equalsIgnoreCase(annotation.db))
-            return "5" + annotation.dbObjectId;
-        else if("RNAcentral".equalsIgnoreCase(annotation.db))
-            return "7" + annotation.dbObjectId;
+        return getSortingCharFromValueOfDb(annotation.db) + annotation.dbObjectId;
+    }
+
+    private String getSortingCharFromValueOfDb(String db) {
+        int sortDigit;
+        if ("UniProtKB".equalsIgnoreCase(db))
+            sortDigit = 3;
+        else if ("ComplexPortal".equalsIgnoreCase(db))
+            sortDigit = 5;
+        else if ("RNAcentral".equalsIgnoreCase(db))
+            sortDigit = 7;
         else
-            return "9" + annotation.dbObjectId;
+            sortDigit = 9;
+        return Integer.toString(sortDigit);
     }
 
     private List<String> constructTargetSets(String value) {
