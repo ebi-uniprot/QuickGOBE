@@ -93,40 +93,7 @@ public class AnnotationControllerIT {
         repository.save(genericDocs);
     }
 
-    // CONSISTENT ORDER
-    @Test
-    public void annotationsAlwaysReturnedInOrderWrittenToRepository() throws Exception {
-        repository.deleteAll();
-        String geneProductId1 = "A0A000";
-        String geneProductId2 = "CPX-102";
-        String geneProductId3 = "URS00000064B1_559292";
 
-        //Create sequence number as B,Z,A
-        AnnotationDocMocker.rowNumberGenerator = new AtomicLong(100);
-        final AnnotationDocument annotationDoc1 = AnnotationDocMocker.createAnnotationDoc(geneProductId1);
-        AnnotationDocMocker.rowNumberGenerator = new AtomicLong(10);
-        final AnnotationDocument annotationDoc2 = AnnotationDocMocker.createAnnotationDoc(geneProductId2);
-        AnnotationDocMocker.rowNumberGenerator = new AtomicLong(50);
-        final AnnotationDocument annotationDoc3 = AnnotationDocMocker.createAnnotationDoc(geneProductId3);
-
-        //save in order A, B, Z
-        repository.save(annotationDoc1);
-        repository.save(annotationDoc2);
-        repository.save(annotationDoc3);
-
-        ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search"));
-
-        //Results should arrive in sequence number
-        response.andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(contentTypeToBeJson())
-                .andExpect(totalNumOfResults(3))
-                .andExpect(fieldInRowHasValue(GENEPRODUCT_ID_FIELD, 0, geneProductId2))
-                .andExpect(fieldInRowHasValue(GENEPRODUCT_ID_FIELD, 1, geneProductId3))
-                .andExpect(fieldInRowHasValue(GENEPRODUCT_ID_FIELD, 2, geneProductId1));
-
-    }
 
     // ASSIGNED BY
     @Test
