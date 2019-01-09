@@ -71,4 +71,18 @@ public class AnnotationRepositoryIT {
 
         assertThat(annotationRepository.findAll(new PageRequest(0, 10)).getTotalElements(), is(2L));
     }
+
+    @Test
+    public void add2DocsAndCheckDefaultSortOrder() {
+        AnnotationDocument doc1 = createAnnotationDoc("A0A000");
+        doc1.defaultSort = "5A0A000";
+        AnnotationDocument doc2 = createAnnotationDoc("A0A001");
+        doc2.defaultSort = "3A0A001";
+
+        annotationRepository.save(doc1);
+        annotationRepository.save(doc2);
+
+        AnnotationDocument firstReturnedDoc = annotationRepository.findAll(new PageRequest(0, 10)).getContent().get(0);
+        assertThat(firstReturnedDoc.geneProductId, is("A0A001"));
+    }
 }

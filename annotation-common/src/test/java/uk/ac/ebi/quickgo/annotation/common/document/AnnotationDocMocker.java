@@ -66,6 +66,7 @@ public class AnnotationDocMocker {
     public static AnnotationDocument createAnnotationDoc(String geneProductId) {
         AnnotationDocument doc = new AnnotationDocument();
         doc.geneProductId = geneProductId;
+        doc.defaultSort = "3" + geneProductId;
 
         // automatically compute a document identifier,
         // to overcome non-uniqueness of all other annotation fields
