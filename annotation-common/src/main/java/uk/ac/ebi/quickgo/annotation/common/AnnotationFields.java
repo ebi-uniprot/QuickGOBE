@@ -36,6 +36,7 @@ public class AnnotationFields {
     static final String WITH_FROM = "withFrom";
     static final String INTERACTING_TAXON_ID = "interactingTaxonId";
     static final String PROTEOME = "proteome";
+    static final String DEFAULt_SORT = "defaultSort";
 
     /**
      * Annotation fields that are indexed, and can therefore be searched.
