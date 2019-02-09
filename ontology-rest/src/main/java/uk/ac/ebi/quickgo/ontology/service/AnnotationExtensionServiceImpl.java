@@ -6,6 +6,8 @@ import uk.ac.ebi.quickgo.model.ontology.go.AnnotationExtensionRelations;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 /**
  * Below implementation is just delegating the calls to legacy code.
  */
@@ -13,6 +15,7 @@ public class AnnotationExtensionServiceImpl implements AnnotationExtensionServic
 
     private AnnotationExtensionRelations goAnnotationExtensionRelations;
 
+    @Autowired
     public AnnotationExtensionServiceImpl(OntologyGraphicsSourceLoader ontologyGraphicsSourceLoader) {
         goAnnotationExtensionRelations = ontologyGraphicsSourceLoader.getGoAnnotationExtensionRelations();
     }
