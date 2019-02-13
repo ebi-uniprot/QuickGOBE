@@ -3,7 +3,7 @@ package uk.ac.ebi.quickgo.ontology.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.springframework.http.MediaType;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,22 +28,19 @@ public class AnnotationExtensionController {
     }
 
     @ApiOperation(value = Docs.Relations.des, response = Map.class, notes = Docs.Relations.note)
-    @RequestMapping(path = "/relations", method = RequestMethod.GET,
-            produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    @RequestMapping(path = "/relations", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
     Map<String, Object> displayAbleAnnotationExtensionRelationsHierarchy() {
         return annotationExtensionService.getDisplayAbleAnnotationExtensionRelationsHierarchy();
     }
 
     @ApiOperation(value = Docs.Domain.des, response = Map.class, notes = Docs.Domain.note)
-    @RequestMapping(path = "/relations/{domain}", method = RequestMethod.GET,
-            produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    @RequestMapping(path = "/relations/{domain}", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
     Map<String, Object> allPossibleRelationsForDomain(@ApiParam(Docs.Domain.dDomain) @PathVariable String domain) {
         return annotationExtensionService.getAllPossibleRelationsForDomain(domain);
     }
 
     @ApiOperation(value = Docs.Validate.des, response = Map.class)
-    @RequestMapping(path = "/{goTermId}/validate/{candidate}", method = RequestMethod.GET,
-            produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    @RequestMapping(path = "/{goTermId}/validate/{candidate}", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
     Map<String, Object> isValidRelation(@ApiParam(Docs.Validate.dGoTermId) @PathVariable String goTermId,
                                         @ApiParam(Docs.Validate.dCandidate) @PathVariable String candidate) {
         return annotationExtensionService.isAnnotationExtensionValidForGoTerm(candidate, goTermId);
