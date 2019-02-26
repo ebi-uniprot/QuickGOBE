@@ -1,9 +1,161 @@
-## ================= Search =================
+## ================= General denfinitions =================
+spring:
+  profiles:
+    include: httpServer
+
+logging:
+  level:
+    root: INFO
+    uk.ac.ebi.quickgo.annotation: DEBUG
+
+## ================= Tomcat definitions =================
+server:
+  tomcat:
+    max-threads: 0
+    max-http-header-size: 64000
+
+## ================= Solr =================
+## DEV solr server
+solr:
+  host: http://ves-hx-ac:8090/solr
+  #host: http://wp-p2m-c5:8090/solr/
+
+## =============== Validation =================
+geneproduct:
+  db:
+    xref:
+      valid:
+        regexes: /home/rizwan/tools/quickgo-local/ff/DB_XREFS_ENTITIES.dat.gz
+        casesensitive: false
+
+## =============== Search =================
+## the fields that are compatible with being interpreted as a terms "LocalParams" query
+## note: see use of these fields in, uk.ac.ebi.quickgo.rest.search.query.UnsortedSolrQuerySerializer
+annotation:
+  terms:
+    query:
+      compatible:
+        fields: ['assignedBy', 'evidenceCode', 'goEvidence', 'goId', 'dbSubset', 'geneProductType', 'qualifier',
+                 'targetSet', 'taxonId', 'geneProductId']
+  validation:
+    validationResource: file:/home/rizwan/tools/quickgo-local/ff/DB_XREFS_ENTITIES.dat.gz
+    chunk: 30
+    headerLines: 1
+    reference_dbs: ['pmid', 'doi', 'go_ref', 'reactome']
+  download:
+    sort:
+      fields: 'rowNumber,id'
+    ontologySource: file:/home/rizwan/tools/quickgo-local/ff/ONTOLOGY_IRI.dat.gz
+    taskExecutor:
+      corePoolSize: 10
+      maxPoolSize: 20
+      queueCapacity: 100
+      keepAliveSeconds: 600
+      allowCoreThreadTimeout: true
+      waitForTasksToCompleteOnShutdown: true
+  metadata:
+    source: file:/home/rizwan/tools/quickgo-local/ff/goa_uniprot.gpa-version
+  stats:
+    typeLimits:
+      goId: 11
+      taxonId: 1
+      reference: 8
+      typeDoesNotExist: 12
+
 # the fields to return in search results from a solr query
 # ontology search: if you define a value, ensure ontologyType is also included
 search:
   external:
     filterConfigs:
-      - signature: goIds,goUsage,relations
-        execution: REST_COMM
-        properties: {ip: 123.456.789, resourceFormat: endpoint, localField: goId}
+    - signature: descendants,evidenceCode,evidenceCodeUsageRelationships
+      execution: REST_COMM
+      properties: {
+        ip: "https://wwwdev.ebi.ac.uk",
+        resourceFormat: "/QuickGO/services/ontology/eco/terms/{evidenceCode}/descendants?relations={evidenceCodeUsageRelationships}",
+        responseClass: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.OntologyRelatives",
+        responseConverter: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.DescendantsFilterConverter"
+      }
+    - signature: descendants,goId,goUsageRelationships
+      execution: REST_COMM
+      properties: {
+        ip: "https://wwwdev.ebi.ac.uk",
+        resourceFormat: "/QuickGO/services/ontology/go/terms/{goId}/descendants?relations={goUsageRelationships}",
+        responseClass: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.OntologyRelatives",
+        responseConverter: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.DescendantsFilterConverter"
+      }
+    - signature: goId,goUsageRelationships,slim
+      execution: REST_COMM
+      properties: {
+        ip: "https://wwwdev.ebi.ac.uk",
+        resourceFormat: "/QuickGO/services/ontology/go/slim?ids={goId}&relations={goUsageRelationships}",
+        responseClass: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.OntologyRelatives",
+        responseConverter: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.SlimmingFilterConverter"
+      }
+    - signature: goId,goName
+      execution: REST_COMM
+      properties: {
+        ip: "https://www.ebi.ac.uk",
+        resourceFormat: "/QuickGO/services/ontology/go/terms/{goId}",
+        responseClass: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.BasicOntology",
+        responseConverter: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.BasicOntologyIdentityFilterConverter"
+      }
+    - signature: taxonId,taxonName
+      execution: REST_COMM
+      properties: {
+        ip: "https://www.ebi.ac.uk",
+        resourceFormat: "/proteins/api/taxonomy/id/{taxonId}/node",
+        responseClass: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.BasicTaxonomyNode",
+        responseConverter: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.BasicTaxonomyNodeIdentityFilterConverter"
+      }
+    - signature: geneProductId,name
+      execution: REST_COMM
+      properties: {
+        ip: "https://www.ebi.ac.uk",
+        resourceFormat: "/QuickGO/services/geneproduct/{geneProductId}",
+        responseClass: "uk.ac.ebi.quickgo.annotation.service.comm.rest.geneproduct.model.BasicGeneProduct",
+        responseConverter: "uk.ac.ebi.quickgo.annotation.service.comm.rest.geneproduct.converter.GeneProductFilterConverter",
+        timeout: 15000
+      }
+    - signature: geneProductId,synonyms
+      execution: REST_COMM
+      properties: {
+        ip: "https://www.ebi.ac.uk",
+        resourceFormat: "/QuickGO/services/geneproduct/{geneProductId}",
+        responseClass: "uk.ac.ebi.quickgo.annotation.service.comm.rest.geneproduct.model.BasicGeneProduct",
+        responseConverter: "uk.ac.ebi.quickgo.annotation.service.comm.rest.geneproduct.converter.GeneProductFilterConverter",
+        timeout: 15000
+      }
+    - signature: canonicalId,name
+      execution: REST_COMM
+      properties: {
+        ip: "https://www.ebi.ac.uk",
+        resourceFormat: "/QuickGO/services/geneproduct/{canonicalId}",
+        responseClass: "uk.ac.ebi.quickgo.annotation.service.comm.rest.geneproduct.model.BasicGeneProduct",
+        responseConverter: "uk.ac.ebi.quickgo.annotation.service.comm.rest.geneproduct.converter.GeneProductFilterConverter",
+        timeout: 15000
+      }
+    - signature: canonicalId,synonyms
+      execution: REST_COMM
+      properties: {
+        ip: "https://www.ebi.ac.uk",
+        resourceFormat: "/QuickGO/services/geneproduct/{canonicalId}",
+        responseClass: "uk.ac.ebi.quickgo.annotation.service.comm.rest.geneproduct.model.BasicGeneProduct",
+        responseConverter: "uk.ac.ebi.quickgo.annotation.service.comm.rest.geneproduct.converter.GeneProductFilterConverter",
+        timeout: 15000
+      }
+  wildcard:
+    fields: extension_unsorted
+  return:
+    fields: id,geneProductId,qualifier,goId,goEvidence,evidenceCode,reference,withFrom,taxonId,assignedBy,extension,symbol,geneProductId,interactingTaxonId,date,goAspect,targetSet
+
+
+# ================= Tranformations from Solr fields to readable names =================
+model:
+  repo2domainFieldNameTransformations:
+    transformations: {
+      goId_join: goId,
+      goAspect: aspect
+    }
+
+cors:
+  expose-headers: ['Content-Type', 'Content-Disposition']

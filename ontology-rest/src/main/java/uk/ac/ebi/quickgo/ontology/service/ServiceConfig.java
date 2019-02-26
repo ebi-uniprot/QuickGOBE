@@ -66,6 +66,11 @@ public class ServiceConfig {
     }
 
     @Bean
+    public AnnotationExtensionService annotationExtensionService(OntologyGraphicsSourceLoader ontologyGraphicsSourceLoader) {
+        return new AnnotationExtensionServiceImpl(ontologyGraphicsSourceLoader);
+    }
+
+    @Bean
     public OntologyGraphicsSourceLoader ontologyGraphicsSourceLoader() {
         return new OntologyGraphicsSourceLoader(new File(sourceFile));
     }

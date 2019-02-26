@@ -33,15 +33,6 @@ public class AnnotationExtensionRelations {
 		public boolean hasScope(String namespace, String idSyntax) {
 			return this.namespace.equals(namespace) && this.idSyntax.equals(idSyntax);
 		}
-
-		public boolean matches(String candidate) {
-			matcher.reset(candidate);
-			return matcher.matches();
-		}
-
-		public boolean matches(String namespace, String target) {
-			return matches(namespace + ":" + target);
-		}
 	}
 
 	public static class EntityMatcherSet {
@@ -77,19 +68,6 @@ public class AnnotationExtensionRelations {
 			}
 		}
 
-		public boolean matches(String candidate) {
-			for (EntityMatcher em : entityMatchers) {
-				if (em.matches(candidate)) {
-					return true;
-				}
-			}
-			return false;
-		}
-
-		public boolean matches(String namespace, String target) {
-			return matches(namespace + ":" + target);
-		}
-
 		public boolean matchesComposite(String candidate) {
 			return compositePattern != null && compositePattern.matcher(candidate).matches();
 		}
@@ -117,10 +95,6 @@ public class AnnotationExtensionRelations {
 
 		public boolean matches(String candidate) {
 			return matchers.matchesComposite(candidate);
-		}
-
-		public boolean matches(String namespace, String target) {
-			return matches(namespace + ":" + target);
 		}
 	}
 
@@ -159,20 +133,6 @@ public class AnnotationExtensionRelations {
 			}
 
 			return false;
-		}
-
-		public List<String> entityTypeList() {
-			List<String> entityTypes = new ArrayList<>();
-
-			for (Entity e : entities) {
-				if (e.type != null && !("".equals(e.type))) {
-					if (entityTypes.indexOf(e.type) < 0) {
-						entityTypes.add(e.type);
-					}
-				}
-			}
-
-			return entityTypes;
 		}
 
 		public List<GOTerm> termList() {
@@ -235,10 +195,6 @@ public class AnnotationExtensionRelations {
 			return parents.size() > 0;
 		}
 
-		public boolean hasDomain() {
-			return domains.size() > 0;
-		}
-
 		public void addDomain(Entity entity) {
 			domains.add(entity);
 		}
@@ -255,16 +211,16 @@ public class AnnotationExtensionRelations {
 			subsets.add(subset);
 		}
 
-		public void setValidInExtension(boolean flag) {
-			this.validInExtension = flag;
+		public void setValidInExtension() {
+			this.validInExtension = true;
 		}
 
 		public boolean getValidInExtension() {
 			return validInExtension;
 		}
 
-		public void setDisplayForCurators(boolean flag) {
-			this.displayForCurators = flag;
+		public void setDisplayForCurators() {
+			this.displayForCurators = true;
 		}
 
 		public boolean getDisplayForCurators() {
@@ -279,14 +235,10 @@ public class AnnotationExtensionRelations {
 				// this relation has no explicit domain options, so check its parents
 				if (hasParents()) {
 					for (AnnotationExtensionRelation parent : parents) {
-						switch (parent.isValidDomain(term)) {
-							case GOOD:
-								return ValidationStatus.GOOD;
-							case BAD:
-								return ValidationStatus.BAD;
-							case INDETERMINATE:
-								break;
-						}
+                        ValidationStatus status = parent.isValidDomain(term);
+                        if (status != ValidationStatus.INDETERMINATE) {
+                            return status;
+                        }
 					}
 					// all parents return an indeterminate status
 					return ValidationStatus.INDETERMINATE;
@@ -314,14 +266,10 @@ public class AnnotationExtensionRelations {
 				// there are no explicit range options defined for this relation, so check against its parents
 				if (hasParents()) {
 					for (AnnotationExtensionRelation parent : parents) {
-						switch (parent.isValidRange(candidate, term)) {
-							case GOOD:
-								return ValidationStatus.GOOD;
-							case BAD:
-								return ValidationStatus.BAD;
-							case INDETERMINATE:
-								break;
-						}
+                        ValidationStatus status = parent.isValidRange(candidate, term);
+                        if (status != ValidationStatus.INDETERMINATE) {
+                            return status;
+                        }
 					}
 					// all parents return an indeterminate status
 					return ValidationStatus.INDETERMINATE;
@@ -339,46 +287,6 @@ public class AnnotationExtensionRelations {
 
 		public List<EntityMatcher> rangeOptions() {
 			return ranges.optionList();
-		}
-
-		public String getName() {
-			return name;
-		}
-
-		public String getUsage() {
-			return usage;
-		}
-
-		public String getDomain() {
-			return domain;
-		}
-
-		public List<String> getParentsNames() {
-			List<String> parentsNames = new ArrayList<>();
-			for(AnnotationExtensionRelation annotationExtensionRelation : parents){
-				parentsNames.add(annotationExtensionRelation.getName());
-			}
-			return parentsNames;
-		}
-
-		public List<AnnotationExtensionRelation> getParents() {
-			return parents;
-		}
-
-		public EntitySet getDomains() {
-			return domains;
-		}
-
-		public EntitySet getRanges() {
-			return ranges;
-		}
-
-		public List<String> getSecondaries() {
-			return secondaries;
-		}
-
-		public List<String> getSubsets() {
-			return subsets;
 		}
 	}
 
@@ -413,69 +321,6 @@ public class AnnotationExtensionRelations {
 	public AnnotationExtensionRelations(GeneOntology ontology) {
 		this.ontology = ontology;
 	}
-
-//	public AnnotationExtensionRelations(GeneOntology ontology, GOSourceFiles sourceFiles) throws Exception {
-//		this.ontology = ontology;
-//
-//		for (String[] row : sourceFiles.annExtRelations.reader(EAnnExtRelation.RELATION, EAnnExtRelation.USAGE, EAnnExtRelation.DOMAIN)) {
-//			annExtRelations.put(row[0], new AnnotationExtensionRelation(row[0], row[1], row[2]));
-//		}
-//
-//		for (String[] row : sourceFiles.aerRelations.reader(EAnnExtRelRelation.CHILD, EAnnExtRelRelation.PARENT, EAnnExtRelRelation.RELATION_TYPE)) {
-//			AnnotationExtensionRelation child = annExtRelations.get(row[0]);
-//			AnnotationExtensionRelation parent = annExtRelations.get(row[1]);
-//			if (child != null && parent != null) {
-//				relations.add(new Relation(child, parent, row[2]));
-//				child.addParent(parent);
-//			}
-//		}
-//
-//		for (String[] row : sourceFiles.aerSecondaries.reader(EAnnExtRelSecondary.RELATION, EAnnExtRelSecondary.SECONDARY_ID)) {
-//			AnnotationExtensionRelation rel = annExtRelations.get(row[0]);
-//			if (rel != null) {
-//				rel.addSecondary(row[1]);
-//			}
-//		}
-//
-//		for (String[] row : sourceFiles.aerSubsets.reader(EAnnExtRelSubset.SUBSET, EAnnExtRelSubset.RELATION)) {
-//			AnnotationExtensionRelation rel = annExtRelations.get(row[1]);
-//			if (rel != null) {
-//				if ("_valid_relations_".equals(row[0])) {
-//					rel.setValidInExtension(true);
-//				}
-//				else if ("_displayed_relations_".equals(row[0])) {
-//					rel.setDisplayForCurators(true);
-//				}
-//				else {
-//					rel.addSubset(row[0]);
-//				}
-//			}
-//		}
-//
-//		for (String[] row : sourceFiles.aerDomains.reader(EAnnExtRelDomain.RELATION, EAnnExtRelDomain.ENTITY, EAnnExtRelDomain.ENTITY_TYPE)) {
-//			AnnotationExtensionRelation relation = annExtRelations.get(row[0]);
-//			if (relation != null && row[1] != null) {
-//				relation.addDomain(getEntity(row[1], row[2]));
-//			}
-//		}
-//
-//		for (String[] row : sourceFiles.aerEntitySyntax.reader(EAnnExtRelEntitySyntax.ENTITY, EAnnExtRelEntitySyntax.ENTITY_TYPE, EAnnExtRelEntitySyntax.NAMESPACE, EAnnExtRelEntitySyntax.ID_SYNTAX)) {
-//			Entity entity = getEntity(row[0], row[1]);
-//			entity.addMatcher(entityMatchers.getMatcher(row[2], row[3]));
-//		}
-//
-//
-//		for (String[] row : sourceFiles.aerRanges.reader(EAnnExtRelRange.RELATION, EAnnExtRelRange.ENTITY, EAnnExtRelRange.ENTITY_TYPE)) {
-//			AnnotationExtensionRelation relation = annExtRelations.get(row[0]);
-//			if (relation != null && row[1] != null) {
-//				relation.addRange(getEntity(row[1], row[2]));
-//			}
-//		}
-//
-//		for (String[] row : sourceFiles.aerRangeDefaults.reader(EAnnExtRelRangeDefault.NAMESPACE, EAnnExtRelRangeDefault.ID_SYNTAX)) {
-//			rangeDefaults.add(entityMatchers.getMatcher(row[0], row[1]));
-//		}
-//	}
 
 	public static class AnnExtRelException extends Exception {
 		private static final long serialVersionUID = 1L;
@@ -547,7 +392,7 @@ public class AnnotationExtensionRelations {
 				if (sb.length() > 0) {
 					sb.append(" or ");
 				}
-				sb.append(t.getId()).append(" (").append(t.getName()).append(")");
+				sb.append(t.id).append(" (").append(t.name).append(")");
 			}
 			this.domain = (sb.length() > 0) ? sb.toString() : "None defined";
 
@@ -566,46 +411,6 @@ public class AnnotationExtensionRelations {
 			}
 
 			this.subsets = aer.subsets;
-		}
-
-		public String getId() {
-			return id;
-		}
-
-		public void setId(String id) {
-			this.id = id;
-		}
-
-		public String getUsage() {
-			return usage;
-		}
-
-		public void setUsage(String usage) {
-			this.usage = usage;
-		}
-
-		public String getDomain() {
-			return domain;
-		}
-
-		public void setDomain(String domain) {
-			this.domain = domain;
-		}
-
-		public String getRange() {
-			return range;
-		}
-
-		public void setRange(String range) {
-			this.range = range;
-		}
-
-		public List<String> getSubsets() {
-			return subsets;
-		}
-
-		public void setSubsets(List<String> subsets) {
-			this.subsets = subsets;
 		}
 	}
 
@@ -738,7 +543,9 @@ public class AnnotationExtensionRelations {
 				AnnotationExtensionRelation aer = annExtRelations.get(s);
 				if (aer.validInExtension && aer.isValidDomain(term) != ValidationStatus.BAD && aer.rangeOptions().size() > 0) {
 					AER relation = new AER(aer);
-					allRelations.addRelation(relation);
+                    if (aer.subsets.size() > 0) {
+                        allRelations.addRelation(relation);
+                    }
 					for (String subsetName : aer.subsets) {
 						AERSubset subset = subsets.get(subsetName);
 						if (subset == null) {
@@ -756,9 +563,5 @@ public class AnnotationExtensionRelations {
 		}
 
 		return map;
-	}
-
-	public Map<String, AnnotationExtensionRelation> getAnnExtRelations() {
-		return annExtRelations;
 	}
 }

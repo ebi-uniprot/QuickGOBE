@@ -64,9 +64,9 @@ public class AnnotationExtensionRelsLoader extends SourceInfoLoader<GOSourceFile
             AnnotationExtensionRelations.AnnotationExtensionRelation rel = aer.annExtRelations.get(row[1]);
             if (rel != null) {
                 if ("_valid_relations_".equals(row[0])) {
-                    rel.setValidInExtension(true);
+                    rel.setValidInExtension();
                 } else if ("_displayed_relations_".equals(row[0])) {
-                    rel.setDisplayForCurators(true);
+                    rel.setDisplayForCurators();
                 } else {
                     rel.addSubset(row[0]);
                 }
