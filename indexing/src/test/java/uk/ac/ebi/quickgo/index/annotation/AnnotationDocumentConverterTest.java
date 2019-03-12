@@ -60,7 +60,8 @@ public class AnnotationDocumentConverterTest {
                         buildKeyValuesPair(DB_OBJECT_SYMBOL, "moeA5"),
                         buildKeyValuesPair(DB_OBJECT_TYPE, "protein"),
                         buildKeyValuesPair(PROTEOME, "gcrpIso"),
-                        buildKeyValuesPair(TARGET_SET, "BHF-UCL", "Exosome", "KRUK"));
+                        buildKeyValuesPair(TARGET_SET, "BHF-UCL", "Exosome", "KRUK"),
+                        buildKeyValuesPair(GP_RELATED_GO_IDS, "GO:0005886"));
 
         AnnotationDocument doc = converter.process(annotation);
 
