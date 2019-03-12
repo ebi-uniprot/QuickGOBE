@@ -74,6 +74,7 @@ public class AnnotationDocumentConverterTest {
         assertThat(doc.proteome, is("gcrpIso"));
         assertThat(doc.targetSets, contains("BHF-UCL", "Exosome", "KRUK"));
         assertThat(doc.defaultSort, is("9EBI-10043081"));
+        assertThat(doc.gpRelatedGoIds, is("GO:0005886"));
     }
 
     // interacting taxon
