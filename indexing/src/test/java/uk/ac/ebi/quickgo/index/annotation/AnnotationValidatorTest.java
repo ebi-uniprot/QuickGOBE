@@ -49,7 +49,7 @@ public class AnnotationValidatorTest {
     }
 
     @Test(expected = ValidationException.class)
-    public void nullGODIThrowsException() {
+    public void nullGOIdThrowsException() {
         annotation.goId = null;
         validator.validate(annotation);
     }
@@ -307,7 +307,7 @@ public class AnnotationValidatorTest {
     public void complexPortalAnnotationsCanBeMissingGoEvidenceIdsAndThatsOK() {
         annotation.annotationProperties =
                 "go_aspect=cellular_component|taxon_id=10090|db_object_symbol=methylosome_mouse" +
-                        "|db_object_type=complex|taxon_lineage=10090";
+                        "|db_object_type=complex|taxon_lineage=10090|gp_related_go_ids=GO:1";
         validator.validate(annotation);
     }
 
@@ -348,8 +348,30 @@ public class AnnotationValidatorTest {
     }
 
     @Test(expected = ValidationException.class)
-    public void invalidAnnotationPropertyDueToMissingTaxonLinage() {
+    public void invalidAnnotationPropertyDueToMissingTaxonLineage() {
         annotation.annotationProperties = "go_evidence=IEA|taxon_id=35758|db_subset=TrEMBL|db_object_symbol=moeA5|db_object_type=protein";
+        validator.validate(annotation);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void invalidAnnotationPropertyDueToGpRelatedGoIdsCaseIncorrect() {
+        annotation.annotationProperties =
+            "go_evidence=IEA|taxon_id=35758|db_subset=TrEMBL|db_object_symbol=moeA5|db_object_type=protein" +
+                "|taxon_lineage=10,200|gp_related_go_ids=go:1,Go:2";
+        validator.validate(annotation);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void invalidAnnotationPropertyDueToMissingGpRelatedGoIds() {
+        annotation.annotationProperties = "go_evidence=IEA|taxon_id=35758|db_subset=TrEMBL|db_object_symbol=moeA5|db_object_type=protein|taxon_lineage=10,200";
+        validator.validate(annotation);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void invalidAnnotationPropertyDueToGpRelatedGoIdsIsEmpty() {
+        annotation.annotationProperties =
+            "go_evidence=IEA|taxon_id=35758|db_subset=TrEMBL|db_object_symbol=moeA5|db_object_type=protein" +
+                "|taxon_lineage=10,200|gp_related_go_ids=";
         validator.validate(annotation);
     }
 

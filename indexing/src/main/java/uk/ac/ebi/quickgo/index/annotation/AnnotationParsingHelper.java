@@ -36,7 +36,7 @@ class AnnotationParsingHelper {
     private static final String RAW_TAXON_FORMAT = "([1-9]+[0-9]*)";
     private static final String RAW_TAXON_ANCESTORS_FORMAT = "([1-9]+[0-9]*)(,[1-9]+[0-9]*)*";
     private static final String INTERACTING_TAXON_FORMAT = "taxon:" + RAW_TAXON_FORMAT;
-    private static final String RAW_GP_RELATED_GO_IDS_FORMAT = "(GO:[0-9]*)(,GO:[0-9]*)*";
+    private static final String RAW_GP_RELATED_GO_IDS_FORMAT = "(GO:[0-9]+)(,GO:[0-9]+)*";
     static final String DATE_FORMAT = "[0-9]{8}";
 
     static final Pattern PROPS_TAXON_REGEX = Pattern.compile(TAXON_ID + "=" + RAW_TAXON_FORMAT);
@@ -62,4 +62,6 @@ class AnnotationParsingHelper {
     static final Pattern RAW_TAXON_ANCESTORS_REGEX = Pattern.compile(RAW_TAXON_ANCESTORS_FORMAT);
     static final Pattern DATE_REGEX = Pattern.compile(DATE_FORMAT);
     static final Pattern RAW_GP_RELATED_GO_IDS_REGEX = Pattern.compile(RAW_GP_RELATED_GO_IDS_FORMAT);
+    static final Pattern PROPS_GP_RELATED_GO_IDS_REGEX = Pattern.compile(GP_RELATED_GO_IDS + "=" +
+        RAW_GP_RELATED_GO_IDS_FORMAT);
 }
