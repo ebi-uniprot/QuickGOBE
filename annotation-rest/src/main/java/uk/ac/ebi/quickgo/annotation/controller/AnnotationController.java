@@ -5,10 +5,7 @@ import uk.ac.ebi.quickgo.annotation.download.header.HeaderCreator;
 import uk.ac.ebi.quickgo.annotation.download.header.HeaderCreatorFactory;
 import uk.ac.ebi.quickgo.annotation.download.header.HeaderUri;
 import uk.ac.ebi.quickgo.annotation.download.model.DownloadContent;
-import uk.ac.ebi.quickgo.annotation.model.About;
-import uk.ac.ebi.quickgo.annotation.model.Annotation;
-import uk.ac.ebi.quickgo.annotation.model.AnnotationRequest;
-import uk.ac.ebi.quickgo.annotation.model.StatisticsGroup;
+import uk.ac.ebi.quickgo.annotation.model.*;
 import uk.ac.ebi.quickgo.annotation.service.search.NameService;
 import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.annotation.service.statistics.StatisticsService;
@@ -205,10 +202,11 @@ public class AnnotationController {
                     "filters", response = ResponseExceptionHandler.ErrorInfo.class)})
     @ApiOperation(value = "Search for all annotations that match the supplied filter criteria.")
     @RequestMapping(value = "/search", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<QueryResult<Annotation>> annotationLookup(
+    public ResponseEntity<QueryResult<Annotation>> annotationLookup( @RequestBody AnnotationRequestBody body,
             @Valid @ModelAttribute AnnotationRequest request, BindingResult bindingResult) {
         checkBindingErrors(bindingResult);
 
+        request.setRequestBody(body);
         FilterQueryInfo filterQueryInfo = extractFilterQueryInfo(request);
 
         QueryRequest queryRequest = queryTemplate.newBuilder()

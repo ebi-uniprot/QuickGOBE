@@ -17,10 +17,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.arrayContaining;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.EVIDENCE_CODE_USAGE_RELATIONS_PARAM;
@@ -629,6 +626,49 @@ public class AnnotationRequestTest {
 
         List<FilterRequest> filterRequests = annotationRequest.createFilterRequests();
         assertThat(filterRequests, contains(request));
+    }
+
+    @Test
+    public void setAndGetRequestBody_defaultValues() {
+        AnnotationRequestBody emptyBody = AnnotationRequestBody.builder().build();
+
+        annotationRequest.setRequestBody(emptyBody);
+
+        AnnotationRequestBody requestBody = annotationRequest.getRequestBody();
+        assertThat(requestBody, notNullValue());
+        assertThat(requestBody.getAnd(), notNullValue());
+        assertThat(requestBody.getAnd().getGoTerms(), empty());
+        assertThat(requestBody.getAnd().getGoUsage(), is(DEFAULT_GO_USAGE));
+        assertThat(requestBody.getAnd().getGoUsageRelationships(), arrayContaining(DEFAULT_GO_USAGE_RELATIONSHIPS));
+
+        assertThat(requestBody.getNot(), notNullValue());
+        assertThat(requestBody.getNot().getGoTerms(), empty());
+        assertThat(requestBody.getNot().getGoUsage(), is(DEFAULT_GO_USAGE));
+        assertThat(requestBody.getNot().getGoUsageRelationships(), arrayContaining(DEFAULT_GO_USAGE_RELATIONSHIPS));
+    }
+
+    @Test
+    public void setAndGetRequestBody_defaultGoUsage() {
+        AnnotationRequestBody body = AnnotationRequestBody.builder()
+          .and(AnnotationRequestBody.GoDescription.builder().goUsageRelationships(new String[]{"is_A"}).build())
+          .build();
+        annotationRequest.setRequestBody(body);
+
+        AnnotationRequestBody requestBody = annotationRequest.getRequestBody();
+
+        assertThat(requestBody.getAnd().getGoUsage(), is(DEFAULT_GO_USAGE));
+    }
+
+    @Test
+    public void setAndGetRequestBody_defaultGoUsageRelations() {
+        AnnotationRequestBody body = AnnotationRequestBody.builder()
+          .not(AnnotationRequestBody.GoDescription.builder().goUsage("abc").build())
+          .build();
+        annotationRequest.setRequestBody(body);
+
+        AnnotationRequestBody requestBody = annotationRequest.getRequestBody();
+
+        assertThat(requestBody.getNot().getGoUsageRelationships(), arrayContaining(DEFAULT_GO_USAGE_RELATIONSHIPS));
     }
 
     //----------------- helpers

@@ -79,7 +79,7 @@ public class AnnotationRequest {
     static final String DEFAULT_TAXON_USAGE = DESCENDANTS_USAGE;
     static final String DEFAULT_EVIDENCE_CODE_USAGE = DESCENDANTS_USAGE;
     static final String DEFAULT_GO_USAGE = DESCENDANTS_USAGE;
-
+    static final String[] DEFAULT_GO_USAGE_RELATIONSHIPS=("is_a,part_of,occurs_in".split(","));
     /**
      * indicates which fields should be looked at when creating filters
      */
@@ -223,8 +223,10 @@ public class AnnotationRequest {
             value = "The proteomic classification of the annotated gene product, if applicable - this is relevant for" +
                     " proteins only. The allowed values are complete; none; gcrpCan (Gene Centric Reference Proteome " +
                     "Canonical) & gcrpIso (Gene Centric Reference Proteome IsoForm).",
-            allowableValues = "complete," + "none,gcrpCan,gcrpIso", hidden = true) private String[]
-            proteome;
+            allowableValues = "complete," + "none,gcrpCan,gcrpIso", hidden = true)
+    private String[] proteome;
+
+    private AnnotationRequestBody requestBody;
 
     private final Map<String, String[]> filterMap = new HashMap<>();
 
@@ -571,6 +573,39 @@ public class AnnotationRequest {
      */
     public String[] getProteome() {
         return filterMap.get(PROTEOME);
+    }
+
+    public void setRequestBody(AnnotationRequestBody requestBody) {
+        fillDefaultGoDescription(requestBody);
+        this.requestBody = requestBody;
+    }
+
+    private void fillDefaultGoDescription(AnnotationRequestBody requestBody) {
+        if(requestBody.getAnd() == null){
+            requestBody.setAnd(new AnnotationRequestBody.GoDescription());
+        }
+        fillDefaultGoDescriptionIfNotPresent(requestBody.getAnd());
+
+        if(requestBody.getNot() == null){
+            requestBody.setNot(new AnnotationRequestBody.GoDescription());
+        }
+        fillDefaultGoDescriptionIfNotPresent(requestBody.getNot());
+    }
+
+    private void fillDefaultGoDescriptionIfNotPresent(AnnotationRequestBody.GoDescription goDescription) {
+        if (goDescription.getGoTerms() == null) {
+            goDescription.setGoTerms(new ArrayList<>());
+        }
+        if (goDescription.getGoUsage() == null || goDescription.getGoUsage().trim().isEmpty()) {
+            goDescription.setGoUsage(DEFAULT_GO_USAGE);
+        }
+        if (goDescription.getGoUsageRelationships() == null || goDescription.getGoUsageRelationships().length == 0) {
+            goDescription.setGoUsageRelationships(DEFAULT_GO_USAGE_RELATIONSHIPS);
+        }
+    }
+
+    public AnnotationRequestBody getRequestBody() {
+        return requestBody;
     }
 
     /**

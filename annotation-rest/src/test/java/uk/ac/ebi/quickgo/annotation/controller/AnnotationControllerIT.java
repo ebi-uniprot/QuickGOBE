@@ -1,15 +1,19 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import uk.ac.ebi.quickgo.annotation.AnnotationREST;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker;
+import uk.ac.ebi.quickgo.annotation.model.AnnotationRequestBody;
 import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -1992,6 +1996,43 @@ public class AnnotationControllerIT {
 
         response.andDo(print())
                 .andExpect(jsonPath("$.annotation.timestamp").value("2017-03-01 18:00"));
+    }
+
+    @Test
+    public void bodyWithSearchEndPoint() throws Exception {
+        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A842");
+        AnnotationDocument doc2 = AnnotationDocMocker.createAnnotationDoc("A0A843");
+
+        doc.proteome = "gcrpCan";
+        doc.geneProductSubset = "swiss-prot";
+        doc2.proteome= "";
+        doc2.geneProductSubset="";
+        doc2.geneProductType="miRNA";
+        repository.save(doc);
+        repository.save(doc2);
+
+        ResultActions response =
+            mockMvc.perform(get(RESOURCE_URL + "/search").param(GP_SUBSET_PARAM.getName(), "swiss-prot")
+                .param(GENE_PRODUCT_TYPE_PARAM.getName(), "protein,miRNA")
+                .param(PROTEOME_PARAM.getName(), "gcrpCan")
+
+            );
+
+        MockMvcRequestBuilders.post("/debug").contentType(MediaType.APPLICATION_JSON).content(new String("{\"T1\":109.1, \"T2\":99.3}").getBytes());
+
+       get(RESOURCE_URL + "/search").contentType(MediaType.APPLICATION_JSON).content(requestBody());
+
+        response.andDo(print())
+            .andExpect(status().isOk())
+            .andExpect(contentTypeToBeJson())
+            .andExpect(totalNumOfResults(2))
+            .andExpect(fieldsInAllResultsExist(2));
+    }
+
+    private String requestBody() throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        AnnotationRequestBody body = AnnotationRequestBody.builder().and(AnnotationRequestBody.GoDescription.builder().build()).build();
+        return objectMapper.writeValueAsString(body);
     }
 
     // ------------------------------- Helpers -------------------------------
