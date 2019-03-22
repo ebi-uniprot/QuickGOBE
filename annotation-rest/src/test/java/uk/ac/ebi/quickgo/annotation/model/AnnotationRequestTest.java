@@ -628,49 +628,6 @@ public class AnnotationRequestTest {
         assertThat(filterRequests, contains(request));
     }
 
-    @Test
-    public void setAndGetRequestBody_defaultValues() {
-        AnnotationRequestBody emptyBody = AnnotationRequestBody.builder().build();
-
-        annotationRequest.setRequestBody(emptyBody);
-
-        AnnotationRequestBody requestBody = annotationRequest.getRequestBody();
-        assertThat(requestBody, notNullValue());
-        assertThat(requestBody.getAnd(), notNullValue());
-        assertThat(requestBody.getAnd().getGoTerms(), empty());
-        assertThat(requestBody.getAnd().getGoUsage(), is(DEFAULT_GO_USAGE));
-        assertThat(requestBody.getAnd().getGoUsageRelationships(), arrayContaining(DEFAULT_GO_USAGE_RELATIONSHIPS));
-
-        assertThat(requestBody.getNot(), notNullValue());
-        assertThat(requestBody.getNot().getGoTerms(), empty());
-        assertThat(requestBody.getNot().getGoUsage(), is(DEFAULT_GO_USAGE));
-        assertThat(requestBody.getNot().getGoUsageRelationships(), arrayContaining(DEFAULT_GO_USAGE_RELATIONSHIPS));
-    }
-
-    @Test
-    public void setAndGetRequestBody_defaultGoUsage() {
-        AnnotationRequestBody body = AnnotationRequestBody.builder()
-          .and(AnnotationRequestBody.GoDescription.builder().goUsageRelationships(new String[]{"is_A"}).build())
-          .build();
-        annotationRequest.setRequestBody(body);
-
-        AnnotationRequestBody requestBody = annotationRequest.getRequestBody();
-
-        assertThat(requestBody.getAnd().getGoUsage(), is(DEFAULT_GO_USAGE));
-    }
-
-    @Test
-    public void setAndGetRequestBody_defaultGoUsageRelations() {
-        AnnotationRequestBody body = AnnotationRequestBody.builder()
-          .not(AnnotationRequestBody.GoDescription.builder().goUsage("abc").build())
-          .build();
-        annotationRequest.setRequestBody(body);
-
-        AnnotationRequestBody requestBody = annotationRequest.getRequestBody();
-
-        assertThat(requestBody.getNot().getGoUsageRelationships(), arrayContaining(DEFAULT_GO_USAGE_RELATIONSHIPS));
-    }
-
     //----------------- helpers
     private String getDefaultTaxonSearchField() {
         String field;

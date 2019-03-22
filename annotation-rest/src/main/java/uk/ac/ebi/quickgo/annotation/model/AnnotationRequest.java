@@ -576,32 +576,8 @@ public class AnnotationRequest {
     }
 
     public void setRequestBody(AnnotationRequestBody requestBody) {
-        fillDefaultGoDescription(requestBody);
+        AnnotationRequestBody.putDefaultValuesIfAbsent(requestBody);
         this.requestBody = requestBody;
-    }
-
-    private void fillDefaultGoDescription(AnnotationRequestBody requestBody) {
-        if(requestBody.getAnd() == null){
-            requestBody.setAnd(new AnnotationRequestBody.GoDescription());
-        }
-        fillDefaultGoDescriptionIfNotPresent(requestBody.getAnd());
-
-        if(requestBody.getNot() == null){
-            requestBody.setNot(new AnnotationRequestBody.GoDescription());
-        }
-        fillDefaultGoDescriptionIfNotPresent(requestBody.getNot());
-    }
-
-    private void fillDefaultGoDescriptionIfNotPresent(AnnotationRequestBody.GoDescription goDescription) {
-        if (goDescription.getGoTerms() == null) {
-            goDescription.setGoTerms(new ArrayList<>());
-        }
-        if (goDescription.getGoUsage() == null || goDescription.getGoUsage().trim().isEmpty()) {
-            goDescription.setGoUsage(DEFAULT_GO_USAGE);
-        }
-        if (goDescription.getGoUsageRelationships() == null || goDescription.getGoUsageRelationships().length == 0) {
-            goDescription.setGoUsageRelationships(DEFAULT_GO_USAGE_RELATIONSHIPS);
-        }
     }
 
     public AnnotationRequestBody getRequestBody() {
