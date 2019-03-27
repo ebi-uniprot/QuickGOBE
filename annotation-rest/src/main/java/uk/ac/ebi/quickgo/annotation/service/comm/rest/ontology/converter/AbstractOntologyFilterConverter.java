@@ -31,11 +31,11 @@ abstract class AbstractOntologyFilterConverter
             new ConvertedFilter<>(not(QuickGOQuery.createAllQuery()));
     private static final String ERROR_MESSAGE_ON_INVALID_IDS = "No convertible results found for IDs, %s";
     private static final String DELIMITER = ", ";
-    private static final String UNKNOWN_ID_FORMAT =
+    protected static final String UNKNOWN_ID_FORMAT =
             "Unknown ID encountered: %s. Expected either GO/ECO term.";
     private final StringJoiner idsWithNoRelatives;
 
-    private ConvertedFilter<QuickGOQuery> convertedFilter;
+    protected ConvertedFilter<QuickGOQuery> convertedFilter;
 
     AbstractOntologyFilterConverter() {
         convertedFilter = FILTER_EVERYTHING;
@@ -65,7 +65,7 @@ abstract class AbstractOntologyFilterConverter
             }
 
             convertedFilter = createFilter(queries);
-            handleInvalidIds(idsWithNoRelatives);
+            handleInvalidIds();
         }
 
         return convertedFilter;
@@ -115,13 +115,11 @@ abstract class AbstractOntologyFilterConverter
     /**
      * Checks whether the {@code invalidIds} has recorded any IDs.
      * If yes, then a {@link RetrievalException} is thrown indicating this.
-     *
-     * @param invalidIds an instance of {@link StringJoiner}.
      */
-    private static void handleInvalidIds(StringJoiner invalidIds) {
-        if (invalidIds.length() > 0) {
+    protected void handleInvalidIds() {
+        if (idsWithNoRelatives.length() > 0) {
             throw new RetrievalException(
-                    String.format(ERROR_MESSAGE_ON_INVALID_IDS, invalidIds.toString()));
+                    String.format(ERROR_MESSAGE_ON_INVALID_IDS, idsWithNoRelatives.toString()));
         }
     }
     
@@ -129,7 +127,7 @@ abstract class AbstractOntologyFilterConverter
      * Capture an additional ID that has no relative.
      * @param id the value to add
      */
-    private void addIdWithNoRelative(String id) {
+    protected void addIdWithNoRelative(String id) {
         if (!Strings.isNullOrEmpty(id)) {
             idsWithNoRelatives.add(id);
         }

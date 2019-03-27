@@ -758,6 +758,36 @@ public class AnnotationRequest {
         return request;
     }
 
+  private Optional<FilterRequest> createAndUsageFilter(String usageParam, String usageValue, String idParam, String
+    idField, String relationshipsParam) {
+    Optional<FilterRequest> request;
+    FilterRequest.Builder filterBuilder = FilterRequest.newBuilder();
+
+    if(getRequestBody() == null || getRequestBody().getAnd().getGoTerms().isEmpty()){
+      return Optional.empty();
+    }
+
+    AnnotationRequestBody.GoDescription and = getRequestBody().getAnd();
+    if (filterMap.containsKey(idField)) {
+      // term id provided
+      switch (and.getGoUsage()) {
+        case SLIM_USAGE:
+        case DESCENDANTS_USAGE:
+          request = of(filterBuilder.addProperty(usageValue)
+            .addProperty(idParam, filterMap.get(idField))
+            .addProperty(relationshipsParam, filterMap.get(relationshipsParam))
+            .build());
+          break;
+        case EXACT_USAGE:
+        default:
+          request = of(filterBuilder.addProperty(idField, filterMap.get(idField))
+            .build());
+          break;
+      }
+    }
+  return Optional.empty();
+  }
+
     private String[] createLowercasedStringArray(String... args) {
         return Stream.of(args)
                 .map(String::toLowerCase)

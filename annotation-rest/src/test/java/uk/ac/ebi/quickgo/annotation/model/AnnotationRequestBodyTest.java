@@ -80,9 +80,34 @@ public class AnnotationRequestBodyTest {
   }
 
   @Test
-  public void goUsage_shouldBeLowerCase() {
+  public void goUsageRelationshipsFromSetter_shouldBeLowerCase() {
+    AnnotationRequestBody.GoDescription and = new AnnotationRequestBody.GoDescription();
+    and.setGoUsageRelationships(new String[]{"RELATES_to"});
+    AnnotationRequestBody body = AnnotationRequestBody.builder()
+      .and(and)
+      .build();
+    AnnotationRequestBody.putDefaultValuesIfAbsent(body);
+
+    assertThat(body.getAnd().getGoUsageRelationships(), arrayContaining("relates_to"));
+  }
+
+  @Test
+  public void goUsageFromBuilder_shouldBeLowerCase() {
     AnnotationRequestBody body = AnnotationRequestBody.builder()
       .not(AnnotationRequestBody.GoDescription.builder().goUsage("abcD").build())
+      .build();
+
+    AnnotationRequestBody.putDefaultValuesIfAbsent(body);
+
+    assertThat(body.getNot().getGoUsage(), is("abcd"));
+  }
+
+  @Test
+  public void goUsageFromSetter_shouldBeLowerCase() {
+    AnnotationRequestBody.GoDescription not = new AnnotationRequestBody.GoDescription();
+    not.setGoUsage("ABCD");
+    AnnotationRequestBody body = AnnotationRequestBody.builder()
+      .not(not)
       .build();
 
     AnnotationRequestBody.putDefaultValuesIfAbsent(body);

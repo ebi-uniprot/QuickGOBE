@@ -202,7 +202,7 @@ public class AnnotationController {
                     "filters", response = ResponseExceptionHandler.ErrorInfo.class)})
     @ApiOperation(value = "Search for all annotations that match the supplied filter criteria.")
     @RequestMapping(value = "/search", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<QueryResult<Annotation>> annotationLookup( @RequestBody AnnotationRequestBody body,
+    public ResponseEntity<QueryResult<Annotation>> annotationLookup( @RequestBody(required = false) AnnotationRequestBody body,
             @Valid @ModelAttribute AnnotationRequest request, BindingResult bindingResult) {
         checkBindingErrors(bindingResult);
 

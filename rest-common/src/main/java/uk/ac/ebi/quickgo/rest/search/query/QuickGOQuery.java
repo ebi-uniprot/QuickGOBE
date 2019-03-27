@@ -55,6 +55,15 @@ public abstract class QuickGOQuery {
         return new CompositeQuery(Collections.singleton(query), QueryOp.NOT);
     }
 
+    public static QuickGOQuery not(QuickGOQuery... queries) {
+        Preconditions.checkArgument(queries != null && arrayHasNoNullElements(queries),
+          "Queries to compose cannot be null");
+
+        Set<QuickGOQuery> queriesSet = new LinkedHashSet<>();
+        Collections.addAll(queriesSet, queries);
+        return new CompositeQuery(queriesSet, QueryOp.NOT);
+    }
+
     public static QuickGOQuery createQuery(String field, String value) {
         if (value.equals(SELECT_ALL_WHERE_FIELD_IS_NOT_EMPTY)) {
             return new AllNonEmptyFieldQuery(field, value);

@@ -22,6 +22,8 @@ public class AnnotationRequestBody {
   private GoDescription not;
 
   public static void putDefaultValuesIfAbsent(AnnotationRequestBody requestBody) {
+    if(requestBody == null)
+      return;
     if (requestBody.getAnd() == null) {
       requestBody.setAnd(new AnnotationRequestBody.GoDescription());
     }
