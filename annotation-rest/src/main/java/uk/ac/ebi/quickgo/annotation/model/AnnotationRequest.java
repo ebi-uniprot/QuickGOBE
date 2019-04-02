@@ -605,7 +605,7 @@ public class AnnotationRequest {
         createGoUsageFilter().ifPresent(filterRequests::add);
         createEvidenceCodeUsageFilter().ifPresent(filterRequests::add);
         createTaxonFilter().ifPresent(filterRequests::add);
-
+        createBodyFilter().forEach(filterRequests::add);
         return filterRequests;
     }
 
@@ -758,35 +758,41 @@ public class AnnotationRequest {
         return request;
     }
 
-  private Optional<FilterRequest> createAndUsageFilter(String usageParam, String usageValue, String idParam, String
-    idField, String relationshipsParam) {
-    Optional<FilterRequest> request;
-    FilterRequest.Builder filterBuilder = FilterRequest.newBuilder();
+    private List<FilterRequest> createBodyFilter() {
+        List<FilterRequest> ret = new ArrayList<>();
+        if (getRequestBody() == null) {
+            return Collections.emptyList();
+        }
 
-    if(getRequestBody() == null || getRequestBody().getAnd().getGoTerms().isEmpty()){
-      return Optional.empty();
+        createUsageBodyFilter(getRequestBody().getAnd(), "andGoId", GP_RELATED_GO_IDS, "andGoUsageRelationships").ifPresent(ret::add);
+        createUsageBodyFilter(getRequestBody().getNot(), "notGoId", GP_RELATED_GO_IDS, "notGoUsageRelationships").ifPresent(ret::add);
+        return ret;
     }
 
-    AnnotationRequestBody.GoDescription and = getRequestBody().getAnd();
-    if (filterMap.containsKey(idField)) {
-      // term id provided
-      switch (and.getGoUsage()) {
-        case SLIM_USAGE:
-        case DESCENDANTS_USAGE:
-          request = of(filterBuilder.addProperty(usageValue)
-            .addProperty(idParam, filterMap.get(idField))
-            .addProperty(relationshipsParam, filterMap.get(relationshipsParam))
-            .build());
-          break;
-        case EXACT_USAGE:
-        default:
-          request = of(filterBuilder.addProperty(idField, filterMap.get(idField))
-            .build());
-          break;
-      }
+    private Optional<FilterRequest> createUsageBodyFilter(AnnotationRequestBody.GoDescription goDescription,
+                                                          String idParam, String idField, String relationshipsParam) {
+        Optional<FilterRequest> request = Optional.empty();
+        if (goDescription.getGoTerms().isEmpty()) {
+            return request;
+        }
+
+        FilterRequest.Builder filterBuilder = FilterRequest.newBuilder();
+        switch (goDescription.getGoUsage()) {
+            case SLIM_USAGE:
+            case DESCENDANTS_USAGE:
+                request = of(filterBuilder.addProperty(goDescription.getGoUsage())
+                  .addProperty(idParam, String.join(",",goDescription.getGoTerms()))
+                  .addProperty(relationshipsParam, goDescription.getGoUsageRelationships())
+                  .build());
+                break;
+            case EXACT_USAGE:
+                request = of(filterBuilder.addProperty(idField)
+                  .addProperty(idParam, String.join(",",goDescription.getGoTerms()))
+                  .build());
+                break;
+        }
+        return request;
     }
-  return Optional.empty();
-  }
 
     private String[] createLowercasedStringArray(String... args) {
         return Stream.of(args)

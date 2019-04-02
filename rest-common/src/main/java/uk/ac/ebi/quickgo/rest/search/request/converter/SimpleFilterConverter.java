@@ -24,6 +24,7 @@ class SimpleFilterConverter implements FilterConverter<FilterRequest, QuickGOQue
     private static final String GENE_PRODUCT_SUBSET = "geneProductSubset_unsorted";
     private static final String PROTEOME = "proteome_unsorted";
     private static final String EXTENSION = "extension_unsorted";
+    private static final String GP_RELATED_GO_IDS ="gpRelatedGoIds_unsorted";
 
     private final FilterConfig filterConfig;
 
@@ -187,6 +188,11 @@ class SimpleFilterConverter implements FilterConverter<FilterRequest, QuickGOQue
 
         // retQuries should never be null practically
         return retQuries;
+    }
+
+    private QuickGOQuery handleGoUsageExactWithNotFilter(FilterRequest request) {
+        List<String> requestValues = request.getProperties().get(GP_RELATED_GO_IDS);
+        return null;
     }
 
 }
