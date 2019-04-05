@@ -2,23 +2,20 @@ package uk.ac.ebi.quickgo.ontology.controller;
 
 import uk.ac.ebi.quickgo.common.SearchableField;
 import uk.ac.ebi.quickgo.graphics.model.GraphImageLayout;
-import uk.ac.ebi.quickgo.ontology.model.GraphRequest;
+import uk.ac.ebi.quickgo.ontology.model.*;
 import uk.ac.ebi.quickgo.graphics.ontology.GraphPresentation;
 import uk.ac.ebi.quickgo.graphics.ontology.RenderingGraphException;
 import uk.ac.ebi.quickgo.graphics.service.GraphImageService;
 import uk.ac.ebi.quickgo.ontology.OntologyRestConfig;
 import uk.ac.ebi.quickgo.ontology.common.OntologyFields;
 import uk.ac.ebi.quickgo.ontology.controller.validation.OBOControllerValidationHelper;
-import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
-import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
-import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
-import uk.ac.ebi.quickgo.ontology.model.OntologySpecifier;
 import uk.ac.ebi.quickgo.ontology.model.graph.AncestorGraph;
 import uk.ac.ebi.quickgo.ontology.model.graph.AncestorVertex;
 import uk.ac.ebi.quickgo.ontology.service.OntologyService;
 import uk.ac.ebi.quickgo.ontology.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.rest.ParameterBindingException;
 import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
+import uk.ac.ebi.quickgo.rest.comm.ResponseType;
 import uk.ac.ebi.quickgo.rest.headers.HttpHeadersProvider;
 import uk.ac.ebi.quickgo.rest.search.RetrievalException;
 import uk.ac.ebi.quickgo.rest.search.SearchDispatcher;
@@ -72,6 +69,7 @@ public abstract class OBOController<T extends OBOTerm> {
     static final String GUIDELINES_SUB_RESOURCE = "guidelines";
     static final String ANCESTORS_SUB_RESOURCE = "ancestors";
     static final String DESCENDANTS_SUB_RESOURCE = "descendants";
+    static final String CHILDREN_SUB_RESOURCE = "children";
     static final String PATHS_SUB_RESOURCE = "paths";
     static final String CHART_SUB_RESOURCE = "chart";
     static final String CHART_COORDINATES_SUB_RESOURCE = CHART_SUB_RESOURCE + "/coords";
@@ -374,6 +372,19 @@ public abstract class OBOController<T extends OBOTerm> {
                         validationHelper.validateCSVIds(ids),
                         asOntologyRelationTypeArray(validationHelper.validateRelationTypes(relations,
                                 DEFAULT_TRAVERSAL_TYPES))));
+    }
+
+    /**
+     * Retrieves the children of ontology terms
+     * @param ids the term ids in CSV format
+     * @return a result containing the children
+     */
+    @ApiOperation(value = "Retrieves the children of specified ontology terms")
+    @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + CHILDREN_SUB_RESOURCE, method = RequestMethod.GET,
+      produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<QueryResult<OBOMinimum>> findChildren(
+      @ApiParam(value = "Comma-separated term IDs", required = true) @PathVariable(value = "ids") String ids) {
+        return getResultsResponse(ontologyService.findChildrenInfoByOntologyId(validationHelper.validateCSVIds(ids)));
     }
 
     /**
