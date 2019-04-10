@@ -2,12 +2,9 @@ package uk.ac.ebi.quickgo.ontology.service;
 
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
 import uk.ac.ebi.quickgo.ontology.common.OntologyType;
+import uk.ac.ebi.quickgo.ontology.model.*;
 import uk.ac.ebi.quickgo.ontology.model.graph.AncestorGraph;
 import uk.ac.ebi.quickgo.ontology.model.graph.AncestorVertex;
-import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
-import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
-import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
-import uk.ac.ebi.quickgo.ontology.model.SlimTerm;
 import uk.ac.ebi.quickgo.rest.search.query.RegularPage;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
@@ -125,6 +122,15 @@ public interface OntologyService<T extends OBOTerm> {
      * chosen information
      */
     List<T> findDescendantsInfoByOntologyId(List<String> ids, OntologyRelationType... relations);
+
+    /**
+     * Find the set of children for a specified list of ids, {@code ids}
+     *
+     * @param ids a {@link List} ids whose children one is interested in
+     * @return a {@link List} of {@link OBOMinimum} instances corresponding to the ontology term ids containing the
+     * chosen information
+     */
+    List<OBOMinimum> findChildrenInfoByOntologyId(List<String> ids);
 
     /**
      * Maps ids to their equivalent, slimmed ids. The results are presented as a list of {@link SlimTerm} instances,

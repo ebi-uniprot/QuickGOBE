@@ -635,6 +635,67 @@ public abstract class OBOControllerIT {
     }
 
     @Test
+    public void invalidChildrenProduces400AndErrorMessage() throws Exception {
+        ResultActions response = mockMvc.perform(
+          get(buildTermsURLWithSubResource(invalidId(), CHILDREN_SUB_RESOURCE)));
+
+        expectInvalidIdError(response, invalidId());
+    }
+
+    @Test
+    public void noChildren_notHaveChildrenInJson() throws Exception {
+        int relCount = relationships.size();
+        String highestParent = relationships.get(0).child;
+
+        ontologyRepository.deleteAll();
+        createAndSaveDocs(relCount);
+
+        ResultActions response = mockMvc.perform(
+          get(buildTermsURLWithSubResource(highestParent, CHILDREN_SUB_RESOURCE)));
+
+        response.andDo(print())
+          .andExpect(jsonPath("$.numberOfHits").value(1))
+          .andExpect(jsonPath("$.results[0].children").doesNotExist());
+    }
+
+    @Test
+    public void canFetchAllChildrenFrom1Term() throws Exception {
+        int relCount = relationships.size();
+        String highestParent = relationships.get(relCount - 1).parent;
+
+        ontologyRepository.deleteAll();
+        createAndSaveDocs(relCount + 1);
+
+        ResultActions response = mockMvc.perform(
+          get(buildTermsURLWithSubResource(highestParent, CHILDREN_SUB_RESOURCE)));
+
+        response.andDo(print())
+          .andExpect(jsonPath("$.numberOfHits").value(1))
+          .andExpect(jsonPath("$.results[0].children", hasSize(1)))
+          .andExpect(jsonPath("$.results[0].children[0].hasChildren", is(true)));
+    }
+
+    @Test
+    public void canFetchAllChildrenFrom2Terms() throws Exception {
+        int relCount = relationships.size();
+        String top = relationships.get(relCount - 1).parent;
+        String secondTop = relationships.get(relCount - 2).parent;
+
+        ontologyRepository.deleteAll();
+        createAndSaveDocs(relCount + 1);
+
+        ResultActions response = mockMvc.perform(
+          get(buildTermsURLWithSubResource(toCSV(top, secondTop), CHILDREN_SUB_RESOURCE)));
+
+        response.andDo(print())
+          .andExpect(jsonPath("$.numberOfHits").value(2))
+          .andExpect(jsonPath("$.results[0].children", hasSize(1)))
+          .andExpect(jsonPath("$.results[0].children[0].hasChildren", is(true)))
+          .andExpect(jsonPath("$.results[1].children", hasSize(1)))
+          .andExpect(jsonPath("$.results[1].children[0].hasChildren", is(true)));;
+    }
+
+    @Test
     public void canFetchAllDescendantsFrom1Term() throws Exception {
         int relCount = relationships.size();
         String highestParent = relationships.get(relCount - 1).parent;

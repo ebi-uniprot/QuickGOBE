@@ -3,10 +3,7 @@ package uk.ac.ebi.quickgo.ontology.service;
 import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
 import uk.ac.ebi.quickgo.ontology.common.OntologyType;
-import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
-import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
-import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
-import uk.ac.ebi.quickgo.ontology.model.SlimTerm;
+import uk.ac.ebi.quickgo.ontology.model.*;
 import uk.ac.ebi.quickgo.ontology.model.graph.AncestorGraph;
 import uk.ac.ebi.quickgo.ontology.model.graph.AncestorVertex;
 import uk.ac.ebi.quickgo.ontology.service.converter.OntologyDocConverter;
@@ -20,6 +17,7 @@ import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 import com.google.common.base.Preconditions;
 import java.util.*;
 import java.util.function.BiFunction;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
@@ -142,6 +140,43 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
         return convertDocs(ontologyRepository.findCoreAttrByTermId(ontologyType, buildIdList(ids)))
                 .map(term -> this.insertDescendants(term, relations))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<OBOMinimum> findChildrenInfoByOntologyId(List<String> ids) {
+        return convertDocs(ontologyRepository.findCoreAttrByTermId(ontologyType, buildIdList(ids)))
+          .map(this::convertMinimum)
+          .collect(Collectors.toList());
+    }
+
+    private OBOMinimum convertMinimum(OBOTerm term){
+        OBOMinimum retObj = new OBOMinimum();
+        retObj.name = term.name;
+        retObj.id = term.id;
+        retObj.children = convertMinimumChildren(term.children);
+        return retObj;
+    }
+
+    private List<OBOMinimum.Children> convertMinimumChildren(List<OBOTerm.Relation> children) {
+        if (children.isEmpty())
+            return Collections.emptyList();
+
+        List<String> idsOfChildren = children.stream().map(c -> c.id).collect(Collectors.toList());
+        return convertDocs(ontologyRepository.findCoreAttrByTermId(ontologyType, buildIdList(idsOfChildren)))
+          .map(term -> convertMinimumChild(children, term))
+          .collect(Collectors.toList());
+    }
+
+    private OBOMinimum.Children convertMinimumChild(List<OBOTerm.Relation> directChildren, OBOTerm directChildTerm){
+        Predicate<OBOTerm.Relation> matchById = childTerm -> childTerm.id.equals(directChildTerm.id);
+        OBOTerm.Relation directChild = directChildren.stream().filter(matchById).findFirst().get();
+
+        OBOMinimum.Children retObj = new OBOMinimum.Children();
+        retObj.id = directChild.id;
+        retObj.relation= directChild.relation;
+        retObj.name = directChildTerm.name;
+        retObj.hasChildren = !directChildTerm.children.isEmpty();
+        return retObj;
     }
 
     @Override

@@ -3,10 +3,7 @@ package uk.ac.ebi.quickgo.ontology.service;
 import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
 import uk.ac.ebi.quickgo.ontology.common.OntologyType;
-import uk.ac.ebi.quickgo.ontology.model.ECOTerm;
-import uk.ac.ebi.quickgo.ontology.model.GOTerm;
-import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
-import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
+import uk.ac.ebi.quickgo.ontology.model.*;
 import uk.ac.ebi.quickgo.ontology.model.graph.AncestorEdge;
 import uk.ac.ebi.quickgo.ontology.model.graph.AncestorGraph;
 import uk.ac.ebi.quickgo.ontology.model.graph.AncestorVertex;
@@ -336,6 +333,45 @@ public class OntologyServiceImplTest {
 
             assertThat(ancestors.size(), is(1));
             assertThat(ancestors.get(0).ancestors, is(myAncestors));
+        }
+
+        @Test
+        public void findsEmptyChildrenForMissingTerm() {
+            String id = "GO:0000001";
+            Set<String> ids = new HashSet<>(idsViaOntologyService(id));
+            when(ontologyTraversalMock.children(id)).thenReturn(Collections.emptySet());
+            List<OBOMinimum> children = goOntologyService.findChildrenInfoByOntologyId(asList(ids));
+            assertThat(children.size(), is(0));
+        }
+
+        @Test
+        public void findsChildrenForTerm() {
+            String parentId = "GO:0000001", childId = "GO:0000002";
+            Set<OntologyRelationship> myChildren = singleton(new OntologyRelationship(childId, parentId, OntologyRelationType.IS_A));
+
+            OntologyDocument parentDoc = createGODoc(parentId, "parent");
+            GOTerm parentTerm = createGOTerm(parentId);
+            OntologyDocument childDoc = createGODoc(childId, "child");
+            GOTerm childTerm = createGOTerm(childId);
+
+            when(repositoryMock
+              .findCoreAttrByTermId(OntologyType.GO.name(), idsViaOntologyService(parentId)))
+              .thenReturn(singletonList(parentDoc));
+            when(repositoryMock
+              .findCoreAttrByTermId(OntologyType.GO.name(), idsViaOntologyService(childId)))
+              .thenReturn(singletonList(childDoc));
+            when(goDocumentConverterMock.convert(parentDoc)).thenReturn(parentTerm);
+            when(goDocumentConverterMock.convert(childDoc)).thenReturn(childTerm);
+            when(ontologyTraversalMock.children(parentId))
+              .thenReturn(myChildren);
+
+            List<OBOMinimum> children = goOntologyService
+              .findChildrenInfoByOntologyId(singletonList(parentId));
+
+            assertThat(children.size(), is(1));
+            assertThat(children.get(0).children.size(), is(1));
+            assertThat(children.get(0).children.get(0).hasChildren, is(false));
+            assertThat(children.get(0).children.get(0).relation, is(OntologyRelationType.IS_A));
         }
 
         @Test
