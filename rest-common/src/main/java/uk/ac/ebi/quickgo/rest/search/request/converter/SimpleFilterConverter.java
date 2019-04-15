@@ -9,8 +9,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.or;
-import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.and;
+import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.*;
 
 /**
  * Defines the conversion of a simple request to a corresponding {@link QuickGOQuery}.
@@ -87,6 +86,8 @@ class SimpleFilterConverter implements FilterConverter<FilterRequest, QuickGOQue
         // GOA-3266
         if (request.getSignature().contains(GENE_PRODUCT_TYPE)) {
             return handleGeneProductTypeMultiplePropertiesFilter(request);
+        }else if(request.getSignature().contains(GENE_PRODUCT_TYPE)){
+            return handleGoUsageExactFilter(request);
         }else{
             return handleGenericMultiplePropertiesInSingleFilter(request);
         }
@@ -109,15 +110,12 @@ class SimpleFilterConverter implements FilterConverter<FilterRequest, QuickGOQue
             QuickGOQuery gptProteinQuery = QuickGOQuery.createQuery(GENE_PRODUCT_TYPE, PROTEIN);
 
             if (request.getProperties().containsKey(GENE_PRODUCT_SUBSET)) {
-                final QuickGOQuery subset = or(request.getProperties().get(GENE_PRODUCT_SUBSET).stream()
-                        .map(val -> QuickGOQuery.createQuery(GENE_PRODUCT_SUBSET, val))
-                        .toArray(size -> new QuickGOQuery[size]));
+                QuickGOQuery subset = or(quickGOQueriesFromRequest(request, GENE_PRODUCT_SUBSET));
                 gptProteinQuery = and(gptProteinQuery, subset);
             }
 
             if (request.getProperties().containsKey(PROTEOME)) {
-                final QuickGOQuery proteome = or(request.getProperties().get(PROTEOME).stream().map(val ->
-                        QuickGOQuery.createQuery(PROTEOME, val)).toArray(size -> new QuickGOQuery[size]));
+                QuickGOQuery proteome = or(quickGOQueriesFromRequest(request, PROTEOME));
                 gptProteinQuery = and(gptProteinQuery, proteome);
             }
 
@@ -190,9 +188,23 @@ class SimpleFilterConverter implements FilterConverter<FilterRequest, QuickGOQue
         return retQuries;
     }
 
-    private QuickGOQuery handleGoUsageExactWithNotFilter(FilterRequest request) {
-        List<String> requestValues = request.getProperties().get(GP_RELATED_GO_IDS);
-        return null;
+    private QuickGOQuery handleGoUsageExactFilter(FilterRequest request) {
+        String AND_GO_ID = "andGoId";
+        String NOT_GO_ID = "notGoId";
+        if(request.getSignature().contains(AND_GO_ID))
+            return and(quickGOQueriesFromRequest(request, AND_GO_ID, GP_RELATED_GO_IDS));
+        else
+            return not(quickGOQueriesFromRequest(request, NOT_GO_ID, GP_RELATED_GO_IDS));
+    }
+
+    private QuickGOQuery[] quickGOQueriesFromRequest(FilterRequest request, String queryField){
+        return quickGOQueriesFromRequest(request, queryField, queryField);
+    }
+
+    private QuickGOQuery[] quickGOQueriesFromRequest(FilterRequest request, String idParam, String queryField){
+        List<String> requestValues = request.getProperties().get(idParam);
+        return requestValues.stream().map(val -> createQuery(queryField, val))
+            .toArray(size -> new QuickGOQuery[size]);
     }
 
 }

@@ -787,7 +787,7 @@ public class AnnotationRequest {
                 break;
             case EXACT_USAGE:
                 request = of(filterBuilder.addProperty(idField)
-                  .addProperty(idParam, String.join(",",goDescription.getGoTerms()))
+                  .addProperty(idParam, goDescription.getGoTerms().toArray(new String[goDescription.getGoTerms().size()]))
                   .build());
                 break;
         }
