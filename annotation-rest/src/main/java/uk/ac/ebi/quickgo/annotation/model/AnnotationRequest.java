@@ -79,7 +79,7 @@ public class AnnotationRequest {
     static final String DEFAULT_TAXON_USAGE = DESCENDANTS_USAGE;
     static final String DEFAULT_EVIDENCE_CODE_USAGE = DESCENDANTS_USAGE;
     static final String DEFAULT_GO_USAGE = DESCENDANTS_USAGE;
-    static final String[] DEFAULT_GO_USAGE_RELATIONSHIPS=("is_a,part_of,occurs_in".split(","));
+    static final String DEFAULT_GO_USAGE_RELATIONSHIPS="is_a,part_of,occurs_in";
     /**
      * indicates which fields should be looked at when creating filters
      */

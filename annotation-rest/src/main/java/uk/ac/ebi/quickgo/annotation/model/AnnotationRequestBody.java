@@ -24,7 +24,7 @@ public class AnnotationRequestBody {
   private GoDescription not;
 
   public static void putDefaultValuesIfAbsent(AnnotationRequestBody requestBody) {
-    if(requestBody == null)
+    if (requestBody == null)
       return;
     if (requestBody.getAnd() == null) {
       requestBody.setAnd(new AnnotationRequestBody.GoDescription());
@@ -59,10 +59,11 @@ public class AnnotationRequestBody {
     private String[] goUsageRelationships;
     private String goUsage;
 
-    public void setGoUsageRelationships(String[] goUsageRelationships) {
-      this.goUsageRelationships = Stream.of(goUsageRelationships)
-        .map(String::toLowerCase)
-        .toArray(String[]::new);
+    public void setGoUsageRelationships(String goUsageRelationships) {
+      String[] arr = goUsageRelationships == null || goUsageRelationships.trim().isEmpty()
+        ? new String[]{} : goUsageRelationships.split(",");
+
+      this.goUsageRelationships = Stream.of(arr).map(String::toLowerCase).toArray(String[]::new);
     }
 
     public void setGoUsage(String goUsage) {

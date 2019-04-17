@@ -30,12 +30,12 @@ public class AnnotationRequestBodyTest {
     assertThat(requestBody.getAnd(), notNullValue());
     assertThat(requestBody.getAnd().getGoTerms(), empty());
     assertThat(requestBody.getAnd().getGoUsage(), is(DEFAULT_GO_USAGE));
-    assertThat(requestBody.getAnd().getGoUsageRelationships(), arrayContaining(DEFAULT_GO_USAGE_RELATIONSHIPS));
+    assertThat(requestBody.getAnd().getGoUsageRelationships(), arrayContaining(DEFAULT_GO_USAGE_RELATIONSHIPS.split(",")));
 
     assertThat(requestBody.getNot(), notNullValue());
     assertThat(requestBody.getNot().getGoTerms(), empty());
     assertThat(requestBody.getNot().getGoUsage(), is(DEFAULT_GO_USAGE));
-    assertThat(requestBody.getNot().getGoUsageRelationships(), arrayContaining(DEFAULT_GO_USAGE_RELATIONSHIPS));
+    assertThat(requestBody.getNot().getGoUsageRelationships(), arrayContaining(DEFAULT_GO_USAGE_RELATIONSHIPS.split(",")));
   }
 
   @Test
@@ -56,7 +56,7 @@ public class AnnotationRequestBodyTest {
 
     AnnotationRequestBody.putDefaultValuesIfAbsent(body);
 
-    assertThat(body.getNot().getGoUsageRelationships(), arrayContaining(DEFAULT_GO_USAGE_RELATIONSHIPS));
+    assertThat(body.getNot().getGoUsageRelationships(), arrayContaining(DEFAULT_GO_USAGE_RELATIONSHIPS.split(",")));
   }
 
   @Test
@@ -80,15 +80,49 @@ public class AnnotationRequestBodyTest {
   }
 
   @Test
-  public void goUsageRelationshipsFromSetter_shouldBeLowerCase() {
+  public void goUsageRelationshipsFromStringSetter_commaSeprated() {
     AnnotationRequestBody.GoDescription and = new AnnotationRequestBody.GoDescription();
-    and.setGoUsageRelationships(new String[]{"RELATES_to"});
+    and.setGoUsageRelationships("is_a,type_of");
     AnnotationRequestBody body = AnnotationRequestBody.builder()
       .and(and)
       .build();
     AnnotationRequestBody.putDefaultValuesIfAbsent(body);
 
-    assertThat(body.getAnd().getGoUsageRelationships(), arrayContaining("relates_to"));
+    assertThat(body.getAnd().getGoUsageRelationships(), arrayContaining("is_a", "type_of"));
+  }
+
+  @Test
+  public void goUsageRelationshipsFromStringSetter_null() {
+    AnnotationRequestBody.GoDescription and = new AnnotationRequestBody.GoDescription();
+    and.setGoUsageRelationships(null);
+    AnnotationRequestBody body = AnnotationRequestBody.builder()
+      .and(and)
+      .build();
+
+    assertThat(body.getAnd().getGoUsageRelationships(), emptyArray());
+  }
+
+  @Test
+  public void goUsageRelationshipsFromStringSetter_empty() {
+    AnnotationRequestBody.GoDescription and = new AnnotationRequestBody.GoDescription();
+    and.setGoUsageRelationships("");
+    AnnotationRequestBody body = AnnotationRequestBody.builder()
+      .and(and)
+      .build();
+
+    assertThat(body.getAnd().getGoUsageRelationships(), emptyArray());
+  }
+
+  @Test
+  public void goUsageRelationshipsFromStringSetter_shouldBeLowerCase() {
+    AnnotationRequestBody.GoDescription and = new AnnotationRequestBody.GoDescription();
+    and.setGoUsageRelationships("ParT_oF");
+    AnnotationRequestBody body = AnnotationRequestBody.builder()
+      .and(and)
+      .build();
+    AnnotationRequestBody.putDefaultValuesIfAbsent(body);
+
+    assertThat(body.getAnd().getGoUsageRelationships(), arrayContaining("part_of"));
   }
 
   @Test
