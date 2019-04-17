@@ -17,6 +17,8 @@ import static uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern.Flag.CASE_I
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class AnnotationRequestBody {
   private GoDescription and;
   private GoDescription not;

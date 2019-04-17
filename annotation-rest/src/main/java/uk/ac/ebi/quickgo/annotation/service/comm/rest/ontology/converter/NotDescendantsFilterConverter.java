@@ -12,6 +12,7 @@ import java.util.Set;
 import static java.util.Objects.nonNull;
 import static uk.ac.ebi.quickgo.common.validator.OntologyIdPredicate.isValidGOTermId;
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.not;
+import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.or;
 
 public class NotDescendantsFilterConverter extends AbstractOntologyFilterConverter {
   @Override protected boolean validResult(OntologyRelatives.Result result) {
@@ -26,7 +27,7 @@ public class NotDescendantsFilterConverter extends AbstractOntologyFilterConvert
 
   @Override protected ConvertedFilter<QuickGOQuery> createFilter(Set<QuickGOQuery> queries) {
     if (!queries.isEmpty()) {
-      return new ConvertedFilter<>(not(queries.toArray(new QuickGOQuery[queries.size()])));
+      return new ConvertedFilter<>(not(or(queries.toArray(new QuickGOQuery[queries.size()]))));
     } else {
       return FILTER_EVERYTHING;
     }

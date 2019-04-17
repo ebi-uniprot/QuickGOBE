@@ -764,13 +764,13 @@ public class AnnotationRequest {
             return Collections.emptyList();
         }
 
-        createUsageBodyFilter(getRequestBody().getAnd(), "andGoId", GP_RELATED_GO_IDS, "andGoUsageRelationships").ifPresent(ret::add);
-        createUsageBodyFilter(getRequestBody().getNot(), "notGoId", GP_RELATED_GO_IDS, "notGoUsageRelationships").ifPresent(ret::add);
+        createUsageBodyFilter(getRequestBody().getAnd(), GP_RELATED_AND_GO_IDS, "andGoUsageRelationships").ifPresent(ret::add);
+        createUsageBodyFilter(getRequestBody().getNot(), GP_RELATED_NOT_GO_IDS, "notGoUsageRelationships").ifPresent(ret::add);
         return ret;
     }
 
     private Optional<FilterRequest> createUsageBodyFilter(AnnotationRequestBody.GoDescription goDescription,
-                                                          String idParam, String idField, String relationshipsParam) {
+                                                          String idParam, String relationshipsParam) {
         Optional<FilterRequest> request = Optional.empty();
         if (goDescription.getGoTerms().isEmpty()) {
             return request;
@@ -786,7 +786,7 @@ public class AnnotationRequest {
                   .build());
                 break;
             case EXACT_USAGE:
-                request = of(filterBuilder.addProperty(idField)
+                request = of(filterBuilder
                   .addProperty(idParam, goDescription.getGoTerms().toArray(new String[goDescription.getGoTerms().size()]))
                   .build());
                 break;

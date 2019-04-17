@@ -16,6 +16,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static uk.ac.ebi.quickgo.annotation.IdGeneratorUtil.createGoId;
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.not;
+import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.or;
 
 public class NotDescendantsFilterConverterTest {
   private OntologyRelatives response;
@@ -55,8 +56,8 @@ public class NotDescendantsFilterConverterTest {
     ConvertedFilter<QuickGOQuery> convertedFilter = converter.transform(response);
 
     assertThat(convertedFilter.getConvertedValue(), is(
-      not(QuickGOQuery.createQuery(field, desc1),
-        QuickGOQuery.createQuery(field, desc2))));
+      not(or(QuickGOQuery.createQuery(field, desc1),
+        QuickGOQuery.createQuery(field, desc2)))));
     assertThat(convertedFilter.getFilterContext(), is(Optional.empty()));
   }
 

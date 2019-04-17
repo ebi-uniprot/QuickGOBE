@@ -201,7 +201,7 @@ public class AnnotationController {
             @ApiResponse(code = 400, message = "Bad request due to a validation issue encountered in one of the " +
                     "filters", response = ResponseExceptionHandler.ErrorInfo.class)})
     @ApiOperation(value = "Search for all annotations that match the supplied filter criteria.")
-    @RequestMapping(value = "/search", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/search", method = {RequestMethod.GET, RequestMethod.POST}, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<Annotation>> annotationLookup( @RequestBody(required = false) AnnotationRequestBody body,
             @Valid @ModelAttribute AnnotationRequest request, BindingResult bindingResult) {
         checkBindingErrors(bindingResult);

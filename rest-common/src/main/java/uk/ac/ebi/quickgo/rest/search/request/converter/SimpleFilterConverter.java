@@ -24,6 +24,9 @@ class SimpleFilterConverter implements FilterConverter<FilterRequest, QuickGOQue
     private static final String PROTEOME = "proteome_unsorted";
     private static final String EXTENSION = "extension_unsorted";
     private static final String GP_RELATED_GO_IDS ="gpRelatedGoIds_unsorted";
+    private static final String GP_RELATED_AND_GO_IDS = "andGoId";
+    private static final String GP_RELATED_NOT_GO_IDS = "notGoId";
+    private static final String GO_ID = "goId_unsorted";
 
     private final FilterConfig filterConfig;
 
@@ -66,6 +69,10 @@ class SimpleFilterConverter implements FilterConverter<FilterRequest, QuickGOQue
 
         if(request.getSignature().size() ==1 && request.getSignature().contains(EXTENSION)){
             return handleExtensionPropertyFilter(request);
+        }else if (request.getSignature().size() ==1 && request.getSignature().contains(GP_RELATED_AND_GO_IDS)){
+            return queryForGpRelatedGoIdsWithAnd(request);
+        }else if (request.getSignature().size() ==1 && request.getSignature().contains(GP_RELATED_NOT_GO_IDS)){
+            return not(or(quickGOQueriesFromRequest(request, GP_RELATED_NOT_GO_IDS, GP_RELATED_GO_IDS)));
         }
 
         Set<QuickGOQuery> queries = request.getValues()
@@ -80,14 +87,18 @@ class SimpleFilterConverter implements FilterConverter<FilterRequest, QuickGOQue
         return or(queries.toArray(new QuickGOQuery[queries.size()]));
     }
 
+    private QuickGOQuery queryForGpRelatedGoIdsWithAnd(FilterRequest request) {
+        QuickGOQuery actualFilterOnGpRelated = and(quickGOQueriesFromRequest(request, GP_RELATED_AND_GO_IDS, GP_RELATED_GO_IDS));
+        QuickGOQuery onlyShowDocumentsWithMatchingGoId = or(quickGOQueriesFromRequest(request, GP_RELATED_AND_GO_IDS, GO_ID));
+        return and(onlyShowDocumentsWithMatchingGoId, actualFilterOnGpRelated);
+    }
+
     private QuickGOQuery getQuickGOQueryForMultipleProperties(FilterRequest request) {
 
         //Handling request manually
         // GOA-3266
         if (request.getSignature().contains(GENE_PRODUCT_TYPE)) {
             return handleGeneProductTypeMultiplePropertiesFilter(request);
-        }else if(request.getSignature().contains(GENE_PRODUCT_TYPE)){
-            return handleGoUsageExactFilter(request);
         }else{
             return handleGenericMultiplePropertiesInSingleFilter(request);
         }
@@ -186,15 +197,6 @@ class SimpleFilterConverter implements FilterConverter<FilterRequest, QuickGOQue
 
         // retQuries should never be null practically
         return retQuries;
-    }
-
-    private QuickGOQuery handleGoUsageExactFilter(FilterRequest request) {
-        String AND_GO_ID = "andGoId";
-        String NOT_GO_ID = "notGoId";
-        if(request.getSignature().contains(AND_GO_ID))
-            return and(quickGOQueriesFromRequest(request, AND_GO_ID, GP_RELATED_GO_IDS));
-        else
-            return not(quickGOQueriesFromRequest(request, NOT_GO_ID, GP_RELATED_GO_IDS));
     }
 
     private QuickGOQuery[] quickGOQueriesFromRequest(FilterRequest request, String queryField){

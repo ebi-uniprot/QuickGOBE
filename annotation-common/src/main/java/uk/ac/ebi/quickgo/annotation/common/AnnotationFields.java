@@ -62,6 +62,8 @@ public class AnnotationFields {
         public static final String EXTENSION = storeAndGet(VALUES, "extension_unsorted");
         public static final String PROTEOME = storeAndGet(VALUES, "proteome_unsorted");
         public static final String GP_RELATED_GO_IDS = storeAndGet(VALUES, "gpRelatedGoIds_unsorted");
+        public static final String GP_RELATED_AND_GO_IDS = storeAndGet(VALUES, "andGoId");
+        public static final String GP_RELATED_NOT_GO_IDS = storeAndGet(VALUES, "notGoId");
 
         public static final String GENE_PRODUCT_TYPE_AND_PROTEOME = storeAndGet(VALUES, GENE_PRODUCT_TYPE + COMMA +
                 PROTEOME);
