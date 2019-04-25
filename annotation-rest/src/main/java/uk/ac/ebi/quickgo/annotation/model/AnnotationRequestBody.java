@@ -6,9 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Pattern;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.stream.Stream;
 
 import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.DEFAULT_GO_USAGE;
@@ -20,8 +19,8 @@ import static uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern.Flag.CASE_I
 @NoArgsConstructor
 @AllArgsConstructor
 public class AnnotationRequestBody {
-  private GoDescription and;
-  private GoDescription not;
+  @Valid private GoDescription and;
+  @Valid private GoDescription not;
 
   public static void putDefaultValuesIfAbsent(AnnotationRequestBody requestBody) {
     if (requestBody == null)
@@ -40,7 +39,7 @@ public class AnnotationRequestBody {
 
   private static void fillDefaultGoDescriptionIfNotPresent(AnnotationRequestBody.GoDescription goDescription) {
     if (goDescription.getGoTerms() == null) {
-      goDescription.setGoTerms(new ArrayList<>());
+      goDescription.setGoTerms(new String[0]);
     }
     if (goDescription.getGoUsage() == null || goDescription.getGoUsage().trim().isEmpty()) {
       goDescription.setGoUsage(DEFAULT_GO_USAGE);
@@ -55,7 +54,7 @@ public class AnnotationRequestBody {
   @NoArgsConstructor
   @AllArgsConstructor
   public static class GoDescription {
-    private List<String> goTerms;
+    private String[] goTerms;
     private String[] goUsageRelationships;
     private String goUsage;
 
@@ -71,7 +70,7 @@ public class AnnotationRequestBody {
     }
 
     @ArrayPattern(regexp = "^GO:[0-9]{7}$", flags = CASE_INSENSITIVE, paramName = "goTerms")
-    public List<String> getGoTerms() {
+    public String[] getGoTerms() {
       return goTerms;
     }
 

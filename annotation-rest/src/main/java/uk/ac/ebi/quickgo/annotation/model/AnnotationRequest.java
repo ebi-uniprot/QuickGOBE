@@ -772,7 +772,7 @@ public class AnnotationRequest {
     private Optional<FilterRequest> createUsageBodyFilter(AnnotationRequestBody.GoDescription goDescription,
                                                           String idParam, String relationshipsParam) {
         Optional<FilterRequest> request = Optional.empty();
-        if (goDescription.getGoTerms().isEmpty()) {
+        if (goDescription.getGoTerms().length == 0) {
             return request;
         }
 
@@ -787,7 +787,7 @@ public class AnnotationRequest {
                 break;
             case EXACT_USAGE:
                 request = of(filterBuilder
-                  .addProperty(idParam, goDescription.getGoTerms().toArray(new String[goDescription.getGoTerms().size()]))
+                  .addProperty(idParam, goDescription.getGoTerms())
                   .build());
                 break;
         }

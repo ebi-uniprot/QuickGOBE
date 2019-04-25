@@ -28,12 +28,12 @@ public class AnnotationRequestBodyTest {
 
     assertThat(requestBody, notNullValue());
     assertThat(requestBody.getAnd(), notNullValue());
-    assertThat(requestBody.getAnd().getGoTerms(), empty());
+    assertThat(requestBody.getAnd().getGoTerms(), emptyArray());
     assertThat(requestBody.getAnd().getGoUsage(), is(DEFAULT_GO_USAGE));
     assertThat(requestBody.getAnd().getGoUsageRelationships(), arrayContaining(DEFAULT_GO_USAGE_RELATIONSHIPS.split(",")));
 
     assertThat(requestBody.getNot(), notNullValue());
-    assertThat(requestBody.getNot().getGoTerms(), empty());
+    assertThat(requestBody.getNot().getGoTerms(), emptyArray());
     assertThat(requestBody.getNot().getGoUsage(), is(DEFAULT_GO_USAGE));
     assertThat(requestBody.getNot().getGoUsageRelationships(), arrayContaining(DEFAULT_GO_USAGE_RELATIONSHIPS.split(",")));
   }
