@@ -80,7 +80,7 @@ public class AnnotationRequestBody {
       return goUsageRelationships;
     }
 
-    @Pattern(regexp = "^slim|descendants|exact$", flags = Pattern.Flag.CASE_INSENSITIVE,
+    @Pattern(regexp = "^descendants|exact$", flags = Pattern.Flag.CASE_INSENSITIVE,
       message = "Invalid goUsage: ${validatedValue}")
     public String getGoUsage() {
       return goUsage;
