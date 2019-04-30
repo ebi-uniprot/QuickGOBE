@@ -226,6 +226,7 @@ public class AnnotationRequest {
             allowableValues = "complete," + "none,gcrpCan,gcrpIso", hidden = true)
     private String[] proteome;
 
+    @ApiModelProperty(hidden = true)
     private AnnotationRequestBody requestBody;
 
     private final Map<String, String[]> filterMap = new HashMap<>();

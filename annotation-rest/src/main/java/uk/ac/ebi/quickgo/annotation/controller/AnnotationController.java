@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
+import io.swagger.annotations.*;
 import uk.ac.ebi.quickgo.annotation.download.header.HeaderContent;
 import uk.ac.ebi.quickgo.annotation.download.header.HeaderCreator;
 import uk.ac.ebi.quickgo.annotation.download.header.HeaderCreatorFactory;
@@ -25,10 +26,6 @@ import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformationRequests;
 import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformerChain;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -202,8 +199,10 @@ public class AnnotationController {
                     "filters", response = ResponseExceptionHandler.ErrorInfo.class)})
     @ApiOperation(value = "Search for all annotations that match the supplied filter criteria.")
     @RequestMapping(value = "/search", method = {RequestMethod.GET, RequestMethod.POST}, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<QueryResult<Annotation>> annotationLookup( @Valid @RequestBody(required = false) AnnotationRequestBody body,
-            @Valid @ModelAttribute AnnotationRequest request, BindingResult bindingResult) {
+    public ResponseEntity<QueryResult<Annotation>> annotationLookup(
+        @ApiParam("Optional body for advance filtering")
+        @Valid @RequestBody(required = false) AnnotationRequestBody body,
+        @Valid @ModelAttribute AnnotationRequest request, BindingResult bindingResult) {
         checkBindingErrors(bindingResult);
 
         request.setRequestBody(body);
