@@ -200,7 +200,8 @@ public class AnnotationController {
     @ApiOperation(value = "Search for all annotations that match the supplied filter criteria.")
     @RequestMapping(value = "/search", method = {RequestMethod.GET, RequestMethod.POST}, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<Annotation>> annotationLookup(
-        @ApiParam("Optional body for advance filtering")
+        @ApiParam("Optional body for advance filtering. For example show me all annotations to proteins that are annotated to GO:xxx AND GO:yyy " +
+          "or show me all annotations to proteins that are annotated to GO:xxx and NOT GO:yyy")
         @Valid @RequestBody(required = false) AnnotationRequestBody body,
         @Valid @ModelAttribute AnnotationRequest request, BindingResult bindingResult) {
         checkBindingErrors(bindingResult);
