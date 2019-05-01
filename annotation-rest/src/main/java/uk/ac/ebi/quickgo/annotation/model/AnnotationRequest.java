@@ -227,7 +227,6 @@ public class AnnotationRequest {
             allowableValues = "complete," + "none,gcrpCan,gcrpIso", hidden = true)
     private String[] proteome;
 
-    @JsonIgnore
     private AnnotationRequestBody requestBody;
 
     private final Map<String, String[]> filterMap = new HashMap<>();
@@ -582,6 +581,7 @@ public class AnnotationRequest {
         this.requestBody = requestBody;
     }
 
+    @JsonIgnore
     public AnnotationRequestBody getRequestBody() {
         return requestBody;
     }
