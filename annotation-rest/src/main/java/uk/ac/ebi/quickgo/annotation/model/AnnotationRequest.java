@@ -227,7 +227,6 @@ public class AnnotationRequest {
             allowableValues = "complete," + "none,gcrpCan,gcrpIso", hidden = true)
     private String[] proteome;
 
-    @JsonIgnore
     private AnnotationRequestBody requestBody;
 
     private final Map<String, String[]> filterMap = new HashMap<>();
@@ -577,15 +576,10 @@ public class AnnotationRequest {
         return filterMap.get(PROTEOME);
     }
 
-    @JsonIgnore
-    public void setRequestBody(AnnotationRequestBody requestBody) {
+
+    public void addRequestBody(AnnotationRequestBody requestBody) {
         AnnotationRequestBody.putDefaultValuesIfAbsent(requestBody);
         this.requestBody = requestBody;
-    }
-
-    @JsonIgnore
-    public AnnotationRequestBody getRequestBody() {
-        return requestBody;
     }
 
     /**
@@ -764,12 +758,12 @@ public class AnnotationRequest {
 
     private List<FilterRequest> createBodyFilter() {
         List<FilterRequest> ret = new ArrayList<>();
-        if (getRequestBody() == null) {
+        if (requestBody == null) {
             return Collections.emptyList();
         }
 
-        createUsageBodyFilter(getRequestBody().getAnd(), GP_RELATED_AND_GO_IDS, "andGoUsageRelationships").ifPresent(ret::add);
-        createUsageBodyFilter(getRequestBody().getNot(), GP_RELATED_NOT_GO_IDS, "notGoUsageRelationships").ifPresent(ret::add);
+        createUsageBodyFilter(requestBody.getAnd(), GP_RELATED_AND_GO_IDS, "andGoUsageRelationships").ifPresent(ret::add);
+        createUsageBodyFilter(requestBody.getNot(), GP_RELATED_NOT_GO_IDS, "notGoUsageRelationships").ifPresent(ret::add);
         return ret;
     }
 

@@ -205,7 +205,7 @@ public class AnnotationController {
         @Valid @ModelAttribute AnnotationRequest request, BindingResult bindingResult) {
         checkBindingErrors(bindingResult);
 
-        request.setRequestBody(body);
+        request.addRequestBody(body);
         FilterQueryInfo filterQueryInfo = extractFilterQueryInfo(request);
 
         QueryRequest queryRequest = queryTemplate.newBuilder()
