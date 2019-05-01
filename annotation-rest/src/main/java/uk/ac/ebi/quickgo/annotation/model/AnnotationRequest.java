@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import uk.ac.ebi.quickgo.annotation.validation.service.ReferenceValidator;
 import uk.ac.ebi.quickgo.annotation.validation.service.WithFromValidator;
 import uk.ac.ebi.quickgo.common.validator.GeneProductIDList;
@@ -226,7 +227,7 @@ public class AnnotationRequest {
             allowableValues = "complete," + "none,gcrpCan,gcrpIso", hidden = true)
     private String[] proteome;
 
-    @ApiModelProperty(hidden = true)
+    @JsonIgnore
     private AnnotationRequestBody requestBody;
 
     private final Map<String, String[]> filterMap = new HashMap<>();
