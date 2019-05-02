@@ -173,4 +173,78 @@ public class SimpleFilterConverterTest {
         assertThat(resultingQuery, is(expectedQuery));
     }
 
+    @Test
+    public void transformsRequestContaining_extensionAll() {
+        FilterRequest request = FilterRequest.newBuilder().addProperty(EXTENSION, "*").build();
+        QuickGOQuery resultingQuery = converter.transform(request).getConvertedValue();
+        QuickGOQuery expectedQuery = QuickGOQuery.createQuery(EXTENSION, "*");
+
+        assertThat(resultingQuery, is(expectedQuery));
+    }
+
+    @Test
+    public void transformsRequestContaining_extension() {
+        FilterRequest request = FilterRequest.newBuilder().addProperty(EXTENSION, FIELD_VALUE_1).build();
+        QuickGOQuery resultingQuery = converter.transform(request).getConvertedValue();
+        QuickGOQuery expectedQuery = QuickGOQuery.createContainQuery(EXTENSION, FIELD_VALUE_1);
+
+        assertThat(resultingQuery, is(expectedQuery));
+    }
+
+    @Test
+    public void transformsRequestContaining_extensionMultipleValues() {
+        FilterRequest request = FilterRequest.newBuilder()
+          .addProperty(EXTENSION, FIELD_VALUE_1, FIELD_VALUE_2).build();
+        QuickGOQuery resultingQuery = converter.transform(request).getConvertedValue();
+        QuickGOQuery expectedQuery =
+          or(
+            QuickGOQuery.createContainQuery(EXTENSION, FIELD_VALUE_1),
+            QuickGOQuery.createContainQuery(EXTENSION, FIELD_VALUE_2)
+          );
+
+        assertThat(resultingQuery, is(expectedQuery));
+    }
+
+    @Test
+    public void transformsRequestContaining_extensionAND() {
+        FilterRequest request = FilterRequest.newBuilder().addProperty(EXTENSION, "a AND b").build();
+        QuickGOQuery resultingQuery = converter.transform(request).getConvertedValue();
+        QuickGOQuery expectedQuery =
+          and(
+            QuickGOQuery.createContainQuery(EXTENSION, "a"),
+            QuickGOQuery.createContainQuery(EXTENSION, "b")
+          );
+
+        assertThat(resultingQuery, is(expectedQuery));
+    }
+
+    @Test
+    public void transformsRequestContaining_extensionOR() {
+        FilterRequest request = FilterRequest.newBuilder().addProperty(EXTENSION, "a OR b").build();
+        QuickGOQuery resultingQuery = converter.transform(request).getConvertedValue();
+        QuickGOQuery expectedQuery =
+          or(
+            QuickGOQuery.createContainQuery(EXTENSION, "a"),
+            QuickGOQuery.createContainQuery(EXTENSION, "b")
+          );
+
+        assertThat(resultingQuery, is(expectedQuery));
+    }
+
+    @Test
+    public void transformsRequestContaining_extension_AND_OR() {
+        FilterRequest request = FilterRequest.newBuilder().addProperty(EXTENSION, "a AND b OR c").build();
+        QuickGOQuery resultingQuery = converter.transform(request).getConvertedValue();
+        QuickGOQuery expectedQuery =
+          or(
+            and(
+              QuickGOQuery.createContainQuery(EXTENSION, "a"),
+              QuickGOQuery.createContainQuery(EXTENSION, "b")
+            ),
+            QuickGOQuery.createContainQuery(EXTENSION, "c")
+          );
+
+        assertThat(resultingQuery, is(expectedQuery));
+    }
+
 }
