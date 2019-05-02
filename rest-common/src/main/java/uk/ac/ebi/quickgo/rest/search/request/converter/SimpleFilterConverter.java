@@ -18,10 +18,10 @@ import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.*;
  */
 class SimpleFilterConverter implements FilterConverter<FilterRequest, QuickGOQuery> {
     //Below const. taken from annotation-common:uk.ac.ebi.quickgo.annotation.common.AnnotationFields
-    private static final String PROTEIN = "protein";
-    private static final String GENE_PRODUCT_TYPE = "geneProductType_unsorted";
-    private static final String GENE_PRODUCT_SUBSET = "geneProductSubset_unsorted";
-    private static final String PROTEOME = "proteome_unsorted";
+    static final String PROTEIN = "protein";
+    static final String GENE_PRODUCT_TYPE = "geneProductType_unsorted";
+    static final String GENE_PRODUCT_SUBSET = "geneProductSubset_unsorted";
+    static final String PROTEOME = "proteome_unsorted";
     static final String EXTENSION = "extension_unsorted";
     static final String GP_RELATED_GO_IDS ="gpRelatedGoIds_unsorted";
     static final String GP_RELATED_AND_GO_IDS = "andGoId";

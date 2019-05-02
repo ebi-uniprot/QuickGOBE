@@ -247,4 +247,99 @@ public class SimpleFilterConverterTest {
         assertThat(resultingQuery, is(expectedQuery));
     }
 
+    @Test
+    public void transformsRequest_geneproductOnly() {
+        FilterRequest request = FilterRequest.newBuilder()
+          .addProperty(GENE_PRODUCT_TYPE, FIELD_VALUE_1)
+          .addProperty(FIELD2, FIELD_VALUE_2)
+          .build();
+        QuickGOQuery resultingQuery = converter.transform(request).getConvertedValue();
+
+        QuickGOQuery expectedQuery = QuickGOQuery.createQuery(GENE_PRODUCT_TYPE, FIELD_VALUE_1);
+
+        assertThat(resultingQuery, is(expectedQuery));
+    }
+
+    @Test
+    public void transformsRequest_geneproduct_proteins() {
+        FilterRequest request = FilterRequest.newBuilder()
+          .addProperty(GENE_PRODUCT_TYPE, FIELD_VALUE_1,PROTEIN)
+          .addProperty(FIELD2, FIELD_VALUE_2)
+          .build();
+        QuickGOQuery resultingQuery = converter.transform(request).getConvertedValue();
+
+        QuickGOQuery expectedQuery =
+          or(
+            QuickGOQuery.createQuery(GENE_PRODUCT_TYPE, FIELD_VALUE_1),
+            QuickGOQuery.createQuery(GENE_PRODUCT_TYPE, PROTEIN)
+          );
+
+        assertThat(resultingQuery, is(expectedQuery));
+    }
+
+    @Test
+    public void transformsRequest_geneproduct_proteins_geneProductSubset() {
+        FilterRequest request = FilterRequest.newBuilder()
+          .addProperty(GENE_PRODUCT_TYPE, FIELD_VALUE_1, PROTEIN)
+          .addProperty(GENE_PRODUCT_SUBSET, FIELD_VALUE_2)
+          .build();
+        QuickGOQuery resultingQuery = converter.transform(request).getConvertedValue();
+
+        QuickGOQuery expectedQuery =
+          or(
+            QuickGOQuery.createQuery(GENE_PRODUCT_TYPE, FIELD_VALUE_1),
+            and(
+              QuickGOQuery.createQuery(GENE_PRODUCT_TYPE, PROTEIN),
+              QuickGOQuery.createQuery(GENE_PRODUCT_SUBSET, FIELD_VALUE_2)
+            )
+          );
+
+        assertThat(resultingQuery, is(expectedQuery));
+    }
+
+    @Test
+    public void transformsRequest_geneproduct_proteins_proteome() {
+        FilterRequest request = FilterRequest.newBuilder()
+          .addProperty(GENE_PRODUCT_TYPE, FIELD_VALUE_1, PROTEIN)
+          .addProperty(PROTEOME, FIELD_VALUE_2)
+          .build();
+        QuickGOQuery resultingQuery = converter.transform(request).getConvertedValue();
+
+        QuickGOQuery expectedQuery =
+          or(
+            QuickGOQuery.createQuery(GENE_PRODUCT_TYPE, FIELD_VALUE_1),
+            and(
+              QuickGOQuery.createQuery(PROTEOME, FIELD_VALUE_2),
+              QuickGOQuery.createQuery(GENE_PRODUCT_TYPE, PROTEIN)
+            )
+          );
+
+        assertThat(resultingQuery, is(expectedQuery));
+    }
+
+    @Test
+    public void transformsRequest_geneproduct_proteins_geneProductSubset_proteome() {
+        String VALUE3 = "value3";
+        FilterRequest request = FilterRequest.newBuilder()
+          .addProperty(GENE_PRODUCT_TYPE, FIELD_VALUE_1, PROTEIN)
+          .addProperty(GENE_PRODUCT_SUBSET, FIELD_VALUE_2)
+          .addProperty(PROTEOME, VALUE3)
+          .build();
+        QuickGOQuery resultingQuery = converter.transform(request).getConvertedValue();
+
+        QuickGOQuery expectedQuery =
+          or(
+            QuickGOQuery.createQuery(GENE_PRODUCT_TYPE, FIELD_VALUE_1),
+            and(
+              QuickGOQuery.createQuery(PROTEOME, VALUE3),
+              and(
+                QuickGOQuery.createQuery(GENE_PRODUCT_TYPE, PROTEIN),
+                QuickGOQuery.createQuery(GENE_PRODUCT_SUBSET, FIELD_VALUE_2)
+              )
+            )
+          );
+
+        assertThat(resultingQuery, is(expectedQuery));
+    }
+
 }
