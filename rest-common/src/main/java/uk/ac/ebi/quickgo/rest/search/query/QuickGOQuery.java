@@ -54,6 +54,7 @@ public abstract class QuickGOQuery {
 
         return new CompositeQuery(Collections.singleton(query), QueryOp.NOT);
     }
+
     public static QuickGOQuery createQuery(String field, String value) {
         if (value.equals(SELECT_ALL_WHERE_FIELD_IS_NOT_EMPTY)) {
             return new AllNonEmptyFieldQuery(field, value);
