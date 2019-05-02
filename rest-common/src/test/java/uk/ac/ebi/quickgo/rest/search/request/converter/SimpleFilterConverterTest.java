@@ -12,8 +12,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.and;
-import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.or;
+import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.*;
+import static uk.ac.ebi.quickgo.rest.search.request.converter.SimpleFilterConverter.*;
 
 /**
  * Created 06/06/16
@@ -108,6 +108,67 @@ public class SimpleFilterConverterTest {
                                 QuickGOQuery.createQuery(FIELD2, FIELD_VALUE_1)
                         )
                 );
+
+        assertThat(resultingQuery, is(expectedQuery));
+    }
+
+    @Test
+    public void transformsRequestContainingAdvanceFilter_goIdAnd() {
+        FilterRequest request = FilterRequest.newBuilder().addProperty(GP_RELATED_AND_GO_IDS, FIELD_VALUE_1).build();
+        QuickGOQuery resultingQuery = converter.transform(request).getConvertedValue();
+        QuickGOQuery expectedQuery =
+          and(
+            QuickGOQuery.createQuery(GP_RELATED_GO_IDS, FIELD_VALUE_1),
+            QuickGOQuery.createQuery(GO_ID, FIELD_VALUE_1)
+          );
+
+        assertThat(resultingQuery, is(expectedQuery));
+    }
+
+    @Test
+    public void transformsRequestContainingAdvanceFilter_goIdAndMultipleValues() {
+        FilterRequest request = FilterRequest.newBuilder()
+          .addProperty(GP_RELATED_AND_GO_IDS, FIELD_VALUE_1, FIELD_VALUE_2).build();
+        QuickGOQuery resultingQuery = converter.transform(request).getConvertedValue();
+        QuickGOQuery expectedQuery =
+          and(
+            or(
+              QuickGOQuery.createQuery(GO_ID, FIELD_VALUE_1),
+              QuickGOQuery.createQuery(GO_ID, FIELD_VALUE_2)
+            ),
+            and(
+              QuickGOQuery.createQuery(GP_RELATED_GO_IDS, FIELD_VALUE_1),
+              QuickGOQuery.createQuery(GP_RELATED_GO_IDS, FIELD_VALUE_2)
+            )
+          );
+
+        assertThat(resultingQuery, is(expectedQuery));
+    }
+
+    @Test
+    public void transformsRequestContainingAdvanceFilter_goIdNot() {
+        FilterRequest request = FilterRequest.newBuilder().addProperty(GP_RELATED_NOT_GO_IDS, FIELD_VALUE_1).build();
+        QuickGOQuery resultingQuery = converter.transform(request).getConvertedValue();
+        QuickGOQuery expectedQuery =
+          not(
+            QuickGOQuery.createQuery(GP_RELATED_GO_IDS, FIELD_VALUE_1)
+          );
+
+        assertThat(resultingQuery, is(expectedQuery));
+    }
+
+    @Test
+    public void transformsRequestContainingAdvanceFilter_goIdNotMultipleValues() {
+        FilterRequest request = FilterRequest.newBuilder()
+          .addProperty(GP_RELATED_NOT_GO_IDS, FIELD_VALUE_1, FIELD_VALUE_2).build();
+        QuickGOQuery resultingQuery = converter.transform(request).getConvertedValue();
+        QuickGOQuery expectedQuery =
+          not(
+            or(
+              QuickGOQuery.createQuery(GP_RELATED_GO_IDS, FIELD_VALUE_1),
+              QuickGOQuery.createQuery(GP_RELATED_GO_IDS, FIELD_VALUE_2)
+            )
+          );
 
         assertThat(resultingQuery, is(expectedQuery));
     }

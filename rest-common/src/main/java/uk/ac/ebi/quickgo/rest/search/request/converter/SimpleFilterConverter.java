@@ -23,10 +23,10 @@ class SimpleFilterConverter implements FilterConverter<FilterRequest, QuickGOQue
     private static final String GENE_PRODUCT_SUBSET = "geneProductSubset_unsorted";
     private static final String PROTEOME = "proteome_unsorted";
     private static final String EXTENSION = "extension_unsorted";
-    private static final String GP_RELATED_GO_IDS ="gpRelatedGoIds_unsorted";
-    private static final String GP_RELATED_AND_GO_IDS = "andGoId";
-    private static final String GP_RELATED_NOT_GO_IDS = "notGoId";
-    private static final String GO_ID = "goId_unsorted";
+    static final String GP_RELATED_GO_IDS ="gpRelatedGoIds_unsorted";
+    static final String GP_RELATED_AND_GO_IDS = "andGoId";
+    static final String GP_RELATED_NOT_GO_IDS = "notGoId";
+    static final String GO_ID = "goId_unsorted";
 
     private final FilterConfig filterConfig;
 
