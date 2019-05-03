@@ -35,12 +35,15 @@ import org.springframework.web.context.WebApplicationContext;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.*;
 import static uk.ac.ebi.quickgo.annotation.IdGeneratorUtil.createGPId;
+import static uk.ac.ebi.quickgo.annotation.IdGeneratorUtil.createGoId;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.EXTENSIONS;
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.createGenericDocsChangingGoId;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.*;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.ResponseItem.responseItem;
 import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.DEFAULT_ENTRIES_PER_PAGE;
@@ -1999,40 +2002,49 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void bodyWithSearchEndPoint() throws Exception {
-        AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A842");
-        AnnotationDocument doc2 = AnnotationDocMocker.createAnnotationDoc("A0A843");
-
-        doc.proteome = "gcrpCan";
-        doc.geneProductSubset = "swiss-prot";
-        doc2.proteome= "";
-        doc2.geneProductSubset="";
-        doc2.geneProductType="miRNA";
-        repository.save(doc);
-        repository.save(doc2);
-
-        ResultActions response =
-            mockMvc.perform(get(RESOURCE_URL + "/search").param(GP_SUBSET_PARAM.getName(), "swiss-prot")
-                .param(GENE_PRODUCT_TYPE_PARAM.getName(), "protein,miRNA")
-                .param(PROTEOME_PARAM.getName(), "gcrpCan")
-
-            );
-
-        MockMvcRequestBuilders.post("/debug").contentType(MediaType.APPLICATION_JSON).content(new String("{\"T1\":109.1, \"T2\":99.3}").getBytes());
-
-       get(RESOURCE_URL + "/search").contentType(MediaType.APPLICATION_JSON).content(requestBody());
-
-        response.andDo(print())
-            .andExpect(status().isOk())
-            .andExpect(contentTypeToBeJson())
-            .andExpect(totalNumOfResults(2))
-            .andExpect(fieldsInAllResultsExist(2));
+    public void advanceFilterNotGoId_descendents_defaultRelations() throws Exception {
+        advanceFilterTest(20, false, false);
     }
 
-    private String requestBody() throws JsonProcessingException {
+    @Test
+    public void advanceFilterNotGoId_exact() throws Exception {
+        advanceFilterTest(20, false, true);
+    }
+
+    @Test
+    public void advanceFilterAndGoId_descendents_defaultRelations() throws Exception {
+        advanceFilterTest(5, true, false);
+    }
+
+    @Test
+    public void advanceFilterAndGoId_exact() throws Exception {
+        advanceFilterTest(5, true, true);
+    }
+
+    private void advanceFilterTest(int expected, boolean and, boolean exact) throws Exception {
+        List<AnnotationDocument> docs = createGenericDocsChangingGoId(5);
+        repository.deleteAll();
+        repository.save(docs);
+        AnnotationRequestBody.GoDescription description = AnnotationRequestBody.GoDescription.builder()
+          .goTerms(new String[]{createGoId(1)})
+          .goUsage(exact ? "exact" : "descendants")
+          .build();
+        AnnotationRequestBody body = and ? AnnotationRequestBody.builder().and(description).build()
+          : AnnotationRequestBody.builder().not(description).build();
+
+        ResultActions response = mockMvc.perform(
+          post(RESOURCE_URL + "/search").contentType(MediaType.APPLICATION_JSON).content(json(body))
+        );
+
+        response.andDo(print())
+          .andExpect(status().isOk())
+          .andExpect(contentTypeToBeJson())
+          .andExpect(totalNumOfResults(expected));
+    }
+
+    private String json(Object object) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
-        AnnotationRequestBody body = AnnotationRequestBody.builder().and(AnnotationRequestBody.GoDescription.builder().build()).build();
-        return objectMapper.writeValueAsString(body);
+        return objectMapper.writeValueAsString(object);
     }
 
     // ------------------------------- Helpers -------------------------------

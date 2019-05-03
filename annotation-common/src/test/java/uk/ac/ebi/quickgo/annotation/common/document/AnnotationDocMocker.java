@@ -11,6 +11,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static java.util.Arrays.asList;
 
@@ -74,7 +75,7 @@ public class AnnotationDocMocker {
         long rowNumber = rowNumberGenerator.incrementAndGet();
         doc.id = geneProductId + "!" + rowNumber;
 
-        doc.goId = GO_ID;
+        setGoId(doc, GO_ID);
         doc.evidenceCode = ECO_ID;
         doc.qualifier = QUALIFIER;
         doc.goEvidence = GO_EVIDENCE;
@@ -95,10 +96,14 @@ public class AnnotationDocMocker {
 
         return doc;
     }
+    private static void setGoId(AnnotationDocument doc, String goId){
+      doc.goId = goId;
+      doc.gpRelatedGoIds = asList(goId);
+    }
 
     public static AnnotationDocument createAnnotationDoc(String geneProductId, String goId) {
         AnnotationDocument doc = createAnnotationDoc(geneProductId);
-        doc.goId = goId;
+        setGoId(doc, goId);
         return doc;
     }
 
@@ -145,7 +150,7 @@ public class AnnotationDocMocker {
         return IntStream.range(0, number)
                         .mapToObj(i -> {
                             AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc(gpId);
-                            doc.goId = createGOID(i);
+                            setGoId(doc, createGOID(i));
                             return doc;
                         })
                         .collect(Collectors.toList());
