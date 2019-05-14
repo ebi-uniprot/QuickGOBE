@@ -224,7 +224,7 @@ public class AnnotationRequest {
             value = "The proteomic classification of the annotated gene product, if applicable - this is relevant for" +
                     " proteins only. The allowed values are complete; none; gcrpCan (Gene Centric Reference Proteome " +
                     "Canonical) & gcrpIso (Gene Centric Reference Proteome IsoForm).",
-            allowableValues = "complete," + "none,gcrpCan,gcrpIso", hidden = true)
+            allowableValues = "complete,none,gcrpCan,gcrpIso", hidden = true)
     private String[] proteome;
 
     private AnnotationRequestBody requestBody;

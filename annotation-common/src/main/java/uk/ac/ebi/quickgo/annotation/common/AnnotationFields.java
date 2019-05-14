@@ -62,6 +62,9 @@ public class AnnotationFields {
         public static final String EXTENSION = storeAndGet(VALUES, "extension_unsorted");
         public static final String PROTEOME = storeAndGet(VALUES, "proteome_unsorted");
         public static final String GP_RELATED_GO_IDS = storeAndGet(VALUES, "gpRelatedGoIds_unsorted");
+        //Below fields are not matching above naming convention, because they are not part of solr
+        //They are here to trick quickgo code frame work for specific cases
+        //e-g notGoId tell in framework filter we need to put NOT in gp_related_go_ids to get result etc
         public static final String GP_RELATED_AND_GO_IDS = storeAndGet(VALUES, "andGoId");
         public static final String GP_RELATED_NOT_GO_IDS = storeAndGet(VALUES, "notGoId");
 

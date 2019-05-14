@@ -21,7 +21,7 @@ import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.or;
 public class NotDescendantsFilterConverterTest {
   private OntologyRelatives response;
   private NotDescendantsFilterConverter converter;
-  String field = AnnotationFields.Searchable.GP_RELATED_GO_IDS;
+  private String field = AnnotationFields.Searchable.GP_RELATED_GO_IDS;
 
   @Before
   public void setUp() {

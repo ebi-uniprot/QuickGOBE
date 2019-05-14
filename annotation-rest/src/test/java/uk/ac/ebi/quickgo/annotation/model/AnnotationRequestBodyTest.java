@@ -80,7 +80,7 @@ public class AnnotationRequestBodyTest {
   }
 
   @Test
-  public void goUsageRelationshipsFromStringSetter_commaSeprated() {
+  public void goUsageRelationshipsFromStringSetter_commaSeparated() {
     AnnotationRequestBody.GoDescription and = new AnnotationRequestBody.GoDescription();
     and.setGoUsageRelationships("is_a,type_of");
     AnnotationRequestBody body = AnnotationRequestBody.builder()
