@@ -1,6 +1,16 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
 import io.swagger.annotations.*;
+import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 import uk.ac.ebi.quickgo.annotation.download.header.HeaderContent;
 import uk.ac.ebi.quickgo.annotation.download.header.HeaderCreator;
 import uk.ac.ebi.quickgo.annotation.download.header.HeaderCreatorFactory;
@@ -26,6 +36,8 @@ import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformationRequests;
 import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformerChain;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -33,31 +45,18 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Stream;
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-import org.slf4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.task.TaskExecutor;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.stream.Collectors.toList;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.HttpHeaders.VARY;
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
 import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.*;
-import static uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.completablevalue
-        .EvidenceNameInjector.EVIDENCE_CODE;
-import static uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.completablevalue
-        .OntologyNameInjector.GO_ID;
-import static uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.completablevalue
-        .TaxonomyNameInjector.TAXON_ID;
+import static uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.completablevalue.EvidenceNameInjector.EVIDENCE_CODE;
+import static uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.completablevalue.OntologyNameInjector.GO_ID;
+import static uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.completablevalue.TaxonomyNameInjector.TAXON_ID;
 import static uk.ac.ebi.quickgo.common.array.ArrayPopulation.ensureArrayContains;
 import static uk.ac.ebi.quickgo.common.array.ArrayPopulation.ensureArrayContainsCommonValue;
 import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.searchAndTransform;
@@ -198,10 +197,10 @@ public class AnnotationController {
             @ApiResponse(code = 400, message = "Bad request due to a validation issue encountered in one of the " +
                     "filters", response = ResponseExceptionHandler.ErrorInfo.class)})
     @ApiOperation(value = "Search for all annotations that match the supplied filter criteria.")
-    @RequestMapping(value = "/search", method = {RequestMethod.GET, RequestMethod.POST}, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/search", method = {GET, POST}, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<Annotation>> annotationLookup(
         @ApiParam("Optional body for advance filtering. For example show me all annotations to proteins that are annotated to GO:xxx AND GO:yyy " +
-          "or show me all annotations to proteins that are annotated to GO:xxx and NOT GO:yyy. It is in beta and subject to change in future")
+          "or show me all annotations to proteins that are annotated to GO:xxx and NOT GO:yyy. Request Body is in beta and subject to change in future")
         @Valid @RequestBody(required = false) AnnotationRequestBody body,
         @Valid @ModelAttribute AnnotationRequest request, BindingResult bindingResult) {
         checkBindingErrors(bindingResult);
@@ -233,7 +232,7 @@ public class AnnotationController {
             @ApiResponse(code = 400, message = "Bad request due to a validation issue encountered in one of the " +
                     "filters", response = ResponseExceptionHandler.ErrorInfo.class)})
     @ApiOperation(value = "Generate statistics for the annotation result set obtained from applying the filters.")
-    @RequestMapping(value = "/stats", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/stats", method = {GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<StatisticsGroup>> annotationStats(
             @Valid @ModelAttribute AnnotationRequest request, BindingResult bindingResult) {
         checkBindingErrors(bindingResult);
@@ -245,10 +244,12 @@ public class AnnotationController {
 
     @ApiOperation(value = "Download all annotations that match the supplied filter criteria.",
             response = File.class)
-    @RequestMapping(value = "/downloadSearch",
-            method = {RequestMethod.GET},
+    @RequestMapping(value = "/downloadSearch", method = {GET, POST},
             produces = {GPAD_MEDIA_TYPE_STRING, GAF_MEDIA_TYPE_STRING, TSV_MEDIA_TYPE_STRING})
     public ResponseEntity<ResponseBodyEmitter> downloadLookup(
+            @ApiParam("Optional body for advance filtering. For example show me all annotations to proteins that are annotated to GO:xxx AND GO:yyy " +
+              "or show me all annotations to proteins that are annotated to GO:xxx and NOT GO:yyy. Request Body is in beta and subject to change in future")
+            @Valid @RequestBody(required = false) AnnotationRequestBody body,
             @Valid @ModelAttribute AnnotationRequest request,
             BindingResult bindingResult,
             @RequestHeader(ACCEPT) MediaType mediaTypeAcceptHeader, HttpServletRequest servletRequest) {
@@ -270,6 +271,7 @@ public class AnnotationController {
                     ensureArrayContainsCommonValue(request.getSelectedFields(), request.getIncludeFields(), "name"));
         }
 
+        request.addRequestBody(body);
         FilterQueryInfo filterQueryInfo = extractFilterQueryInfo(request);
         final int pageLimit = getPageLimit(request);
 
@@ -327,14 +329,14 @@ public class AnnotationController {
     @ApiOperation(value = "Get meta-data information about the annotation service",
             response = About.class,
             notes = "Provides the date the annotation information was created.")
-    @RequestMapping(value = "/about", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/about", method = GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<MetaData> provideMetaData() {
         return new ResponseEntity<>(metaDataProvider.lookupMetaData(), HttpStatus.OK);
     }
 
     @ApiOperation(value = "Download statistics for all annotations that match the supplied filter criteria.",
             response = File.class)
-    @RequestMapping(value = "/downloadStats", method = {RequestMethod.GET},
+    @RequestMapping(value = "/downloadStats", method = {GET},
             produces = {EXCEL_MEDIA_TYPE_STRING, JSON_MEDIA_TYPE_STRING})
     public ResponseEntity<ResponseBodyEmitter> downloadStats(@Valid @ModelAttribute AnnotationRequest request,
             BindingResult bindingResult, @RequestHeader(ACCEPT) MediaType mediaTypeAcceptHeader) {
