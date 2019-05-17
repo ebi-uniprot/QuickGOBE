@@ -102,14 +102,12 @@ public class AnnotationRequest {
      * TODO: These state variables are only here until springfox can get the @ApiModelProperty to work with our POJO.
      * When the fix is in place we can move the @ApiModelProperty definitions to the getters
      */
-    @ApiModelProperty(
-            value = "The ontology to which associated GO terms belong. " +
-                    "Accepts comma separated values. E.g., 'biological_process,molecular_function'.",
-            allowableValues = "biological_process,molecular_function,cellular_component")
+    @ApiModelProperty(value = "The ontology to which associated GO terms belong. Accepts comma separated values." +
+      " Allowed values are biological_process,molecular_function,cellular_component.")
     private String aspect;
 
-    @ApiModelProperty(value = "The database from which this annotation originates. Accepts comma separated values." +
-            "E.g., BHF-UCL,Ensembl")
+    @ApiModelProperty(value = "The database from which this annotation originates. Accepts comma separated values" +
+      " or enter each value on new line from swagger interface. E.g., BHF-UCL,Ensembl")
     private String[] assignedBy;
 
     @ApiModelProperty(
@@ -117,20 +115,39 @@ public class AnnotationRequest {
                     "Format: DB:Reference or just DB. Accepts comma separated values. E.g., PMID:2676709 or PMID")
     private String reference;
 
-    @ApiModelProperty(
-            value = "The id of the gene product annotated with the GO term. Accepts comma separated values." +
+    @ApiModelProperty(value = "The id of the gene product annotated with the GO term. Accepts comma separated values." +
                     "E.g., URS00000064B1_559292")
     private String geneProductId;
 
-    @ApiModelProperty(
-            value = "Evidence code indicating how the annotation is supported. Accepts comma separated values. " +
-                    "E.g., ECO:0000255")
-    private String evidenceCode;
+    @ApiModelProperty(value = "The type of gene product. Accepts comma separated values. Allowed values are" +
+      " miRNA,complex,protein")
+    private String geneProductType;
 
     @ApiModelProperty(
-            value = "The GO id of an annotation. Accepts comma separated values. " +
-                    "E.g., GO:0070125")
+      value = "A database that provides a set of gene products. Only valid with 'protein' geneProductType." +
+        " Accepts comma separated values. Allowed values are TrEMBL,Swiss-Prot")
+    private String geneProductSubset;
+
+    @ApiModelProperty(
+      value = "The proteomic classification of the annotated gene product, if applicable - this is relevant for" +
+        " proteins only. The allowed values are complete; none; gcrpCan (Gene Centric Reference Proteome" +
+        " Canonical) & gcrpIso (Gene Centric Reference Proteome IsoForm). Accepts comma separated values or" +
+        "you can use swagger UI to entry each value on new line.")
+    private String[] proteome;
+
+    @ApiModelProperty(value = "The GO id of an annotation. Accepts comma separated values. E.g., GO:0070125")
     private String goId;
+
+    @ApiModelProperty(
+      value = "Indicates how the GO terms within the annotations should be used. Used in conjunction with " +
+        "'goUsageRelationships' filter. E.g., descendants",
+      allowableValues = "descendants,exact,slim")
+    private String goUsage;
+
+    @ApiModelProperty(
+      value = "The relationship between the 'goId' values found within the annotations. Allows comma separated" +
+        " values. Allowed values are is_a,part_of,occurs_in,regulates")
+    private String goUsageRelationships;
 
     @ApiModelProperty(
             value = "Aids the interpretation of an annotation. Accepts comma separated values. " +
@@ -152,17 +169,9 @@ public class AnnotationRequest {
             allowableValues = "descendants,exact")
     private String taxonUsage;
 
-    @ApiModelProperty(
-            value = "Indicates how the GO terms within the annotations should be used. Used in conjunction with " +
-                    "'goUsageRelationships' filter. E.g., descendants",
-            allowableValues = "descendants,exact,slim")
-    private String goUsage;
-
-    @ApiModelProperty(
-            value = "The relationship between the 'goId' values " +
-                    "found within the annotations. Allows comma separated values. E.g., is_a,part_of",
-            allowableValues = "is_a,part_of,occurs_in,regulates")
-    private String goUsageRelationships;
+    @ApiModelProperty(value = "Evidence code indicating how the annotation is supported. Accepts comma separated" +
+      " values. E.g., ECO:0000255")
+    private String evidenceCode;
 
     @ApiModelProperty(
             value = "Indicates how the evidence code terms within the annotations should be used. Is used in " +
@@ -172,24 +181,11 @@ public class AnnotationRequest {
 
     @ApiModelProperty(
             value = "The relationship between the provided 'evidenceCode' identifiers. " +
-                    "Allows comma separated values. E.g., is_a,part_of",
-            allowableValues = "is_a,part_of,occurs_in,regulates")
+                    "Allows comma separated values. Allowed values are is_a,part_of,occurs_in,regulates")
     private String evidenceCodeUsageRelationships;
 
-    @ApiModelProperty(
-            value = "The type of gene product. Accepts comma separated values. E.g., protein,RNA",
-            allowableValues = "protein,RNA,complex")
-    private String geneProductType;
-
-    @ApiModelProperty(
-            value = "Gene product set. " +
-                    "Accepts comma separated values. E.g., KRUK,BHF-UCL,Exosome")
+    @ApiModelProperty(value = "Gene product set. Accepts comma separated values. E.g., KRUK,BHF-UCL,Exosome")
     private String targetSet;
-
-    @ApiModelProperty(
-            value = "A database that provides a set of gene products. Accepts comma separated " +
-                    "values. E.g., TrEMBL")
-    private String geneProductSubset;
 
     @ApiModelProperty(
             value = "Gene ontology evidence codes of the 'goId's found within the annotations. Accepts comma " +
@@ -209,7 +205,8 @@ public class AnnotationRequest {
     private int downloadLimit = DEFAULT_DOWNLOAD_LIMIT;
 
     @ApiModelProperty(
-            value = "Optional fields retrieved from external services. Accepts comma separated values.",
+            value = "Optional fields retrieved from external services. Accepts comma separated values. From swagger interface" +
+              " can select multiple values. Allowed values are goName,taxonName,name,synonyms",
             allowableValues = "goName,taxonName,name,synonyms")
     private String[] includeFields;
 
@@ -219,13 +216,6 @@ public class AnnotationRequest {
                     "withFrom,taxonId,assignedBy,extension,date,taxonName,synonym,name,type,interactingTaxonId",
             hidden = true)
     private String[] selectedFields;
-
-    @ApiModelProperty(
-            value = "The proteomic classification of the annotated gene product, if applicable - this is relevant for" +
-                    " proteins only. The allowed values are complete; none; gcrpCan (Gene Centric Reference Proteome " +
-                    "Canonical) & gcrpIso (Gene Centric Reference Proteome IsoForm).",
-            allowableValues = "complete,none,gcrpCan,gcrpIso", hidden = true)
-    private String[] proteome;
 
     private AnnotationRequestBody requestBody;
 
