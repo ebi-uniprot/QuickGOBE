@@ -40,7 +40,7 @@ public class AnnotationExtensionController {
     }
 
     @ApiOperation(value = Docs.Validate.des, response = Map.class, notes = Docs.Validate.note)
-    @RequestMapping(path = "/{goTermId}/validate/{candidate}", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
+    @RequestMapping(path = "/{goTermId}/validate/{candidate:.+}", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
     Map<String, Object> isValidRelation(@ApiParam(Docs.Validate.dGoTermId) @PathVariable String goTermId,
                                         @ApiParam(Docs.Validate.dCandidate) @PathVariable String candidate) {
         return annotationExtensionService.isAnnotationExtensionValidForGoTerm(candidate, goTermId);
