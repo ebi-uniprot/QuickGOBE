@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import uk.ac.ebi.quickgo.annotation.validation.service.ReferenceValidator;
 import uk.ac.ebi.quickgo.annotation.validation.service.WithFromValidator;
 import uk.ac.ebi.quickgo.common.validator.GeneProductIDList;
@@ -79,7 +80,7 @@ public class AnnotationRequest {
     static final String DEFAULT_TAXON_USAGE = DESCENDANTS_USAGE;
     static final String DEFAULT_EVIDENCE_CODE_USAGE = DESCENDANTS_USAGE;
     static final String DEFAULT_GO_USAGE = DESCENDANTS_USAGE;
-
+    static final String DEFAULT_GO_USAGE_RELATIONSHIPS="is_a,part_of,occurs_in";
     /**
      * indicates which fields should be looked at when creating filters
      */
@@ -87,144 +88,129 @@ public class AnnotationRequest {
             GENE_PRODUCT_ID, GO_EVIDENCE, QUALIFIER, REFERENCE, TARGET_SET, WITH_FROM, EXTENSION
     };
 
-    @ApiModelProperty(
-            value = "Number of results per page (" + MIN_ENTRIES_PER_PAGE + "-" + MAX_ENTRIES_PER_PAGE + ")",
-            allowableValues = "range[" + MIN_ENTRIES_PER_PAGE + "," + MAX_ENTRIES_PER_PAGE + "]")
-    protected int limit = DEFAULT_ENTRIES_PER_PAGE;
-
-    @ApiModelProperty(
-            value = "Page number of the result set to display.",
-            allowableValues = "range[" + MIN_PAGE_NUMBER + ",max_result_set_size]")
-    private int page = DEFAULT_PAGE_NUMBER;
-
     /*
      * TODO: These state variables are only here until springfox can get the @ApiModelProperty to work with our POJO.
      * When the fix is in place we can move the @ApiModelProperty definitions to the getters
      */
-    @ApiModelProperty(
-            value = "The ontology to which associated GO terms belong. " +
-                    "Accepts comma separated values. E.g., 'biological_process,molecular_function'.",
-            allowableValues = "biological_process,molecular_function,cellular_component")
-    private String aspect;
-
-    @ApiModelProperty(value = "The database from which this annotation originates. Accepts comma separated values." +
-            "E.g., BHF-UCL,Ensembl")
-    private String[] assignedBy;
-
-    @ApiModelProperty(
-            value = "Literature id / database reference / database type. " +
-                    "Format: DB:Reference or just DB. Accepts comma separated values. E.g., PMID:2676709 or PMID")
-    private String reference;
-
-    @ApiModelProperty(
-            value = "The id of the gene product annotated with the GO term. Accepts comma separated values." +
-                    "E.g., URS00000064B1_559292")
+    @ApiModelProperty(value = "The id of the gene product annotated with the GO term. Accepts comma separated values." +
+                    "E.g., URS00000064B1_559292", position = 1)
     private String geneProductId;
 
-    @ApiModelProperty(
-            value = "Evidence code indicating how the annotation is supported. Accepts comma separated values. " +
-                    "E.g., ECO:0000255")
-    private String evidenceCode;
+    @ApiModelProperty(value = "The type of gene product. Accepts comma separated values. Allowed values are" +
+      " miRNA,complex,protein", position = 2)
+    private String geneProductType;
 
     @ApiModelProperty(
-            value = "The GO id of an annotation. Accepts comma separated values. " +
-                    "E.g., GO:0070125")
+      value = "A database that provides a set of gene products. Only valid with 'protein' geneProductType." +
+        " Accepts comma separated values. Allowed values are TrEMBL,Swiss-Prot", position = 3)
+    private String geneProductSubset;
+
+    @ApiModelProperty(
+      value = "The proteomic classification of the annotated gene product, if applicable - this is relevant for" +
+        " proteins only. The allowed values are complete; none; gcrpCan (Gene Centric Reference Proteome" +
+        " Canonical) & gcrpIso (Gene Centric Reference Proteome IsoForm). Accepts comma separated values or" +
+        "you can use swagger UI to entry each value on new line.", position = 4)
+    private String[] proteome;
+
+    @ApiModelProperty(value = "The GO id of an annotation. Accepts comma separated values. E.g., GO:0070125", position = 5)
     private String goId;
 
     @ApiModelProperty(
-            value = "Aids the interpretation of an annotation. Accepts comma separated values. " +
-                    "E.g., enables,involved_in")
-    private String qualifier;
-
-    @ApiModelProperty(
-            value = "Additional ids for an annotation. Accepts comma separated values. " +
-                    "E.g., P63328")
-    private String withFrom;
-
-    @ApiModelProperty(
-            value = "The taxonomic id of the species encoding the gene product associated to an annotation. " +
-                    "Accepts comma separated values. E.g., 1310605")
-    private String taxonId;
-
-    @ApiModelProperty(
-            value = "Indicates how the taxonomic ids within the annotations should be used. E.g., exact",
-            allowableValues = "descendants,exact")
-    private String taxonUsage;
-
-    @ApiModelProperty(
-            value = "Indicates how the GO terms within the annotations should be used. Used in conjunction with " +
-                    "'goUsageRelationships' filter. E.g., descendants",
-            allowableValues = "descendants,exact,slim")
+      value = "Indicates how the GO terms within the annotations should be used. Used in conjunction with " +
+        "'goUsageRelationships' filter. E.g., descendants",
+      allowableValues = "descendants,exact,slim", position = 6)
     private String goUsage;
 
     @ApiModelProperty(
-            value = "The relationship between the 'goId' values " +
-                    "found within the annotations. Allows comma separated values. E.g., is_a,part_of",
-            allowableValues = "is_a,part_of,occurs_in,regulates")
+      value = "The relationship between the 'goId' values found within the annotations. Allows comma separated" +
+        " values. Allowed values are is_a,part_of,occurs_in,regulates", position = 7)
     private String goUsageRelationships;
+
+    @ApiModelProperty(value = "Gene ontology evidence codes of the 'goId's found within the annotations. Accepts comma " +
+      "separated values. E.g., EXP,IDA", hidden = true, position = 8)
+    private String goIdEvidence;
+
+    @ApiModelProperty(value = "The taxonomic id of the species encoding the gene product associated to an annotation." +
+      " Accepts comma separated values. E.g., 1310605", position = 9)
+    private String taxonId;
+
+    @ApiModelProperty(value = "Indicates how the taxonomic ids within the annotations should be used. E.g., exact",
+            allowableValues = "descendants,exact", position = 10)
+    private String taxonUsage;
+
+    @ApiModelProperty(value = "Literature id / database reference / database type. Format: DB:Reference or just DB." +
+      " Accepts comma separated values. E.g., PMID:2676709 or PMID", position = 11)
+    private String reference;
+
+    @ApiModelProperty(value = "Evidence code indicating how the annotation is supported. Accepts comma separated" +
+      " values. E.g., ECO:0000255", position = 12)
+    private String evidenceCode;
 
     @ApiModelProperty(
             value = "Indicates how the evidence code terms within the annotations should be used. Is used in " +
                     "conjunction with 'evidenceCodeUsageRelationships' filter. E.g., descendants",
-            allowableValues = "descendants,exact")
+            allowableValues = "descendants,exact", position = 13)
     private String evidenceCodeUsage;
 
-    @ApiModelProperty(
-            value = "The relationship between the provided 'evidenceCode' identifiers. " +
-                    "Allows comma separated values. E.g., is_a,part_of",
-            allowableValues = "is_a,part_of,occurs_in,regulates")
+    @ApiModelProperty(value = "The relationship between the provided 'evidenceCode' identifiers. " +
+      "Allows comma separated values. Allowed values are is_a,part_of,occurs_in,regulates", position = 14)
     private String evidenceCodeUsageRelationships;
 
-    @ApiModelProperty(
-            value = "The type of gene product. Accepts comma separated values. E.g., protein,RNA",
-            allowableValues = "protein,RNA,complex")
-    private String geneProductType;
-
-    @ApiModelProperty(
-            value = "Gene product set. " +
-                    "Accepts comma separated values. E.g., KRUK,BHF-UCL,Exosome")
-    private String targetSet;
-
-    @ApiModelProperty(
-            value = "A database that provides a set of gene products. Accepts comma separated " +
-                    "values. E.g., TrEMBL")
-    private String geneProductSubset;
-
-    @ApiModelProperty(
-            value = "Gene ontology evidence codes of the 'goId's found within the annotations. Accepts comma " +
-                    "separated values. E.g., EXP,IDA",
-            hidden = true)
-    private String goIdEvidence;
-
     @ApiModelProperty(value = "Extensions to annotations, where each extension can be: " +
-            "EXTENSION(DB:ID) / EXTENSION(DB) / EXTENSION. ")
+      "EXTENSION(DB:ID) / EXTENSION(DB) / EXTENSION. ", position = 15)
     private String extension;
 
-    @ApiModelProperty(
-            value = "The number of annotations to download ("+MIN_DOWNLOAD_NUMBER+"-"+MAX_DOWNLOAD_NUMBER+"). Note, " +
-                    "the page size parameter 'limit' will be ignored when downloading results. ",
-            allowableValues = "range[" + MIN_DOWNLOAD_NUMBER + "," + MAX_DOWNLOAD_NUMBER + "]",
-            hidden = true)
-    private int downloadLimit = DEFAULT_DOWNLOAD_LIMIT;
+    @ApiModelProperty(value = "The ontology to which associated GO terms belong. Accepts comma separated values." +
+      " Allowed values are biological_process,molecular_function,cellular_component.", position = 16)
+    private String aspect;
+
+    @ApiModelProperty(value = "The database from which this annotation originates. Accepts comma separated values" +
+      " or enter each value on new line from swagger interface. E.g., BHF-UCL,Ensembl", position = 17)
+    private String[] assignedBy;
+
+    @ApiModelProperty(value = "Gene product set. Accepts comma separated values. E.g., KRUK,BHF-UCL,Exosome"
+      , position = 18)
+    private String targetSet;
+
+    @ApiModelProperty(value = "Aids the interpretation of an annotation. Accepts comma separated values. " +
+      "E.g., enables,involved_in", position = 19)
+    private String qualifier;
+
+    @ApiModelProperty(value = "Additional ids for an annotation. Accepts comma separated values. " +
+      "E.g., P63328", position = 20)
+    private String withFrom;
 
     @ApiModelProperty(
-            value = "Optional fields retrieved from external services. Accepts comma separated values.",
-            allowableValues = "goName,taxonName,name,synonyms")
+            value = "Optional fields retrieved from external services. Accepts comma separated values. From swagger interface" +
+              " can select multiple values. Allowed values are goName,taxonName,name,synonyms",
+            allowableValues = "goName,taxonName,name,synonyms", position = 21)
     private String[] includeFields;
 
     @ApiModelProperty(
             value = "For TSV downloads only: fields to be downloaded. Accepts comma separated values.",
             allowableValues = "geneProductId,symbol,qualifier,goId,goAspect,goName,evidenceCode,goEvidence,reference," +
                     "withFrom,taxonId,assignedBy,extension,date,taxonName,synonym,name,type,interactingTaxonId",
-            hidden = true)
+            hidden = true, position = 22)
     private String[] selectedFields;
 
     @ApiModelProperty(
-            value = "The proteomic classification of the annotated gene product, if applicable - this is relevant for" +
-                    " proteins only. The allowed values are complete; none; gcrpCan (Gene Centric Reference Proteome " +
-                    "Canonical) & gcrpIso (Gene Centric Reference Proteome IsoForm).",
-            allowableValues = "complete," + "none,gcrpCan,gcrpIso", hidden = true) private String[]
-            proteome;
+      value = "The number of annotations to download ("+MIN_DOWNLOAD_NUMBER+"-"+MAX_DOWNLOAD_NUMBER+"). Note, " +
+        "the page size parameter 'limit' will be ignored when downloading results. ",
+      allowableValues = "range[" + MIN_DOWNLOAD_NUMBER + "," + MAX_DOWNLOAD_NUMBER + "]",
+      hidden = true, position = 23)
+    private int downloadLimit = DEFAULT_DOWNLOAD_LIMIT;
+
+    @ApiModelProperty(
+      value = "Number of results per page (" + MIN_ENTRIES_PER_PAGE + "-" + MAX_ENTRIES_PER_PAGE + ")",
+      allowableValues = "range[" + MIN_ENTRIES_PER_PAGE + "," + MAX_ENTRIES_PER_PAGE + "]", position = 24)
+    protected int limit = DEFAULT_ENTRIES_PER_PAGE;
+
+    @ApiModelProperty(
+      value = "Page number of the result set to display.",
+      allowableValues = "range[" + MIN_PAGE_NUMBER + ",max_result_set_size]", position = 25)
+    private int page = DEFAULT_PAGE_NUMBER;
+
+    private AnnotationRequestBody requestBody;
 
     private final Map<String, String[]> filterMap = new HashMap<>();
 
@@ -573,6 +559,12 @@ public class AnnotationRequest {
         return filterMap.get(PROTEOME);
     }
 
+
+    public void addRequestBody(AnnotationRequestBody requestBody) {
+        AnnotationRequestBody.putDefaultValuesIfAbsent(requestBody);
+        this.requestBody = requestBody;
+    }
+
     /**
      * Produces a set of {@link FilterRequest} objects given the filter attributes provided by the user.
      *
@@ -594,7 +586,7 @@ public class AnnotationRequest {
         createGoUsageFilter().ifPresent(filterRequests::add);
         createEvidenceCodeUsageFilter().ifPresent(filterRequests::add);
         createTaxonFilter().ifPresent(filterRequests::add);
-
+        createBodyFilter().forEach(filterRequests::add);
         return filterRequests;
     }
 
@@ -744,6 +736,42 @@ public class AnnotationRequest {
             request = Optional.empty();
         }
 
+        return request;
+    }
+
+    private List<FilterRequest> createBodyFilter() {
+        List<FilterRequest> ret = new ArrayList<>();
+        if (requestBody == null) {
+            return Collections.emptyList();
+        }
+
+        createUsageBodyFilter(requestBody.getAnd(), GP_RELATED_AND_GO_IDS, "andGoUsageRelationships").ifPresent(ret::add);
+        createUsageBodyFilter(requestBody.getNot(), GP_RELATED_NOT_GO_IDS, "notGoUsageRelationships").ifPresent(ret::add);
+        return ret;
+    }
+
+    private Optional<FilterRequest> createUsageBodyFilter(AnnotationRequestBody.GoDescription goDescription,
+                                                          String idParam, String relationshipsParam) {
+        Optional<FilterRequest> request = Optional.empty();
+        if (goDescription.getGoTerms().length == 0) {
+            return request;
+        }
+
+        FilterRequest.Builder filterBuilder = FilterRequest.newBuilder();
+        switch (goDescription.getGoUsage()) {
+            case SLIM_USAGE:
+            case DESCENDANTS_USAGE:
+                request = of(filterBuilder.addProperty(goDescription.getGoUsage())
+                  .addProperty(idParam, String.join(",",goDescription.getGoTerms()))
+                  .addProperty(relationshipsParam, goDescription.getGoUsageRelationships())
+                  .build());
+                break;
+            case EXACT_USAGE:
+                request = of(filterBuilder
+                  .addProperty(idParam, goDescription.getGoTerms())
+                  .build());
+                break;
+        }
         return request;
     }
 

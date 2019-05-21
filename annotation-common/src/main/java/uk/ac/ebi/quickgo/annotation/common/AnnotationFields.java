@@ -37,6 +37,7 @@ public class AnnotationFields {
     static final String INTERACTING_TAXON_ID = "interactingTaxonId";
     static final String PROTEOME = "proteome";
     static final String DEFAULt_SORT = "defaultSort";
+    static final String GP_RELATED_GO_IDS = "gpRelatedGoIds";
 
     /**
      * Annotation fields that are indexed, and can therefore be searched.
@@ -60,6 +61,12 @@ public class AnnotationFields {
         public static final String WITH_FROM = storeAndGet(VALUES, "withFrom_search");
         public static final String EXTENSION = storeAndGet(VALUES, "extension_unsorted");
         public static final String PROTEOME = storeAndGet(VALUES, "proteome_unsorted");
+        public static final String GP_RELATED_GO_IDS = storeAndGet(VALUES, "gpRelatedGoIds_unsorted");
+        //Below fields are not matching above naming convention, because they are not part of solr
+        //They are here to trick quickgo code frame work for specific cases
+        //e-g notGoId tell in framework filter we need to put NOT in gp_related_go_ids to get result etc
+        public static final String GP_RELATED_AND_GO_IDS = storeAndGet(VALUES, "andGoId");
+        public static final String GP_RELATED_NOT_GO_IDS = storeAndGet(VALUES, "notGoId");
 
         public static final String GENE_PRODUCT_TYPE_AND_PROTEOME = storeAndGet(VALUES, GENE_PRODUCT_TYPE + COMMA +
                 PROTEOME);

@@ -1,15 +1,19 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import uk.ac.ebi.quickgo.annotation.AnnotationREST;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker;
+import uk.ac.ebi.quickgo.annotation.model.AnnotationRequestBody;
 import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -31,12 +35,15 @@ import org.springframework.web.context.WebApplicationContext;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.*;
 import static uk.ac.ebi.quickgo.annotation.IdGeneratorUtil.createGPId;
+import static uk.ac.ebi.quickgo.annotation.IdGeneratorUtil.createGoId;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.EXTENSIONS;
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.createGenericDocsChangingGoId;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.*;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.ResponseItem.responseItem;
 import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.DEFAULT_ENTRIES_PER_PAGE;
@@ -1992,6 +1999,52 @@ public class AnnotationControllerIT {
 
         response.andDo(print())
                 .andExpect(jsonPath("$.annotation.timestamp").value("2017-03-01 18:00"));
+    }
+
+    @Test
+    public void advanceFilterNotGoId_descendents_defaultRelations() throws Exception {
+        advanceFilterTest(20, false, false);
+    }
+
+    @Test
+    public void advanceFilterNotGoId_exact() throws Exception {
+        advanceFilterTest(20, false, true);
+    }
+
+    @Test
+    public void advanceFilterAndGoId_descendents_defaultRelations() throws Exception {
+        advanceFilterTest(5, true, false);
+    }
+
+    @Test
+    public void advanceFilterAndGoId_exact() throws Exception {
+        advanceFilterTest(5, true, true);
+    }
+
+    private void advanceFilterTest(int expected, boolean and, boolean exact) throws Exception {
+        List<AnnotationDocument> docs = createGenericDocsChangingGoId(5);
+        repository.deleteAll();
+        repository.save(docs);
+        AnnotationRequestBody.GoDescription description = AnnotationRequestBody.GoDescription.builder()
+          .goTerms(new String[]{createGoId(1)})
+          .goUsage(exact ? "exact" : "descendants")
+          .build();
+        AnnotationRequestBody body = and ? AnnotationRequestBody.builder().and(description).build()
+          : AnnotationRequestBody.builder().not(description).build();
+
+        ResultActions response = mockMvc.perform(
+          post(RESOURCE_URL + "/search").contentType(MediaType.APPLICATION_JSON).content(json(body))
+        );
+
+        response.andDo(print())
+          .andExpect(status().isOk())
+          .andExpect(contentTypeToBeJson())
+          .andExpect(totalNumOfResults(expected));
+    }
+
+    private String json(Object object) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.writeValueAsString(object);
     }
 
     // ------------------------------- Helpers -------------------------------

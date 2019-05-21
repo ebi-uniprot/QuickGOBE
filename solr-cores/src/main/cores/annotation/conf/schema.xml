@@ -90,6 +90,7 @@
     <field name="taxonAncestors" type="int" indexed="true" stored="false" multiValued="true" docValues="true"/>
     <field name="withFrom" type="string" indexed="true" stored="true" multiValued="true"/>
     <field name="proteome" type="string" indexed="false" stored="false" multiValued="false"/>
+    <field name="gpRelatedGoIds" type="string" indexed="true" stored="false" multiValued="true" docValues="true"/>
 
     <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
     <!-- Fields that can be used with terms queries:
@@ -141,6 +142,9 @@
 
     <field name="proteome_unsorted" type="lowercase" indexed="true" stored="false" multiValued="false"/>
     <copyField source="proteome" dest="proteome_unsorted"/>
+
+    <field name="gpRelatedGoIds_unsorted" type="string" indexed="true" stored="false" multiValued="true"/>
+    <copyField source="gpRelatedGoIds" dest="gpRelatedGoIds_unsorted"/>
 
     <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
     <!-- Fields that are used specifically for search -->

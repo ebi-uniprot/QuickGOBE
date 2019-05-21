@@ -8,6 +8,7 @@ import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker;
 import uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationMocker;
+import uk.ac.ebi.quickgo.annotation.model.AnnotationRequestBody;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.geneproduct.model.BasicGeneProduct;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.BasicOntology;
 import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
@@ -15,6 +16,8 @@ import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -38,6 +41,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static java.util.Collections.asLifoQueue;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.is;
@@ -49,6 +53,7 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
@@ -56,7 +61,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.INCLUDE_FIELD_PARAM;
 import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.SELECTED_FIELD_PARAM;
+import static uk.ac.ebi.quickgo.annotation.IdGeneratorUtil.createGoId;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.createGenericDocs;
+import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.createGenericDocsChangingGoId;
 import static uk.ac.ebi.quickgo.annotation.controller.DownloadResponseVerifier.nonNullMandatoryFieldsExist;
 import static uk.ac.ebi.quickgo.annotation.controller.DownloadResponseVerifierSelectedFields.selectedFieldsExist;
 import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.*;
@@ -189,6 +196,31 @@ public class AnnotationControllerDownloadIT {
     @Test
     public void canDownloadWithFilterAllAvailableItemsInGpadFormat() throws Exception {
         canDownloadWithFilterAllAvailableItems(GPAD_MEDIA_TYPE);
+    }
+
+    @Test
+    public void canDownloadWhenBodyIsProvidedAsPost() throws Exception {
+        int expectedDownloadCount = 5;
+
+        createGenericDocsChangingGoId(expectedDownloadCount).forEach(this::saveToRepo);
+
+        List<String> expectedIds = Arrays.asList(createGoId(2));
+
+        AnnotationRequestBody.GoDescription description = AnnotationRequestBody.GoDescription.builder()
+          .goTerms(new String[]{createGoId(2)})
+          .goUsage("exact")
+          .build();
+        AnnotationRequestBody body = AnnotationRequestBody.builder().and(description).build();
+
+
+        ResultActions response = mockMvc.perform(
+          post(DOWNLOAD_SEARCH_URL)
+            .header(ACCEPT, GPAD_MEDIA_TYPE)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(new ObjectMapper().writeValueAsString(body))
+            .param(DOWNLOAD_LIMIT_PARAM, Integer.toString(expectedDownloadCount)));
+
+        checkResponse(GPAD_MEDIA_TYPE, response, expectedIds);
     }
 
     @Test

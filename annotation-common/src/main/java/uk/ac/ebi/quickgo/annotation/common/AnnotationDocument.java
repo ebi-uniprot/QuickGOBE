@@ -76,6 +76,9 @@ public class AnnotationDocument implements QuickGODocument {
     @Field(AnnotationFields.DEFAULt_SORT)
     public String defaultSort;
 
+    @Field(AnnotationFields.GP_RELATED_GO_IDS)
+    public List<String> gpRelatedGoIds;
+
     @Override public String getUniqueName() {
         return id;
     }

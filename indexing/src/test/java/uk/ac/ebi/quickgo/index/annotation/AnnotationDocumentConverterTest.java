@@ -16,9 +16,7 @@ import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 import static uk.ac.ebi.quickgo.index.annotation.AnnotationDocumentConverter.DEFAULT_TAXON;
 import static uk.ac.ebi.quickgo.index.annotation.AnnotationMocker.createValidAnnotation;
 import static uk.ac.ebi.quickgo.index.annotation.AnnotationParsingHelper.*;
@@ -60,7 +58,8 @@ public class AnnotationDocumentConverterTest {
                         buildKeyValuesPair(DB_OBJECT_SYMBOL, "moeA5"),
                         buildKeyValuesPair(DB_OBJECT_TYPE, "protein"),
                         buildKeyValuesPair(PROTEOME, "gcrpIso"),
-                        buildKeyValuesPair(TARGET_SET, "BHF-UCL", "Exosome", "KRUK"));
+                        buildKeyValuesPair(TARGET_SET, "BHF-UCL", "Exosome", "KRUK"),
+                        buildKeyValuesPair(GP_RELATED_GO_IDS, "GO:0005886"));
 
         AnnotationDocument doc = converter.process(annotation);
 
@@ -73,6 +72,7 @@ public class AnnotationDocumentConverterTest {
         assertThat(doc.proteome, is("gcrpIso"));
         assertThat(doc.targetSets, contains("BHF-UCL", "Exosome", "KRUK"));
         assertThat(doc.defaultSort, is("9EBI-10043081"));
+        assertThat(doc.gpRelatedGoIds, contains("GO:0005886"));
     }
 
     // interacting taxon
@@ -470,6 +470,60 @@ public class AnnotationDocumentConverterTest {
 
         Assert.assertTrue(doc.defaultSort.startsWith("9"));
         assertThat(doc.defaultSort, is("9" + annotation.dbObjectId));
+    }
+
+
+    // annotation properties: gpRelatedGoIds
+    @Test
+    public void convertsNullAnnotationPropertiesToDefaultGpRelatedGoIdsList() {
+        annotation.annotationProperties = null;
+
+        AnnotationDocument doc = converter.process(annotation);
+
+        assertThat(doc.gpRelatedGoIds, empty());
+    }
+
+    @Test
+    public void convertsNullGpRelatedGoIdsAnnotationPropertiesToDefaultGpRelatedGoIdsList() {
+        String value = null;
+        annotation.annotationProperties = buildKeyValuesPair(GP_RELATED_GO_IDS, value);
+
+        AnnotationDocument doc = converter.process(annotation);
+
+        assertThat(doc.gpRelatedGoIds, empty());
+    }
+
+    @Test
+    public void convertsEmptyGpRelatedGoIdsAnnotationPropertiesToDefaultGpRelatedGoIdsList() {
+        String value = "";
+        annotation.annotationProperties = buildKeyValuesPair(GP_RELATED_GO_IDS, value);
+
+        AnnotationDocument doc = converter.process(annotation);
+
+        assertThat(doc.gpRelatedGoIds, empty());
+    }
+
+    @Test
+    public void convertsInvalidGpRelatedGoIdsAnnotationPropertiesToDefaultGpRelatedGoIdsList() {
+        String value = "go123";
+        annotation.annotationProperties = buildKeyValuesPair(GP_RELATED_GO_IDS, value);
+
+        AnnotationDocument doc = converter.process(annotation);
+
+        assertThat(doc.gpRelatedGoIds, empty());
+    }
+
+    @Test
+    public void convertsMultipleGpRelatedGoIdsAnnotationProperties() {
+        String go1 = "GO:0033014";
+        String go2 = "GO:0005524";
+        String value = go1 + "," + go2;
+        annotation.annotationProperties = buildKeyValuesPair(GP_RELATED_GO_IDS, value);
+
+        AnnotationDocument doc = converter.process(annotation);
+
+        assertThat(doc.gpRelatedGoIds, hasSize(2));
+        assertThat(doc.gpRelatedGoIds, contains(go1, go2));
     }
 
     private String constructGeneProductId(Annotation annotation) {return annotation.db + ":" + annotation.dbObjectId;}

@@ -23,7 +23,7 @@ public class AnnotationMocker {
         annotation.annotationExtension = "occurs_in(CL:1000428)";
         annotation.annotationProperties =
                 "go_evidence=IEA|taxon_id=35758|db_subset=TrEMBL|db_object_symbol=moeA5|db_object_type=protein" +
-                        "|target_set=BHF-UCL,Exosome,KRUK|taxon_lineage=1,2,3,4";
+                        "|target_set=BHF-UCL,Exosome,KRUK|taxon_lineage=1,2,3,4|gp_related_go_ids=GO:1,GO:02";
         return annotation;
     }
 }

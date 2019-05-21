@@ -8,10 +8,7 @@ import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import org.slf4j.Logger;
@@ -73,6 +70,7 @@ class AnnotationDocumentConverter implements ItemProcessor<Annotation, Annotatio
         doc.date = createDateFromString(annotation);
         doc.taxonAncestors = constructTaxonAncestors(propertiesMap.get(TAXON_ANCESTORS));
         doc.proteome = propertiesMap.get(PROTEOME);
+        doc.gpRelatedGoIds = constructGpRelatedGoIds(propertiesMap.get(GP_RELATED_GO_IDS));
 
         return doc;
     }
@@ -129,6 +127,16 @@ class AnnotationDocumentConverter implements ItemProcessor<Annotation, Annotatio
             }
         }
         return singletonList(DEFAULT_TAXON);
+    }
+
+    private List<String> constructGpRelatedGoIds(String rawGpRelatedGoIds) {
+        if (!Strings.isNullOrEmpty(rawGpRelatedGoIds)) {
+            Matcher matcher = RAW_GP_RELATED_GO_IDS_REGEX.matcher(rawGpRelatedGoIds);
+            if (matcher.matches()) {
+                return createNullableStringListFromDelimitedValues(rawGpRelatedGoIds, COMMA);
+            }
+        }
+        return Collections.emptyList();
     }
 
     private List<Integer> createNullableIntegerListFromDelimitedValues(String value, String delimiter) {

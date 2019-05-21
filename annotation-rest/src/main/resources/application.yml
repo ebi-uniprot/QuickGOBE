@@ -83,6 +83,22 @@ search:
         responseClass: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.OntologyRelatives",
         responseConverter: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.DescendantsFilterConverter"
       }
+    - signature: descendants,andGoId,andGoUsageRelationships
+      execution: REST_COMM
+      properties: {
+        ip: "https://wwwdev.ebi.ac.uk",
+        resourceFormat: "/QuickGO/services/ontology/go/terms/{andGoId}/descendants?relations={andGoUsageRelationships}",
+        responseClass: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.OntologyRelatives",
+        responseConverter: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.AndDescendantsFilterConverter"
+      }
+    - signature: descendants,notGoId,notGoUsageRelationships
+      execution: REST_COMM
+      properties: {
+        ip: "https://wwwdev.ebi.ac.uk",
+        resourceFormat: "/QuickGO/services/ontology/go/terms/{notGoId}/descendants?relations={notGoUsageRelationships}",
+        responseClass: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.OntologyRelatives",
+        responseConverter: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.NotDescendantsFilterConverter"
+      }
     - signature: goId,goUsageRelationships,slim
       execution: REST_COMM
       properties: {

@@ -82,13 +82,16 @@ class AnnotationValidator implements Validator<Annotation> {
     private void checkMandatoryPropertiesFieldsExist(Annotation annotation) {
         if (!(PROPS_TAXON_REGEX.matcher(annotation.annotationProperties).find() &&
                       PROPS_DB_OBJECT_TYPE_REGEX.matcher(annotation.annotationProperties).find() &&
-                      PROPS_TAXON_ANCESTORS_REGEX.matcher(annotation.annotationProperties).find())) {
+                      PROPS_TAXON_ANCESTORS_REGEX.matcher(annotation.annotationProperties).find() &&
+                      PROPS_GP_RELATED_GO_IDS_REGEX.matcher(annotation.annotationProperties).find()
+        )) {
             handleFieldPatternMismatchError(
                     "Annotation Properties: required field not found",
                     annotation.annotationProperties,
                     PROPS_TAXON_REGEX.pattern()
                             + " AND " + PROPS_DB_OBJECT_TYPE_REGEX.pattern()
-                            + " AND " + PROPS_TAXON_ANCESTORS_REGEX.pattern(),
+                            + " AND " + PROPS_TAXON_ANCESTORS_REGEX.pattern()
+                            + " AND " + PROPS_GP_RELATED_GO_IDS_REGEX.pattern(),
                     annotation);
         }
     }
