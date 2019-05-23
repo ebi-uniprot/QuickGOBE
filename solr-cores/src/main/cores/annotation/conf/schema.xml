@@ -143,7 +143,7 @@
     <field name="proteome_unsorted" type="lowercase" indexed="true" stored="false" multiValued="false"/>
     <copyField source="proteome" dest="proteome_unsorted"/>
 
-    <field name="gpRelatedGoIds_unsorted" type="string" indexed="true" stored="false" multiValued="true"/>
+    <field name="gpRelatedGoIds_unsorted" type="lowercase" indexed="true" stored="false" multiValued="true"/>
     <copyField source="gpRelatedGoIds" dest="gpRelatedGoIds_unsorted"/>
 
     <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
