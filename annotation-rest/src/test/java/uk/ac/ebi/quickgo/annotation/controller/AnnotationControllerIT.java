@@ -2,8 +2,24 @@ package uk.ac.ebi.quickgo.annotation.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang.StringUtils;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.client.RestOperations;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.context.WebApplicationContext;
 import uk.ac.ebi.quickgo.annotation.AnnotationREST;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
@@ -18,22 +34,12 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-import org.apache.commons.lang.StringUtils;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -46,9 +52,7 @@ import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.E
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.createGenericDocsChangingGoId;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.*;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.ResponseItem.responseItem;
-import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.DEFAULT_ENTRIES_PER_PAGE;
-import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.MAX_PAGE_NUMBER;
-import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.MAX_PAGE_RESULTS;
+import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.*;
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.SELECT_ALL_WHERE_FIELD_IS_NOT_EMPTY;
 
 /**
@@ -82,6 +86,9 @@ public class AnnotationControllerIT {
     public static final String EXACT_USAGE = "exact";
     private MockMvc mockMvc;
     private List<AnnotationDocument> genericDocs;
+    private MockRestServiceServer mockRestServiceServer;
+    @Autowired
+    private RestOperations restOperations;
     @Autowired
     private WebApplicationContext webApplicationContext;
 
@@ -2003,6 +2010,7 @@ public class AnnotationControllerIT {
 
     @Test
     public void advanceFilterNotGoId_descendents_defaultRelations() throws Exception {
+        mockRestToOntologyForDescendants();
         advanceFilterTest(20, false, false);
     }
 
@@ -2013,7 +2021,18 @@ public class AnnotationControllerIT {
 
     @Test
     public void advanceFilterAndGoId_descendents_defaultRelations() throws Exception {
+        mockRestToOntologyForDescendants();
         advanceFilterTest(5, true, false);
+    }
+
+    private void mockRestToOntologyForDescendants(){
+        mockRestServiceServer = MockRestServiceServer.createServer((RestTemplate) restOperations);
+
+        String term = createGoId(1);
+        String url = String.format("https://localhost/QuickGO/services/ontology/go/terms/%s/descendants?relations=is_a,part_of,occurs_in",term);
+
+        mockRestServiceServer.expect(requestTo(url)).andExpect(method(HttpMethod.GET))
+          .andRespond(withSuccess("{\"results\": [{\"descendants\": [\"GO:0000001\"]}]}", MediaType.APPLICATION_JSON));
     }
 
     @Test
@@ -2027,7 +2046,7 @@ public class AnnotationControllerIT {
         repository.save(docs);
         AnnotationRequestBody.GoDescription description = AnnotationRequestBody.GoDescription.builder()
           .goTerms(new String[]{createGoId(1)})
-          .goUsage(exact ? "exact" : "descendants")
+          .goUsage(exact ? "exact" : DESCENDANTS)
           .build();
         AnnotationRequestBody body = and ? AnnotationRequestBody.builder().and(description).build()
           : AnnotationRequestBody.builder().not(description).build();
