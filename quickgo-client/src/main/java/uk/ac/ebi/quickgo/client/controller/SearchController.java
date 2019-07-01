@@ -42,6 +42,7 @@ import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.search;
 @RestController
 @RequestMapping(value = "/internal/search")
 public class SearchController {
+    private static final String COLLECTION = "ontology";
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private final SearchService<OntologyTerm> ontologySearchService;
@@ -86,6 +87,7 @@ public class SearchController {
 
         DefaultSearchQueryTemplate.Builder requestBuilder = requestTemplate.newBuilder()
                 .setQuery(request.createQuery())
+                .setCollection(COLLECTION)
                 .addFacets(request.getFacet() == null ? null : Arrays.asList(request.getFacet()))
                 .addFilters(convertFilterRequestsToQueries(request.createFilterRequests()))
                 .useHighlighting(request.isHighlighting())

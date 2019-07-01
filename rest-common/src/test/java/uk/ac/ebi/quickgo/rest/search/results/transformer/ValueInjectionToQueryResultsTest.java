@@ -11,9 +11,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -40,8 +40,6 @@ public class ValueInjectionToQueryResultsTest {
 
     @Before
     public void setup() {
-        when(mockGoNameInjector.getId()).thenReturn(GO_NAME_REQUEST);
-        when(mockTaxonNameInjector.getId()).thenReturn(TAXON_NAME_REQUEST);
         requiredInjectors.add(mockGoNameInjector);
         requiredInjectors.add(mockTaxonNameInjector);
         results = createMockedAnnotationList(2);

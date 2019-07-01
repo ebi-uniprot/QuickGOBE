@@ -29,7 +29,7 @@ search:
           responseConverter: "uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.SlimmingFilterConverter"
         }
 model:
-  repo2domainFieldNameTransformations:
+  repo-to-domain-field-name-transformations:
     transformations: {
       goId_join: goId
     }

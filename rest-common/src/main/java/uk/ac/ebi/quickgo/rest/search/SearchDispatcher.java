@@ -321,6 +321,7 @@ public final class SearchDispatcher {
             int nextPageSize) {
         DefaultSearchQueryTemplate.Builder queryRequestBuilder = queryTemplate.newBuilder()
                 .setQuery(queryRequest.getQuery())
+                .setCollection(queryRequest.getCollection())
                 .addFilters(queryRequest.getFilters())
                 .addFacets(queryRequest.getFacets().stream().map(AbstractField::getField).collect(Collectors.toList()))
                 .setAggregate(queryRequest.getAggregate())

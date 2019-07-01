@@ -1,18 +1,18 @@
 package uk.ac.ebi.quickgo.index.annotation.coterms;
 
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.batch.item.ItemProcessor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.batch.item.ItemProcessor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -28,7 +28,7 @@ import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.c
  * Created with IntelliJ IDEA.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {CoTermsConfig.class})
+@SpringBootTest(classes = {CoTermsConfig.class})
 @DirtiesContext(classMode = AFTER_EACH_TEST_METHOD)
 public class CoTermsProcessingAndCalculationIT {
 

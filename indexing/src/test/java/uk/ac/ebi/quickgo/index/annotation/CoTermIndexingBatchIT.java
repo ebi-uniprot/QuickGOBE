@@ -1,11 +1,5 @@
 package uk.ac.ebi.quickgo.index.annotation;
 
-import uk.ac.ebi.quickgo.common.store.BasicTemporaryFolder;
-import uk.ac.ebi.quickgo.index.annotation.coterms.CoTermsConfigProperties;
-import uk.ac.ebi.quickgo.index.common.JobTestRunnerConfig;
-
-import java.util.List;
-import java.util.stream.Collectors;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,16 +8,21 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationContextLoader;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit4.SpringRunner;
+import uk.ac.ebi.quickgo.common.store.BasicTemporaryFolder;
+import uk.ac.ebi.quickgo.index.annotation.coterms.CoTermsConfigProperties;
+import uk.ac.ebi.quickgo.index.common.JobTestRunnerConfig;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
-import static org.springframework.test.util.MatcherAssertionErrors.assertThat;
 import static uk.ac.ebi.quickgo.index.annotation.CoTermIndexingConfig.ANNOTATION_READING_STEP_NAME;
 import static uk.ac.ebi.quickgo.index.annotation.CoTermIndexingConfig.COTERM_INDEXING_JOB_NAME;
 import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermsConfig.CO_TERM_ALL_SUMMARIZATION_STEP;
@@ -35,10 +34,9 @@ import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermsConfig.CO_TERM_M
  * Created 22/04/16
  * @author Edd
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(
-        classes = {CoTermIndexingBatchIT.TestConfig.class, CoTermIndexingConfig.class, JobTestRunnerConfig.class},
-        loader = SpringApplicationContextLoader.class)
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = {CoTermIndexingBatchIT.TestConfig.class, CoTermIndexingConfig.class,
+  JobTestRunnerConfig.class})
 public class CoTermIndexingBatchIT {
 
     @ClassRule

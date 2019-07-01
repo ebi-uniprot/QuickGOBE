@@ -24,6 +24,7 @@ import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.createFirstCursorPa
  */
 public class SolrQueryConverterTest {
     private static final String REQUEST_HANDLER_NAME = "/select";
+    private static final String COLLECTION = "collection";
     private static final Set<String> WILDCARD_COMPATIBLE_FIELDS = new HashSet<>();
 
     private SolrQueryConverter converter;
@@ -62,7 +63,7 @@ public class SolrQueryConverterTest {
     public void solrQueryReferencesCorrectRequestHandlerName() throws Exception {
         QuickGOQuery fieldQuery = createBasicQuery();
 
-        QueryRequest request = new QueryRequest.Builder(fieldQuery).build();
+        QueryRequest request = new QueryRequest.Builder(fieldQuery, COLLECTION).build();
 
         SolrQuery query = converter.convert(request);
 
@@ -76,7 +77,7 @@ public class SolrQueryConverterTest {
         int currentPage = 2;
         int pageSize = 25;
 
-        QueryRequest request = new QueryRequest.Builder(fieldQuery)
+        QueryRequest request = new QueryRequest.Builder(fieldQuery, COLLECTION)
                 .setPage(new RegularPage(currentPage, pageSize))
                 .build();
 
@@ -93,7 +94,7 @@ public class SolrQueryConverterTest {
         String facetField1 = "facet1";
         String facetField2 = "facet2";
 
-        QueryRequest request = new QueryRequest.Builder(fieldQuery)
+        QueryRequest request = new QueryRequest.Builder(fieldQuery, COLLECTION)
                 .addFacetField(facetField1)
                 .addFacetField(facetField2)
                 .build();
@@ -111,7 +112,7 @@ public class SolrQueryConverterTest {
         String filterValue = "filterValue1";
         QuickGOQuery filterFieldQuery = QuickGOQuery.createQuery(filterField, filterValue);
 
-        QueryRequest request = new QueryRequest.Builder(fieldQuery)
+        QueryRequest request = new QueryRequest.Builder(fieldQuery, COLLECTION)
                 .addQueryFilter(filterFieldQuery)
                 .build();
 
@@ -124,7 +125,7 @@ public class SolrQueryConverterTest {
     public void defaultConvertQueryRequestDoesNotUseHighlighting() {
         QuickGOQuery fieldQuery = createBasicQuery();
 
-        QueryRequest request = new QueryRequest.Builder(fieldQuery).build();
+        QueryRequest request = new QueryRequest.Builder(fieldQuery, COLLECTION).build();
 
         SolrQuery query = converter.convert(request);
 
@@ -136,7 +137,7 @@ public class SolrQueryConverterTest {
         QuickGOQuery fieldQuery = createBasicQuery();
 
         QueryRequest request = new QueryRequest
-                .Builder(fieldQuery)
+                .Builder(fieldQuery, COLLECTION)
                 .build();
 
         SolrQuery query = converter.convert(request);
@@ -151,7 +152,7 @@ public class SolrQueryConverterTest {
         String highlightedField = "highlightedField";
 
         QueryRequest request = new QueryRequest
-                .Builder(fieldQuery)
+                .Builder(fieldQuery, COLLECTION)
                 .addHighlightedField(highlightedField)
                 .build();
 
@@ -168,7 +169,7 @@ public class SolrQueryConverterTest {
         String projectedField = "projectedField";
 
         QueryRequest request = new QueryRequest
-                .Builder(fieldQuery)
+                .Builder(fieldQuery, COLLECTION)
                 .addProjectedField(projectedField)
                 .build();
 
@@ -185,7 +186,7 @@ public class SolrQueryConverterTest {
         String projectedField2 = "projectedField2";
 
         QueryRequest request = new QueryRequest
-                .Builder(fieldQuery)
+                .Builder(fieldQuery, COLLECTION)
                 .addProjectedField(projectedField1)
                 .addProjectedField(projectedField2)
                 .build();
@@ -200,7 +201,7 @@ public class SolrQueryConverterTest {
         QuickGOQuery fieldQuery = createBasicQuery();
 
         QueryRequest request = new QueryRequest
-                .Builder(fieldQuery)
+                .Builder(fieldQuery, COLLECTION)
                 .build();
 
         SolrQuery query = converter.convert(request);
@@ -214,7 +215,7 @@ public class SolrQueryConverterTest {
 
         int pageSize = 10;
         QueryRequest request = new QueryRequest
-                .Builder(fieldQuery)
+                .Builder(fieldQuery, COLLECTION)
                 .setPage(createFirstCursorPage(pageSize))
                 .build();
 
@@ -232,7 +233,7 @@ public class SolrQueryConverterTest {
         int pageSize = 10;
         String cursor = "fakeCursor";
         QueryRequest request = new QueryRequest
-                .Builder(fieldQuery)
+                .Builder(fieldQuery, COLLECTION)
                 .setPage(createCursorPage(cursor, pageSize))
                 .build();
 
@@ -248,7 +249,7 @@ public class SolrQueryConverterTest {
         QuickGOQuery fieldQuery = createBasicQuery();
 
         QueryRequest request = new QueryRequest
-                .Builder(fieldQuery)
+                .Builder(fieldQuery, COLLECTION)
                 .build();
 
         SolrQuery query = converter.convert(request);
@@ -263,7 +264,7 @@ public class SolrQueryConverterTest {
         String sortField = "field";
         SortCriterion.SortOrder sortOrder = SortCriterion.SortOrder.ASC;
         QueryRequest request = new QueryRequest
-                .Builder(fieldQuery)
+                .Builder(fieldQuery, COLLECTION)
                 .addSortCriterion(sortField, sortOrder)
                 .build();
 
@@ -285,7 +286,7 @@ public class SolrQueryConverterTest {
         SortCriterion.SortOrder sortOrder2 = SortCriterion.SortOrder.ASC;
 
         QueryRequest request = new QueryRequest
-                .Builder(fieldQuery)
+                .Builder(fieldQuery, COLLECTION)
                 .addSortCriterion(sortField0, sortOrder0)
                 .addSortCriterion(sortField1, sortOrder1)
                 .addSortCriterion(sortField2, sortOrder2)

@@ -8,7 +8,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -58,7 +58,6 @@ public class DbXRefEntityValidationTest {
 		when(uniprotEntity.getDatabase()).thenReturn("UniProtKB");
 		when(uniprotEntity.getEntityType()).thenReturn("PR:000000001");
 		when(uniprotEntity.matches("A0A000")).thenReturn(true);
-		when(uniprotEntity.matches("999999")).thenReturn(false);
 
 		dbXrefEntities = DbXRefEntityValidation.createWithData(listOfFormats);
 	}

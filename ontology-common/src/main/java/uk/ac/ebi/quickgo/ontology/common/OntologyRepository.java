@@ -3,8 +3,11 @@ package uk.ac.ebi.quickgo.ontology.common;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.solr.repository.Pivot;
 import org.springframework.data.solr.repository.Query;
 import org.springframework.data.solr.repository.SolrCrudRepository;
+
+import static org.springframework.data.solr.core.query.Query.Operator.OR;
 
 /**
  * Ontology repository interface exposing methods for performing searches over its contents.
@@ -27,8 +30,11 @@ public interface OntologyRepository extends SolrCrudRepository<OntologyDocument,
             fields = {OntologyFields.ID, OntologyFields.NAME, OntologyFields.IS_OBSOLETE, OntologyFields.COMMENT,
                     OntologyFields.ASPECT, OntologyFields.ANCESTOR,
                     OntologyFields.USAGE, OntologyFields.SYNONYM, OntologyFields.DEFINITION,
-                    OntologyFields.DEFINITION_XREFS})
+                    OntologyFields.DEFINITION_XREFS, OntologyFields.ID_LOWERCASE})
     List<OntologyDocument> findCoreAttrByTermId(String idType, List<String> ids);
+
+    @Query(value = "id_lowercase:(GO\\:0000001 GO\\:0000002)", defaultOperator = OR)
+    List<OntologyDocument> findByOntologyTypeAndIdOrSecondaryIds(String idType, List<String> id, List<String> ids);
 
     // history
     @Query(value = QUERY_ONTOLOGY_TYPE_AND_ID,

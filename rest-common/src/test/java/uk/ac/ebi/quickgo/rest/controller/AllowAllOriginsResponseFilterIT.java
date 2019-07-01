@@ -4,7 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -17,9 +17,9 @@ import org.springframework.web.context.WebApplicationContext;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.springframework.http.HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static uk.ac.ebi.quickgo.rest.controller.AllowAllOriginsResponseFilter.ALLOW_ALL_ORIGINS;
 import static uk.ac.ebi.quickgo.rest.controller.FakeRESTApp.RESOURCE_1_URL;
 
@@ -31,7 +31,7 @@ import static uk.ac.ebi.quickgo.rest.controller.FakeRESTApp.RESOURCE_1_URL;
  */
 @ActiveProfiles("allow-origins-integration-test")
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = {FakeRESTApp.class})
+@SpringBootTest(classes = {FakeRESTApp.class})
 @WebAppConfiguration
 public class AllowAllOriginsResponseFilterIT {
     @Autowired

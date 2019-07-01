@@ -1,12 +1,8 @@
 package uk.ac.ebi.quickgo.rest.search;
 
-import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
-
-import java.util.stream.Stream;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.runner.RunWith;
-import org.mockito.internal.matchers.GreaterOrEqual;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -17,6 +13,9 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
+
+import java.util.stream.Stream;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -102,7 +101,7 @@ public abstract class SearchControllerSetup {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.pageInfo.resultsPerPage").value(limit))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.pageInfo.current").value(pageNum))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.pageInfo.total").value(new GreaterOrEqual<>(pageNum)));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.pageInfo.total").value(pageNum));
     }
 
     /**

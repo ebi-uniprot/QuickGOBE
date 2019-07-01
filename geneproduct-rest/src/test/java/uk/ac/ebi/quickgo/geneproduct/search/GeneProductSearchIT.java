@@ -1,16 +1,15 @@
 package uk.ac.ebi.quickgo.geneproduct.search;
 
+import org.apache.http.HttpStatus;
+import org.junit.Before;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import uk.ac.ebi.quickgo.geneproduct.GeneProductREST;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductDocument;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepository;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductType;
 import uk.ac.ebi.quickgo.rest.search.SearchControllerSetup;
-
-import org.apache.http.HttpStatus;
-import org.junit.Before;
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
@@ -19,7 +18,7 @@ import static uk.ac.ebi.quickgo.geneproduct.GeneProductParameters.*;
 import static uk.ac.ebi.quickgo.geneproduct.common.common.GeneProductDocMocker.createDocWithId;
 import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.MAX_PAGE_NUMBER;
 
-@SpringApplicationConfiguration(classes = {GeneProductREST.class})
+@SpringBootTest(classes = {GeneProductREST.class})
 public class GeneProductSearchIT extends SearchControllerSetup {
     @Autowired
     private GeneProductRepository repository;

@@ -1,21 +1,19 @@
 package uk.ac.ebi.quickgo.index;
 
-import uk.ac.ebi.quickgo.common.QuickGODocument;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.mockito.stubbing.Stubber;
+import org.springframework.batch.item.ItemWriter;
 
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
-import org.mockito.stubbing.Stubber;
-import org.springframework.batch.item.ItemWriter;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
-import static org.springframework.test.util.MatcherAssertionErrors.assertThat;
 
 /**
  * Utility methods to help the testing of the retry logic associated with writing

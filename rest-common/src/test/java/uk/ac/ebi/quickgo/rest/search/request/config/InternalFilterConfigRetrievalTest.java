@@ -10,7 +10,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -37,8 +37,6 @@ public class InternalFilterConfigRetrievalTest {
 
     @Before
     public void setUp() throws Exception {
-        when(searchableField.isSearchable(SEARCHABLE_FIELD_NAME)).thenReturn(true);
-
         when(searchableField.searchableFields()).thenReturn(Stream.of(SEARCHABLE_FIELD_NAME));
         config = new InternalFilterConfigRetrieval(searchableField);
     }

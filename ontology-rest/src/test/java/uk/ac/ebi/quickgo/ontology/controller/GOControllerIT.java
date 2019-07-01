@@ -83,7 +83,7 @@ public class GOControllerIT extends OBOControllerIT {
 
         expectBasicFieldsInResults(response, asList(GO_0000001, GO_0000002))
                 .andExpect(jsonPath("$.results.*.blacklist", hasSize(2)))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(status().isOk());
     }
 
@@ -93,7 +93,7 @@ public class GOControllerIT extends OBOControllerIT {
 
         expectBasicFieldsInResults(response, singletonList(GO_0000001))
                 .andExpect(jsonPath("$.results.*.goDiscussions", hasSize(1)))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(status().isOk());
     }
 
@@ -118,7 +118,7 @@ public class GOControllerIT extends OBOControllerIT {
 
         response.andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(jsonPath("$.numberOfHits").value(1));
 
         expectIdentitySlims(response, singletonList(GO_SLIM1));
@@ -131,7 +131,7 @@ public class GOControllerIT extends OBOControllerIT {
 
         response.andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(jsonPath("$.numberOfHits").value(2));
 
         expectSlimInfo(response, GO_SLIM_CHILD1, singletonList(GO_SLIM1));
@@ -145,7 +145,7 @@ public class GOControllerIT extends OBOControllerIT {
 
         response.andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(jsonPath("$.numberOfHits").value(2));
 
         expectSlimInfo(response, GO_SLIM_CHILD1, singletonList(GO_SLIM1));
@@ -159,7 +159,7 @@ public class GOControllerIT extends OBOControllerIT {
 
         response.andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(jsonPath("$.numberOfHits").value(2));
         expectSlimInfo(response, GO_SLIM_CHILD2, singletonList(GO_SLIM2));
         expectIdentitySlims(response, singletonList(GO_SLIM2));
@@ -169,7 +169,7 @@ public class GOControllerIT extends OBOControllerIT {
 
         response.andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(jsonPath("$.numberOfHits").value(2));
         expectSlimInfo(response, GO_SLIM_CHILD2, singletonList(GO_SLIM3));
         expectIdentitySlims(response, singletonList(GO_SLIM3));
@@ -182,7 +182,7 @@ public class GOControllerIT extends OBOControllerIT {
 
         response.andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(jsonPath("$.numberOfHits").value(3));
 
         expectSlimInfo(response, GO_SLIM_CHILD3, singletonList(GO_SLIM4));
@@ -197,7 +197,7 @@ public class GOControllerIT extends OBOControllerIT {
 
         response.andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(jsonPath("$.numberOfHits").value(4));
 
         expectSlimInfo(response, GO_SLIM_CHILD5, asList(GO_SLIM5, GO_SLIM6));
@@ -213,7 +213,7 @@ public class GOControllerIT extends OBOControllerIT {
 
         response.andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(jsonPath("$.numberOfHits").value(1));
 
         expectSlimInfo(response, GO_SLIM_CHILD5, asList(GO_SLIM5, GO_SLIM6));
@@ -227,7 +227,7 @@ public class GOControllerIT extends OBOControllerIT {
 
         response.andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(jsonPath("$.numberOfHits").value(0));
     }
 
@@ -305,7 +305,7 @@ public class GOControllerIT extends OBOControllerIT {
 
         response.andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(jsonPath("$.numberOfHits").value(1));
 
         expectIdentitySlims(response, asList(GO_SLIM1, GO_SLIM1));
@@ -318,7 +318,7 @@ public class GOControllerIT extends OBOControllerIT {
 
         response.andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(jsonPath("$.numberOfHits").value(2));
         expectSlimInfo(response, GO_SLIM_CHILD8, asList(GO_SLIM8));
     }
@@ -330,7 +330,7 @@ public class GOControllerIT extends OBOControllerIT {
 
         response.andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(jsonPath("$.numberOfHits").value(2));
         expectSlimInfo(response, GO_SLIM_CHILD9, asList(GO_SLIM9));
     }

@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.geneproduct.common;
 
+import org.springframework.data.solr.core.mapping.SolrDocument;
 import uk.ac.ebi.quickgo.common.QuickGODocument;
 
 import java.util.List;
@@ -13,6 +14,7 @@ import static uk.ac.ebi.quickgo.geneproduct.common.GeneProductFields.*;
  *
  * @author Ricardo antunes
  */
+@SolrDocument(collection = "geneproduct")
 public class GeneProductDocument implements QuickGODocument {
     @Field(ID)
     public String id;

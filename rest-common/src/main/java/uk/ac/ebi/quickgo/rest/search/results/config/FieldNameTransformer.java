@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
  * @author Edd
  */
 @Component
-@ConfigurationProperties(prefix = "model.repo2domainFieldNameTransformations")
+@ConfigurationProperties(prefix = "model.repo-to-domain-field-name-transformations")
 public class FieldNameTransformer {
     private Map<String, String> transformations;
 

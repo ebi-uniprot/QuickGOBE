@@ -12,7 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -160,8 +160,6 @@ public class SolrQueryResultHighlightingConverterTest {
 
         SolrDocument doc1 = new SolrDocument();
         doc1.put("id", ID1);
-
-        when(results.stream()).thenReturn(Stream.of(doc1));
 
         List<DocHighlight> docHighlights = converter.convertResultHighlighting(results, new HashMap<>());
 

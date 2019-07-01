@@ -18,6 +18,7 @@ public class QueryRequest {
     private final String highlightStartDelim;
     private final String highlightEndDelim;
     private final List<SortCriterion> sortCriteria;
+    private final String collection;
 
     private QueryRequest(Builder builder) {
         this.query = builder.query;
@@ -30,6 +31,7 @@ public class QueryRequest {
         this.highlightStartDelim = builder.highlightStartDelim;
         this.highlightEndDelim = builder.highlightEndDelim;
         this.sortCriteria = new ArrayList<>(builder.sortCriteria);
+        this.collection = builder.collection;
     }
 
     public QuickGOQuery getQuery() {
@@ -76,6 +78,10 @@ public class QueryRequest {
         return sortCriteria;
     }
 
+    public String getCollection() {
+        return collection;
+    }
+
     public static class Builder {
         private QuickGOQuery query;
         private Page page;
@@ -87,11 +93,14 @@ public class QueryRequest {
         private String highlightStartDelim;
         private String highlightEndDelim;
         private Set<SortCriterion> sortCriteria;
+        private String collection;
 
-        public Builder(QuickGOQuery query) {
+        public Builder(QuickGOQuery query, String collection) {
             Preconditions.checkArgument(query != null, "Query cannot be null");
+            Preconditions.checkArgument(collection != null && !collection.isEmpty(), "Collection cannot be null");
 
             this.query = query;
+            this.collection = collection;
             facets = new LinkedHashSet<>();
             filters = new LinkedHashSet<>();
             sortCriteria = new LinkedHashSet<>();
@@ -195,6 +204,9 @@ public class QueryRequest {
                 that.highlightEndDelim != null) {
             return false;
         }
+        if (collection != null ? !collection.equals(that.collection) : that.collection != null) {
+            return false;
+        }
         return sortCriteria != null ? sortCriteria.equals(that.sortCriteria) : that.sortCriteria == null;
     }
 
@@ -209,6 +221,7 @@ public class QueryRequest {
         result = 31 * result + (highlightStartDelim != null ? highlightStartDelim.hashCode() : 0);
         result = 31 * result + (highlightEndDelim != null ? highlightEndDelim.hashCode() : 0);
         result = 31 * result + (sortCriteria != null ? sortCriteria.hashCode() : 0);
+        result = 31 * result + (collection != null ? collection.hashCode() : 0);
         return result;
     }
 
@@ -224,6 +237,7 @@ public class QueryRequest {
                 ", highlightStartDelim='" + highlightStartDelim + '\'' +
                 ", highlightEndDelim='" + highlightEndDelim + '\'' +
                 ", sortCriteria=" + sortCriteria +
+                ", collection='" + collection + '\'' +
                 '}';
     }
 

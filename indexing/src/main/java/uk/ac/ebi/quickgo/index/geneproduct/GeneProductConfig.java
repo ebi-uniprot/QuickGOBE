@@ -97,7 +97,7 @@ public class GeneProductConfig {
                     @Override public void beforeJob(JobExecution jobExecution) {}
 
                     @Override public void afterJob(JobExecution jobExecution) {
-                        geneProductTemplate.commit();
+                        geneProductTemplate.commit("geneproduct");
                     }
                 })
                 .build();

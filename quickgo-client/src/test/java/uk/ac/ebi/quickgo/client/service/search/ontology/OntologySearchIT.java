@@ -1,20 +1,19 @@
 package uk.ac.ebi.quickgo.client.service.search.ontology;
 
+import org.apache.http.HttpStatus;
+import org.junit.Before;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import uk.ac.ebi.quickgo.client.QuickGOREST;
 import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
 import uk.ac.ebi.quickgo.ontology.common.OntologyType;
 import uk.ac.ebi.quickgo.rest.search.SearchControllerSetup;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import org.apache.http.HttpStatus;
-import org.junit.Before;
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
@@ -25,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static uk.ac.ebi.quickgo.ontology.common.OntologyFields.Facetable;
 import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.MAX_PAGE_NUMBER;
 
-@SpringApplicationConfiguration(classes = {QuickGOREST.class})
+@SpringBootTest(classes = {QuickGOREST.class})
 public class OntologySearchIT extends SearchControllerSetup {
     private static final String ONTOLOGY_RESOURCE_URL = "/internal/search/ontology";
 
@@ -399,14 +398,14 @@ public class OntologySearchIT extends SearchControllerSetup {
     }
 
     private void saveToRepository(OntologyDocument... documents) {
-        repository.save(asList(documents));
+        repository.saveAll(asList(documents));
     }
 
     private void saveNDocs(int n) {
         List<OntologyDocument> documents = IntStream.range(1, n + 1)
                 .mapToObj(i -> createGODoc(String.valueOf(i), "name " + n))
                 .collect(Collectors.toList());
-        repository.save(documents);
+        repository.saveAll(documents);
     }
 
     private OntologyDocument createGODoc(String id, String name) {

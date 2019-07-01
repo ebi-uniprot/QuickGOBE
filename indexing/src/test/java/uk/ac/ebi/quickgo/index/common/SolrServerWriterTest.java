@@ -4,12 +4,12 @@ import uk.ac.ebi.quickgo.common.QuickGODocument;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrClient;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.mockito.Mockito.verify;
 
@@ -20,7 +20,7 @@ import static org.mockito.Mockito.verify;
 @RunWith(MockitoJUnitRunner.class)
 public class SolrServerWriterTest {
     @Mock
-    private SolrServer solrServer;
+    private SolrClient solrServer;
     private SolrServerWriter<QuickGODocument> solrServerWriter;
 
     @Before

@@ -1,5 +1,17 @@
 package uk.ac.ebi.quickgo.rest.search.request.config;
 
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.ac.ebi.quickgo.common.SearchableField;
 import uk.ac.ebi.quickgo.rest.search.request.FilterUtil;
 
@@ -7,19 +19,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.test.ConfigFileApplicationContextInitializer;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -27,8 +26,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static uk.ac.ebi.quickgo.rest.search.request.config.FilterConfig.ExecutionType;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = ExternalRequestConfigRetrievalIT.TestApplication.class,
-        initializers = ConfigFileApplicationContextInitializer.class)
+@SpringBootTest(classes = ExternalRequestConfigRetrievalIT.TestApplication.class)
 @ActiveProfiles(profiles = {"ExternalFilterExecutionConfigIT"})
 public class ExternalRequestConfigRetrievalIT {
     @Configuration

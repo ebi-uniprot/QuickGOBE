@@ -22,6 +22,7 @@ import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.createFirstCursorPa
  * @author Edd
  */
 public class DefaultSearchQueryTemplateTest {
+    private static final String COLLECTION = "collection";
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
@@ -278,6 +279,7 @@ public class DefaultSearchQueryTemplateTest {
         QueryRequest request = defaultSearchQueryTemplate
                 .newBuilder()
                 .setQuery(new AllQuery())
+                .setCollection(COLLECTION)
                 .build();
         assertThat(request.getPage(), is(cursorPage));
     }
@@ -289,7 +291,7 @@ public class DefaultSearchQueryTemplateTest {
 
     private DefaultSearchQueryTemplate.Builder createBuilder() {
         DefaultSearchQueryTemplate.Builder builder = defaultSearchQueryTemplate.newBuilder();
-        builder.setQuery(this.query);
+        builder.setQuery(this.query).setCollection(COLLECTION);
         return builder;
     }
 }

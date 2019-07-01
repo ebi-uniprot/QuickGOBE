@@ -8,17 +8,13 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.http.HttpMethod;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.client.RestOperations;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
 import uk.ac.ebi.quickgo.annotation.AnnotationREST;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
@@ -37,9 +33,6 @@ import java.util.stream.Stream;
 
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -63,7 +56,7 @@ import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.SELECT_ALL_WHERE_
  * Created with IntelliJ IDEA.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = {AnnotationREST.class})
+@SpringBootTest(classes = {AnnotationREST.class})
 @WebAppConfiguration
 public class AnnotationControllerIT {
 
@@ -86,9 +79,6 @@ public class AnnotationControllerIT {
     public static final String EXACT_USAGE = "exact";
     private MockMvc mockMvc;
     private List<AnnotationDocument> genericDocs;
-    private MockRestServiceServer mockRestServiceServer;
-    @Autowired
-    private RestOperations restOperations;
     @Autowired
     private WebApplicationContext webApplicationContext;
 
@@ -104,7 +94,7 @@ public class AnnotationControllerIT {
                 .build();
 
         genericDocs = createGenericDocs(NUMBER_OF_GENERIC_DOCS);
-        repository.save(genericDocs);
+        repository.saveAll(genericDocs);
     }
 
     @Test
@@ -389,7 +379,7 @@ public class AnnotationControllerIT {
 
         List<AnnotationDocument> documents =
                 createDocsWithTaxonAncestors(asList(taxonId, parentTaxonId, grandParentTaxonId));
-        repository.save(documents);
+        repository.saveAll(documents);
 
         String[] expectedGPIds = asArray(transformDocs(documents, d -> d.geneProductId));
 
@@ -420,7 +410,7 @@ public class AnnotationControllerIT {
         List<AnnotationDocument> documents =
                 createDocsWithTaxonAncestors(asList(taxonId1, parentTaxonId1, grandParentTaxonId1));
         documents.addAll(createDocsWithTaxonAncestors(asList(taxonId2, parentTaxonId2, grandParentTaxonId2)));
-        repository.save(documents);
+        repository.saveAll(documents);
 
         Integer[] expectedTaxonIds = {taxonId1,
                 parentTaxonId1,
@@ -461,7 +451,7 @@ public class AnnotationControllerIT {
 
         List<AnnotationDocument> documents =
                 createDocsWithTaxonAncestors(asList(taxonId, parentTaxonId, grandParentTaxonId));
-        repository.save(documents);
+        repository.saveAll(documents);
 
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search")
@@ -1113,7 +1103,7 @@ public class AnnotationControllerIT {
         int totalEntries = 60;
 
         repository.deleteAll();
-        repository.save(createGenericDocs(totalEntries));
+        repository.saveAll(createGenericDocs(totalEntries));
 
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search")
@@ -1164,7 +1154,7 @@ public class AnnotationControllerIT {
 
         int existingPages = 4;
         int resultsPerPage = 10;
-        repository.save(createGenericDocs(resultsPerPage * existingPages));
+        repository.saveAll(createGenericDocs(resultsPerPage * existingPages));
 
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search")
@@ -1180,7 +1170,7 @@ public class AnnotationControllerIT {
         repository.deleteAll();
 
         int docsNecessaryToForcePagination = MAX_PAGE_RESULTS + 1;
-        repository.save(createGenericDocs(docsNecessaryToForcePagination));
+        repository.saveAll(createGenericDocs(docsNecessaryToForcePagination));
 
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search")
@@ -1198,7 +1188,7 @@ public class AnnotationControllerIT {
         int pageNumWhichIsTooHigh = totalEntries;
 
         repository.deleteAll();
-        repository.save(createGenericDocs(totalEntries));
+        repository.saveAll(createGenericDocs(totalEntries));
 
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search")
@@ -1787,8 +1777,8 @@ public class AnnotationControllerIT {
         for (AnnotationDocument doc : docsWithoutExtensions) {
             doc.extensions = null;
         }
-        repository.save(docsWithExtensions);
-        repository.save(docsWithoutExtensions);
+        repository.saveAll(docsWithExtensions);
+        repository.saveAll(docsWithoutExtensions);
 
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(EXTENSION_PARAM.getName(),
                                                                                      SELECT_ALL_WHERE_FIELD_IS_NOT_EMPTY));
@@ -2010,7 +2000,6 @@ public class AnnotationControllerIT {
 
     @Test
     public void advanceFilterNotGoId_descendents_defaultRelations() throws Exception {
-        mockRestToOntologyForDescendants();
         advanceFilterTest(20, false, false);
     }
 
@@ -2021,18 +2010,7 @@ public class AnnotationControllerIT {
 
     @Test
     public void advanceFilterAndGoId_descendents_defaultRelations() throws Exception {
-        mockRestToOntologyForDescendants();
         advanceFilterTest(5, true, false);
-    }
-
-    private void mockRestToOntologyForDescendants(){
-        mockRestServiceServer = MockRestServiceServer.createServer((RestTemplate) restOperations);
-
-        String term = createGoId(1);
-        String url = String.format("https://localhost/QuickGO/services/ontology/go/terms/%s/descendants?relations=is_a,part_of,occurs_in",term);
-
-        mockRestServiceServer.expect(requestTo(url)).andExpect(method(HttpMethod.GET))
-          .andRespond(withSuccess("{\"results\": [{\"descendants\": [\"GO:0000001\"]}]}", MediaType.APPLICATION_JSON));
     }
 
     @Test
@@ -2043,10 +2021,10 @@ public class AnnotationControllerIT {
     private void advanceFilterTest(int expected, boolean and, boolean exact) throws Exception {
         List<AnnotationDocument> docs = createGenericDocsChangingGoId(5);
         repository.deleteAll();
-        repository.save(docs);
+        repository.saveAll(docs);
         AnnotationRequestBody.GoDescription description = AnnotationRequestBody.GoDescription.builder()
           .goTerms(new String[]{createGoId(1)})
-          .goUsage(exact ? "exact" : DESCENDANTS)
+          .goUsage(exact ? "exact" : "descendants")
           .build();
         AnnotationRequestBody body = and ? AnnotationRequestBody.builder().and(description).build()
           : AnnotationRequestBody.builder().not(description).build();

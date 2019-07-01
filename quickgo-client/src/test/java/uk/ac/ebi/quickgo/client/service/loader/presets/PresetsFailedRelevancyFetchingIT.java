@@ -1,5 +1,15 @@
 package uk.ac.ebi.quickgo.client.service.loader.presets;
 
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.test.JobLauncherTestUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
 import uk.ac.ebi.quickgo.client.model.presets.CompositePreset;
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
 import uk.ac.ebi.quickgo.client.service.loader.presets.assignedby.AssignedByPresetsConfig;
@@ -9,22 +19,11 @@ import uk.ac.ebi.quickgo.client.service.loader.presets.withFrom.WithFromPresetsC
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.test.JobLauncherTestUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationContextLoader;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
-import static org.springframework.test.util.MatcherAssertionErrors.assertThat;
 
 /**
  * Tests the population of the preset relevancy information despite a failure in REST communication to an
@@ -34,9 +33,7 @@ import static org.springframework.test.util.MatcherAssertionErrors.assertThat;
  * @author Edd
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(
-        classes = {PresetsConfig.class, MockPresetDataConfig.class, JobTestRunnerConfig.class},
-        loader = SpringApplicationContextLoader.class)
+@SpringBootTest(classes = {PresetsConfig.class, MockPresetDataConfig.class, JobTestRunnerConfig.class})
 @WebAppConfiguration
 @ActiveProfiles(profiles = {MockPresetDataConfig.FAILED_FETCHING, MockPresetDataConfig.NO_SEARCH_ATTRIBUTES})
 public class PresetsFailedRelevancyFetchingIT {

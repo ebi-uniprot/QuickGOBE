@@ -23,6 +23,6 @@ final class FakeCompositeBuilder implements SearchQueryRequestBuilder {
     }
 
     @Override public QueryRequest.Builder builder() {
-        return new QueryRequest.Builder(query);
+        return new QueryRequest.Builder(query, "");
     }
 }

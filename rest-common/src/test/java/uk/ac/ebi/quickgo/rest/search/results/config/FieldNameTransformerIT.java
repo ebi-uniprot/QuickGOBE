@@ -1,17 +1,17 @@
 package uk.ac.ebi.quickgo.rest.search.results.config;
 
-import java.util.HashMap;
-import java.util.Map;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.test.ConfigFileApplicationContextInitializer;
-import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
@@ -22,8 +22,7 @@ import static org.hamcrest.core.Is.is;
  * @author Edd
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = FieldNameTransformerIT.TestApplication.class,
-        initializers = ConfigFileApplicationContextInitializer.class)
+@SpringBootTest(classes = FieldNameTransformerIT.TestApplication.class)
 public class FieldNameTransformerIT {
     @Autowired
     private FieldNameTransformer transformer;

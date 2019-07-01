@@ -1,21 +1,22 @@
 package uk.ac.ebi.quickgo.geneproduct.model;
 
-import uk.ac.ebi.quickgo.common.FacetableField;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Stream;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+import uk.ac.ebi.quickgo.common.FacetableField;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Stream;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
@@ -26,10 +27,11 @@ import static org.hamcrest.Matchers.hasSize;
  * Tests that the validation added to the {@link GeneProductRequest} class is correct.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = GeneProductRequestValidationIT.GeneProductRequestValidationConfig.class)
+@SpringBootTest(classes = GeneProductRequestValidationIT.GeneProductRequestValidationConfig.class)
 public class GeneProductRequestValidationIT {
     private static final String INVALID_FACET_1 = "invalid1";
 
+    @Configuration
     static class GeneProductRequestValidationConfig {
         @Bean
         FacetableField facetableField() {

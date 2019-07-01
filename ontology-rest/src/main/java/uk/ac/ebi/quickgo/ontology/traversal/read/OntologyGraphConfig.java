@@ -1,13 +1,5 @@
 package uk.ac.ebi.quickgo.ontology.traversal.read;
 
-import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
-import uk.ac.ebi.quickgo.ontology.traversal.OntologyGraph;
-import uk.ac.ebi.quickgo.ontology.traversal.OntologyGraphTraversal;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.zip.GZIPInputStream;
 import org.slf4j.Logger;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecutionListener;
@@ -28,9 +20,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
+import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
+import uk.ac.ebi.quickgo.ontology.traversal.OntologyGraph;
+import uk.ac.ebi.quickgo.ontology.traversal.OntologyGraphTraversal;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.zip.GZIPInputStream;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -91,11 +90,6 @@ public class OntologyGraphConfig {
                 .processor(ontologyRelationshipCompositeProcessor())
                 .writer(ontologyGraphPopulator(ontologyGraph))
                 .build();
-    }
-
-    @Bean
-    static PropertySourcesPlaceholderConfigurer propertyPlaceHolderConfigurer() {
-        return new PropertySourcesPlaceholderConfigurer();
     }
 
     @Bean
