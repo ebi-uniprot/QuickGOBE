@@ -7,7 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -81,8 +81,6 @@ public class StringToQuickGOQueryConverterTest {
     public void converterWithDefaultFieldConvertsValueIntoFieldAndValueQuery() throws Exception {
         String value = "value1";
 
-        when(searchableFieldMock.isSearchable(value)).thenReturn(false);
-
         QuickGOQuery query = converter.convert(value);
 
         QuickGOQuery expectedQuery = createFieldAndValueQuery(DEFAULT_FIELD, value);
@@ -95,8 +93,6 @@ public class StringToQuickGOQueryConverterTest {
         converter = new StringToQuickGOQueryConverter(searchableFieldMock);
 
         String value = "value1";
-
-        when(searchableFieldMock.isSearchable(value)).thenReturn(false);
 
         QuickGOQuery query = converter.convert(value);
 

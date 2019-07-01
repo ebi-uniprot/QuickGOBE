@@ -8,7 +8,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -39,9 +39,7 @@ public class ValidationEntityCheckerTest {
         when(validationEntity1.keyValue()).thenReturn("interpro");
         when(validationEntity2.keyValue()).thenReturn("intact");
         when(validationEntity3.keyValue()).thenReturn("uniprotkb");
-        when(validationEntity1.test("IPR123456")).thenReturn(true);
         when(validationEntity2.test("EBI-11166735")).thenReturn(true);
-        when(validationEntity3.test("A0A000")).thenReturn(true);
         checker.addEntities(Arrays.asList(validationEntity1, validationEntity2, validationEntity3));
 
     }

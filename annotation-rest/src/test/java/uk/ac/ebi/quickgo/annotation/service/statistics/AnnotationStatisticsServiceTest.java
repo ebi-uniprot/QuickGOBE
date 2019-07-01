@@ -17,9 +17,9 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 /**
@@ -57,10 +57,6 @@ public class AnnotationStatisticsServiceTest {
     public void setUp() {
         statsService = new AnnotationStatisticsService(filterFactoryMock, searchServiceMock,
                 statsConverterMock, requiredStatisticsProvider);
-
-        when(searchServiceMock.findByQuery(any())).thenReturn(queryResult);
-        when(queryResult.getAggregation()).thenReturn(aggregateResponse);
-        when(filterFactoryMock.convert(any())).thenReturn(convertedFilter);
     }
 
     @Test

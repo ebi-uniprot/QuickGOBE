@@ -132,6 +132,7 @@ public class AnnotationController {
     private static final String GO_NAME = "goName";
     private static final String TAXON_NAME = "taxonName";
     private static final String EVIDENCE_NAME = "evidenceName";
+    private static final String COLLECTION = "annotation";
     private final MetaDataProvider metaDataProvider;
     private final SearchService<Annotation> annotationSearchService;
     private final SearchServiceConfig.AnnotationCompositeRetrievalConfig annotationRetrievalConfig;
@@ -210,6 +211,7 @@ public class AnnotationController {
 
         QueryRequest queryRequest = queryTemplate.newBuilder()
                 .setQuery(QuickGOQuery.createAllQuery())
+                .setCollection(COLLECTION)
                 .addFilters(filterQueryInfo.getFilterQueries())
                 .setPage(new RegularPage(request.getPage(), request.getLimit()))
                 .build();
@@ -302,6 +304,7 @@ public class AnnotationController {
     private QueryRequest createQueryRequest(FilterQueryInfo filterQueryInfo, int pageLimit) {
         return downloadQueryTemplate.newBuilder()
                 .setQuery(QuickGOQuery.createAllQuery())
+                .setCollection(COLLECTION)
                 .addFilters(filterQueryInfo.getFilterQueries())
                 .setPage(createFirstCursorPage(pageLimit))
                 .build();

@@ -1,11 +1,5 @@
 package uk.ac.ebi.quickgo.index.geneproduct;
 
-import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
-import uk.ac.ebi.quickgo.geneproduct.common.GeneProductDocument;
-import uk.ac.ebi.quickgo.index.DocumentWriteRetryHelper;
-import uk.ac.ebi.quickgo.index.common.JobTestRunnerConfig;
-
-import java.util.List;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -19,21 +13,24 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationContextLoader;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
+import uk.ac.ebi.quickgo.geneproduct.common.GeneProductDocument;
+import uk.ac.ebi.quickgo.index.DocumentWriteRetryHelper;
+import uk.ac.ebi.quickgo.index.common.JobTestRunnerConfig;
+
+import java.util.List;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.springframework.test.util.MatcherAssertionErrors.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 import static uk.ac.ebi.quickgo.index.DocumentWriteRetryHelper.stubSolrWriteResponses;
 import static uk.ac.ebi.quickgo.index.DocumentWriteRetryHelper.validateWriteAttempts;
 
@@ -42,10 +39,8 @@ import static uk.ac.ebi.quickgo.index.DocumentWriteRetryHelper.validateWriteAtte
  */
 @ActiveProfiles(profiles = {"embeddedServer", "twoSolrRemoteHostErrors"})
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(
-        classes = {GeneProductConfig.class, JobTestRunnerConfig.class, GeneProductIndexingRetrySucceedsBatchIT
-                .RetryConfig.class},
-        loader = SpringApplicationContextLoader.class)
+@SpringBootTest(classes = {GeneProductConfig.class, JobTestRunnerConfig.class, GeneProductIndexingRetrySucceedsBatchIT
+                .RetryConfig.class})
 public class GeneProductIndexingRetrySucceedsBatchIT {
     @ClassRule
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();

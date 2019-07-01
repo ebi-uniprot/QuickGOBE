@@ -1,18 +1,18 @@
 package uk.ac.ebi.quickgo.annotation.download.header;
 
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.ac.ebi.quickgo.annotation.download.DownloadConfig;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItems;
@@ -24,7 +24,7 @@ import static org.hamcrest.Matchers.hasItems;
  * Created with IntelliJ IDEA.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = DownloadConfig.class)
+@SpringBootTest(classes = DownloadConfig.class)
 public class OntologyHeaderInfoIT {
     private static final String ECO_VERSION = "http://purl.obolibrary.org/obo/eco/releases/2017-01-06/eco.owl";
     private static final String GO_VERSION = "http://purl.obolibrary.org/obo/go/releases/2017-01-12/go.owl";

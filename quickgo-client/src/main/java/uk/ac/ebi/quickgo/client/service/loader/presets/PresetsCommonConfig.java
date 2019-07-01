@@ -1,9 +1,5 @@
 package uk.ac.ebi.quickgo.client.service.loader.presets;
 
-import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
-import uk.ac.ebi.quickgo.rest.search.request.config.FilterConfigRetrieval;
-import uk.ac.ebi.quickgo.rest.search.request.converter.RESTFilterConverterFactory;
-
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
@@ -12,8 +8,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.web.client.RestOperations;
+import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
+import uk.ac.ebi.quickgo.rest.search.request.config.FilterConfigRetrieval;
+import uk.ac.ebi.quickgo.rest.search.request.converter.RESTFilterConverterFactory;
 
 /**
  * Provides common Spring Batch job configuration details and methods used when populating preset information.
@@ -41,11 +39,6 @@ public class PresetsCommonConfig {
     @Bean
     public CompositePresetImpl presets() {
         return new CompositePresetImpl();
-    }
-
-    @Bean
-    static PropertySourcesPlaceholderConfigurer propertyPlaceHolderConfigurer() {
-        return new PropertySourcesPlaceholderConfigurer();
     }
 
     @Bean

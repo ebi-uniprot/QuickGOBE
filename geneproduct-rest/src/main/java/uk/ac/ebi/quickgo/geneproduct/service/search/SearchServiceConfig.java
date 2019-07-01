@@ -1,5 +1,10 @@
 package uk.ac.ebi.quickgo.geneproduct.service.search;
 
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.*;
+import org.springframework.data.solr.core.SolrTemplate;
 import uk.ac.ebi.quickgo.common.FacetableField;
 import uk.ac.ebi.quickgo.common.SearchableField;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductFields;
@@ -14,21 +19,12 @@ import uk.ac.ebi.quickgo.rest.search.solr.SolrRequestRetrieval;
 import uk.ac.ebi.quickgo.rest.search.solr.SolrRetrievalConfig;
 import uk.ac.ebi.quickgo.rest.service.ServiceRetrievalConfig;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.*;
-import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
-import org.springframework.data.solr.core.SolrTemplate;
 
-import static uk.ac.ebi.quickgo.rest.search.solr.SolrRetrievalConfigHelper.DEFAULT_HIGHLIGHT_DELIMS;
-import static uk.ac.ebi.quickgo.rest.search.solr.SolrRetrievalConfigHelper.HIGHLIGHT_END_DELIM_INDEX;
-import static uk.ac.ebi.quickgo.rest.search.solr.SolrRetrievalConfigHelper.HIGHLIGHT_START_DELIM_INDEX;
-import static uk.ac.ebi.quickgo.rest.search.solr.SolrRetrievalConfigHelper.convertHighlightDelims;
+import static uk.ac.ebi.quickgo.rest.search.solr.SolrRetrievalConfigHelper.*;
 import static uk.ac.ebi.quickgo.rest.service.ServiceRetrievalConfigHelper.extractFieldMappings;
 
 /**
@@ -131,11 +127,6 @@ public class SearchServiceConfig {
                 return highlightDelimsArr[HIGHLIGHT_END_DELIM_INDEX];
             }
         };
-    }
-
-    @Bean
-    public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
-        return new PropertySourcesPlaceholderConfigurer();
     }
 
     public interface GeneProductCompositeRetrievalConfig extends SolrRetrievalConfig, ServiceRetrievalConfig {}

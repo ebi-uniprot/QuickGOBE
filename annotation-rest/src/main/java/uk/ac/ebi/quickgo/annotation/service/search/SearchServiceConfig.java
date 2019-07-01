@@ -1,5 +1,18 @@
 package uk.ac.ebi.quickgo.annotation.service.search;
 
+import net.sf.ehcache.CacheManager;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.ehcache.EhCacheCacheManager;
+import org.springframework.cache.ehcache.EhCacheManagerFactoryBean;
+import org.springframework.context.annotation.*;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.data.solr.core.SolrTemplate;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationFields;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepoConfig;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
@@ -36,20 +49,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import net.sf.ehcache.CacheManager;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.cache.ehcache.EhCacheCacheManager;
-import org.springframework.cache.ehcache.EhCacheManagerFactoryBean;
-import org.springframework.context.annotation.*;
-import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.data.solr.core.SolrTemplate;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -105,11 +104,6 @@ public class SearchServiceConfig {
 
     @Value("${cache.config.path:" + CACHE_CONFIG_FILE + "}")
     private String cacheConfigPath;
-
-    @Bean
-    public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
-        return new PropertySourcesPlaceholderConfigurer();
-    }
 
     @Bean
     public SearchService<Annotation> annotationSearchService(
@@ -275,6 +269,7 @@ public class SearchServiceConfig {
                 FileSystemResource fileSystemResource = new FileSystemResource(cacheConfigPath);
                 if (fileSystemResource.exists() && fileSystemResource.isReadable()) {
                     factoryBean.setConfigLocation(fileSystemResource);
+                    factoryBean.setShared(true);
                     return factoryBean;
                 }
             }
@@ -283,6 +278,7 @@ public class SearchServiceConfig {
         }
         //Failed to load config file, so use the version bundled with this jar
         factoryBean.setConfigLocation(new ClassPathResource(CACHE_CONFIG_FILE));
+        factoryBean.setShared(true);
         return factoryBean;
     }
 

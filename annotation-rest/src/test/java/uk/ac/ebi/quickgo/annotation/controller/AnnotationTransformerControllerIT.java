@@ -1,29 +1,16 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
-import uk.ac.ebi.quickgo.annotation.AnnotationREST;
-import uk.ac.ebi.quickgo.annotation.IdGeneratorUtil;
-import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
-import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
-import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.BasicOntology;
-import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.BasicTaxonomyNode;
-import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
-import uk.ac.ebi.quickgo.ontology.common.OntologyRepoConfig;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.ArrayList;
-import java.util.List;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.client.MockRestServiceServer;
@@ -34,6 +21,17 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
+import uk.ac.ebi.quickgo.annotation.AnnotationREST;
+import uk.ac.ebi.quickgo.annotation.IdGeneratorUtil;
+import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
+import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
+import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.BasicOntology;
+import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.BasicTaxonomyNode;
+import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
+import uk.ac.ebi.quickgo.ontology.common.OntologyRepoConfig;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Arrays.asList;
@@ -41,7 +39,6 @@ import static java.util.Collections.singletonList;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_CLASS;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
@@ -53,9 +50,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.INCLUDE_FIELD_PARAM;
 import static uk.ac.ebi.quickgo.annotation.IdGeneratorUtil.createGPId;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.createAnnotationDoc;
-import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.contentTypeToBeJson;
-import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.pageInfoExists;
-import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.totalNumOfResults;
+import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.*;
 
 /**
  * The purpose of this class is to integration test the annotation result transformation components
@@ -65,7 +60,7 @@ import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.totalNumO
  * @author Edd
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = {AnnotationREST.class, OntologyRepoConfig.class})
+@SpringBootTest(classes = {AnnotationREST.class, OntologyRepoConfig.class})
 @WebAppConfiguration
 public class AnnotationTransformerControllerIT {
     @ClassRule

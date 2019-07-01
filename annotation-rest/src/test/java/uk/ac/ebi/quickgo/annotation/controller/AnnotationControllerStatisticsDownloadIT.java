@@ -1,22 +1,12 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
-import uk.ac.ebi.quickgo.annotation.AnnotationREST;
-import uk.ac.ebi.quickgo.annotation.IdGeneratorUtil;
-import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
-import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
-import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker;
-import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
-
-import java.util.List;
-import java.util.function.Function;
-import java.util.stream.IntStream;
 import net.sf.ehcache.CacheManager;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -28,24 +18,28 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
+import uk.ac.ebi.quickgo.annotation.AnnotationREST;
+import uk.ac.ebi.quickgo.annotation.IdGeneratorUtil;
+import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
+import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
+import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker;
+import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
+
+import java.util.List;
+import java.util.function.Function;
+import java.util.stream.IntStream;
 
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.is;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
-import static org.springframework.http.HttpHeaders.VARY;
+import static org.springframework.http.HttpHeaders.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.ECO_ID;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.createGenericDocsChangingGoId;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.numOfResults;
 import static uk.ac.ebi.quickgo.annotation.controller.StatsResponseVerifier.namesInTypeWithinGroup;
-import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.EXCEL_MEDIA_TYPE;
-import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.JSON_MEDIA_TYPE;
-import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.fileExtension;
+import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.*;
 
 /**
  * @author Tony Wardell
@@ -54,7 +48,7 @@ import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.fileEx
  * Created with IntelliJ IDEA.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = {AnnotationREST.class})
+@SpringBootTest(classes = {AnnotationREST.class})
 @WebAppConfiguration
 public class AnnotationControllerStatisticsDownloadIT {
     // temporary data store for solr's data, which is automatically cleaned on exit
@@ -95,7 +89,7 @@ public class AnnotationControllerStatisticsDownloadIT {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
         MockRestServiceServer mockRestServiceServer = MockRestServiceServer.createServer((RestTemplate) restOperations);
         List<AnnotationDocument> genericDocs = createGenericDocsChangingGoId(NUMBER_OF_GENERIC_DOCS);
-        annotationRepository.save(genericDocs);
+        annotationRepository.saveAll(genericDocs);
         setupHelper = new StatsSetupHelper(mockRestServiceServer);
         goNames = new String[NUMBER_OF_GENERIC_DOCS];
         IntStream.range(0, goNames.length)

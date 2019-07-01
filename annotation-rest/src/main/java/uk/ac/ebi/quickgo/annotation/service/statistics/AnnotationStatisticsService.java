@@ -42,6 +42,7 @@ public class AnnotationStatisticsService implements StatisticsService {
 
     private static final int FIRST_PAGE = 1;
     private static final int RESULTS_PER_PAGE = 0;
+    private static final String COLLECTION = "annotation";
     private final RequiredStatisticsProvider requiredStatisticsProvider;
     private final FilterConverterFactory converterFactory;
     private final SearchService<Annotation> searchService;
@@ -120,6 +121,7 @@ public class AnnotationStatisticsService implements StatisticsService {
         Map<String, List<String>> slimmingInfoMap = new HashMap<>();
         QueryRequest queryRequest = queryTemplate.newBuilder()
                 .setQuery(QuickGOQuery.createAllQuery())
+                .setCollection(COLLECTION)
                 .addFilters(filterRequests.stream()
                         .map(converterFactory::convert)
                         .map(convertedFilter -> captureConvertedFilterInfo(convertedFilter, slimmingInfoMap))

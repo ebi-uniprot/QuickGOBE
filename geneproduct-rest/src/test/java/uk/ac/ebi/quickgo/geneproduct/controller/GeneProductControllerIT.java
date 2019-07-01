@@ -1,5 +1,18 @@
 package uk.ac.ebi.quickgo.geneproduct.controller;
 
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 import uk.ac.ebi.quickgo.geneproduct.GeneProductREST;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductDocument;
@@ -10,30 +23,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * Performs tests on GeneProduct REST controller.
@@ -43,7 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Date: 04/04/2016
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = {GeneProductREST.class})
+@SpringBootTest(classes = {GeneProductREST.class})
 @WebAppConfiguration
 public class GeneProductControllerIT {
 
@@ -84,7 +80,7 @@ public class GeneProductControllerIT {
         validIdsCSV = basicDocs.stream().map(doc -> doc.id).collect(Collectors.joining(","));
         validIdList = Arrays.asList(validIdsCSV.split(COMMA));
 
-        geneProductRepository.save(basicDocs);
+        geneProductRepository.saveAll(basicDocs);
     }
 
     @Test
@@ -93,7 +89,7 @@ public class GeneProductControllerIT {
 
         response.andDo(print())
                 .andExpect(jsonPath("$.results.*.id", hasSize(1)))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(status().isOk());
     }
 
@@ -102,12 +98,12 @@ public class GeneProductControllerIT {
         geneProductRepository.deleteAll();
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
         List<GeneProductDocument> basicDocs = createBasicComplexPortalDocs();
-        geneProductRepository.save(basicDocs);
+        geneProductRepository.saveAll(basicDocs);
         ResultActions response = mockMvc.perform(get(buildGeneProductURL(basicDocs.get(0).id)));
 
         response.andDo(print())
                 .andExpect(jsonPath("$.results.*.id", hasSize(1)))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(status().isOk());
     }
 
@@ -117,7 +113,7 @@ public class GeneProductControllerIT {
 
         result.andDo(print())
                 .andExpect(jsonPath("$.results.*.id", hasSize(3)))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(status().isOk());
 
         int index = 0;
@@ -164,7 +160,7 @@ public class GeneProductControllerIT {
 
         result.andDo(print())
                 .andExpect(jsonPath("$.results.*.id", hasSize(3)))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(status().isOk());
 
         int index = 0;

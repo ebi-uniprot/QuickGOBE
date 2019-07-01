@@ -1,23 +1,12 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
-import uk.ac.ebi.quickgo.annotation.AnnotationREST;
-import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
-import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
-import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker;
-import uk.ac.ebi.quickgo.common.QuickGODocument;
-import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
-
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import net.sf.ehcache.CacheManager;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.client.MockRestServiceServer;
@@ -27,34 +16,40 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
+import uk.ac.ebi.quickgo.annotation.AnnotationREST;
+import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
+import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
+import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker;
+import uk.ac.ebi.quickgo.common.QuickGODocument;
+import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 
-import static java.util.Collections.singletonList;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.GENE_PRODUCT_ID_PARAM;
-import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.GO_ID_PARAM;
-import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.GO_USAGE_PARAM;
-import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.TAXON_ID_PARAM;
-import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.TAXON_USAGE_PARAM;
+import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.*;
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.*;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.contentTypeToBeJson;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.totalNumOfResults;
-import static uk.ac.ebi.quickgo.annotation.controller.StatsResponseVerifier.keysInTypeWithinGroup;
-import static uk.ac.ebi.quickgo.annotation.controller.StatsResponseVerifier.namesInTypeWithinGroup;
-import static uk.ac.ebi.quickgo.annotation.controller.StatsResponseVerifier.numberOfTypes;
-import static uk.ac.ebi.quickgo.annotation.controller.StatsResponseVerifier.numericValueForGroup;
-import static uk.ac.ebi.quickgo.annotation.controller.StatsResponseVerifier.totalHitsInGroup;
+import static uk.ac.ebi.quickgo.annotation.controller.StatsResponseVerifier.*;
 
 /**
  * Tests the behaviour of the statistics endpoint of the {@link AnnotationController}.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = {AnnotationREST.class})
+@SpringBootTest(classes = {AnnotationREST.class})
 @WebAppConfiguration
 public class AnnotationControllerStatisticsIT {
     // temporary data store for solr's data, which is automatically cleaned on exit
@@ -110,7 +105,7 @@ public class AnnotationControllerStatisticsIT {
                 .build();
         mockRestServiceServer = MockRestServiceServer.createServer((RestTemplate) restOperations);
         savedDocs = createGenericDocs();
-        repository.save(savedDocs);
+        repository.saveAll(savedDocs);
     }
 
     @Test

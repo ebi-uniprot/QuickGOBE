@@ -83,6 +83,7 @@ public class DefaultSearchQueryTemplate {
         private final Set<QuickGOQuery> filterQueries;
         private final Set<String> facets;
         private QuickGOQuery query;
+        private String collection;
 
         private Page page;
         private boolean highlighting;
@@ -169,6 +170,17 @@ public class DefaultSearchQueryTemplate {
         }
 
         /**
+         * Specify the collection on which you want to query.
+         *
+         * @param collection the search collection.
+         * @return this {@link DefaultSearchQueryTemplate.Builder} instance
+         */
+        public DefaultSearchQueryTemplate.Builder setCollection(String collection) {
+            this.collection = collection;
+            return this;
+        }
+
+        /**
          * Specify which page of results to return.
          *
          * @param page the page of results to return.
@@ -191,7 +203,7 @@ public class DefaultSearchQueryTemplate {
         }
 
         @Override public QueryRequest build() {
-            QueryRequest.Builder builder = new QueryRequest.Builder(query);
+            QueryRequest.Builder builder = new QueryRequest.Builder(query, collection);
 
             facets.forEach(builder::addFacetField);
 

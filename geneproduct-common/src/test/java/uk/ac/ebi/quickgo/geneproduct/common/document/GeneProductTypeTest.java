@@ -1,11 +1,10 @@
 package uk.ac.ebi.quickgo.geneproduct.common.document;
 
+import org.junit.Test;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductType;
 
-import org.junit.Test;
-
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.springframework.test.util.MatcherAssertionErrors.assertThat;
 
 /**
  * Ensures interaction of the {@link GeneProductType} enumeration works as expected.

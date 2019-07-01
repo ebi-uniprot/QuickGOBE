@@ -1,24 +1,20 @@
 package uk.ac.ebi.quickgo.annotation.download.header;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.MediaType;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyObject;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 import static uk.ac.ebi.quickgo.annotation.download.TSVDownload.*;
 import static uk.ac.ebi.quickgo.annotation.download.header.TSVHeaderCreator.*;
 

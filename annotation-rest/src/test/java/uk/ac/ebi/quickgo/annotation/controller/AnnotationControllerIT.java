@@ -2,8 +2,20 @@ package uk.ac.ebi.quickgo.annotation.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang.StringUtils;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 import uk.ac.ebi.quickgo.annotation.AnnotationREST;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
@@ -18,19 +30,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-import org.apache.commons.lang.StringUtils;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
@@ -46,9 +45,7 @@ import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.E
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.createGenericDocsChangingGoId;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.*;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.ResponseItem.responseItem;
-import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.DEFAULT_ENTRIES_PER_PAGE;
-import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.MAX_PAGE_NUMBER;
-import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.MAX_PAGE_RESULTS;
+import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.*;
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.SELECT_ALL_WHERE_FIELD_IS_NOT_EMPTY;
 
 /**
@@ -59,7 +56,7 @@ import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.SELECT_ALL_WHERE_
  * Created with IntelliJ IDEA.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = {AnnotationREST.class})
+@SpringBootTest(classes = {AnnotationREST.class})
 @WebAppConfiguration
 public class AnnotationControllerIT {
 
@@ -97,7 +94,7 @@ public class AnnotationControllerIT {
                 .build();
 
         genericDocs = createGenericDocs(NUMBER_OF_GENERIC_DOCS);
-        repository.save(genericDocs);
+        repository.saveAll(genericDocs);
     }
 
     @Test
@@ -382,7 +379,7 @@ public class AnnotationControllerIT {
 
         List<AnnotationDocument> documents =
                 createDocsWithTaxonAncestors(asList(taxonId, parentTaxonId, grandParentTaxonId));
-        repository.save(documents);
+        repository.saveAll(documents);
 
         String[] expectedGPIds = asArray(transformDocs(documents, d -> d.geneProductId));
 
@@ -413,7 +410,7 @@ public class AnnotationControllerIT {
         List<AnnotationDocument> documents =
                 createDocsWithTaxonAncestors(asList(taxonId1, parentTaxonId1, grandParentTaxonId1));
         documents.addAll(createDocsWithTaxonAncestors(asList(taxonId2, parentTaxonId2, grandParentTaxonId2)));
-        repository.save(documents);
+        repository.saveAll(documents);
 
         Integer[] expectedTaxonIds = {taxonId1,
                 parentTaxonId1,
@@ -454,7 +451,7 @@ public class AnnotationControllerIT {
 
         List<AnnotationDocument> documents =
                 createDocsWithTaxonAncestors(asList(taxonId, parentTaxonId, grandParentTaxonId));
-        repository.save(documents);
+        repository.saveAll(documents);
 
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search")
@@ -1106,7 +1103,7 @@ public class AnnotationControllerIT {
         int totalEntries = 60;
 
         repository.deleteAll();
-        repository.save(createGenericDocs(totalEntries));
+        repository.saveAll(createGenericDocs(totalEntries));
 
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search")
@@ -1157,7 +1154,7 @@ public class AnnotationControllerIT {
 
         int existingPages = 4;
         int resultsPerPage = 10;
-        repository.save(createGenericDocs(resultsPerPage * existingPages));
+        repository.saveAll(createGenericDocs(resultsPerPage * existingPages));
 
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search")
@@ -1173,7 +1170,7 @@ public class AnnotationControllerIT {
         repository.deleteAll();
 
         int docsNecessaryToForcePagination = MAX_PAGE_RESULTS + 1;
-        repository.save(createGenericDocs(docsNecessaryToForcePagination));
+        repository.saveAll(createGenericDocs(docsNecessaryToForcePagination));
 
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search")
@@ -1191,7 +1188,7 @@ public class AnnotationControllerIT {
         int pageNumWhichIsTooHigh = totalEntries;
 
         repository.deleteAll();
-        repository.save(createGenericDocs(totalEntries));
+        repository.saveAll(createGenericDocs(totalEntries));
 
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search")
@@ -1780,8 +1777,8 @@ public class AnnotationControllerIT {
         for (AnnotationDocument doc : docsWithoutExtensions) {
             doc.extensions = null;
         }
-        repository.save(docsWithExtensions);
-        repository.save(docsWithoutExtensions);
+        repository.saveAll(docsWithExtensions);
+        repository.saveAll(docsWithoutExtensions);
 
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(EXTENSION_PARAM.getName(),
                                                                                      SELECT_ALL_WHERE_FIELD_IS_NOT_EMPTY));
@@ -2024,7 +2021,7 @@ public class AnnotationControllerIT {
     private void advanceFilterTest(int expected, boolean and, boolean exact) throws Exception {
         List<AnnotationDocument> docs = createGenericDocsChangingGoId(5);
         repository.deleteAll();
-        repository.save(docs);
+        repository.saveAll(docs);
         AnnotationRequestBody.GoDescription description = AnnotationRequestBody.GoDescription.builder()
           .goTerms(new String[]{createGoId(1)})
           .goUsage(exact ? "exact" : "descendants")

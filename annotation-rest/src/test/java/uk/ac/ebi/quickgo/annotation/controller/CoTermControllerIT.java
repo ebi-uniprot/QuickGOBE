@@ -1,17 +1,10 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
-import uk.ac.ebi.quickgo.annotation.AnnotationREST;
-import uk.ac.ebi.quickgo.annotation.coterms.CoTermSource;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -19,17 +12,19 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import uk.ac.ebi.quickgo.annotation.AnnotationREST;
+import uk.ac.ebi.quickgo.annotation.coterms.CoTermSource;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.contentTypeToBeJson;
 
 /**
  * @author Tony Wardell
@@ -38,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Created with IntelliJ IDEA.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = {AnnotationREST.class})
+@SpringBootTest(classes = {AnnotationREST.class})
 @WebAppConfiguration
 public class CoTermControllerIT {
 
@@ -67,7 +62,7 @@ public class CoTermControllerIT {
         ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001)));
         response.andDo(print());
         expectFieldsInResults(response, Collections.singletonList(GO_0000001))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(contentTypeToBeJson())
                 .andExpect(jsonPath("$.results.*", hasSize(NUMBER_OF_ALL_CO_TERM_RECORDS)))
                 .andExpect(status().isOk());
     }
@@ -95,7 +90,7 @@ public class CoTermControllerIT {
         ResultActions response = mockMvc.perform(get(buildPathToResource(MANUAL_ONLY_TERM, "source=MANUAL")));
 
         expectFieldsInResults(response, Collections.singletonList(MANUAL_ONLY_TERM))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(contentTypeToBeJson())
                 .andExpect(jsonPath("$.results.*", hasSize(1)))
                 .andExpect(jsonPath("$.results.*.target").value(MANUAL_ONLY_TERM))
                 .andExpect(jsonPath("$.results.*.comparedTerm").value("GO:0004444"))
@@ -111,7 +106,7 @@ public class CoTermControllerIT {
         ResultActions response = mockMvc.perform(get(buildPathToResource(ALL_ONLY_TERM, "source=ALL")));
 
         expectFieldsInResults(response, Collections.singletonList(ALL_ONLY_TERM))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(contentTypeToBeJson())
                 .andExpect(jsonPath("$.results.*", hasSize(1)))
                 .andExpect(jsonPath("$.results.*.target").value(ALL_ONLY_TERM))
                 .andExpect(jsonPath("$.results.*.comparedTerm").value("GO:0003333"))
@@ -127,7 +122,7 @@ public class CoTermControllerIT {
         ResultActions response = mockMvc.perform(get(buildPathToResource(MANUAL_ONLY_TERM, "source=MaNuAl")));
 
         expectFieldsInResults(response, Collections.singletonList(MANUAL_ONLY_TERM))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(contentTypeToBeJson())
                 .andExpect(jsonPath("$.results.*", hasSize(1)))
                 .andExpect(jsonPath("$.results.*.target").value(MANUAL_ONLY_TERM))
                 .andExpect(jsonPath("$.results.*.comparedTerm").value("GO:0004444"))
@@ -138,7 +133,7 @@ public class CoTermControllerIT {
     public void retrievesAllCoTermsWhenNoSourceProvided() throws Exception {
         ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "source=")));
         expectFieldsInResults(response, Collections.singletonList(GO_0000001))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(contentTypeToBeJson())
                 .andExpect(jsonPath("$.results.*", hasSize(NUMBER_OF_ALL_CO_TERM_RECORDS)))
                 .andExpect(status().isOk());
     }
@@ -156,13 +151,13 @@ public class CoTermControllerIT {
     public void setNumberOfResponsesBasedOnLimit() throws Exception {
         ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "limit=4")));
         expectFieldsInResults(response, Collections.singletonList(GO_0000001))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(contentTypeToBeJson())
                 .andExpect(jsonPath("$.results.*", hasSize(4)));
 
         //Now we are going to reduce the requested limit to see if it works OK.
         response = mockMvc.perform(get(buildPathToResource(GO_0000001, "limit=3")));
         expectFieldsInResults(response, Collections.singletonList(GO_0000001))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(contentTypeToBeJson())
                 .andExpect(jsonPath("$.results.*", hasSize(3)))
                 .andExpect(jsonPath("$.results[0].target").value(GO_0000001))
                 .andExpect(jsonPath("$.results[0].comparedTerm").value(GO_0000001))
@@ -178,7 +173,7 @@ public class CoTermControllerIT {
     public void ifTheLimitIsLeftEmptyThenUserDefaultLimit() throws Exception {
         ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "limit=")));
         expectFieldsInResults(response, Collections.singletonList(GO_0000001))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(contentTypeToBeJson())
                 .andExpect(jsonPath("$.results.*", hasSize(NUMBER_OF_ALL_CO_TERM_RECORDS)))
                 .andExpect(status().isOk());
     }
@@ -211,7 +206,7 @@ public class CoTermControllerIT {
     public void numberOfHitsIsNotLimitedToRequestedLimit() throws Exception {
         ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "limit=4")));
         expectFieldsInResults(response, Collections.singletonList(GO_0000001))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(contentTypeToBeJson())
                 .andExpect(jsonPath("$.results.*", hasSize(4)))
                 .andExpect(jsonPath("$.numberOfHits", is(equalTo(12))));
     }
@@ -223,7 +218,7 @@ public class CoTermControllerIT {
     public void retrieveAllCoTermsUsingSimilarityThresholdBelowThatFoundInTheRecordsForAllCoTerms() throws Exception {
         ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "similarityThreshold=0.1")));
         expectFieldsInResults(response, Collections.singletonList(GO_0000001))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(contentTypeToBeJson())
                 .andExpect(jsonPath("$.results.*", hasSize(NUMBER_OF_ALL_CO_TERM_RECORDS)))
                 .andExpect(status().isOk());
     }
@@ -241,7 +236,7 @@ public class CoTermControllerIT {
         ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "similarityThreshold=99.9")));
         response.andDo(print());
         expectFieldsInResults(response, Collections.singletonList(GO_0000001))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(contentTypeToBeJson())
                 .andExpect(jsonPath("$.results.*", hasSize(1)))
                 .andExpect(jsonPath("$.results.*.target").value(GO_0000001))
                 .andExpect(jsonPath("$.results.*.comparedTerm").value(GO_0000001))
@@ -253,7 +248,7 @@ public class CoTermControllerIT {
     public void returnsAllCoTermsWhenSimilarityNotFilledIn() throws Exception {
         ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "similarityThreshold=")));
         expectFieldsInResults(response, Collections.singletonList(GO_0000001))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(contentTypeToBeJson())
                 .andExpect(jsonPath("$.results.*", hasSize(NUMBER_OF_ALL_CO_TERM_RECORDS)))
                 .andExpect(status().isOk());
     }

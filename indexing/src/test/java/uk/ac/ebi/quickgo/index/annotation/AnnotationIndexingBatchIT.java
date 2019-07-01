@@ -1,5 +1,20 @@
 package uk.ac.ebi.quickgo.index.annotation;
 
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.test.JobLauncherTestUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
 import uk.ac.ebi.quickgo.common.store.BasicTemporaryFolder;
@@ -11,27 +26,11 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.test.JobLauncherTestUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationContextLoader;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
-import static org.springframework.test.util.MatcherAssertionErrors.assertThat;
 import static uk.ac.ebi.quickgo.index.annotation.AnnotationConfig.ANNOTATION_INDEXING_JOB_NAME;
 import static uk.ac.ebi.quickgo.index.annotation.AnnotationConfig.ANNOTATION_INDEXING_STEP_NAME;
 import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermsConfig.CO_TERM_ALL_SUMMARIZATION_STEP;
@@ -45,10 +44,8 @@ import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermsConfig.CO_TERM_M
  */
 @ActiveProfiles(profiles = {"embeddedServer"})
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(
-        classes = {AnnotationIndexingBatchIT.TestConfig.class,
-                AnnotationIndexingConfig.class, JobTestRunnerConfig.class},
-        loader = SpringApplicationContextLoader.class)
+@SpringBootTest(classes = {AnnotationIndexingBatchIT.TestConfig.class,
+                AnnotationIndexingConfig.class, JobTestRunnerConfig.class})
 public class AnnotationIndexingBatchIT {
 
     @ClassRule

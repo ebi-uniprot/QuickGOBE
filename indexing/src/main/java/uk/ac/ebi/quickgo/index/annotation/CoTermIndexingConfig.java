@@ -87,7 +87,7 @@ public class CoTermIndexingConfig {
                               @Override public void beforeJob(JobExecution jobExecution) {}
 
                               @Override public void afterJob(JobExecution jobExecution) {
-                                  annotationTemplate.commit();
+                                  annotationTemplate.commit("annotation");
                               }
                           })
                           .build();

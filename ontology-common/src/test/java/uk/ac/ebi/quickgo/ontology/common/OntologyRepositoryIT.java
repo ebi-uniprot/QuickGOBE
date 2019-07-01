@@ -1,5 +1,16 @@
 package uk.ac.ebi.quickgo.ontology.common;
 
+import org.apache.solr.client.solrj.SolrServerException;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.solr.core.SolrTemplate;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.ac.ebi.quickgo.common.QueryUtils;
 import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocMocker;
@@ -8,18 +19,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationContextLoader;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.solr.core.SolrTemplate;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -35,8 +34,9 @@ import static org.hamcrest.core.IsNull.notNullValue;
  * @author Edd
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = OntologyRepoConfig.class, loader = SpringApplicationContextLoader.class)
+@SpringBootTest(classes = OntologyRepoConfig.class)
 public class OntologyRepositoryIT {
+    private static final String COLLECTION = "ontology";
     // temporary data store for solr's data, which is automatically cleaned on exit
     @ClassRule
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
@@ -89,8 +89,10 @@ public class OntologyRepositoryIT {
         ontologyRepository.save(OntologyDocMocker.createGODoc(id2, "GO name 2"));
         ontologyRepository.save(OntologyDocMocker.createGODoc("GO:0000003", "GO name 3"));
 
+        ontologyRepository.findAll().forEach(System.out::println);
         List<OntologyDocument> results =
-                ontologyRepository.findCoreAttrByTermId(OntologyType.GO.name(), buildIdList(id1, id2));
+                //ontologyRepository.findCoreAttrByTermId(OntologyType.GO.name(), buildIdList(id1,id2));
+          ontologyRepository.findByOntologyTypeAndIdOrSecondaryIds(OntologyType.GO.name(), buildIdList(id1,id2), buildIdList(id1,id2));
         assertThat(results.size(), is(2));
 
         results.forEach(doc -> assertThat(copyAsCoreDoc(doc), is(equalTo(doc))));
@@ -258,7 +260,7 @@ public class OntologyRepositoryIT {
                 OntologyDocMocker.createGODoc("C", "Clint Eastwood")
         );
 
-        ontologyRepository.save(ontologyDocuments);
+        ontologyRepository.saveAll(ontologyDocuments);
 
         int count = 0;
         for (OntologyDocument ontologyDocument : ontologyDocuments) {
@@ -279,17 +281,17 @@ public class OntologyRepositoryIT {
      */
     @Test
     public void saveDirectlyToSolrServer() throws IOException, SolrServerException {
-        ontologyTemplate.getSolrClient().addBean(OntologyDocMocker.createGODoc("A", "Alice Cooper"));
-        ontologyTemplate.getSolrClient().addBean(OntologyDocMocker.createGODoc("B", "Alice Cooper"));
-        ontologyTemplate.getSolrClient().addBean(OntologyDocMocker.createGODoc("C", "Alice Cooper"));
-        ontologyTemplate.getSolrClient().addBeans(
+        ontologyTemplate.getSolrClient().addBean(COLLECTION,OntologyDocMocker.createGODoc("A", "Alice Cooper"));
+        ontologyTemplate.getSolrClient().addBean(COLLECTION,OntologyDocMocker.createGODoc("B", "Alice Cooper"));
+        ontologyTemplate.getSolrClient().addBean(COLLECTION,OntologyDocMocker.createGODoc("C", "Alice Cooper"));
+        ontologyTemplate.getSolrClient().addBeans(COLLECTION,
                 Arrays.asList(
                         OntologyDocMocker.createGODoc("D", "Alice Cooper"),
                         OntologyDocMocker.createGODoc("E", "Alice Cooper")));
 
         assertThat(ontologyRepository.findAll(new PageRequest(0, 10)).getTotalElements(), is(0L));
 
-        ontologyTemplate.getSolrClient().commit();
+        ontologyTemplate.getSolrClient().commit(COLLECTION);
 
         assertThat(ontologyRepository.findAll(new PageRequest(0, 10)).getTotalElements(), is(5L));
     }

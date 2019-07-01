@@ -1,5 +1,11 @@
 package uk.ac.ebi.quickgo.rest.search.request.converter;
 
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.experimental.runners.Enclosed;
+import org.junit.runner.RunWith;
+import org.springframework.web.client.RestOperations;
+import org.springframework.web.client.RestTemplate;
 import uk.ac.ebi.quickgo.rest.comm.RESTRequesterImpl;
 import uk.ac.ebi.quickgo.rest.comm.ResponseType;
 import uk.ac.ebi.quickgo.rest.search.RetrievalException;
@@ -9,21 +15,11 @@ import uk.ac.ebi.quickgo.rest.search.request.config.FilterConfig;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
-import org.junit.runner.RunWith;
-import org.springframework.web.client.RestOperations;
-import org.springframework.web.client.RestTemplate;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.createQuery;
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.or;
 import static uk.ac.ebi.quickgo.rest.search.request.converter.RESTFilterConverter.*;
@@ -114,7 +110,7 @@ public class RESTFilterConverterTest {
         public void failedExecutionOfRESTResponseCausesRetrievalException() {
             String resource = "/subresource";
 
-            doThrow(ExecutionException.class).when(restRequesterMock).get(FakeResponse.class);
+            doThrow(RuntimeException.class).when(restRequesterMock).get(FakeResponse.class);
             when(restRequestBuilderMock.build()).thenReturn(restRequesterMock);
 
             FilterConfig config = createRestFilterConfig(resource, FakeResponse.class, FakeResponseConverter.class);
@@ -132,7 +128,7 @@ public class RESTFilterConverterTest {
         public void timeoutOfRESTResponseCausesRetrievalException() {
             String resource = "/subresource";
 
-            doThrow(TimeoutException.class).when(restRequesterMock).get(FakeResponse.class);
+            doThrow(RuntimeException.class).when(restRequesterMock).get(FakeResponse.class);
             when(restRequestBuilderMock.build()).thenReturn(restRequesterMock);
 
             FilterConfig config = createRestFilterConfig(resource, FakeResponse.class, FakeResponseConverter.class);
@@ -150,7 +146,7 @@ public class RESTFilterConverterTest {
         public void interruptionOfRESTResponseCausesRetrievalException() {
             String resource = "/subresource";
 
-            doThrow(InterruptedException.class).when(restRequesterMock).get(FakeResponse.class);
+            doThrow(RuntimeException.class).when(restRequesterMock).get(FakeResponse.class);
             when(restRequestBuilderMock.build()).thenReturn(restRequesterMock);
 
             FilterConfig config = createRestFilterConfig(resource, FakeResponse.class, FakeResponseConverter.class);

@@ -590,7 +590,7 @@ public abstract class OBOController<T extends OBOTerm> {
         QuickGOQuery restrictedUserQuery = restrictQueryToOTypeResults(userQuery);
 
         QueryRequest.Builder builder = new QueryRequest
-                .Builder(restrictedUserQuery)
+                .Builder(restrictedUserQuery, "ontology")
                 .setPage(new RegularPage(page, limit));
 
         if (!ontologyRetrievalConfig.getSearchReturnedFields().isEmpty()) {

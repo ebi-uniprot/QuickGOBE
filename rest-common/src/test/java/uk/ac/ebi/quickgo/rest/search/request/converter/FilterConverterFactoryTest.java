@@ -12,7 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.web.client.RestOperations;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -80,7 +80,6 @@ public class FilterConverterFactoryTest {
 
         when(filterConfigRetrievalMock.getBySignature(request.getSignature()))
                 .thenReturn(Optional.empty());
-        when(filterConfigMock.getExecution()).thenReturn(SIMPLE);
 
         converter.convert(request);
     }
@@ -127,7 +126,6 @@ public class FilterConverterFactoryTest {
 
         when(filterConfigRetrievalMock.getBySignature(request.getSignature()))
                 .thenReturn(Optional.empty());
-        when(filterConfigMock.getExecution()).thenReturn(JOIN);
 
         setConfigPropertiesMap();
 
@@ -144,6 +142,5 @@ public class FilterConverterFactoryTest {
         configPropertiesMap.put(FROM_ATTRIBUTE_NAME, fromAttribute);
         configPropertiesMap.put(TO_TABLE_NAME, toTable);
         configPropertiesMap.put(TO_ATTRIBUTE_NAME, toAttribute);
-        when(filterConfigMock.getProperties()).thenReturn(configPropertiesMap);
     }
 }

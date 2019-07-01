@@ -1,12 +1,6 @@
 package uk.ac.ebi.quickgo.index.annotation;
 
 import org.junit.Before;
-import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
-import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
-import uk.ac.ebi.quickgo.index.common.JobTestRunnerConfig;
-
-import java.util.List;
-import java.util.stream.Collectors;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,26 +13,29 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationContextLoader;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
+import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
+import uk.ac.ebi.quickgo.index.common.JobTestRunnerConfig;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.util.MatcherAssertionErrors.assertThat;
+import static uk.ac.ebi.quickgo.index.DocumentWriteRetryHelper.*;
 import static uk.ac.ebi.quickgo.index.annotation.AnnotationConfig.ANNOTATION_INDEXING_JOB_NAME;
 import static uk.ac.ebi.quickgo.index.annotation.AnnotationConfig.ANNOTATION_INDEXING_STEP_NAME;
-import static uk.ac.ebi.quickgo.index.DocumentWriteRetryHelper.stubSolrWriteResponses;
-import static uk.ac.ebi.quickgo.index.DocumentWriteRetryHelper.validateWriteAttempts;
-import static uk.ac.ebi.quickgo.index.DocumentWriteRetryHelper.SolrResponse;
 
 
 /**
@@ -55,10 +52,8 @@ import static uk.ac.ebi.quickgo.index.DocumentWriteRetryHelper.SolrResponse;
 @ActiveProfiles(profiles = {"embeddedServer", "twoSolrRemoteHostErrors"})
 //@ActiveProfiles(profiles = {"embeddedServer"})
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(
-        classes = {AnnotationIndexingConfig.class, JobTestRunnerConfig.class,
-                AnnotationIndexingRetriesSolrWritesWithSuccessIT.RetryConfig.class},
-        loader = SpringApplicationContextLoader.class)
+@SpringBootTest(classes = {AnnotationIndexingConfig.class, JobTestRunnerConfig.class,
+                AnnotationIndexingRetriesSolrWritesWithSuccessIT.RetryConfig.class})
 public class AnnotationIndexingRetriesSolrWritesWithSuccessIT {
 
     @ClassRule

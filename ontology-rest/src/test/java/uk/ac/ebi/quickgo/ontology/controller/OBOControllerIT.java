@@ -1,5 +1,23 @@
 package uk.ac.ebi.quickgo.ontology.controller;
 
+import org.apache.http.HttpHeaders;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 import uk.ac.ebi.quickgo.graphics.model.GraphImageLayout;
 import uk.ac.ebi.quickgo.graphics.ontology.GraphImage;
@@ -18,42 +36,17 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.apache.http.HttpHeaders;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.any;
-import static org.mockito.Matchers.anyListOf;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static uk.ac.ebi.quickgo.common.converter.HelpfulConverter.toCSV;
 import static uk.ac.ebi.quickgo.ontology.OntologyRestConfig.CACHE_CONTROL_HEADER;
 import static uk.ac.ebi.quickgo.ontology.controller.OBOController.*;
@@ -65,7 +58,7 @@ import static uk.ac.ebi.quickgo.ontology.controller.OBOController.*;
  * Created by edd on 14/01/2016.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = {OntologyREST.class, GraphicsConfig.class})
+@SpringBootTest(classes = {OntologyREST.class})
 @WebAppConfiguration
 public abstract class OBOControllerIT {
     // temporary data store for solr's data, which is automatically cleaned on exit
@@ -89,7 +82,7 @@ public abstract class OBOControllerIT {
     protected OntologyGraph ontologyGraph;
     protected MockMvc mockMvc;
 
-    @Autowired
+    @MockBean
     private GraphImageService graphImageService;
     private String resourceUrl;
     private String validId;
@@ -129,7 +122,7 @@ public abstract class OBOControllerIT {
         validIdsCSV = toCSV(validIdList);
 
         ontologyRepository.deleteAll();
-        ontologyRepository.save(basicDocs);
+        ontologyRepository.saveAll(basicDocs);
 
         setupSimpleRelationshipChain();
 
@@ -155,7 +148,7 @@ public abstract class OBOControllerIT {
 
         expectBasicFieldsInResults(response, singletonList(validDocWithNoGraphData.id))
                 .andExpect(jsonPath("$.results.*.id", hasSize(1)))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(status().isOk());
     }
 
@@ -175,7 +168,7 @@ public abstract class OBOControllerIT {
 
         expectCoreFieldsInResults(response, singletonList(primaryId))
                 .andExpect(jsonPath("$.results.*.id", hasSize(1)))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(status().isOk());
     }
 
@@ -195,7 +188,7 @@ public abstract class OBOControllerIT {
 
         expectCoreFieldsInResults(response, singletonList(primaryId))
                 .andExpect(jsonPath("$.results.*.id", hasSize(1)))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(status().isOk());
     }
 
@@ -205,7 +198,7 @@ public abstract class OBOControllerIT {
 
         expectCoreFieldsInResults(response, singletonList(validId))
                 .andExpect(jsonPath("$.results.*.id", hasSize(1)))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(status().isOk());
     }
 
@@ -215,7 +208,7 @@ public abstract class OBOControllerIT {
 
         expectCoreFieldsInResults(response, singletonList(validId))
                 .andExpect(jsonPath("$.results.*.id", hasSize(1)))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(status().isOk());
     }
 
@@ -226,7 +219,7 @@ public abstract class OBOControllerIT {
 
         expectCoreFieldsInResults(response, validIdList)
                 .andExpect(jsonPath("$.results.*.id", hasSize(validIdList.size())))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(status().isOk());
     }
 
@@ -237,7 +230,7 @@ public abstract class OBOControllerIT {
         expectCoreFieldsInResults(response, validIdShortList)
                 .andDo(print())
                 .andExpect(jsonPath("$.results.*.id", hasSize(validIdShortList.size())))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(status().isOk());
     }
 
@@ -247,7 +240,7 @@ public abstract class OBOControllerIT {
 
         expectCompleteFieldsInResults(response, singletonList(validId))
                 .andExpect(jsonPath("$.results.*.history", hasSize(1)))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(status().isOk());
     }
 
@@ -258,7 +251,7 @@ public abstract class OBOControllerIT {
 
         expectCompleteFieldsInResults(response, validIdShortList)
                 .andExpect(jsonPath("$.results.*.history", hasSize(2)))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(status().isOk());
     }
 
@@ -268,7 +261,7 @@ public abstract class OBOControllerIT {
 
         expectBasicFieldsInResults(response, singletonList(validId))
                 .andExpect(jsonPath("$.results.*.history", hasSize(1)))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(status().isOk());
     }
 
@@ -279,7 +272,7 @@ public abstract class OBOControllerIT {
 
         expectBasicFieldsInResults(response, validIdShortList)
                 .andExpect(jsonPath("$.results.*.history", hasSize(2)))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(status().isOk());
     }
 
@@ -289,7 +282,7 @@ public abstract class OBOControllerIT {
 
         expectBasicFieldsInResults(response, singletonList(validId))
                 .andExpect(jsonPath("$.results.*.xRefs", hasSize(1)))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(status().isOk());
     }
 
@@ -300,7 +293,7 @@ public abstract class OBOControllerIT {
 
         expectBasicFieldsInResults(response, validIdShortList)
                 .andExpect(jsonPath("$.results.*.xRefs", hasSize(2)))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(status().isOk());
     }
 
@@ -310,7 +303,7 @@ public abstract class OBOControllerIT {
 
         expectBasicFieldsInResults(response, singletonList(validId))
                 .andExpect(jsonPath("$.results.*.taxonConstraints", hasSize(1)))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(status().isOk());
     }
 
@@ -321,7 +314,7 @@ public abstract class OBOControllerIT {
 
         expectBasicFieldsInResults(response, validIdShortList)
                 .andExpect(jsonPath("$.results.*.taxonConstraints", hasSize(2)))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(status().isOk());
     }
 
@@ -331,7 +324,7 @@ public abstract class OBOControllerIT {
 
         expectBasicFieldsInResults(response, singletonList(validId))
                 .andExpect(jsonPath("$.results.*.annotationGuidelines", hasSize(1)))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(status().isOk());
     }
 
@@ -342,7 +335,7 @@ public abstract class OBOControllerIT {
 
         expectBasicFieldsInResults(response, validIdShortList)
                 .andExpect(jsonPath("$.results.*.annotationGuidelines", hasSize(2)))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(status().isOk());
     }
 
@@ -352,7 +345,7 @@ public abstract class OBOControllerIT {
 
         expectBasicFieldsInResults(response, singletonList(validId))
                 .andExpect(jsonPath("$.results.*.xRelations", hasSize(1)))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(status().isOk());
     }
 
@@ -363,7 +356,7 @@ public abstract class OBOControllerIT {
 
         expectBasicFieldsInResults(response, validIdShortList)
                 .andExpect(jsonPath("$.results.*.xRelations", hasSize(2)))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(status().isOk());
     }
 
@@ -545,7 +538,7 @@ public abstract class OBOControllerIT {
         ResultActions response = mockMvc.perform(get(buildTermsURL()));
         expectBasicFieldsInResults(response, validIdShortList)
                 .andDo(print())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.results", hasSize(defaultPageSize)));
     }
@@ -560,7 +553,7 @@ public abstract class OBOControllerIT {
         ResultActions response = mockMvc.perform(get(buildTermsURL(ids)));
         expectBasicFieldsInResults(response, ids)
                 .andDo(print())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.results", hasSize(maxPageSize)));
     }
@@ -1328,7 +1321,7 @@ public abstract class OBOControllerIT {
 
     private List<OntologyDocument> createAndSaveDocs(int n) {
         final List<OntologyDocument> nDocs = createNDocs(n);
-        ontologyRepository.save(nDocs);
+        ontologyRepository.saveAll(nDocs);
         setupSimpleRelationshipChain(n);
         return nDocs;
     }

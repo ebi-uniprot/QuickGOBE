@@ -1,14 +1,6 @@
 package uk.ac.ebi.quickgo.index.geneproduct;
 
-import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
-import uk.ac.ebi.quickgo.geneproduct.common.GeneProductDocument;
-import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepository;
-import uk.ac.ebi.quickgo.index.common.JobTestRunnerConfig;
-
 import com.google.common.collect.Lists;
-import java.util.Collection;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -18,24 +10,29 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationContextLoader;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
+import uk.ac.ebi.quickgo.geneproduct.common.GeneProductDocument;
+import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepository;
+import uk.ac.ebi.quickgo.index.common.JobTestRunnerConfig;
+
+import java.util.Collection;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.springframework.test.util.MatcherAssertionErrors.assertThat;
 
 /**
  * Tests whether Spring Batch is correctly wired up to run the Gene product indexing.
  */
 @ActiveProfiles(profiles = {"embeddedServer"})
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(
-        classes = {GeneProductConfig.class, JobTestRunnerConfig.class},
-        loader = SpringApplicationContextLoader.class)
+@SpringBootTest(classes = {GeneProductConfig.class, JobTestRunnerConfig.class})
 public class GeneProductIndexingBatchIT {
     @ClassRule
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
