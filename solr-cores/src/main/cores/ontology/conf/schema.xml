@@ -16,10 +16,11 @@
  limitations under the License.
 -->
 
-<schema name="ontology" version="1.5">
+<schema name="ontology" version="1.6">
     <!-- ========================================================================== -->
     <!--                   Start of QuickGO Ontology fields                         -->
 
+    <uniqueKey>id</uniqueKey>
     <!-- The following fields are used for storage and faceting purposes, search fields are declared below -->
     <field name="id" type="string" indexed="true" stored="true"/>
     <field name="ontologyType" type="string" indexed="true" stored="true"/>

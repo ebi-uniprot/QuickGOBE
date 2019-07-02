@@ -16,10 +16,11 @@
  limitations under the License.
 -->
 
-<schema name="geneproduct" version="1.5">
+<schema name="geneproduct" version="1.6">
 
     <!-- ========================================================================== -->
     <!--                   Start of QuickGO Gene Product fields                     -->
+    <uniqueKey>id</uniqueKey>
     <!-- NOTE: Do not change the analyzers of these fields. These fields are only to store or facet, not to search -->
     <field name="id" type="string" indexed="true" stored="true"/>
     <field name="name" type="string" indexed="false" stored="true"/>

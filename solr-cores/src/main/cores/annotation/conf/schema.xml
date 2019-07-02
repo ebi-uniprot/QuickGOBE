@@ -45,7 +45,7 @@
     that avoids logging every request
 -->
 
-<schema name="annotation" version="1.5">
+<schema name="annotation" version="1.6">
     <!-- attribute "name" is the name of this schema and is only used for display purposes.
          version="x.y" is Solr's version number for the schema syntax and
          semantics.  It should not normally be changed by applications.
@@ -69,6 +69,7 @@
 
     <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
     <!-- Fields used by the annotation model -->
+    <uniqueKey>id</uniqueKey>
     <!-- The following fields are used for storage and/or faceting, do not add search specific analyzers to these -->
     <field name="id" type="string" indexed="true" stored="true" multiValued="false" required="true" docValues="true"/>
     <field name="assignedBy" type="string" indexed="true" stored="true" multiValued="false" docValues="true"/>
