@@ -29,7 +29,7 @@ public class OntologyRepoConfig {
     Logger LOGGER = org.slf4j.LoggerFactory.getLogger(OntologyRepoConfig.class);
 
     @Bean
-    public SolrClient solrServer(SolrClientFactory solrClientFactory) {
+    public SolrClient solrClient(SolrClientFactory solrClientFactory) {
         return solrClientFactory.getSolrClient();
     }
 
