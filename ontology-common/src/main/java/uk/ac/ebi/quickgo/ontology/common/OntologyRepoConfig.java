@@ -46,14 +46,6 @@ public class OntologyRepoConfig {
         return new EmbeddedSolrServerFactory(solrHome);
     }
 
-    //@Bean
-    //@Profile("embeddedServer")
-    public CoreContainer coreContainer(@Value("${solr.solr.home}") String solrHome) {
-        CoreContainer container = new CoreContainer(new File(solrHome).getAbsolutePath());
-        container.load();
-        return container;
-    }
-
     @Bean
     public SolrTemplate ontologyTemplate(SolrClientFactory solrClientFactory) {
         SolrTemplate template = new SolrTemplate(solrClientFactory);
