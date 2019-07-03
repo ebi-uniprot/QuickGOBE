@@ -91,8 +91,7 @@ public class OntologyRepositoryIT {
 
         ontologyRepository.findAll().forEach(System.out::println);
         List<OntologyDocument> results =
-                //ontologyRepository.findCoreAttrByTermId(OntologyType.GO.name(), buildIdList(id1,id2));
-          ontologyRepository.findByOntologyTypeAndIdOrSecondaryIds(OntologyType.GO.name(), buildIdList(id1,id2), buildIdList(id1,id2));
+                ontologyRepository.findCoreAttrByTermId(OntologyType.GO.name(), buildIdList(id1,id2));
         assertThat(results.size(), is(2));
 
         results.forEach(doc -> assertThat(copyAsCoreDoc(doc), is(equalTo(doc))));
