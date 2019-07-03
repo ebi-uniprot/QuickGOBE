@@ -1,7 +1,6 @@
 package uk.ac.ebi.quickgo.ontology.common;
 
 import org.apache.solr.client.solrj.beans.Field;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.solr.core.mapping.SolrDocument;
 import uk.ac.ebi.quickgo.common.QuickGODocument;
 
@@ -16,7 +15,6 @@ import java.util.List;
 @SolrDocument(collection = "ontology")
 public class OntologyDocument implements QuickGODocument {
 
-    @Id
     @Field(OntologyFields.ID)
     public String id;
 

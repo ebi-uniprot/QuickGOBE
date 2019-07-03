@@ -33,9 +33,6 @@ public interface OntologyRepository extends SolrCrudRepository<OntologyDocument,
                     OntologyFields.DEFINITION_XREFS, OntologyFields.ID_LOWERCASE})
     List<OntologyDocument> findCoreAttrByTermId(String idType, List<String> ids);
 
-    @Query(value = "id_lowercase:(GO\\:0000001 GO\\:0000002)", defaultOperator = OR)
-    List<OntologyDocument> findByOntologyTypeAndIdOrSecondaryIds(String idType, List<String> id, List<String> ids);
-
     // history
     @Query(value = QUERY_ONTOLOGY_TYPE_AND_ID,
             fields = {
