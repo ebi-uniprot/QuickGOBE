@@ -20,7 +20,6 @@
     <!-- ========================================================================== -->
     <!--                   Start of QuickGO Ontology fields                         -->
 
-    <uniqueKey>id</uniqueKey>
     <!-- The following fields are used for storage and faceting purposes, search fields are declared below -->
     <field name="id" type="string" indexed="true" stored="true"/>
     <field name="ontologyType" type="string" indexed="true" stored="true"/>
@@ -265,7 +264,7 @@
             <filter class="solr.LowerCaseFilterFactory"/>
         </analyzer>
         <analyzer type="query">
-            <tokenizer class="solr.KeywordTokenizerFactory"/>
+            <tokenizer class="solr.WhitespaceTokenizerFactory"/>
             <filter class="solr.LowerCaseFilterFactory"/>
         </analyzer>
     </fieldType>
