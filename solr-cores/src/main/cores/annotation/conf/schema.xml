@@ -69,7 +69,6 @@
 
     <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
     <!-- Fields used by the annotation model -->
-    <uniqueKey>id</uniqueKey>
     <!-- The following fields are used for storage and/or faceting, do not add search specific analyzers to these -->
     <field name="id" type="string" indexed="true" stored="true" multiValued="false" required="true" docValues="true"/>
     <field name="assignedBy" type="string" indexed="true" stored="true" multiValued="false" docValues="true"/>
