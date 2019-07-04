@@ -6,6 +6,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import uk.ac.ebi.quickgo.common.FacetableField;
@@ -32,6 +33,7 @@ import static uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern.DEFAULT_ERR
 public class OntologyRequestValidationIT {
     private static final String VALID_FACET = "valid";
 
+    @Configuration
     static class OntologyRequestValidationConfig {
         @Bean
         public Validator validator() {

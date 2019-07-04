@@ -1,5 +1,9 @@
 package uk.ac.ebi.quickgo.ontology.service;
 
+import com.google.common.base.Preconditions;
+import org.slf4j.Logger;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
 import uk.ac.ebi.quickgo.ontology.common.OntologyType;
@@ -14,15 +18,11 @@ import uk.ac.ebi.quickgo.rest.search.query.RegularPage;
 import uk.ac.ebi.quickgo.rest.search.results.PageInfo;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
-import com.google.common.base.Preconditions;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.slf4j.Logger;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 
 import static java.util.Collections.singleton;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -72,7 +72,7 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
 
     @Override
     public QueryResult<T> findAllByOntologyType(OntologyType type, RegularPage page) {
-        Pageable pageable = new PageRequest(calculatePageNumber(page.getPageNumber()), page.getPageSize());
+        Pageable pageable = PageRequest.of(calculatePageNumber(page.getPageNumber()), page.getPageSize());
 
         org.springframework.data.domain.Page<OntologyDocument> pagedResult =
                 ontologyRepository.findAllByOntologyType(type.name(), pageable);
