@@ -57,7 +57,7 @@ public class AnnotationRequestValidationIT {
     //ASSIGNED BY PARAMETER
     @Test
     public void nullAssignedByIsValid() {
-        annotationRequest.setAssignedBy(null);
+        annotationRequest.setAssignedBy();
 
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
@@ -85,7 +85,7 @@ public class AnnotationRequestValidationIT {
     //GO EVIDENCE PARAMETER
     @Test
     public void nullGoEvidenceIsValid() {
-        annotationRequest.setGoIdEvidence(null);
+        annotationRequest.setGoIdEvidence();
 
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
@@ -113,7 +113,7 @@ public class AnnotationRequestValidationIT {
     //ASPECT PARAMETER
     @Test
     public void nullAspectIsValid() {
-        annotationRequest.setAspect(null);
+        annotationRequest.setAspect();
 
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }

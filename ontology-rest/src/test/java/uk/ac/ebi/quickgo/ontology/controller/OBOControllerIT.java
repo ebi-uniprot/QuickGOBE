@@ -906,7 +906,7 @@ public abstract class OBOControllerIT {
     @Test
     public void failedChartRequestProduces500() throws Exception {
         String exceptionDescription = "Error encountered during creation of ontology chart graphics.";
-        when(graphImageService.createChart(anyListOf(String.class), anyString(), any(GraphPresentation.class)))
+        when(graphImageService.createChart(anyList(), anyString(), any(GraphPresentation.class)))
                 .thenThrow(
                 new RenderingGraphException("Problem rendering graphics")
         );
@@ -947,7 +947,7 @@ public abstract class OBOControllerIT {
     @Test
     public void failedChartCoordsRequestProduces500() throws Exception {
         String exceptionDescription = "Error encountered during creation of ontology chart graphics.";
-        when(graphImageService.createChart(anyListOf(String.class), anyString(), any(GraphPresentation.class)))
+        when(graphImageService.createChart(anyList(), anyString(), any(GraphPresentation.class)))
                 .thenThrow(
                 new RenderingGraphException("Problem rendering graphics")
         );
@@ -1044,7 +1044,7 @@ public abstract class OBOControllerIT {
 
         MvcResult result = response.andReturn();
         assertThat(result.getResponse().getContentLength(), is(greaterThan(0)));
-        verify(graphImageService).createChart(anyListOf(String.class), anyString(), eq(defaultPresentation));
+        verify(graphImageService).createChart(anyList(), anyString(), eq(defaultPresentation));
     }
 
     @Test
@@ -1061,7 +1061,7 @@ public abstract class OBOControllerIT {
 
         MvcResult result = response.andReturn();
         assertThat(result.getResponse().getContentLength(), is(greaterThan(0)));
-        verify(graphImageService).createChart(anyListOf(String.class), anyString(), eq(getGraphPresentationNegated()));
+        verify(graphImageService).createChart(anyList(), anyString(), eq(getGraphPresentationNegated()));
     }
 
     @Test
@@ -1072,7 +1072,7 @@ public abstract class OBOControllerIT {
         ResultActions response = mockMvc.perform(get(urlTarget));
 
         response.andExpect(status().isOk());
-        verify(graphImageService).createChart(anyListOf(String.class), anyString(), eq(defaultPresentation));
+        verify(graphImageService).createChart(anyList(), anyString(), eq(defaultPresentation));
 
     }
 
@@ -1085,7 +1085,7 @@ public abstract class OBOControllerIT {
         ResultActions response = mockMvc.perform(get(urlTarget));
 
         response.andExpect(status().isOk());
-        verify(graphImageService).createChart(anyListOf(String.class), anyString(), eq(getGraphPresentationNegated()));
+        verify(graphImageService).createChart(anyList(), anyString(), eq(getGraphPresentationNegated()));
 
     }
 
@@ -1288,7 +1288,7 @@ public abstract class OBOControllerIT {
         GraphImageLayout layout = new GraphImageLayout();
         layout.title = "layout title";
         when(mockGraphImageResult.getLayout()).thenReturn(layout);
-        when(graphImageService.createChart(anyListOf(String.class), anyString(), any(GraphPresentation.class)))
+        when(graphImageService.createChart(anyList(), anyString(), any(GraphPresentation.class)))
                 .thenReturn(mockGraphImageResult);
     }
 

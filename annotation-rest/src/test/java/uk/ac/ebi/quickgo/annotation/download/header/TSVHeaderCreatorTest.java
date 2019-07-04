@@ -108,7 +108,7 @@ public class TSVHeaderCreatorTest {
 
     @Test(expected = IllegalStateException.class)
     public void ioErrorWhenWritingHeaderCausesIllegalStateException() throws Exception {
-        doThrow(IllegalStateException.class).when(mockEmitter).send(anyObject(), any());
+        doThrow(IllegalStateException.class).when(mockEmitter).send(any(), any());
         tsvHeaderCreator.write(mockEmitter, mockContent);
     }
 
