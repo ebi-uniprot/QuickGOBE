@@ -49,7 +49,7 @@ public class TermSlimmer {
         checkArgument(ontologyType != null && ontologyType == GO, "OntologyType cannot be null and must be GO");
         checkArgument(ontology != null, "Ontology cannot be null");
         checkArgument(requestedSlimTerms != null && !requestedSlimTerms.isEmpty(), "Slim-set cannot be null or empty");
-        checkArgument(requestedRelationTypes != null && requestedRelationTypes.length != 0, "Requested relation types cannot be null");
+        checkArgument(requestedRelationTypes != null, "Requested relation types cannot be null");
         List<String> slimTerms = retainValidSlimTerms(ontology, ontologyType, requestedSlimTerms);
         checkArgument(!slimTerms.isEmpty(), "Requested slim-set contains no valid terms");
 
