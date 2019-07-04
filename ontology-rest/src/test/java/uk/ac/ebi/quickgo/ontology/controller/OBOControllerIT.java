@@ -1234,8 +1234,9 @@ public abstract class OBOControllerIT {
                 .andDo(print())
                 .andExpect(jsonPath("$.url", is(requestUrl(result))))
                 .andExpect(jsonPath("$.messages", hasItem(containsString(
-                        "Failed to convert property value of type [java.lang.String] to required type [boolean] for " +
-                                "property 'showKey'; nested exception is java.lang.IllegalArgumentException: Invalid boolean value [bloom]"))));
+                        "Failed to convert property value of type 'java.lang.String' to required type" +
+                          " 'boolean' for property 'showKey'; nested exception is java.lang.IllegalArgumentException:" +
+                          " Invalid boolean value [bloom]"))));
     }
 
     protected ResultActions expectInvalidRelationError(ResultActions result, String relation) throws Exception {
