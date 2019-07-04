@@ -9,12 +9,16 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.client.RestOperations;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
 import uk.ac.ebi.quickgo.annotation.AnnotationREST;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
@@ -82,6 +86,9 @@ public class AnnotationControllerIT {
     public static final String EXACT_USAGE = "exact";
     private MockMvc mockMvc;
     private List<AnnotationDocument> genericDocs;
+    private MockRestServiceServer mockRestServiceServer;
+    @Autowired
+    private RestOperations restOperations;
     @Autowired
     private WebApplicationContext webApplicationContext;
 
