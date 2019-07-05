@@ -34,6 +34,6 @@ public class SolrCrudRepoWriter<D extends QuickGODocument, R extends SolrCrudRep
 
     @Override public void write(List<? extends D> list) throws Exception {
         LOGGER.info("Writing batch to the repository.");
-        repository.save(list);
+        repository.saveAll(list);
     }
 }

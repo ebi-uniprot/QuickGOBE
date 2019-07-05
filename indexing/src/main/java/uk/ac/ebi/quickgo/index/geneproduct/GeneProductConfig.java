@@ -1,18 +1,5 @@
 package uk.ac.ebi.quickgo.index.geneproduct;
 
-import uk.ac.ebi.quickgo.common.QuickGODocument;
-import uk.ac.ebi.quickgo.geneproduct.common.GeneProductDocument;
-import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepoConfig;
-import uk.ac.ebi.quickgo.index.common.GZipBufferedReaderFactory;
-import uk.ac.ebi.quickgo.index.common.SolrServerWriter;
-import uk.ac.ebi.quickgo.index.common.listener.ItemRateWriterListener;
-import uk.ac.ebi.quickgo.index.common.listener.LogJobListener;
-import uk.ac.ebi.quickgo.index.common.listener.LogStepListener;
-import uk.ac.ebi.quickgo.index.common.listener.SkipLoggerListener;
-
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -41,6 +28,19 @@ import org.springframework.core.io.Resource;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.retry.backoff.BackOffPolicy;
 import org.springframework.retry.backoff.ExponentialBackOffPolicy;
+import uk.ac.ebi.quickgo.common.QuickGODocument;
+import uk.ac.ebi.quickgo.geneproduct.common.GeneProductDocument;
+import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepoConfig;
+import uk.ac.ebi.quickgo.index.common.GZipBufferedReaderFactory;
+import uk.ac.ebi.quickgo.index.common.SolrServerWriter;
+import uk.ac.ebi.quickgo.index.common.listener.ItemRateWriterListener;
+import uk.ac.ebi.quickgo.index.common.listener.LogJobListener;
+import uk.ac.ebi.quickgo.index.common.listener.LogStepListener;
+import uk.ac.ebi.quickgo.index.common.listener.SkipLoggerListener;
+
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Sets up batch jobs for gene product indexing.
@@ -49,6 +49,7 @@ import org.springframework.retry.backoff.ExponentialBackOffPolicy;
 @EnableBatchProcessing
 @Import({GeneProductRepoConfig.class})
 public class GeneProductConfig {
+    static final String COLLECTION = "geneproduct";
     static final String GENE_PRODUCT_INDEXING_JOB_NAME = "geneProductIndexingJob";
     static final String GENE_PRODUCT_INDEXING_STEP_NAME = "geneProductIndexStep";
 
@@ -197,7 +198,7 @@ public class GeneProductConfig {
 
     @Bean
     ItemWriter<GeneProductDocument> geneProductRepositoryWriter() {
-        return new SolrServerWriter<>(geneProductTemplate.getSolrClient());
+        return new SolrServerWriter<>(geneProductTemplate.getSolrClient(), COLLECTION);
     }
 
     private JobExecutionListener logJobListener() {
