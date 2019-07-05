@@ -81,7 +81,7 @@ public class TermSlimmerTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void nullRelationshipsCauseCreationException() {
-        TermSlimmer.createSlims(OntologyType.GO, mockOntologyGraph, mockSlimSet);
+        TermSlimmer.createSlims(OntologyType.GO, mockOntologyGraph, mockSlimSet, null);
     }
 
     @Test
