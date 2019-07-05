@@ -16,12 +16,14 @@ import org.springframework.batch.item.ItemWriter;
 public class SolrServerWriter<D extends QuickGODocument> implements
                                                          ItemWriter<D> {
     private final SolrClient server;
+    private final String collection;
 
-    public SolrServerWriter(SolrClient server) {
+    public SolrServerWriter(SolrClient server, String collectionName) {
         this.server = server;
+        this.collection = collectionName;
     }
 
     @Override public void write(List<? extends D> list) throws Exception {
-        server.addBeans(list);
+        server.addBeans(collection, list);
     }
 }

@@ -38,6 +38,7 @@ import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.T
 @EnableBatchProcessing
 @Import({AnnotationRepoConfig.class})
 public class AnnotationConfig {
+    static final String COLLECTION = "annotation";
     static final String ANNOTATION_INDEXING_JOB_NAME = "annotationIndexingJob";
     static final String ANNOTATION_INDEXING_STEP_NAME = "annotationIndexStep";
 
@@ -108,6 +109,6 @@ public class AnnotationConfig {
 
     @Bean
     ItemWriter<AnnotationDocument> annotationSolrServerWriter() {
-        return new SolrServerWriter<>(annotationTemplate.getSolrClient());
+        return new SolrServerWriter<>(annotationTemplate.getSolrClient(), COLLECTION);
     }
 }

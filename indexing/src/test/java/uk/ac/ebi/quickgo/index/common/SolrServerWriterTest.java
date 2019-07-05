@@ -19,13 +19,14 @@ import static org.mockito.Mockito.verify;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class SolrServerWriterTest {
+    private static final String COLLECTION = "fake";
     @Mock
     private SolrClient solrServer;
     private SolrServerWriter<QuickGODocument> solrServerWriter;
 
     @Before
     public void setUp() {
-        solrServerWriter = new SolrServerWriter<>(solrServer);
+        solrServerWriter = new SolrServerWriter<>(solrServer, COLLECTION);
     }
 
     @Test
@@ -34,7 +35,7 @@ public class SolrServerWriterTest {
         solrServerWriter.write(fakeDocuments);
 
         // ensure solr server has sent the documents off for indexing
-        verify(solrServer).addBeans(fakeDocuments);
+        verify(solrServer).addBeans(COLLECTION, fakeDocuments);
     }
 
     private static class FakeDocument implements QuickGODocument {
