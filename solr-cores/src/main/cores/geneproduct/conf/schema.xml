@@ -186,7 +186,7 @@
       These fields support doc values, but they require the field to be
       single-valued and either be required or have a default value.
     -->
-    <fieldType name="int" class="solr.IntPointField" positionIncrementGap="0"/>
+    <fieldType name="int" class="solr.TrieIntField" positionIncrementGap="0"/>
     <fieldType name="float" class="solr.FloatPointField" positionIncrementGap="0"/>
     <fieldType name="long" class="solr.LongPointField" positionIncrementGap="0"/>
     <fieldType name="double" class="solr.DoublePointField" positionIncrementGap="0"/>
