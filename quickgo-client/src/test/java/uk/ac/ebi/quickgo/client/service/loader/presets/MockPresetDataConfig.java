@@ -10,8 +10,8 @@ import uk.ac.ebi.quickgo.common.SearchableField;
 import uk.ac.ebi.quickgo.rest.search.RetrievalException;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -173,21 +173,21 @@ public class MockPresetDataConfig {
         when(mockRestOperations.getForObject(
                 anyStringContaining(ASSIGNED_BY),
                 isA(Class.class),
-                any(HashMap.class)))
+                any(Map.class)))
                 .thenReturn(DEFAULT_RELEVANT_ASSIGNED_BYS);
         when(mockRestOperations.getForObject(
                 anyStringContaining(TAXON_ID),
                 isA(Class.class),
-                any(HashMap.class)))
+                any(Map.class)))
                 .thenReturn(DEFAULT_RELEVANT_TAXONS);
         when(mockRestOperations.getForObject(
                 anyStringContaining(QUALIFIER),
                 isA(Class.class),
-                any(HashMap.class)))
+                any(Map.class)))
                 .thenReturn(DEFAULT_RELEVANT_QUALIFIERS);
         when(mockRestOperations.getForObject(anyStringContaining("withFrom"),
                 isA(Class.class),
-                any(HashMap.class)))
+                any(Map.class)))
                 .thenReturn(DEFAULT_RELEVANT_WITH_FROM);
 
         return mockRestOperations;
@@ -202,7 +202,7 @@ public class MockPresetDataConfig {
                 .getForObject(
                         anyString(),
                         isA(Class.class),
-                        any(HashMap.class));
+                        any(Map.class));
         return mockRestOperations;
     }
 
