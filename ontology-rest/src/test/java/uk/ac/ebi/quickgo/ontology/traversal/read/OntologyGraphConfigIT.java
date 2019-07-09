@@ -7,6 +7,7 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.ac.ebi.quickgo.ontology.traversal.OntologyGraph;
 
@@ -26,6 +27,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {OntologyGraphConfig.class, JobTestRunnerConfig.class})
+@TestPropertySource(properties = "ontology.traversal.source=classpath:/relations/RELATIONS.dat.gz,classpath:/relations/ECO_RELATIONS.dat.gz")
 public class OntologyGraphConfigIT {
 
     @Autowired
