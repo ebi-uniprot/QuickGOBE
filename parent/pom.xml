@@ -29,7 +29,7 @@
         <jacoco.itReportPath>${jacoco.outputDir}/${jacoco.out.it.file}</jacoco.itReportPath>
 
         <!-- dependency version numbers -->
-        <spring.boot.starter>2.1.5.RELEASE</spring.boot.starter>
+        <spring.boot.starter>2.1.6.RELEASE</spring.boot.starter>
         <guava.version>18.0</guava.version>
 
         <solr.version>7.7.2</solr.version>
