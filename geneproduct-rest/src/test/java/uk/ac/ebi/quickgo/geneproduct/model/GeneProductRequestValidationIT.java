@@ -160,7 +160,7 @@ public class GeneProductRequestValidationIT {
 
     @Test
     public void nullTaxonIdIsValid() {
-        geneProductRequest.setTaxonId(null);
+        geneProductRequest.setTaxonId();
 
         assertThat(validator.validate(geneProductRequest), hasSize(0));
     }
