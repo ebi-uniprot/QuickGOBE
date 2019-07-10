@@ -42,7 +42,7 @@ public class AnnotationRepositoryIT {
         AnnotationDocument doc1 = createAnnotationDoc("A0A000");
         annotationRepository.save(doc1);
 
-        assertThat(annotationRepository.findAll(new PageRequest(0, 10)).getTotalElements(), is(1L));
+        assertThat(annotationRepository.findAll(PageRequest.of(0, 10)).getTotalElements(), is(1L));
     }
 
     @Test
@@ -53,7 +53,7 @@ public class AnnotationRepositoryIT {
         annotationRepository.save(doc1);
         annotationRepository.save(doc2);
 
-        assertThat(annotationRepository.findAll(new PageRequest(0, 10)).getTotalElements(), is(2L));
+        assertThat(annotationRepository.findAll(PageRequest.of(0, 10)).getTotalElements(), is(2L));
     }
 
     @Test
@@ -67,7 +67,7 @@ public class AnnotationRepositoryIT {
         annotationRepository.save(doc3);
         annotationRepository.delete(doc3);
 
-        assertThat(annotationRepository.findAll(new PageRequest(0, 10)).getTotalElements(), is(2L));
+        assertThat(annotationRepository.findAll(PageRequest.of(0, 10)).getTotalElements(), is(2L));
     }
 
     @Test
@@ -80,7 +80,7 @@ public class AnnotationRepositoryIT {
         annotationRepository.save(doc1);
         annotationRepository.save(doc2);
 
-        AnnotationDocument firstReturnedDoc = annotationRepository.findAll(new PageRequest(0, 10)).getContent().get(0);
+        AnnotationDocument firstReturnedDoc = annotationRepository.findAll(PageRequest.of(0, 10)).getContent().get(0);
         assertThat(firstReturnedDoc.geneProductId, is("A0A001"));
     }
 }
