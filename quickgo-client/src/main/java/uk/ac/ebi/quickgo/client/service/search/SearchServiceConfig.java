@@ -118,6 +118,7 @@ public class SearchServiceConfig {
         };
     }
 
+    @Primary
     @Bean
     public FacetableField ontologyFacetableField() {
         return new FacetableField() {
