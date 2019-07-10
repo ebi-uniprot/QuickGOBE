@@ -40,7 +40,7 @@
         <!-- plugin version numbers -->
         <compiler.version>3.3</compiler.version>
         <surefire-version>2.19.1</surefire-version>
-        <failsafe-version>2.19.1</failsafe-version>
+        <failsafe-version>2.18.1</failsafe-version>
         <jacoco.version>0.7.8</jacoco.version>
         <maven-jar-plugin.version>2.6</maven-jar-plugin.version>
 
@@ -278,6 +278,7 @@
                     </configuration>
                     <executions>
                         <execution>
+                            <phase>integration-test</phase>
                             <goals>
                                 <goal>integration-test</goal>
                                 <goal>verify</goal>
