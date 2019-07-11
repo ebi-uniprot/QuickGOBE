@@ -44,11 +44,7 @@
         <springfox-swagger2.version>2.7.0</springfox-swagger2.version>
 
         <!-- plugin version numbers -->
-        <compiler.version>3.3</compiler.version>
-        <surefire-version>2.19.1</surefire-version>
-        <failsafe-version>2.18.1</failsafe-version>
         <jacoco.version>0.7.8</jacoco.version>
-        <maven-jar-plugin.version>2.6</maven-jar-plugin.version>
 
         <!-- jmeter default properties -->
         <jmeter-maven-plugin.version>1.10.1</jmeter-maven-plugin.version>
@@ -194,7 +190,6 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>${maven-jar-plugin.version}</version>
                     <executions>
                         <execution>
                             <id>test-jar</id>
@@ -216,7 +211,6 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>${compiler.version}</version>
                     <configuration>
                         <source>1.8</source>
                         <target>1.8</target>
@@ -226,7 +220,6 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>${surefire-version}</version>
                     <configuration>
                         <!-- Exclude integration tests from unit test run-->
                         <excludes>
@@ -241,7 +234,6 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>${failsafe-version}</version>
                     <configuration>
                         <forkCount>1</forkCount>
                         <reuseForks>false</reuseForks>
@@ -293,8 +285,8 @@
                     </executions>
                 </plugin>
                 <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-clean-plugin</artifactId>
-                    <version>3.0.0</version>
                     <configuration>
                         <filesets>
                             <fileset>
