@@ -56,7 +56,7 @@ public class OntologyRepositoryIT {
     public void add1DocumentThenFind1Documents() throws IOException, SolrServerException {
         ontologyRepository.save(OntologyDocMocker.createGODoc("A", "Alice Cooper"));
 
-        assertThat(ontologyRepository.findAll(new PageRequest(0, 10)).getTotalElements(), is(1L));
+        assertThat(ontologyRepository.findAll(PageRequest.of(0, 10)).getTotalElements(), is(1L));
     }
 
     @Test
@@ -65,7 +65,7 @@ public class OntologyRepositoryIT {
         ontologyRepository.save(OntologyDocMocker.createGODoc("B", "Bob The Builder"));
         ontologyRepository.save(OntologyDocMocker.createGODoc("C", "Clint Eastwood"));
 
-        assertThat(ontologyRepository.findAll(new PageRequest(0, 10)).getTotalElements(), is(3L));
+        assertThat(ontologyRepository.findAll(PageRequest.of(0, 10)).getTotalElements(), is(3L));
     }
 
     @Test
@@ -245,7 +245,7 @@ public class OntologyRepositoryIT {
         ontologyRepository.save(ecoDoc);
 
         Page<OntologyDocument> pagedDocs =
-                ontologyRepository.findAllByOntologyType(OntologyType.GO.name(), new PageRequest(0, 2));
+                ontologyRepository.findAllByOntologyType(OntologyType.GO.name(), PageRequest.of(0, 2));
 
         assertThat(pagedDocs.getTotalElements(), is(1L));
         assertThat(pagedDocs.getContent().get(0).getUniqueName(), is(goDoc.getUniqueName()));
@@ -264,7 +264,7 @@ public class OntologyRepositoryIT {
         int count = 0;
         for (OntologyDocument ontologyDocument : ontologyDocuments) {
             Page<OntologyDocument> pagedDocs =
-                    ontologyRepository.findAllByOntologyType(OntologyType.GO.name(), new PageRequest(count++, 1));
+                    ontologyRepository.findAllByOntologyType(OntologyType.GO.name(), PageRequest.of(count++, 1));
 
             assertThat(pagedDocs.getContent(), hasSize(1));
             assertThat(pagedDocs.getContent().get(0).getUniqueName(), is(ontologyDocument.getUniqueName()));
@@ -288,11 +288,11 @@ public class OntologyRepositoryIT {
                         OntologyDocMocker.createGODoc("D", "Alice Cooper"),
                         OntologyDocMocker.createGODoc("E", "Alice Cooper")));
 
-        assertThat(ontologyRepository.findAll(new PageRequest(0, 10)).getTotalElements(), is(0L));
+        assertThat(ontologyRepository.findAll(PageRequest.of(0, 10)).getTotalElements(), is(0L));
 
         ontologyTemplate.getSolrClient().commit(COLLECTION);
 
-        assertThat(ontologyRepository.findAll(new PageRequest(0, 10)).getTotalElements(), is(5L));
+        assertThat(ontologyRepository.findAll(PageRequest.of(0, 10)).getTotalElements(), is(5L));
     }
 
     private OntologyDocument copyAsBasicDoc(OntologyDocument document) {
