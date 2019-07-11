@@ -914,7 +914,7 @@
                      term. Again exact matches have higher boosting to make use these come first.
             -->
             <str name="qf">
-                id_lowercase^20 secondaryId_lowercase^5 name_edge^2 synonym_edge name_exact^5 synonym_exact^5
+                id_lowercase^20 secondaryId_lowercase^10 name_edge^2 synonym_edge name_exact^5 synonym_exact^5
             </str>
             <str name="pf">
                 name_edge^2 synonym_edge name_exact^5 synonym_exact^5
