@@ -2061,6 +2061,32 @@ public class AnnotationControllerIT {
           .andExpect(totalNumOfResults(expected));
     }
 
+    @Test
+    public void advanceFilter_invalidGoId() throws Exception {
+        AnnotationRequestBody.GoDescription and = new AnnotationRequestBody.GoDescription(new String[]{"invalid-go-id"},null,"exact");
+        AnnotationRequestBody body = new AnnotationRequestBody(and);
+
+        ResultActions response = mockMvc.perform(
+          post(RESOURCE_URL + "/search").contentType(MediaType.APPLICATION_JSON).content(json(body))
+        );
+
+        response.andDo(print())
+          .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void advanceFilter_invalidUsage() throws Exception {
+        AnnotationRequestBody.GoDescription and = new AnnotationRequestBody.GoDescription(new String[]{createGoId(1)}, null, "invalid");
+        AnnotationRequestBody body = new AnnotationRequestBody(and);
+
+        ResultActions response = mockMvc.perform(
+          post(RESOURCE_URL + "/search").contentType(MediaType.APPLICATION_JSON).content(json(body))
+        );
+
+        response.andDo(print())
+          .andExpect(status().isBadRequest());
+    }
+
     private String json(Object object) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.writeValueAsString(object);
