@@ -75,14 +75,19 @@
 
     <build>
         <plugins>
-            <!-- allows executable jar with embedded jetty to be created through, "mvn package" command -->
             <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <configuration>
+                    <reuseForks>false</reuseForks>
+                    <skipITs>${skipITs}</skipITs>
+                </configuration>
                 <executions>
                     <execution>
+                        <phase>integration-test</phase>
                         <goals>
-                            <goal>repackage</goal>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
                         </goals>
                     </execution>
                 </executions>
