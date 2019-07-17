@@ -18,6 +18,7 @@
     </parent>
 
     <properties>
+        <java.version>11</java.version>
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
@@ -141,6 +142,10 @@
                         <groupId>org.apache.logging.log4j</groupId>
                         <artifactId>log4j-1.2-api</artifactId>
                     </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.hadoop</groupId>
+                        <artifactId>hadoop-annotations</artifactId>
+                    </exclusion>
                 </exclusions>
             </dependency>
 
@@ -210,6 +215,7 @@
                             <exclude>**/IT*.java</exclude>
                         </excludes>
                         <argLine>${jacoco.agent.ut.arg}</argLine>
+                        <argLine>--illegal-access=permit</argLine>
                     </configuration>
                 </plugin>
 
@@ -217,10 +223,9 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
                     <configuration>
-                        <forkCount>1</forkCount>
-                        <reuseForks>false</reuseForks>
                         <skipITs>${skipITs}</skipITs>
                         <argLine>${jacoco.agent.it.arg}</argLine>
+                        <argLine>--illegal-access=permit</argLine>
                     </configuration>
                     <executions>
                         <execution>
@@ -354,6 +359,9 @@
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-maven-plugin</artifactId>
+                <configuration>
+                    <jvmTarget>1.8</jvmTarget>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
