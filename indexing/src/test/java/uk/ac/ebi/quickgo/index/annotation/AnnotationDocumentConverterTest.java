@@ -1,6 +1,10 @@
 package uk.ac.ebi.quickgo.index.annotation;
 
+import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
 import uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper;
@@ -10,9 +14,6 @@ import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.stream.Collectors;
-import org.hamcrest.CoreMatchers;
-import org.junit.Before;
-import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -29,15 +30,17 @@ public class AnnotationDocumentConverterTest {
     private AnnotationDocumentConverter converter;
     private Annotation annotation;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         converter = new AnnotationDocumentConverter();
         annotation = createValidAnnotation();
     }
 
-    @Test(expected = DocumentReaderException.class)
+    @Test
     public void nullAnnotationThrowsException() {
-        converter.process(null);
+        Assertions.assertThrows(DocumentReaderException.class, () -> {
+            converter.process(null);
+        });
     }
 
     @Test
