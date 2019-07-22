@@ -1,13 +1,13 @@
 package uk.ac.ebi.quickgo.geneproduct.model;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import uk.ac.ebi.quickgo.common.FacetableField;
 
@@ -26,7 +26,7 @@ import static org.hamcrest.Matchers.hasSize;
 /**
  * Tests that the validation added to the {@link GeneProductRequest} class is correct.
  */
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = GeneProductRequestValidationIT.GeneProductRequestValidationConfig.class)
 public class GeneProductRequestValidationIT {
     private static final String INVALID_FACET_1 = "invalid1";
@@ -59,7 +59,7 @@ public class GeneProductRequestValidationIT {
 
     private GeneProductRequest geneProductRequest;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         geneProductRequest = new GeneProductRequest();
         geneProductRequest.setQuery("query");
