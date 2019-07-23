@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.index.annotation;
 
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepoConfig;
+import uk.ac.ebi.quickgo.common.SolrCollectionName;
 import uk.ac.ebi.quickgo.index.common.GZipBufferedReaderFactory;
 import uk.ac.ebi.quickgo.index.common.SolrServerWriter;
 
@@ -38,7 +39,7 @@ import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.T
 @EnableBatchProcessing
 @Import({AnnotationRepoConfig.class})
 public class AnnotationConfig {
-    static final String COLLECTION = "annotation";
+    static final String COLLECTION = SolrCollectionName.ANNOTATION;
     static final String ANNOTATION_INDEXING_JOB_NAME = "annotationIndexingJob";
     static final String ANNOTATION_INDEXING_STEP_NAME = "annotationIndexStep";
 

@@ -12,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.ac.ebi.quickgo.common.QueryUtils;
+import uk.ac.ebi.quickgo.common.SolrCollectionName;
 import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocMocker;
 
@@ -36,7 +37,7 @@ import static org.hamcrest.core.IsNull.notNullValue;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = OntologyRepoConfig.class)
 public class OntologyRepositoryIT {
-    private static final String COLLECTION = "ontology";
+    private static final String COLLECTION = SolrCollectionName.ONTOLOGY;
     // temporary data store for solr's data, which is automatically cleaned on exit
     @ClassRule
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();

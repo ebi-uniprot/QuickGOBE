@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.geneproduct.controller;
 
+import uk.ac.ebi.quickgo.common.SolrCollectionName;
 import uk.ac.ebi.quickgo.geneproduct.model.GeneProduct;
 import uk.ac.ebi.quickgo.geneproduct.model.GeneProductRequest;
 import uk.ac.ebi.quickgo.geneproduct.service.GeneProductService;
@@ -50,7 +51,7 @@ import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.search;
 @Api(tags = {"gene products"})
 @RequestMapping(value = "/geneproduct")
 public class GeneProductController {
-    private static final String COLLECTION = "geneproduct";
+    private static final String COLLECTION = SolrCollectionName.GENE_PRODUCT;
     private static final Logger LOGGER = LoggerFactory.getLogger(GeneProductController.class);
 
     private final GeneProductService geneProductService;

@@ -3,6 +3,7 @@ package uk.ac.ebi.quickgo.ontology.common;
 import org.apache.solr.client.solrj.beans.Field;
 import org.springframework.data.solr.core.mapping.SolrDocument;
 import uk.ac.ebi.quickgo.common.QuickGODocument;
+import uk.ac.ebi.quickgo.common.SolrCollectionName;
 
 import java.util.List;
 
@@ -12,7 +13,7 @@ import java.util.List;
  * Created 11/11/15
  * @author Edd
  */
-@SolrDocument(collection = "ontology")
+@SolrDocument(collection = SolrCollectionName.ONTOLOGY)
 public class OntologyDocument implements QuickGODocument {
 
     @Field(OntologyFields.ID)

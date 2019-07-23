@@ -10,6 +10,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import uk.ac.ebi.quickgo.common.SolrCollectionName;
 
 import static org.mockito.Mockito.verify;
 
@@ -19,7 +20,7 @@ import static org.mockito.Mockito.verify;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class SolrServerWriterTest {
-    private static final String COLLECTION = "fake";
+    private static final String COLLECTION = SolrCollectionName.FAKE;
     @Mock
     private SolrClient solrServer;
     private SolrServerWriter<QuickGODocument> solrServerWriter;

@@ -6,6 +6,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import uk.ac.ebi.quickgo.common.SolrCollectionName;
 import uk.ac.ebi.quickgo.rest.comm.FilterContext;
 import uk.ac.ebi.quickgo.rest.search.query.*;
 import uk.ac.ebi.quickgo.rest.search.results.PageInfo;
@@ -39,7 +40,7 @@ import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.createFirstCursorPa
  */
 @RunWith(MockitoJUnitRunner.class)
 public class SearchDispatcherStreamedResultsTest {
-    private static final String COLLECTION = "collection";
+    private static final String COLLECTION = SolrCollectionName.COLLECTION;
     @Mock
     private QueryRequest queryRequest;
 

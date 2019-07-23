@@ -29,6 +29,7 @@ import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.retry.backoff.BackOffPolicy;
 import org.springframework.retry.backoff.ExponentialBackOffPolicy;
 import uk.ac.ebi.quickgo.common.QuickGODocument;
+import uk.ac.ebi.quickgo.common.SolrCollectionName;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductDocument;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepoConfig;
 import uk.ac.ebi.quickgo.index.common.GZipBufferedReaderFactory;
@@ -49,7 +50,7 @@ import java.util.List;
 @EnableBatchProcessing
 @Import({GeneProductRepoConfig.class})
 public class GeneProductConfig {
-    static final String COLLECTION = "geneproduct";
+    static final String COLLECTION = SolrCollectionName.GENE_PRODUCT;
     static final String GENE_PRODUCT_INDEXING_JOB_NAME = "geneProductIndexingJob";
     static final String GENE_PRODUCT_INDEXING_STEP_NAME = "geneProductIndexStep";
 
@@ -98,7 +99,7 @@ public class GeneProductConfig {
                     @Override public void beforeJob(JobExecution jobExecution) {}
 
                     @Override public void afterJob(JobExecution jobExecution) {
-                        geneProductTemplate.commit("geneproduct");
+                        geneProductTemplate.commit(SolrCollectionName.GENE_PRODUCT);
                     }
                 })
                 .build();

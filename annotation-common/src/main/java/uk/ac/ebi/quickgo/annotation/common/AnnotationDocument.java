@@ -3,6 +3,7 @@ package uk.ac.ebi.quickgo.annotation.common;
 import org.apache.solr.client.solrj.beans.Field;
 import org.springframework.data.solr.core.mapping.SolrDocument;
 import uk.ac.ebi.quickgo.common.QuickGODocument;
+import uk.ac.ebi.quickgo.common.SolrCollectionName;
 
 import java.util.Date;
 import java.util.List;
@@ -13,7 +14,7 @@ import java.util.List;
  * Created 14/04/16
  * @author Edd
  */
-@SolrDocument(collection = "annotation")
+@SolrDocument(collection = SolrCollectionName.ANNOTATION)
 public class AnnotationDocument implements QuickGODocument {
 
     @Field(AnnotationFields.ID)

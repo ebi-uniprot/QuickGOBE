@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.rest.search;
 
+import uk.ac.ebi.quickgo.common.SolrCollectionName;
 import uk.ac.ebi.quickgo.rest.search.query.*;
 
 import java.util.ArrayList;
@@ -22,7 +23,7 @@ import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.createFirstCursorPa
  * @author Edd
  */
 public class DefaultSearchQueryTemplateTest {
-    private static final String COLLECTION = "collection";
+    private static final String COLLECTION = SolrCollectionName.COLLECTION;
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 

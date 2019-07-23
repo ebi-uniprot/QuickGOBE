@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import uk.ac.ebi.quickgo.common.SolrCollectionName;
 import uk.ac.ebi.quickgo.rest.search.query.Page;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
@@ -35,7 +36,7 @@ import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.createFirstCursorPa
 @RunWith(MockitoJUnitRunner.class)
 public class AbstractSolrQueryResultConverterTest {
     private static final QuickGOQuery DEFAULT_QUERY = QuickGOQuery.createQuery("field1", "value1");
-    private static final String COLLECTION = "collection";
+    private static final String COLLECTION = SolrCollectionName.COLLECTION;
 
     private uk.ac.ebi.quickgo.rest.search.solr.AbstractSolrQueryResultConverter<String> converter;
 
