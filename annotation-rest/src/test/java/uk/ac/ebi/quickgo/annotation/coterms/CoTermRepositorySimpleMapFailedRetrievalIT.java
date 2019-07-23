@@ -3,7 +3,7 @@ package uk.ac.ebi.quickgo.annotation.coterms;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -14,7 +14,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * Created with IntelliJ IDEA.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = {CoTermRepoTestConfig.class})
+@SpringBootTest(classes = {CoTermRepoTestConfig.class})
 @ActiveProfiles(profiles = CoTermRepoTestConfig.FAILED_RETRIEVAL)
 public class CoTermRepositorySimpleMapFailedRetrievalIT {
 

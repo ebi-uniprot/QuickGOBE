@@ -1,5 +1,11 @@
 package uk.ac.ebi.quickgo.rest.search.request.converter;
 
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.web.client.RestOperations;
 import uk.ac.ebi.quickgo.rest.comm.ResponseType;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 import uk.ac.ebi.quickgo.rest.search.request.config.FilterConfig;
@@ -8,22 +14,14 @@ import uk.ac.ebi.quickgo.rest.search.request.config.FilterConfigRetrieval;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.web.client.RestOperations;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.isA;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 import static uk.ac.ebi.quickgo.rest.search.request.converter.RESTFilterConverter.*;
-import static uk.ac.ebi.quickgo.rest.search.request.converter.RESTFilterConverterFactoryTest.FakeResponseConverter
-        .buildConvertedResponse;
+import static uk.ac.ebi.quickgo.rest.search.request.converter.RESTFilterConverterFactoryTest.FakeResponseConverter.buildConvertedResponse;
 
 /**
  * Created 05/09/16
@@ -33,8 +31,6 @@ import static uk.ac.ebi.quickgo.rest.search.request.converter.RESTFilterConverte
 public class RESTFilterConverterFactoryTest {
     @Mock
     private FilterConfigRetrieval filterConfigRetrievalMock;
-    @Mock
-    private FilterConfig filterConfigMock;
     @Mock
     private RestOperations restOperationsMock;
 
@@ -79,8 +75,8 @@ public class RESTFilterConverterFactoryTest {
 
         FilterConfig filterConfig = createRestFilterConfig("resource", String.class, FakeResponseConverter.class);
 
-        when(filterConfigRetrievalMock.getBySignature(request.getSignature()))
-                .thenReturn(Optional.of(filterConfig));
+        doReturn(Optional.of(filterConfig)).
+        when(filterConfigRetrievalMock).getBySignature(request.getSignature());
 
         ConvertedFilter<String> convertedFilter = converter.convert(request);
         assertThat(convertedFilter.getConvertedValue(), is(buildConvertedResponse(response)));
@@ -91,10 +87,8 @@ public class RESTFilterConverterFactoryTest {
         FakeResponse response = new FakeResponse();
         response.fakeResponseValue = value;
 
-        when(restOperationsMock.getForObject(
-                anyString(),
-                isA(Class.class),
-                any(HashMap.class))).thenReturn(response);
+        doReturn(response).when(restOperationsMock)
+          .getForObject(anyString(), isA(Class.class), any(Map.class));
     }
 
     private FilterConfig createRestFilterConfig(

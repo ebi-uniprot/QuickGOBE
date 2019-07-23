@@ -5,7 +5,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
+import uk.ac.ebi.quickgo.common.SolrCollectionName;
 import uk.ac.ebi.quickgo.rest.comm.FilterContext;
 import uk.ac.ebi.quickgo.rest.search.query.*;
 import uk.ac.ebi.quickgo.rest.search.results.PageInfo;
@@ -25,7 +26,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.*;
 import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.createFirstCursorPage;
@@ -39,6 +40,7 @@ import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.createFirstCursorPa
  */
 @RunWith(MockitoJUnitRunner.class)
 public class SearchDispatcherStreamedResultsTest {
+    private static final String COLLECTION = SolrCollectionName.COLLECTION;
     @Mock
     private QueryRequest queryRequest;
 
@@ -56,6 +58,7 @@ public class SearchDispatcherStreamedResultsTest {
     public void setUp() {
         transformer = new IdentityResultsTransformationChain();
         when(queryRequest.getQuery()).thenReturn(new AllQuery());
+        when(queryRequest.getCollection()).thenReturn(COLLECTION);
         when(queryRequest.getFilters()).thenReturn(emptyList());
         when(queryRequest.getAggregate()).thenReturn(new AggregateRequest("value"));
         when(queryRequest.getSortCriteria()).thenReturn(emptyList());
@@ -220,6 +223,7 @@ public class SearchDispatcherStreamedResultsTest {
 
         QueryRequest queryRequest = queryTemplate.newBuilder()
                 .setQuery(query)
+                .setCollection(COLLECTION)
                 .addSortCriterion(sortField1, sortOrder1)
                 .addSortCriterion(sortField2, sortOrder2)
                 .setAggregate(aggregate)

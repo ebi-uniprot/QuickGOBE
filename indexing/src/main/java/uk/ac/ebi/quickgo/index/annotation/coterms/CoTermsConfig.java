@@ -1,16 +1,5 @@
 package uk.ac.ebi.quickgo.index.annotation.coterms;
 
-import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
-import uk.ac.ebi.quickgo.common.QuickGODocument;
-import uk.ac.ebi.quickgo.index.common.listener.ItemRateWriterListener;
-import uk.ac.ebi.quickgo.index.common.listener.LogStepListener;
-import uk.ac.ebi.quickgo.index.common.listener.SkipLoggerListener;
-import uk.ac.ebi.quickgo.index.common.writer.ListItemWriter;
-
-import java.time.Instant;
-import java.util.List;
-import java.util.Objects;
-import java.util.function.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.ItemWriteListener;
@@ -31,9 +20,19 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
+import uk.ac.ebi.quickgo.common.QuickGODocument;
+import uk.ac.ebi.quickgo.index.common.listener.ItemRateWriterListener;
+import uk.ac.ebi.quickgo.index.common.listener.LogStepListener;
+import uk.ac.ebi.quickgo.index.common.listener.SkipLoggerListener;
+import uk.ac.ebi.quickgo.index.common.writer.ListItemWriter;
+
+import java.time.Instant;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Predicate;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
@@ -71,11 +70,6 @@ public class CoTermsConfig {
     @ConfigurationProperties(prefix = "indexing.coterms")
     public CoTermsConfigProperties coTermsConfigProperties() {
         return new CoTermsConfigProperties();
-    }
-
-    @Bean
-    public static PropertySourcesPlaceholderConfigurer propertyConfigIn() {
-        return new PropertySourcesPlaceholderConfigurer();
     }
 
     @Bean

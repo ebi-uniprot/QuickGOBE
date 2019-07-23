@@ -1,14 +1,16 @@
 package uk.ac.ebi.quickgo.ontology.model;
 
-import javax.validation.Validator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+
+import javax.validation.Validator;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
@@ -21,9 +23,10 @@ import static org.hamcrest.Matchers.hasSize;
  * Created with IntelliJ IDEA.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = GraphRequestValidationIT.GraphRequestValidationConfig.class)
+@SpringBootTest(classes = GraphRequestValidationIT.GraphRequestValidationConfig.class)
 public class GraphRequestValidationIT {
 
+    @Configuration
     static class GraphRequestValidationConfig {
 
         @Bean

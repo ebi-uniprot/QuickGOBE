@@ -4,7 +4,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
@@ -14,9 +14,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 /**
  * Check properties for configuring the download {@link ThreadPoolTaskExecutor}, were read and used.
@@ -26,7 +24,7 @@ import static org.mockito.Mockito.verify;
  */
 @ActiveProfiles("download-task-executor-test")
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = DownloadTaskExecutorReadPropertiesIT.FakeApplication.class)
+@SpringBootTest(classes = DownloadTaskExecutorReadPropertiesIT.FakeApplication.class)
 public class DownloadTaskExecutorReadPropertiesIT {
     @Autowired
     private ThreadPoolTaskExecutor taskExecutor;

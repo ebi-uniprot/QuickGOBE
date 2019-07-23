@@ -1,5 +1,20 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 import uk.ac.ebi.quickgo.annotation.AnnotationREST;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationFields;
@@ -13,21 +28,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -47,7 +47,7 @@ import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.totalNumO
  * @author Edd
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = {AnnotationREST.class, StatsConfigsAreAppliedIT.TestStatsTypeConfig.class})
+@SpringBootTest(classes = {AnnotationREST.class, StatsConfigsAreAppliedIT.TestStatsTypeConfig.class})
 @WebAppConfiguration
 public class StatsConfigsAreAppliedIT {
     // temporary data store for solr's data, which is automatically cleaned on exit
@@ -91,7 +91,7 @@ public class StatsConfigsAreAppliedIT {
     public void goIdConfigReadAndApplied() throws Exception {
         List<AnnotationDocument> docs =
                 createDocsAndApply((i, doc) -> doc.goId = createGOId(i));
-        repository.save(docs);
+        repository.saveAll(docs);
 
         ResultActions response = mockMvc.perform(get(STATS_ENDPOINT)
                 .param(TAXON_ID_PARAMETER_NAME, AnnotationDocMocker.TAXON_ID));
@@ -108,7 +108,7 @@ public class StatsConfigsAreAppliedIT {
     public void taxonIdConfigReadAndApplied() throws Exception {
         List<AnnotationDocument> docs =
                 createDocsAndApply((i, doc) -> doc.taxonId = i);
-        repository.save(docs);
+        repository.saveAll(docs);
 
         ResultActions response = mockMvc.perform(get(STATS_ENDPOINT)
                 .param(TAXON_ID_PARAMETER_NAME, AnnotationDocMocker.TAXON_ID));
@@ -125,7 +125,7 @@ public class StatsConfigsAreAppliedIT {
     public void noConfigForReferenceMeansThereAreDefaultNumber() throws Exception {
         List<AnnotationDocument> docs =
                 createDocsAndApply((i, doc) -> doc.reference = createRef(i));
-        repository.save(docs);
+        repository.saveAll(docs);
 
         ResultActions response = mockMvc.perform(get(STATS_ENDPOINT)
                 .param(TAXON_ID_PARAMETER_NAME, AnnotationDocMocker.TAXON_ID));

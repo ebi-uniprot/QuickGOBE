@@ -1,29 +1,24 @@
 package uk.ac.ebi.quickgo.client.service.loader.presets;
 
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import org.springframework.web.client.RestOperations;
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
 import uk.ac.ebi.quickgo.client.model.presets.evidence.PresetEvidenceItem;
 import uk.ac.ebi.quickgo.common.SearchableField;
 import uk.ac.ebi.quickgo.rest.search.RetrievalException;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
-import org.springframework.web.client.RestOperations;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.isA;
-import static org.mockito.Matchers.matches;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.assignedby.AssignedByPresetsConfig.ASSIGNED_BY;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.qualifier.QualifierPresetsConfig.QUALIFIER;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.taxon.TaxonPresetsConfig.TAXON_ID;
@@ -178,21 +173,21 @@ public class MockPresetDataConfig {
         when(mockRestOperations.getForObject(
                 anyStringContaining(ASSIGNED_BY),
                 isA(Class.class),
-                any(HashMap.class)))
+                any(Map.class)))
                 .thenReturn(DEFAULT_RELEVANT_ASSIGNED_BYS);
         when(mockRestOperations.getForObject(
                 anyStringContaining(TAXON_ID),
                 isA(Class.class),
-                any(HashMap.class)))
+                any(Map.class)))
                 .thenReturn(DEFAULT_RELEVANT_TAXONS);
         when(mockRestOperations.getForObject(
                 anyStringContaining(QUALIFIER),
                 isA(Class.class),
-                any(HashMap.class)))
+                any(Map.class)))
                 .thenReturn(DEFAULT_RELEVANT_QUALIFIERS);
         when(mockRestOperations.getForObject(anyStringContaining("withFrom"),
                 isA(Class.class),
-                any(HashMap.class)))
+                any(Map.class)))
                 .thenReturn(DEFAULT_RELEVANT_WITH_FROM);
 
         return mockRestOperations;
@@ -207,7 +202,7 @@ public class MockPresetDataConfig {
                 .getForObject(
                         anyString(),
                         isA(Class.class),
-                        any(HashMap.class));
+                        any(Map.class));
         return mockRestOperations;
     }
 

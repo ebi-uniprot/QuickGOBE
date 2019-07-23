@@ -7,10 +7,8 @@ import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.ConfigFileApplicationContextInitializer;
-import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
 import uk.ac.ebi.quickgo.annotation.IdGeneratorUtil;
 import uk.ac.ebi.quickgo.annotation.validation.loader.ValidationConfig;
 import uk.ac.ebi.quickgo.annotation.validation.service.JobTestRunnerConfig;
@@ -31,16 +29,14 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static uk.ac.ebi.quickgo.annotation.IdGeneratorUtil.generateValues;
 import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.*;
-import static uk.ac.ebi.quickgo.annotation.validation.loader.ValidationConfig
-        .LOAD_ANNOTATION_DBX_REF_ENTITIES_STEP_NAME;
+import static uk.ac.ebi.quickgo.annotation.validation.loader.ValidationConfig.LOAD_ANNOTATION_DBX_REF_ENTITIES_STEP_NAME;
 import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.*;
 
 /**
  * Tests that the validation added to the {@link AnnotationRequest} class is correct.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = {AnnotationRequestConfig.class, ValidationConfig.class, JobTestRunnerConfig
-        .class}, initializers = ConfigFileApplicationContextInitializer.class)
+@SpringBootTest(classes = {AnnotationRequestConfig.class, ValidationConfig.class, JobTestRunnerConfig.class})
 public class AnnotationRequestValidationIT {
     private static final String[] VALID_GENE_PRODUCT_ID = {"A0A000", "A0A003"};
     private static boolean HAS_RUN = false;
@@ -61,7 +57,7 @@ public class AnnotationRequestValidationIT {
     //ASSIGNED BY PARAMETER
     @Test
     public void nullAssignedByIsValid() {
-        annotationRequest.setAssignedBy(null);
+        annotationRequest.setAssignedBy();
 
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
@@ -89,7 +85,7 @@ public class AnnotationRequestValidationIT {
     //GO EVIDENCE PARAMETER
     @Test
     public void nullGoEvidenceIsValid() {
-        annotationRequest.setGoIdEvidence(null);
+        annotationRequest.setGoIdEvidence();
 
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
@@ -117,7 +113,7 @@ public class AnnotationRequestValidationIT {
     //ASPECT PARAMETER
     @Test
     public void nullAspectIsValid() {
-        annotationRequest.setAspect(null);
+        annotationRequest.setAspect();
 
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }

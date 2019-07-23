@@ -3,6 +3,7 @@ package uk.ac.ebi.quickgo.index.annotation;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepoConfig;
 import uk.ac.ebi.quickgo.common.QuickGODocument;
+import uk.ac.ebi.quickgo.common.SolrCollectionName;
 import uk.ac.ebi.quickgo.index.annotation.coterms.CoTermsAggregationWriter;
 import uk.ac.ebi.quickgo.index.annotation.coterms.CoTermsConfig;
 import uk.ac.ebi.quickgo.index.common.listener.ItemRateWriterListener;
@@ -104,7 +105,7 @@ public class AnnotationIndexingConfig {
                               @Override public void beforeJob(JobExecution jobExecution) {}
 
                               @Override public void afterJob(JobExecution jobExecution) {
-                                  annotationTemplate.commit();
+                                  annotationTemplate.commit(SolrCollectionName.ANNOTATION);
                               }
                           })
                           .build();

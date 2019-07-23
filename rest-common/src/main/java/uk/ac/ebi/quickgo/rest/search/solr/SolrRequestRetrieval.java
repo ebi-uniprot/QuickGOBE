@@ -63,7 +63,7 @@ public class SolrRequestRetrieval<T> implements RequestRetrieval<T> {
         SolrQuery query = queryRequestConverter.convert(request);
 
         try {
-            QueryResponse response = solrClient.query(query);
+            QueryResponse response = solrClient.query(request.getCollection(), query);
             return resultConverter.convert(response, request);
         } catch (SolrServerException | SolrException | IOException e) {
             throw new RetrievalException(e);

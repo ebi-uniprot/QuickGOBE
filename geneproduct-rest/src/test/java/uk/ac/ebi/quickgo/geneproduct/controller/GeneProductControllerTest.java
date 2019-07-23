@@ -1,5 +1,11 @@
 package uk.ac.ebi.quickgo.geneproduct.controller;
 
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.http.ResponseEntity;
 import uk.ac.ebi.quickgo.geneproduct.model.GeneProduct;
 import uk.ac.ebi.quickgo.geneproduct.service.GeneProductService;
 import uk.ac.ebi.quickgo.geneproduct.service.search.SearchServiceConfig;
@@ -12,20 +18,11 @@ import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.http.ResponseEntity;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
@@ -82,11 +79,9 @@ public class GeneProductControllerTest {
         when(geneProductService.findById(SINGLE_CSV_LIST)).thenReturn(singleGP);
 
         final List<GeneProduct> multiGP = asList(geneProduct1, geneProduct2, geneProduct3);
-        when(geneProductService.findById(MULTI_CSV_LIST)).thenReturn(multiGP);
 
         multiCSVTooBig = createOversizedCSVRequest();
 
-        when(validationHelper.validateCSVIds(MULTI_CSV)).thenReturn(MULTI_CSV_LIST);
         when(validationHelper.validateCSVIds(SINGLE_CSV)).thenReturn(SINGLE_CSV_LIST);
         doThrow(new IllegalArgumentException()).when(validationHelper).validateCSVIds(multiCSVTooBig);
 

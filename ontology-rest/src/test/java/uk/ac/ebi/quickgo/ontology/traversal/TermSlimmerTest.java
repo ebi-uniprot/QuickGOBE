@@ -1,29 +1,24 @@
 package uk.ac.ebi.quickgo.ontology.traversal;
 
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 import uk.ac.ebi.quickgo.ontology.common.OntologyType;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static uk.ac.ebi.quickgo.ontology.common.OntologyType.ECO;
-import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.CAPABLE_OF_PART_OF;
-import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.HAS_PART;
-import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.IS_A;
-import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.PART_OF;
+import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.*;
 import static uk.ac.ebi.quickgo.ontology.traversal.TermSlimmer.DEFAULT_RELATION_TYPES;
 
 /**

@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.ontology.controller;
 
 import uk.ac.ebi.quickgo.common.SearchableField;
+import uk.ac.ebi.quickgo.common.SolrCollectionName;
 import uk.ac.ebi.quickgo.graphics.model.GraphImageLayout;
 import uk.ac.ebi.quickgo.ontology.model.*;
 import uk.ac.ebi.quickgo.graphics.ontology.GraphPresentation;
@@ -590,7 +591,7 @@ public abstract class OBOController<T extends OBOTerm> {
         QuickGOQuery restrictedUserQuery = restrictQueryToOTypeResults(userQuery);
 
         QueryRequest.Builder builder = new QueryRequest
-                .Builder(restrictedUserQuery)
+                .Builder(restrictedUserQuery, SolrCollectionName.ONTOLOGY)
                 .setPage(new RegularPage(page, limit));
 
         if (!ontologyRetrievalConfig.getSearchReturnedFields().isEmpty()) {

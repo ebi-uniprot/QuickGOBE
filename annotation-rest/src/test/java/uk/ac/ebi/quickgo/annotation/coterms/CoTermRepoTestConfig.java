@@ -1,10 +1,10 @@
 package uk.ac.ebi.quickgo.annotation.coterms;
 
-import java.io.IOException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+
+import java.io.IOException;
 
 import static uk.ac.ebi.quickgo.annotation.coterms.CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap;
 import static uk.ac.ebi.quickgo.annotation.coterms.CoTermRepositorySimpleMap.createEmptyRepository;
@@ -22,11 +22,6 @@ public class CoTermRepoTestConfig {
     static final String SUCCESSFUL_RETRIEVAL = "successfulRetrieval";
 
     private CoTermProperties coTermProperties = new CoTermProperties();
-
-    @Bean
-    static PropertySourcesPlaceholderConfigurer propertyPlaceHolderConfigurer() {
-        return new PropertySourcesPlaceholderConfigurer();
-    }
 
     @Bean
     @Profile(SUCCESSFUL_RETRIEVAL)

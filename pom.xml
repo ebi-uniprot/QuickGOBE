@@ -12,6 +12,11 @@
     <name>Builds the QuickGO project</name>
     <description>Aggregator pom configured to build certain parts, or all of the QuickGO project</description>
 
+    <properties>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+    </properties>
+
     <profiles>
         <profile>
             <id>solr-plugins</id>

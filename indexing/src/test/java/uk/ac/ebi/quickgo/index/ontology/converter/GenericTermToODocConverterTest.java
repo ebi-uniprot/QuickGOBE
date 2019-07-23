@@ -9,7 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
@@ -343,9 +343,7 @@ public class GenericTermToODocConverterTest {
 
         ArrayList<GenericTerm> replacedBy = new ArrayList<>();
         GenericTerm replacementTerm = mock(GenericTerm.class);
-        when(replacementTerm.getId()).thenReturn("replacement1");
         replacedBy.add(replacementTerm);
-        when(term.replacedBy()).thenReturn(replacedBy);
 
         OntologyDocument result = converter.apply(term);
         OntologyDocument document = result;

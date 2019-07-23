@@ -1,5 +1,15 @@
 package uk.ac.ebi.quickgo.geneproduct.common;
 
+import org.apache.solr.client.solrj.SolrServerException;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.solr.core.SolrTemplate;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import uk.ac.ebi.quickgo.common.SolrCollectionName;
 import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 
 import java.io.IOException;
@@ -7,16 +17,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationContextLoader;
-import org.springframework.data.solr.core.SolrTemplate;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -27,10 +27,11 @@ import static uk.ac.ebi.quickgo.geneproduct.common.common.GeneProductDocMocker.c
  * Tests the behaviour of the {@link GeneProductRepository}
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = GeneProductRepoConfig.class, loader = SpringApplicationContextLoader.class)
+@SpringBootTest(classes = GeneProductRepoConfig.class)
 public class GeneProductRepositoryIT {
     @ClassRule
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
+    private static final String COLLECTION = SolrCollectionName.GENE_PRODUCT;
 
     @Autowired
     private GeneProductRepository geneProductRepository;
@@ -125,8 +126,8 @@ public class GeneProductRepositoryIT {
      */
     private void deleteFromRepositoryByIds(GeneProductDocument... docs) throws SolrServerException, IOException {
         for (GeneProductDocument doc : docs) {
-            geneProductTemplate.getSolrClient().deleteByQuery(GeneProductFields.Searchable.ID + ":" + doc.id);
+            geneProductTemplate.getSolrClient().deleteByQuery(COLLECTION,GeneProductFields.Searchable.ID + ":" + doc.id);
         }
-        geneProductTemplate.getSolrClient().commit();
+        geneProductTemplate.getSolrClient().commit(COLLECTION);
     }
 }

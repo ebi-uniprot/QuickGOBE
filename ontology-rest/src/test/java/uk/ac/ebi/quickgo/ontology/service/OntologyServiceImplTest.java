@@ -1,5 +1,13 @@
 package uk.ac.ebi.quickgo.ontology.service;
 
+import de.bechte.junit.runners.context.HierarchicalContextRunner;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
 import uk.ac.ebi.quickgo.ontology.common.OntologyType;
@@ -14,25 +22,15 @@ import uk.ac.ebi.quickgo.rest.search.SolrQueryStringSanitizer;
 import uk.ac.ebi.quickgo.rest.search.query.RegularPage;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
-import de.bechte.junit.runners.context.HierarchicalContextRunner;
 import java.util.*;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 
 import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 import static uk.ac.ebi.quickgo.ontology.common.document.OntologyDocMocker.createECODoc;
 import static uk.ac.ebi.quickgo.ontology.common.document.OntologyDocMocker.createGODoc;
 
@@ -144,7 +142,7 @@ public class OntologyServiceImplTest {
                 allDocs.add(createGODoc("id" + i, "name" + i));
             }
 
-            Pageable firstPageable = new PageRequest(zeroBasedPageNumber, pageSize);
+            Pageable firstPageable = PageRequest.of(zeroBasedPageNumber, pageSize);
 
             List<OntologyDocument> firstResultSet = allDocs.subList(0, pageSize);
             Page<OntologyDocument> firstPage =

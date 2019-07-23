@@ -1,22 +1,23 @@
 package uk.ac.ebi.quickgo.rest.controller.request;
 
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import uk.ac.ebi.quickgo.common.FacetableField;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -26,11 +27,12 @@ import static org.hamcrest.Matchers.hasSize;
  * Tests the behaviour of the {@link AllowableFacetsImpl} class.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = AllowableFacetsImplIT.AllowableFacetsConfig.class)
+@SpringBootTest(classes = AllowableFacetsImplIT.AllowableFacetsConfig.class)
 public class AllowableFacetsImplIT {
     private static final String INVALID_FACET_1 = "invalid1";
     private static final String INVALID_FACET_2 = "invalid2";
 
+    @Configuration
     static class AllowableFacetsConfig {
         @Bean
         FacetableField facetableField() {

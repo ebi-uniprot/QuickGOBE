@@ -1,16 +1,14 @@
 package uk.ac.ebi.quickgo.annotation.common;
 
-import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
-
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationContextLoader;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -24,7 +22,7 @@ import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.c
  */
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = AnnotationRepoConfig.class, loader = SpringApplicationContextLoader.class)
+@SpringBootTest(classes = AnnotationRepoConfig.class)
 public class AnnotationRepositoryIT {
 
     // temporary data store for solr's data, which is automatically cleaned on exit
@@ -44,7 +42,7 @@ public class AnnotationRepositoryIT {
         AnnotationDocument doc1 = createAnnotationDoc("A0A000");
         annotationRepository.save(doc1);
 
-        assertThat(annotationRepository.findAll(new PageRequest(0, 10)).getTotalElements(), is(1L));
+        assertThat(annotationRepository.findAll(PageRequest.of(0, 10)).getTotalElements(), is(1L));
     }
 
     @Test
@@ -55,7 +53,7 @@ public class AnnotationRepositoryIT {
         annotationRepository.save(doc1);
         annotationRepository.save(doc2);
 
-        assertThat(annotationRepository.findAll(new PageRequest(0, 10)).getTotalElements(), is(2L));
+        assertThat(annotationRepository.findAll(PageRequest.of(0, 10)).getTotalElements(), is(2L));
     }
 
     @Test
@@ -69,7 +67,7 @@ public class AnnotationRepositoryIT {
         annotationRepository.save(doc3);
         annotationRepository.delete(doc3);
 
-        assertThat(annotationRepository.findAll(new PageRequest(0, 10)).getTotalElements(), is(2L));
+        assertThat(annotationRepository.findAll(PageRequest.of(0, 10)).getTotalElements(), is(2L));
     }
 
     @Test
@@ -82,7 +80,7 @@ public class AnnotationRepositoryIT {
         annotationRepository.save(doc1);
         annotationRepository.save(doc2);
 
-        AnnotationDocument firstReturnedDoc = annotationRepository.findAll(new PageRequest(0, 10)).getContent().get(0);
+        AnnotationDocument firstReturnedDoc = annotationRepository.findAll(PageRequest.of(0, 10)).getContent().get(0);
         assertThat(firstReturnedDoc.geneProductId, is("A0A001"));
     }
 }

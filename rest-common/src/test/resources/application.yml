@@ -11,7 +11,7 @@ search:
         execution: REST_COMM
         properties: {ip: 123.456.789, resourceFormat: endpoint, localField: goId, timeout: 4000}
 model:
-  repo2domainFieldNameTransformations:
+  repo-to-domain-field-name-transformations:
     transformations: {
       field1: transformedField1,
       field2: transformedField2

@@ -1,22 +1,22 @@
 package uk.ac.ebi.quickgo.ontology.traversal.read;
 
-import uk.ac.ebi.quickgo.ontology.traversal.OntologyGraph;
-
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationContextLoader;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import uk.ac.ebi.quickgo.ontology.traversal.OntologyGraph;
+
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.springframework.test.util.MatcherAssertionErrors.assertThat;
 
 /**
  * Check that the {@link OntologyGraphConfig} correctly sets up an instance of
@@ -26,9 +26,8 @@ import static org.springframework.test.util.MatcherAssertionErrors.assertThat;
  * @author Edd
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(
-        classes = {OntologyGraphConfig.class, JobTestRunnerConfig.class},
-        loader = SpringApplicationContextLoader.class)
+@SpringBootTest(classes = {OntologyGraphConfig.class, JobTestRunnerConfig.class})
+@TestPropertySource(properties = "ontology.traversal.source=classpath:/relations/RELATIONS.dat.gz,classpath:/relations/ECO_RELATIONS.dat.gz")
 public class OntologyGraphConfigIT {
 
     @Autowired
