@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.ac.ebi.quickgo.client.model.ontology.OntologyRequest;
 import uk.ac.ebi.quickgo.client.model.ontology.OntologyTerm;
 import uk.ac.ebi.quickgo.client.service.search.SearchServiceConfig;
+import uk.ac.ebi.quickgo.common.SolrCollectionName;
 import uk.ac.ebi.quickgo.rest.ParameterBindingException;
 import uk.ac.ebi.quickgo.rest.search.DefaultSearchQueryTemplate;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
@@ -42,7 +43,7 @@ import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.search;
 @RestController
 @RequestMapping(value = "/internal/search")
 public class SearchController {
-    private static final String COLLECTION = "ontology";
+    private static final String COLLECTION = SolrCollectionName.ONTOLOGY;
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private final SearchService<OntologyTerm> ontologySearchService;

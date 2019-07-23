@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import uk.ac.ebi.quickgo.common.SolrCollectionName;
 import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 
 import java.io.IOException;
@@ -30,7 +31,7 @@ import static uk.ac.ebi.quickgo.geneproduct.common.common.GeneProductDocMocker.c
 public class GeneProductRepositoryIT {
     @ClassRule
     public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
-    private static final String COLLECTION = "geneproduct";
+    private static final String COLLECTION = SolrCollectionName.GENE_PRODUCT;
 
     @Autowired
     private GeneProductRepository geneProductRepository;

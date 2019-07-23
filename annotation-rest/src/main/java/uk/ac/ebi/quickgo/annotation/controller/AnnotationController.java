@@ -20,6 +20,7 @@ import uk.ac.ebi.quickgo.annotation.model.*;
 import uk.ac.ebi.quickgo.annotation.service.search.NameService;
 import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.annotation.service.statistics.StatisticsService;
+import uk.ac.ebi.quickgo.common.SolrCollectionName;
 import uk.ac.ebi.quickgo.rest.ParameterBindingException;
 import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
 import uk.ac.ebi.quickgo.rest.comm.FilterContext;
@@ -132,7 +133,7 @@ public class AnnotationController {
     private static final String GO_NAME = "goName";
     private static final String TAXON_NAME = "taxonName";
     private static final String EVIDENCE_NAME = "evidenceName";
-    private static final String COLLECTION = "annotation";
+    private static final String COLLECTION = SolrCollectionName.ANNOTATION;
     private final MetaDataProvider metaDataProvider;
     private final SearchService<Annotation> annotationSearchService;
     private final SearchServiceConfig.AnnotationCompositeRetrievalConfig annotationRetrievalConfig;

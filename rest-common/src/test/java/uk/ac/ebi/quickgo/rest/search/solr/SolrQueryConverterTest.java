@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.rest.search.solr;
 
+import uk.ac.ebi.quickgo.common.SolrCollectionName;
 import uk.ac.ebi.quickgo.rest.search.query.*;
 
 import java.util.HashSet;
@@ -24,7 +25,7 @@ import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.createFirstCursorPa
  */
 public class SolrQueryConverterTest {
     private static final String REQUEST_HANDLER_NAME = "/select";
-    private static final String COLLECTION = "collection";
+    private static final String COLLECTION = SolrCollectionName.COLLECTION;
     private static final Set<String> WILDCARD_COMPATIBLE_FIELDS = new HashSet<>();
 
     private SolrQueryConverter converter;

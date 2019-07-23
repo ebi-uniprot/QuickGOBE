@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 import org.junit.Before;
 import org.junit.Test;
+import uk.ac.ebi.quickgo.common.SolrCollectionName;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -18,7 +19,7 @@ import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.createFirstCursorPa
  * Tests the {@link QueryRequest} implementation
  */
 public class QueryRequestTest {
-    private static final String COLLECTION = "collection";
+    private static final String COLLECTION = SolrCollectionName.COLLECTION;
     private QuickGOQuery query;
 
     @Before
