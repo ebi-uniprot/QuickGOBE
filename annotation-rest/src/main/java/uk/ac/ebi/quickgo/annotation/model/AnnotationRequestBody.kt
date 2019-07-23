@@ -8,6 +8,17 @@ import uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern.Flag.CASE_INSENSIT
 import javax.validation.Valid
 import javax.validation.constraints.Pattern
 
+/**
+ * This class is a simple data class with builders having jvm overloads, written using kotlin.
+ * Before that we decided to use loombok, but we think for data object/clear code kotlin is more useful
+ * Look into git history AnnotationRequestBody.java with loombok annotation deleted (for reference)
+ * Might be is future we decide to not use kotlin when java will introduce data objects (release 14 or 15)
+ *
+ * This class could be lot smaller and simpler but as all test expecting builders, i decided to not make any change at all
+ * in other parts of application, that is how we can be sure about the seamless interoperability of kotlin with java
+ *
+ * For onwards we can simply use data object with jvmoverloads and copy constructor from kotlin to have clean code and easy to test
+ */
 data class AnnotationRequestBody @JvmOverloads constructor(@field:Valid var and: GoDescription? = null,
                                                            @field:Valid var not: GoDescription? = null) {
 
