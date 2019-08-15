@@ -37,6 +37,9 @@ import java.util.stream.Stream;
 
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -2007,6 +2010,7 @@ public class AnnotationControllerIT {
 
     @Test
     public void advanceFilterNotGoId_descendents_defaultRelations() throws Exception {
+        mockRestToOntologyForDescendants();
         advanceFilterTest(20, false, false);
     }
 
@@ -2017,7 +2021,18 @@ public class AnnotationControllerIT {
 
     @Test
     public void advanceFilterAndGoId_descendents_defaultRelations() throws Exception {
+        mockRestToOntologyForDescendants();
         advanceFilterTest(5, true, false);
+    }
+
+    private void mockRestToOntologyForDescendants(){
+        mockRestServiceServer = MockRestServiceServer.createServer((RestTemplate) restOperations);
+
+        String term = createGoId(1);
+        String url = String.format("https://localhost/QuickGO/services/ontology/go/terms/%s/descendants?relations=is_a,part_of,occurs_in",term);
+
+        mockRestServiceServer.expect(requestTo(url)).andExpect(method(HttpMethod.GET))
+          .andRespond(withSuccess("{\"results\": [{\"descendants\": [\"GO:0000001\"]}]}", MediaType.APPLICATION_JSON));
     }
 
     @Test
@@ -2031,7 +2046,7 @@ public class AnnotationControllerIT {
         repository.saveAll(docs);
         AnnotationRequestBody.GoDescription description = AnnotationRequestBody.GoDescription.builder()
           .goTerms(new String[]{createGoId(1)})
-          .goUsage(exact ? "exact" : "descendants")
+          .goUsage(exact ? "exact" : DESCENDANTS)
           .build();
         AnnotationRequestBody body = and ? AnnotationRequestBody.builder().and(description).build()
           : AnnotationRequestBody.builder().not(description).build();
