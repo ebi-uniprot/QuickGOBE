@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.index.geneproduct;
 
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -114,7 +114,7 @@ public class GeneProductConfig {
                 .skip(FlatFileParseException.class)
                 .skip(ValidationException.class)
                 .listener(skipLogListener())
-                .retry(HttpSolrClient.RemoteSolrException.class)
+                .retry(SolrServerException.class)
                 .retryLimit(retryLimit)
                 .backOffPolicy(backOffPolicy())
                 .<GeneProduct>reader(geneProductMultiFileReader())

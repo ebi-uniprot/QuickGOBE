@@ -1,8 +1,8 @@
 package uk.ac.ebi.quickgo.index;
 
+import org.apache.solr.client.solrj.SolrServerException;
 import uk.ac.ebi.quickgo.index.common.listener.LogJobListener;
 
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.junit.Test;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -112,7 +112,7 @@ public class QuickGOIndexMainTest {
         ItemWriter<String> createWriter() {
             return list -> {
                 if (itemCount >= WHEN_TO_FAIL) {
-                    throw new HttpSolrClient.RemoteSolrException("localhost", 999, "No registered leader", new RuntimeException());
+                    throw new SolrServerException("localhost 999 No registered leader");
                 } else {
                     System.out.println(list);
                 }

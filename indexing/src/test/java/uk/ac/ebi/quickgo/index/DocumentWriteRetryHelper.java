@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.index;
 
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.mockito.stubbing.Stubber;
 import org.springframework.batch.item.ItemWriter;
 
@@ -32,7 +32,7 @@ public class DocumentWriteRetryHelper {
      * Stubs successive Solrmethod call actions based on a given list of {@link SolrResponse}
      * values. {@link SolrResponse#OK} simulates that Solr was able to write the documents it
      * received; {@link SolrResponse#REMOTE_EXCEPTION} simulates Solr being busy and responding
-     * with a {@link HttpSolrClient.RemoteSolrException}, meaning the documents could not be
+     * with a {@link SolrServerException}, meaning the documents could not be
      * written
      * @param responses represents a list of behavioural responses from Solr
      * @return a {@link Stubber} which can be associated with a method call
@@ -45,8 +45,9 @@ public class DocumentWriteRetryHelper {
                     stubber = (stubber == null) ? doNothing() : stubber.doNothing();
                     break;
                 case REMOTE_EXCEPTION:
-                    stubber = (stubber == null) ? doThrow(new HttpSolrClient.RemoteSolrException(HOST, CODE, MESSAGE, null))
-                            : stubber.doThrow(new HttpSolrClient.RemoteSolrException(HOST, CODE, MESSAGE, null));
+                    String msg = "Host: " + HOST + ", Code: " + CODE + ", Message: " + MESSAGE;
+                    stubber = (stubber == null) ? doThrow(new SolrServerException(msg))
+                            : stubber.doThrow(new SolrServerException(msg));
                     break;
                 default:
                     throw new IllegalStateException("Unknown SolrResponse");
