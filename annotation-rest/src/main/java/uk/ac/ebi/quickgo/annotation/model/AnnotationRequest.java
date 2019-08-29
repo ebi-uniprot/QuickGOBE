@@ -181,16 +181,18 @@ public class AnnotationRequest {
     private String withFrom;
 
     @ApiModelProperty(
-            value = "Optional fields retrieved from external services. Accepts comma separated values. From swagger interface" +
+            value = "Work only with /search endpoint. Will be ignored with /downloadSearch endpoint. "+
+              "Optional fields retrieved from external services. Accepts comma separated values. From interface" +
               " can select multiple values. Allowed values are goName,taxonName,name,synonyms",
             allowableValues = "goName,taxonName,name,synonyms", position = 21)
     private String[] includeFields;
 
     @ApiModelProperty(
-            value = "For TSV downloads only: fields to be downloaded. Accepts comma separated values.",
+            value = "For TSV downloads only: fields to be downloaded. Accepts comma separated values, Or From interface"
+            +" once can select multiple values. Will be ignored for /search endpoint or other download types",
             allowableValues = "geneProductId,symbol,qualifier,goId,goAspect,goName,evidenceCode,goEvidence,reference," +
                     "withFrom,taxonId,assignedBy,extension,date,taxonName,synonym,name,type,interactingTaxonId",
-            hidden = true, position = 22)
+            position = 22)
     private String[] selectedFields;
 
     @ApiModelProperty(
