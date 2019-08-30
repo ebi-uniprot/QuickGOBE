@@ -181,18 +181,21 @@ public class AnnotationRequest {
     private String withFrom;
 
     @ApiModelProperty(
-            value = "Work only with /search endpoint. Will be ignored with /downloadSearch endpoint. "+
-              "Optional fields retrieved from external services. Accepts comma separated values. From interface" +
-              " can select multiple values. Allowed values are goName,taxonName,name,synonyms",
-            allowableValues = "goName,taxonName,name,synonyms", position = 21)
+      value = "Optional fields retrieved from external services. Accepts comma separated values. From interface"
+        + " can select multiple values. Allowed values are goName,taxonName,name,synonyms",
+      allowableValues = "goName,taxonName,name,synonyms", position = 21)
     private String[] includeFields;
 
     @ApiModelProperty(
-            value = "For TSV downloads only: fields to be downloaded. Accepts comma separated values, Or From interface"
-            +" once can select multiple values. Will be ignored for /search endpoint or other download types",
-            allowableValues = "geneProductId,symbol,qualifier,goId,goAspect,goName,evidenceCode,goEvidence,reference," +
-                    "withFrom,taxonId,assignedBy,extension,date,taxonName,synonym,name,type,interactingTaxonId",
-            position = 22)
+      value = "ONLY FOR TSV DOWNLOAD: fields to be downloaded. Accepts comma separated values, Or From interface"
+        + " once can select multiple values. If you don't provide this param with TSV download, we will answer your query"
+        + " with default fields (GENE PRODUCT DB, geneProductId, symbol, qualifier. goId, goAspect, evidenceCode,"
+        + " goEvidence, reference, withFrom, taxonId, assignedBy, extensions, date). But if you send this param it will"
+        + " override default. NOTE: If you want to download fields goName, taxonName, name and synonyms you must"
+        + " specify them in includeFields parameter else you will get empty values",
+      allowableValues = "geneProductId,symbol,qualifier,goId,goAspect,goName,evidenceCode,goEvidence,reference," +
+        "withFrom,taxonId,assignedBy,extensions,date,taxonName,synonyms,name,type,interactingTaxonId",
+      position = 22)
     private String[] selectedFields;
 
     @ApiModelProperty(
