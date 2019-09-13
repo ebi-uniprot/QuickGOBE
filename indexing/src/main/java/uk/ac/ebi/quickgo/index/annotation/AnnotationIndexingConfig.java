@@ -15,6 +15,7 @@ import uk.ac.ebi.quickgo.index.common.listener.SkipLoggerListener;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -119,6 +120,7 @@ public class AnnotationIndexingConfig {
                 .skip(FlatFileParseException.class)
                 .skip(ValidationException.class)
                 .retry(SolrServerException.class)
+                .retry(HttpSolrClient.RemoteSolrException.class)
                 .retryLimit(retryLimit)
                 .backOffPolicy(backOffPolicy())
                 .<Annotation>reader(annotationMultiFileReader)
