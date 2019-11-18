@@ -62,7 +62,8 @@ public class AnnotationDocumentConverterTest {
                         buildKeyValuesPair(DB_OBJECT_TYPE, "protein"),
                         buildKeyValuesPair(PROTEOME, "gcrpIso"),
                         buildKeyValuesPair(TARGET_SET, "BHF-UCL", "Exosome", "KRUK"),
-                        buildKeyValuesPair(GP_RELATED_GO_IDS, "GO:0005886"));
+                        buildKeyValuesPair(GP_RELATED_GO_IDS, "GO:0005886"),
+                        buildKeyValuesPair(ROW_NUM, "1"));
 
         AnnotationDocument doc = converter.process(annotation);
 
@@ -76,6 +77,7 @@ public class AnnotationDocumentConverterTest {
         assertThat(doc.targetSets, contains("BHF-UCL", "Exosome", "KRUK"));
         assertThat(doc.defaultSort, is("9EBI-10043081"));
         assertThat(doc.gpRelatedGoIds, contains("GO:0005886"));
+        assertThat(doc.id, is("1"));
     }
 
     // interacting taxon

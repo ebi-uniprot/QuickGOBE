@@ -25,6 +25,7 @@ class AnnotationParsingHelper {
     static final String TAXON_ANCESTORS = "taxon_lineage";
     static final String PROTEOME = "proteome";
     static final String GP_RELATED_GO_IDS = "gp_related_go_ids";
+    static final String ROW_NUM = "row_num";
 
     // string regex representations
     private static final String DB_COLON_REF_FORMAT = "[A-Za-z0-9_\\.-]+(:[A-Za-z0-9_\\.-]+){1,}";
