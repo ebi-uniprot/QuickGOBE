@@ -83,7 +83,8 @@ class AnnotationValidator implements Validator<Annotation> {
         if (!(PROPS_TAXON_REGEX.matcher(annotation.annotationProperties).find() &&
                       PROPS_DB_OBJECT_TYPE_REGEX.matcher(annotation.annotationProperties).find() &&
                       PROPS_TAXON_ANCESTORS_REGEX.matcher(annotation.annotationProperties).find() &&
-                      PROPS_GP_RELATED_GO_IDS_REGEX.matcher(annotation.annotationProperties).find()
+                      PROPS_GP_RELATED_GO_IDS_REGEX.matcher(annotation.annotationProperties).find() &&
+                      PROPS_ROW_NUM_REGEX.matcher(annotation.annotationProperties).find()
         )) {
             handleFieldPatternMismatchError(
                     "Annotation Properties: required field not found",
@@ -91,7 +92,8 @@ class AnnotationValidator implements Validator<Annotation> {
                     PROPS_TAXON_REGEX.pattern()
                             + " AND " + PROPS_DB_OBJECT_TYPE_REGEX.pattern()
                             + " AND " + PROPS_TAXON_ANCESTORS_REGEX.pattern()
-                            + " AND " + PROPS_GP_RELATED_GO_IDS_REGEX.pattern(),
+                            + " AND " + PROPS_GP_RELATED_GO_IDS_REGEX.pattern()
+                            + " AND " + PROPS_ROW_NUM_REGEX.pattern(),
                     annotation);
         }
     }

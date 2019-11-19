@@ -31,10 +31,7 @@ class AnnotationDocumentConverter implements ItemProcessor<Annotation, Annotatio
     private static final String ANNOTATION_DATE_FORMAT = "yyyyMMdd";
     private final DateTimeFormatter dateTimeFormatter;
 
-    private final AtomicLong documentCounter;
-
     AnnotationDocumentConverter() {
-        documentCounter = new AtomicLong(0L);
         this.dateTimeFormatter = DateTimeFormatter.ofPattern(ANNOTATION_DATE_FORMAT);
     }
 
@@ -49,7 +46,7 @@ class AnnotationDocumentConverter implements ItemProcessor<Annotation, Annotatio
 
         AnnotationDocument doc = new AnnotationDocument();
 
-        doc.id = Long.toString(documentCounter.getAndIncrement());
+        doc.id = propertiesMap.get(ROW_NUM);
         doc.geneProductId = constructGeneProductId(annotation);
         doc.defaultSort = constructDefaultSort(annotation);
         doc.qualifier = annotation.qualifier;
