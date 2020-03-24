@@ -167,7 +167,7 @@ search:
 
 # ================= Tranformations from Solr fields to readable names =================
 model:
-  repo-to-domain-field-name-transformations:
+  repo2domainFieldNameTransformations:
     transformations: {
       goId_join: goId,
       goAspect: aspect
