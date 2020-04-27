@@ -188,7 +188,7 @@ public class OntologySearchIT extends SearchControllerSetup {
 
         saveToRepository(doc1, doc2, doc3);
 
-        checkValidFacetResponse("go", Facetable.ASPECT, Facetable.ONTOLOGY_TYPE);
+        checkValidFacetResponse("go", Facetable.ASPECT, Facetable.ONTOLOGY_TYPE, Facetable.IS_OBSOLETE);
     }
 
     // filter queries ---------------------------------------------------------

@@ -232,6 +232,42 @@ public class OntologyRequestValidationIT {
                 );
     }
 
+    //isObsolete FILTER
+    @Test
+    public void unrecognizedFilterByTypeObsoleteIsInvalid() {
+        String incorrectVal = "incorrect";
+        ontologyRequest.setIsObsolete(incorrectVal);
+
+        Set<ConstraintViolation<OntologyRequest>> violations = validator.validate(ontologyRequest);
+
+        assertThat(violations, hasSize(1));
+        assertThat(violations.iterator().next().getMessage(),
+          is("Provided isObsolete is invalid: " + incorrectVal));
+    }
+
+    @Test
+    public void obsoleteWithMixedCasingIsInvalid() {
+        String mixedCaseBool = "TruE";
+        ontologyRequest.setIsObsolete(mixedCaseBool);
+
+        Set<ConstraintViolation<OntologyRequest>> violations = validator.validate(ontologyRequest);
+
+        assertThat(violations, hasSize(1));
+        assertThat(violations.iterator().next().getMessage(),
+          is("Provided isObsolete is invalid: " + mixedCaseBool));
+    }
+
+    @Test
+    public void providedFilterByObsoleteValuesAreAllValid() throws Exception {
+        Arrays.asList("true", "false")
+          .forEach(type -> {
+                ontologyRequest.setIsObsolete(type);
+                assertThat("Type value: " + type + " is invalid",
+                  validator.validate(ontologyRequest), hasSize(0));
+            }
+          );
+    }
+
     @Test
     public void unrecognizedFacetIsInvalid() throws Exception {
         ontologyRequest.setFacet(new String[]{"invalidFacet"});

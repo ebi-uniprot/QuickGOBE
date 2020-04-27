@@ -31,7 +31,7 @@ import static uk.ac.ebi.quickgo.rest.search.DefaultSearchQueryTemplate.DEFAULT_P
  * encapsulates the list and document field name to use for that argument.
  */
 public class OntologyRequest {
-    private static final String[] TARGET_FIELDS = new String[]{Searchable.ASPECT, Searchable.ONTOLOGY_TYPE};
+    private static final String[] TARGET_FIELDS = new String[]{Searchable.ASPECT, Searchable.ONTOLOGY_TYPE, Searchable.IS_OBSOLETE};
 
     @ApiModelProperty(value = "Indicates whether the result set should be highlighted")
     private boolean highlighting = false;
@@ -44,8 +44,8 @@ public class OntologyRequest {
             allowableValues = "range[" + MIN_ENTRIES_PER_PAGE + "," + MAX_ENTRIES_PER_PAGE + "]")
     private int limit = DEFAULT_ENTRIES_PER_PAGE;
 
-    @ApiModelProperty(value = "Fields to generate facets from", allowableValues = "aspect, ontologyType",
-            example = "aspect, ontologyType")
+    @ApiModelProperty(value = "Fields to generate facets from", allowableValues = "aspect, ontologyType, isObsolete",
+            example = "aspect, ontologyType, isObsolete")
     private String[] facet;
 
     @ApiModelProperty(value = "The query used to filter the gene products", example = "kinase", required = true)
@@ -62,6 +62,10 @@ public class OntologyRequest {
     @ApiModelProperty(value = "Further filters the results of the main query based on a value chosen from " +
             "the type field", allowableValues = "GO,ECO", example = "GO")
     private String type;
+
+    @ApiModelProperty(value = "Further filters the results of the main query based on a value chosen from " +
+      "the isObsolete field", allowableValues = "true,false", example = "false")
+    private String isObsolete;
 
     private Map<String, String[]> filterMap = new HashMap<>();
 
@@ -136,6 +140,18 @@ public class OntologyRequest {
     public void setOntologyType(String filterByType) {
         if (filterByType != null) {
             filterMap.put(Searchable.ONTOLOGY_TYPE, new String[]{filterByType});
+        }
+    }
+
+    @Pattern(regexp = "true|false", message = "Provided isObsolete is invalid: ${validatedValue}")
+    public String getIsObsolete() {
+        return filterMap.get(Searchable.IS_OBSOLETE) == null ? null :
+          filterMap.get(Searchable.IS_OBSOLETE)[0];
+    }
+
+    public void setIsObsolete(String filterByObsolete) {
+        if (filterByObsolete != null) {
+            filterMap.put(Searchable.IS_OBSOLETE, new String[]{filterByObsolete});
         }
     }
 

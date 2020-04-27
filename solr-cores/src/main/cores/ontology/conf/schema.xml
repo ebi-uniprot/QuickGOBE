@@ -25,7 +25,7 @@
     <field name="ontologyType" type="string" indexed="true" stored="true"/>
     <field name="name" type="string" indexed="false" stored="true"/>
     <field name="secondaryId" type="string" indexed="true" stored="true" multiValued="true"/>
-    <field name="isObsolete" type="boolean" indexed="false" stored="true"/>
+    <field name="isObsolete" type="boolean" indexed="true" stored="true"/>
     <field name="replacements" type="string" indexed="false" stored="true" multiValued="true"/>
     <field name="replaces" type="string" indexed="false" stored="true" multiValued="true"/>
     <field name="definition" type="string" indexed="false" stored="true"/>
