@@ -904,20 +904,22 @@
                     - Ontology identifier
                     - Ontology name
                     - Ontology synonym
+                    - Ontology isObsolete
 
                     The scoring has been customized to:
                      - Provide the identifier with the highest result
                      - allow the name to be of higher importance than the synonym (by boosting)
                      - prefer search terms that are exact matches to a name or synonym (these are boosted by 5 to
                      appear over all other results, except ontology ids)
+                     - terms which are not obsolete should be scored more then obsolete
                      - increase scoring of documents that match, with 0 slop, to search queries with more than one search
                      term. Again exact matches have higher boosting to make use these come first.
             -->
             <str name="qf">
-                id_lowercase^20 secondaryId_lowercase^10 name_edge^2 synonym_edge name_exact^5 synonym_exact^5
+                id_lowercase^20 secondaryId_lowercase^10 name_edge^2 synonym_edge name_exact^5 synonym_exact^5 isObsolete:false^1
             </str>
             <str name="pf">
-                name_edge^2 synonym_edge name_exact^5 synonym_exact^5
+                name_edge^2 synonym_edge name_exact^5 synonym_exact^5 isObsolete:false^1
             </str>
             <int name="ps">0</int>
         </lst>
