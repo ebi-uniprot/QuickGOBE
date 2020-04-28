@@ -922,7 +922,7 @@
             <int name="ps">0</int>
 
             <!-- Boost Query:
-                    - Ontology isObsolete
+                    - Ontology isObsolete GOA-3450 and GOA-3416
 
                     The scoring has been customized to:
                      - terms which are not obsolete should be scored more then obsolete term
