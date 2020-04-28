@@ -927,9 +927,7 @@
                     The scoring has been customized to:
                      - terms which are not obsolete should be scored more then obsolete term
             -->
-            <str name="bq">
-                isObsolete:false^5
-            </str>
+            <str name="bq">isObsolete:false^100</str>
         </lst>
     </requestHandler>
 
