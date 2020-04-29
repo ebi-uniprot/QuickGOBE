@@ -37,6 +37,7 @@ public class GraphImageLayout {
 
     public static class NodePosition {
         public String id;
+        public String name;
         public int left;
         public int right;
         public int top;

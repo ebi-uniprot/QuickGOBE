@@ -117,6 +117,10 @@ public class TermNode implements INode, IPositionableNode {
         return this.id;
     }
 
+    public String getName() {
+        return this.name;
+    }
+
     Color fillColour = Color.white;
     Color lineColour = Color.black;
     Stroke border = new BasicStroke(1);

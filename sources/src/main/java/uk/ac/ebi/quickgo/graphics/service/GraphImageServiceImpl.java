@@ -76,6 +76,7 @@ public class GraphImageServiceImpl implements GraphImageService {
                 .map(term -> {
                     GraphImageLayout.NodePosition nodePosition = new GraphImageLayout.NodePosition();
                     nodePosition.id = term.getId();
+                    nodePosition.name = term.getName();
                     nodePosition.bottom = term.bottom();
                     nodePosition.top = term.top();
                     nodePosition.left = term.left();
