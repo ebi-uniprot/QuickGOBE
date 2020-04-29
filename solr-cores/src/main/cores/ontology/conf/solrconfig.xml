@@ -920,6 +920,14 @@
                 name_edge^2 synonym_edge name_exact^5 synonym_exact^5
             </str>
             <int name="ps">0</int>
+
+            <!-- Boost Query:
+                    - Ontology isObsolete GOA-3450 and GOA-3416
+
+                    The scoring has been customized to:
+                     - terms which are not obsolete should be scored more then obsolete term
+            -->
+            <str name="bq">isObsolete:false^100</str>
         </lst>
     </requestHandler>
 

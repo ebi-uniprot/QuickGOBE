@@ -58,6 +58,7 @@ public class OntologyFields {
         public static final String ASPECT = storeAndGet(VALUES, "aspect_lowercase");
         public static final String ID = storeAndGet(VALUES, ID_LOWERCASE);
         public static final String ONTOLOGY_TYPE = storeAndGet(VALUES, ONTOLOGY_TYPE_LOWERCASE);
+        public static final String IS_OBSOLETE = storeAndGet(VALUES, OntologyFields.IS_OBSOLETE);
 
         public static boolean isSearchable(String field) {
             return VALUES.contains(field);
@@ -73,6 +74,7 @@ public class OntologyFields {
 
         public static final String ASPECT = storeAndGet(VALUES, OntologyFields.ASPECT);
         public static final String ONTOLOGY_TYPE = storeAndGet(VALUES, OntologyFields.ONTOLOGY_TYPE);
+        public static final String IS_OBSOLETE = storeAndGet(VALUES, OntologyFields.IS_OBSOLETE);
 
         public static boolean isFacetable(String field) {
             return VALUES.contains(field);
