@@ -2,15 +2,20 @@ package uk.ac.ebi.quickgo.graphics.ontology;
 
 import uk.ac.ebi.quickgo.model.ontology.generic.GenericTerm;
 import uk.ac.ebi.quickgo.model.ontology.generic.GenericTermSet;
+import uk.ac.ebi.quickgo.model.ontology.go.GOTerm;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static uk.ac.ebi.quickgo.graphics.ontology.GraphPresentation.*;
 
 public class TermNode implements INode, IPositionableNode {
+    static final Color defaultBoxHeaderBackgroundColor = new Color(0x00709B);
+    static final Color functionGoTermBoxHeaderBgColor = Color.darkGray;
+    static final Color componentGoTermBoxHeaderBgColor = new Color(0x93A661);
     private Font font;
 
     private GenericTerm term;
@@ -162,18 +167,20 @@ public class TermNode implements INode, IPositionableNode {
         }
     }
 
-    // Term id background colour
-    Color idColour = new Color(0x00709B);
-
     public void renderID(Graphics2D g2) {
         FontMetrics fm = g2.getFontMetrics();
         Rectangle2D r = fm.getStringBounds(id, g2);
 
-        g2.setColor(idColour);
-        g2.fillRect(left(), top(), width, (int) r.getHeight() + 4);
+        drawFilledBackgroundForHeaderOfTermBox(g2, r);
 
         g2.setColor(Color.WHITE);
         g2.drawString(id, (float) (left() + (width - r.getWidth()) / 2), (float) (top() - r.getMinY() + 2));
+    }
+
+    private void drawFilledBackgroundForHeaderOfTermBox(Graphics2D g2, Rectangle2D r){
+        int widthToCoverOutlineOuter = width + 1;
+        g2.setColor(getTermIdBackgroundColor());
+        g2.fillRect(left(), top(), widthToCoverOutlineOuter, (int) r.getHeight() + 4);
     }
 
     static class TextLine {
@@ -262,5 +269,22 @@ public class TermNode implements INode, IPositionableNode {
             }
             return ixSpace;
         }
+    }
+
+    Color getTermIdBackgroundColor() {
+        if (isGoTerm()) {
+            GOTerm goTerm = (GOTerm) term;
+            if (goTerm.getAspect() == GOTerm.EGOAspect.F) {
+                return functionGoTermBoxHeaderBgColor;
+            }
+            else if (goTerm.getAspect() == GOTerm.EGOAspect.C) {
+                return componentGoTermBoxHeaderBgColor;
+            }
+        }
+        return defaultBoxHeaderBackgroundColor;
+    }
+
+    boolean isGoTerm(){
+        return Objects.nonNull(term) && term.isGOTerm() && term instanceof GOTerm;
     }
 }

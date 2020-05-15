@@ -13,15 +13,20 @@ public class GraphPresentation {
     public final static boolean FILL = true;
     private static final String fontName = "Lucida Sans";
     public static final Font FONT = new Font(fontName, Font.PLAIN, fontSize);
+    //default show Information chart on right hand
     public static boolean defaultShowKey = true;
+    //default box will have header id
     public static boolean defaultShowTermIds = true;
     public static int defaultWidth = 85;
     public static int defaultHeight = 55;
     public static boolean defaultShowSlimColours = false;
     public static boolean defaultShowChildren = false;
     //changeable
+    //box header which contain id
     public final boolean termIds;
+    //Information chart on right hand key
     public final boolean key;
+    //Show Slim Colours
     public final boolean subsetColours;
     public final boolean showChildren;
     public final int width;

@@ -1,6 +1,3 @@
-/**
- *
- */
 package uk.ac.ebi.quickgo.model.ontology.go;
 
 import uk.ac.ebi.quickgo.model.ontology.generic.AuditRecord;
@@ -67,15 +64,17 @@ public class GOTerm extends GenericTerm {
             this.namespace = namespace;
         }
 
-        public static EGOAspect fromString(String s) throws Exception {
+        public static EGOAspect fromString(String s){
             if ("Process".equalsIgnoreCase(s)) {
                 return P;
             } else if ("Function".equalsIgnoreCase(s)) {
                 return F;
             } else if ("Component".equalsIgnoreCase(s)) {
                 return C;
+            } else if ("Root".equalsIgnoreCase(s)) {
+                return R;
             } else {
-                throw new Exception("Invalid ontology: " + s);
+                throw new IllegalArgumentException("Invalid ontology: " + s);
             }
         }
     }

@@ -7,10 +7,9 @@ import uk.ac.ebi.quickgo.model.ontology.generic.RelationType;
 import java.awt.*;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
+
+import static uk.ac.ebi.quickgo.graphics.ontology.TermNode.*;
 
 public class GraphImage extends RenderableImage {
     private static final Font labelFont = new Font("Lucida Sans", Font.PLAIN, 10);
@@ -165,12 +164,8 @@ public class GraphImage extends RenderableImage {
                 }
             }
 
-            //	        RelationType rta[] = {RelationType.ISA,  RelationType.PARTOF, /*RelationType.HASPART,*/
-            // RelationType.REGULATES, RelationType.POSITIVEREGULATES, RelationType.NEGATIVEREGULATES, RelationType
-            // .OCCURSIN, RelationType.USEDIN, RelationType.CAPABLEOF, RelationType.CAPABLEOFPARTOF};
-
             int knHeight = style.height / 2;
-            int knY = knHeight;
+            int knY = knHeight + computeHeightGoNodeHeaderColorInformation();
 
             int yMax = knY;
             for (RelationType rt : relationTypes) {
@@ -211,6 +206,7 @@ public class GraphImage extends RenderableImage {
             g2.setColor(Color.BLACK);
             g2.drawString(errorMessage, 5, 50);
         } else {
+            drawCompleteGoNodeHeaderColorInformation(g2);
             for (RelationEdge relation : relations) {
                 relation.render(g2);
             }
@@ -225,6 +221,49 @@ public class GraphImage extends RenderableImage {
             g2.setColor(Color.BLACK);
             g2.drawString("QuickGO - https://www.ebi.ac.uk/QuickGO", 5, height - g2.getFontMetrics().getDescent());
         }
+    }
+
+    boolean isDisplayGoNodeHeaderColorInformation(){
+        if(style.key && style.termIds){
+            Optional<TermNode> term = getOntologyTerms().stream().findFirst();
+            return term.isPresent() && term.get().isGoTerm();
+        }
+        return false;
+    }
+
+    void drawCompleteGoNodeHeaderColorInformation(Graphics2D g2){
+        if(isDisplayGoNodeHeaderColorInformation()){
+            drawGoNodeHeaderColorInformation("Process", defaultBoxHeaderBackgroundColor, g2,  1);
+            drawGoNodeHeaderColorInformation("Function", functionGoTermBoxHeaderBgColor, g2,  2);
+            drawGoNodeHeaderColorInformation("Component", componentGoTermBoxHeaderBgColor, g2, 3);
+        }
+    }
+
+    int getGoNodeHeaderColorInformationHeight(){
+        return style.height / 2;
+    }
+
+    void drawGoNodeHeaderColorInformation(String header, Color bgColor, Graphics2D g2, int row){
+        int xAxisStartingPosition = super.width - style.width - rightMargin;
+        int yAxis = (getGoNodeHeaderColorInformationHeight() * row);
+
+        FontMetrics fm = g2.getFontMetrics();
+        Rectangle2D r = fm.getStringBounds(header, g2);
+
+        g2.setColor(bgColor);
+        g2.fillRect(xAxisStartingPosition, yAxis, style.width, (int) r.getHeight() + 4);
+
+        g2.setColor(Color.WHITE);
+        g2.drawString(header, (float) (xAxisStartingPosition + (style.width - r.getWidth()) / 2), (float) (yAxis - r.getMinY() + 2));
+    }
+
+    int computeHeightGoNodeHeaderColorInformation() {
+        if (isDisplayGoNodeHeaderColorInformation()) {
+            int numberOfGoAspectHeaderBars = 3;
+            int extraSpaceToAddAfterGoNodeHeaderColorInformation = style.height / 2;
+            return (getGoNodeHeaderColorInformationHeight() * numberOfGoAspectHeaderBars) + extraSpaceToAddAfterGoNodeHeaderColorInformation;
+        }
+        return 0;
     }
 
     /**
