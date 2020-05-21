@@ -12,11 +12,57 @@ import static org.junit.jupiter.api.Assertions.*;
 import static uk.ac.ebi.quickgo.graphics.ontology.TermNode.*;
 
 class TermNodeTest {
+  private GraphPresentation style = new GraphPresentation.Builder().build();
+
+  @Nested
+  class slimWidth_coloredMarkerAtBottomWhenShowSlimColorIsTrue{
+    @Test
+    void slimBoxWidthFor85_willBe10() {
+      TermNode node = new TermNode("name", "id", style);
+      assertEquals(10, node.slimWidth());
+    }
+
+    @Test
+    void whenWidthDouble_sizeWillBeDouble() {
+      style  = new GraphPresentation.Builder().termBoxWidth(85 * 2).build();;
+      TermNode node = new TermNode("name", "id", style);
+      assertEquals(20, node.slimWidth());
+    }
+
+    @Test
+    void toGetReasonableWidth_shouldBeDividedWith8point5(){
+      style  = new GraphPresentation.Builder().termBoxWidth(102).build();;
+      TermNode node = new TermNode("name", "id", style);
+      assertEquals((int)(102/8.5), node.slimWidth());
+    }
+  }
+
+  @Nested
+  class slimHeight_coloredMarkerAtBottomWhenShowSlimColorIsTrue{
+    @Test
+    void slimBoxHeightFor55_willBe4() {
+      TermNode node = new TermNode("name", "id", style);
+      assertEquals(4, node.slimHeight());
+    }
+
+    @Test
+    void whenHeightTriple_sizeWillBeTriple() {
+      style  = new GraphPresentation.Builder().termBoxHeight(55 * 3).build();;
+      TermNode node = new TermNode("name", "id", style);
+      assertEquals(12, node.slimHeight());
+    }
+
+    @Test
+    void toGetReasonableHeight_shouldBeDividedWith13point75(){
+      style  = new GraphPresentation.Builder().termBoxHeight(1120).build();;
+      TermNode node = new TermNode("name", "id", style);
+      assertEquals((int)(1120/13.75), node.slimHeight());
+    }
+  }
 
   @Nested
   class TermIdBackGroundColor {
     private Color defaultColor = defaultBoxHeaderBackgroundColor;
-    private GraphPresentation style = new GraphPresentation.Builder().build();
 
     @Test
     void defaultColor_whenTermIsNotProvided() {

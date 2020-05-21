@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 public class GenericGraph<N extends INode, E extends IEdge<N>> implements IGraph<N, E> {
-    public List<N> nodes = new ArrayList<>();
+    List<N> nodes = new ArrayList<>();
     public List<E> edges = new ArrayList<>();
 
     public List<N> getNodes() {
@@ -37,7 +37,7 @@ public class GenericGraph<N extends INode, E extends IEdge<N>> implements IGraph
         return results;
     }
 
-    public E findEdge(N parent, N child) {
+    private E findEdge(N parent, N child) {
         for (E e : edges) {
             if ((e.getParent() == parent) && (e.getChild() == child)) {
                 return e;
@@ -46,7 +46,7 @@ public class GenericGraph<N extends INode, E extends IEdge<N>> implements IGraph
         return null;
     }
 
-    public boolean connected(N a, N b) {
+    boolean connected(N a, N b) {
         return (findEdge(a, b) != null) || (findEdge(b, a) != null);
     }
 }

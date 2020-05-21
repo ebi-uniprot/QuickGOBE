@@ -30,6 +30,8 @@ public class GraphRequest {
     private boolean showSlimColours = GraphPresentation.defaultShowSlimColours;
     @ApiModelProperty(value = "Whether or not to show the children of terms")
     private boolean showChildren = GraphPresentation.defaultShowChildren;
+    @ApiModelProperty(value = "Text font size in pixels")
+    private Integer fontSize = GraphPresentation.defaultFontSize;
 
     public GraphRequest() {}
 
@@ -97,5 +99,14 @@ public class GraphRequest {
 
     public void setShowChildren(boolean val) {
         this.showChildren = val;
+    }
+
+    @Min(value = 1)
+    public Integer getFontSize() {
+        return fontSize;
+    }
+
+    public void setFontSize(Integer fontSize) {
+        this.fontSize = fontSize;
     }
 }

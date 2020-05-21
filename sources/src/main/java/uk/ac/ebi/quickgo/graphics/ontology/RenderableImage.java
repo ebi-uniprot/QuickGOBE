@@ -8,7 +8,7 @@ public abstract class RenderableImage {
     public int width;
     public int height;
 
-    public String src;
+    String src;
 
     public RenderedImage render() {
         BufferedImage image = prepare();

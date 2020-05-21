@@ -635,6 +635,7 @@ public abstract class OBOController<T extends OBOTerm> {
         presentationBuilder.termBoxHeight(request.getTermBoxHeight());
         presentationBuilder.showSlimColours(request.isShowSlimColours());
         presentationBuilder.showChildren(request.isShowChildren());
+        presentationBuilder.fontSize(request.getFontSize());
         return presentationBuilder.build();
     }
 }

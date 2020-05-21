@@ -10,12 +10,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static uk.ac.ebi.quickgo.graphics.ontology.GraphPresentation.*;
-
 public class TermNode implements INode, IPositionableNode {
     static final Color defaultBoxHeaderBackgroundColor = new Color(0x00709B);
     static final Color functionGoTermBoxHeaderBgColor = Color.darkGray;
     static final Color componentGoTermBoxHeaderBgColor = new Color(0x93A661);
+    private Color fillColour = Color.white;
+    private Color lineColour = Color.black;
     private Font font;
 
     private GenericTerm term;
@@ -26,24 +26,26 @@ public class TermNode implements INode, IPositionableNode {
     private int y;
     private int width;
     private int height;
-    public int topLine = 0;
+    private int topLine = 0;
+    private List<TextLine> lines = new ArrayList<>();
+    private int yheight;
 
     int[] colours = new int[0];
     private GraphPresentation style;
 
-    public TermNode(String name, String id, GraphPresentation style) {
+    TermNode(String name, String id, GraphPresentation style) {
         this.name = name;
         this.id = id;
         this.style = style;
         if (style.termIds && id.length() > 0) {
-            topLine = fontSize + 1;
+            topLine = style.getIdHeaderFontSize();
         }
         height = style.height;
         width = style.width;
-        font = FONT;
+        font = style.font;
     }
 
-    public TermNode(GenericTerm term, GraphPresentation style) {
+    TermNode(GenericTerm term, GraphPresentation style) {
         this(term.getName().replace('_', ' '), term.getId(), style);
         this.term = term;
 
@@ -126,29 +128,25 @@ public class TermNode implements INode, IPositionableNode {
         return this.name;
     }
 
-    Color fillColour = Color.white;
-    Color lineColour = Color.black;
-    Stroke border = new BasicStroke(1);
-
-    public void setFillColour(Color c) {
+    void setFillColour(Color c) {
         if (c != null) {
             this.fillColour = c;
         }
     }
 
-    public void render(Graphics2D g2) {
+    void render(Graphics2D g2) {
         g2.setFont(font);
 
         g2.setColor(fillColour);
         g2.fillRect(left(), top(), width, height);
 
         g2.setColor(lineColour);
-        g2.setStroke(border);
+        g2.setStroke(style.getBoxBorder());
         g2.drawRect(left(), top(), width, height);
 
         for (int i = 0; i < colours.length; i++) {
             g2.setColor(new Color(colours[i]));
-            g2.fillRect(left() + (i * 10) + 1, bottom() - 3, 10, 4);
+            g2.fillRect(left() + (i * slimWidth()) + 1,bottom() - slimHeight() + 1, slimWidth(), slimHeight());
         }
         g2.setColor(lineColour);
 
@@ -167,7 +165,19 @@ public class TermNode implements INode, IPositionableNode {
         }
     }
 
-    public void renderID(Graphics2D g2) {
+    int slimWidth() {
+        //for reasonable slim color marker at bottom, width is 10 with default box width of 85
+        float dividerToGetReasonableWidth = 8.5f;
+        return (int) (style.width / dividerToGetReasonableWidth);
+    }
+
+    int slimHeight(){
+        //for reasonable slim color marker at bottom, height is 4 with default box height of 55
+        float dividerToGetReasonableHeight = 13.75f;
+        return (int) (style.height / dividerToGetReasonableHeight);
+    }
+
+    private void renderID(Graphics2D g2) {
         FontMetrics fm = g2.getFontMetrics();
         Rectangle2D r = fm.getStringBounds(id, g2);
 
@@ -190,7 +200,7 @@ public class TermNode implements INode, IPositionableNode {
         private FontMetrics fm;
         private Font f;
 
-        public TextLine(Graphics2D g2, FontMetrics fm) {
+        private TextLine(Graphics2D g2, FontMetrics fm) {
             this.g2 = g2;
             this.fm = fm;
             this.f = fm.getFont();
@@ -214,7 +224,7 @@ public class TermNode implements INode, IPositionableNode {
             return text == null ? 0 : text.length();
         }
 
-        public void draw(Graphics2D g2, int x, int y) {
+        private void draw(Graphics2D g2, int x, int y) {
             g2.drawString(text, (float) (x - bounds.getWidth() / 2 - bounds.getMinX()), y + f.getSize2D());
         }
 
@@ -222,9 +232,6 @@ public class TermNode implements INode, IPositionableNode {
             return f.getSize();
         }
     }
-
-    List<TextLine> lines = new ArrayList<>();
-    int yheight;
 
     private void reflow(String text, FontMetrics fm, Graphics2D g2) {
         int hmargin = 2;

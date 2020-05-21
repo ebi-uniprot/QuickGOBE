@@ -15,11 +15,11 @@ import java.util.Map;
 import static uk.ac.ebi.quickgo.graphics.ontology.GraphPresentation.*;
 
 public class OntologyGraph extends GenericGraph<TermNode, RelationEdge> {
-    public GraphPresentation presentation;
-    EnumSet<RelationType> relationTypes;
-    int ancestorLimit = 0;
-    int pixelLimit = 0;
-    int overflow = 0;
+    private GraphPresentation presentation;
+    private EnumSet<RelationType> relationTypes;
+    private int ancestorLimit = 0;
+    private int pixelLimit = 0;
+    private int overflow = 0;
     // map containing all terms that are part of (i.e., nodes in) the graph
     private Map<GenericTerm, TermNode> termMap = new HashMap<>();
     // map containing all relations that are part of (i.e., edges in) the graph
@@ -93,7 +93,7 @@ public class OntologyGraph extends GenericGraph<TermNode, RelationEdge> {
         if (overflow > 0) {
             image = new GraphImage(
                     "Chart too large - there are more than " + ancestorLimit + " ancestor terms (overflow = " +
-                            overflow + ")");
+                            overflow + ")", presentation);
         } else {
             GraphLayout<TermNode, RelationEdge> layout =
                     new GraphLayout<TermNode, RelationEdge>(this, GraphLayout.Orientation.TOP);
@@ -106,7 +106,7 @@ public class OntologyGraph extends GenericGraph<TermNode, RelationEdge> {
             if (pixelLimit > 0 && pixelCount > pixelLimit) {
                 image = new GraphImage(
                         "Chart too large: limit is " + pixelLimit + " pixels, actual size is " + pixelCount +
-                                " pixels");
+                                " pixels", presentation);
             } else {
                 image = new GraphImage(layout.getWidth(), layout.getHeight(), getNodes(), getEdges(), presentation,
                         relationTypes);
@@ -136,12 +136,12 @@ public class OntologyGraph extends GenericGraph<TermNode, RelationEdge> {
         return makeGraph(terms, null, ancestorLimit, pixelLimit, style);
     }
 
-    void addRelation(TermRelation relation) {
+    private void addRelation(TermRelation relation) {
         if (!edgeMap.containsKey(relation)) {
             TermNode pt = termMap.get(relation.parent);
             TermNode ct = termMap.get(relation.child);
             if (pt != null && ct != null) {
-                RelationEdge graphEdge = new RelationEdge(pt, ct, relation.typeof);
+                RelationEdge graphEdge = new RelationEdge(pt, ct, relation.typeof, presentation);
                 edgeMap.put(relation, graphEdge);
                 edges.add(graphEdge);
             }
