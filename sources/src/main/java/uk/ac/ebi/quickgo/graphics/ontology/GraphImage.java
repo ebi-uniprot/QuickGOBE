@@ -174,7 +174,7 @@ public class GraphImage extends RenderableImage {
                 yMax = kn.bottom();
             }
 
-            int pos = 20;
+            int pos = 27;
             for (GenericTermSet subset : subsets) {
                 TermNode bottomNode = subsetNode(subset.name, subset.name, pos);
                 bottomNode.colours = new int[]{subset.colour};
