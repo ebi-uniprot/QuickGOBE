@@ -9,10 +9,9 @@ import java.util.Objects;
  */
 public class GraphPresentation {
 
-    public final static int fontSize = 11;
     public final static boolean FILL = true;
     private static final String fontName = "Lucida Sans";
-    public static final Font FONT = new Font(fontName, Font.PLAIN, fontSize);
+
     //default show Information chart on right hand
     public static boolean defaultShowKey = true;
     //default box will have header id
@@ -21,6 +20,7 @@ public class GraphPresentation {
     public static int defaultHeight = 55;
     public static boolean defaultShowSlimColours = false;
     public static boolean defaultShowChildren = false;
+    public static int defaultFontSize = 11;
     //changeable
     //box header which contain id
     public final boolean termIds;
@@ -31,15 +31,27 @@ public class GraphPresentation {
     public final boolean showChildren;
     public final int width;
     public final int height;
+    final int fontSize;
+
+    final Font font;
+    final Font labelFont;
+    final Font infoFont;
+    final Font errorFont;
 
     private GraphPresentation(boolean termIds, boolean key, boolean subsetColours, boolean showChildren, int width,
-            int height) {
+            int height, int fontSize) {
         this.termIds = termIds;
         this.key = key;
         this.subsetColours = subsetColours;
         this.showChildren = showChildren;
         this.width = width;
         this.height = height;
+        this.fontSize = fontSize;
+
+        this.font = new Font(fontName, Font.PLAIN, fontSize);
+        this.labelFont = new Font(fontName, Font.PLAIN, fontSize - relativeSize(1));
+        this.infoFont = new Font(fontName, Font.PLAIN, fontSize - relativeSize(2));
+        this.errorFont = new Font(fontName, Font.PLAIN, fontSize + relativeSize(5));
     }
 
     public static class Builder {
@@ -49,6 +61,7 @@ public class GraphPresentation {
         private boolean showChildren = defaultShowChildren;
         private int width = defaultWidth;
         private int height = defaultHeight;
+        private int fontSize = defaultFontSize;
 
         public Builder() {
         }
@@ -83,6 +96,11 @@ public class GraphPresentation {
             return this;
         }
 
+        public Builder fontSize(int fontSize) {
+            this.fontSize = fontSize;
+            return this;
+        }
+
         public GraphPresentation build() {
             return new GraphPresentation(
                     this.showIDs,
@@ -90,7 +108,8 @@ public class GraphPresentation {
                     this.showSlimColours,
                     this.showChildren,
                     this.width,
-                    this.height);
+                    this.height,
+                    this.fontSize);
         }
     }
 
@@ -124,5 +143,48 @@ public class GraphPresentation {
                 ", width=" + width +
                 ", height=" + height +
                 '}';
+    }
+
+    int getIdHeaderFontSize(){
+        return this.fontSize + 1;
+    }
+
+    Stroke getBoxBorder(){
+        return new BasicStroke(getBoxBorderSize());
+    }
+
+    float getBoxBorderSize(){
+        int defaultBorderForDefaultSize = 1;
+        return relativeFontSizeIncrease() * defaultBorderForDefaultSize;
+    }
+
+    float relativeFontSizeIncrease(){
+        return (float) fontSize / defaultFontSize;
+    }
+
+    Stroke arrowLineRelativeFont(Stroke basicStroke){
+        BasicStroke s = (BasicStroke) basicStroke;
+        float widthRelativeToFont = s.getLineWidth() * relativeFontSizeIncrease();
+        return new BasicStroke(widthRelativeToFont, s.getEndCap(), s.getLineJoin(), s.getMiterLimit(), s.getDashArray(), s.getDashPhase());
+    }
+
+    float getArrowHeadStyleSize(){
+        int defaultWidth = 2;
+        float proportionalIncrease = relativeFontSizeIncrease() <= 1 ? 0 : relativeFontSizeIncrease();
+        return (relativeFontSizeIncrease() * defaultWidth) + proportionalIncrease;
+    }
+
+    Stroke getArrowHeadStyle(){
+        return new BasicStroke(getArrowHeadStyleSize());
+    }
+
+    int relativeSize(int font){
+        return (int) relativeFontSizeIncrease() * font;
+    }
+
+    int getSlimBoxWidth(){
+        int slimNameCanBeGreaterThanGoId = 55;
+        int fontIncreaseShouldIncreaseWidth = relativeFontSizeIncrease() <= 1 ? 0 : (int) (relativeFontSizeIncrease() / 2 * slimNameCanBeGreaterThanGoId);
+        return width + slimNameCanBeGreaterThanGoId + fontIncreaseShouldIncreaseWidth;
     }
 }

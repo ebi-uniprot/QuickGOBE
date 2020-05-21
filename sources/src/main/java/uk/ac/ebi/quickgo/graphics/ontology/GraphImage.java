@@ -12,28 +12,28 @@ import java.util.*;
 import static uk.ac.ebi.quickgo.graphics.ontology.TermNode.*;
 
 public class GraphImage extends RenderableImage {
-    private static final Font labelFont = new Font("Lucida Sans", Font.PLAIN, 10);
-    private static final Font infoFont = new Font("Lucida Sans", Font.PLAIN, 9);
-    private static final Font errorFont = new Font("Lucida Sans", Font.PLAIN, 16);
 
     public static class KeyNode implements INode {
         public int xCentre;
         public int yCentre;
         public int width;
         public int height;
+        RelationType relType;
+        private final GraphPresentation style;
 
         public static class RelationStroke extends DrawableEdge<INode> {
-            private static final Stroke relationStroke = new BasicStroke(2f);
+            private static final Stroke defaultStyleRelation = new BasicStroke(2f);
             private static final Shape arrow = DrawableEdge.standardArrow(8, 6, 2);
 
             RelationType type;
 
-            public RelationStroke(int xFrom, int yFrom, int xTo, int yTo, RelationType rtype) {
-                super(null, null, Color.black, rtype.stroke == null ? relationStroke : rtype.stroke,
+            public RelationStroke(int xFrom, int yFrom, int xTo, int yTo, RelationType rtype, GraphPresentation style) {
+                super(null, null, Color.black, rtype.stroke == null ? style.arrowLineRelativeFont(defaultStyleRelation) : style.arrowLineRelativeFont(rtype.stroke),
                         (rtype.polarity == RelationType.Polarity.POSITIVE ||
                                  rtype.polarity == RelationType.Polarity.BIPOLAR) ? arrow : null,
                         (rtype.polarity == RelationType.Polarity.NEGATIVE ||
-                                 rtype.polarity == RelationType.Polarity.BIPOLAR) ? arrow : null);
+                                 rtype.polarity == RelationType.Polarity.BIPOLAR) ? arrow : null,
+                        style.getArrowHeadStyle());
                 this.type = rtype;
                 this.colour = rtype.colour;
 
@@ -42,26 +42,24 @@ public class GraphImage extends RenderableImage {
                 shape.lineTo(xTo, yTo);
                 this.setRoute(shape);
             }
+
         }
 
-        RelationType relType;
-
-        public KeyNode(int xCentre, int yCentre, int width, int height, RelationType relType) {
+        public KeyNode(int xCentre, int yCentre, int width, int height, RelationType relType, GraphPresentation style) {
             this.xCentre = xCentre;
             this.yCentre = yCentre;
             this.width = width;
             this.height = height;
             this.relType = relType;
+            this.style = style;
         }
-
-        Stroke border = new BasicStroke(1);
 
         public void render(Graphics2D g2) {
             int margin = height / 10;
             int boxSide = height - (2 * margin);
             int offsetY = boxSide / 4;
             new RelationStroke(xCentre + (width / 2) - boxSide - (2 * margin), yCentre + offsetY,
-                    xCentre - (width / 2) + boxSide + (2 * margin), yCentre + offsetY, relType).render(g2);
+                    xCentre - (width / 2) + boxSide + (2 * margin), yCentre + offsetY, relType, style).render(g2);
 
             int left = xCentre - (width / 2) + margin;
             int top = yCentre - (height / 2) + margin;
@@ -69,7 +67,7 @@ public class GraphImage extends RenderableImage {
             left += (width - margin - boxSide);
             drawBox(g2, left, top, boxSide, boxSide, "B");
 
-            g2.setFont(labelFont);
+            g2.setFont(style.labelFont);
             Rectangle2D r = g2.getFontMetrics().getStringBounds(relType.description, g2);
             g2.drawString(relType.description, (float) (xCentre - (r.getWidth() / 2)),
                     (float) (yCentre + offsetY - (r.getHeight() / 2)));
@@ -77,10 +75,10 @@ public class GraphImage extends RenderableImage {
 
         void drawBox(Graphics2D g2, int left, int top, int width, int height, String label) {
             g2.setColor(Color.black);
-            g2.setStroke(border);
+            g2.setStroke(style.getBoxBorder());
             g2.drawRect(left, top, width, height);
 
-            g2.setFont(labelFont);
+            g2.setFont(style.labelFont);
             Rectangle2D r = g2.getFontMetrics().getStringBounds(label, g2);
             g2.drawString(label, (float) (left + (width / 2) - (r.getWidth() / 2)),
                     (float) (top + (height / 2) + (r.getHeight() / 2)));
@@ -123,7 +121,7 @@ public class GraphImage extends RenderableImage {
     public Collection<RelationEdge> relations = new ArrayList<>();
     public Collection<KeyNode> legend = new ArrayList<>();
 
-    private GraphPresentation style;
+    private final GraphPresentation style;
 
     public String selected;
     public final String errorMessage;
@@ -137,9 +135,10 @@ public class GraphImage extends RenderableImage {
     public static final int bottomMargin = 16;
     public static final int minWidth = 250;
 
-    public GraphImage(String errorMessage) {
+    public GraphImage(String errorMessage, GraphPresentation style) {
         super(500, 100);
         this.errorMessage = errorMessage;
+        this.style = style;
     }
 
     public GraphImage(int width, int height, Collection<TermNode> terms, Collection<RelationEdge> relations,
@@ -169,7 +168,7 @@ public class GraphImage extends RenderableImage {
 
             int yMax = knY;
             for (RelationType rt : relationTypes) {
-                KeyNode kn = new KeyNode(super.width - style.width - rightMargin, knY, style.width * 2, knHeight, rt);
+                KeyNode kn = new KeyNode(super.width - style.width - rightMargin, knY, style.width * 2, knHeight, rt, style);
                 legend.add(kn);
                 knY += knHeight;
                 yMax = kn.bottom();
@@ -192,7 +191,7 @@ public class GraphImage extends RenderableImage {
 
     private TermNode subsetNode(String name, String id, int row) {
         TermNode node = new TermNode(name, id, style);
-        node.setWidth(node.getWidth() + 55);
+        node.setWidth(style.getSlimBoxWidth());
         node.setHeight(node.getHeight() / 2);
         node.setLocation(width - node.getWidth() / 2 - rightMargin, node.getHeight() * row / 2);
         terms.add(node);
@@ -202,7 +201,7 @@ public class GraphImage extends RenderableImage {
     @Override
     protected void render(Graphics2D g2) {
         if (errorMessage != null) {
-            g2.setFont(errorFont);
+            g2.setFont(style.errorFont);
             g2.setColor(Color.BLACK);
             g2.drawString(errorMessage, 5, 50);
         } else {
@@ -217,7 +216,7 @@ public class GraphImage extends RenderableImage {
                 ke.render(g2);
             }
 
-            g2.setFont(infoFont);
+            g2.setFont(style.infoFont);
             g2.setColor(Color.BLACK);
             g2.drawString("QuickGO - https://www.ebi.ac.uk/QuickGO", 5, height - g2.getFontMetrics().getDescent());
         }
@@ -233,6 +232,7 @@ public class GraphImage extends RenderableImage {
 
     void drawCompleteGoNodeHeaderColorInformation(Graphics2D g2){
         if(isDisplayGoNodeHeaderColorInformation()){
+            g2.setFont(style.font);
             drawGoNodeHeaderColorInformation("Process", defaultBoxHeaderBackgroundColor, g2,  1);
             drawGoNodeHeaderColorInformation("Function", functionGoTermBoxHeaderBgColor, g2,  2);
             drawGoNodeHeaderColorInformation("Component", componentGoTermBoxHeaderBgColor, g2, 3);

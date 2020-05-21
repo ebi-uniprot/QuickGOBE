@@ -67,6 +67,27 @@ public class GraphRequestValidationIT {
     }
 
     @Test
+    public void fontSizeMinimum1() {
+        graphRequest.setFontSize(1);
+
+        assertThat(validator.validate(graphRequest), hasSize(0));
+    }
+
+    @Test
+    public void fontSizeCannotBeZero() {
+        graphRequest.setFontSize(0);
+
+        assertThat(validator.validate(graphRequest), hasSize(1));
+    }
+
+    @Test
+    public void fontSizeCannotBeLessThan1() {
+        graphRequest.setFontSize(-1);
+
+        assertThat(validator.validate(graphRequest), hasSize(1));
+    }
+
+    @Test
     public void termBoxWidthMinimum1() {
         graphRequest.setTermBoxWidth(1);
 

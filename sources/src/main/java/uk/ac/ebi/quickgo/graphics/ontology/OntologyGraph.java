@@ -93,7 +93,7 @@ public class OntologyGraph extends GenericGraph<TermNode, RelationEdge> {
         if (overflow > 0) {
             image = new GraphImage(
                     "Chart too large - there are more than " + ancestorLimit + " ancestor terms (overflow = " +
-                            overflow + ")");
+                            overflow + ")", presentation);
         } else {
             GraphLayout<TermNode, RelationEdge> layout =
                     new GraphLayout<TermNode, RelationEdge>(this, GraphLayout.Orientation.TOP);
@@ -106,7 +106,7 @@ public class OntologyGraph extends GenericGraph<TermNode, RelationEdge> {
             if (pixelLimit > 0 && pixelCount > pixelLimit) {
                 image = new GraphImage(
                         "Chart too large: limit is " + pixelLimit + " pixels, actual size is " + pixelCount +
-                                " pixels");
+                                " pixels", presentation);
             } else {
                 image = new GraphImage(layout.getWidth(), layout.getHeight(), getNodes(), getEdges(), presentation,
                         relationTypes);
@@ -141,7 +141,7 @@ public class OntologyGraph extends GenericGraph<TermNode, RelationEdge> {
             TermNode pt = termMap.get(relation.parent);
             TermNode ct = termMap.get(relation.child);
             if (pt != null && ct != null) {
-                RelationEdge graphEdge = new RelationEdge(pt, ct, relation.typeof);
+                RelationEdge graphEdge = new RelationEdge(pt, ct, relation.typeof, presentation);
                 edgeMap.put(relation, graphEdge);
                 edges.add(graphEdge);
             }

@@ -16,11 +16,35 @@ import static uk.ac.ebi.quickgo.graphics.ontology.GraphPresentation.defaultHeigh
 import static uk.ac.ebi.quickgo.graphics.ontology.TermNode.*;
 
 class GraphImageTest {
+  private GraphPresentation defaultStyle = new GraphPresentation.Builder().build();
+
+  @Nested
+  class render{
+    private GraphImage gi = spy(graphImage(defaultStyle));
+    private Graphics2D g2 = mock(Graphics2D.class);
+    private FontMetrics fontMetrics = mock(FontMetrics.class);
+
+    @Test
+    void infoMessageShouldTakeFontFromStyle() {
+      when(g2.getFontMetrics()).thenReturn(fontMetrics);
+
+      gi.render(g2);
+
+      verify(g2, times(1)).setFont(defaultStyle.infoFont);
+    }
+
+    @Test
+    void errorMessageShouldTakeFontFromStyle() {
+      gi = spy(new GraphImage("error msg", defaultStyle));
+      gi.render(g2);
+
+      verify(g2, times(1)).setFont(defaultStyle.errorFont);
+    }
+  }
 
   @Nested
   class DrawCompleteGoNodeHeaderColorInformation {
     private int height300 = 300;
-    private GraphPresentation defaultStyle = new GraphPresentation.Builder().build();
     private GraphPresentation style300 = new GraphPresentation.Builder().termBoxHeight(height300).build();
 
     @Nested
@@ -223,6 +247,7 @@ class GraphImageTest {
 
         verify(gi, times(1)).drawCompleteGoNodeHeaderColorInformation(g2);
         verify(gi, times(1)).isDisplayGoNodeHeaderColorInformation();
+        verify(g2, times(1)).setFont(defaultStyle.font);
         verify(gi, times(1)).drawGoNodeHeaderColorInformation("Process", defaultBoxHeaderBackgroundColor, g2, 1);
         verify(gi, times(1)).drawGoNodeHeaderColorInformation("Function", functionGoTermBoxHeaderBgColor, g2, 2);
         verify(gi, times(1)).drawGoNodeHeaderColorInformation("Component", componentGoTermBoxHeaderBgColor, g2, 3);
@@ -230,13 +255,12 @@ class GraphImageTest {
         verifyNoMoreInteractions(gi);
       }
     }
+  }
+  private GraphImage graphImage(GraphPresentation style) {
+    return graphImage(style, Collections.emptyList());
+  }
 
-    private GraphImage graphImage(GraphPresentation style) {
-      return graphImage(style, Collections.emptyList());
-    }
-
-    private GraphImage graphImage(GraphPresentation style, List<TermNode> terms) {
-      return new GraphImage(0, 0, terms, null, style, Collections.emptyList());
-    }
+  private GraphImage graphImage(GraphPresentation style, List<TermNode> terms) {
+    return new GraphImage(0, 0, terms, Collections.emptyList(), style, Collections.emptyList());
   }
 }

@@ -36,11 +36,11 @@ public class TermNode implements INode, IPositionableNode {
         this.id = id;
         this.style = style;
         if (style.termIds && id.length() > 0) {
-            topLine = fontSize + 1;
+            topLine = style.getIdHeaderFontSize();
         }
         height = style.height;
         width = style.width;
-        font = FONT;
+        font = style.font;
     }
 
     public TermNode(GenericTerm term, GraphPresentation style) {
@@ -128,7 +128,6 @@ public class TermNode implements INode, IPositionableNode {
 
     Color fillColour = Color.white;
     Color lineColour = Color.black;
-    Stroke border = new BasicStroke(1);
 
     public void setFillColour(Color c) {
         if (c != null) {
@@ -143,12 +142,12 @@ public class TermNode implements INode, IPositionableNode {
         g2.fillRect(left(), top(), width, height);
 
         g2.setColor(lineColour);
-        g2.setStroke(border);
+        g2.setStroke(style.getBoxBorder());
         g2.drawRect(left(), top(), width, height);
 
         for (int i = 0; i < colours.length; i++) {
             g2.setColor(new Color(colours[i]));
-            g2.fillRect(left() + (i * 10) + 1, bottom() - 3, 10, 4);
+            g2.fillRect(left() + (i * slimWidth()) + 1,bottom() - slimHeight() + 1, slimWidth(), slimHeight());
         }
         g2.setColor(lineColour);
 
@@ -165,6 +164,18 @@ public class TermNode implements INode, IPositionableNode {
         if (style.termIds) {
             renderID(g2);
         }
+    }
+
+    int slimWidth() {
+        //for reasonable slim color marker at bottom, width is 10 with default box width of 85
+        float dividerToGetReasonableWidth = 8.5f;
+        return (int) (style.width / dividerToGetReasonableWidth);
+    }
+
+    int slimHeight(){
+        //for reasonable slim color marker at bottom, height is 4 with default box height of 55
+        float dividerToGetReasonableHeight = 13.75f;
+        return (int) (style.height / dividerToGetReasonableHeight);
     }
 
     public void renderID(Graphics2D g2) {

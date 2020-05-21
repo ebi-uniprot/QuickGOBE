@@ -22,7 +22,7 @@ public class GraphImageResultTest {
     @Before
     public void setUp() {
         validDescription = "Valid description";
-        validGraphImage = new GraphImage("stub graph image");
+        validGraphImage = new GraphImage("stub graph image", null);
         validGraphImageLayout = new GraphImageLayout();
     }
 

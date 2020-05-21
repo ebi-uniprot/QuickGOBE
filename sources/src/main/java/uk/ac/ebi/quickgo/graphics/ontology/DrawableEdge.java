@@ -11,11 +11,11 @@ public class DrawableEdge<N extends INode> implements IRoutableEdge<N> {
 
     protected Shape route;
     protected Color colour;
-    Stroke stroke;
+    Stroke arrowLineStyle;
 
-    Shape parentArrow;
-    Shape childArrow;
-    private static final Stroke arrowStroke = new BasicStroke(2f);
+    Shape parentArrowHead;
+    Shape childArrowHead;
+    private final Stroke arrowStroke;
 
     public static Shape standardArrow(float length, float width, float inset) {
         GeneralPath arrow = new GeneralPath();
@@ -35,26 +35,22 @@ public class DrawableEdge<N extends INode> implements IRoutableEdge<N> {
         return standardArrow(length, length / 2, 0);
     }
 
-    public DrawableEdge(N parent, N child, Color colour, Stroke stroke, Shape parentArrow, Shape childArrow) {
+    public DrawableEdge(N parent, N child, Color colour, Stroke arrowLineStyle, Shape parentArrowHead, Shape childArrowHead, Stroke arrowHeadStyle) {
         this.parent = parent;
         this.child = child;
         this.colour = colour;
-        this.stroke = stroke;
-        this.parentArrow = parentArrow;
-        this.childArrow = childArrow;
+        this.arrowLineStyle = arrowLineStyle;
+        this.parentArrowHead = parentArrowHead;
+        this.childArrowHead = childArrowHead;
+        this.arrowStroke = arrowHeadStyle;
     }
 
-    public DrawableEdge(Color colour, Stroke stroke) {
-        this.colour = colour;
-        this.stroke = stroke;
+    public void setParentArrowHead(Shape parentArrowHead) {
+        this.parentArrowHead = parentArrowHead;
     }
 
-    public void setParentArrow(Shape parentArrow) {
-        this.parentArrow = parentArrow;
-    }
-
-    public void setChildArrow(Shape childArrow) {
-        this.childArrow = childArrow;
+    public void setChildArrowHead(Shape childArrowHead) {
+        this.childArrowHead = childArrowHead;
     }
 
     /**
@@ -81,14 +77,14 @@ public class DrawableEdge<N extends INode> implements IRoutableEdge<N> {
      * @param g2 Canvas
      */
     public void render(Graphics2D g2) {
-        g2.setStroke(stroke);
+        g2.setStroke(arrowLineStyle);
         g2.setColor(colour);
 
         g2.draw(route);
 
         g2.setStroke(arrowStroke);
-        if (parentArrow != null || childArrow != null) {
-            drawArrows(g2, route, parentArrow, childArrow);
+        if (parentArrowHead != null || childArrowHead != null) {
+            drawArrows(g2, route, parentArrowHead, childArrowHead);
         }
     }
 
