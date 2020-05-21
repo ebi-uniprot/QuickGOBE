@@ -6,18 +6,18 @@ import java.awt.geom.GeneralPath;
 import java.awt.geom.PathIterator;
 
 public class DrawableEdge<N extends INode> implements IRoutableEdge<N> {
-    N parent;
-    N child;
+    private N parent;
+    private N child;
 
-    protected Shape route;
+    private Shape route;
     protected Color colour;
-    Stroke arrowLineStyle;
+    private Stroke arrowLineStyle;
 
-    Shape parentArrowHead;
-    Shape childArrowHead;
+    private Shape parentArrowHead;
+    private Shape childArrowHead;
     private final Stroke arrowStroke;
 
-    public static Shape standardArrow(float length, float width, float inset) {
+    static Shape standardArrow(float length, float width, float inset) {
         GeneralPath arrow = new GeneralPath();
         arrow.moveTo(width / 2, length);
         arrow.lineTo(0, 0);
@@ -35,7 +35,7 @@ public class DrawableEdge<N extends INode> implements IRoutableEdge<N> {
         return standardArrow(length, length / 2, 0);
     }
 
-    public DrawableEdge(N parent, N child, Color colour, Stroke arrowLineStyle, Shape parentArrowHead, Shape childArrowHead, Stroke arrowHeadStyle) {
+    DrawableEdge(N parent, N child, Color colour, Stroke arrowLineStyle, Shape parentArrowHead, Shape childArrowHead, Stroke arrowHeadStyle) {
         this.parent = parent;
         this.child = child;
         this.colour = colour;
@@ -76,7 +76,7 @@ public class DrawableEdge<N extends INode> implements IRoutableEdge<N> {
      *
      * @param g2 Canvas
      */
-    public void render(Graphics2D g2) {
+    void render(Graphics2D g2) {
         g2.setStroke(arrowLineStyle);
         g2.setColor(colour);
 
@@ -88,7 +88,7 @@ public class DrawableEdge<N extends INode> implements IRoutableEdge<N> {
         }
     }
 
-    public static void drawArrows(Graphics2D g2, Shape route, Shape parentArrow, Shape childArrow) {
+    private static void drawArrows(Graphics2D g2, Shape route, Shape parentArrow, Shape childArrow) {
         PathIterator pi = route.getPathIterator(null, 2);
 
         double[] posn = new double[6];

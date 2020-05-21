@@ -9,7 +9,7 @@ import java.util.Objects;
  */
 public class GraphPresentation {
 
-    public final static boolean FILL = true;
+    final static boolean FILL = true;
     private static final String fontName = "Lucida Sans";
 
     //default show Information chart on right hand
@@ -23,12 +23,12 @@ public class GraphPresentation {
     public static int defaultFontSize = 11;
     //changeable
     //box header which contain id
-    public final boolean termIds;
+    final boolean termIds;
     //Information chart on right hand key
     public final boolean key;
     //Show Slim Colours
-    public final boolean subsetColours;
-    public final boolean showChildren;
+    final boolean subsetColours;
+    final boolean showChildren;
     public final int width;
     public final int height;
     final int fontSize;

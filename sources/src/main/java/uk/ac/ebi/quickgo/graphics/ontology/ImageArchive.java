@@ -5,9 +5,9 @@ import java.util.Map;
 
 public class ImageArchive {
     //static WeakValueMap<Integer, RenderableImage> content;
-    static Map<Integer, RenderableImage> content;
+    private static Map<Integer, RenderableImage> content;
 
-    static final String imageServletAddress = "graphs";
+    private static final String imageServletAddress = "graphs";
 
     public static String store(RenderableImage image) {
         if (content == null) {

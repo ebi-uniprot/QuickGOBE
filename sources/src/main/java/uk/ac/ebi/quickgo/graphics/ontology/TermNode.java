@@ -10,12 +10,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static uk.ac.ebi.quickgo.graphics.ontology.GraphPresentation.*;
-
 public class TermNode implements INode, IPositionableNode {
     static final Color defaultBoxHeaderBackgroundColor = new Color(0x00709B);
     static final Color functionGoTermBoxHeaderBgColor = Color.darkGray;
     static final Color componentGoTermBoxHeaderBgColor = new Color(0x93A661);
+    private Color fillColour = Color.white;
+    private Color lineColour = Color.black;
     private Font font;
 
     private GenericTerm term;
@@ -26,12 +26,14 @@ public class TermNode implements INode, IPositionableNode {
     private int y;
     private int width;
     private int height;
-    public int topLine = 0;
+    private int topLine = 0;
+    private List<TextLine> lines = new ArrayList<>();
+    private int yheight;
 
     int[] colours = new int[0];
     private GraphPresentation style;
 
-    public TermNode(String name, String id, GraphPresentation style) {
+    TermNode(String name, String id, GraphPresentation style) {
         this.name = name;
         this.id = id;
         this.style = style;
@@ -43,7 +45,7 @@ public class TermNode implements INode, IPositionableNode {
         font = style.font;
     }
 
-    public TermNode(GenericTerm term, GraphPresentation style) {
+    TermNode(GenericTerm term, GraphPresentation style) {
         this(term.getName().replace('_', ' '), term.getId(), style);
         this.term = term;
 
@@ -126,16 +128,13 @@ public class TermNode implements INode, IPositionableNode {
         return this.name;
     }
 
-    Color fillColour = Color.white;
-    Color lineColour = Color.black;
-
-    public void setFillColour(Color c) {
+    void setFillColour(Color c) {
         if (c != null) {
             this.fillColour = c;
         }
     }
 
-    public void render(Graphics2D g2) {
+    void render(Graphics2D g2) {
         g2.setFont(font);
 
         g2.setColor(fillColour);
@@ -178,7 +177,7 @@ public class TermNode implements INode, IPositionableNode {
         return (int) (style.height / dividerToGetReasonableHeight);
     }
 
-    public void renderID(Graphics2D g2) {
+    private void renderID(Graphics2D g2) {
         FontMetrics fm = g2.getFontMetrics();
         Rectangle2D r = fm.getStringBounds(id, g2);
 
@@ -201,7 +200,7 @@ public class TermNode implements INode, IPositionableNode {
         private FontMetrics fm;
         private Font f;
 
-        public TextLine(Graphics2D g2, FontMetrics fm) {
+        private TextLine(Graphics2D g2, FontMetrics fm) {
             this.g2 = g2;
             this.fm = fm;
             this.f = fm.getFont();
@@ -225,7 +224,7 @@ public class TermNode implements INode, IPositionableNode {
             return text == null ? 0 : text.length();
         }
 
-        public void draw(Graphics2D g2, int x, int y) {
+        private void draw(Graphics2D g2, int x, int y) {
             g2.drawString(text, (float) (x - bounds.getWidth() / 2 - bounds.getMinX()), y + f.getSize2D());
         }
 
@@ -233,9 +232,6 @@ public class TermNode implements INode, IPositionableNode {
             return f.getSize();
         }
     }
-
-    List<TextLine> lines = new ArrayList<>();
-    int yheight;
 
     private void reflow(String text, FontMetrics fm, Graphics2D g2) {
         int hmargin = 2;

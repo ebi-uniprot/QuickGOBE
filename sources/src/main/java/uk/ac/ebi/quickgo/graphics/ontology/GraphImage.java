@@ -21,13 +21,13 @@ public class GraphImage extends RenderableImage {
         RelationType relType;
         private final GraphPresentation style;
 
-        public static class RelationStroke extends DrawableEdge<INode> {
+        static class RelationStroke extends DrawableEdge<INode> {
             private static final Stroke defaultStyleRelation = new BasicStroke(2f);
             private static final Shape arrow = DrawableEdge.standardArrow(8, 6, 2);
 
             RelationType type;
 
-            public RelationStroke(int xFrom, int yFrom, int xTo, int yTo, RelationType rtype, GraphPresentation style) {
+            RelationStroke(int xFrom, int yFrom, int xTo, int yTo, RelationType rtype, GraphPresentation style) {
                 super(null, null, Color.black, rtype.stroke == null ? style.arrowLineRelativeFont(defaultStyleRelation) : style.arrowLineRelativeFont(rtype.stroke),
                         (rtype.polarity == RelationType.Polarity.POSITIVE ||
                                  rtype.polarity == RelationType.Polarity.BIPOLAR) ? arrow : null,
@@ -45,7 +45,7 @@ public class GraphImage extends RenderableImage {
 
         }
 
-        public KeyNode(int xCentre, int yCentre, int width, int height, RelationType relType, GraphPresentation style) {
+        KeyNode(int xCentre, int yCentre, int width, int height, RelationType relType, GraphPresentation style) {
             this.xCentre = xCentre;
             this.yCentre = yCentre;
             this.width = width;
@@ -54,7 +54,7 @@ public class GraphImage extends RenderableImage {
             this.style = style;
         }
 
-        public void render(Graphics2D g2) {
+        void render(Graphics2D g2) {
             int margin = height / 10;
             int boxSide = height - (2 * margin);
             int offsetY = boxSide / 4;
@@ -124,16 +124,16 @@ public class GraphImage extends RenderableImage {
     private final GraphPresentation style;
 
     public String selected;
-    public final String errorMessage;
+    private final String errorMessage;
 
     public String id() {
         return String.valueOf(System.identityHashCode(this));
     }
 
-    public static final int keyMargin = 50;
-    public static final int rightMargin = 10;
-    public static final int bottomMargin = 16;
-    public static final int minWidth = 250;
+    private static final int keyMargin = 50;
+    private static final int rightMargin = 10;
+    private static final int bottomMargin = 16;
+    private static final int minWidth = 250;
 
     public GraphImage(String errorMessage, GraphPresentation style) {
         super(500, 100);
@@ -141,7 +141,7 @@ public class GraphImage extends RenderableImage {
         this.style = style;
     }
 
-    public GraphImage(int width, int height, Collection<TermNode> terms, Collection<RelationEdge> relations,
+    GraphImage(int width, int height, Collection<TermNode> terms, Collection<RelationEdge> relations,
             GraphPresentation style, Collection<RelationType> relationTypes) {
         super(Math.max(minWidth, width + (style.key ? keyMargin + (style.width * 2) + rightMargin : 0)),
                 height + bottomMargin);
