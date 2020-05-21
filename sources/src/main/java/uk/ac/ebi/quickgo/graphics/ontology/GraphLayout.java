@@ -34,7 +34,7 @@ public class GraphLayout<N extends IPositionableNode, E extends IRoutableEdge<N>
         TOP, LEFT, BOTTOM, RIGHT
     }
 
-    final static Logger logger = LoggerFactory.getLogger(GraphLayout.class);
+    private final static Logger logger = LoggerFactory.getLogger(GraphLayout.class);
 
     /**
      * Prepare for layout
@@ -43,7 +43,7 @@ public class GraphLayout<N extends IPositionableNode, E extends IRoutableEdge<N>
      * @param orientation indicates which side of the graph the parents will be placed.
      */
 
-    public GraphLayout(IGraph<N, E> graph, Orientation orientation) {
+    GraphLayout(IGraph<N, E> graph, Orientation orientation) {
         this.orientation = orientation;
 
         for (N n : graph.getNodes()) {
@@ -72,7 +72,7 @@ public class GraphLayout<N extends IPositionableNode, E extends IRoutableEdge<N>
      * This method finally calls setLocation on all the nodes and
      * setRoute on all the edges.
      */
-    public void layout() {
+    void layout() {
         findLevels();
 
         rationalise();
@@ -145,15 +145,15 @@ public class GraphLayout<N extends IPositionableNode, E extends IRoutableEdge<N>
     /**
      * Ratio of maximum edge vertical distance to horizontal distance
      */
-    public int edgeLengthHeightRatio = 3;
+    int edgeLengthHeightRatio = 3;
     /**
      * Number of passes up and down the levels to attempt to optimise node positions
      */
-    public int reorderIterations = 25;
+    private final int reorderIterations = 25;
     /**
      * Minimum gap between levels
      */
-    public int minLevelGap = 10;
+    private int minLevelGap = 10;
     /**
      * Levels may be split if they have more than this number of nodes
      */
@@ -161,11 +161,11 @@ public class GraphLayout<N extends IPositionableNode, E extends IRoutableEdge<N>
     /**
      * Edges running though levels will be allocated this much horizontal space
      */
-    public int insertedEdgeWidth = 20;
+    private int insertedEdgeWidth = 20;
     /**
      * Minimum gap between nodes within a level
      */
-    public int withinLevelGap = 20;
+    private int withinLevelGap = 20;
     /**
      * Extra gap between lines and nodes in a level
      */
@@ -173,15 +173,15 @@ public class GraphLayout<N extends IPositionableNode, E extends IRoutableEdge<N>
     /**
      * Extra gap between lines and nodes in a level
      */
-    public int betweenLevelExtraGap = 1;
+    private int betweenLevelExtraGap = 1;
     /**
      * Horizontal margin
      */
-    public int horizontalMargin = 2;
+    int horizontalMargin = 2;
     /**
      * Vertical margin
      */
-    public int verticalMargin = 2;
+    int verticalMargin = 2;
     //
 
     // Internal implementation
@@ -254,7 +254,7 @@ public class GraphLayout<N extends IPositionableNode, E extends IRoutableEdge<N>
             this.withinLevelSize = withinLevelSize;
         }
 
-        public Set<HierarchicalNode> getRealParents() {
+        Set<HierarchicalNode> getRealParents() {
             Set<HierarchicalNode> parents = new HashSet<>();
             for (EdgeMapping e : originalEdges) {
                 if (e.child == this) {
@@ -264,7 +264,7 @@ public class GraphLayout<N extends IPositionableNode, E extends IRoutableEdge<N>
             return parents;
         }
 
-        public Set<HierarchicalNode> getRealChildren() {
+        Set<HierarchicalNode> getRealChildren() {
             Set<HierarchicalNode> children = new HashSet<>();
             for (EdgeMapping e : originalEdges) {
                 if (e.parent == this) {
@@ -319,7 +319,7 @@ public class GraphLayout<N extends IPositionableNode, E extends IRoutableEdge<N>
         private HierarchicalNode parent;
         private HierarchicalNode child;
 
-        public EdgeMapping(E underlying, HierarchicalNode parent, HierarchicalNode child) {
+        EdgeMapping(E underlying, HierarchicalNode parent, HierarchicalNode child) {
             this.underlying = underlying;
 
             this.parent = parent;
@@ -338,7 +338,7 @@ public class GraphLayout<N extends IPositionableNode, E extends IRoutableEdge<N>
             return child;
         }
 
-        public HierarchicalEdge(HierarchicalNode parent, HierarchicalNode child) {
+        HierarchicalEdge(HierarchicalNode parent, HierarchicalNode child) {
             this.parent = parent;
             this.child = child;
         }
@@ -368,7 +368,7 @@ public class GraphLayout<N extends IPositionableNode, E extends IRoutableEdge<N>
         List<HierarchicalNode> nodes = new ArrayList<>();
         GenericGraph<HierarchicalNode, HierarchicalEdge> hierarchicalGraph;
 
-        public Level(GenericGraph<HierarchicalNode, HierarchicalEdge> hierarchicalGraph, int levelNumber) {
+        Level(GenericGraph<HierarchicalNode, HierarchicalEdge> hierarchicalGraph, int levelNumber) {
             this.hierarchicalGraph = hierarchicalGraph;
             this.levelNumber = levelNumber;
         }
@@ -469,7 +469,7 @@ public class GraphLayout<N extends IPositionableNode, E extends IRoutableEdge<N>
             return nd.location - nd.withinLevelSize / 2;
         }
 
-        public void attach(Level above, Level below) {
+        void attach(Level above, Level below) {
             for (int j = 0; j < nodes.size(); j++) {
                 HierarchicalNode nj = nodes.get(j);
 

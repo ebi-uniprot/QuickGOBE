@@ -1285,7 +1285,8 @@ public abstract class OBOControllerIT {
 
     private void requestToChartServiceReturnsValidImage() {
         GraphImageResult mockGraphImageResult = mock(GraphImageResult.class);
-        when(mockGraphImageResult.getGraphImage()).thenReturn(new GraphImage("Mocked GraphImage"));
+        GraphPresentation style = new GraphPresentation.Builder().build();
+        when(mockGraphImageResult.getGraphImage()).thenReturn(new GraphImage("Mocked GraphImage", style));
         GraphImageLayout layout = new GraphImageLayout();
         layout.title = "layout title";
         when(mockGraphImageResult.getLayout()).thenReturn(layout);
@@ -1330,14 +1331,15 @@ public abstract class OBOControllerIT {
     private String graphParamsNegated() {
         String graphParmsString =
                 "?showKey=%s&showIds=%s&termBoxWidth=%s&termBoxHeight=%s&showSlimColours=%s&showChildren" +
-                        "=%s";
+                        "=%s&fontSize=%s";
         return String.format(graphParmsString,
                 !GraphPresentation.defaultShowKey,
                 !GraphPresentation.defaultShowTermIds,
                 GraphPresentation.defaultWidth + 200,
                 GraphPresentation.defaultHeight + 100,
                 !GraphPresentation.defaultShowSlimColours,
-                !GraphPresentation.defaultShowChildren);
+                !GraphPresentation.defaultShowChildren,
+                GraphPresentation.defaultFontSize * 2);
     }
 
     private GraphPresentation getGraphPresentationNegated() {
@@ -1349,6 +1351,7 @@ public abstract class OBOControllerIT {
                 .termBoxHeight(GraphPresentation.defaultHeight + 100)
                 .showSlimColours(!GraphPresentation.defaultShowSlimColours)
                 .showChildren(!GraphPresentation.defaultShowChildren)
+                .fontSize(GraphPresentation.defaultFontSize * 2)
                 .build();
     }
 }
