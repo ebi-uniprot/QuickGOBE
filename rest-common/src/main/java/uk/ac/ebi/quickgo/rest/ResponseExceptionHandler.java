@@ -53,7 +53,7 @@ public class ResponseExceptionHandler {
 
     private HttpHeaders headers(){
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Type", MediaType.APPLICATION_JSON_UTF8_VALUE);
+        headers.add("Content-Type", MediaType.APPLICATION_JSON_VALUE);
         return headers;
     }
 
