@@ -27,7 +27,7 @@
     <field name="symbol" type="string" indexed="false" stored="true"/>
     <field name="database" type="string" indexed="false" stored="true"/>
     <field name="type" type="string" indexed="true" stored="true"/>
-    <field name="taxonId" type="int" indexed="true" stored="true"/>
+    <field name="taxonId" type="int" indexed="true" stored="true" docValues="true"/>
     <field name="taxonName" type="string" indexed="false" stored="false"/>
     <field name="dbSubset" type="string" indexed="true" stored="true"/>
     <field name="isCompleteProteome" type="boolean" indexed="false" stored="true"/>
@@ -181,30 +181,19 @@
     -->
 
     <!--
-      Default numeric field types. For faster range queries, consider the tint/tfloat/tlong/tdouble types.
-
-      These fields support doc values, but they require the field to be
-      single-valued and either be required or have a default value.
-    -->
-    <fieldType name="int" class="solr.TrieIntField" positionIncrementGap="0"/>
-    <fieldType name="float" class="solr.FloatPointField" positionIncrementGap="0"/>
-    <fieldType name="long" class="solr.LongPointField" positionIncrementGap="0"/>
-    <fieldType name="double" class="solr.DoublePointField" positionIncrementGap="0"/>
-
-    <!--
      Numeric field types that index each value at various levels of precision
      to accelerate range queries when the number of values between the range
      endpoints is large. See the javadoc for NumericRangeQuery for internal
-     implementation details.
+     implementation details. For single valued fields, docValues="true" must be used to enable sorting.
 
      Smaller precisionStep values (specified in bits) will lead to more tokens
      indexed per value, slightly larger index size, and faster range queries.
      A precisionStep of 0 disables indexing at different precision levels.
     -->
-    <fieldType name="tint" class="solr.IntPointField" positionIncrementGap="0"/>
-    <fieldType name="tfloat" class="solr.FloatPointField" positionIncrementGap="0"/>
-    <fieldType name="tlong" class="solr.LongPointField" positionIncrementGap="0"/>
-    <fieldType name="tdouble" class="solr.DoublePointField" positionIncrementGap="0"/>
+    <fieldType name="int" class="solr.IntPointField" positionIncrementGap="0"/>
+    <fieldType name="float" class="solr.FloatPointField" positionIncrementGap="0"/>
+    <fieldType name="long" class="solr.LongPointField" positionIncrementGap="0"/>
+    <fieldType name="double" class="solr.DoublePointField" positionIncrementGap="0"/>
 
     <!-- The format for this date field is of the form 1995-12-31T23:59:59Z, and
          is a more restricted form of the canonical representation of dateTime

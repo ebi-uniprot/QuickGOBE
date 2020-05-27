@@ -148,7 +148,7 @@ public abstract class OBOControllerIT {
 
         expectBasicFieldsInResults(response, singletonList(validDocWithNoGraphData.id))
                 .andExpect(jsonPath("$.results.*.id", hasSize(1)))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
@@ -168,7 +168,7 @@ public abstract class OBOControllerIT {
 
         expectCoreFieldsInResults(response, singletonList(primaryId))
                 .andExpect(jsonPath("$.results.*.id", hasSize(1)))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
@@ -188,7 +188,7 @@ public abstract class OBOControllerIT {
 
         expectCoreFieldsInResults(response, singletonList(primaryId))
                 .andExpect(jsonPath("$.results.*.id", hasSize(1)))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
@@ -198,7 +198,7 @@ public abstract class OBOControllerIT {
 
         expectCoreFieldsInResults(response, singletonList(validId))
                 .andExpect(jsonPath("$.results.*.id", hasSize(1)))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
@@ -208,7 +208,7 @@ public abstract class OBOControllerIT {
 
         expectCoreFieldsInResults(response, singletonList(validId))
                 .andExpect(jsonPath("$.results.*.id", hasSize(1)))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
@@ -219,7 +219,7 @@ public abstract class OBOControllerIT {
 
         expectCoreFieldsInResults(response, validIdList)
                 .andExpect(jsonPath("$.results.*.id", hasSize(validIdList.size())))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
@@ -230,7 +230,7 @@ public abstract class OBOControllerIT {
         expectCoreFieldsInResults(response, validIdShortList)
                 .andDo(print())
                 .andExpect(jsonPath("$.results.*.id", hasSize(validIdShortList.size())))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
@@ -240,7 +240,7 @@ public abstract class OBOControllerIT {
 
         expectCompleteFieldsInResults(response, singletonList(validId))
                 .andExpect(jsonPath("$.results.*.history", hasSize(1)))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
@@ -251,7 +251,7 @@ public abstract class OBOControllerIT {
 
         expectCompleteFieldsInResults(response, validIdShortList)
                 .andExpect(jsonPath("$.results.*.history", hasSize(2)))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
@@ -261,7 +261,7 @@ public abstract class OBOControllerIT {
 
         expectBasicFieldsInResults(response, singletonList(validId))
                 .andExpect(jsonPath("$.results.*.history", hasSize(1)))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
@@ -272,7 +272,7 @@ public abstract class OBOControllerIT {
 
         expectBasicFieldsInResults(response, validIdShortList)
                 .andExpect(jsonPath("$.results.*.history", hasSize(2)))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
@@ -282,7 +282,7 @@ public abstract class OBOControllerIT {
 
         expectBasicFieldsInResults(response, singletonList(validId))
                 .andExpect(jsonPath("$.results.*.xRefs", hasSize(1)))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
@@ -293,7 +293,7 @@ public abstract class OBOControllerIT {
 
         expectBasicFieldsInResults(response, validIdShortList)
                 .andExpect(jsonPath("$.results.*.xRefs", hasSize(2)))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
@@ -303,7 +303,7 @@ public abstract class OBOControllerIT {
 
         expectBasicFieldsInResults(response, singletonList(validId))
                 .andExpect(jsonPath("$.results.*.taxonConstraints", hasSize(1)))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
@@ -314,7 +314,7 @@ public abstract class OBOControllerIT {
 
         expectBasicFieldsInResults(response, validIdShortList)
                 .andExpect(jsonPath("$.results.*.taxonConstraints", hasSize(2)))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
@@ -324,7 +324,7 @@ public abstract class OBOControllerIT {
 
         expectBasicFieldsInResults(response, singletonList(validId))
                 .andExpect(jsonPath("$.results.*.annotationGuidelines", hasSize(1)))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
@@ -335,7 +335,7 @@ public abstract class OBOControllerIT {
 
         expectBasicFieldsInResults(response, validIdShortList)
                 .andExpect(jsonPath("$.results.*.annotationGuidelines", hasSize(2)))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
@@ -345,7 +345,7 @@ public abstract class OBOControllerIT {
 
         expectBasicFieldsInResults(response, singletonList(validId))
                 .andExpect(jsonPath("$.results.*.xRelations", hasSize(1)))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
@@ -356,7 +356,7 @@ public abstract class OBOControllerIT {
 
         expectBasicFieldsInResults(response, validIdShortList)
                 .andExpect(jsonPath("$.results.*.xRelations", hasSize(2)))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
@@ -538,7 +538,7 @@ public abstract class OBOControllerIT {
         ResultActions response = mockMvc.perform(get(buildTermsURL()));
         expectBasicFieldsInResults(response, validIdShortList)
                 .andDo(print())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.results", hasSize(defaultPageSize)));
     }
@@ -553,7 +553,7 @@ public abstract class OBOControllerIT {
         ResultActions response = mockMvc.perform(get(buildTermsURL(ids)));
         expectBasicFieldsInResults(response, ids)
                 .andDo(print())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.results", hasSize(maxPageSize)));
     }

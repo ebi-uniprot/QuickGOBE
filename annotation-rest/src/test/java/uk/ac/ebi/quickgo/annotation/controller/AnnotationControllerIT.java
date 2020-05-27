@@ -2,7 +2,6 @@ package uk.ac.ebi.quickgo.annotation.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.lang.StringUtils;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -1628,7 +1627,7 @@ public class AnnotationControllerIT {
 
     @Test
     public void filterAnnotationsByInvertedCaseGoAspectSuccessfully() throws Exception {
-        String goAspect = StringUtils.swapCase(AnnotationDocMocker.GO_ASPECT);
+        String goAspect = AnnotationDocMocker.GO_ASPECT.toUpperCase();
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(GO_ASPECT_PARAM.getName(), goAspect));
 
