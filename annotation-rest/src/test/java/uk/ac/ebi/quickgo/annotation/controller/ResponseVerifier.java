@@ -135,7 +135,7 @@ final class ResponseVerifier {
     }
 
     static ResultMatcher contentTypeToBeJson() {
-        return content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
+        return content().contentType(MediaType.APPLICATION_JSON_VALUE);
     }
 
     static ResultMatcher totalNumOfResults(int numResults) {

@@ -89,7 +89,7 @@ public class GeneProductControllerIT {
 
         response.andDo(print())
                 .andExpect(jsonPath("$.results.*.id", hasSize(1)))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
@@ -103,7 +103,7 @@ public class GeneProductControllerIT {
 
         response.andDo(print())
                 .andExpect(jsonPath("$.results.*.id", hasSize(1)))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
@@ -113,7 +113,7 @@ public class GeneProductControllerIT {
 
         result.andDo(print())
                 .andExpect(jsonPath("$.results.*.id", hasSize(3)))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
         int index = 0;
@@ -160,7 +160,7 @@ public class GeneProductControllerIT {
 
         result.andDo(print())
                 .andExpect(jsonPath("$.results.*.id", hasSize(3)))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
         int index = 0;
