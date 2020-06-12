@@ -275,4 +275,23 @@ class GraphPresentationTest {
             assertEquals(style22.fontSize + 10, style22.errorFont.getSize());
         }
     }
+
+    @Nested
+    class getBottomMargin{
+        private final int defaultBottomMargin =16;
+        @Test
+        void withDefaultFontSizeIt_willBe16() {
+            assertEquals(defaultBottomMargin, style.getBottomMargin());
+        }
+
+        @Test
+        void whenSizeDoubleMarginBecomeDouble() {
+            assertEquals(defaultBottomMargin * 2, style22.getBottomMargin());
+        }
+
+        @Test
+        void whenSizeIncreaseMarginIncrease() {
+            assertEquals(defaultBottomMargin * 3, style33.getBottomMargin());
+        }
+    }
 }
