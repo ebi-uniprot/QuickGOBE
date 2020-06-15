@@ -132,7 +132,6 @@ public class GraphImage extends RenderableImage {
 
     private static final int keyMargin = 50;
     private static final int rightMargin = 10;
-    private static final int bottomMargin = 16;
     private static final int minWidth = 250;
 
     public GraphImage(String errorMessage, GraphPresentation style) {
@@ -144,7 +143,7 @@ public class GraphImage extends RenderableImage {
     GraphImage(int width, int height, Collection<TermNode> terms, Collection<RelationEdge> relations,
             GraphPresentation style, Collection<RelationType> relationTypes) {
         super(Math.max(minWidth, width + (style.key ? keyMargin + (style.width * 2) + rightMargin : 0)),
-                height + bottomMargin);
+                height + style.getBottomMargin());
 
         this.errorMessage = null;
 
@@ -182,7 +181,7 @@ public class GraphImage extends RenderableImage {
                 yMax = bottomNode.bottom();
             }
 
-            int bottom = yMax + bottomMargin;
+            int bottom = yMax + style.getBottomMargin();
             if (this.height < bottom) {
                 this.height = bottom;
             }

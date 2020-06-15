@@ -11,6 +11,7 @@ public class GraphPresentation {
 
     final static boolean FILL = true;
     private static final String fontName = "Lucida Sans";
+    private static final int bottomMargin = 16;
 
     //default show Information chart on right hand
     public static boolean defaultShowKey = true;
@@ -186,5 +187,9 @@ public class GraphPresentation {
         int slimNameCanBeGreaterThanGoId = 55;
         int fontIncreaseShouldIncreaseWidth = relativeFontSizeIncrease() <= 1 ? 0 : (int) (relativeFontSizeIncrease() / 2 * slimNameCanBeGreaterThanGoId);
         return width + slimNameCanBeGreaterThanGoId + fontIncreaseShouldIncreaseWidth;
+    }
+
+    int getBottomMargin() {
+        return (int) (bottomMargin * relativeFontSizeIncrease());
     }
 }

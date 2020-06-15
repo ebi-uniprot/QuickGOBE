@@ -33,8 +33,10 @@ public class AnnotationRepoConfig {
 
     @Bean
     @Profile("httpServer")
-    public SolrClientFactory httpSolrServerFactory(@Value("${solr.host}") String solrUrl) {
-        return new HttpSolrClientFactory(new HttpSolrClient.Builder().withBaseSolrUrl(solrUrl).build());
+    public SolrClientFactory httpSolrServerFactory(@Value("${solr.host}") String solrUrl,
+                                                   @Value("${solr.timeoutMilliSeconds:120000}") int timeout) {
+        return new HttpSolrClientFactory(new HttpSolrClient.Builder().withBaseSolrUrl(solrUrl)
+          .withSocketTimeout(timeout).build());
     }
 
     @Bean
