@@ -19,6 +19,7 @@ server:
 solr:
   host: http://ves-hx-ac:8090/solr
   #host: http://wp-p2m-c5:8090/solr/
+  timeoutMilliSeconds:120000
 
 ## =============== Validation =================
 geneproduct:
