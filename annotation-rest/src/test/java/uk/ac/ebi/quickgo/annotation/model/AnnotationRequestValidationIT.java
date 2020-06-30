@@ -547,21 +547,21 @@ public class AnnotationRequestValidationIT {
 
     @Test
     public void limitValueEqualToMaxEntriesPerPageIsInvalid() {
-        annotationRequest.setLimit(MAX_ENTRIES_PER_PAGE);
+        annotationRequest.setLimit(MAX_ANNOTATION_PER_PAGE_RESULT);
 
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
     public void limitValueAboveMaxEntriesPerPageIsInvalid() {
-        int invalidEntriesPerPage = MAX_ENTRIES_PER_PAGE + 1;
+        int invalidEntriesPerPage = MAX_ANNOTATION_PER_PAGE_RESULT + 1;
         annotationRequest.setLimit(invalidEntriesPerPage);
 
         Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
 
         assertThat(violations, hasSize(1));
         assertThat(violations.iterator().next().getMessage(),
-                is("Number of entries per page cannot be more than " + MAX_ENTRIES_PER_PAGE + " but found: " +
+                is("Number of entries per page cannot be more than " + MAX_ANNOTATION_PER_PAGE_RESULT + " but found: " +
                         invalidEntriesPerPage));
 
         assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));

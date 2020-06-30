@@ -44,8 +44,10 @@ public class AnnotationRequest {
     static final int MAX_TAXON_IDS = 50;
     static final int MAX_REFERENCES = 50;
     static final int MIN_DOWNLOAD_NUMBER = 1;
-    static final int MAX_DOWNLOAD_NUMBER = 50000;
+    static final int MAX_DOWNLOAD_NUMBER = 2000000;
     static final int DEFAULT_DOWNLOAD_LIMIT = 10000;
+    public static final int MAX_ANNOTATION_PAGE = 10000;
+    public static final int MAX_ANNOTATION_PER_PAGE_RESULT = 200;
 
     //Names of the parameters in readable format
     static final String ASSIGNED_BY_PARAM = "Assigned By";
@@ -206,13 +208,13 @@ public class AnnotationRequest {
     private int downloadLimit = DEFAULT_DOWNLOAD_LIMIT;
 
     @ApiModelProperty(
-      value = "Number of results per page (" + MIN_ENTRIES_PER_PAGE + "-" + MAX_ENTRIES_PER_PAGE + ")",
-      allowableValues = "range[" + MIN_ENTRIES_PER_PAGE + "," + MAX_ENTRIES_PER_PAGE + "]", position = 24)
+      value = "Number of results per page (" + MIN_ENTRIES_PER_PAGE + "-" + MAX_ANNOTATION_PER_PAGE_RESULT + ")",
+      allowableValues = "range[" + MIN_ENTRIES_PER_PAGE + "," + MAX_ANNOTATION_PER_PAGE_RESULT + "]", position = 24)
     protected int limit = DEFAULT_ENTRIES_PER_PAGE;
 
     @ApiModelProperty(
-      value = "Page number of the result set to display.",
-      allowableValues = "range[" + MIN_PAGE_NUMBER + ",max_result_set_size]", position = 25)
+      value = "Page number of the result set to display. (" + MIN_PAGE_NUMBER + "-" + MAX_ANNOTATION_PAGE + ")",
+      allowableValues = "range[" + MIN_PAGE_NUMBER + "," + MAX_ANNOTATION_PAGE + "]", position = 25)
     private int page = DEFAULT_PAGE_NUMBER;
 
     private AnnotationRequestBody requestBody;
@@ -459,7 +461,7 @@ public class AnnotationRequest {
 
     @Min(value = MIN_ENTRIES_PER_PAGE, message = "Number of entries per page cannot be less than {value} but " +
             "found: ${validatedValue}")
-    @Max(value = MAX_ENTRIES_PER_PAGE, message = "Number of entries per page cannot be more than {value} but " +
+    @Max(value = MAX_ANNOTATION_PER_PAGE_RESULT, message = "Number of entries per page cannot be more than {value} but " +
             "found: ${validatedValue}")
     public int getLimit() {
         return limit;
@@ -470,7 +472,7 @@ public class AnnotationRequest {
     }
 
     @Min(value = MIN_PAGE_NUMBER, message = "Page number cannot be less than {value}, but found: ${validatedValue}")
-    @Max(value = MAX_PAGE_NUMBER, message = "Page number cannot be greater than {value}, but found: ${validatedValue}")
+    @Max(value = MAX_ANNOTATION_PAGE, message = "Page number cannot be greater than {value}, but found: ${validatedValue}")
     public int getPage() {
         return page;
     }

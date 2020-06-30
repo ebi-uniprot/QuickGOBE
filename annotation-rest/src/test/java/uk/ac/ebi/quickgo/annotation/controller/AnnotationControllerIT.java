@@ -51,6 +51,8 @@ import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.E
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.createGenericDocsChangingGoId;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.*;
 import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.ResponseItem.responseItem;
+import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.MAX_ANNOTATION_PAGE;
+import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.MAX_ANNOTATION_PER_PAGE_RESULT;
 import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.*;
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.SELECT_ALL_WHERE_FIELD_IS_NOT_EMPTY;
 
@@ -1178,12 +1180,12 @@ public class AnnotationControllerIT {
     public void requestingMoreResultsPerPageThanPermittedReturns400() throws Exception {
         repository.deleteAll();
 
-        int docsNecessaryToForcePagination = MAX_PAGE_RESULTS + 1;
+        int docsNecessaryToForcePagination = MAX_ANNOTATION_PER_PAGE_RESULT + 1;
         repository.saveAll(createGenericDocs(docsNecessaryToForcePagination));
 
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search")
-                        .param(LIMIT_PARAM.getName(), String.valueOf(MAX_PAGE_RESULTS + 1))
+                        .param(LIMIT_PARAM.getName(), String.valueOf(MAX_ANNOTATION_PER_PAGE_RESULT + 1))
                         .param(PAGE_PARAM.getName(), String.valueOf(1)));
 
         response.andDo(print())
@@ -1192,7 +1194,7 @@ public class AnnotationControllerIT {
 
     @Test
     public void pageRequestHigherThanPaginationLimitReturns400() throws Exception {
-        int totalEntries = MAX_PAGE_NUMBER + 1;
+        int totalEntries = MAX_ANNOTATION_PAGE + 1;
         int pageSize = 1;
         int pageNumWhichIsTooHigh = totalEntries;
 
@@ -1281,11 +1283,13 @@ public class AnnotationControllerIT {
                         .withAttribute("id", "IPR015421").build()));
     }
 
+    //---------- Limit related tests.
+
     @Test
     public void limitForPageExceedsMaximumAllowed() throws Exception {
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search")
-                        .param(LIMIT_PARAM.getName(), "101"));
+                        .param(LIMIT_PARAM.getName(), Integer.toString(MAX_ANNOTATION_PER_PAGE_RESULT+1)));
 
         response.andDo(print())
                 .andExpect(status().isBadRequest());
@@ -1294,14 +1298,12 @@ public class AnnotationControllerIT {
     @Test
     public void limitForPageWithinMaximumAllowed() throws Exception {
         ResultActions response = mockMvc.perform(
-                get(RESOURCE_URL + "/search").param(LIMIT_PARAM.getName(), "100"));
+                get(RESOURCE_URL + "/search").param(LIMIT_PARAM.getName(), Integer.toString(MAX_ANNOTATION_PER_PAGE_RESULT)));
 
         response.andExpect(status().isOk())
                 .andExpect(totalNumOfResults(NUMBER_OF_GENERIC_DOCS))
-                .andExpect(pageInfoMatches(1, 1, 100));
+                .andExpect(pageInfoMatches(1, 1, MAX_ANNOTATION_PER_PAGE_RESULT));
     }
-
-    //---------- Limit related tests.
 
     @Test
     public void limitForPageThrowsErrorWhenNegative() throws Exception {
