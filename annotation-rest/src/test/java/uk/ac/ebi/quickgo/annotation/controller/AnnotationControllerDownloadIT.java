@@ -80,7 +80,7 @@ public class AnnotationControllerDownloadIT {
     private static final String DOWNLOAD_SEARCH_URL = "/annotation/downloadSearch";
     private static final String DOWNLOAD_LIMIT_PARAM = "downloadLimit";
     private static final int MIN_DOWNLOAD_NUMBER = 1;
-    private static final int MAX_DOWNLOAD_NUMBER = 50000;
+    private static final int MAX_DOWNLOAD_NUMBER = 2000000;
     private static final String EXACT = "exact";
     private static final String GO_NAME_FIELD = "goName";
     private static final String GO_TERM_RESOURCE_FORMAT = "/ontology/go/terms/%s";
