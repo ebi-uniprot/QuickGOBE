@@ -29,6 +29,7 @@ import static org.slf4j.LoggerFactory.getLogger;
  */
 class RESTFilterConverter<T> implements FilterConverter<FilterRequest, T> {
     static final String HOST = "ip";
+    static final String BACKUP_HOST = "bp";
     static final String RESOURCE_FORMAT = "resourceFormat";
     static final String TIMEOUT = "timeout";
     static final String RESPONSE_CLASS = "responseClass";
@@ -91,7 +92,15 @@ class RESTFilterConverter<T> implements FilterConverter<FilterRequest, T> {
     }
 
     static String buildResourceTemplate(FilterConfig config) {
-        return retrieveHostProperty(config) + retrieveResourceFormat(config);
+        return retrieveHostProperty(HOST, config) + retrieveResourceFormat(config);
+    }
+
+    static String buildBackupResourceTemplate(FilterConfig config) {
+        String backup = config.getProperties().get(BACKUP_HOST);
+        if(backup == null || backup.trim().isEmpty()){
+            return "";
+        }
+        return retrieveHostProperty(BACKUP_HOST, config) + retrieveResourceFormat(config);
     }
 
     private static String retrieveResourceFormat(FilterConfig config) {
@@ -106,8 +115,8 @@ class RESTFilterConverter<T> implements FilterConverter<FilterRequest, T> {
         return PROTOCOL_REGEX.matcher(uri).find();
     }
 
-    private static String retrieveHostProperty(FilterConfig config) {
-        String host = config.getProperties().get(HOST).trim();
+    private static String retrieveHostProperty(String property, FilterConfig config) {
+        String host = config.getProperties().get(property).trim();
 
         if (!usesProtocol(host)) {
             // default protocol over REST
@@ -128,7 +137,8 @@ class RESTFilterConverter<T> implements FilterConverter<FilterRequest, T> {
     }
 
     RESTRequesterImpl.Builder createRestRequesterBuilder() {
-        return RESTRequesterImpl.newBuilder(restOperations, buildResourceTemplate(filterConfig));
+        return RESTRequesterImpl.newBuilder(restOperations, buildResourceTemplate(filterConfig),
+          buildBackupResourceTemplate(filterConfig));
     }
 
     private Class<?> loadResponseType() {
@@ -198,10 +208,21 @@ class RESTFilterConverter<T> implements FilterConverter<FilterRequest, T> {
     }
 
     private <R> R fetchResults(RESTRequesterImpl restRequester, Class<R> responseType)
-            throws ExecutionException, InterruptedException, TimeoutException {
-        return restRequester
-                .get(responseType)
-                .get(timeoutMillis, TimeUnit.MILLISECONDS);
+      throws ExecutionException, InterruptedException, TimeoutException {
+        var primaryWait = restRequester.hasBackup() ? timeoutMillis / 3 : timeoutMillis;
+        try {
+            return restRequester
+              .get(responseType)
+              .get(primaryWait, TimeUnit.MILLISECONDS);
+        } catch (ExecutionException | InterruptedException | TimeoutException exception) {
+            if (restRequester.hasBackup()) {
+                LOGGER.error("Request to primary URL is failed after "+primaryWait+" milis, trying backup and will wait for "+timeoutMillis);
+                return restRequester
+                  .getBackup(responseType)
+                  .get(timeoutMillis, TimeUnit.MILLISECONDS);
+            }
+            throw exception;
+        }
     }
 
     static class InvalidHostNameException extends RuntimeException {

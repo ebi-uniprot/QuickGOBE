@@ -1,9 +1,10 @@
 package uk.ac.ebi.quickgo.rest.search.request.converter;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 import uk.ac.ebi.quickgo.rest.comm.RESTRequesterImpl;
@@ -15,10 +16,14 @@ import uk.ac.ebi.quickgo.rest.search.request.config.FilterConfig;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.createQuery;
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.or;
@@ -28,31 +33,27 @@ import static uk.ac.ebi.quickgo.rest.search.request.converter.RESTFilterConverte
  * Created 20/06/16
  * @author Edd
  */
-@RunWith(Enclosed.class)
-public class RESTFilterConverterTest {
-    public static class ProcessingRESTResponses {
+class RESTFilterConverterTest {
+    @Nested
+    class ProcessingRESTResponses {
 
         private RESTRequesterImpl.Builder restRequestBuilderMock;
         private RESTRequesterImpl restRequesterMock;
 
-        @Before
+        @BeforeEach
         public void setUp() {
             restRequestBuilderMock = mock(RESTRequesterImpl.Builder.class);
-            restRequesterMock = mock(RESTRequesterImpl.class);
+            restRequesterMock = mock(RESTRequesterImpl.class, RETURNS_DEEP_STUBS);
         }
 
         @Test
-        public void fetchesSingleDatumFromRESTResources() {
+        void fetchesSingleDataFromRESTResources() {
             String resource = "/{id}/subresource";
 
             String field = "field";
             String restValue = "1";
 
-            FakeResponse response = new FakeResponse();
-            FakeResponse.Result result = new FakeResponse.Result();
-            result.resultField = field;
-            result.resultValue = restValue;
-            response.results.add(result);
+            FakeResponse response = fakeResponse(field, restValue);
 
             setFutureRestResponse(FakeResponse.class, response);
             FilterConfig config = createRestFilterConfig(resource, FakeResponse.class, FakeResponseConverter.class);
@@ -70,22 +71,61 @@ public class RESTFilterConverterTest {
         }
 
         @Test
-        public void fetchesMultipleDataFromRESTResources() {
+        void fetchesSingleDataFromBackupRESTResourcesWhenPrimaryFails()
+          throws InterruptedException, ExecutionException, TimeoutException {
+            String field = "field";
+            String restValue = "1";
+
+            FakeResponse response = fakeResponse(field, restValue);
+
+            setRestResponsePrimaryFail(FakeResponse.class, response);
+            FilterConfig config = createRestFilterConfig("/{id}/subresource", FakeResponse.class, FakeResponseConverter.class);
+            FilterRequest filter = FilterRequest.newBuilder().addProperty("id", "anything").build();
+            RESTFilterConverter<QuickGOQuery> converter = createConverter(config);
+
+            QuickGOQuery query = converter.transform(filter).getConvertedValue();
+
+            assertThat(query, is(createQuery(field, restValue)));
+        }
+
+        @Test
+        void fetchDataFromRESTResourcesCauseExceptionWhenPrimaryAndBackupFails()
+          throws InterruptedException, ExecutionException, TimeoutException {
+            FakeResponse response = fakeResponse("field", "1");
+
+            setRestResponseBothFail(FakeResponse.class, response);
+            FilterConfig config = createRestFilterConfig("/{id}/subresource", FakeResponse.class, FakeResponseConverter.class);
+            FilterRequest filter = FilterRequest.newBuilder().addProperty("id", "anything").build();
+            RESTFilterConverter<QuickGOQuery> converter = createConverter(config);
+
+            assertThrows(RetrievalException.class, ()-> converter.transform(filter));
+        }
+
+        @Test
+        void fetchDataFromRESTResourcesCauseExceptionWhenPrimaryFailsAndBackupIsNotConfigured()
+          throws InterruptedException, ExecutionException, TimeoutException {
+            when(restRequesterMock.get(FakeResponse.class).get(anyLong(), eq(TimeUnit.MILLISECONDS))).thenThrow(ExecutionException.class);
+            when(restRequestBuilderMock.build()).thenReturn(restRequesterMock);
+            FilterConfig config = createRestFilterConfig("/{id}/subresource", FakeResponse.class, FakeResponseConverter.class);
+            FilterRequest filter = FilterRequest.newBuilder().addProperty("id", "anything").build();
+            RESTFilterConverter<QuickGOQuery> converter = createConverter(config);
+
+            assertThrows(RetrievalException.class, ()-> converter.transform(filter));
+        }
+
+        @Test
+        void fetchesMultipleDataFromRESTResources() {
             String resource = "/{id}/subresource";
 
             String restValue1 = "1";
             String restValue2 = "2";
             String field = "field";
 
-            FakeResponse response = new FakeResponse();
-            FakeResponse.Result result1 = new FakeResponse.Result();
-            result1.resultField = field;
-            result1.resultValue = restValue1;
+            FakeResponse response = fakeResponse(field, restValue1);
             FakeResponse.Result result2 = new FakeResponse.Result();
             result2.resultField = field;
             result2.resultValue = restValue2;
 
-            response.results.add(result1);
             response.results.add(result2);
 
             setFutureRestResponse(FakeResponse.class, response);
@@ -106,8 +146,8 @@ public class RESTFilterConverterTest {
                             createQuery(field, restValue1))));
         }
 
-        @Test(expected = RetrievalException.class)
-        public void failedExecutionOfRESTResponseCausesRetrievalException() {
+        @Test
+        void failedExecutionOfRESTResponseCausesRetrievalException() {
             String resource = "/subresource";
 
             doThrow(RuntimeException.class).when(restRequesterMock).get(FakeResponse.class);
@@ -121,11 +161,11 @@ public class RESTFilterConverterTest {
 
             RESTFilterConverter converter = createConverter(config);
 
-            converter.transform(filter);
+            assertThrows(RetrievalException.class, () -> converter.transform(filter));
         }
 
-        @Test(expected = RetrievalException.class)
-        public void timeoutOfRESTResponseCausesRetrievalException() {
+        @Test
+        void timeoutOfRESTResponseCausesRetrievalException() {
             String resource = "/subresource";
 
             doThrow(RuntimeException.class).when(restRequesterMock).get(FakeResponse.class);
@@ -139,14 +179,14 @@ public class RESTFilterConverterTest {
 
             RESTFilterConverter converter = createConverter(config);
 
-            converter.transform(filter);
+            assertThrows(RetrievalException.class, () -> converter.transform(filter));
         }
 
-        @Test(expected = RetrievalException.class)
-        public void interruptionOfRESTResponseCausesRetrievalException() {
+        @Test
+        void interruptionOfRESTResponseCausesRetrievalException() {
             String resource = "/subresource";
 
-            doThrow(RuntimeException.class).when(restRequesterMock).get(FakeResponse.class);
+            when(restRequesterMock.get(any())).thenThrow(RuntimeException.class);
             when(restRequestBuilderMock.build()).thenReturn(restRequesterMock);
 
             FilterConfig config = createRestFilterConfig(resource, FakeResponse.class, FakeResponseConverter.class);
@@ -157,11 +197,11 @@ public class RESTFilterConverterTest {
 
             RESTFilterConverter converter = createConverter(config);
 
-            converter.transform(filter);
+            assertThrows(RetrievalException.class, () -> converter.transform(filter));
         }
 
-        @Test(expected = RetrievalException.class)
-        public void invalidResponseClassCausesRetrievalException() {
+        @Test
+        void invalidResponseClassCausesRetrievalException() {
             String resource = "/subresource";
 
             setFutureRestResponse(String.class, "this is wrong");
@@ -173,18 +213,14 @@ public class RESTFilterConverterTest {
 
             RESTFilterConverter converter = createConverter(config);
 
-            converter.transform(filter);
+            assertThrows(RetrievalException.class, () -> converter.transform(filter));
         }
 
-        @Test(expected = RetrievalException.class)
-        public void invalidResponseConverterClassCausesRetrievalException() {
+        @Test
+        void invalidResponseConverterClassCausesRetrievalException() {
             String resource = "/subresource";
 
-            FakeResponse response = new FakeResponse();
-            FakeResponse.Result result = new FakeResponse.Result();
-            result.resultField = "field";
-            result.resultValue = "value";
-            response.results.add(result);
+            FakeResponse response = fakeResponse("field", "value");
 
             setFutureRestResponse(FakeResponse.class, response);
             FilterConfig config = createRestFilterConfig(resource, FakeResponse.class, String.class);
@@ -195,13 +231,38 @@ public class RESTFilterConverterTest {
 
             RESTFilterConverter converter = createConverter(config);
 
-            converter.transform(filter);
+            assertThrows(RetrievalException.class, () -> converter.transform(filter));
         }
 
         private <R> void setFutureRestResponse(Class<R> responseType, R response) {
             CompletableFuture<R> futureResponse = CompletableFuture.supplyAsync(() -> response);
             when(restRequesterMock.get(responseType)).thenReturn(futureResponse);
             when(restRequestBuilderMock.build()).thenReturn(restRequesterMock);
+        }
+
+        private <R> void setRestResponsePrimaryFail(Class<R> responseType, R response)
+          throws InterruptedException, ExecutionException, TimeoutException {
+            when(restRequesterMock.hasBackup()).thenReturn(true);
+            when(restRequesterMock.get(responseType).get(anyLong(), eq(TimeUnit.MILLISECONDS))).thenThrow(ExecutionException.class);
+            when(restRequesterMock.getBackup(responseType).get(anyLong(), eq(TimeUnit.MILLISECONDS))).thenReturn(response);
+            when(restRequestBuilderMock.build()).thenReturn(restRequesterMock);
+        }
+
+        private <R> void setRestResponseBothFail(Class<R> responseType, R response)
+          throws InterruptedException, ExecutionException, TimeoutException {
+            when(restRequesterMock.hasBackup()).thenReturn(true);
+            when(restRequesterMock.get(responseType).get(anyLong(), eq(TimeUnit.MILLISECONDS))).thenThrow(ExecutionException.class);
+            when(restRequesterMock.getBackup(responseType).get(anyLong(), eq(TimeUnit.MILLISECONDS))).thenThrow(ExecutionException.class);
+            when(restRequestBuilderMock.build()).thenReturn(restRequesterMock);
+        }
+
+        private FakeResponse fakeResponse(String field, String restValue){
+            FakeResponse response = new FakeResponse();
+            FakeResponse.Result result = new FakeResponse.Result();
+            result.resultField = field;
+            result.resultValue = restValue;
+            response.results.add(result);
+            return response;
         }
 
         private FilterConfig createRestFilterConfig(
@@ -213,6 +274,7 @@ public class RESTFilterConverterTest {
 
             Map<String, String> configMap = new HashMap<>();
             configMap.put(HOST, "www.golden.grahams.co.uk/");
+            configMap.put(BACKUP_HOST, "www.backup.host.co.uk/");
             configMap.put(RESOURCE_FORMAT, resource);
             configMap.put(RESPONSE_CONVERTER_CLASS, responseConverterClass.getName());
             configMap.put(RESPONSE_CLASS, responseClass.getName());
@@ -232,14 +294,15 @@ public class RESTFilterConverterTest {
         }
     }
 
-    public static class BuildingResourceTemplates {
+    @Nested
+    class BuildingResourceTemplates {
 
         private static final String HTTPS = "https://";
         private final String DEFAULT_RESOURCE = "/QuickGO";
-        private String DEFAULT_HOST = "abc-def-ghi:8080";
+        private final String DEFAULT_HOST = "abc-def-ghi:8080";
 
         @Test
-        public void buildsResourceTemplateWithHostNameOnlyAndResourceOnly() {
+        void buildsResourceTemplateWithHostNameOnlyAndResourceOnly() {
             FilterConfig config = createRestFilterConfig();
             Map<String, String> configMap = createValidConfigMap();
             configMap.put(HOST, DEFAULT_HOST);
@@ -251,7 +314,7 @@ public class RESTFilterConverterTest {
         }
 
         @Test
-        public void buildsResourceTemplateWithHostNameEndingInForwardSlashAndResourceOnly() {
+        void buildsResourceTemplateWithHostNameEndingInForwardSlashAndResourceOnly() {
             FilterConfig config = createRestFilterConfig();
             Map<String, String> configMap = createValidConfigMap();
             configMap.put(HOST, DEFAULT_HOST + "/");
@@ -263,7 +326,7 @@ public class RESTFilterConverterTest {
         }
 
         @Test
-        public void buildsResourceTemplateWithHttpHostNameAndResourceOnly() {
+        void buildsResourceTemplateWithHttpHostNameAndResourceOnly() {
             FilterConfig config = createRestFilterConfig();
             Map<String, String> configMap = createValidConfigMap();
             configMap.put(HOST, "http://" + DEFAULT_HOST + "/");
@@ -275,7 +338,7 @@ public class RESTFilterConverterTest {
         }
 
         @Test
-        public void buildsResourceTemplateWithHttpsHostNameAndResourceOnly() {
+        void buildsResourceTemplateWithHttpsHostNameAndResourceOnly() {
             FilterConfig config = createRestFilterConfig();
             Map<String, String> configMap = createValidConfigMap();
             configMap.put(HOST, HTTPS + DEFAULT_HOST + "/");
@@ -286,7 +349,7 @@ public class RESTFilterConverterTest {
             assertThat(resourceTemplate, is(HTTPS + DEFAULT_HOST + DEFAULT_RESOURCE));
         }
 
-        @Test(expected = InvalidHostNameException.class)
+        @Test
         public void invalidCharacterInHostNameThrowsException() {
             FilterConfig config = createRestFilterConfig();
             Map<String, String> configMap = createValidConfigMap();
@@ -294,10 +357,10 @@ public class RESTFilterConverterTest {
             configMap.put(RESOURCE_FORMAT, DEFAULT_RESOURCE);
             config.setProperties(configMap);
 
-            buildResourceTemplate(config);
+            assertThrows(InvalidHostNameException.class, () -> buildResourceTemplate(config));
         }
 
-        @Test(expected = InvalidHostNameException.class)
+        @Test
         public void invalidCharacterInHostsPortThrowsException() {
             FilterConfig config = createRestFilterConfig();
             Map<String, String> configMap = createValidConfigMap();
@@ -305,7 +368,7 @@ public class RESTFilterConverterTest {
             configMap.put(RESOURCE_FORMAT, DEFAULT_RESOURCE);
             config.setProperties(configMap);
 
-            buildResourceTemplate(config);
+            assertThrows(InvalidHostNameException.class, () -> buildResourceTemplate(config));
         }
 
         private FilterConfig createRestFilterConfig() {
@@ -325,12 +388,119 @@ public class RESTFilterConverterTest {
         }
     }
 
-    public static class ValidatingInstantiationParameters {
+    @Nested
+    class BuildingBackupResourceTemplates {
+
+        private static final String HTTPS = "https://";
+        private final String DEFAULT_RESOURCE = "/QuickGO";
+        private final String DEFAULT_BACKUP_HOST = "back-up-vm:9080";
+
+        @ParameterizedTest
+        @NullAndEmptySource
+        void buildBackupResourceTemplateWillBeEmpty_ifBackupHostProperty(String backupNullEmptyHost) {
+            FilterConfig config = createRestFilterConfig();
+            Map<String, String> configMap = createValidConfigMap();
+            configMap.put(BACKUP_HOST, backupNullEmptyHost);
+            configMap.put(RESOURCE_FORMAT, DEFAULT_RESOURCE);
+            config.setProperties(configMap);
+
+            String resourceTemplate = buildBackupResourceTemplate(config);
+            assertThat(resourceTemplate, is(""));
+        }
+
+        @Test
+        void buildsResourceTemplateWithBackupHostNameOnlyAndResourceOnly() {
+            FilterConfig config = createRestFilterConfig();
+            Map<String, String> configMap = createValidConfigMap();
+            configMap.put(BACKUP_HOST, DEFAULT_BACKUP_HOST);
+            configMap.put(RESOURCE_FORMAT, DEFAULT_RESOURCE);
+            config.setProperties(configMap);
+
+            String resourceTemplate = buildBackupResourceTemplate(config);
+            assertThat(resourceTemplate, is(DEFAULT_PROTOCOL + DEFAULT_BACKUP_HOST + DEFAULT_RESOURCE));
+        }
+
+        @Test
+        void buildsResourceTemplateWithHostNameEndingInForwardSlashAndResourceOnly() {
+            FilterConfig config = createRestFilterConfig();
+            Map<String, String> configMap = createValidConfigMap();
+            configMap.put(BACKUP_HOST, DEFAULT_BACKUP_HOST + "/");
+            configMap.put(RESOURCE_FORMAT, DEFAULT_RESOURCE);
+            config.setProperties(configMap);
+
+            String resourceTemplate = buildBackupResourceTemplate(config);
+            assertThat(resourceTemplate, is(DEFAULT_PROTOCOL + DEFAULT_BACKUP_HOST + DEFAULT_RESOURCE));
+        }
+
+        @Test
+        void buildsResourceTemplateWithHttpHostNameAndResourceOnly() {
+            FilterConfig config = createRestFilterConfig();
+            Map<String, String> configMap = createValidConfigMap();
+            configMap.put(BACKUP_HOST, "http://" + DEFAULT_BACKUP_HOST + "/");
+            configMap.put(RESOURCE_FORMAT, DEFAULT_RESOURCE);
+            config.setProperties(configMap);
+
+            String resourceTemplate = buildBackupResourceTemplate(config);
+            assertThat(resourceTemplate, is(DEFAULT_PROTOCOL + DEFAULT_BACKUP_HOST + DEFAULT_RESOURCE));
+        }
+
+        @Test
+        void buildsResourceTemplateWithHttpsHostNameAndResourceOnly() {
+            FilterConfig config = createRestFilterConfig();
+            Map<String, String> configMap = createValidConfigMap();
+            configMap.put(BACKUP_HOST, HTTPS + DEFAULT_BACKUP_HOST + "/");
+            configMap.put(RESOURCE_FORMAT, DEFAULT_RESOURCE);
+            config.setProperties(configMap);
+
+            String resourceTemplate = buildBackupResourceTemplate(config);
+            assertThat(resourceTemplate, is(HTTPS + DEFAULT_BACKUP_HOST + DEFAULT_RESOURCE));
+        }
+
+        @Test
+        void invalidCharacterInHostNameThrowsException() {
+            FilterConfig config = createRestFilterConfig();
+            Map<String, String> configMap = createValidConfigMap();
+            configMap.put(BACKUP_HOST, (DEFAULT_BACKUP_HOST + "?:8082") + "/");
+            configMap.put(RESOURCE_FORMAT, DEFAULT_RESOURCE);
+            config.setProperties(configMap);
+
+            assertThrows(InvalidHostNameException.class, () -> buildBackupResourceTemplate(config));
+        }
+
+        @Test
+        public void invalidCharacterInHostsPortThrowsException() {
+            FilterConfig config = createRestFilterConfig();
+            Map<String, String> configMap = createValidConfigMap();
+            configMap.put(BACKUP_HOST, (DEFAULT_BACKUP_HOST + "&") + "/");
+            configMap.put(RESOURCE_FORMAT, DEFAULT_RESOURCE);
+            config.setProperties(configMap);
+
+            assertThrows(InvalidHostNameException.class, () -> buildBackupResourceTemplate(config));
+        }
+
+        private FilterConfig createRestFilterConfig() {
+            FilterConfig config = new FilterConfig();
+            config.setExecution(FilterConfig.ExecutionType.REST_COMM);
+            return config;
+        }
+
+        private Map<String, String> createValidConfigMap() {
+            Map<String, String> configMap = new HashMap<>();
+            String host = DEFAULT_BACKUP_HOST + "/";
+            configMap.put(BACKUP_HOST, host);
+            String resource = "/QuickGO/services/go/terms/{id}/complete";
+            configMap.put(RESOURCE_FORMAT, resource);
+            return configMap;
+        }
+    }
+
+    @Nested
+    class ValidatingInstantiationParameters {
         private FilterConfig filterConfig;
 
         private RestOperations restOperationsMock;
 
-        @Before
+        @BeforeEach
         public void setUp() {
             this.filterConfig = new FilterConfig();
             this.filterConfig.setProperties(new HashMap<>());
@@ -338,7 +508,7 @@ public class RESTFilterConverterTest {
         }
 
         @Test
-        public void successfullyCreateFilterConfigContainingMandatoryParameters() {
+        void successfullyCreateFilterConfigContainingMandatoryParameters() {
             addConfigParam(HOST, "host");
             addConfigParam(RESOURCE_FORMAT, "resource format");
             addConfigParam(TIMEOUT, "1000");
@@ -348,64 +518,64 @@ public class RESTFilterConverterTest {
             new RESTFilterConverter(filterConfig, restOperationsMock);
         }
 
-        @Test(expected = IllegalArgumentException.class)
-        public void nullFilterConfigCausesException() {
-            new RESTFilterConverter(null, restOperationsMock);
+        @Test
+        void nullFilterConfigCausesException() {
+            assertThrows(IllegalArgumentException.class, () -> new RESTFilterConverter(null, restOperationsMock));
         }
 
-        @Test(expected = IllegalArgumentException.class)
-        public void nullRestOperationsFilterConfigCausesException() {
-            new RESTFilterConverter(filterConfig, null);
+        @Test
+        void nullRestOperationsFilterConfigCausesException() {
+            assertThrows(IllegalArgumentException.class, () -> new RESTFilterConverter(filterConfig, null));
         }
 
-        @Test(expected = IllegalArgumentException.class)
-        public void noHostCausesInstantiationException() {
+        @Test
+        void noHostCausesInstantiationException() {
             addConfigParam(RESOURCE_FORMAT, "resource format");
             addConfigParam(RESPONSE_CONVERTER_CLASS, FakeResponseConverter.class.getName());
             addConfigParam(RESPONSE_CLASS, FakeResponse.class.getName());
             addConfigParam(TIMEOUT, "1000");
 
-            new RESTFilterConverter(filterConfig, restOperationsMock);
+            assertThrows(IllegalArgumentException.class, () -> new RESTFilterConverter(filterConfig, restOperationsMock));
         }
 
-        @Test(expected = IllegalArgumentException.class)
-        public void noResourceFormatCausesInstantiationException() {
+        @Test
+        void noResourceFormatCausesInstantiationException() {
             addConfigParam(HOST, "host");
             addConfigParam(RESPONSE_CONVERTER_CLASS, FakeResponseConverter.class.getName());
             addConfigParam(RESPONSE_CLASS, FakeResponse.class.getName());
             addConfigParam(TIMEOUT, "1000");
 
-            new RESTFilterConverter(filterConfig, restOperationsMock);
+            assertThrows(IllegalArgumentException.class, () -> new RESTFilterConverter(filterConfig, restOperationsMock));
         }
 
-        @Test(expected = IllegalArgumentException.class)
-        public void noResponseClassCausesInstantiationException() {
+        @Test
+        void noResponseClassCausesInstantiationException() {
             addConfigParam(HOST, "host");
             addConfigParam(RESOURCE_FORMAT, "resource format");
             addConfigParam(RESPONSE_CONVERTER_CLASS, FakeResponseConverter.class.getName());
             addConfigParam(TIMEOUT, "1000");
 
-            new RESTFilterConverter(filterConfig, restOperationsMock);
+            assertThrows(IllegalArgumentException.class, () -> new RESTFilterConverter(filterConfig, restOperationsMock));
         }
 
-        @Test(expected = IllegalArgumentException.class)
-        public void noResponseConverterClassCausesInstantiationException() {
+        @Test
+        void noResponseConverterClassCausesInstantiationException() {
             addConfigParam(HOST, "host");
             addConfigParam(RESOURCE_FORMAT, "resource format");
             addConfigParam(RESPONSE_CLASS, FakeResponse.class.getName());
             addConfigParam(TIMEOUT, "1000");
 
-            new RESTFilterConverter(filterConfig, restOperationsMock);
+            assertThrows(IllegalArgumentException.class, () -> new RESTFilterConverter(filterConfig, restOperationsMock));
         }
 
-        @Test(expected = IllegalArgumentException.class)
-        public void noNumericalTimeoutCausesInstantiationException() {
+        @Test
+        void noNumericalTimeoutCausesInstantiationException() {
             addConfigParam(HOST, "host");
             addConfigParam(RESOURCE_FORMAT, "resource format");
             addConfigParam(RESPONSE_CLASS, FakeResponse.class.getName());
             addConfigParam(TIMEOUT, "THIS IS NOT A NUMBER");
 
-            new RESTFilterConverter(filterConfig, restOperationsMock);
+            assertThrows(IllegalArgumentException.class, () -> new RESTFilterConverter(filterConfig, restOperationsMock));
         }
 
         private void addConfigParam(String name, String value) {
