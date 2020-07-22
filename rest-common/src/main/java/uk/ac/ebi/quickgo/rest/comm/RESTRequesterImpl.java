@@ -34,7 +34,7 @@ public class RESTRequesterImpl implements RESTRequester {
     }
 
     public boolean hasBackup(){
-        return backupUrl != null && backupUrl.trim().isEmpty();
+        return backupUrl != null && !backupUrl.trim().isEmpty();
     }
 
     public <T> CompletableFuture<T> getBackup(Class<T> responseType) {
