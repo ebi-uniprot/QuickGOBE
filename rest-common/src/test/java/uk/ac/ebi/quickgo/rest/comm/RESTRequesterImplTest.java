@@ -29,6 +29,7 @@ public class RESTRequesterImplTest {
 
     private static final String SERVICE_ENDPOINT = "useful/endpoint";
     private RESTRequesterImpl.Builder requesterBuilder;
+    private static final String EMPTY_BACKUP_URL = "";
 
     @Mock
     private RestTemplate restTemplateMock;
@@ -36,7 +37,7 @@ public class RESTRequesterImplTest {
 
     @Before
     public void setUp() {
-        requesterBuilder = RESTRequesterImpl.newBuilder(restTemplateMock, SERVICE_ENDPOINT);
+        requesterBuilder = RESTRequesterImpl.newBuilder(restTemplateMock, SERVICE_ENDPOINT, EMPTY_BACKUP_URL);
 
         requestParameters = new HashMap<>();
     }
@@ -48,18 +49,18 @@ public class RESTRequesterImplTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void creatingWithRestOperationsThrowsException() {
-        RESTRequesterImpl.newBuilder(null, "value");
+    public void creatingWithNullRestOperationsThrowsException() {
+        RESTRequesterImpl.newBuilder(null, "value", EMPTY_BACKUP_URL);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void creatingWithNullURLThrowsException() {
-        RESTRequesterImpl.newBuilder(restTemplateMock, null);
+        RESTRequesterImpl.newBuilder(restTemplateMock, null, EMPTY_BACKUP_URL);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void creatingWithEmptyURLThrowsException() {
-        RESTRequesterImpl.newBuilder(restTemplateMock, "");
+        RESTRequesterImpl.newBuilder(restTemplateMock, "", EMPTY_BACKUP_URL);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -94,7 +95,7 @@ public class RESTRequesterImplTest {
         String url = SERVICE_ENDPOINT + "/something-else";
 
         RestTemplate restTemplateMock = mock(RestTemplate.class);
-        RESTRequesterImpl.Builder requesterBuilder = RESTRequesterImpl.newBuilder(restTemplateMock, url);
+        RESTRequesterImpl.Builder requesterBuilder = RESTRequesterImpl.newBuilder(restTemplateMock, url, EMPTY_BACKUP_URL);
         Map<String, String> requestParameters = new HashMap<>();
 
         requesterBuilder.addRequestParameter(param1, value1);
@@ -102,7 +103,7 @@ public class RESTRequesterImplTest {
 
         RESTRequesterImpl requester = requesterBuilder.build();
 
-        CompletableFuture<FakeDTO> completableFuture = requester.get(restTemplateMock, FakeDTO.class);
+        CompletableFuture<FakeDTO> completableFuture = requester.get(url, restTemplateMock, FakeDTO.class);
         completableFuture.get();
 
         verify(restTemplateMock, times(1)).getForObject(url, FakeDTO.class, requestParameters);
@@ -119,7 +120,7 @@ public class RESTRequesterImplTest {
 
         RESTRequesterImpl requester = requesterBuilder.build();
 
-        CompletableFuture<FakeDTO> completableFuture = requester.get(restTemplateMock, FakeDTO.class);
+        CompletableFuture<FakeDTO> completableFuture = requester.get(newURL, restTemplateMock, FakeDTO.class);
         FakeDTO fakeDTO = completableFuture.get();
 
         verify(restTemplateMock, times(1)).getForObject(newURL, FakeDTO.class, requestParameters);
@@ -134,7 +135,7 @@ public class RESTRequesterImplTest {
 
         RESTRequesterImpl requester = requesterBuilder.build();
 
-        CompletableFuture<FakeDTO> completableFuture = requester.get(restTemplateMock, FakeDTO.class);
+        CompletableFuture<FakeDTO> completableFuture = requester.get(SERVICE_ENDPOINT, restTemplateMock, FakeDTO.class);
 
         FakeDTO fakeDTO = completableFuture.get();
         assertThat(fakeDTO.value, is(dtoValue));
@@ -148,7 +149,7 @@ public class RESTRequesterImplTest {
 
         RESTRequesterImpl requester = requesterBuilder.build();
 
-        CompletableFuture<FakeDTO> completableFuture = requester.get(restTemplateMock, FakeDTO.class);
+        CompletableFuture<FakeDTO> completableFuture = requester.get(SERVICE_ENDPOINT, restTemplateMock, FakeDTO.class);
 
         FakeDTO fakeDTO = completableFuture.get();
         assertThat(fakeDTO.value, is(dtoValue));
@@ -162,11 +163,35 @@ public class RESTRequesterImplTest {
         RESTRequesterImpl requester = requesterBuilder.build();
 
         String failed = "Failed";
-        CompletableFuture<FakeDTO> completableFuture = requester.get(restTemplateMock, FakeDTO.class)
+        CompletableFuture<FakeDTO> completableFuture = requester.get(SERVICE_ENDPOINT, restTemplateMock, FakeDTO.class)
                 .exceptionally(ex -> new FakeDTO(failed));
 
         FakeDTO fakeDTO = completableFuture.get();
         assertThat(fakeDTO.value, is(failed));
+    }
+
+    @Test
+    public void whenBackupUrlEmpty_hasBackup_returnFalse() {
+        RESTRequesterImpl requester = requesterBuilder.build();
+        assertThat(requester.hasBackup(), is(false));
+    }
+
+    @Test
+    public void whenBackupUrlNull_hasBackup_returnFalse() {
+        RESTRequesterImpl requester = RESTRequesterImpl.newBuilder(restTemplateMock, SERVICE_ENDPOINT, null).build();
+        assertThat(requester.hasBackup(), is(false));
+    }
+
+    @Test
+    public void whenBackupUrlEmptySpaces_hasBackup_returnFalse() {
+        RESTRequesterImpl requester = RESTRequesterImpl.newBuilder(restTemplateMock, SERVICE_ENDPOINT, "  ").build();
+        assertThat(requester.hasBackup(), is(false));
+    }
+
+    @Test
+    public void whenBackupUrlNonEmpty_hasBackup_returnTrue() {
+        RESTRequesterImpl requester = RESTRequesterImpl.newBuilder(restTemplateMock, SERVICE_ENDPOINT, "nonEmpty").build();
+        assertThat(requester.hasBackup(), is(true));
     }
 
     private static Stubber delayAnswer(int delay, Object toReturn) {
