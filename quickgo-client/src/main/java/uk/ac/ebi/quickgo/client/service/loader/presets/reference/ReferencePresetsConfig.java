@@ -43,9 +43,6 @@ public class ReferencePresetsConfig {
     public static final String CORE_REFERENCE_DB_LOADING_STEP_NAME = "GenericReferenceDBReadingStep";
     public static final String SPECIFIC_REFERENCE_LOADING_STEP_NAME = "SpecificReferenceReadingStep";
     private static final String REFERENCE_DB_DEFAULTS = "DOI,GO_REF,PMID,REACTOME";
-    private static final String REFERENCE_SPECIFIC_DB_DEFAULTS =
-            "0000037,0000038,0000043,0000045,0000039,0000040,0000044,0000046,0000003,0000041,0000020,0000002," +
-                    "0000042,0000019,0000035,0000049,0000104,0000108";
     private static final RawNamedPreset INVALID_PRESET = null;
     private static final String GO_REF_FORMAT = "GO_REF:%s";
 
@@ -60,8 +57,6 @@ public class ReferencePresetsConfig {
     private Resource[] specificResources;
     @Value("${reference.db.preset.header.lines:1}")
     private int specificDBHeaderLines;
-    @Value("#{'${reference.specific.db.preset.defaults:" + REFERENCE_SPECIFIC_DB_DEFAULTS + "}'.split(',')}")
-    private List<String> specificDBDefaults;
 
     @Bean
     public Step referenceGenericDbStep(
@@ -102,8 +97,7 @@ public class ReferencePresetsConfig {
                 .faultTolerant()
                 .skipLimit(SKIP_LIMIT)
                 .<RawNamedPreset>reader(rawPresetMultiFileReader(specificResources, itemReader))
-                .processor(compositeItemProcessor(validatingItemProcessor(),
-                        rawPresetFilter(specificDBDefaults)))
+                .processor(compositeItemProcessor(validatingItemProcessor()))
                 .writer(rawPresetWriter(
                         presets,
                         aRawPresetItem -> PresetItem.createWithName(buildGORefID(aRawPresetItem.name))
