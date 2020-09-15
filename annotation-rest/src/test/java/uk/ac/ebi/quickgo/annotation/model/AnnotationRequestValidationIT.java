@@ -1,14 +1,19 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.ac.ebi.quickgo.annotation.IdGeneratorUtil;
 import uk.ac.ebi.quickgo.annotation.validation.loader.ValidationConfig;
 import uk.ac.ebi.quickgo.annotation.validation.service.JobTestRunnerConfig;
@@ -35,7 +40,7 @@ import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.*
 /**
  * Tests that the validation added to the {@link AnnotationRequest} class is correct.
  */
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {AnnotationRequestConfig.class, ValidationConfig.class, JobTestRunnerConfig.class})
 public class AnnotationRequestValidationIT {
     private static final String[] VALID_GENE_PRODUCT_ID = {"A0A000", "A0A003"};
@@ -49,7 +54,7 @@ public class AnnotationRequestValidationIT {
 
     private AnnotationRequest annotationRequest;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         annotationRequest = new AnnotationRequest();
     }
@@ -616,11 +621,11 @@ public class AnnotationRequestValidationIT {
                 is(createRegexErrorMessage(USAGE_RELATIONSHIP_PARAM, invalidRel)));
     }
 
-    @Test(expected = ParameterException.class)
+    @Test
     public void cannotCreateFilterWithGoUsageAndNoUsageIds() {
         annotationRequest.setGoUsage("descendants");
 
-        annotationRequest.createFilterRequests();
+        Assertions.assertThrows(ParameterException.class, () -> annotationRequest.createFilterRequests());
     }
 
     //---------------------------------------
@@ -673,11 +678,11 @@ public class AnnotationRequestValidationIT {
                 is(createRegexErrorMessage(USAGE_RELATIONSHIP_PARAM, invalidRel)));
     }
 
-    @Test(expected = ParameterException.class)
+    @Test
     public void cannotCreateFilterWithEcoUsageAndNoUsageIds() {
         annotationRequest.setEvidenceCodeUsage("descendants");
 
-        annotationRequest.createFilterRequests();
+        Assertions.assertThrows(ParameterException.class, () -> annotationRequest.createFilterRequests());
     }
 
     //---------------------------------------
@@ -856,6 +861,29 @@ public class AnnotationRequestValidationIT {
     @Test
     public void invalidSelectedFieldProducesValidationError() {
         annotationRequest.setSelectedFields("XXXXXXXXXX");
+        assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"tsv","gpad","gaf"})
+    public void downloadFileTypeValidValues(String mediaType) {
+        annotationRequest.setDownloadFileType(mediaType);
+        assertThat(validator.validate(annotationRequest), is(empty()));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {MediaType.ALL_VALUE,MediaType.APPLICATION_JSON_VALUE,MediaType.APPLICATION_PDF_VALUE,
+    MediaType.APPLICATION_XML_VALUE, MediaType.TEXT_PLAIN_VALUE, MediaType.TEXT_HTML_VALUE, MediaType.IMAGE_JPEG_VALUE})
+    public void downloadFileTypeOthersMediaTypeAreInValid(String mediaType) {
+        annotationRequest.setDownloadFileType(mediaType);
+        assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"abc", "", "   ", "not/valid/check", "TEXT/tsv", "text/GPAD", "TEXT/GAF", "text/tsv",
+        "text/gpad", "text/gaf"})
+    public void downloadFileTypeInValid_valuesWhichAreNotMediaTypeSyntax(String mediaType) {
+        annotationRequest.setDownloadFileType(mediaType);
         assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
     }
 
