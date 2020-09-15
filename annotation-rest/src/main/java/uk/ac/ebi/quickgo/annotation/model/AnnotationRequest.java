@@ -215,8 +215,8 @@ public class AnnotationRequest {
     private int page = DEFAULT_PAGE_NUMBER;
 
     @ApiModelProperty(
-        value = "Only apply for download endpoint, pass this parameter when user can't provide accept header. when this" +
-            "para present, will ignore accept header",
+        value = "Only applies for download endpoint. Pass this parameter when user can't provide accept header. When this" +
+            "parameter is present, accept header is ignored",
         allowableValues = GPAD_SUB_TYPE + "," + GAF_SUB_TYPE + "," + TSV_SUB_TYPE,
         hidden = true, position = 26)
     private String downloadFileType;
