@@ -15,6 +15,7 @@ import uk.ac.ebi.quickgo.annotation.download.header.HeaderContent;
 import uk.ac.ebi.quickgo.annotation.download.header.HeaderCreator;
 import uk.ac.ebi.quickgo.annotation.download.header.HeaderCreatorFactory;
 import uk.ac.ebi.quickgo.annotation.download.header.HeaderUri;
+import uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory;
 import uk.ac.ebi.quickgo.annotation.download.model.DownloadContent;
 import uk.ac.ebi.quickgo.annotation.model.*;
 import uk.ac.ebi.quickgo.annotation.service.search.NameService;
@@ -45,6 +46,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -259,12 +261,17 @@ public class AnnotationController {
         LOGGER.info("Download Request:: " + request + ", " + mediaTypeAcceptHeader);
         checkBindingErrors(bindingResult);
 
-        if (mediaTypeAcceptHeader.getSubtype().equals("gaf")) {
+        mediaTypeAcceptHeader = Optional.ofNullable(request.getDownloadFileType())
+            .filter(Predicate.not(String::isBlank))
+            .map(MediaTypeFactory::createMediaType)
+            .orElse(mediaTypeAcceptHeader);
+
+        if (mediaTypeAcceptHeader.getSubtype().equals(GAF_SUB_TYPE)) {
             //For gaf, gene product name and synonyms must be present, so make sure it appears in the list of  include
             // fields.
             request.setIncludeFields(ensureArrayContains(request.getIncludeFields(), "name"));
             request.setIncludeFields(ensureArrayContains(request.getIncludeFields(), "synonyms"));
-        } else if (mediaTypeAcceptHeader.getSubtype().equals("tsv")) {
+        } else if (mediaTypeAcceptHeader.getSubtype().equals(TSV_SUB_TYPE)) {
             //If synonyms are requested, ensure synonyms is in the list of include fields.
             request.setIncludeFields(
                     ensureArrayContainsCommonValue(request.getSelectedFields(), request.getIncludeFields(),

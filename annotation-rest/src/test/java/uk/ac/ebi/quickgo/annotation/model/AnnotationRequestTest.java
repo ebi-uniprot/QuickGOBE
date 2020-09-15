@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
+import org.springframework.http.MediaType;
 import uk.ac.ebi.quickgo.annotation.AnnotationParameters;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationFields;
 import uk.ac.ebi.quickgo.rest.ParameterException;
@@ -23,6 +24,7 @@ import static org.hamcrest.core.IsEqual.equalTo;
 import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.EVIDENCE_CODE_USAGE_RELATIONS_PARAM;
 import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.GO_ID_PARAM;
 import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.GO_USAGE_RELATIONS_PARAM;
+import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.*;
 import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.*;
 
 /**
@@ -628,6 +630,11 @@ public class AnnotationRequestTest {
         assertThat(filterRequests, contains(request));
     }
 
+    @Test
+    public void canSetGetAnyString_downloadFileType() {
+        annotationRequest.setDownloadFileType("notValidType");
+        assertThat(annotationRequest.getDownloadFileType(), equalTo("notValidType"));
+    }
     //----------------- helpers
     private String getDefaultTaxonSearchField() {
         String field;
