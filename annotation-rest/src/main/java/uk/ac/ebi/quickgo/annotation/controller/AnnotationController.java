@@ -8,6 +8,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.MimeType;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
@@ -23,6 +24,7 @@ import uk.ac.ebi.quickgo.annotation.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.annotation.service.statistics.StatisticsService;
 import uk.ac.ebi.quickgo.common.SolrCollectionName;
 import uk.ac.ebi.quickgo.rest.ParameterBindingException;
+import uk.ac.ebi.quickgo.rest.ParameterException;
 import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
 import uk.ac.ebi.quickgo.rest.comm.FilterContext;
 import uk.ac.ebi.quickgo.rest.metadata.MetaData;
@@ -47,6 +49,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -257,14 +260,21 @@ public class AnnotationController {
             @Valid @RequestBody(required = false) AnnotationRequestBody body,
             @Valid @ModelAttribute AnnotationRequest request,
             BindingResult bindingResult,
-            @RequestHeader(ACCEPT) MediaType mediaTypeAcceptHeader, HttpServletRequest servletRequest) {
-        LOGGER.info("Download Request:: " + request + ", " + mediaTypeAcceptHeader);
+            @RequestHeader(ACCEPT) MediaType[] incomingAcceptHeader, HttpServletRequest servletRequest) {
+        LOGGER.info("Download Request:: " + request + ", " + Arrays.toString(incomingAcceptHeader));
         checkBindingErrors(bindingResult);
 
-        mediaTypeAcceptHeader = Optional.ofNullable(request.getDownloadFileType())
+        Supplier<String> errMsg = () -> String.format("Provide at least one from '%s', '%s' or '%s' as 'accept' header",
+                GPAD_MEDIA_TYPE_STRING, GAF_MEDIA_TYPE_STRING, TSV_MEDIA_TYPE_STRING);
+        Supplier<MediaType> firstSupportingTypeFromHeaders = () -> Stream.of(incomingAcceptHeader).map(MimeType::getSubtype)
+            .filter(sbt -> sbt.equals(GPAD_SUB_TYPE) || sbt.equals(GAF_SUB_TYPE) || sbt.equals(TSV_SUB_TYPE))
+            .findFirst().map(MediaTypeFactory::createMediaType)
+            .orElseThrow(() -> new ParameterException(errMsg.get()));
+
+        var mediaTypeAcceptHeader = Optional.ofNullable(request.getDownloadFileType())
             .filter(Predicate.not(String::isBlank))
             .map(MediaTypeFactory::createMediaType)
-            .orElse(mediaTypeAcceptHeader);
+            .orElseGet(firstSupportingTypeFromHeaders);
 
         if (mediaTypeAcceptHeader.getSubtype().equals(GAF_SUB_TYPE)) {
             //For gaf, gene product name and synonyms must be present, so make sure it appears in the list of  include
