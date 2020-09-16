@@ -1,6 +1,5 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import uk.ac.ebi.quickgo.annotation.validation.service.ReferenceValidator;
 import uk.ac.ebi.quickgo.annotation.validation.service.WithFromValidator;
 import uk.ac.ebi.quickgo.common.validator.GeneProductIDList;
@@ -14,13 +13,11 @@ import io.swagger.annotations.ApiModelProperty;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 
 import static java.util.Optional.of;
 import static uk.ac.ebi.quickgo.annotation.common.AnnotationFields.Searchable.*;
+import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.*;
 import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.*;
 import static uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern.Flag.CASE_INSENSITIVE;
 
@@ -216,6 +213,13 @@ public class AnnotationRequest {
       value = "Page number of the result set to display. (" + MIN_PAGE_NUMBER + "-" + MAX_ANNOTATION_PAGE + ")",
       allowableValues = "range[" + MIN_PAGE_NUMBER + "," + MAX_ANNOTATION_PAGE + "]", position = 25)
     private int page = DEFAULT_PAGE_NUMBER;
+
+    @ApiModelProperty(
+        value = "Only applies for download endpoint. Pass this parameter when user can't provide accept header. When this" +
+            "parameter is present, accept header is ignored",
+        allowableValues = GPAD_SUB_TYPE + "," + GAF_SUB_TYPE + "," + TSV_SUB_TYPE,
+        hidden = true, position = 26)
+    private String downloadFileType;
 
     private AnnotationRequestBody requestBody;
 
@@ -566,6 +570,16 @@ public class AnnotationRequest {
         return filterMap.get(PROTEOME);
     }
 
+    public void setDownloadFileType(String downloadFileType) {
+        this.downloadFileType = downloadFileType;
+    }
+
+    @Pattern(regexp = "^" + GPAD_SUB_TYPE + "|" + GAF_SUB_TYPE + "|" + TSV_SUB_TYPE + "$",
+        message = "Invalid download file type: ${validatedValue}. Only allowed " + GPAD_SUB_TYPE + " or "
+            + GAF_SUB_TYPE + " or " + TSV_SUB_TYPE)
+    public String getDownloadFileType() {
+        return downloadFileType;
+    }
 
     public void addRequestBody(AnnotationRequestBody requestBody) {
         AnnotationRequestBody.putDefaultValuesIfAbsent(requestBody);

@@ -57,8 +57,7 @@ import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.c
 import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.createGenericDocsChangingGoId;
 import static uk.ac.ebi.quickgo.annotation.controller.DownloadResponseVerifier.nonNullMandatoryFieldsExist;
 import static uk.ac.ebi.quickgo.annotation.controller.DownloadResponseVerifierSelectedFields.selectedFieldsExist;
-import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.GAF_MEDIA_TYPE;
-import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.GPAD_MEDIA_TYPE;
+import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.*;
 
 /**
  * Tests whether the downloading functionality of the {@link AnnotationController} works as expected.
@@ -79,6 +78,7 @@ public class AnnotationControllerDownloadIT {
     private static final int NUMBER_OF_GENERIC_DOCS = 200;
     private static final String DOWNLOAD_SEARCH_URL = "/annotation/downloadSearch";
     private static final String DOWNLOAD_LIMIT_PARAM = "downloadLimit";
+    private static final String DOWNLOAD_FILE_TYPE_PARAM = "downloadFileType";
     private static final int MIN_DOWNLOAD_NUMBER = 1;
     private static final int MAX_DOWNLOAD_NUMBER = 2000000;
     private static final String EXACT = "exact";
@@ -252,6 +252,79 @@ public class AnnotationControllerDownloadIT {
     @Test
     public void canDownloadInTSVFormatWithSelectedFieldsCaseInsensitive() throws Exception {
         canDownloadWithSelectedFields();
+    }
+
+    @Test
+    public void whenDownloadFileTypeProvidedAsPartOfRequestParam_acceptHeaderWillBeIgnored() throws Exception {
+            int expectedDownloadCount = 97;
+            ResultActions response = mockMvc.perform(
+                get(DOWNLOAD_SEARCH_URL)
+                    .header(ACCEPT, GPAD_MEDIA_TYPE)
+                    .param(DOWNLOAD_FILE_TYPE_PARAM, TSV_SUB_TYPE));
+
+            List<String> storedIds = getFieldValuesFromRepo(doc -> idFrom(doc.geneProductId), expectedDownloadCount);
+
+            checkResponse(TSV_MEDIA_TYPE, response, storedIds);
+    }
+
+    @Test
+    public void whenDownloadFileTypeRequest_invalidValue_isBadReqeust() throws Exception {
+        badRequest("fileType", "Invalid download file type: fileType. Only allowed gpad or gaf or tsv");
+    }
+
+    @Test
+    public void whenDownloadFileTypeRequest_empty_isBadReqeust() throws Exception {
+        badRequest("", "Invalid download file type: . Only allowed gpad or gaf or tsv");
+    }
+
+    @Test
+    public void canProvideCommaSeparatedHeaders() throws Exception {
+        ResultActions response = mockMvc.perform(
+            get(DOWNLOAD_SEARCH_URL)
+                .header(ACCEPT, "*/*,text/gpad,text/html"));
+        List<String> storedIds = getFieldValuesFromRepo(doc -> idFrom(doc.geneProductId), 97);
+
+        checkResponse(GPAD_MEDIA_TYPE, response, storedIds);
+    }
+
+    @Test
+    public void whenMultipleAcceptHeaders_firstValidWillBeUsed() throws Exception {
+        ResultActions response = mockMvc.perform(
+            get(DOWNLOAD_SEARCH_URL)
+                .header(ACCEPT, "image/jpg","text/*","text/tsv","text/gaf","text/html","text/gpad"));
+        List<String> storedIds = getFieldValuesFromRepo(doc -> idFrom(doc.geneProductId), 97);
+
+        checkResponse(TSV_MEDIA_TYPE, response, storedIds);
+    }
+
+    @Test
+    public void whenMultipleAcceptHeaders_notHaveSingleValid_BadRequest() throws Exception {
+        ResultActions response = mockMvc.perform(
+            get(DOWNLOAD_SEARCH_URL)
+                .header(ACCEPT, "image/jpg")
+                .header(ACCEPT, "*/*")
+                .header(ACCEPT, "text/html")
+                .header(ACCEPT, "text/text")
+        );
+
+        var err = String.format("Provide at least one from '%s', '%s' or '%s' as 'accept' header",
+            GPAD_MEDIA_TYPE_STRING, GAF_MEDIA_TYPE_STRING, TSV_MEDIA_TYPE_STRING);
+        assertBadRequestError(response, err);
+    }
+
+    private void badRequest(String paramValue, String errorMsg) throws Exception {
+        ResultActions response = mockMvc.perform(
+            get(DOWNLOAD_SEARCH_URL)
+                .header(ACCEPT, GPAD_MEDIA_TYPE)
+                .param(DOWNLOAD_FILE_TYPE_PARAM, paramValue));
+        assertBadRequestError(response, errorMsg);
+    }
+
+    private void assertBadRequestError(ResultActions response, String errorMsg) throws Exception {
+        response.andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.messages").value(errorMsg));
     }
 
     private List<AnnotationDocument> createDocs(int number) {

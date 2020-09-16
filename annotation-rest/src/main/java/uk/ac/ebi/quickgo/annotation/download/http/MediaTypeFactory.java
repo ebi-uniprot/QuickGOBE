@@ -1,6 +1,8 @@
 package uk.ac.ebi.quickgo.annotation.download.http;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+
 import org.springframework.http.MediaType;
 
 /**
@@ -14,12 +16,12 @@ public class MediaTypeFactory {
     public static final String TSV_SUB_TYPE = "tsv";
     public static final String GAF_SUB_TYPE = "gaf";
     public static final String GPAD_SUB_TYPE = "gpad";
-    private static final String TEXT_TYPE = "text";
+    static final String TEXT_TYPE = "text";
     public static final String TSV_MEDIA_TYPE_STRING = TEXT_TYPE + "/" + TSV_SUB_TYPE;
     public static final String GAF_MEDIA_TYPE_STRING = TEXT_TYPE + "/" + GAF_SUB_TYPE;
     public static final String GPAD_MEDIA_TYPE_STRING = TEXT_TYPE + "/" + GPAD_SUB_TYPE;
     private static final String APPLICATION_TYPE = "application";
-    private static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
+    static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
     public static final MediaType TSV_MEDIA_TYPE = new MediaType(TEXT_TYPE, TSV_SUB_TYPE, DEFAULT_CHARSET);
     public static final MediaType GAF_MEDIA_TYPE = new MediaType(TEXT_TYPE, GAF_SUB_TYPE, DEFAULT_CHARSET);
     public static final MediaType GPAD_MEDIA_TYPE = new MediaType(TEXT_TYPE, GPAD_SUB_TYPE, DEFAULT_CHARSET);
@@ -36,6 +38,10 @@ public class MediaTypeFactory {
             return EXCEL_FILE_TYPE;
         }
         return mediaType.getSubtype();
+    }
+
+    public static MediaType createMediaType(String subType) {
+        return new MediaType(TEXT_TYPE, subType, DEFAULT_CHARSET);
     }
 
 }

@@ -17,7 +17,7 @@
     <description>Responsible for indexing the QuickGO Solr indexes</description>
 
     <properties>
-        <commons-collections.version>3.2.1</commons-collections.version>
+        <commons-collections.version>3.2.2</commons-collections.version>
         <quickgo-sources.version>1.0</quickgo-sources.version>
         <sitemapgen4j.version>1.0.6</sitemapgen4j.version>
     </properties>

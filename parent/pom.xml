@@ -13,7 +13,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.3.0.RELEASE</version>
+        <version>2.3.3.RELEASE</version>
         <relativePath/>
     </parent>
 
@@ -38,7 +38,7 @@
         <jacoco.itReportPath>${jacoco.outputDir}/${jacoco.out.it.file}</jacoco.itReportPath>
 
         <!-- dependency version numbers -->
-        <guava.version>18.0</guava.version>
+        <guava.version>24.1.1-jre</guava.version>
 
         <solr.version>8.4.0</solr.version>
         <core-dropwizard-metrics.version>3.2.6</core-dropwizard-metrics.version>
