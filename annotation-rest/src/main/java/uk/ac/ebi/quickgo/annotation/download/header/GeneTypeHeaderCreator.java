@@ -50,7 +50,7 @@ public abstract class GeneTypeHeaderCreator extends AbstractHeaderCreator {
 
     abstract String version();
 
-    private void send(ResponseBodyEmitter emitter, String content) throws IOException {
+    void send(ResponseBodyEmitter emitter, String content) throws IOException {
         emitter.send(PREFIX + content + "\n", MediaType.TEXT_PLAIN);
     }
 
