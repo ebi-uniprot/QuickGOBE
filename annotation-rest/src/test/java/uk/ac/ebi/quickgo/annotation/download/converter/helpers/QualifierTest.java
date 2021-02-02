@@ -1,9 +1,9 @@
 package uk.ac.ebi.quickgo.annotation.download.converter.helpers;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 
 /**
  * Does the Qualifier class do everything expected of it?
@@ -13,85 +13,95 @@ import static org.junit.Assert.assertThat;
  * Time: 10:47
  * Created with IntelliJ IDEA.
  */
-public class QualifierTest {
+class QualifierTest {
 
     @Test
-    public void enables() {
-        assertThat(Qualifier.gafQualifierAsString("enables"), is(""));
+    void enables() {
+        assertThat(Qualifier.gafQualifierAsString("enables"), is("enables"));
     }
 
     @Test
-    public void notPart_of() {
-        assertThat(Qualifier.gafQualifierAsString("not|part_of"), is("NOT"));
+    void notPart_of() {
+        assertThat(Qualifier.gafQualifierAsString("not|part_of"), is("NOT|part_of"));
     }
 
     @Test
-    public void notPart_ofUppercase() {
-        assertThat(Qualifier.gafQualifierAsString("NOT|part_of"), is("NOT"));
+    void notPart_ofUppercase() {
+        assertThat(Qualifier.gafQualifierAsString("NOT|part_of"), is("NOT|part_of"));
     }
 
     @Test
-    public void contributesTo() {
+    void contributesTo() {
         assertThat(Qualifier.gafQualifierAsString("contributes_to"), is("contributes_to"));
     }
 
     @Test
-    public void notContributesTo() {
+    void notContributesTo() {
         assertThat(Qualifier.gafQualifierAsString("not|contributes_to"), is("NOT|contributes_to"));
     }
 
     @Test
-    public void colocalizesWith() {
+    void colocalizesWith() {
         assertThat(Qualifier.gafQualifierAsString("colocalizes_with"), is("colocalizes_with"));
     }
 
     @Test
-    public void notcolocalizesWith() {
+    void notcolocalizesWith() {
         assertThat(Qualifier.gafQualifierAsString("not|colocalizes_with"), is("NOT|colocalizes_with"));
     }
 
     @Test
-    public void isNull() {
+    void isNull() {
         assertThat(Qualifier.gafQualifierAsString(null), is(""));
     }
 
     @Test
-    public void isEmpty() {
+    void isEmpty() {
         assertThat(Qualifier.gafQualifierAsString(""), is(""));
     }
 
     @Test
-    public void actsUpstreamOf() {
-        assertThat(Qualifier.gafQualifierAsString("acts_upstream_of"), is(""));
+    void actsUpstreamOf() {
+        assertThat(Qualifier.gafQualifierAsString("acts_upstream_of"), is("acts_upstream_of"));
     }
 
     @Test
-    public void actsUpstreamOfPositiveEffect() {
-        assertThat(Qualifier.gafQualifierAsString("acts_upstream_of_positive_effect"), is(""));
+    void actsUpstreamOfPositiveEffect() {
+        assertThat(Qualifier.gafQualifierAsString("acts_upstream_of_positive_effect"), is("acts_upstream_of_positive_effect"));
     }
 
     @Test
-    public void actsUpstreamOfNegativeEffect() {
-        assertThat(Qualifier.gafQualifierAsString("acts_upstream_of_negative_effect"), is(""));
+    void actsUpstreamOfNegativeEffect() {
+        assertThat(Qualifier.gafQualifierAsString("acts_upstream_of_negative_effect"), is("acts_upstream_of_negative_effect"));
     }
 
     @Test
-    public void actsUpstreamOfOrWithin() {
-        assertThat(Qualifier.gafQualifierAsString("acts_upstream_of_or_within"), is(""));
+    void actsUpstreamOfOrWithin() {
+        assertThat(Qualifier.gafQualifierAsString("acts_upstream_of_or_within"), is("acts_upstream_of_or_within"));
     }
 
     @Test
-    public void actsUpstreamOfOrWithinPositiveEffect() {
-        assertThat(Qualifier.gafQualifierAsString("acts_upstream_of_or_within_positive_effect"), is(""));
+    void actsUpstreamOfOrWithinPositiveEffect() {
+        assertThat(Qualifier.gafQualifierAsString("acts_upstream_of_or_within_positive_effect"), is("acts_upstream_of_or_within_positive_effect"));
     }
 
     @Test
-    public void actsUpstreamOfOrWithinNegativeEffect() {
-        assertThat(Qualifier.gafQualifierAsString("acts_upstream_of_or_within_negative_effect"), is(""));
+    void actsUpstreamOfOrWithinNegativeEffect() {
+        assertThat(Qualifier.gafQualifierAsString("acts_upstream_of_or_within_negative_effect"), is("acts_upstream_of_or_within_negative_effect"));
     }
 
     @Test
-    public void is_active_in() {
-        assertThat(Qualifier.gafQualifierAsString("is_active_in"), is(""));
+    void is_active_in() {
+        assertThat(Qualifier.gafQualifierAsString("is_active_in"), is("is_active_in"));
+    }
+
+    @Test
+    void located_in() {
+        assertThat(Qualifier.gafQualifierAsString("located_in"), is("located_in"));
+    }
+
+    @Test
+    void notLocated_in() {
+        assertThat(Qualifier.gafQualifierAsString("not|located_in"), is("NOT|located_in"));
     }
 }

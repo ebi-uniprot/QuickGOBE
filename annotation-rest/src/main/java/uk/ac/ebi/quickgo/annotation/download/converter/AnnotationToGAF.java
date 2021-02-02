@@ -17,7 +17,7 @@ import static uk.ac.ebi.quickgo.common.model.Aspect.fromScientificName;
 
 /**
  * Convert an {@link Annotation}  to a String representation.
- * See http://geneontology.org/page/go-annotation-file-gaf-format-21}
+ * See http://geneontology.org/page/go-annotation-file-gaf-format-22}
  *
  * The columns that constitute a GAF file are:
  <pre>
@@ -48,7 +48,7 @@ import static uk.ac.ebi.quickgo.common.model.Aspect.fromScientificName;
 public class AnnotationToGAF implements BiFunction<Annotation, List<String>, List<String>> {
 
     static final String OUTPUT_DELIMITER = "\t";
-    private static List<Function<GafSource, String>> gafColumnFunctions = new ArrayList<>();
+    private static final List<Function<GafSource, String>> gafColumnFunctions = new ArrayList<>();
 
     static {
         Function<GafSource, GeneProduct> gpSource = GafSource::getGeneProduct;
