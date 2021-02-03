@@ -14,15 +14,13 @@ import java.util.Objects;
 public class Qualifier {
 
     private static final String EMPTY_STRING = "";
-    private static final String CONTRIBUTES_TO = "contributes_to";
-    private static final String COLOCALIZES_WITH = "colocalizes_with";
     private static final String NOT_LOWERCASE = "not";
     private static final String NOT_UPPERCASE = "NOT";
 
     private Qualifier() {}
 
     /**
-     * For GAF, there are a limited set of usable values, otherwise show a empty string.
+     * For GAF 2.2, qualifier is required, our dataset should not contain non empty value.
      * @param qualifier input string
      * @return string representation for GAF format.
      */
@@ -34,19 +32,11 @@ public class Qualifier {
 
         String lcQualifier = qualifier.toLowerCase();
 
-        if (lcQualifier.contains(CONTRIBUTES_TO) || lcQualifier.contains(COLOCALIZES_WITH)) {
-            if (lcQualifier.contains(NOT_LOWERCASE)) {
-                return showNotInUpperCase(qualifier);
-            } else {
-                return qualifier;
-            }
+        if (lcQualifier.contains(NOT_LOWERCASE)) {
+            return showNotInUpperCase(qualifier);
         } else {
-            //For the qualifiers that are not displayed, if they are negated, then show (only the not as) NOT
-            if (lcQualifier.contains(NOT_LOWERCASE)) {
-                return NOT_UPPERCASE;
-            }
+            return qualifier;
         }
-        return EMPTY_STRING;
     }
 
     private static String showNotInUpperCase(String qualifier) {

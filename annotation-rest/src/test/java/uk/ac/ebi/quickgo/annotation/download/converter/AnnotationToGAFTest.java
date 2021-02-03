@@ -1,5 +1,10 @@
 package uk.ac.ebi.quickgo.annotation.download.converter;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationMocker;
 import uk.ac.ebi.quickgo.annotation.model.GeneProduct;
@@ -8,8 +13,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Test;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -25,7 +28,7 @@ import static uk.ac.ebi.quickgo.annotation.model.AnnotationMocker.*;
  * Time: 14:19
  * Created with IntelliJ IDEA.
  */
-public class AnnotationToGAFTest {
+class AnnotationToGAFTest {
 
     private static final int COL_DB = 0;
     private static final int COL_DB_OBJECT_ID = 1;
@@ -47,13 +50,13 @@ public class AnnotationToGAFTest {
 
     private AnnotationToGAF annotationToGAF;
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         annotationToGAF = new AnnotationToGAF();
     }
 
     @Test
-    public void uniProtGeneProductWithoutIsoForm() {
+    void uniProtGeneProductWithoutIsoForm() {
         Annotation annotation = AnnotationMocker.createValidUniProtAnnotationWithoutIsoForm();
 
         String[] elements = annotationToDownloadColumns(annotation);
@@ -78,7 +81,7 @@ public class AnnotationToGAFTest {
     }
 
     @Test
-    public void uniProtGeneProductWithIsoForm() {
+    void uniProtGeneProductWithIsoForm() {
         Annotation annotation = AnnotationMocker.createValidUniProtAnnotationWithIsoForm();
 
         String[] elements = annotationToDownloadColumns(annotation);
@@ -103,7 +106,7 @@ public class AnnotationToGAFTest {
     }
 
     @Test
-    public void complexPortal() {
+    void complexPortal() {
         Annotation annotation = AnnotationMocker.createValidComplexPortalAnnotation();
 
         String[] elements = annotationToDownloadColumns(annotation);
@@ -127,7 +130,7 @@ public class AnnotationToGAFTest {
     }
 
     @Test
-    public void rNACentral() {
+    void rNACentral() {
         Annotation annotation = AnnotationMocker.createValidRNACentralAnnotation();
 
         String[] elements = annotationToDownloadColumns(annotation);
@@ -151,34 +154,28 @@ public class AnnotationToGAFTest {
         assertThat(elements[COL_GENE_PRODUCT_FORM_ID], is(""));
     }
 
-    @Test
-    public void createGAFStringWithEmptyQualifier() {
+    @ParameterizedTest
+    @ValueSource(strings = {"enables", "part_of", "involved_in", "located_in"})
+    void createGAFStringWithQualifiers(String qualifierToBeEmptyInGaf) {
         Annotation annotation = AnnotationMocker.createValidComplexPortalAnnotation();
-        List<String> undisplayableQualifiers = asList("enables", "part_of", "involved_in", "spurious_value");
 
-        for (String qualifierToBeEmptyInGaf : undisplayableQualifiers) {
-            annotation.qualifier = qualifierToBeEmptyInGaf;
-            String[] elements = annotationToDownloadColumns(annotation);
-            assertThat(elements[COL_QUALIFIER], is(""));
-        }
+        annotation.qualifier = qualifierToBeEmptyInGaf;
+        String[] elements = annotationToDownloadColumns(annotation);
+        assertThat(elements[COL_QUALIFIER], is(qualifierToBeEmptyInGaf));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"contributes_to", "NOT|contributes_to", "colocalizes_with", "NOT|colocalizes_with"})
+    void createValidGAFQualifiers(String qualifier) {
+        Annotation annotation = AnnotationMocker.createValidComplexPortalAnnotation();
+
+        annotation.qualifier = qualifier;
+        String[] elements = annotationToDownloadColumns(annotation);
+        assertThat(elements[COL_QUALIFIER], is(qualifier));
     }
 
     @Test
-    public void createValidGAFQualifiers() {
-        Annotation annotation = AnnotationMocker.createValidComplexPortalAnnotation();
-        List<String> displayableQualifiersForGAF = asList(
-                "contributes_to", "NOT|contributes_to",
-                "colocalizes_with", "NOT|colocalizes_with");
-
-        for (String qualifier : displayableQualifiersForGAF) {
-            annotation.qualifier = qualifier;
-            String[] elements = annotationToDownloadColumns(annotation);
-            assertThat(elements[COL_QUALIFIER], is(qualifier));
-        }
-    }
-
-    @Test
-    public void createGAFStringFromAnnotationWhereAspectIsBiologicalProcess() {
+    void createGAFStringFromAnnotationWhereAspectIsBiologicalProcess() {
         Annotation annotation = AnnotationMocker.createValidComplexPortalAnnotation();
         annotation.goAspect = "biological_process";
 
@@ -189,7 +186,7 @@ public class AnnotationToGAFTest {
     }
 
     @Test
-    public void createGAFStringFromAnnotationWhereAspectIsCellularComponent() {
+    void createGAFStringFromAnnotationWhereAspectIsCellularComponent() {
         Annotation annotation = AnnotationMocker.createValidComplexPortalAnnotation();
         annotation.goAspect = "cellular_component";
 
@@ -199,7 +196,7 @@ public class AnnotationToGAFTest {
     }
 
     @Test
-    public void slimmedToGoIdReplacesGoIdIfItExists() {
+    void slimmedToGoIdReplacesGoIdIfItExists() {
         Annotation annotation = AnnotationMocker.createValidComplexPortalAnnotation();
         final String slimmedToGoId = "GO:0005524";
         annotation.slimmedIds = Collections.singletonList(slimmedToGoId);
@@ -210,7 +207,7 @@ public class AnnotationToGAFTest {
     }
 
     @Test
-    public void multipleSlimmedToGoIdsCreatesEqualQuantityOfAnnotationRecords() {
+    void multipleSlimmedToGoIdsCreatesEqualQuantityOfAnnotationRecords() {
         Annotation annotation = AnnotationMocker.createValidComplexPortalAnnotation();
         final String slimmedToGoId0 = "GO:0005524";
         final String slimmedToGoId1 = "GO:1005524";
@@ -226,7 +223,7 @@ public class AnnotationToGAFTest {
     }
 
     @Test
-    public void interactingTaxId() {
+    void interactingTaxId() {
         Annotation annotation = AnnotationMocker.createValidComplexPortalAnnotation();
         annotation.interactingTaxonId = 9877;
 
@@ -235,18 +232,17 @@ public class AnnotationToGAFTest {
         assertThat(elements[COL_TAXON], is("taxon:" + TAXON_ID + "|taxon:" + 9877));
     }
 
-    @Test(expected = NullPointerException.class)
-    public void nullGeneProductIdThrowsException() {
+    @Test
+    void nullGeneProductIdThrowsException() {
         Annotation annotation = AnnotationMocker.createValidComplexPortalAnnotation();
         annotation.geneProductId = null;
         annotation.setGeneProduct(null);
 
-        annotationToDownloadColumns(annotation);
-
+        Assertions.assertThrows(NullPointerException.class, () -> annotationToDownloadColumns(annotation));
     }
 
     @Test
-    public void nullSymbol() {
+    void nullSymbol() {
         Annotation annotation = AnnotationMocker.createValidComplexPortalAnnotation();
         annotation.symbol = null;
 
@@ -256,7 +252,7 @@ public class AnnotationToGAFTest {
     }
 
     @Test
-    public void testForNullQualifier() {
+    void testForNullQualifier() {
         Annotation annotation = AnnotationMocker.createValidComplexPortalAnnotation();
         annotation.qualifier = null;
 
@@ -266,7 +262,7 @@ public class AnnotationToGAFTest {
     }
 
     @Test
-    public void nullGoId() {
+    void nullGoId() {
         Annotation annotation = AnnotationMocker.createValidComplexPortalAnnotation();
         annotation.goId = null;
 
@@ -276,7 +272,7 @@ public class AnnotationToGAFTest {
     }
 
     @Test
-    public void nullReference() {
+    void nullReference() {
         Annotation annotation = AnnotationMocker.createValidComplexPortalAnnotation();
         annotation.reference = null;
 
@@ -286,7 +282,7 @@ public class AnnotationToGAFTest {
     }
 
     @Test
-    public void nullOrEmptyGoEvidenceIsNotValidGafRecord() {
+    void nullOrEmptyGoEvidenceIsNotValidGafRecord() {
         Annotation annotation = AnnotationMocker.createValidComplexPortalAnnotation();
 
         annotation.goEvidence = null;
@@ -301,7 +297,7 @@ public class AnnotationToGAFTest {
     }
 
     @Test
-    public void nullInWithFrom() {
+    void nullInWithFrom() {
         Annotation annotation = AnnotationMocker.createValidComplexPortalAnnotation();
         annotation.withFrom = null;
 
@@ -311,7 +307,7 @@ public class AnnotationToGAFTest {
     }
 
     @Test
-    public void emptyWithFrom() {
+    void emptyWithFrom() {
         Annotation annotation = AnnotationMocker.createValidComplexPortalAnnotation();
         annotation.withFrom = new ArrayList<>();
 
@@ -321,7 +317,7 @@ public class AnnotationToGAFTest {
     }
 
     @Test
-    public void nullAspect() {
+    void nullAspect() {
         Annotation annotation = AnnotationMocker.createValidComplexPortalAnnotation();
         annotation.goAspect = null;
 
@@ -331,7 +327,7 @@ public class AnnotationToGAFTest {
     }
 
     @Test
-    public void nullDate() {
+    void nullDate() {
         Annotation annotation = AnnotationMocker.createValidComplexPortalAnnotation();
         annotation.date = null;
 
@@ -341,7 +337,7 @@ public class AnnotationToGAFTest {
     }
 
     @Test
-    public void nullAssignedBy() {
+    void nullAssignedBy() {
         Annotation annotation = AnnotationMocker.createValidComplexPortalAnnotation();
         annotation.assignedBy = null;
 
@@ -351,7 +347,7 @@ public class AnnotationToGAFTest {
     }
 
     @Test
-    public void nullInExtensions() {
+    void nullInExtensions() {
         Annotation annotation = AnnotationMocker.createValidComplexPortalAnnotation();
         annotation.extensions = null;
 
@@ -361,7 +357,7 @@ public class AnnotationToGAFTest {
     }
 
     @Test
-    public void emptyExtensions() {
+    void emptyExtensions() {
         Annotation annotation = AnnotationMocker.createValidComplexPortalAnnotation();
         annotation.extensions = new ArrayList<>();
 
@@ -371,7 +367,7 @@ public class AnnotationToGAFTest {
     }
 
     @Test
-    public void nullName() {
+    void nullName() {
         Annotation annotation = AnnotationMocker.createValidComplexPortalAnnotation();
         annotation.name = null;
 
@@ -381,7 +377,7 @@ public class AnnotationToGAFTest {
     }
 
     @Test
-    public void taxonHasInteractingValueAlso() {
+    void taxonHasInteractingValueAlso() {
         Annotation annotation = AnnotationMocker.createValidComplexPortalAnnotation();
         annotation.interactingTaxonId = 777;
 
@@ -391,13 +387,13 @@ public class AnnotationToGAFTest {
     }
 
     @Test
-    public void qualifierContainsNot() {
+    void qualifierContainsNotInUpper_remainingAsItIs() {
         Annotation annotation = AnnotationMocker.createValidComplexPortalAnnotation();
         annotation.qualifier = "not|part_of";
 
         String[] elements = annotationToDownloadColumns(annotation);
 
-        assertThat(elements[COL_QUALIFIER], is("NOT"));
+        assertThat(elements[COL_QUALIFIER], is("NOT|part_of"));
     }
 
     private void checkReturned(String slimmedToGoId, String converted) {

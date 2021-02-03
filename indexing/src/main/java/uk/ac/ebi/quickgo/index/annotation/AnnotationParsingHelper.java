@@ -33,7 +33,7 @@ class AnnotationParsingHelper {
             "^(NOT\\|)?(involved_in|enables|part_of|contributes_to|colocalizes_with|" +
                     "acts_upstream_of|acts_upstream_of_positive_effect|acts_upstream_of_negative_effect|" +
                     "acts_upstream_of_or_within|acts_upstream_of_or_within_positive_effect|" +
-                    "acts_upstream_of_or_within_negative_effect|is_active_in)$";
+                    "acts_upstream_of_or_within_negative_effect|is_active_in|located_in)$";
     private static final String RAW_TAXON_FORMAT = "([1-9]+[0-9]*)";
     private static final String RAW_TAXON_ANCESTORS_FORMAT = "([1-9]+[0-9]*)(,[1-9]+[0-9]*)*";
     private static final String INTERACTING_TAXON_FORMAT = "taxon:" + RAW_TAXON_FORMAT;
