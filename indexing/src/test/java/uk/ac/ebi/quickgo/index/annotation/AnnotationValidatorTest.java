@@ -165,7 +165,7 @@ public class AnnotationValidatorTest {
                 "acts_upstream_of_or_within",
                 "acts_upstream_of_or_within_positive_effect",
                 "acts_upstream_of_or_within_negative_effect",
-                "is_active_in"};
+                "is_active_in", "located_in"};
 
         Arrays.stream(qualifier).forEach(q -> {
             annotation.qualifier = q;
@@ -181,7 +181,7 @@ public class AnnotationValidatorTest {
                 "NOT|acts_upstream_of_or_within",
                 "NOT|acts_upstream_of_or_within_positive_effect",
                 "NOT|acts_upstream_of_or_within_negative_effect",
-                "NOT|is_active_in"};
+                "NOT|is_active_in", "NOT|located_in"};
 
         Arrays.stream(qualifier).forEach(q -> {
             annotation.qualifier = q;
