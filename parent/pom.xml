@@ -40,7 +40,7 @@
         <!-- dependency version numbers -->
         <guava.version>24.1.1-jre</guava.version>
 
-        <solr.version>8.4.0</solr.version>
+        <solr.version>8.8.2</solr.version>
         <core-dropwizard-metrics.version>3.2.6</core-dropwizard-metrics.version>
         <junit-hierarchicalcontextrunner.version>4.12.1</junit-hierarchicalcontextrunner.version>
         <springfox-swagger2.version>2.7.0</springfox-swagger2.version>
