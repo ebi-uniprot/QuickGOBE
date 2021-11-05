@@ -276,12 +276,7 @@ public class AnnotationController {
             .map(MediaTypeFactory::createMediaType)
             .orElseGet(firstSupportingTypeFromHeaders);
 
-        if (mediaTypeAcceptHeader.getSubtype().equals(GAF_SUB_TYPE)) {
-            //For gaf, gene product name and synonyms must be present, so make sure it appears in the list of  include
-            // fields.
-            request.setIncludeFields(ensureArrayContains(request.getIncludeFields(), "name"));
-            request.setIncludeFields(ensureArrayContains(request.getIncludeFields(), "synonyms"));
-        } else if (mediaTypeAcceptHeader.getSubtype().equals(TSV_SUB_TYPE)) {
+        if (mediaTypeAcceptHeader.getSubtype().equals(TSV_SUB_TYPE)) {
             //If synonyms are requested, ensure synonyms is in the list of include fields.
             request.setIncludeFields(
                     ensureArrayContainsCommonValue(request.getSelectedFields(), request.getIncludeFields(),
