@@ -2,7 +2,6 @@ package uk.ac.ebi.quickgo.annotation;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.data.solr.SolrRepositoriesAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 import uk.ac.ebi.quickgo.annotation.coterms.CoTermConfig;
@@ -22,7 +21,7 @@ import uk.ac.ebi.quickgo.rest.controller.SwaggerConfig;
  * Time: 14:41
  * Created with IntelliJ IDEA.
  */
-@SpringBootApplication(exclude = {SolrRepositoriesAutoConfiguration.class})
+@SpringBootApplication
 @ComponentScan({"uk.ac.ebi.quickgo.annotation.controller",
         "uk.ac.ebi.quickgo.rest",
         "uk.ac.ebi.quickgo.annotation.service.statistics"})

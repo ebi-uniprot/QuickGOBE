@@ -2,7 +2,6 @@ package uk.ac.ebi.quickgo.client;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.data.solr.SolrRepositoriesAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 import uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfig;
@@ -15,7 +14,7 @@ import uk.ac.ebi.quickgo.rest.controller.SwaggerConfig;
  * Created 16/11/15
  * @author Edd
  */
-@SpringBootApplication(exclude = {SolrRepositoriesAutoConfiguration.class})
+@SpringBootApplication
 @ComponentScan({
         "uk.ac.ebi.quickgo.client.controller",
         "uk.ac.ebi.quickgo.rest"

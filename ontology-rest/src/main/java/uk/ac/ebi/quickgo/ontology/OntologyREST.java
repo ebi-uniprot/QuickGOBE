@@ -3,7 +3,6 @@ package uk.ac.ebi.quickgo.ontology;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.data.solr.SolrRepositoriesAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 import uk.ac.ebi.quickgo.ontology.metadata.MetaDataConfig;
@@ -16,7 +15,7 @@ import uk.ac.ebi.quickgo.rest.controller.SwaggerConfig;
  * Created 16/11/15
  * @author Edd
  */
-@SpringBootApplication(exclude = {SolrRepositoriesAutoConfiguration.class})
+@SpringBootApplication
 @ComponentScan({
         "uk.ac.ebi.quickgo.ontology.controller",
         "uk.ac.ebi.quickgo.rest"})
