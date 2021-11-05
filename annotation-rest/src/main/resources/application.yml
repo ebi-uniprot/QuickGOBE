@@ -2,6 +2,8 @@
 spring:
   profiles:
     include: httpServer
+  lifecycle:
+    timeout-per-shutdown-phase: 5m
 
 logging:
   level:
@@ -14,6 +16,7 @@ server:
     threads:
       max: 0
   max-http-header-size: 64000
+  shutdown: graceful
 
 ## ================= Solr =================
 ## DEV solr server
