@@ -655,10 +655,15 @@ public class AnnotationRequest {
                 ", downloadLimit=" + downloadLimit +
                 ", includeFields=" + Arrays.toString(includeFields) +
                 ", selectedFields=" + Arrays.toString(selectedFields) +
-                ", filterMap=" + filterMap +
+                ", filterMap=" +  toStringFilterMap() +
                 '}';
     }
 
+    private String toStringFilterMap() {
+        return "{" + filterMap.entrySet().stream()
+          .map(es -> es.getKey() + "=" + Arrays.toString(es.getValue()))
+          .collect(Collectors.joining(",")) + "}";
+    }
     private Optional<FilterRequest> createSimpleFilter(String key) {
         Optional<FilterRequest> request;
         if (filterMap.containsKey(key)) {
