@@ -58,6 +58,7 @@ annotation:
       keepAliveSeconds: 600
       allowCoreThreadTimeout: true
       waitForTasksToCompleteOnShutdown: true
+    defaultEmitterTimeout: 18000000
   metadata:
     source: file:/home/rizwan/tools/quickgo-local/ff/goa_uniprot.gpa-version
   stats:
