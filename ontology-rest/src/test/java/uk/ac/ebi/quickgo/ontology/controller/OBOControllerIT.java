@@ -1089,6 +1089,26 @@ public abstract class OBOControllerIT {
 
     }
 
+    @Test
+    public void getSecondaryIdsByOneId() throws Exception {
+        ResultActions response = mockMvc.perform(get(buildTermsURLWithSubResource(validId, SECONDARY_IDS_SUB_RESOURCE)));
+
+        expectBasicFieldsInResults(response, singletonList(validId))
+          .andExpect(jsonPath("$.results.*.secondaryIds", hasSize(1)))
+          .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+          .andExpect(status().isOk());
+    }
+
+    @Test
+    public void getSecondaryIdsByTwoIds() throws Exception {
+        ResultActions response = mockMvc.perform(get(buildTermsURLWithSubResource(validIdsShortCSV, SECONDARY_IDS_SUB_RESOURCE)));
+
+        expectBasicFieldsInResults(response, validIdShortList)
+          .andExpect(jsonPath("$.results.*.secondaryIds", hasSize(2)))
+          .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+          .andExpect(status().isOk());
+    }
+
     //-----------------------  Check Http Header for Cache-Control content ------------------------------------------
     @Test
     public void cacheControlMaxAgeReducesOnSubsequentRequests() throws Exception {

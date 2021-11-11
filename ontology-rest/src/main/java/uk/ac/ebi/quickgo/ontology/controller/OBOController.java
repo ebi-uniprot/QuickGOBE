@@ -74,6 +74,7 @@ public abstract class OBOController<T extends OBOTerm> {
     static final String PATHS_SUB_RESOURCE = "paths";
     static final String CHART_SUB_RESOURCE = "chart";
     static final String CHART_COORDINATES_SUB_RESOURCE = CHART_SUB_RESOURCE + "/coords";
+    static final String SECONDARY_IDS_SUB_RESOURCE = "secondaryids";
     static final String BASE_64_CONTENT_ENCODING = "base64";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OBOController.class);
@@ -490,6 +491,17 @@ public abstract class OBOController<T extends OBOTerm> {
         } else {
             return getResultsResponse(Collections.singletonList(ancestorGraph));
         }
+    }
+
+    @ApiOperation(value = "Get secondary ids for given (CSV) list of ids. Response Term list have primary and list" +
+      " of secondary ids (if exists) irrespective of input id (which can be primary or secondary)",
+      notes = "If possible, response fields include: id, isObsolete, name, definition, comments, secondaryIds.")
+    @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + SECONDARY_IDS_SUB_RESOURCE, method = RequestMethod.GET,
+      produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<QueryResult<T>> findSecondaryIds(
+      @ApiParam(value = "Comma-separated term IDs - can be primary or secondary id. Any id is of the an invalid" +
+        " format: response returns 400", required = true) @PathVariable(value = "ids") String ids) {
+        return getResultsResponse(ontologyService.findSecondaryIdsByOntologyId(validationHelper.validateCSVIds(ids)));
     }
 
     private List<OntologyRelationType> validRelations(String relations) {
