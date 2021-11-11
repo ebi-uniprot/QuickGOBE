@@ -157,4 +157,12 @@ public interface OntologyService<T extends OBOTerm> {
      */
     AncestorGraph<AncestorVertex> findOntologySubGraphById(Set<String> startIds, Set<String> stopIds,
             OntologyRelationType... relations);
+
+    /**
+     * Find the Secondary Ids for a specified list of ontology IDs (primary or secondary both).
+     * @param ids the ontology IDs
+     * @return a {@link List} of {@link OBOTerm} instances corresponding to the ontology term ids containing the
+     * chosen information
+     */
+    List<T> findSecondaryIdsByOntologyId(List<String> ids);
 }

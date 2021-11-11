@@ -206,6 +206,14 @@ public class OntologyServiceImpl<T extends OBOTerm> implements OntologyService<T
         return new AncestorGraph<>(ancestorGraph.edges, coreVertices);
     }
 
+    @Override
+    public List<T> findSecondaryIdsByOntologyId(List<String> ids) {
+        return ontologyRepository.findSecondaryIdsByTermId(ontologyType, buildIdList(ids))
+          .stream()
+          .map(converter::convert)
+          .collect(Collectors.toList());
+    }
+
     List<String> buildIdList(Collection<String> ids) {
         Preconditions.checkArgument(ids != null, "List of IDs cannot be null");
 

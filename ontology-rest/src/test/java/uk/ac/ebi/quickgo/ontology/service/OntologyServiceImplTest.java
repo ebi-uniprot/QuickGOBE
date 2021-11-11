@@ -55,7 +55,7 @@ class OntologyServiceImplTest {
     }
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         repositoryMock = mock(OntologyRepository.class);
         goDocumentConverterMock = mock(GODocConverter.class);
         ecoDocumentConverterMock = mock(ECODocConverter.class);
@@ -555,6 +555,22 @@ class OntologyServiceImplTest {
             assertThat(ancestorGraph.vertices, hasSize(0));
         }
 
+        @Test
+        void findSecondaryIdsByOntologyId() {
+            String id = "GO:0000001";
+            OntologyDocument doc = createGODoc(id, "name1");
+
+            when(repositoryMock.findSecondaryIdsByTermId(OntologyType.GO.name(), idsViaOntologyService(id)))
+              .thenReturn(singletonList(doc));
+            when(goDocumentConverterMock.convert(doc)).thenReturn(createGOTerm(id));
+
+            List<GOTerm> goTerms = goOntologyService.findSecondaryIdsByOntologyId(singletonList(id));
+            assertThat(goTerms.size(), is(1));
+
+            GOTerm expectedGoTerm = goTerms.get(0);
+            assertThat(expectedGoTerm.id, is(equalTo(id)));
+        }
+
         private GOTerm createGOTerm(String id) {
             GOTerm term = new GOTerm();
             term.id = id;
@@ -879,14 +895,26 @@ class OntologyServiceImplTest {
             Set<String> toIds = new HashSet<>(idsViaOntologyService(parent));
 
             when(ontologyTraversalMock.paths(fromIds, toIds, OntologyRelationType.IS_A))
-                    .thenReturn(Collections.singletonList(Collections
-                                                                  .singletonList(new OntologyRelationship(child,
-                                                                                                          parent,
-                                                                                                          OntologyRelationType.IS_A))));
-            List<List<OntologyRelationship>> paths =
-                    ecoOntologyService.paths(fromIds, toIds, OntologyRelationType.IS_A);
+                    .thenReturn(List.of(List.of(new OntologyRelationship(child,parent,OntologyRelationType.IS_A))));
+            List<List<OntologyRelationship>> paths = ecoOntologyService.paths(fromIds, toIds, OntologyRelationType.IS_A);
 
             assertThat(paths.size(), is(1));
+        }
+
+        @Test
+        void findsSecondaryIdsForEcoIdentifier() {
+            String id = "ECO:0000001";
+            OntologyDocument doc = createECODoc(id, "name1");
+
+            when(repositoryMock.findSecondaryIdsByTermId(OntologyType.ECO.name(), idsViaOntologyService(id)))
+              .thenReturn(singletonList(doc));
+            when(ecoDocumentConverterMock.convert(doc)).thenReturn(createECOTerm(id));
+
+            List<ECOTerm> ecoTerms = ecoOntologyService.findSecondaryIdsByOntologyId(singletonList(id));
+            assertThat(ecoTerms.size(), is(1));
+
+            ECOTerm expectedTerm = ecoTerms.get(0);
+            assertThat(expectedTerm.id, is(equalTo(id)));
         }
 
         private ECOTerm createECOTerm(String id) {

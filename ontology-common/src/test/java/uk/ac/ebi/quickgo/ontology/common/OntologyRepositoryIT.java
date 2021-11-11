@@ -296,6 +296,36 @@ public class OntologyRepositoryIT {
         assertThat(ontologyRepository.findAll(PageRequest.of(0, 10)).getTotalElements(), is(5L));
     }
 
+    @Test
+    public void retrievesSecondaryIdByPrimary(){
+        retrievesSecondaryIdField(buildIdList("GO:0000001"));
+    }
+
+    @Test
+    public void retrievesSecondaryIdBySecondary(){
+        retrievesSecondaryIdField(buildIdList("GO:0000003"));
+    }
+
+    @Test
+    public void retrievesSecondaryIdMix(){
+        retrievesSecondaryIdField(buildIdList("GO:0000001", "GO:0000003", "GO:0000004"));
+    }
+
+    private void retrievesSecondaryIdField(List<String> searchIds) {
+        String id = "GO:0000001";
+        ontologyRepository.save(OntologyDocMocker.createGODoc(id, "GO name 1"));
+
+        var resultList = ontologyRepository.findSecondaryIdsByTermId(OntologyType.GO.name(), searchIds);
+
+        assertThat(resultList, is(notNullValue()));
+        assertThat(resultList.size(), is(1));
+
+        OntologyDocument doc = resultList.get(0);
+        OntologyDocument docToMatch = copyAsBasicDoc(doc);
+        docToMatch.secondaryIds = doc.secondaryIds;
+        assertThat(doc, is(equalTo(docToMatch)));
+    }
+
     private OntologyDocument copyAsBasicDoc(OntologyDocument document) {
         OntologyDocument basicDoc = new OntologyDocument();
         basicDoc.id = document.id;

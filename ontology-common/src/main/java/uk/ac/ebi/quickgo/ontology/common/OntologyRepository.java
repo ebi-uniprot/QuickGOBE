@@ -69,4 +69,9 @@ public interface OntologyRepository extends SolrCrudRepository<OntologyDocument,
     List<OntologyDocument> findAnnotationGuidelinesByTermId(String idType, List<String> ids);
 
     Page<OntologyDocument> findAllByOntologyType(String type, Pageable pageable);
+
+    @Query(value = QUERY_ONTOLOGY_TYPE_AND_ID,
+      fields = {OntologyFields.ID, OntologyFields.NAME, OntologyFields.IS_OBSOLETE, OntologyFields.COMMENT,
+        OntologyFields.DEFINITION, OntologyFields.SECONDARY_ID})
+    List<OntologyDocument> findSecondaryIdsByTermId(String idType, List<String> ids);
 }
