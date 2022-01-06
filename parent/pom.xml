@@ -53,6 +53,7 @@
         <jmeter-analysis-maven-plugin.version>1.0.6</jmeter-analysis-maven-plugin.version>
         <jmeter.min.jvm.mem>1024</jmeter.min.jvm.mem>
         <jmeter.max.jvm.mem>2048</jmeter.max.jvm.mem>
+        <log4j.version>2.17.0</log4j.version>
     </properties>
 
     <dependencyManagement>
@@ -170,7 +171,27 @@
                 <artifactId>springfox-swagger-ui</artifactId>
                 <version>${springfox-swagger2.version}</version>
             </dependency>
-
+            <!--https://www.ebi.ac.uk/panda/jira/browse/GOA-3568-->
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-core</artifactId>
+                <version>${log4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-to-slf4j</artifactId>
+                <version>${log4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-api</artifactId>
+                <version>${log4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-web</artifactId>
+                <version>${log4j.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
