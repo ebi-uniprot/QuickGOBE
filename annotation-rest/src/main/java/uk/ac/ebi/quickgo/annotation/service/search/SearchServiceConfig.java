@@ -1,17 +1,12 @@
 package uk.ac.ebi.quickgo.annotation.service.search;
 
-import net.sf.ehcache.CacheManager;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.cache.ehcache.EhCacheCacheManager;
-import org.springframework.cache.ehcache.EhCacheManagerFactoryBean;
 import org.springframework.context.annotation.*;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.solr.core.SolrTemplate;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationFields;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepoConfig;
@@ -45,7 +40,6 @@ import uk.ac.ebi.quickgo.rest.service.ServiceRetrievalConfig;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -83,7 +77,6 @@ public class SearchServiceConfig {
     private static final String SOLR_ANNOTATION_QUERY_REQUEST_HANDLER = "/query";
     private static final String DEFAULT_DOWNLOAD_SORT_FIELDS = "defaultSort,id";
     private static final int DEFAULT_DOWNLOAD_PAGE_SIZE = 500;
-    private static final String CACHE_CONFIG_FILE = "ehcache.xml";
 
     @Value("${geneproduct.db.xref.valid.regexes}")
     String xrefValidationRegexFile;
@@ -101,9 +94,6 @@ public class SearchServiceConfig {
 
     @Value("${search.wildcard.fields:}")
     private String fieldsThatCanBeSearchedByWildCard;
-
-    @Value("${cache.config.path:" + CACHE_CONFIG_FILE + "}")
-    private String cacheConfigPath;
 
     @Bean
     public SearchService<Annotation> annotationSearchService(
@@ -254,32 +244,6 @@ public class SearchServiceConfig {
         transformerChain.addTransformer(taxonNameTransformer);
         transformerChain.addTransformer(evidenceNameTransformer);
         return transformerChain;
-    }
-
-    @Bean
-    public EhCacheCacheManager cacheManager(CacheManager cm) {
-        return new EhCacheCacheManager(cm);
-    }
-
-    @Bean
-    public EhCacheManagerFactoryBean ehCache() {
-        EhCacheManagerFactoryBean factoryBean = new EhCacheManagerFactoryBean();
-        try {
-            if (Objects.nonNull(cacheConfigPath)) {
-                FileSystemResource fileSystemResource = new FileSystemResource(cacheConfigPath);
-                if (fileSystemResource.exists() && fileSystemResource.isReadable()) {
-                    factoryBean.setConfigLocation(fileSystemResource);
-                    factoryBean.setShared(true);
-                    return factoryBean;
-                }
-            }
-        } catch (Exception e) {
-            LOGGER.error(String.format("Failed to load cache configuration file from %s", cacheConfigPath));
-        }
-        //Failed to load config file, so use the version bundled with this jar
-        factoryBean.setConfigLocation(new ClassPathResource(CACHE_CONFIG_FILE));
-        factoryBean.setShared(true);
-        return factoryBean;
     }
 
     @Bean

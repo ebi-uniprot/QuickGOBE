@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
-import net.sf.ehcache.CacheManager;
+import org.springframework.cache.CacheManager;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -94,7 +94,7 @@ public class AnnotationControllerStatisticsDownloadIT {
         goNames = new String[NUMBER_OF_GENERIC_DOCS];
         IntStream.range(0, goNames.length)
                 .forEach(i -> goNames[i] = toName.apply(i));
-        cacheManager.clearAll();
+        cacheManager.getCache("names").clear();
     }
 
     @Test

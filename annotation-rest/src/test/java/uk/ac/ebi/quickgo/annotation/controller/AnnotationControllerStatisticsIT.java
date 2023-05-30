@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
-import net.sf.ehcache.CacheManager;
+import org.springframework.cache.CacheManager;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -175,7 +175,7 @@ public class AnnotationControllerStatisticsIT {
     //----------- Names for GO ids, taxon ids and eco codes -----------//
     @Test
     public void namesForGoIdsAndTaxonIdsAndEvidenceCodes() throws Exception {
-        cacheManager.clearAll();
+        cacheManager.getCache("names").clear();
         final int expectedDistinctValueCount = 1;
         StatsSetupHelper statsSetupHelper = new StatsSetupHelper(mockRestServiceServer);
         statsSetupHelper.expectGoTermHasNameViaRest(GO_ID, GO_TERM_NAME);
