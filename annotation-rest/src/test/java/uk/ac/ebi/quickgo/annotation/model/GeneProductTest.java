@@ -58,13 +58,13 @@ public class GeneProductTest {
 
     @Test
     public void uniprotWithIsoformOrVarient2() {
-        final String fullId = "UniProtKB:Q92583:PRO_0000005211";
+        final String fullId = "UniProtKB:Q92583-PRO_0000005211";
 
         GeneProduct uniprot = GeneProduct.fromCurieId(fullId);
 
         assertThat(uniprot.db(), is("UniProtKB"));
         assertThat(uniprot.canonicalId(), is("Q92583"));
-        assertThat(uniprot.fullId(), equalTo("UniProtKB:Q92583:PRO_0000005211"));
+        assertThat(uniprot.fullId(), equalTo("UniProtKB:Q92583-PRO_0000005211"));
         assertThat(uniprot.type(), is("protein"));
     }
 
