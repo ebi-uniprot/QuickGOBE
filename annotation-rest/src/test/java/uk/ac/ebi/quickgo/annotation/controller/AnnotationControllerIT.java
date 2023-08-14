@@ -871,7 +871,7 @@ public class AnnotationControllerIT {
     public void findIsoformEntryAndNonIsoformEntryById() throws Exception {
         String id = "P05067";
         String geneProductIdWithIso = "UniProtKB:P05067-2";
-        String geneProductIdWithVar = "UniProtKB:P05067:PRO_0000005211";
+        String geneProductIdWithVar = "UniProtKB:P05067-PRO_0000005211";
         AnnotationDocument doc1 = AnnotationDocMocker.createAnnotationDoc(geneProductIdWithIso);
         AnnotationDocument doc2 = AnnotationDocMocker.createAnnotationDoc(geneProductIdWithVar);
         repository.save(doc1);
