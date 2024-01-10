@@ -68,6 +68,19 @@ public class GeneProductTest {
         assertThat(uniprot.type(), is("protein"));
     }
 
+
+    @Test
+    public void uniprotWithIsoformOrVarient3() {
+        final String fullId = "UniProtKB:P02649-VAR_000652";
+
+        GeneProduct uniprot = GeneProduct.fromCurieId(fullId);
+
+        assertThat(uniprot.db(), is("UniProtKB"));
+        assertThat(uniprot.canonicalId(), is("P02649"));
+        assertThat(uniprot.fullId(), equalTo(fullId));
+        assertThat(uniprot.type(), is("protein"));
+    }
+
     @Test(expected = IllegalStateException.class)
     public void nulThrowsException() {
         GeneProduct.fromCurieId(null);

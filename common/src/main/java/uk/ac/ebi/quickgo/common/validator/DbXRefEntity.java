@@ -53,8 +53,8 @@ public class DbXRefEntity {
      * <ul>
      * <li> id e.g. P19712
      * <li> db:id e.g. UniProtKB:P19712
-     * <li> id:feature or variation e.g. 'P19712:PRO_0000038050'
-     * <li> db:id:feature or variation e.g. 'UniProtKB:P19712:PRO_0000038050'
+     * <li> id:feature or variation e.g. 'P19712-PRO_0000038050'
+     * <li> db:id:feature or variation e.g. 'UniProtKB:P19712-PRO_0000038050'
      * </ul>
      * @param id the gene product id to be checked. This can be either the qualified (e.g., UniProtKB:Q12345),
      *           or unqualified value (e.g., Q12345)
@@ -72,7 +72,7 @@ public class DbXRefEntity {
                     //id has the format db:id e.g. UniProtKB:P19712
                     return idValidationPattern.matcher(idComponents[1]).matches();
                 } else {
-                    // id has the format id:feature or variation e.g. 'P19712:PRO_0000038050'
+                    // id has the format id:feature or variation e.g. 'P19712-PRO_0000038050'
                     return idValidationPattern.matcher(id).matches();
                 }
             default:

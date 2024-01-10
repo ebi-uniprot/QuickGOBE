@@ -24,7 +24,7 @@ public class AnnotationRequestConfig {
     private static final String DB_URL = "http://www.uniprot.org/uniprot/[example_id]/";
     private static final String UNIPROTKB_GENE_PRODUCT_ID_VALIDATING_REGEX = "([OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z]" +
             "([0-9][A-Z][A-Z0-9]{2}){1,2}[0-9])" +
-            "((-[0-9]+)|:PRO_[0-9]{10}|:VAR_[0-9]{6}){0,1}";
+            "((-[0-9]+)|-PRO_[0-9]{10}|-VAR_[0-9]{6}){0,1}";
 
     public AnnotationRequestConfig() {}
 

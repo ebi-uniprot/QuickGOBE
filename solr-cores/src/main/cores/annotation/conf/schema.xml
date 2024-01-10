@@ -229,7 +229,7 @@
 
     <!--
         Search for database references in the form:
-            database:id:additional_info
+            database:id-additional_info
         where one can obtain a hit by database/id/additional_info or the entire combination
      -->
     <fieldType name="database_ignorecase" class="solr.TextField" positionIncrementGap="100">
@@ -239,33 +239,33 @@
                 source: UniProtKB:P12345-1
                 tokens: UniProtKB:P12345-1, UniProtKB, P12345-1
 
-                source: UniProtKB:P12345:Pro_x
-                tokens: UniProtKB:P12345:Pro_x, UniProtKB, UniProtKB:P12345
+                source: UniProtKB:P12345-Pro_x
+                tokens: UniProtKB:P12345-Pro_x, UniProtKB, UniProtKB:P12345
 
                 source: ANYTHING
                 tokens: ANYTHING (possibly plus other tokens, depending on ANYTHING)
                 -->
             <filter class="solr.PatternCaptureGroupFilterFactory"
-                    pattern="(([^:]+)(?::)([^:]+)).*|(.*)"
+                    pattern="(([^:]+)(?::)([^-]+)).*|(.*)"
                     preserve_original="true"/>
 
             <!--
                 source: UniProtKB:P12345-1
                 tokens: UniProtKB:P12345, P12345
 
-                source: UniProtKB:P12345:Pro_x
+                source: UniProtKB:P12345-Pro_x
                 tokens: UniProtKB:P12345, P12345
                 -->
             <filter class="solr.PatternCaptureGroupFilterFactory"
-                    pattern="((?:[^:]+)(?::)([^:-]+)).*"
+                    pattern="((?:[^:]+)(?::)([^-]+)).*"
                     preserve_original="true"/>
 
             <!--
-                source: UniProtKB:P12345:Pro_x
-                tokens: P12345:Pro_x
+                source: UniProtKB:P12345-Pro_x
+                tokens: P12345-Pro_x
                 -->
             <filter class="solr.PatternCaptureGroupFilterFactory"
-                    pattern="(?:[^:]+)(?::)([^:]+.*)"
+                    pattern="(?:[^:]+)(?::)([^-]+.*)"
                     preserve_original="true"/>
             <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
             <filter class="solr.LowerCaseFilterFactory"/>
