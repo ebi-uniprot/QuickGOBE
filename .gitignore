@@ -2,4 +2,6 @@
 **/*.iml
 */target
 
+indexing/src/test/resources/CoTermsAll
+indexing/src/test/resources/CoTermsManual
 solr-cores/src/main/cores/*/data
