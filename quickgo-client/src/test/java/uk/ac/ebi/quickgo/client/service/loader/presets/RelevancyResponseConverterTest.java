@@ -1,32 +1,32 @@
 package uk.ac.ebi.quickgo.client.service.loader.presets;
-
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Created 23/09/16
  * @author Edd
  */
-public class RelevancyResponseConverterTest {
+class RelevancyResponseConverterTest {
     private RelevancyResponseConverter responseConverter;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         responseConverter = new RelevancyResponseConverter();
     }
 
     @Test
-    public void transformsValidAssignedByResponse() {
+    void transformsValidAssignedByResponse() {
         RelevancyResponseType response = new RelevancyResponseType();
         response.terms = new RelevancyResponseType.Terms();
         response.terms.relevancies = new ArrayList<>();
@@ -40,13 +40,13 @@ public class RelevancyResponseConverterTest {
         assertThat(convertedFilter.getConvertedValue(), contains(term1, term2));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void nullResponseCausesException() {
-        responseConverter.transform(null);
+    @Test
+    void nullResponseCausesException() {
+        assertThrows(IllegalArgumentException.class, () -> responseConverter.transform(null));
     }
 
     @Test
-    public void nullTermsIsTransformedGracefully() {
+    void nullTermsIsTransformedGracefully() {
         RelevancyResponseType response = new RelevancyResponseType();
         assertThat(response.terms, is(nullValue()));
 
@@ -56,7 +56,7 @@ public class RelevancyResponseConverterTest {
     }
 
     @Test
-    public void nullAssignedByIsTransformedGracefully() {
+    void nullAssignedByIsTransformedGracefully() {
         RelevancyResponseType response = new RelevancyResponseType();
         response.terms = new RelevancyResponseType.Terms();
         assertThat(response.terms.relevancies, is(nullValue()));

@@ -1,12 +1,11 @@
 package uk.ac.ebi.quickgo.ontology.service.converter;
-
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.ac.ebi.quickgo.common.converter.FlatFieldBuilder;
 import uk.ac.ebi.quickgo.common.converter.FlatFieldLeaf;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 
 import java.util.Optional;
-import org.junit.Before;
-import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -15,16 +14,16 @@ import static org.hamcrest.MatcherAssert.assertThat;
 /**
  * Tests the behaviour of the {@link ReplaceConverter} class.
  */
-public class ReplacesConverterTest {
+class ReplacesConverterTest {
     private ReplaceConverter converter;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() throws Exception {
         converter = new ReplaceConverter();
     }
 
     @Test
-    public void emptyReplaceStringIsConvertedToEmptyOptional() throws Exception {
+    void emptyReplaceStringIsConvertedToEmptyOptional() throws Exception {
         String toConvert = "";
 
         Optional<OBOTerm.Replace> convertedOptional = converter.apply(toConvert);
@@ -33,7 +32,7 @@ public class ReplacesConverterTest {
     }
 
     @Test
-    public void replaceStringWithJustIdIsConvertedIntoEmptyOptional() throws Exception {
+    void replaceStringWithJustIdIsConvertedIntoEmptyOptional() throws Exception {
         String toConvert = "id1";
 
         Optional<OBOTerm.Replace> convertedOptional = converter.apply(toConvert);
@@ -42,7 +41,7 @@ public class ReplacesConverterTest {
     }
 
     @Test
-    public void replaceStringWithIdAndTypeIsConvertedIntoPopulatedReplaceOptional() throws Exception {
+    void replaceStringWithIdAndTypeIsConvertedIntoPopulatedReplaceOptional() throws Exception {
         String goTermId = "id1";
         String relationType = "replacedBy";
 

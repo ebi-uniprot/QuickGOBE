@@ -1,25 +1,27 @@
 package uk.ac.ebi.quickgo.client.service.loader.presets;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.validator.ValidationException;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Created 05/09/16
  * @author Edd
  */
-public class PresetsValidationHelperTest {
-    @Test(expected = ValidationException.class)
-    public void checkIsNullOrEmptyProducesExceptionOnNullValue() {
-        PresetsValidationHelper.checkIsNullOrEmpty(null);
-    }
-
-    @Test(expected = ValidationException.class)
-    public void checkIsNullOrEmptyProducesExceptionOnEmptyValue() {
-        PresetsValidationHelper.checkIsNullOrEmpty("");
+class PresetsValidationHelperTest {
+    @Test
+    void checkIsNullOrEmptyProducesExceptionOnNullValue() {
+        assertThrows(ValidationException.class, () -> PresetsValidationHelper.checkIsNullOrEmpty(null));
     }
 
     @Test
-    public void checkIsNullOrEmptyIsFalseForNonNullOrEmptyValue() {
+    void checkIsNullOrEmptyProducesExceptionOnEmptyValue() {
+        assertThrows(ValidationException.class, () -> PresetsValidationHelper.checkIsNullOrEmpty(""));
+    }
+
+    @Test
+    void checkIsNullOrEmptyIsFalseForNonNullOrEmptyValue() {
         PresetsValidationHelper.checkIsNullOrEmpty("valid value");
     }
 }

@@ -3,13 +3,15 @@ package uk.ac.ebi.quickgo.ontology.model;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.*;
 import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationship.combineRelationships;
 
@@ -19,8 +21,8 @@ import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationship.combineRelat
  * Created 23/05/16
  * @author Edd
  */
-@RunWith(Enclosed.class)
-public class OntologyRelationshipTest {
+
+class OntologyRelationshipTest {
 
     private static void checkVerticesAreCorrect(OntologyRelationship child2Parent, OntologyRelationship
             parent2GrandParent,
@@ -37,21 +39,20 @@ public class OntologyRelationshipTest {
         return new OntologyRelationship("parent", "grandparent", type);
     }
 
-    @RunWith(Parameterized.class)
-    public static class CombinationTest {
+    @Nested
+    class CombinationTest {
 
-        private final OntologyRelationType childParentRelationship;
-        private final OntologyRelationType parentGrandParentRelationship;
-        private final OntologyRelationType combinedRelationship;
+        private OntologyRelationType childParentRelationship;
+        private OntologyRelationType parentGrandParentRelationship;
+        private OntologyRelationType combinedRelationship;
 
-        public CombinationTest(OntologyRelationType childParentRelationship, OntologyRelationType
+        void initCombinationTest(OntologyRelationType childParentRelationship, OntologyRelationType
                 parentGrandParentRelationship, OntologyRelationType combinedRelationship) {
             this.childParentRelationship = childParentRelationship;
             this.parentGrandParentRelationship = parentGrandParentRelationship;
             this.combinedRelationship = combinedRelationship;
         }
 
-        @Parameterized.Parameters(name = "{index}: combine({0}, {1}) = {2}")
         public static Collection<Object[]> data() {
             List<Object[]> testCaseParameters = new ArrayList<>();
 
@@ -79,8 +80,11 @@ public class OntologyRelationshipTest {
             return testCases;
         }
 
-        @Test
-        public void testCombination() {
+        @MethodSource("data")
+        @ParameterizedTest(name = "{index}: combine({0}, {1}) = {2}")
+        void testCombination(OntologyRelationType childParentRelationship, OntologyRelationType
+                parentGrandParentRelationship, OntologyRelationType combinedRelationship) {
+            initCombinationTest(childParentRelationship, parentGrandParentRelationship, combinedRelationship);
             OntologyRelationship child2Parent = createChildParentRelationship(childParentRelationship);
             OntologyRelationship parent2GrandParent =
                     createParentGrandParentRelationship(parentGrandParentRelationship);
@@ -113,13 +117,13 @@ public class OntologyRelationshipTest {
         }
     }
 
-    public static class SetupTest {
-        @Test(expected = IllegalArgumentException.class)
-        public void incorrectlyCombinedRelationshipsCausesException() {
+    @Nested
+    class SetupTest {
+        @Test
+        void incorrectlyCombinedRelationshipsCausesException() {
             OntologyRelationship child2Parent = createChildParentRelationship(OntologyRelationType.UNDEFINED);
             OntologyRelationship parent2GrandParent = createChildParentRelationship(OntologyRelationType.UNDEFINED);
-
-            combineRelationships(child2Parent, parent2GrandParent);
+            assertThrows(IllegalArgumentException.class, () -> combineRelationships(child2Parent, parent2GrandParent));
         }
     }
 }

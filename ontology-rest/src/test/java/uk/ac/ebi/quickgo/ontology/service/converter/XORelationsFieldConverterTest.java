@@ -1,13 +1,11 @@
 package uk.ac.ebi.quickgo.ontology.service.converter;
-
-import uk.ac.ebi.quickgo.common.converter.FlatFieldBuilder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import org.junit.Before;
-import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -18,16 +16,16 @@ import static uk.ac.ebi.quickgo.common.converter.FlatFieldLeaf.newFlatFieldLeaf;
  * Created 01/12/15
  * @author Edd
  */
-public class XORelationsFieldConverterTest {
+class XORelationsFieldConverterTest {
     private XORelationsFieldConverter converter;
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         this.converter = new XORelationsFieldConverter();
     }
 
     @Test
-    public void convertsXOntologyRelations() {
+    void convertsXOntologyRelations() {
         String id0 = "id0";
         String term0 = "term0";
         String namespace0 = "ns0";
@@ -69,7 +67,7 @@ public class XORelationsFieldConverterTest {
     }
 
     @Test
-    public void gracefullyHandleWrongFieldCount() {
+    void gracefullyHandleWrongFieldCount() {
         Optional<OBOTerm.XORelation> result = converter.apply(newFlatField().addField(newFlatFieldLeaf("wrong format"))
                 .buildString());
         assertThat(result.isPresent(), is(false));

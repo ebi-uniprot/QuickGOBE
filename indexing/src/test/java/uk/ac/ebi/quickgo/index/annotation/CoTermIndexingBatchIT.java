@@ -1,8 +1,7 @@
 package uk.ac.ebi.quickgo.index.annotation;
 
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
@@ -12,11 +11,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.test.context.junit4.SpringRunner;
-import uk.ac.ebi.quickgo.common.store.BasicTemporaryFolder;
 import uk.ac.ebi.quickgo.index.annotation.coterms.CoTermsConfigProperties;
 import uk.ac.ebi.quickgo.index.common.JobTestRunnerConfig;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,19 +32,18 @@ import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermsConfig.CO_TERM_M
  * Created 22/04/16
  * @author Edd
  */
-@RunWith(SpringRunner.class)
 @SpringBootTest(classes = {CoTermIndexingBatchIT.TestConfig.class, CoTermIndexingConfig.class,
   JobTestRunnerConfig.class})
-public class CoTermIndexingBatchIT {
+class CoTermIndexingBatchIT {
 
-    @ClassRule
-    public static BasicTemporaryFolder basicTemporaryFolder = new BasicTemporaryFolder();
+    @TempDir
+    private static Path basicTemporaryFolder;
 
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
 
     @Test
-    public void successfulCoTermsOnlyJob() throws Exception {
+    void successfulCoTermsOnlyJob() throws Exception {
         JobExecution jobExecution = jobLauncherTestUtils.launchJob();
         assertThat(jobExecution.getJobInstance().getJobName(), is(COTERM_INDEXING_JOB_NAME));
 
@@ -106,8 +103,8 @@ public class CoTermIndexingBatchIT {
             CoTermsConfigProperties properties = new CoTermsConfigProperties();
             properties.setChunkSize(1);
             properties.setLoginterval(1000);
-            properties.setManual(basicTemporaryFolder.getRoot().getAbsolutePath() + "/CoTermsManual");
-            properties.setAll(basicTemporaryFolder.getRoot().getAbsolutePath() + "/CoTermsAll");
+            properties.setManual(basicTemporaryFolder + "/CoTermsManual");
+            properties.setAll(basicTemporaryFolder + "/CoTermsAll");
             return properties;
         }
     }

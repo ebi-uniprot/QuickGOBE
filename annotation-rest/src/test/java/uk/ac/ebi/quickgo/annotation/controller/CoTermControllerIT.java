@@ -1,12 +1,9 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -32,10 +29,9 @@ import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.contentTy
  * Time: 16:32
  * Created with IntelliJ IDEA.
  */
-@RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {AnnotationREST.class})
 @WebAppConfiguration
-public class CoTermControllerIT {
+class CoTermControllerIT {
 
     private static final String RESOURCE_URL = "/annotation/coterms";
     private static final int NUMBER_OF_ALL_CO_TERM_RECORDS = 12;
@@ -51,14 +47,14 @@ public class CoTermControllerIT {
     private WebApplicationContext webApplicationContext;
     private MockMvc mockMvc;
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
                 .build();
     }
 
     @Test
-    public void canRetrieveCoTermsForTerm() throws Exception {
+    void canRetrieveCoTermsForTerm() throws Exception {
         ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001)));
         response.andDo(print());
         expectFieldsInResults(response, Collections.singletonList(GO_0000001))
@@ -68,7 +64,7 @@ public class CoTermControllerIT {
     }
 
     @Test
-    public void nothingRetrievedIfTermDoesntExist() throws Exception {
+    void nothingRetrievedIfTermDoesntExist() throws Exception {
         ResultActions response = mockMvc.perform(get(buildPathToResource(GO_9000001)));
         response.andDo(print())
                 .andExpect(jsonPath("$.results.*", hasSize(0)))
@@ -77,7 +73,7 @@ public class CoTermControllerIT {
 
 
     @Test
-    public void errorReturnedIfTheRequestedGoTermIdIsInvalid() throws Exception {
+    void errorReturnedIfTheRequestedGoTermIdIsInvalid() throws Exception {
         ResultActions response = mockMvc.perform(get(buildPathToResource(GO_TERM_INVALID)));
         response.andExpect(status().isBadRequest());
         expectInvalidGoTermErrorMessage(response, GO_TERM_INVALID);
@@ -86,7 +82,7 @@ public class CoTermControllerIT {
     // Test source parameter
 
     @Test
-    public void retrieveManualCoTermsInformationWhenRequested() throws Exception {
+    void retrieveManualCoTermsInformationWhenRequested() throws Exception {
         ResultActions response = mockMvc.perform(get(buildPathToResource(MANUAL_ONLY_TERM, "source=MANUAL")));
 
         expectFieldsInResults(response, Collections.singletonList(MANUAL_ONLY_TERM))
@@ -102,7 +98,7 @@ public class CoTermControllerIT {
     }
 
     @Test
-    public void retrieveAllCoTermsInformationWhenRequested() throws Exception {
+    void retrieveAllCoTermsInformationWhenRequested() throws Exception {
         ResultActions response = mockMvc.perform(get(buildPathToResource(ALL_ONLY_TERM, "source=ALL")));
 
         expectFieldsInResults(response, Collections.singletonList(ALL_ONLY_TERM))
@@ -118,7 +114,7 @@ public class CoTermControllerIT {
     }
 
     @Test
-    public void sourceParameterShouldNotBeCaseSensitive() throws Exception {
+    void sourceParameterShouldNotBeCaseSensitive() throws Exception {
         ResultActions response = mockMvc.perform(get(buildPathToResource(MANUAL_ONLY_TERM, "source=MaNuAl")));
 
         expectFieldsInResults(response, Collections.singletonList(MANUAL_ONLY_TERM))
@@ -130,7 +126,7 @@ public class CoTermControllerIT {
     }
 
     @Test
-    public void retrievesAllCoTermsWhenNoSourceProvided() throws Exception {
+    void retrievesAllCoTermsWhenNoSourceProvided() throws Exception {
         ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "source=")));
         expectFieldsInResults(response, Collections.singletonList(GO_0000001))
                 .andExpect(contentTypeToBeJson())
@@ -139,7 +135,7 @@ public class CoTermControllerIT {
     }
 
     @Test
-    public void errorIfValueForSourceIsUnknown() throws Exception {
+    void errorIfValueForSourceIsUnknown() throws Exception {
         String requestedSource = "FUBAR";
         ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "source=" + requestedSource)));
         response.andExpect(status().isBadRequest());
@@ -148,7 +144,7 @@ public class CoTermControllerIT {
 
     // Tests for limit parameter
     @Test
-    public void setNumberOfResponsesBasedOnLimit() throws Exception {
+    void setNumberOfResponsesBasedOnLimit() throws Exception {
         ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "limit=4")));
         expectFieldsInResults(response, Collections.singletonList(GO_0000001))
                 .andExpect(contentTypeToBeJson())
@@ -170,7 +166,7 @@ public class CoTermControllerIT {
     }
 
     @Test
-    public void ifTheLimitIsLeftEmptyThenUserDefaultLimit() throws Exception {
+    void ifTheLimitIsLeftEmptyThenUserDefaultLimit() throws Exception {
         ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "limit=")));
         expectFieldsInResults(response, Collections.singletonList(GO_0000001))
                 .andExpect(contentTypeToBeJson())
@@ -179,14 +175,14 @@ public class CoTermControllerIT {
     }
 
     @Test
-    public void ifTheLimitIsSetToZeroThenReturnNoResults() throws Exception {
+    void ifTheLimitIsSetToZeroThenReturnNoResults() throws Exception {
         ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "limit=0")));
         response.andExpect(status().isBadRequest());
         expectLimitErrorMessage(response);
     }
 
     @Test
-    public void ifTheLimitIsSetToNegativeNumberThenExpectError() throws Exception {
+    void ifTheLimitIsSetToNegativeNumberThenExpectError() throws Exception {
         String requestedLimit = "-1";
         ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "limit=" + requestedLimit)));
         response.andExpect(status().isBadRequest());
@@ -194,7 +190,7 @@ public class CoTermControllerIT {
     }
 
     @Test
-    public void ifTheLimitIsSetToNonNumberThenExpectError() throws Exception {
+    void ifTheLimitIsSetToNonNumberThenExpectError() throws Exception {
         String requestedLimit = "AAA";
         ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "limit=" + requestedLimit)));
         response.andExpect(status().isBadRequest());
@@ -203,7 +199,7 @@ public class CoTermControllerIT {
 
 
     @Test
-    public void numberOfHitsIsNotLimitedToRequestedLimit() throws Exception {
+    void numberOfHitsIsNotLimitedToRequestedLimit() throws Exception {
         ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "limit=4")));
         expectFieldsInResults(response, Collections.singletonList(GO_0000001))
                 .andExpect(contentTypeToBeJson())
@@ -215,7 +211,7 @@ public class CoTermControllerIT {
     // Tests for similarity threshold
 
     @Test
-    public void retrieveAllCoTermsUsingSimilarityThresholdBelowThatFoundInTheRecordsForAllCoTerms() throws Exception {
+    void retrieveAllCoTermsUsingSimilarityThresholdBelowThatFoundInTheRecordsForAllCoTerms() throws Exception {
         ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "similarityThreshold=0.1")));
         expectFieldsInResults(response, Collections.singletonList(GO_0000001))
                 .andExpect(contentTypeToBeJson())
@@ -224,7 +220,7 @@ public class CoTermControllerIT {
     }
 
     @Test
-    public void noCoTermsRetrievedWhenSimilarityThresholdAboveThatFoundInTheRecordsForAllCoTerms() throws Exception {
+    void noCoTermsRetrievedWhenSimilarityThresholdAboveThatFoundInTheRecordsForAllCoTerms() throws Exception {
         ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "similarityThreshold=101")));
         response.andDo(print())
                 .andExpect(jsonPath("$.results.*", hasSize(0)))
@@ -232,7 +228,7 @@ public class CoTermControllerIT {
     }
 
     @Test
-    public void useValueForSimilarityThresholdThatReturnsOnlyOneRecord() throws Exception {
+    void useValueForSimilarityThresholdThatReturnsOnlyOneRecord() throws Exception {
         ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "similarityThreshold=99.9")));
         response.andDo(print());
         expectFieldsInResults(response, Collections.singletonList(GO_0000001))
@@ -245,7 +241,7 @@ public class CoTermControllerIT {
     }
 
     @Test
-    public void returnsAllCoTermsWhenSimilarityNotFilledIn() throws Exception {
+    void returnsAllCoTermsWhenSimilarityNotFilledIn() throws Exception {
         ResultActions response = mockMvc.perform(get(buildPathToResource(GO_0000001, "similarityThreshold=")));
         expectFieldsInResults(response, Collections.singletonList(GO_0000001))
                 .andExpect(contentTypeToBeJson())

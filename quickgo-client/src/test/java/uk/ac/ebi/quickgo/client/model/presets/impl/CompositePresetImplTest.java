@@ -2,19 +2,19 @@ package uk.ac.ebi.quickgo.client.model.presets.impl;
 
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
 
-import de.bechte.junit.runners.context.HierarchicalContextRunner;
 import java.util.*;
 import java.util.stream.Collectors;
 import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.ac.ebi.quickgo.client.model.presets.PresetItem.createWithName;
 import static uk.ac.ebi.quickgo.client.model.presets.PresetType.ASSIGNED_BY;
 import static uk.ac.ebi.quickgo.client.model.presets.PresetType.GO_SLIMS_SETS;
@@ -24,23 +24,23 @@ import static uk.ac.ebi.quickgo.client.model.presets.PresetType.QUALIFIERS;
  * Created 03/10/16
  * @author Edd
  */
-@RunWith(HierarchicalContextRunner.class)
-public class CompositePresetImplTest {
+class CompositePresetImplTest {
     private static final String NAME = "name";
     private static final String ID = "id";
     private static final String ASSOC = "assoc";
 
-    public class GroupingPresetIdsByName {
+    @Nested
+    class GroupingPresetIdsByName {
 
         private CompositePresetImpl presetBuilder;
 
-        @Before
-        public void setUp() {
+        @BeforeEach
+        void setUp() {
             presetBuilder = new CompositePresetImpl();
         }
 
         @Test
-        public void canAdd1AndRetrievePreset() {
+        void canAdd1AndRetrievePreset() {
             presetBuilder.addPreset(
                     GO_SLIMS_SETS,
                     createWithName(name(1))
@@ -55,7 +55,7 @@ public class CompositePresetImplTest {
         }
 
         @Test
-        public void canAddGroupOf2PresetsAndRetrieveCorrectly() {
+        void canAddGroupOf2PresetsAndRetrieveCorrectly() {
             presetBuilder.addPreset(
                     GO_SLIMS_SETS,
                     presetItemWith(name(1), id(1), assoc(10)));
@@ -88,7 +88,7 @@ public class CompositePresetImplTest {
         }
 
         @Test
-        public void canAddGroupOf2PresetsAndGroupOf1PresetsAndRetrieveCorrectly() {
+        void canAddGroupOf2PresetsAndGroupOf1PresetsAndRetrieveCorrectly() {
             presetBuilder.addPreset(
                     GO_SLIMS_SETS,
                     presetItemWith(name(1), id(1), assoc(10)));
@@ -134,7 +134,7 @@ public class CompositePresetImplTest {
         }
 
         @Test
-        public void presetsAreReturnedInAlphabeticalOrder() {
+        void presetsAreReturnedInAlphabeticalOrder() {
             presetBuilder.addPreset(GO_SLIMS_SETS,
                     createWithName("B").withProperty(ID, anyId()).build());
             presetBuilder.addPreset(GO_SLIMS_SETS,
@@ -152,23 +152,24 @@ public class CompositePresetImplTest {
                     contains("A", "B", "C"));
         }
 
-        @Test(expected = IllegalArgumentException.class)
-        public void cannotAddNullPreset() {
-            presetBuilder.addPreset(GO_SLIMS_SETS, null);
+        @Test
+        void cannotAddNullPreset() {
+            assertThrows(IllegalArgumentException.class, () -> presetBuilder.addPreset(GO_SLIMS_SETS, null));
         }
 
     }
 
-    public class NonGroupedPresets {
+    @Nested
+    class NonGroupedPresets {
         private CompositePresetImpl presetBuilder;
 
-        @Before
-        public void setUp() {
+        @BeforeEach
+        void setUp() {
             this.presetBuilder = new CompositePresetImpl();
         }
 
         @Test
-        public void canAdd1PresetAndRetrieveCorrectly() {
+        void canAdd1PresetAndRetrieveCorrectly() {
             presetBuilder.addPreset(ASSIGNED_BY, createWithName(name(1)).build());
             List<PresetItem> presets = presetBuilder.getAssignedBy();
             assertThat(presets, hasSize(1));
@@ -178,7 +179,7 @@ public class CompositePresetImplTest {
         }
 
         @Test
-        public void canAdd2PresetsAndRetrieveCorrectly() {
+        void canAdd2PresetsAndRetrieveCorrectly() {
             presetBuilder.addPreset(ASSIGNED_BY, createWithName(name(1)).build());
             presetBuilder.addPreset(ASSIGNED_BY, createWithName(name(2)).build());
             List<PresetItem> presets = presetBuilder.getAssignedBy();
@@ -190,7 +191,7 @@ public class CompositePresetImplTest {
         }
 
         @Test
-        public void presetsAreReturnedInRelevancyOrder() {
+        void presetsAreReturnedInRelevancyOrder() {
             presetBuilder.addPreset(ASSIGNED_BY, createWithName(name(3)).withRelevancy(3).build());
             presetBuilder.addPreset(ASSIGNED_BY, createWithName(name(1)).withRelevancy(1).build());
             presetBuilder.addPreset(ASSIGNED_BY, createWithName(name(2)).withRelevancy(2).build());
@@ -205,7 +206,7 @@ public class CompositePresetImplTest {
         }
 
         @Test
-        public void qualifiersAreReturnedInAlphabeticalOrder() {
+        void qualifiersAreReturnedInAlphabeticalOrder() {
             presetBuilder.addPreset(QUALIFIERS, createWithName("A2").withProperty(ID, anyId()).build());
             presetBuilder.addPreset(QUALIFIERS, createWithName("BZZZ").withProperty(ID, anyId()).build());
             presetBuilder.addPreset(QUALIFIERS, createWithName("C").withProperty(ID, anyId()).build());
@@ -220,10 +221,10 @@ public class CompositePresetImplTest {
         }
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void cannotAddNullPreset() {
+    @Test
+    void cannotAddNullPreset() {
         CompositePresetImpl presetBuilder = new CompositePresetImpl();
-        presetBuilder.addPreset(ASSIGNED_BY, null);
+        assertThrows(IllegalArgumentException.class, () -> presetBuilder.addPreset(ASSIGNED_BY, null));
     }
 
     private static String name(int id) {

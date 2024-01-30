@@ -2,20 +2,20 @@ package uk.ac.ebi.quickgo.common.array;
 
 import java.util.Arrays;
 import java.util.List;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 import static uk.ac.ebi.quickgo.common.array.ArrayPopulation.ensureArrayContains;
 import static uk.ac.ebi.quickgo.common.array.ArrayPopulation.ensureArrayContainsCommonValue;
 
-public class ArrayPopulationTest {
+class ArrayPopulationTest {
 
     // ------ ensureArrayContains
 
     @Test
-    public void ensureArrayContainsWithoutTargetValue() {
+    void ensureArrayContainsWithoutTargetValue() {
         String[] array = new String[]{"bother", "tiresome", "bugbear"};
 
         String[] updated = ensureArrayContains(array, "irritation");
@@ -26,7 +26,7 @@ public class ArrayPopulationTest {
     }
 
     @Test
-    public void ensureArrayContainsWithTargetValue() {
+    void ensureArrayContainsWithTargetValue() {
         String[] array = new String[]{"bother", "tiresome", "bugbear", "irritation"};
 
         String[] updated = ensureArrayContains(array, "irritation");
@@ -37,7 +37,7 @@ public class ArrayPopulationTest {
     }
 
     @Test
-    public void ensureArrayContainsStartingWithNullArray() {
+    void ensureArrayContainsStartingWithNullArray() {
         String[] array = null;
 
         String[] updated = ensureArrayContains(array, "irritation");
@@ -48,7 +48,7 @@ public class ArrayPopulationTest {
     }
 
     @Test
-    public void ensureArrayContainsStartingWithEmptyArray() {
+    void ensureArrayContainsStartingWithEmptyArray() {
         String[] array = new String[0];
 
         String[] updated = ensureArrayContains(array, "irritation");
@@ -61,7 +61,7 @@ public class ArrayPopulationTest {
     // ------ ensureArrayContainsCommonValue
 
     @Test
-    public void updateFieldsWithCheckFieldsWithoutValue() {
+    void updateFieldsWithCheckFieldsWithoutValue() {
         String[] arrayToCheck = new String[]{"bother", "tiresome", "bugbear"};
         String[] arrayTarget = new String[0];
         String value = "irritation";
@@ -72,7 +72,7 @@ public class ArrayPopulationTest {
     }
 
     @Test
-    public void updateFieldsWithCheckFieldsWithValue() {
+    void updateFieldsWithCheckFieldsWithValue() {
         String[] arrayToCheck = new String[]{"bother", "tiresome", "bugbear", "irritation"};
         String[] arrayTarget = new String[0];
         String value = "irritation";
@@ -85,7 +85,7 @@ public class ArrayPopulationTest {
     }
 
     @Test
-    public void valueAlreadyExistsInCheckArrayAndTargetArray() {
+    void valueAlreadyExistsInCheckArrayAndTargetArray() {
         String[] arrayToCheck = new String[]{"bother", "tiresome", "bugbear", "irritation"};
         String[] arrayTarget = new String[]{"irritation"};
         String value = "irritation";
@@ -98,7 +98,7 @@ public class ArrayPopulationTest {
     }
 
     @Test
-    public void valueDoesNotExistInCheckArrayButDoesExistInTargetArray() {
+    void valueDoesNotExistInCheckArrayButDoesExistInTargetArray() {
         String[] arrayToCheck = new String[]{"bother", "tiresome", "bugbear"};
         String[] arrayTarget = new String[]{"irritation"};
         String value = "irritation";
@@ -111,7 +111,7 @@ public class ArrayPopulationTest {
     }
 
     @Test
-    public void checkArrayIsNull() {
+    void checkArrayIsNull() {
         String[] arrayToCheck = null;
         String[] arrayTarget = new String[0];
         String value = "irritation";
@@ -122,7 +122,7 @@ public class ArrayPopulationTest {
     }
 
     @Test
-    public void targetArrayIsNullAndCheckArrayDoesNotContainValue() {
+    void targetArrayIsNullAndCheckArrayDoesNotContainValue() {
         String[] arrayToCheck = new String[]{"bother", "tiresome", "bugbear"};
         String[] arrayTarget = null;
         String value = "irritation";
@@ -133,7 +133,7 @@ public class ArrayPopulationTest {
     }
 
     @Test
-    public void targetArrayIsNullAndCheckArrayDoesContainValue() {
+    void targetArrayIsNullAndCheckArrayDoesContainValue() {
         String[] arrayToCheck = new String[]{"bother", "tiresome", "bugbear", "irritation"};
         String[] arrayTarget = null;
         String value = "irritation";

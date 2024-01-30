@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.annotation.download.header;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 
@@ -13,7 +13,7 @@ import java.util.List;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
-import static org.mockito.ArgumentMatchers.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 import static uk.ac.ebi.quickgo.annotation.download.TSVDownload.*;
 import static uk.ac.ebi.quickgo.annotation.download.header.TSVHeaderCreator.*;
@@ -24,7 +24,7 @@ import static uk.ac.ebi.quickgo.annotation.download.header.TSVHeaderCreator.*;
  * Time: 12:10
  * Created with IntelliJ IDEA.
  */
-public class TSVHeaderCreatorTest {
+class TSVHeaderCreatorTest {
 
     private static final String REQUEST_URI =
             "/QuickGO/services/annotation/downloadSearch?downloadLimit=7&geneProductId" +
@@ -44,8 +44,8 @@ public class TSVHeaderCreatorTest {
     private final HeaderContent mockContent = mock(HeaderContent.class);
     private TSVHeaderCreator tsvHeaderCreator;
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         String FORMAT_VERSION_1 = "test-version_1";
         String FORMAT_VERSION_2 = "test-version_2";
         tsvHeaderCreator = new TSVHeaderCreator();
@@ -56,7 +56,7 @@ public class TSVHeaderCreatorTest {
     }
 
     @Test
-    public void writeColumnNameForIndividualField() throws Exception {
+    void writeColumnNameForIndividualField() throws Exception {
         for (String[] field2Column : fields2Columns) {
             verifyColumnNameForIndividualField(singletonList(field2Column[0]), field2Column[1] + "\n");
         }
@@ -79,7 +79,7 @@ public class TSVHeaderCreatorTest {
     }
 
     @Test
-    public void writeHeaderForSeveralSelectedFields() throws Exception {
+    void writeHeaderForSeveralSelectedFields() throws Exception {
         when(mockContent.isSlimmed()).thenReturn(false);
         when(mockContent.getSelectedFields())
                 .thenReturn(asList(GENE_PRODUCT_FIELD_NAME, GO_NAME_FIELD_NAME, TAXON_NAME_FIELD_NAME));
@@ -93,7 +93,7 @@ public class TSVHeaderCreatorTest {
     }
 
     @Test
-    public void writeHeaderForSeveralSelectedFieldsInNewOrder() throws Exception {
+    void writeHeaderForSeveralSelectedFieldsInNewOrder() throws Exception {
         when(mockContent.isSlimmed()).thenReturn(false);
         when(mockContent.getSelectedFields()).thenReturn(asList(TAXON_NAME_FIELD_NAME, GO_NAME_FIELD_NAME,
                 GENE_PRODUCT_FIELD_NAME));
@@ -106,14 +106,14 @@ public class TSVHeaderCreatorTest {
                                          + "\n", MediaType.TEXT_PLAIN);
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void ioErrorWhenWritingHeaderCausesIllegalStateException() throws Exception {
+    @Test
+    void ioErrorWhenWritingHeaderCausesIllegalStateException() throws Exception {
         doThrow(IllegalStateException.class).when(mockEmitter).send(any(), any());
-        tsvHeaderCreator.write(mockEmitter, mockContent);
+        assertThrows(IllegalStateException.class, () -> tsvHeaderCreator.write(mockEmitter, mockContent));
     }
 
     @Test
-    public void writeHeaderForFullListOfFieldsNotSlimmed() throws Exception {
+    void writeHeaderForFullListOfFieldsNotSlimmed() throws Exception {
         when(mockContent.isSlimmed()).thenReturn(false);
         when(mockContent.getSelectedFields()).thenReturn(Collections.emptyList());
 
@@ -124,7 +124,7 @@ public class TSVHeaderCreatorTest {
     }
 
     @Test
-    public void writeHeaderForSeveralSelectedFieldsWhenSlimmed() throws Exception {
+    void writeHeaderForSeveralSelectedFieldsWhenSlimmed() throws Exception {
         when(mockContent.isSlimmed()).thenReturn(true);
         when(mockContent.getSelectedFields()).thenReturn(asList(GENE_PRODUCT_FIELD_NAME,
                                                                 GO_TERM_FIELD_NAME,
@@ -139,18 +139,18 @@ public class TSVHeaderCreatorTest {
                 + TAXON_NAME + "\n", MediaType.TEXT_PLAIN);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void exceptionThrownIfEmitterIsNull() {
-        tsvHeaderCreator.write(null, mockContent);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void exceptionThrownIfContentIsNull() {
-        tsvHeaderCreator.write(mockEmitter, null);
+    @Test
+    void exceptionThrownIfEmitterIsNull() {
+        assertThrows(IllegalArgumentException.class, () -> tsvHeaderCreator.write(null, mockContent));
     }
 
     @Test
-    public void noExceptionThrownIfEmitterThrowsIOException() throws Exception{
+    void exceptionThrownIfContentIsNull() {
+        assertThrows(IllegalArgumentException.class, () -> tsvHeaderCreator.write(mockEmitter, null));
+    }
+
+    @Test
+    void noExceptionThrownIfEmitterThrowsIOException() throws Exception{
         doThrow(new IOException("Test IOException")).when(mockEmitter).send(any(Object.class), eq(MediaType
                                                                                                           .TEXT_PLAIN));
         tsvHeaderCreator.write(mockEmitter, mockContent);

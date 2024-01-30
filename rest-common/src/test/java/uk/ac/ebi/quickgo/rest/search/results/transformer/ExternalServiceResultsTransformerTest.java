@@ -11,11 +11,11 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
 
@@ -23,8 +23,8 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -36,8 +36,8 @@ import static org.mockito.Mockito.when;
  * Created 06/04/17
  * @author Edd
  */
-@RunWith(MockitoJUnitRunner.class)
-public class ExternalServiceResultsTransformerTest {
+@ExtendWith(MockitoExtension.class)
+class ExternalServiceResultsTransformerTest {
     private static final String GO_NAME_REQUEST = "goName";
     private static final String TAXON_NAME_REQUEST = "taxonName";
     private static final String GO_ID = "goId";
@@ -55,8 +55,8 @@ public class ExternalServiceResultsTransformerTest {
 
     private ValueMutator<QueryResult<FakeResponseModel>,FakeResponseModel> resultMutator;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         when(mockGoNameInjector.getId()).thenReturn(GO_NAME_REQUEST);
         when(mockTaxonNameInjector.getId()).thenReturn(TAXON_NAME_REQUEST);
 
@@ -69,19 +69,18 @@ public class ExternalServiceResultsTransformerTest {
 
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void nullResultMutatorCausesException() {
-        new ExternalServiceResultsTransformer<>(Collections.emptyList(), null);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void nullFieldInjectorsCausesException() {
-        new ExternalServiceResultsTransformer<>(null,
-                                                resultMutator);
+    @Test
+    void nullResultMutatorCausesException() {
+        assertThrows(IllegalArgumentException.class, () -> new ExternalServiceResultsTransformer<>(Collections.emptyList(), null));
     }
 
     @Test
-    public void transformingFilterContextWithGoNameRequestResultsInCallToCorrectInjector() {
+    void nullFieldInjectorsCausesException() {
+        assertThrows(IllegalArgumentException.class, () -> new ExternalServiceResultsTransformer<>(null, resultMutator));
+    }
+
+    @Test
+    void transformingFilterContextWithGoNameRequestResultsInCallToCorrectInjector() {
         FilterContext filterContext = createFilterContext(GO_NAME_REQUEST);
 
         List<FakeResponseModel> annotations = createMockedAnnotationList(2);
@@ -100,7 +99,7 @@ public class ExternalServiceResultsTransformerTest {
     }
 
     @Test
-    public void transformingFilterContextWithMultipleRequestsResultsInCallsToCorrectInjector() {
+    void transformingFilterContextWithMultipleRequestsResultsInCallsToCorrectInjector() {
         FilterContext filterContext = createFilterContext(GO_NAME_REQUEST, TAXON_NAME_REQUEST);
 
         List<FakeResponseModel> annotations = createMockedAnnotationList(2);
@@ -117,7 +116,7 @@ public class ExternalServiceResultsTransformerTest {
     }
 
     @Test
-    public void restResponse404LeavesNullAnnotationGoName() {
+    void restResponse404LeavesNullAnnotationGoName() {
         FilterContext filterContext = createFilterContext(GO_NAME_REQUEST);
 
         ExecutionException executionException =

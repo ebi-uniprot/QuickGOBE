@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.descendants;
-
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.DescendantsFilterConverter;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.OntologyRelatives;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
@@ -8,8 +9,6 @@ import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import org.junit.Before;
-import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -19,13 +18,13 @@ import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.or;
 /**
  * Created by edd on 02/11/2016.
  */
-public abstract class AbstractDescendantsFilterConverterTest {
+abstract class AbstractDescendantsFilterConverterTest {
     private OntologyRelatives response;
     private DescendantsFilterConverter converter;
     String field;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         response = new OntologyRelatives();
         response.setResults(new ArrayList<>());
         converter = new DescendantsFilterConverter();
@@ -34,7 +33,7 @@ public abstract class AbstractDescendantsFilterConverterTest {
     public abstract String ontologyId(int id);
 
     @Test
-    public void descendantsFromSingleResourceAreConvertedToQuickGOQuery() {
+    void descendantsFromSingleResourceAreConvertedToQuickGOQuery() {
         String id1 = ontologyId(1);
         String desc1 = ontologyId(2);
 
@@ -46,7 +45,7 @@ public abstract class AbstractDescendantsFilterConverterTest {
     }
 
     @Test
-    public void differentDescendantsFromMultipleResourcesAreConvertedToQuickGOQuery() {
+    void differentDescendantsFromMultipleResourcesAreConvertedToQuickGOQuery() {
         String id1 = ontologyId(1);
         String id2 = ontologyId(2);
         String desc1 = ontologyId(11);
@@ -64,7 +63,7 @@ public abstract class AbstractDescendantsFilterConverterTest {
     }
 
     @Test
-    public void sameDescendantsFromMultipleResourcesAreConvertedToQuickGOQuery() {
+    void sameDescendantsFromMultipleResourcesAreConvertedToQuickGOQuery() {
         String id1 = ontologyId(1);
         String id2 = ontologyId(2);
         String desc1 = ontologyId(11);
@@ -80,7 +79,7 @@ public abstract class AbstractDescendantsFilterConverterTest {
     }
 
     @Test
-    public void nullResultsMeansFilterEverything() {
+    void nullResultsMeansFilterEverything() {
         response.setResults(null);
         ConvertedFilter<QuickGOQuery> convertedFilter = converter.transform(response);
 
@@ -89,7 +88,7 @@ public abstract class AbstractDescendantsFilterConverterTest {
     }
 
     @Test
-    public void emptyResultsMeansFilterEverything() {
+    void emptyResultsMeansFilterEverything() {
         ConvertedFilter<QuickGOQuery> convertedFilter = converter.transform(response);
 
         assertThat(convertedFilter.getConvertedValue(), is(not(QuickGOQuery.createAllQuery())));

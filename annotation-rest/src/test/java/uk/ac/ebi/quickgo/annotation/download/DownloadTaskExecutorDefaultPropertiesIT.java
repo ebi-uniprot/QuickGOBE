@@ -1,14 +1,12 @@
 package uk.ac.ebi.quickgo.annotation.download;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -21,34 +19,33 @@ import static uk.ac.ebi.quickgo.annotation.download.TaskExecutorProperties.*;
  * Created 23/01/17
  * @author Edd
  */
-@RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = DownloadTaskExecutorDefaultPropertiesIT.FakeApplication.class)
-public class DownloadTaskExecutorDefaultPropertiesIT {
+class DownloadTaskExecutorDefaultPropertiesIT {
     @Autowired
     private ThreadPoolTaskExecutor taskExecutor;
 
     @Test
-    public void corePoolSizeIsPopulated() {
+    void corePoolSizeIsPopulated() {
         assertThat(taskExecutor.getCorePoolSize(), is(DEFAULT_CORE_POOL_SIZE));
     }
 
     @Test
-    public void maxPoolSizeIsPopulated() {
+    void maxPoolSizeIsPopulated() {
         assertThat(taskExecutor.getMaxPoolSize(), is(MAX_POOL_SIZE));
     }
 
     @Test
-    public void queueCapacityIsPopulated() {
+    void queueCapacityIsPopulated() {
         assertThat(taskExecutor.getThreadPoolExecutor().getQueue().remainingCapacity(), is(QUEUE_CAPACITY));
     }
 
     @Test
-    public void keepAliveIsPopulated() {
+    void keepAliveIsPopulated() {
         assertThat(taskExecutor.getKeepAliveSeconds(), is(KEEP_ALIVE_SECONDS));
     }
 
     @Test
-    public void allowCoreThreadTimeoutIsPopulated() {
+    void allowCoreThreadTimeoutIsPopulated() {
         assertThat(taskExecutor.getThreadPoolExecutor().allowsCoreThreadTimeOut(), is(ALLOW_CORE_THREAD_TIMEOUT));
     }
 
@@ -57,7 +54,7 @@ public class DownloadTaskExecutorDefaultPropertiesIT {
      * therefore testing verifies the method was called.
      */
     @Test
-    public void verifySetWaitForTasksToCompleteOnShutdownIsCalled() {
+    void verifySetWaitForTasksToCompleteOnShutdownIsCalled() {
         ThreadPoolTaskExecutor taskExecutor = mock(ThreadPoolTaskExecutor.class);
 
         DownloadConfig config = new DownloadConfig();

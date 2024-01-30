@@ -1,18 +1,17 @@
 package uk.ac.ebi.quickgo.ff.loader.ontology;
-
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import uk.ac.ebi.quickgo.ff.files.ontology.GOSourceFiles;
 import uk.ac.ebi.quickgo.model.ontology.go.GOTerm;
 import uk.ac.ebi.quickgo.model.ontology.go.GeneOntology;
 
 import java.io.File;
-import org.junit.Ignore;
-import org.junit.Test;
 
-import static junit.framework.TestCase.assertEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * TODO: *HAVE* to enable creating a GOSourceFiles instance without depending on the 50+ source files currently used.
@@ -23,7 +22,7 @@ import static org.junit.Assert.assertThat;
  *
  * Created by edd on 11/12/2015.
  */
-public class GOLoaderIT {
+class GOLoaderIT {
 
     //private static final String SOURCE_FILE_DIR = "/home/eddturner/working/quickgo-local/quickgo-data/ff";
     private static final String SOURCE_FILE_DIR = "C:\\Users\\twardell\\Projects\\QuickGo\\data_ontology";
@@ -31,8 +30,8 @@ public class GOLoaderIT {
     /**
      * Ignored because it's not portable. Depends on hard-coded path.
      */
-    @Ignore @Test
-    public void canLoadGOInstance() {
+    @Disabled @Test
+    void canLoadGOInstance() {
         GOSourceFiles sourceFiles = new GOSourceFiles(new File(SOURCE_FILE_DIR));
         GOLoader goLoader = new GOLoader(sourceFiles);
         GeneOntology geneOntology;

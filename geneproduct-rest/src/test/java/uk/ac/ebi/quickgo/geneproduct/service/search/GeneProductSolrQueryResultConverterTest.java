@@ -1,5 +1,5 @@
 package uk.ac.ebi.quickgo.geneproduct.service.search;
-
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductDocument;
 import uk.ac.ebi.quickgo.geneproduct.model.GeneProduct;
 import uk.ac.ebi.quickgo.geneproduct.service.converter.GeneProductDocConverter;
@@ -10,15 +10,15 @@ import java.util.List;
 import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 /**
@@ -27,8 +27,8 @@ import static org.mockito.Mockito.when;
  * Created 06/04/16
  * @author Edd
  */
-@RunWith(MockitoJUnitRunner.class)
-public class GeneProductSolrQueryResultConverterTest {
+@ExtendWith(MockitoExtension.class)
+class GeneProductSolrQueryResultConverterTest {
     private GeneProductSolrQueryResultConverter converter;
 
     @Mock
@@ -37,18 +37,18 @@ public class GeneProductSolrQueryResultConverterTest {
     @Mock
     private GeneProductDocConverter geneProductConverterMock;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() throws Exception {
         converter = new GeneProductSolrQueryResultConverter(binderMock, geneProductConverterMock, new HashMap<>());
     }
 
-    @Test(expected = AssertionError.class)
-    public void nullResultsListThrowsAssertionError() throws Exception {
-        converter.convertResults(null);
+    @Test
+    void nullResultsListThrowsAssertionError() throws Exception {
+        assertThrows(AssertionError.class, () -> converter.convertResults(null));
     }
 
     @Test
-    public void emptySolrDocListReturnsEmptyResults() throws Exception {
+    void emptySolrDocListReturnsEmptyResults() throws Exception {
         SolrDocumentList solrDocList = new SolrDocumentList();
         List<GeneProductDocument> docTerms = Collections.emptyList();
 
@@ -60,7 +60,7 @@ public class GeneProductSolrQueryResultConverterTest {
     }
 
     @Test
-    public void geneProductSolrDocumentIsConvertedIntoGeneProduct() throws Exception {
+    void geneProductSolrDocumentIsConvertedIntoGeneProduct() throws Exception {
         String termId = "A0A015KZI4";
         GeneProductDocument geneProductDoc = createGeneProductDoc(termId);
 

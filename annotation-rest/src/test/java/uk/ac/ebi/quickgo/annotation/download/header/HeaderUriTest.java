@@ -3,8 +3,8 @@ package uk.ac.ebi.quickgo.annotation.download.header;
 import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -17,7 +17,7 @@ import static org.mockito.Mockito.when;
  * Time: 13:58
  * Created with IntelliJ IDEA.
  */
-public class HeaderUriTest {
+class HeaderUriTest {
 
     private static final String URI = "/QuickGO/services/annotation/downloadSearch?downloadLimit=7&geneProductId" +
             "=UniProtKB:A0A000&includeFields=goName,taxonName";
@@ -29,14 +29,14 @@ public class HeaderUriTest {
         parameterMap.put("includeFields",new String[] {"goName,taxonName"});
     }
 
-    @Before
-    public void setup(){
+    @BeforeEach
+    void setup(){
         when(servletRequest.getRequestURI()).thenReturn("/QuickGO/services/annotation/downloadSearch");
         when(servletRequest.getParameterMap()).thenReturn(parameterMap);
     }
 
     @Test
-    public void buildUriString(){
+    void buildUriString(){
         String uri = HeaderUri.uri(servletRequest);
 
         assertThat(uri, is(URI));

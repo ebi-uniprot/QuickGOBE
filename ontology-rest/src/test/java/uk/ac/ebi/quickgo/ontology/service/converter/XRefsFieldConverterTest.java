@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.ontology.service.converter;
-
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.ac.ebi.quickgo.common.converter.FlatFieldBuilder;
 import uk.ac.ebi.quickgo.common.converter.FlatFieldLeaf;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
@@ -7,8 +8,6 @@ import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import org.junit.Before;
-import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -17,16 +16,16 @@ import static org.hamcrest.Matchers.is;
  * Created 01/12/15
  * @author Edd
  */
-public class XRefsFieldConverterTest {
+class XRefsFieldConverterTest {
     private XRefsFieldConverter converter;
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         this.converter = new XRefsFieldConverter();
     }
 
     @Test
-    public void convertsXrefs() {
+    void convertsXrefs() {
         String dbCode0 = "db code 0";
         String dbId0 = "db id 0";
         String dbName0 = "db name 0";
@@ -60,7 +59,7 @@ public class XRefsFieldConverterTest {
     }
 
     @Test
-    public void gracefullyHandleWrongFieldCount() {
+    void gracefullyHandleWrongFieldCount() {
         Optional<OBOTerm.XRef> result = converter.apply(
                 FlatFieldBuilder.newFlatField().addField(FlatFieldLeaf.newFlatFieldLeaf("wrong format"))
                 .buildString());

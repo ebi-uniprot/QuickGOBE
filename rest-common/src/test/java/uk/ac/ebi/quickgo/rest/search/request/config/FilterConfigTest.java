@@ -1,31 +1,32 @@
 package uk.ac.ebi.quickgo.rest.search.request.config;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.ac.ebi.quickgo.rest.search.request.FilterUtil.asSet;
 
 /**
  * Created 17/06/16
  * @author Edd
  */
-public class FilterConfigTest {
+class FilterConfigTest {
 
-    @Test(expected = IllegalArgumentException.class)
-    public void settingSignatureRequiresNonNullValue() {
+    @Test
+    void settingSignatureRequiresNonNullValue() {
         FilterConfig config = new FilterConfig();
-        config.setSignature(null);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void settingSignatureRequiresNonEmptyValue() {
-        FilterConfig config = new FilterConfig();
-        config.setSignature("  ");
+        assertThrows(IllegalArgumentException.class, () -> config.setSignature(null));
     }
 
     @Test
-    public void settingSignatureWithSingleValue() {
+    void settingSignatureRequiresNonEmptyValue() {
+        FilterConfig config = new FilterConfig();
+        assertThrows(IllegalArgumentException.class, () -> config.setSignature("  "));
+    }
+
+    @Test
+    void settingSignatureWithSingleValue() {
         FilterConfig config = new FilterConfig();
         String value = "value1";
         config.setSignature(value);
@@ -33,7 +34,7 @@ public class FilterConfigTest {
     }
 
     @Test
-    public void settingSignatureWithMultipleValues() {
+    void settingSignatureWithMultipleValues() {
         FilterConfig config = new FilterConfig();
         String value1 = "value1";
         String value2 = "value1";

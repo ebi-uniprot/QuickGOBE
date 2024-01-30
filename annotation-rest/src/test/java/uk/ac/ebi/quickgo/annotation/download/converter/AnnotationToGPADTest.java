@@ -1,18 +1,18 @@
 package uk.ac.ebi.quickgo.annotation.download.converter;
-
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.ac.ebi.quickgo.annotation.model.AnnotationMocker.*;
 
 /**
@@ -21,7 +21,7 @@ import static uk.ac.ebi.quickgo.annotation.model.AnnotationMocker.*;
  * Time: 09:51
  * Created with IntelliJ IDEA.
  */
-public class AnnotationToGPADTest {
+class AnnotationToGPADTest {
 
     private static final int COL_DB = 0;
     private static final int COL_DB_OBJECT_ID = 1;
@@ -38,13 +38,13 @@ public class AnnotationToGPADTest {
 
     private AnnotationToGPAD annotationToGPAD;
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         annotationToGPAD = new AnnotationToGPAD();
     }
 
     @Test
-    public void createGAFStringFromAnnotationModelContainingComplex() {
+    void createGAFStringFromAnnotationModelContainingComplex() {
         Annotation annotation = createValidComplexPortalAnnotation();
 
         String[] elements = annotationToDownloadColumns(annotation);
@@ -64,7 +64,7 @@ public class AnnotationToGPADTest {
     }
 
     @Test
-    public void uniProtGeneProductAnnotationWithIsoForm() {
+    void uniProtGeneProductAnnotationWithIsoForm() {
         Annotation annotation = createValidUniProtAnnotationWithIsoForm();
 
         String[] elements = annotationToDownloadColumns(annotation);
@@ -74,7 +74,7 @@ public class AnnotationToGPADTest {
     }
 
     @Test
-    public void uniProtGeneProductAnnotationWithoutGeneProductIsoForm() {
+    void uniProtGeneProductAnnotationWithoutGeneProductIsoForm() {
         Annotation annotation = createValidUniProtAnnotationWithoutIsoForm();
 
         String[] elements = annotationToDownloadColumns(annotation);
@@ -84,7 +84,7 @@ public class AnnotationToGPADTest {
     }
 
     @Test
-    public void slimmedToGoIdReplacesGoIdIfItExists() {
+    void slimmedToGoIdReplacesGoIdIfItExists() {
         Annotation annotation = createValidComplexPortalAnnotation();
         final String slimmedToGoId = "GO:0005524";
         annotation.slimmedIds = Collections.singletonList(slimmedToGoId);
@@ -94,18 +94,17 @@ public class AnnotationToGPADTest {
         assertThat(elements[COL_GO_ID], is(slimmedToGoId));
     }
 
-    @Test(expected = NullPointerException.class)
-    public void nullGeneProductId() {
+    @Test
+    void nullGeneProductId() {
         Annotation annotation = createValidComplexPortalAnnotation();
         annotation.geneProductId = null;
         annotation.setGeneProduct(null);
-
-        annotationToDownloadColumns(annotation);
+        assertThrows(NullPointerException.class, () -> annotationToDownloadColumns(annotation));
 
     }
 
     @Test
-    public void nullQualifier() {
+    void nullQualifier() {
         Annotation annotation = createValidComplexPortalAnnotation();
         annotation.qualifier = null;
 
@@ -115,7 +114,7 @@ public class AnnotationToGPADTest {
     }
 
     @Test
-    public void nullGoId() {
+    void nullGoId() {
         Annotation annotation = createValidComplexPortalAnnotation();
         annotation.goId = null;
 
@@ -125,7 +124,7 @@ public class AnnotationToGPADTest {
     }
 
     @Test
-    public void nullReference() {
+    void nullReference() {
         Annotation annotation = createValidComplexPortalAnnotation();
         annotation.reference = null;
 
@@ -135,7 +134,7 @@ public class AnnotationToGPADTest {
     }
 
     @Test
-    public void nullEvidence() {
+    void nullEvidence() {
         Annotation annotation = createValidComplexPortalAnnotation();
         annotation.evidenceCode = null;
 
@@ -145,7 +144,7 @@ public class AnnotationToGPADTest {
     }
 
     @Test
-    public void nullWithFrom() {
+    void nullWithFrom() {
         Annotation annotation = createValidComplexPortalAnnotation();
         annotation.withFrom = null;
 
@@ -155,7 +154,7 @@ public class AnnotationToGPADTest {
     }
 
     @Test
-    public void emptyWithFrom() {
+    void emptyWithFrom() {
         Annotation annotation = createValidComplexPortalAnnotation();
         annotation.withFrom = new ArrayList<>();
 
@@ -165,7 +164,7 @@ public class AnnotationToGPADTest {
     }
 
     @Test
-    public void specifiedInteractingTaxonId() {
+    void specifiedInteractingTaxonId() {
         Annotation annotation = createValidComplexPortalAnnotation();
         annotation.interactingTaxonId = INTERACTING_TAXON_ID;
 
@@ -175,7 +174,7 @@ public class AnnotationToGPADTest {
     }
 
     @Test
-    public void lowestInteractingTaxonIdIsPopulatedCorrectly() {
+    void lowestInteractingTaxonIdIsPopulatedCorrectly() {
         Annotation annotation = createValidComplexPortalAnnotation();
         annotation.interactingTaxonId = 1;
 
@@ -185,7 +184,7 @@ public class AnnotationToGPADTest {
     }
 
     @Test
-    public void nullDate() {
+    void nullDate() {
         Annotation annotation = createValidComplexPortalAnnotation();
         annotation.date = null;
 
@@ -195,7 +194,7 @@ public class AnnotationToGPADTest {
     }
 
     @Test
-    public void nullAssignedBy() {
+    void nullAssignedBy() {
         Annotation annotation = createValidComplexPortalAnnotation();
         annotation.assignedBy = null;
 
@@ -205,7 +204,7 @@ public class AnnotationToGPADTest {
     }
 
     @Test
-    public void nullGoEvidence() {
+    void nullGoEvidence() {
         Annotation annotation = createValidComplexPortalAnnotation();
         annotation.goEvidence = null;
 
@@ -215,7 +214,7 @@ public class AnnotationToGPADTest {
     }
 
     @Test
-    public void emptyExtensions() {
+    void emptyExtensions() {
         Annotation annotation = createValidComplexPortalAnnotation();
         annotation.extensions = new ArrayList<>();
 
@@ -225,7 +224,7 @@ public class AnnotationToGPADTest {
     }
 
     @Test
-    public void nullInExtensions() {
+    void nullInExtensions() {
         Annotation annotation = createValidComplexPortalAnnotation();
         annotation.extensions = null;
 
@@ -235,7 +234,7 @@ public class AnnotationToGPADTest {
     }
 
     @Test
-    public void multipleSlimmedToGoIdsCreatesEqualQuantityOfAnnotationRecords() {
+    void multipleSlimmedToGoIdsCreatesEqualQuantityOfAnnotationRecords() {
         Annotation annotation = createValidComplexPortalAnnotation();
         final String slimmedToGoId0 = "GO:0005524";
         final String slimmedToGoId1 = "GO:1005524";

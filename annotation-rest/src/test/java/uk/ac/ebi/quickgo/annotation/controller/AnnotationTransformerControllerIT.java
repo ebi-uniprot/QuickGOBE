@@ -2,16 +2,14 @@ package uk.ac.ebi.quickgo.annotation.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.client.ResponseCreator;
@@ -59,13 +57,10 @@ import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.*;
  * Created 07/04/17
  * @author Edd
  */
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(TemporarySolrDataStore.class)
 @SpringBootTest(classes = {AnnotationREST.class, OntologyRepoConfig.class})
 @WebAppConfiguration
-public class AnnotationTransformerControllerIT {
-    @ClassRule
-    public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
-
+class AnnotationTransformerControllerIT {
     private static final String SEARCH_RESOURCE = "/annotation/search";
     private static final String BASE_URL = "https://localhost";
     private static final String GO_NAME_FIELD = "goName";
@@ -84,8 +79,8 @@ public class AnnotationTransformerControllerIT {
     private MockRestServiceServer mockRestServiceServer;
     private ObjectMapper dtoMapper;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() throws Exception {
         mockMvc = MockMvcBuilders.
                 webAppContextSetup(webApplicationContext)
                 .build();
@@ -97,7 +92,7 @@ public class AnnotationTransformerControllerIT {
 
     // ----------------- gene ontology name values -----------------
     @Test
-    public void requestOmittingGoNameProducesResultWhereGoNameIsNull() throws Exception {
+    void requestOmittingGoNameProducesResultWhereGoNameIsNull() throws Exception {
         annotationRepository.save(createAnnotationDoc(createGPId(1), goId(1)));
 
         expectGoTermsHaveGoNamesViaRest(singletonList(goId(1)), singletonList(goName(1)));
@@ -113,7 +108,7 @@ public class AnnotationTransformerControllerIT {
     }
 
     @Test
-    public void includeGoNameForOneTermFetchesNameFromExternalServiceSuccessfully() throws Exception {
+    void includeGoNameForOneTermFetchesNameFromExternalServiceSuccessfully() throws Exception {
         annotationRepository.save(createAnnotationDoc(createGPId(0), goId(0)));
 
         expectGoTermsHaveGoNamesViaRest(singletonList(goId(0)), singletonList(goName(0)));
@@ -132,7 +127,7 @@ public class AnnotationTransformerControllerIT {
     }
 
     @Test
-    public void includeGoNameForMultipleTermsFetchesNameFromExternalServiceSuccessfully() throws Exception {
+    void includeGoNameForMultipleTermsFetchesNameFromExternalServiceSuccessfully() throws Exception {
         annotationRepository.save(createAnnotationDoc(createGPId(0), goId(0)));
         annotationRepository.save(createAnnotationDoc(createGPId(1), goId(1)));
 
@@ -155,7 +150,7 @@ public class AnnotationTransformerControllerIT {
 
     // ----------------- taxonomy name values -----------------
     @Test
-    public void requestOmittingTaxonNameProducesResultWhereTaxonNameIsNull() throws Exception {
+    void requestOmittingTaxonNameProducesResultWhereTaxonNameIsNull() throws Exception {
         annotationRepository.save(annotationDocWithTaxon(goId(1), taxonId(1)));
 
         expectTaxonIdHasGivenTaxonNameViaRest(taxonId(1), taxonName(1));
@@ -171,7 +166,7 @@ public class AnnotationTransformerControllerIT {
     }
 
     @Test
-    public void includeTaxonNameForOneTermFetchesNameFromExternalServiceSuccessfully() throws Exception {
+    void includeTaxonNameForOneTermFetchesNameFromExternalServiceSuccessfully() throws Exception {
         annotationRepository.save(annotationDocWithTaxon(goId(1), taxonId(1)));
 
         expectTaxonIdHasGivenTaxonNameViaRest(taxonId(1), taxonName(1));
@@ -191,7 +186,7 @@ public class AnnotationTransformerControllerIT {
     }
 
     @Test
-    public void includeTaxonNameForMultipleTermsFetchesNameFromExternalServiceSuccessfully() throws Exception {
+    void includeTaxonNameForMultipleTermsFetchesNameFromExternalServiceSuccessfully() throws Exception {
         annotationRepository.save(annotationDocWithTaxon(goId(1), taxonId(1)));
         annotationRepository.save(annotationDocWithTaxon(goId(2), taxonId(2)));
 
@@ -216,7 +211,7 @@ public class AnnotationTransformerControllerIT {
     }
 
     @Test
-    public void includeGoAndTaxonNameFetchesNamesFromTwoExternalServicesSuccessfully() throws Exception {
+    void includeGoAndTaxonNameFetchesNamesFromTwoExternalServicesSuccessfully() throws Exception {
         AnnotationDocument doc = createAnnotationDoc(createGPId(1), goId(1));
         doc.taxonId = taxonId(1);
         annotationRepository.save(doc);
@@ -243,7 +238,7 @@ public class AnnotationTransformerControllerIT {
     // the follow tests are relevant for all instances of ResponseValueInjector, and
     // not only OntologyNameInjector -- which is used to show the behaviour the results transformer
     @Test
-    public void doNotPopulateValueWhenExternalServiceProduces404() throws Exception {
+    void doNotPopulateValueWhenExternalServiceProduces404() throws Exception {
         annotationRepository.save(createAnnotationDoc(createGPId(0), goId(0)));
         annotationRepository.save(createAnnotationDoc(createGPId(1), goId(1)));
 
@@ -266,7 +261,7 @@ public class AnnotationTransformerControllerIT {
     }
 
     @Test
-    public void injectingValueProducesErrorWhenExternalServiceProducesTimeoutError() throws Exception {
+    void injectingValueProducesErrorWhenExternalServiceProducesTimeoutError() throws Exception {
         annotationRepository.save(createAnnotationDoc(createGPId(0), goId(0)));
         annotationRepository.save(createAnnotationDoc(createGPId(1), goId(1)));
 
@@ -283,7 +278,7 @@ public class AnnotationTransformerControllerIT {
     }
 
     @Test
-    public void injectingValueProducesErrorWhenExternalServiceProducesBadGatewayError() throws Exception {
+    void injectingValueProducesErrorWhenExternalServiceProducesBadGatewayError() throws Exception {
         annotationRepository.save(createAnnotationDoc(createGPId(0), goId(0)));
         annotationRepository.save(createAnnotationDoc(createGPId(1), goId(1)));
 
@@ -300,7 +295,7 @@ public class AnnotationTransformerControllerIT {
     }
 
     @Test
-    public void injectingValueProducesErrorWhenExternalServiceProducesBadRequestError() throws Exception {
+    void injectingValueProducesErrorWhenExternalServiceProducesBadRequestError() throws Exception {
         annotationRepository.save(createAnnotationDoc(createGPId(0), goId(0)));
         annotationRepository.save(createAnnotationDoc(createGPId(1), goId(1)));
 
@@ -317,7 +312,7 @@ public class AnnotationTransformerControllerIT {
     }
 
     @Test
-    public void injectingValueProducesErrorWhenExternalServiceProducesError500() throws Exception {
+    void injectingValueProducesErrorWhenExternalServiceProducesError500() throws Exception {
         annotationRepository.save(createAnnotationDoc(createGPId(0), goId(0)));
         annotationRepository.save(createAnnotationDoc(createGPId(1), goId(1)));
 
@@ -334,7 +329,7 @@ public class AnnotationTransformerControllerIT {
     }
 
     @Test
-    public void invalidIncludeFieldCausesBadRequest() throws Exception {
+    void invalidIncludeFieldCausesBadRequest() throws Exception {
         annotationRepository.save(createAnnotationDoc(createGPId(0), goId(0)));
 
         expectGoTermsHaveGoNamesViaRest(singletonList(goId(0)), singletonList(goName(0)));

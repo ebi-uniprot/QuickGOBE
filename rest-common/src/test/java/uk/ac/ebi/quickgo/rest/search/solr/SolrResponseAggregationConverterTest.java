@@ -1,5 +1,7 @@
 package uk.ac.ebi.quickgo.rest.search.solr;
-
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import uk.ac.ebi.quickgo.rest.search.AggregateFunction;
 import uk.ac.ebi.quickgo.rest.search.results.AggregateResponse;
 import uk.ac.ebi.quickgo.rest.search.results.AggregationBucket;
@@ -10,19 +12,18 @@ import java.util.*;
 import java.util.stream.Collectors;
 import org.apache.solr.client.solrj.SolrResponse;
 import org.apache.solr.common.util.NamedList;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.IsNull.notNullValue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 import static uk.ac.ebi.quickgo.rest.search.solr.AggregateToStringConverter.NUM_BUCKETS;
 import static uk.ac.ebi.quickgo.rest.search.solr.SolrAggregationHelper.AGGREGATIONS_MARKER;
@@ -33,10 +34,9 @@ import static uk.ac.ebi.quickgo.rest.search.solr.SolrAggregationHelper.GLOBAL_ID
 /**
  * Tests the behaviour of the {@link SolrResponseAggregationConverter} class.
  */
-@RunWith(MockitoJUnitRunner.class)
-public class SolrResponseAggregationConverterTest {
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
+class SolrResponseAggregationConverterTest {
 
     @Mock
     private SolrResponse responseMock;
@@ -47,8 +47,8 @@ public class SolrResponseAggregationConverterTest {
     private SolrResponseAggregationConverter converter;
     private SolrAggregate solrAggregate;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp()  {
         solrAggregate = new SolrAggregate();
 
         converter = new SolrResponseAggregationConverter(serviceRetrievalConfigMock);
@@ -57,25 +57,20 @@ public class SolrResponseAggregationConverterTest {
     }
 
     @Test
-    public void creationWithNullServiceRetrievalConfigCausesException() {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("ServiceRetrievalConfig cannot be null");
-
-        new SolrResponseAggregationConverter(null);
+    void creationWithNullServiceRetrievalConfigCausesException() {
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> new SolrResponseAggregationConverter(null));
+        assertTrue(exception.getMessage().contains("ServiceRetrievalConfig cannot be null"));
     }
 
     @Test
-    public void conversionOfNullSolrResponseThrowsException() throws Exception {
+    void conversionOfNullSolrResponseThrowsException()  {
         responseMock = null;
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Cannot convert null Solr response to an aggregation");
-
-        converter.convert(responseMock);
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> converter.convert(responseMock));
+        assertTrue(exception.getMessage().contains("Cannot convert null Solr response to an aggregation"));
     }
 
     @Test
-    public void solrResponseWithNoAggregatesConvertsToEmptyAggregation() throws Exception {
+    void solrResponseWithNoAggregatesConvertsToEmptyAggregation()  {
         when(responseMock.getResponse()).thenReturn(new NamedList<>());
 
         AggregateResponse agg = converter.convert(responseMock);
@@ -87,7 +82,7 @@ public class SolrResponseAggregationConverterTest {
     }
 
     @Test
-    public void solrResponseWithNonAggregatesConvertToEmptyAggregation() throws Exception {
+    void solrResponseWithNonAggregatesConvertToEmptyAggregation()  {
         AggregateResponse agg = converter.convert(responseMock);
 
         assertThat(agg.getName(), is(GLOBAL_ID));
@@ -97,7 +92,7 @@ public class SolrResponseAggregationConverterTest {
     }
 
     @Test
-    public void solrResponseWithAggregatedFunctionConvertsToANonNullAggregation() throws Exception {
+    void solrResponseWithAggregatedFunctionConvertsToANonNullAggregation()  {
         SolrAggregationResult result = new SolrAggregationResult("id", AggregateFunction.COUNT, 3);
         solrAggregate.addFunction(result);
 
@@ -107,7 +102,7 @@ public class SolrResponseAggregationConverterTest {
     }
 
     @Test
-    public void solrResponseWithNonAggregatedBucketInGlobalAggregateConvertsToAEmptyAggregation() throws Exception {
+    void solrResponseWithNonAggregatedBucketInGlobalAggregateConvertsToAEmptyAggregation()  {
         SolrBucket bucket = new SolrBucket("goId");
         solrAggregate.addBucket(bucket);
 
@@ -120,7 +115,7 @@ public class SolrResponseAggregationConverterTest {
     }
 
     @Test
-    public void solrResponseWithTotalDistinctCountForFacetIsAddedToNestedAggregation() throws Exception {
+    void solrResponseWithTotalDistinctCountForFacetIsAddedToNestedAggregation()  {
         String bucketValue1 = "GO:0000001";
         String bucketValue2 = "GO:0000002";
 
@@ -142,7 +137,7 @@ public class SolrResponseAggregationConverterTest {
     }
 
     @Test
-    public void solrResponseWithAggregatedBucketInGlobalAggregateConvertToANonNullAggregation() throws Exception {
+    void solrResponseWithAggregatedBucketInGlobalAggregateConvertToANonNullAggregation()  {
         String aggTypeGoId = SolrAggregationHelper.aggregatePrefixWithTypeTitle("goId");
         SolrBucket bucket = new SolrBucket(aggTypeGoId);
         solrAggregate.addBucket(bucket);
@@ -153,7 +148,7 @@ public class SolrResponseAggregationConverterTest {
     }
 
     @Test
-    public void solrResponseWithTwoAggregatedFunctionsReturnsAnAggregationWithTwoAggregationResults() throws Exception {
+    void solrResponseWithTwoAggregatedFunctionsReturnsAnAggregationWithTwoAggregationResults()  {
         AggregateFunction countFunc = AggregateFunction.COUNT;
         String gpIdField = "geneProductId";
         double aggGpIdHits = 3;
@@ -180,7 +175,7 @@ public class SolrResponseAggregationConverterTest {
     }
 
     @Test
-    public void solrResponseWithTwoValuesInBucketReturnsANestedAggregationWithTwoBucketValues() throws Exception {
+    void solrResponseWithTwoValuesInBucketReturnsANestedAggregationWithTwoBucketValues()  {
         String bucketValue1 = "GO:0000001";
         String bucketValue2 = "GO:0000002";
 
@@ -204,9 +199,9 @@ public class SolrResponseAggregationConverterTest {
     }
 
     @Test
-    public void
+    void
     solrResponseWithAnAggregateFunctionWithinABucketValueReturnsAnNestedAggregationWithABucketContainingAnAggregationFunction()
-            throws Exception {
+             {
         String bucketValue1 = "GO:0000001";
 
         AggregateFunction countFunc = AggregateFunction.COUNT;

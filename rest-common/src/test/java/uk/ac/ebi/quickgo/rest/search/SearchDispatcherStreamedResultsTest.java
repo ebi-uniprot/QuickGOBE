@@ -1,11 +1,13 @@
 package uk.ac.ebi.quickgo.rest.search;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import uk.ac.ebi.quickgo.common.SolrCollectionName;
 import uk.ac.ebi.quickgo.rest.comm.FilterContext;
 import uk.ac.ebi.quickgo.rest.search.query.*;
@@ -38,8 +40,9 @@ import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.createFirstCursorPa
  *
  * @author Edd
  */
-@RunWith(MockitoJUnitRunner.class)
-public class SearchDispatcherStreamedResultsTest {
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
+class SearchDispatcherStreamedResultsTest {
     private static final String COLLECTION = SolrCollectionName.COLLECTION;
     @Mock
     private QueryRequest queryRequest;
@@ -54,8 +57,8 @@ public class SearchDispatcherStreamedResultsTest {
 
     private ResultTransformerChain<QueryResult<String>> transformer;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         transformer = new IdentityResultsTransformationChain();
         when(queryRequest.getQuery()).thenReturn(new AllQuery());
         when(queryRequest.getCollection()).thenReturn(COLLECTION);
@@ -65,7 +68,7 @@ public class SearchDispatcherStreamedResultsTest {
     }
 
     @Test
-    public void nullQueryRequestProducesEmptyStream() {
+    void nullQueryRequestProducesEmptyStream() {
         Stream<QueryResult<String>> resultStream = streamSearchResults(
                 null,
                 queryTemplate,
@@ -78,7 +81,7 @@ public class SearchDispatcherStreamedResultsTest {
     }
 
     @Test
-    public void checkStreamingResultsOneIterationExactly() {
+    void checkStreamingResultsOneIterationExactly() {
         int startElement = 1;
         int pageSize = 10;
         int limit = 10;
@@ -112,7 +115,7 @@ public class SearchDispatcherStreamedResultsTest {
     }
 
     @Test
-    public void checkStreamingResultsOneIteration() {
+    void checkStreamingResultsOneIteration() {
         int startElement = 1;
         int pageSize = 10;
         int limit = 9;
@@ -137,7 +140,7 @@ public class SearchDispatcherStreamedResultsTest {
     }
 
     @Test
-    public void checkStreamingResultsTwoIterationsExactly() {
+    void checkStreamingResultsTwoIterationsExactly() {
         int startElement = 1;
         int pageSize = 10;
         int limit = 20;
@@ -172,7 +175,7 @@ public class SearchDispatcherStreamedResultsTest {
     }
 
     @Test
-    public void checkStreamingResultsTwoIterations() {
+    void checkStreamingResultsTwoIterations() {
         int startElement = 1;
         int pageSize = 10;
         int limit = 15;
@@ -207,7 +210,7 @@ public class SearchDispatcherStreamedResultsTest {
     }
 
     @Test
-    public void createsCorrectlyNextQueryRequest() {
+    void createsCorrectlyNextQueryRequest() {
         QuickGOQuery query = new AllQuery();
         String sortField1 = "sortField1";
         SortCriterion.SortOrder sortOrder1 = SortCriterion.SortOrder.ASC;
@@ -252,7 +255,7 @@ public class SearchDispatcherStreamedResultsTest {
     }
 
     @Test
-    public void resultsNotResizedWhenTheirNumberIsTheSameAsLimit() {
+    void resultsNotResizedWhenTheirNumberIsTheSameAsLimit() {
         QueryResult<String> result =
                 new QueryResult.Builder<>(100, rangeStringList(1, 100))
                         .withPageInfo(new PageInfo.Builder().withNextCursor("anything").build())
@@ -263,7 +266,7 @@ public class SearchDispatcherStreamedResultsTest {
     }
 
     @Test
-    public void resultsNotResizedWhenTheirNumberIsLessThanLimit() {
+    void resultsNotResizedWhenTheirNumberIsLessThanLimit() {
         QueryResult<String> result =
                 new QueryResult.Builder<>(100, rangeStringList(1, 100))
                         .withPageInfo(new PageInfo.Builder().withNextCursor("anything").build())
@@ -274,7 +277,7 @@ public class SearchDispatcherStreamedResultsTest {
     }
 
     @Test
-    public void resultsResizedWhenTheirNumberIsGreaterThanLimit() {
+    void resultsResizedWhenTheirNumberIsGreaterThanLimit() {
         QueryResult<String> result =
                 new QueryResult.Builder<>(100, rangeStringList(1, 100))
                         .withPageInfo(new PageInfo.Builder().withNextCursor("anything").build())
@@ -285,7 +288,7 @@ public class SearchDispatcherStreamedResultsTest {
     }
 
     @Test
-    public void checkGetNextPageSizeFunctionsCorrectly() {
+    void checkGetNextPageSizeFunctionsCorrectly() {
         assertThat(getNextPageSize(0, 100, 10), is(10));
         assertThat(getNextPageSize(0, 10, 10), is(10));
         assertThat(getNextPageSize(0, 9, 10), is(9));
@@ -294,7 +297,7 @@ public class SearchDispatcherStreamedResultsTest {
     }
 
     @Test
-    public void checkGetRequiredIterationsFunctionsCorrectly() {
+    void checkGetRequiredIterationsFunctionsCorrectly() {
         assertThat(getRequiredNumberOfPagesToFetch(10, 1000, 10), is(1));
         assertThat(getRequiredNumberOfPagesToFetch(10, 10, 10), is(1));
         assertThat(getRequiredNumberOfPagesToFetch(10, 9, 10), is(1));

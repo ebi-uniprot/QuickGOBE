@@ -6,10 +6,8 @@ import uk.ac.ebi.quickgo.rest.search.query.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -22,10 +20,8 @@ import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.createFirstCursorPa
  *
  * @author Edd
  */
-public class DefaultSearchQueryTemplateTest {
+class DefaultSearchQueryTemplateTest {
     private static final String COLLECTION = SolrCollectionName.COLLECTION;
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
 
     private static final String START_HIGHLIGHT = "startHighlight";
     private static final String END_HIGHLIGHT = "endHighlight";
@@ -37,8 +33,8 @@ public class DefaultSearchQueryTemplateTest {
     private List<String> returnedFields;
     private DefaultSearchQueryTemplate defaultSearchQueryTemplate;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         this.id = ID;
 
         List<String> highlightFields = Collections.singletonList(id);
@@ -53,12 +49,12 @@ public class DefaultSearchQueryTemplateTest {
     }
 
     @Test
-    public void queryRequestQueryWasSet() {
+    void queryRequestQueryWasSet() {
         assertThat(createBuilder().build().getQuery(), is(query));
     }
 
     @Test
-    public void queryRequestFacetWasSet() {
+    void queryRequestFacetWasSet() {
         DefaultSearchQueryTemplate.Builder requestBuilder = createBuilder();
         List<String> strFacets = new ArrayList<>();
         strFacets.add(id);
@@ -71,13 +67,13 @@ public class DefaultSearchQueryTemplateTest {
     }
 
     @Test
-    public void queryRequestHasNoFacetByDefault() {
+    void queryRequestHasNoFacetByDefault() {
         DefaultSearchQueryTemplate.Builder requestBuilder = createBuilder();
         assertThat(requestBuilder.build().getFacets(), is(emptyIterable()));
     }
 
     @Test
-    public void queryRequestFilterWasSet() {
+    void queryRequestFilterWasSet() {
         DefaultSearchQueryTemplate.Builder requestBuilder = createBuilder();
 
         QuickGOQuery filterQuery = QuickGOQuery.createQuery(id, "value");
@@ -92,13 +88,13 @@ public class DefaultSearchQueryTemplateTest {
     }
 
     @Test
-    public void queryRequestHasNoFiltersByDefault() {
+    void queryRequestHasNoFiltersByDefault() {
         DefaultSearchQueryTemplate.Builder requestBuilder = createBuilder();
         assertThat(requestBuilder.build().getFilters(), is(emptyIterable()));
     }
 
     @Test
-    public void queryRequestPageWasSetExplicitly() {
+    void queryRequestPageWasSetExplicitly() {
         DefaultSearchQueryTemplate.Builder requestBuilder = createBuilder();
         int pageNumber = 11;
         int pageSize = 25;
@@ -116,7 +112,7 @@ public class DefaultSearchQueryTemplateTest {
     }
 
     @Test
-    public void queryRequestPageWasSetByDefault() {
+    void queryRequestPageWasSetByDefault() {
         DefaultSearchQueryTemplate.Builder requestBuilder = createBuilder();
 
         Page abstractRetrievedPage = requestBuilder
@@ -129,7 +125,7 @@ public class DefaultSearchQueryTemplateTest {
     }
 
     @Test
-    public void queryRequestHighlightingWasTurnedOn() {
+    void queryRequestHighlightingWasTurnedOn() {
         DefaultSearchQueryTemplate.Builder requestBuilder = createBuilder();
         requestBuilder.useHighlighting(true);
 
@@ -140,7 +136,7 @@ public class DefaultSearchQueryTemplateTest {
     }
 
     @Test
-    public void queryRequestHighlightingWasTurnedOff() {
+    void queryRequestHighlightingWasTurnedOff() {
         DefaultSearchQueryTemplate.Builder requestBuilder = createBuilder();
         requestBuilder.useHighlighting(false);
 
@@ -151,7 +147,7 @@ public class DefaultSearchQueryTemplateTest {
     }
 
     @Test
-    public void queryRequestHighlightingIsOffByDefault() {
+    void queryRequestHighlightingIsOffByDefault() {
         QueryRequest queryRequest = createBuilder().build();
         assertThat(queryRequest.getHighlightedFields(), is(emptyIterable()));
         assertThat(queryRequest.getHighlightStartDelim(), is(nullValue()));
@@ -159,7 +155,7 @@ public class DefaultSearchQueryTemplateTest {
     }
 
     @Test
-    public void queryRequestReturnedFieldsIsSetByDefault() {
+    void queryRequestReturnedFieldsIsSetByDefault() {
         QueryRequest queryRequest = createBuilder().build();
 
         List<FieldProjection> fieldProjections = new ArrayList<>();
@@ -169,7 +165,7 @@ public class DefaultSearchQueryTemplateTest {
     }
 
     @Test
-    public void queryRequestFirstCursorPageWasSet() {
+    void queryRequestFirstCursorPageWasSet() {
         DefaultSearchQueryTemplate.Builder requestBuilder = createBuilder();
         int pageSize = 22;
         CursorPage expectedPage = CursorPage.createFirstCursorPage(pageSize);
@@ -186,7 +182,7 @@ public class DefaultSearchQueryTemplateTest {
     }
 
     @Test
-    public void queryRequestCursorPageWasSet() {
+    void queryRequestCursorPageWasSet() {
         DefaultSearchQueryTemplate.Builder requestBuilder = createBuilder();
         int pageSize = 22;
         String cursor = "fakeCursor";
@@ -204,7 +200,7 @@ public class DefaultSearchQueryTemplateTest {
     }
 
     @Test
-    public void queryRequestWithNoSortingShowsZeroSortCriteria() {
+    void queryRequestWithNoSortingShowsZeroSortCriteria() {
         DefaultSearchQueryTemplate.Builder requestBuilder = createBuilder();
         List<SortCriterion> sortCriteria = requestBuilder.build().getSortCriteria();
 
@@ -212,7 +208,7 @@ public class DefaultSearchQueryTemplateTest {
     }
 
     @Test
-    public void queryRequestSortCriterionWasSetViaBuilder() {
+    void queryRequestSortCriterionWasSetViaBuilder() {
         DefaultSearchQueryTemplate.Builder requestBuilder = createBuilder();
         String sortField = "field";
         SortCriterion.SortOrder sortOrder = SortCriterion.SortOrder.DESC;
@@ -227,7 +223,7 @@ public class DefaultSearchQueryTemplateTest {
     }
 
     @Test
-    public void queryRequestSortCriteriaWereSetViaBuilder() {
+    void queryRequestSortCriteriaWereSetViaBuilder() {
         DefaultSearchQueryTemplate.Builder requestBuilder = createBuilder();
         String sortField0 = "sortField0";
         SortCriterion.SortOrder sortOrder0 = SortCriterion.SortOrder.ASC;
@@ -251,7 +247,7 @@ public class DefaultSearchQueryTemplateTest {
     }
 
     @Test
-    public void queryRequestSortCriteriaWasSetInTemplate() {
+    void queryRequestSortCriteriaWasSetInTemplate() {
         String sortField0 = "sortField0";
         SortCriterion.SortOrder sortOrder0 = SortCriterion.SortOrder.ASC;
         String sortField1 = "sortField1";
@@ -274,7 +270,7 @@ public class DefaultSearchQueryTemplateTest {
     }
 
     @Test
-    public void templatePageIsUsedByBuilder() {
+    void templatePageIsUsedByBuilder() {
         Page cursorPage = createFirstCursorPage(12345);
         defaultSearchQueryTemplate.setPage(cursorPage);
         QueryRequest request = defaultSearchQueryTemplate

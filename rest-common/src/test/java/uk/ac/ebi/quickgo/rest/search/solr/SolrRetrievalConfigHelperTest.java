@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.rest.search.solr;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -14,11 +14,11 @@ import static uk.ac.ebi.quickgo.rest.search.solr.SolrRetrievalConfigHelper.conve
  * Created 09/02/16
  * @author Edd
  */
-public class SolrRetrievalConfigHelperTest {
+class SolrRetrievalConfigHelperTest {
     private static final String COMMA = ",";
 
     @Test
-    public void settingZeroHighlightFieldsResultsInUsingDefaultHighlighting() {
+    void settingZeroHighlightFieldsResultsInUsingDefaultHighlighting() {
         String highlightDelims = "";
 
         String[] convertedHighlightDelims = convertHighlightDelims(highlightDelims, COMMA);
@@ -28,7 +28,7 @@ public class SolrRetrievalConfigHelperTest {
     }
 
     @Test
-    public void settingExplicitValidHighlightFieldsResultsInTheseFieldsBeingUsed() {
+    void settingExplicitValidHighlightFieldsResultsInTheseFieldsBeingUsed() {
         String highlightDelimStart = "<b>";
         String highlightDelimEnd = "</b>";
         String highlightDelims = highlightDelimStart + COMMA + highlightDelimEnd;
@@ -40,7 +40,7 @@ public class SolrRetrievalConfigHelperTest {
     }
 
     @Test
-    public void settingExplicitInvalidHighlightFieldsResultsInUsingDefaultHighlighting() {
+    void settingExplicitInvalidHighlightFieldsResultsInUsingDefaultHighlighting() {
         String highlightDelimStart = "<b>";
         String highlightDelimEnd = "</b>";
         String highlightDelims = highlightDelimStart + "-" + highlightDelimEnd;

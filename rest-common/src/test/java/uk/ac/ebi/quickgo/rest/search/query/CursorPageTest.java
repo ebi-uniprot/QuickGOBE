@@ -1,17 +1,18 @@
 package uk.ac.ebi.quickgo.rest.search.query;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.*;
 
 /**
  * Created by edd on 15/01/2017.
  */
-public class CursorPageTest {
+class CursorPageTest {
     @Test
-    public void canCreateInitialCursorPage() {
+    void canCreateInitialCursorPage() {
         int pageSize = 4;
         CursorPage page = createFirstCursorPage(pageSize);
 
@@ -20,7 +21,7 @@ public class CursorPageTest {
     }
 
     @Test
-    public void canCreateSubsequentCursorPage() {
+    void canCreateSubsequentCursorPage() {
         int pageSize = 4;
         String cursor = "fakeCursor";
         CursorPage page = createCursorPage(cursor, pageSize);
@@ -29,13 +30,13 @@ public class CursorPageTest {
         assertThat(page.getPageSize(), is(pageSize));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void nullCursorCausesException() {
-        createCursorPage(null, 1);
+    @Test
+    void nullCursorCausesException() {
+        assertThrows(IllegalArgumentException.class, () -> createCursorPage(null, 1));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void emptyCursorCausesException() {
-        createCursorPage("", 1);
+    @Test
+    void emptyCursorCausesException() {
+        assertThrows(IllegalArgumentException.class, () -> createCursorPage("", 1));
     }
 }

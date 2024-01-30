@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.ontology.service.converter;
-
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.ac.ebi.quickgo.common.converter.FlatFieldBuilder;
 import uk.ac.ebi.quickgo.common.converter.FlatFieldLeaf;
 import uk.ac.ebi.quickgo.ontology.model.GOTerm;
@@ -7,8 +8,6 @@ import uk.ac.ebi.quickgo.ontology.model.GOTerm;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import org.junit.Before;
-import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -18,18 +17,18 @@ import static org.hamcrest.core.IsNull.nullValue;
  * Created 01/12/15
  * @author Edd
  */
-public class BlackListFieldConverterTest {
+class BlackListFieldConverterTest {
 
     private BlackListFieldConverter converter;
     public static final int FLAT_FIELD_DEPTH = 0;
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         this.converter = new BlackListFieldConverter();
     }
 
     @Test
-    public void convertsBlacklist() {
+    void convertsBlacklist() {
         List<String> rawBlacklist = new ArrayList<>();
 
         rawBlacklist.add(FlatFieldBuilder.newFlatField()
@@ -64,7 +63,7 @@ public class BlackListFieldConverterTest {
     }
 
     @Test
-    public void gracefullyHandleWrongFieldCount() {
+    void gracefullyHandleWrongFieldCount() {
         Optional<GOTerm.BlacklistItem> result = converter.apply(
                 FlatFieldBuilder.newFlatField().addField(FlatFieldLeaf.newFlatFieldLeaf("wrong " +
                 "format"))

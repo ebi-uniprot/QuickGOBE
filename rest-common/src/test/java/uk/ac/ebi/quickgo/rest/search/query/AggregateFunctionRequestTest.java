@@ -2,55 +2,44 @@ package uk.ac.ebi.quickgo.rest.search.query;
 
 import uk.ac.ebi.quickgo.rest.search.AggregateFunction;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests the behaviour of the {@link AggregateFunctionRequest} class
  */
-public class AggregateFunctionRequestTest {
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
+class AggregateFunctionRequestTest {
 
     @Test
-    public void nullFieldInConstructorThrowsException() throws Exception {
+    void nullFieldInConstructorThrowsException() {
         String field = null;
         AggregateFunction function = AggregateFunction.COUNT;
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Field cannot be null or empty");
-
-        new AggregateFunctionRequest(field, function);
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> new AggregateFunctionRequest(field, function));
+        assertTrue(exception.getMessage().contains("Field cannot be null or empty"));
     }
 
     @Test
-    public void emptyFieldInConstructorThrowsException() throws Exception {
+    void emptyFieldInConstructorThrowsException() {
         String field = "";
         AggregateFunction function = AggregateFunction.COUNT;
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Field cannot be null or empty");
-
-        new AggregateFunctionRequest(field, function);
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> new AggregateFunctionRequest(field, function));
+        assertTrue(exception.getMessage().contains("Field cannot be null or empty"));
     }
 
     @Test
-    public void nullFunctionInConstructorThrowsException() throws Exception {
+    void nullFunctionInConstructorThrowsException() {
         String field = "field";
         AggregateFunction function = null;
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("AggregateRequest function cannot be null");
-
-        new AggregateFunctionRequest(field, function);
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> new AggregateFunctionRequest(field, function));
+        assertTrue(exception.getMessage().contains("AggregateRequest function cannot be null"));
     }
 
     @Test
-    public void createsValidAggregateFieldWithValidFieldAndFunction() throws Exception {
+    void createsValidAggregateFieldWithValidFieldAndFunction() {
         String field = "field";
         AggregateFunction function = AggregateFunction.COUNT;
 

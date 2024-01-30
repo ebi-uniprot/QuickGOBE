@@ -1,14 +1,12 @@
 package uk.ac.ebi.quickgo.annotation.validation.service;
 
 import org.hamcrest.core.Is;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.ac.ebi.quickgo.annotation.validation.loader.ValidationConfig;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -23,9 +21,8 @@ import static uk.ac.ebi.quickgo.annotation.validation.loader.ValidationConfig.LO
  * Created with IntelliJ IDEA.
  */
 
-@RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {JobTestRunnerConfig.class, ValidationConfig.class})
-public class ValidationEntityCheckerIT {
+class ValidationEntityCheckerIT {
 
     @Autowired
     private ValidationEntityChecker validator;
@@ -34,7 +31,7 @@ public class ValidationEntityCheckerIT {
     private JobLauncherTestUtils jobLauncherTestUtils;
 
     @Test
-    public void validationSucceedsIfKnownDb(){
+    void validationSucceedsIfKnownDb(){
         JobExecution jobExecution = jobLauncherTestUtils.launchStep(LOAD_ANNOTATION_DBX_REF_ENTITIES_STEP_NAME);
         assertThat(jobExecution.getStatus(), Is.is(BatchStatus.COMPLETED));
         assertThat(validator.isValid("PMID:123456"), is(true));

@@ -1,16 +1,17 @@
 package uk.ac.ebi.quickgo.rest.search.query;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Created by edd on 15/01/2017.
  */
-public class RegularPageTest {
+class RegularPageTest {
     @Test
-    public void canCreateRegularPage() {
+    void canCreateRegularPage() {
         int currentPage = 1;
         int pageSize = 2;
         RegularPage page = new RegularPage(currentPage, pageSize);
@@ -19,8 +20,8 @@ public class RegularPageTest {
         assertThat(page.getPageSize(), is(pageSize));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void negativePageNumberCausesException() {
-        new RegularPage(-1, 10);
+    @Test
+    void negativePageNumberCausesException() {
+        assertThrows(IllegalArgumentException.class, () -> new RegularPage(-1, 10));
     }
 }

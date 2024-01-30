@@ -6,13 +6,11 @@ import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
 import uk.ac.ebi.quickgo.ontology.model.graph.AncestorEdge;
 import uk.ac.ebi.quickgo.ontology.model.graph.AncestorGraph;
 
-import de.bechte.junit.runners.context.HierarchicalContextRunner;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.*;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -23,6 +21,7 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.*;
 import static uk.ac.ebi.quickgo.ontology.traversal.OntologyGraph.BIOLOGICAL_PROCESS_STOP_NODE;
 import static uk.ac.ebi.quickgo.ontology.traversal.OntologyGraph.CELLULAR_COMPONENT_STOP_NODE;
@@ -36,8 +35,7 @@ import static uk.ac.ebi.quickgo.ontology.traversal.OntologyGraph.MOLECULAR_FUNCT
  *
  * @author Edd
  */
-@RunWith(HierarchicalContextRunner.class)
-public class OntologyGraphTest {
+class OntologyGraphTest {
 
     private OntologyGraph ontologyGraph;
     private OntologyRelationship v1_CO_v2;
@@ -45,8 +43,8 @@ public class OntologyGraphTest {
     private OntologyRelationship v2_OI_v3;
     private OntologyRelationship v2_IA_v3;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         ontologyGraph = new OntologyGraph();
 
         v1_CO_v2 = createRelationship(id("1"), id("2"), CAPABLE_OF);
@@ -77,112 +75,113 @@ public class OntologyGraphTest {
         );
     }
 
-    public class GraphLifecycleTests {
+    @Nested
+    class GraphLifecycleTests {
         @Test
-        public void initialisedGraphContainsNothing() {
+        void initialisedGraphContainsNothing() {
             assertThat(ontologyGraph.getVertices().size(), is(0));
             assertThat(ontologyGraph.getEdges().size(), is(0));
         }
 
         @Test
-        public void addingRelationshipsSucceeds() {
+        void addingRelationshipsSucceeds() {
             setupGraphWith3SimpleRelationships();
 
             assertThat(ontologyGraph.getVertices().size(), is(3));
             assertThat(ontologyGraph.getEdges().size(), is(3));
         }
 
-        @Test(expected = IllegalArgumentException.class)
-        public void addingNullRelationshipsThrowsException() {
-            ontologyGraph.addRelationships(null);
+        @Test
+        void addingNullRelationshipsThrowsException() {
+            assertThrows(IllegalArgumentException.class, () -> ontologyGraph.addRelationships(null));
         }
 
         @Test
-        public void addingEmptyRelationshipsDoesNotThrowException() {
+        void addingEmptyRelationshipsDoesNotThrowException() {
             ontologyGraph.addRelationships(Collections.emptyList());
         }
 
-        @Test(expected = IllegalArgumentException.class)
-        public void findingPathsWithEmptyStartAndEndVerticesThrowsException() {
-            ontologyGraph.paths(
+        @Test
+        void findingPathsWithEmptyStartAndEndVerticesThrowsException() {
+            assertThrows(IllegalArgumentException.class, () -> ontologyGraph.paths(
                     Collections.emptySet(),
                     Collections.emptySet()
-            );
-        }
-
-        @Test(expected = IllegalArgumentException.class)
-        public void findingPathsWithNullStartAndEndVerticesThrowsException() {
-            ontologyGraph.paths(
-                    null,
-                    null
-            );
+            ));
         }
 
         @Test
-        public void canFetchCategorisedVertices() {
+        void findingPathsWithNullStartAndEndVerticesThrowsException() {
+            assertThrows(IllegalArgumentException.class, () -> ontologyGraph.paths(
+                    null,
+                    null
+            ));
+        }
+
+        @Test
+        void canFetchCategorisedVertices() {
             setupGraphWith3SimpleRelationships();
 
             Set<String> goVertices = ontologyGraph.getVertices(OntologyType.GO);
             assertThat(goVertices, containsInAnyOrder(id("1"), id("2"), id("3")));
         }
 
-        @Test(expected = IllegalArgumentException.class)
-        public void uncategorisedVerticesCausesException() {
+        @Test
+        void uncategorisedVerticesCausesException() {
             setupGraphWith3SimpleRelationships();
-
-            ontologyGraph.getVertices(OntologyType.ECO);
+            assertThrows(IllegalArgumentException.class, () -> ontologyGraph.getVertices(OntologyType.ECO));
         }
     }
 
-    public class PathTests {
+    @Nested
+    class PathTests {
 
-        @Test(expected = IllegalArgumentException.class)
-        public void findingPathsBetweenSameVertexThrowsException() {
-            ontologyGraph.paths(
+        @Test
+        void findingPathsBetweenSameVertexThrowsException() {
+            assertThrows(IllegalArgumentException.class, () -> ontologyGraph.paths(
                     ids("1"),
                     ids("1"),
                     CAPABLE_OF_PART_OF
-            );
-        }
-
-        @Test(expected = IllegalArgumentException.class)
-        public void findingPathsWithNullStartVerticesThrowsException() {
-            ontologyGraph.paths(
-                    null,
-                    ids("1"),
-                    CAPABLE_OF_PART_OF
-            );
-        }
-
-        @Test(expected = IllegalArgumentException.class)
-        public void findingPathsWithNullEndVerticesThrowsException() {
-            ontologyGraph.paths(
-                    ids("1"),
-                    null,
-                    CAPABLE_OF_PART_OF
-            );
-        }
-
-        @Test(expected = IllegalArgumentException.class)
-        public void findingPathsWithEmptyStartVerticesThrowsException() {
-            ontologyGraph.paths(
-                    Collections.emptySet(),
-                    ids("1"),
-                    CAPABLE_OF_PART_OF
-            );
-        }
-
-        @Test(expected = IllegalArgumentException.class)
-        public void findingPathsWithEmptyEndVerticesThrowsException() {
-            ontologyGraph.paths(
-                    ids("1"),
-                    Collections.emptySet(),
-                    CAPABLE_OF_PART_OF
-            );
+            ));
         }
 
         @Test
-        public void findAllPathsBetween1LevelOfAncestorsViaAllRelations() {
+        void findingPathsWithNullStartVerticesThrowsException() {
+            assertThrows(IllegalArgumentException.class, () -> ontologyGraph.paths(
+                    null,
+                    ids("1"),
+                    CAPABLE_OF_PART_OF
+            ));
+        }
+
+        @Test
+        void findingPathsWithNullEndVerticesThrowsException() {
+            assertThrows(IllegalArgumentException.class, () -> ontologyGraph.paths(
+                    ids("1"),
+                    null,
+                    CAPABLE_OF_PART_OF
+            ));
+        }
+
+        @Test
+        void findingPathsWithEmptyStartVerticesThrowsException() {
+            assertThrows(IllegalArgumentException.class, () -> ontologyGraph.paths(
+                    Collections.emptySet(),
+                    ids("1"),
+                    CAPABLE_OF_PART_OF
+            ));
+        }
+
+        @Test
+        void findingPathsWithEmptyEndVerticesThrowsException() {
+            assertThrows(IllegalArgumentException.class, () -> ontologyGraph.paths(
+                    ids("1"),
+                    Collections.emptySet(),
+                    CAPABLE_OF_PART_OF
+            ));
+        }
+
+        @Test
+        void findAllPathsBetween1LevelOfAncestorsViaAllRelations() {
             setupGraphWith3SimpleRelationships();
 
             List<List<OntologyRelationship>> paths = ontologyGraph.paths(
@@ -196,7 +195,7 @@ public class OntologyGraphTest {
         }
 
         @Test
-        public void findAllPathsBetween1LevelOfAncestorsVia1Relation() {
+        void findAllPathsBetween1LevelOfAncestorsVia1Relation() {
             setupGraphWith3SimpleRelationships();
 
             List<List<OntologyRelationship>> paths = ontologyGraph.paths(
@@ -210,7 +209,7 @@ public class OntologyGraphTest {
         }
 
         @Test
-        public void findAllPathsBetween2LevelsOfAncestorsViaAllRelations() {
+        void findAllPathsBetween2LevelsOfAncestorsViaAllRelations() {
             setupGraphWith3SimpleRelationships();
 
             List<List<OntologyRelationship>> paths = ontologyGraph.paths(
@@ -224,7 +223,7 @@ public class OntologyGraphTest {
         }
 
         @Test
-        public void findZeroPathsBetween2LevelsOfAncestorsVia1Relation() {
+        void findZeroPathsBetween2LevelsOfAncestorsVia1Relation() {
             setupGraphWith3SimpleRelationships();
 
             List<List<OntologyRelationship>> paths = ontologyGraph.paths(
@@ -237,7 +236,7 @@ public class OntologyGraphTest {
         }
 
         @Test
-        public void findAllPathsBetween2LevelsOfAncestorsVia2Relations() {
+        void findAllPathsBetween2LevelsOfAncestorsVia2Relations() {
             setupGraphWith3SimpleRelationships();
 
             List<List<OntologyRelationship>> paths = ontologyGraph.paths(
@@ -252,7 +251,7 @@ public class OntologyGraphTest {
         }
 
         @Test
-        public void checkAllPathsExistInComplexGraph() {
+        void checkAllPathsExistInComplexGraph() {
             OntologyRelationship v1_IS_v2 = createRelationship(id("1"), id("2"), IS_A);
             OntologyRelationship v2_HP_v3 = createRelationship(id("2"), id("3"), HAS_PART);
             OntologyRelationship v3_HP_v4 = createRelationship(id("3"), id("4"), HAS_PART);
@@ -292,7 +291,7 @@ public class OntologyGraphTest {
         }
 
         @Test
-        public void checkAllPathsExistInComplexGraphBetween2StartVerticesAnd2EndVertices() {
+        void checkAllPathsExistInComplexGraphBetween2StartVerticesAnd2EndVertices() {
             OntologyRelationship v1_IS_v2 = createRelationship(id("1"), id("2"), IS_A);
             OntologyRelationship v2_HP_v3 = createRelationship(id("2"), id("3"), HAS_PART);
             OntologyRelationship v3_HP_v4 = createRelationship(id("3"), id("4"), HAS_PART);
@@ -349,20 +348,21 @@ public class OntologyGraphTest {
         }
     }
 
-    public class AncestorTests {
+    @Nested
+    class AncestorTests {
 
-        @Test(expected = IllegalArgumentException.class)
-        public void findingAncestorsWithNullVerticesThrowsException() {
-            ontologyGraph.ancestors(null);
-        }
-
-        @Test(expected = IllegalArgumentException.class)
-        public void findingAncestorsWithEmptyVerticesThrowsException() {
-            ontologyGraph.ancestors(Collections.emptySet());
+        @Test
+        void findingAncestorsWithNullVerticesThrowsException() {
+            assertThrows(IllegalArgumentException.class, () -> ontologyGraph.ancestors(null));
         }
 
         @Test
-        public void findAncestorsViaAllRelations() {
+        void findingAncestorsWithEmptyVerticesThrowsException() {
+            assertThrows(IllegalArgumentException.class, () -> ontologyGraph.ancestors(Collections.emptySet()));
+        }
+
+        @Test
+        void findAncestorsViaAllRelations() {
             ontologyGraph.addRelationships(asList(v1_CO_v2, v1_CP_v2, v2_IA_v3));
 
             List<String> ancestors = ontologyGraph.ancestors(ids("1"));
@@ -371,7 +371,7 @@ public class OntologyGraphTest {
         }
 
         @Test
-        public void findAncestorsVia1Relation() {
+        void findAncestorsVia1Relation() {
             setupGraphWith3SimpleRelationships();
 
             List<String> ancestors = ontologyGraph.ancestors(ids("1"), CAPABLE_OF_PART_OF);
@@ -380,7 +380,7 @@ public class OntologyGraphTest {
         }
 
         @Test
-        public void ancestorsStopForSuccessiveHasPartsInSimpleScenario() {
+        void ancestorsStopForSuccessiveHasPartsInSimpleScenario() {
             OntologyRelationship v1_CO_v2 = createRelationship(id("1"), id("2"), HAS_PART);
             OntologyRelationship v1_CP_v2 = createRelationship(id("2"), id("3"), HAS_PART);
 
@@ -393,7 +393,7 @@ public class OntologyGraphTest {
         }
 
         @Test
-        public void ancestorsStopForSuccessiveHasPartsInComplexScenario() {
+        void ancestorsStopForSuccessiveHasPartsInComplexScenario() {
             OntologyRelationship v1_IS_v2 = createRelationship(id("1"), id("2"), IS_A);
             OntologyRelationship v2_HP_v3 = createRelationship(id("2"), id("3"), HAS_PART);
             OntologyRelationship v3_HP_v4 = createRelationship(id("3"), id("4"), HAS_PART);
@@ -422,7 +422,7 @@ public class OntologyGraphTest {
         }
 
         @Test
-        public void ancestorsFrom2VerticesInComplexScenario() {
+        void ancestorsFrom2VerticesInComplexScenario() {
             OntologyRelationship v1_IS_v2 = createRelationship(id("1"), id("2"), IS_A);
             OntologyRelationship v2_HP_v3 = createRelationship(id("2"), id("3"), HAS_PART);
             OntologyRelationship v3_HP_v4 = createRelationship(id("3"), id("4"), HAS_PART);
@@ -449,7 +449,7 @@ public class OntologyGraphTest {
         }
 
         @Test
-        public void omitAncestorsOfOneStopNodeSuccessor() {
+        void omitAncestorsOfOneStopNodeSuccessor() {
             String stopA = MOLECULAR_FUNCTION_STOP_NODE;
             String rootNodeThatShouldBeHidden = id("0009999");
 
@@ -477,7 +477,7 @@ public class OntologyGraphTest {
         }
 
         @Test
-        public void omitAncestorsOfAllStopNodeSuccessors() {
+        void omitAncestorsOfAllStopNodeSuccessors() {
             String stopA = MOLECULAR_FUNCTION_STOP_NODE;
             String stopB = BIOLOGICAL_PROCESS_STOP_NODE;
             String stopC = CELLULAR_COMPONENT_STOP_NODE;
@@ -511,7 +511,7 @@ public class OntologyGraphTest {
         }
 
         @Test
-        public void fetchingFilteredAncestorsAsBitSetSucceeds() {
+        void fetchingFilteredAncestorsAsBitSetSucceeds() {
             OntologyRelationship v0_IS_v1 = createRelationship(id("0"), id("1"), IS_A);
             OntologyRelationship v1_IS_v2 = createRelationship(id("1"), id("2"), IS_A);
             OntologyRelationship v1_HAS_v3 = createRelationship(id("1"), id("3"), HAS_PART);
@@ -531,19 +531,20 @@ public class OntologyGraphTest {
         }
     }
 
-    public class DescendantTests {
-        @Test(expected = IllegalArgumentException.class)
-        public void findingDescendantsWithNullVerticesThrowsException() {
-            ontologyGraph.descendants(null);
-        }
-
-        @Test(expected = IllegalArgumentException.class)
-        public void findingDescendantsWithEmptyVerticesThrowsException() {
-            ontologyGraph.descendants(Collections.emptySet());
+    @Nested
+    class DescendantTests {
+        @Test
+        void findingDescendantsWithNullVerticesThrowsException() {
+            assertThrows(IllegalArgumentException.class, () -> ontologyGraph.descendants(null));
         }
 
         @Test
-        public void findDescendantsViaAllRelations() {
+        void findingDescendantsWithEmptyVerticesThrowsException() {
+            assertThrows(IllegalArgumentException.class, () -> ontologyGraph.descendants(Collections.emptySet()));
+        }
+
+        @Test
+        void findDescendantsViaAllRelations() {
             setupGraphWith3SimpleRelationships();
 
             List<String> ancestors = ontologyGraph.descendants(ids("3"));
@@ -552,7 +553,7 @@ public class OntologyGraphTest {
         }
 
         @Test
-        public void findDescendantsVia1Relation() {
+        void findDescendantsVia1Relation() {
             setupGraphWith3SimpleRelationships();
 
             List<String> ancestors = ontologyGraph.descendants(ids("3"), OCCURS_IN);
@@ -561,7 +562,7 @@ public class OntologyGraphTest {
         }
 
         @Test
-        public void findDescendantsViaAllRelationsOverComplexGraph() {
+        void findDescendantsViaAllRelationsOverComplexGraph() {
             OntologyRelationship v1_IS_v2 = createRelationship(id("1"), id("2"), IS_A);
             OntologyRelationship v2_HP_v3 = createRelationship(id("2"), id("3"), HAS_PART);
             OntologyRelationship v3_HP_v4 = createRelationship(id("3"), id("4"), HAS_PART);
@@ -587,7 +588,7 @@ public class OntologyGraphTest {
         }
 
         @Test
-        public void findDescendantsFrom2VerticesViaAllRelationsOverComplexGraph() {
+        void findDescendantsFrom2VerticesViaAllRelationsOverComplexGraph() {
             OntologyRelationship v1_IS_v2 = createRelationship(id("1"), id("2"), IS_A);
             OntologyRelationship v2_HP_v3 = createRelationship(id("2"), id("3"), HAS_PART);
             OntologyRelationship v3_HP_v4 = createRelationship(id("3"), id("4"), HAS_PART);
@@ -613,7 +614,7 @@ public class OntologyGraphTest {
         }
 
         @Test
-        public void findDescendantsVia1RelationOverComplexGraph() {
+        void findDescendantsVia1RelationOverComplexGraph() {
             OntologyRelationship v1_IS_v2 = createRelationship(id("1"), id("2"), IS_A);
             OntologyRelationship v2_HP_v3 = createRelationship(id("2"), id("3"), HAS_PART);
             OntologyRelationship v3_HP_v4 = createRelationship(id("3"), id("4"), HAS_PART);
@@ -639,7 +640,8 @@ public class OntologyGraphTest {
         }
     }
 
-    public class ChildrenTests {
+    @Nested
+    class ChildrenTests {
         private final String parentId = id("1");
 
         private final OntologyRelationship grandParentIsA = createRelationship(parentId, id("0"), IS_A);
@@ -649,8 +651,8 @@ public class OntologyGraphTest {
         private final OntologyRelationship childRegulates = createRelationship(id("5"), parentId, REGULATES);
         private final OntologyRelationship grandChildIsA = createRelationship(id("6"), id("2"), IS_A);
 
-        @Before
-        public void populateOntology() {
+        @BeforeEach
+        void populateOntology() {
             ontologyGraph.addRelationships(asList(
                     grandParentIsA,
                     childIsA,
@@ -661,39 +663,39 @@ public class OntologyGraphTest {
             ));
         }
 
-        @Test(expected = IllegalArgumentException.class)
-        public void findingChildrenWithANullVertexThrowsException() throws Exception {
-            ontologyGraph.children(null);
-        }
-
-        @Test(expected = IllegalArgumentException.class)
-        public void findingChildrenWithAEmptyVertexThrowsException() throws Exception {
-            ontologyGraph.children("");
+        @Test
+        void findingChildrenWithANullVertexThrowsException() throws Exception {
+            assertThrows(IllegalArgumentException.class, () -> ontologyGraph.children(null));
         }
 
         @Test
-        public void finds1IsAChildOfParent1() throws Exception {
+        void findingChildrenWithAEmptyVertexThrowsException() throws Exception {
+            assertThrows(IllegalArgumentException.class, () -> ontologyGraph.children(""));
+        }
+
+        @Test
+        void finds1IsAChildOfParent1() throws Exception {
             Set<OntologyRelationship> expectedChildren = ontologyGraph.children(parentId, IS_A);
 
             assertThat(expectedChildren, contains(childIsA));
         }
 
         @Test
-        public void finds2HasPartChildrenOfParent1() throws Exception {
+        void finds2HasPartChildrenOfParent1() throws Exception {
             Set<OntologyRelationship> expectedChildren = ontologyGraph.children(parentId, HAS_PART);
 
             assertThat(expectedChildren, containsInAnyOrder(childHasPart1, childHasPart2));
         }
 
         @Test
-        public void findsAllChildrenOfParent1WithoutAnyRelationshipsSetAsArguments() throws Exception {
+        void findsAllChildrenOfParent1WithoutAnyRelationshipsSetAsArguments() throws Exception {
             Set<OntologyRelationship> expectedChildren = ontologyGraph.children(parentId);
 
             assertThat(expectedChildren, containsInAnyOrder(childHasPart1, childHasPart2, childIsA, childRegulates));
         }
 
         @Test
-        public void doesNotFindGrandParentOfParentWhenSearchingForChildren() throws Exception {
+        void doesNotFindGrandParentOfParentWhenSearchingForChildren() throws Exception {
             Set<OntologyRelationship> expectedChildren = ontologyGraph.children(parentId);
 
             assertThat(expectedChildren, hasSize(4));
@@ -701,7 +703,7 @@ public class OntologyGraphTest {
         }
 
         @Test
-        public void doesNotFindGrandChildOfParentWhenSearchingForChildren() throws Exception {
+        void doesNotFindGrandChildOfParentWhenSearchingForChildren() throws Exception {
             Set<OntologyRelationship> expectedChildren = ontologyGraph.children(parentId);
 
             assertThat(expectedChildren, hasSize(4));
@@ -709,7 +711,8 @@ public class OntologyGraphTest {
         }
     }
 
-    public class ParentTests {
+    @Nested
+    class ParentTests {
         private final String childId = id("1");
 
         private final OntologyRelationship parentIsA = createRelationship(childId, id("2"), IS_A);
@@ -719,8 +722,8 @@ public class OntologyGraphTest {
         private final OntologyRelationship childIsA = createRelationship(id("6"), childId, REGULATES);
         private final OntologyRelationship grandParentHasPart = createRelationship(id("7"), id("3"), REGULATES);
 
-        @Before
-        public void populateOntology() {
+        @BeforeEach
+        void populateOntology() {
             ontologyGraph.addRelationships(asList(
                     parentIsA,
                     parentHasPart1,
@@ -731,39 +734,39 @@ public class OntologyGraphTest {
             ));
         }
 
-        @Test(expected = IllegalArgumentException.class)
-        public void findingParentsWithANullVertexThrowsException() throws Exception {
-            ontologyGraph.parents(null);
-        }
-
-        @Test(expected = IllegalArgumentException.class)
-        public void findingParentsWithAnEmptyVertexThrowsException() throws Exception {
-            ontologyGraph.parents("");
+        @Test
+        void findingParentsWithANullVertexThrowsException() throws Exception {
+            assertThrows(IllegalArgumentException.class, () -> ontologyGraph.parents(null));
         }
 
         @Test
-        public void finds1IsAParentOfChild1() throws Exception {
+        void findingParentsWithAnEmptyVertexThrowsException() throws Exception {
+            assertThrows(IllegalArgumentException.class, () -> ontologyGraph.parents(""));
+        }
+
+        @Test
+        void finds1IsAParentOfChild1() throws Exception {
             Set<OntologyRelationship> expectedParents = ontologyGraph.parents(childId, IS_A);
 
             assertThat(expectedParents, contains(parentIsA));
         }
 
         @Test
-        public void finds2HasPartParentsOfChild1() throws Exception {
+        void finds2HasPartParentsOfChild1() throws Exception {
             Set<OntologyRelationship> expectedParents = ontologyGraph.parents(childId, HAS_PART);
 
             assertThat(expectedParents, containsInAnyOrder(parentHasPart1, parentHasPart2));
         }
 
         @Test
-        public void findsAllParentsOfChild1WithoutAnyRelationshipsSetAsArguments() throws Exception {
+        void findsAllParentsOfChild1WithoutAnyRelationshipsSetAsArguments() throws Exception {
             Set<OntologyRelationship> expectedParents = ontologyGraph.parents(childId);
 
             assertThat(expectedParents, containsInAnyOrder(parentIsA, parentHasPart1, parentHasPart2, parentRegulates));
         }
 
         @Test
-        public void doesNotFindChildOfChild1WhenSearchingForParents() throws Exception {
+        void doesNotFindChildOfChild1WhenSearchingForParents() throws Exception {
             Set<OntologyRelationship> expectedParents = ontologyGraph.parents(childId);
 
             assertThat(expectedParents, hasSize(4));
@@ -771,7 +774,7 @@ public class OntologyGraphTest {
         }
 
         @Test
-        public void doesNotFinGrandParentOfChildWhenSearchingForParents() throws Exception {
+        void doesNotFinGrandParentOfChildWhenSearchingForParents() throws Exception {
             Set<OntologyRelationship> expectedParents = ontologyGraph.parents(childId);
 
             assertThat(expectedParents, hasSize(4));
@@ -779,7 +782,8 @@ public class OntologyGraphTest {
         }
     }
 
-    public class AncestorGraphTests {
+    @Nested
+    class AncestorGraphTests {
         private OntologyGraph og;
 
         final OntologyVertex pyrophosphataseActivity =  new OntologyVertex("GO:0016462", "pyrophosphatase activity");
@@ -800,14 +804,14 @@ public class OntologyGraphTest {
         final HashSet<String> startingVertices = new HashSet<>();
         final Set<String> stopVertices = new HashSet<>();
 
-        @Before
-        public void setup(){
+        @BeforeEach
+        void setup(){
             og = new OntologyGraph();
             og.addRelationships(asList(py_IA_cy, cy_IA_ca, ca_IA_mf));
         }
 
         @Test
-        public void findSubGraphUsingAllRelationsDefaultStopVertices() {
+        void findSubGraphUsingAllRelationsDefaultStopVertices() {
             final HashSet<String> startingVertices = new HashSet<>(singletonList(catalyticActivity.id));
             final Set<String> stopVertices = new HashSet<>();
 
@@ -820,7 +824,7 @@ public class OntologyGraphTest {
         }
 
         @Test
-        public void findSubGraphUsingAllRelationsSpecifyDefaultStopVertices() {
+        void findSubGraphUsingAllRelationsSpecifyDefaultStopVertices() {
             final HashSet<String> startingVertices = new HashSet<>(singletonList(catalyticActivity.id));
             final HashSet<String> stopVertices = new HashSet<>(singletonList(molecularFunction.id));
 
@@ -833,7 +837,7 @@ public class OntologyGraphTest {
         }
 
         @Test
-        public void findSubGraphSpecifyingRelationsDoNotSpecifyStopNode() {
+        void findSubGraphSpecifyingRelationsDoNotSpecifyStopNode() {
             final HashSet<String> startingVertices = new HashSet<>(singletonList(catalyticActivity.id));
             final OntologyRelationType[] relations = {OntologyRelationType.IS_A};
 
@@ -846,7 +850,7 @@ public class OntologyGraphTest {
         }
 
         @Test
-        public void findSubGraphSpecifyingRelationsSpecifyNonRootStopNode() {
+        void findSubGraphSpecifyingRelationsSpecifyNonRootStopNode() {
             final HashSet<String> startingVertices = new HashSet<>(singletonList(pyrophosphataseActivity.id));
             final HashSet<String> stopVertices = new HashSet<>(singletonList(catalyticActivity.id));
             final OntologyRelationType[] relations = {OntologyRelationType.IS_A};
@@ -861,20 +865,20 @@ public class OntologyGraphTest {
         }
 
         @Test
-        public void findSubGraphWhereMultipleRouteOfSameType() {
+        void findSubGraphWhereMultipleRouteOfSameType() {
             OntologyRelationship py_IA_mf = new OntologyRelationship(pyrophosphataseActivity.id, molecularFunction.id, IS_A);
             calculateGraphForRelationship(py_IA_mf);
         }
 
         @Test
-        public void findSubGraphForMultipleInheritance() {
+        void findSubGraphForMultipleInheritance() {
             OntologyRelationship py_RT_mf = new OntologyRelationship(pyrophosphataseActivity.id, molecularFunction
                     .id, OCCURS_IN);
             calculateGraphForRelationship(py_RT_mf);
         }
 
         @Test
-        public void findSubGraphFilteringByRelationship() {
+        void findSubGraphFilteringByRelationship() {
             OntologyRelationship py_OI_mf = new OntologyRelationship(pyrophosphataseActivity.id, molecularFunction
                     .id, OCCURS_IN);
             og.addRelationships(singletonList(py_OI_mf));
@@ -890,7 +894,7 @@ public class OntologyGraphTest {
         }
 
         @Test
-        public void unrelatedVerticesIgnored() {
+        void unrelatedVerticesIgnored() {
             //Build new graph and add to relationships
             OntologyVertex biologicalProcess = new OntologyVertex("GO:0008150","biological process");
             OntologyVertex localization = new OntologyVertex("GO:0051179","localization");
@@ -922,7 +926,7 @@ public class OntologyGraphTest {
         }
 
         @Test
-        public void noMatchingSubGraphProducesEmptyAncestorGraph() {
+        void noMatchingSubGraphProducesEmptyAncestorGraph() {
             final HashSet<String> startingVertices = new HashSet<>(singletonList("GO:XXXXXX"));
 
             AncestorGraph<String> ancestorGraph = og.subGraph(startingVertices, stopVertices, relations);
@@ -933,7 +937,7 @@ public class OntologyGraphTest {
 
 
         @Test
-        public void okIfStartingNodeIsTopNode() {
+        void okIfStartingNodeIsTopNode() {
             final HashSet<String> startingVertices = new HashSet<>(singletonList(molecularFunction.id));
 
             AncestorGraph<String> ancestorGraph = og.subGraph(startingVertices, stopVertices, relations);
@@ -944,7 +948,7 @@ public class OntologyGraphTest {
         }
 
         @Test
-        public void cyclicalOntologyCanBeCalculatedWithoutEnteringInfiniteLooping() {
+        void cyclicalOntologyCanBeCalculatedWithoutEnteringInfiniteLooping() {
             OntologyRelationship mf_OI_py = new OntologyRelationship(molecularFunction.id,
                                                                      pyrophosphataseActivity.id, OCCURS_IN);
             og.addRelationships(singletonList(mf_OI_py));
@@ -960,39 +964,38 @@ public class OntologyGraphTest {
         }
 
         @Test
-        public void findSubGraphForWhereRelationshipsCanBeCyclical() {
+        void findSubGraphForWhereRelationshipsCanBeCyclical() {
             OntologyRelationship ca_OI_py = new OntologyRelationship(catalyticActivity.id,
                                                                      pyrophosphataseActivity.id, OCCURS_IN);
             calculateGraphForRelationship(ca_OI_py);
         }
 
-        @Test(expected = IllegalArgumentException.class)
-        public void requestingSubGraphWithNullStartingVerticesThrowsException() {
-            og.subGraph(null, stopVertices, relations);
+        @Test
+        void requestingSubGraphWithNullStartingVerticesThrowsException() {
+            assertThrows(IllegalArgumentException.class, () -> og.subGraph(null, stopVertices, relations));
 
         }
 
-        @Test(expected = IllegalArgumentException.class)
-        public void requestingSubGraphWithEmptyStartingVerticesThrowsException() {
-            og.subGraph(startingVertices, stopVertices, relations);
+        @Test
+        void requestingSubGraphWithEmptyStartingVerticesThrowsException() {
+            assertThrows(IllegalArgumentException.class, () -> og.subGraph(startingVertices, stopVertices, relations));
 
         }
 
-        @Test(expected = IllegalArgumentException.class)
-        public void requestingSubGraphWithNullRelationsThrowsException() {
-            og.subGraph(startingVertices, stopVertices, (OntologyRelationType[]) null);
+        @Test
+        void requestingSubGraphWithNullRelationsThrowsException() {
+            assertThrows(IllegalArgumentException.class, () -> og.subGraph(startingVertices, stopVertices, (OntologyRelationType[]) null));
 
         }
 
-        @Test(expected = IllegalArgumentException.class)
-        public void requestingSubGraphWithEmptyRelationsThrowsException() {
+        @Test
+        void requestingSubGraphWithEmptyRelationsThrowsException() {
             final OntologyRelationType[] relations = {};
-
-            og.subGraph(startingVertices, stopVertices, relations);
+            assertThrows(IllegalArgumentException.class, () -> og.subGraph(startingVertices, stopVertices, relations));
 
         }
 
-        public void calculateGraphForRelationship(OntologyRelationship ontologyRelationship ) {
+        void calculateGraphForRelationship(OntologyRelationship ontologyRelationship ) {
             og.addRelationships(singletonList(ontologyRelationship));
             final HashSet<String> startingVertices = new HashSet<>(singletonList(pyrophosphataseActivity.id));
 

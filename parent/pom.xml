@@ -42,7 +42,6 @@
 
         <solr.version>8.4.0</solr.version>
         <core-dropwizard-metrics.version>3.2.6</core-dropwizard-metrics.version>
-        <junit-hierarchicalcontextrunner.version>4.12.1</junit-hierarchicalcontextrunner.version>
         <springfox-swagger2.version>2.7.0</springfox-swagger2.version>
 
         <!-- plugin version numbers -->
@@ -218,13 +217,6 @@
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-test</artifactId>
             <version>${kotlin.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>de.bechte.junit</groupId>
-            <artifactId>junit-hierarchicalcontextrunner</artifactId>
-            <version>${junit-hierarchicalcontextrunner.version}</version>
             <scope>test</scope>
         </dependency>
 

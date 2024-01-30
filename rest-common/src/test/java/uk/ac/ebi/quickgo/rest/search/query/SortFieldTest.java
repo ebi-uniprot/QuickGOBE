@@ -1,10 +1,11 @@
 package uk.ac.ebi.quickgo.rest.search.query;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Tests the {@link SortField} implementation
@@ -12,19 +13,19 @@ import static org.hamcrest.core.Is.is;
  * Created 16/01/17
  * @author Edd
  */
-public class SortFieldTest {
-    @Test(expected = IllegalArgumentException.class)
-    public void nullFieldThrowsException() throws Exception {
-        new SortField(null);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void emptyFieldThrowsException() throws Exception {
-        new SortField("");
+class SortFieldTest {
+    @Test
+    void nullFieldThrowsException()  {
+        assertThrows(IllegalArgumentException.class, () -> new SortField(null));
     }
 
     @Test
-    public void createSortField() throws Exception {
+    void emptyFieldThrowsException()  {
+        assertThrows(IllegalArgumentException.class, () -> new SortField(""));
+    }
+
+    @Test
+    void createSortField()  {
         String sortField = "field";
         SortField sort = new SortField(sortField);
 

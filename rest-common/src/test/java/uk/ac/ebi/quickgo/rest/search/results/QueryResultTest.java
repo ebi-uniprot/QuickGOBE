@@ -1,62 +1,50 @@
 package uk.ac.ebi.quickgo.rest.search.results;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.emptyIterable;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests the {@link QueryResult} implementation
  */
-public class QueryResultTest {
-
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
+class QueryResultTest {
 
     @Test
-    public void negativeTotalNumberResultsThrowsException() throws Exception {
+    void negativeTotalNumberResultsThrowsException()  {
         long numberOfHits = -1;
         List<String> results = Collections.emptyList();
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Total number of hits can not be negative");
-
-        new QueryResult.Builder<>(numberOfHits, results).build();
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> new QueryResult.Builder<>(numberOfHits, results).build());
+        assertTrue(exception.getMessage().contains("Total number of hits can not be negative"));
     }
 
     @Test
-    public void nullResultsListThrowsException() throws Exception {
+    void nullResultsListThrowsException()  {
         long numberOfHits = 1;
         List<String> results = null;
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Results list can not be null");
-
-        new QueryResult.Builder<>(numberOfHits, results).build();
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> new QueryResult.Builder<>(numberOfHits, results).build());
+        assertTrue(exception.getMessage().contains("Results list can not be null"));
     }
 
     @Test
-    public void totalNumberOfHitsLessThanResultsListSizeThrowsException() throws Exception {
+    void totalNumberOfHitsLessThanResultsListSizeThrowsException()  {
         long numberOfHits = 1;
         List<String> results = Arrays.asList("result1", "result2");
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Total number of results is less than number of results in list");
-
-        new QueryResult.Builder<>(numberOfHits, results).build();
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> new QueryResult.Builder<>(numberOfHits, results).build());
+        assertTrue(exception.getMessage().contains("Total number of results is less than number of results in list"));
     }
 
     @Test
-    public void validQueryResultWithNoPageInfoAndNoFacet() throws Exception {
+    void validQueryResultWithNoPageInfoAndNoFacet()  {
         long numberOfHits = 2;
         List<String> results = Arrays.asList("result1", "result2");
 
@@ -70,7 +58,7 @@ public class QueryResultTest {
     }
 
     @Test
-    public void validFullQueryResult() throws Exception {
+    void validFullQueryResult()  {
         long numberOfHits = 2;
         List<String> results = Arrays.asList("result1", "result2");
         PageInfo pageInfo = new PageInfo.Builder()

@@ -7,7 +7,7 @@ import static uk.ac.ebi.quickgo.annotation.IdGeneratorUtil.createGoId;
 /**
  * Created by edd on 02/11/2016.
  */
-public class GODescendantsFilterConverterTest extends AbstractDescendantsFilterConverterTest {
+class GODescendantsFilterConverterTest extends AbstractDescendantsFilterConverterTest {
     public GODescendantsFilterConverterTest() {
         field = AnnotationFields.Searchable.GO_ID;
     }

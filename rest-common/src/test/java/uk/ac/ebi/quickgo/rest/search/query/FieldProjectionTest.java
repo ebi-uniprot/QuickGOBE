@@ -1,28 +1,29 @@
 package uk.ac.ebi.quickgo.rest.search.query;
 
 import org.hamcrest.core.Is;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Created 11/02/16
  * @author Edd
  */
-public class FieldProjectionTest {
-    @Test(expected = IllegalArgumentException.class)
-    public void nullFieldThrowsException() throws Exception {
-        new FieldProjection(null);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void emptyFieldThrowsException() throws Exception {
-        new FieldProjection("");
+class FieldProjectionTest {
+    @Test
+    void nullFieldThrowsException() {
+        assertThrows(IllegalArgumentException.class, () -> new FieldProjection(null));
     }
 
     @Test
-    public void createFieldProjection() throws Exception {
+    void emptyFieldThrowsException() {
+        assertThrows(IllegalArgumentException.class, () -> new FieldProjection(""));
+    }
+
+    @Test
+    void createFieldProjection() {
         String field = "field";
         FieldProjection fieldProjection = new FieldProjection(field);
 

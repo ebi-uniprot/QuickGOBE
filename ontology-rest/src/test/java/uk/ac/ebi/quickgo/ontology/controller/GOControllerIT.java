@@ -9,8 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -35,7 +35,7 @@ import static uk.ac.ebi.quickgo.ontology.controller.OBOController.CONSTRAINTS_SU
  * Created 16/11/15
  * @author Edd
  */
-public class GOControllerIT extends OBOControllerIT {
+class GOControllerIT extends OBOControllerIT {
 
     private static final String RESOURCE_URL = "/ontology/go";
     private static final String GO_0000001 = "GO:0000001";
@@ -70,14 +70,14 @@ public class GOControllerIT extends OBOControllerIT {
     private static final String STOP_NODE = "GO:0008150";
     private static final String NO_VALID_SLIM_TERMS_ERROR_MESSAGE = "Requested slim-set contains no valid terms";
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         setupGOForSlimTests();
     }
 
     // GO specific data  ------------------
     @Test
-    public void canRetrieveBlacklistByIds() throws Exception {
+    void canRetrieveBlacklistByIds() throws Exception {
         ResultActions response = mockMvc.perform(get(
                 buildTermsURLWithSubResource(toCSV(GO_0000001, GO_0000002), CONSTRAINTS_SUB_RESOURCE)));
 
@@ -88,7 +88,7 @@ public class GOControllerIT extends OBOControllerIT {
     }
 
     @Test
-    public void canRetrieveGoDiscussions() throws Exception {
+    void canRetrieveGoDiscussions() throws Exception {
         ResultActions response = mockMvc.perform(get(buildTermsURLWithSubResource(GO_0000001, COMPLETE_SUB_RESOURCE)));
 
         expectBasicFieldsInResults(response, singletonList(GO_0000001))
@@ -99,7 +99,7 @@ public class GOControllerIT extends OBOControllerIT {
 
     // meta-data ------------------
     @Test
-    public void about() throws Exception {
+    void about() throws Exception {
         ResultActions response = mockMvc.perform(get(getResourceURL() + "/about"));
         final String expectedVersion = "http://purl.obolibrary.org/obo/go/releases/2017-01-12/go.owl";
         final String expectedTimestamp = "2017-01-13 02:19";
@@ -111,7 +111,7 @@ public class GOControllerIT extends OBOControllerIT {
 
     // slimming ------------------
     @Test
-    public void slimmingFromAndToTheSameTermReturnsIdentitySlim() throws Exception {
+    void slimmingFromAndToTheSameTermReturnsIdentitySlim() throws Exception {
         ResultActions response = mockMvc.perform(get(getSlimURL())
                 .param(SLIM_TO_IDS_PARAM, GO_SLIM1)
                 .param(SLIM_FROM_IDS_PARAM, GO_SLIM1));
@@ -125,7 +125,7 @@ public class GOControllerIT extends OBOControllerIT {
     }
 
     @Test
-    public void oneIdHasOneSlim() throws Exception {
+    void oneIdHasOneSlim() throws Exception {
         ResultActions response = mockMvc.perform(get(getSlimURL())
                 .param(SLIM_TO_IDS_PARAM, GO_SLIM1));
 
@@ -139,7 +139,7 @@ public class GOControllerIT extends OBOControllerIT {
     }
 
     @Test
-    public void oneIdAndOneNonExistingIdHasOneSlim() throws Exception {
+    void oneIdAndOneNonExistingIdHasOneSlim() throws Exception {
         ResultActions response = mockMvc.perform(get(getSlimURL())
                 .param(SLIM_TO_IDS_PARAM, toCSV(GO_SLIM1, NON_EXISTENT_TERM)));
 
@@ -153,7 +153,7 @@ public class GOControllerIT extends OBOControllerIT {
     }
 
     @Test
-    public void oneIdHasTwoSlims() throws Exception {
+    void oneIdHasTwoSlims() throws Exception {
         ResultActions response = mockMvc.perform(get(getSlimURL())
                 .param(SLIM_TO_IDS_PARAM, GO_SLIM2));
 
@@ -176,7 +176,7 @@ public class GOControllerIT extends OBOControllerIT {
     }
 
     @Test
-    public void twoIdsHave1Slim() throws Exception {
+    void twoIdsHave1Slim() throws Exception {
         ResultActions response = mockMvc.perform(get(getSlimURL())
                 .param(SLIM_TO_IDS_PARAM, GO_SLIM4));
 
@@ -191,7 +191,7 @@ public class GOControllerIT extends OBOControllerIT {
     }
 
     @Test
-    public void twoIdsHave2Slims() throws Exception {
+    void twoIdsHave2Slims() throws Exception {
         ResultActions response = mockMvc.perform(get(getSlimURL())
                 .param(SLIM_TO_IDS_PARAM, toCSV(GO_SLIM5, GO_SLIM6)));
 
@@ -206,7 +206,7 @@ public class GOControllerIT extends OBOControllerIT {
     }
 
     @Test
-    public void twoIdsHave2SlimsButOnlyOneIsRequested() throws Exception {
+    void twoIdsHave2SlimsButOnlyOneIsRequested() throws Exception {
         ResultActions response = mockMvc.perform(get(getSlimURL())
                 .param(SLIM_TO_IDS_PARAM, toCSV(GO_SLIM5, GO_SLIM6))
                 .param(SLIM_FROM_IDS_PARAM, GO_SLIM_CHILD5));
@@ -220,7 +220,7 @@ public class GOControllerIT extends OBOControllerIT {
     }
 
     @Test
-    public void twoIdsHave2SlimsButNoneAreRequested() throws Exception {
+    void twoIdsHave2SlimsButNoneAreRequested() throws Exception {
         ResultActions response = mockMvc.perform(get(getSlimURL())
                 .param(SLIM_TO_IDS_PARAM, toCSV(GO_SLIM5, GO_SLIM6))
                 .param(SLIM_FROM_IDS_PARAM, NON_EXISTENT_TERM));
@@ -232,7 +232,7 @@ public class GOControllerIT extends OBOControllerIT {
     }
 
     @Test
-    public void slimmingWithEmptyIDsCausesCauses400() throws Exception {
+    void slimmingWithEmptyIDsCausesCauses400() throws Exception {
         ResultActions response = mockMvc.perform(get(getSlimURL())
                 .param(SLIM_TO_IDS_PARAM, ""));
 
@@ -241,7 +241,7 @@ public class GOControllerIT extends OBOControllerIT {
     }
 
     @Test
-    public void slimmingWithNoValidIDsCausesCauses400() throws Exception {
+    void slimmingWithNoValidIDsCausesCauses400() throws Exception {
         ResultActions response = mockMvc.perform(get(getSlimURL())
                 .param(SLIM_TO_IDS_PARAM, NON_EXISTENT_TERM));
 
@@ -250,7 +250,7 @@ public class GOControllerIT extends OBOControllerIT {
     }
 
     @Test
-    public void slimmingWithInvalidFromIdButValidToIdProduces400() throws Exception {
+    void slimmingWithInvalidFromIdButValidToIdProduces400() throws Exception {
         ResultActions response = mockMvc.perform(get(getSlimURL())
                 .param(SLIM_FROM_IDS_PARAM, invalidId())
                 .param(SLIM_TO_IDS_PARAM, GO_SLIM1));
@@ -259,7 +259,7 @@ public class GOControllerIT extends OBOControllerIT {
     }
 
     @Test
-    public void slimmingWithFromIdButNoToIdsProduces400() throws Exception {
+    void slimmingWithFromIdButNoToIdsProduces400() throws Exception {
         ResultActions response = mockMvc.perform(get(getSlimURL())
                 .param(SLIM_FROM_IDS_PARAM, GO_SLIM_CHILD1));
 
@@ -268,7 +268,7 @@ public class GOControllerIT extends OBOControllerIT {
     }
 
     @Test
-    public void slimmingWithFromIdButToIdIsInvalidProduces400() throws Exception {
+    void slimmingWithFromIdButToIdIsInvalidProduces400() throws Exception {
         ResultActions response = mockMvc.perform(get(getSlimURL())
                 .param(SLIM_FROM_IDS_PARAM, GO_SLIM_CHILD1)
                 .param(SLIM_TO_IDS_PARAM, invalidId()));
@@ -277,7 +277,7 @@ public class GOControllerIT extends OBOControllerIT {
     }
 
     @Test
-    public void slimmingWithInvalidFromAndInvalidToIdProduces400() throws Exception {
+    void slimmingWithInvalidFromAndInvalidToIdProduces400() throws Exception {
         ResultActions response = mockMvc.perform(get(getSlimURL())
                 .param(SLIM_FROM_IDS_PARAM, invalidId())
                 .param(SLIM_TO_IDS_PARAM, invalidId() + "XXX"));
@@ -286,7 +286,7 @@ public class GOControllerIT extends OBOControllerIT {
     }
 
     @Test
-    public void slimmingOverInvalidRelationshipCauses400() throws Exception {
+    void slimmingOverInvalidRelationshipCauses400() throws Exception {
         String invalidRelation = "XXXX";
         ResultActions response = mockMvc.perform(get(getSlimURL())
                 .param(SLIM_TO_IDS_PARAM, GO_SLIM1)
@@ -297,7 +297,7 @@ public class GOControllerIT extends OBOControllerIT {
     }
 
     @Test
-    public void slimmingOverRelationshipNotInGraphReturnsIdentitySlim() throws Exception {
+    void slimmingOverRelationshipNotInGraphReturnsIdentitySlim() throws Exception {
         String nonExistentGraphRelationship = "occurs_in";
         ResultActions response = mockMvc.perform(get(getSlimURL())
                 .param(SLIM_TO_IDS_PARAM, GO_SLIM1)
@@ -312,7 +312,7 @@ public class GOControllerIT extends OBOControllerIT {
     }
 
     @Test
-    public void canSlimWhereRelationshipIsRegulates() throws Exception {
+    void canSlimWhereRelationshipIsRegulates() throws Exception {
         ResultActions response = mockMvc.perform(get(getSlimURL())
                 .param(SLIM_TO_IDS_PARAM, GO_SLIM8));
 
@@ -324,7 +324,7 @@ public class GOControllerIT extends OBOControllerIT {
     }
 
     @Test
-    public void canSlimWhereRelationshipIsASubclassOfRegulates() throws Exception {
+    void canSlimWhereRelationshipIsASubclassOfRegulates() throws Exception {
         ResultActions response = mockMvc.perform(get(getSlimURL())
                 .param(SLIM_TO_IDS_PARAM, GO_SLIM9));
 

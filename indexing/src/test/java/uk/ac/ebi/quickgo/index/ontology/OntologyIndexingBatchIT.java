@@ -2,9 +2,9 @@ package uk.ac.ebi.quickgo.index.ontology;
 
 import com.redfin.sitemapgenerator.WebSitemapGenerator;
 import org.hamcrest.core.Is;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.stubbing.Stubber;
 import org.slf4j.Logger;
 import org.springframework.batch.core.BatchStatus;
@@ -20,8 +20,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import uk.ac.ebi.quickgo.common.store.BasicTemporaryFolder;
 import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 import uk.ac.ebi.quickgo.index.QuickGOIndexMain;
 import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
@@ -54,16 +52,13 @@ import static uk.ac.ebi.quickgo.ontology.common.document.OntologyDocMocker.creat
  * Created 18/12/15
  * @author Edd
  */
+@ExtendWith(TemporarySolrDataStore.class)
 @ActiveProfiles(profiles = {"embeddedServer"})
-@RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {JobTestRunnerConfig.class, OntologyConfig.class, OntologyIndexingBatchIT.TestConfig.class})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class OntologyIndexingBatchIT {
-    @ClassRule
-    public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
-
-    @ClassRule
-    public static final BasicTemporaryFolder siteMapTempFolder = new BasicTemporaryFolder();
+class OntologyIndexingBatchIT {
+    @TempDir
+    static File siteMapTempFolder;
 
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
@@ -83,7 +78,7 @@ public class OntologyIndexingBatchIT {
     private static final Logger LOGGER = getLogger(OntologyIndexingBatchIT.class);
 
     @Test
-    public void documentReaderExceptionThrownWhenReaderIsOpenedCausesStepFailure() {
+    void documentReaderExceptionThrownWhenReaderIsOpenedCausesStepFailure() {
         doThrow(new DocumentReaderException("Error!")).when(reader).open(any(ExecutionContext.class));
 
         JobExecution jobExecution = jobLauncherTestUtils.launchStep(ONTOLOGY_INDEXING_STEP_NAME);
@@ -91,7 +86,7 @@ public class OntologyIndexingBatchIT {
     }
 
     @Test
-    public void stepSucceedsWhenNoSkips() throws Exception {
+    void stepSucceedsWhenNoSkips() throws Exception {
         List<OntologyReadResult> resultsFromReadingSource = asList(
                 GO_DOC,
                 GO_DOC,
@@ -116,7 +111,7 @@ public class OntologyIndexingBatchIT {
     }
 
     @Test
-    public void stepSkipsOnceWhenReaderFindsOneEmptyOptionalDocument() throws Exception {
+    void stepSkipsOnceWhenReaderFindsOneEmptyOptionalDocument() throws Exception {
         List<OntologyReadResult> resultsFromReadingSource = asList(
                 GO_DOC,
                 DOC_READER_EXCEPTION,
@@ -139,7 +134,7 @@ public class OntologyIndexingBatchIT {
     }
 
     @Test
-    public void tooManySkipsCausesStepToFail() throws Exception {
+    void tooManySkipsCausesStepToFail() throws Exception {
         List<OntologyReadResult> resultsFromReadingSource = asList(
                 GO_DOC,
                 DOC_READER_EXCEPTION,
@@ -172,7 +167,7 @@ public class OntologyIndexingBatchIT {
     }
 
     @Test
-    public void succeedsOn2ChunksButSkips1ChunkWhenSkipLimitExceeded() throws Exception {
+    void succeedsOn2ChunksButSkips1ChunkWhenSkipLimitExceeded() throws Exception {
         List<OntologyReadResult> resultsFromReadingSource = asList(
                 GO_DOC,
                 GO_DOC,
@@ -275,10 +270,8 @@ public class OntologyIndexingBatchIT {
      * @throws IOException may be produced during creation of {@link BufferedReader}
      */
     private void checkSiteMapWasWritten(List<OntologyReadResult> docsThatShouldHaveBeenWritten) throws IOException {
-        File siteMapTempFolderRoot = siteMapTempFolder.getRoot();
-
-        assertThat(new File(siteMapTempFolderRoot, SITEMAP_INDEX_XML).exists(), is(true));
-        File siteMapXml = new File(siteMapTempFolderRoot, SITEMAP_XML);
+        assertThat(new File(siteMapTempFolder, SITEMAP_INDEX_XML).exists(), is(true));
+        File siteMapXml = new File(siteMapTempFolder, SITEMAP_XML);
         assertThat(siteMapXml.exists(), is(true));
 
         int urlMatchCount = 0;
@@ -324,14 +317,14 @@ public class OntologyIndexingBatchIT {
     }
 
     @Configuration
-    public static class TestConfig {
+    static class TestConfig {
         /**
          * A mocked {@link OntologyReader} instance.
          * @return A mocked {@link OntologyReader} instance.
          */
         @Bean
         @Primary
-        public OntologyReader ontologyReader() {
+        OntologyReader ontologyReader() {
             return mock(OntologyReader.class);
         }
 
@@ -341,10 +334,10 @@ public class OntologyIndexingBatchIT {
          */
         @Bean
         @Primary
-        public WebSitemapGenerator sitemapGenerator() {
+        WebSitemapGenerator sitemapGenerator() {
             try {
                 return WebSitemapGenerator
-                        .builder(DEFAULT_QUICKGO_FRONTEND_URL, siteMapTempFolder.getRoot())
+                        .builder(DEFAULT_QUICKGO_FRONTEND_URL, siteMapTempFolder)
                         .build();
             } catch (MalformedURLException e) {
                 LOGGER.error("Sitemap URL is malformed", e);

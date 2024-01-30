@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.rest.search.request;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
@@ -11,24 +11,25 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsNull.notNullValue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Created 17/06/16
  * @author Edd
  */
-public class FilterRequestTest {
-    @Test(expected = IllegalArgumentException.class)
-    public void cannotCreateRequestWithNullName() {
-        FilterRequest.newBuilder().addProperty(null, "value");
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void cannotCreateRequestWithEmptyName() {
-        FilterRequest.newBuilder().addProperty("  ", "value");
+class FilterRequestTest {
+    @Test
+    void cannotCreateRequestWithNullName() {
+        assertThrows(IllegalArgumentException.class, () -> FilterRequest.newBuilder().addProperty(null, "value"));
     }
 
     @Test
-    public void createValidRequestWith1PropertyAnd1Value() {
+    void cannotCreateRequestWithEmptyName() {
+        assertThrows(IllegalArgumentException.class, () -> FilterRequest.newBuilder().addProperty("  ", "value"));
+    }
+
+    @Test
+    void createValidRequestWith1PropertyAnd1Value() {
         String field = "name";
         String fieldValue = "value";
         FilterRequest request = FilterRequest.newBuilder().addProperty(field, fieldValue).build();
@@ -38,7 +39,7 @@ public class FilterRequestTest {
     }
 
     @Test
-    public void createValidRequestWith1PropertyWithEmptyValue() {
+    void createValidRequestWith1PropertyWithEmptyValue() {
         String field = "name";
         FilterRequest request = FilterRequest.newBuilder().addProperty(field).build();
         assertThat(request, is(notNullValue()));
@@ -47,7 +48,7 @@ public class FilterRequestTest {
     }
 
     @Test
-    public void createValidRequestWith1PropertyAnd2Values() {
+    void createValidRequestWith1PropertyAnd2Values() {
         String field = "name";
         String fieldValue1 = "value1";
         String fieldValue2 = "value2";
@@ -58,7 +59,7 @@ public class FilterRequestTest {
     }
 
     @Test
-    public void createValidRequestWith2Properties() {
+    void createValidRequestWith2Properties() {
         String field1 = "name1";
         String field1Value = "value1";
         String field2 = "name2";
@@ -74,7 +75,7 @@ public class FilterRequestTest {
     }
 
     @Test
-    public void fetchingValuesFindsAll() {
+    void fetchingValuesFindsAll() {
         String field1 = "name1";
         String field1Value = "value1";
         String field2 = "name2";
@@ -89,7 +90,7 @@ public class FilterRequestTest {
     }
 
     @Test
-    public void addingPropertyWithoutValueResultsInPropertyWithEmptyValuesList() {
+    void addingPropertyWithoutValueResultsInPropertyWithEmptyValuesList() {
         String field = "name";
         FilterRequest request = FilterRequest.newBuilder().addProperty(field).build();
         assertThat(request, is(notNullValue()));
@@ -101,14 +102,14 @@ public class FilterRequestTest {
      * A filter request without properties is an unlikely situation but possible.
      */
     @Test
-    public void filterRequestWithNoPropertiesHasEmptySignature() {
+    void filterRequestWithNoPropertiesHasEmptySignature() {
         FilterRequest request = FilterRequest.newBuilder().build();
         assertThat(request, is(notNullValue()));
         assertThat(request.getSignature(), is(empty()));
     }
 
     @Test
-    public void filterRequestWithOnePropertyHasSignatureContainingOneValue() {
+    void filterRequestWithOnePropertyHasSignatureContainingOneValue() {
         String field = "name";
         FilterRequest request = FilterRequest.newBuilder().addProperty(field, "value").build();
         assertThat(request, is(notNullValue()));
@@ -116,7 +117,7 @@ public class FilterRequestTest {
     }
 
     @Test
-    public void filterRequestWithMultiplePropertiesHasSignatureContainingMultipleValues() {
+    void filterRequestWithMultiplePropertiesHasSignatureContainingMultipleValues() {
         String field1 = "name1";
         String field2 = "name2";
         FilterRequest request = FilterRequest.newBuilder()

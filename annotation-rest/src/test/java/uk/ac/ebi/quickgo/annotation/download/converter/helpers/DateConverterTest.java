@@ -1,16 +1,17 @@
 package uk.ac.ebi.quickgo.annotation.download.converter.helpers;
 
-import java.util.Date;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
+import java.util.Date;
+
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.DateConverter.ISO_8601_FORMATTER;
 
-public class DateConverterTest {
+class DateConverterTest {
 
     @Test
-    public void dateFormatted() {
+    void dateFormatted() {
         Date date = new Date();
         date.setTime(0);
 
@@ -20,7 +21,7 @@ public class DateConverterTest {
     }
 
     @Test
-    public void nullDate() {
+    void nullDate() {
         Date date = null;
 
         String formattedDate = ISO_8601_FORMATTER.apply(date);

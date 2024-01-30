@@ -20,16 +20,17 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 import java.util.regex.Pattern;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Unit tests available components of the {@link OBOController} class.
@@ -37,8 +38,8 @@ import static org.hamcrest.Matchers.is;
  * Created 16/02/16
  * @author Edd
  */
-@RunWith(MockitoJUnitRunner.class)
-public class OBOControllerTest {
+@ExtendWith(MockitoExtension.class)
+class OBOControllerTest {
     private static final Pattern ID_FORMAT = Pattern.compile("id[0-9]");
     private static final int MAX_PAGE_SIZE = 30;
     private static final int DEFAULT_PAGE_SIZE = 25;
@@ -86,8 +87,8 @@ public class OBOControllerTest {
         };
     }
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
 
         this.controller = createOBOController(ontologyService,
                                               searchService,
@@ -101,21 +102,21 @@ public class OBOControllerTest {
     }
 
     @Test
-    public void termsResponseForNullListContainsZeroResults() {
+    void termsResponseForNullListContainsZeroResults() {
         ResponseEntity<QueryResult<FakeOBOTerm>> termsResponse = controller.getResultsResponse(null);
         assertThat(termsResponse.getBody().getNumberOfHits(), is(0L));
         assertThat(termsResponse.getBody().getResults(), is(empty()));
     }
 
     @Test
-    public void termsResponseForEmptyListContainsZeroResults() {
+    void termsResponseForEmptyListContainsZeroResults() {
         ResponseEntity<QueryResult<FakeOBOTerm>> termsResponse = controller.getResultsResponse(Collections.emptyList());
         assertThat(termsResponse.getBody().getNumberOfHits(), is(0L));
         assertThat(termsResponse.getBody().getResults(), is(empty()));
     }
 
     @Test
-    public void termsResponseForListOfOneContainsOneResult() {
+    void termsResponseForListOfOneContainsOneResult() {
         ResponseEntity<QueryResult<FakeOBOTerm>> termsResponse = controller.getResultsResponse(Collections
                                                                                                        .singletonList(
                                                                                                                new FakeOBOTerm()));
@@ -123,9 +124,9 @@ public class OBOControllerTest {
         assertThat(termsResponse.getBody().getResults().size(), is(1));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void controllerInstantiationFailsOnNullOntologyService() {
-        createOBOController(
+    @Test
+    void controllerInstantiationFailsOnNullOntologyService() {
+        assertThrows(IllegalArgumentException.class, () -> createOBOController(
                 null,
                 searchService,
                 searchableField,
@@ -134,83 +135,89 @@ public class OBOControllerTest {
                 oboControllerValidationHelper,
                 ontologyPagingConfig,
                 ontologySpecifier,
-                headersProvider);
+                headersProvider));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void controllerInstantiationFailsOnNullSearchService() {
-        createOBOController(ontologyService,
-                            null,
-                            searchableField,
-                            retrievalConfig,
-                            graphImageService,
-                            oboControllerValidationHelper,
-                            ontologyPagingConfig,
-                            ontologySpecifier,
-                            headersProvider);
+    @Test
+    void controllerInstantiationFailsOnNullSearchService() {
+        assertThrows(IllegalArgumentException.class, () -> createOBOController(ontologyService,
+                null,
+                searchableField,
+                retrievalConfig,
+                graphImageService,
+                oboControllerValidationHelper,
+                ontologyPagingConfig,
+                ontologySpecifier,
+                headersProvider));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void controllerInstantiationFailsOnNullSearchableField() {
-        createOBOController(ontologyService,
-                            searchService,
-                            null,
-                            retrievalConfig,
-                            graphImageService,
-                            oboControllerValidationHelper,
-                            ontologyPagingConfig,
-                            ontologySpecifier,
-                            headersProvider);
+    @Test
+    void controllerInstantiationFailsOnNullSearchableField() {
+        assertThrows(IllegalArgumentException.class, () -> createOBOController(ontologyService,
+                searchService,
+                null,
+                retrievalConfig,
+                graphImageService,
+                oboControllerValidationHelper,
+                ontologyPagingConfig,
+                ontologySpecifier,
+                headersProvider));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void controllerInstantiationFailsOnNullRetrievalConfig() {
-        createOBOController(ontologyService,
-                            searchService,
-                            searchableField,
-                            null,
-                            graphImageService,
-                            oboControllerValidationHelper,
-                            ontologyPagingConfig,
-                            ontologySpecifier,
-                            headersProvider);
+    @Test
+    void controllerInstantiationFailsOnNullRetrievalConfig() {
+        assertThrows(IllegalArgumentException.class, () -> createOBOController(ontologyService,
+                searchService,
+                searchableField,
+                null,
+                graphImageService,
+                oboControllerValidationHelper,
+                ontologyPagingConfig,
+                ontologySpecifier,
+                headersProvider));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void controllerInstantiationFailsOnNullGraphImageService() {
-        createOBOController(ontologyService,
-                            searchService,
-                            searchableField,
-                            retrievalConfig,
-                            null,
-                            oboControllerValidationHelper,
-                            ontologyPagingConfig,
-                            ontologySpecifier,
-                            headersProvider);
+    @Test
+    void controllerInstantiationFailsOnNullGraphImageService() {
+        assertThrows(IllegalArgumentException.class, () -> createOBOController(ontologyService,
+                searchService,
+                searchableField,
+                retrievalConfig,
+                null,
+                oboControllerValidationHelper,
+                ontologyPagingConfig,
+                ontologySpecifier,
+                headersProvider));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void controllerInstantiationFailsOnNullValidationHelper() {
-        createOBOController(ontologyService, searchService, searchableField, retrievalConfig, graphImageService, null,
-                            ontologyPagingConfig, ontologySpecifier, headersProvider);
+    @Test
+    void controllerInstantiationFailsOnNullValidationHelper() {
+        assertThrows(IllegalArgumentException.class, () -> createOBOController(ontologyService, searchService,
+          searchableField, retrievalConfig, graphImageService, null, ontologyPagingConfig, ontologySpecifier, headersProvider));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void controllerInstantiationFailsOnNullPagingConfig() {
-        createOBOController(ontologyService, searchService, searchableField, retrievalConfig, graphImageService,
-                            oboControllerValidationHelper, null, ontologySpecifier, headersProvider);
+    @Test
+    void controllerInstantiationFailsOnNullPagingConfig() {
+        assertThrows(IllegalArgumentException.class, () ->
+            createOBOController(ontologyService, searchService, searchableField, retrievalConfig, graphImageService,
+                    oboControllerValidationHelper, null, ontologySpecifier, headersProvider)
+        );
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void controllerInstantiationFailsOnNullOntologySpecifier() {
-        createOBOController(ontologyService, searchService, searchableField, retrievalConfig, graphImageService,
-                            oboControllerValidationHelper, ontologyPagingConfig, null, headersProvider);
+    @Test
+    void controllerInstantiationFailsOnNullOntologySpecifier() {
+        assertThrows(IllegalArgumentException.class, () ->
+            createOBOController(ontologyService, searchService, searchableField, retrievalConfig, graphImageService,
+                    oboControllerValidationHelper, ontologyPagingConfig, null, headersProvider)
+        );
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void controllerInstantiationFailsOnNullHeaderProvider() {
-        createOBOController(ontologyService, searchService, searchableField, retrievalConfig, graphImageService,
-                            oboControllerValidationHelper, ontologyPagingConfig, ontologySpecifier, null);
+    @Test
+    void controllerInstantiationFailsOnNullHeaderProvider() {
+        assertThrows(IllegalArgumentException.class, () ->
+            createOBOController(ontologyService, searchService, searchableField, retrievalConfig, graphImageService,
+                    oboControllerValidationHelper, ontologyPagingConfig, ontologySpecifier, null)
+        );
     }
 
     private static class FakeOBOTerm extends OBOTerm {}

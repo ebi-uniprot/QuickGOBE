@@ -1,12 +1,10 @@
 package uk.ac.ebi.quickgo.client.service.search.ontology;
 
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -37,15 +35,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * <b>Note: This class should be used solely for functional tests on the user query, and no other section of the user
  * request.</b>
  */
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(TemporarySolrDataStore.class)
 @SpringBootTest(classes = {QuickGOREST.class})
 @WebAppConfiguration
-public class OntologyUserQueryScoringIT {
+class OntologyUserQueryScoringIT {
     private static final String RESOURCE_URL = "/internal/search/ontology";
     private static final String QUERY_PARAM = "query";
-
-    @ClassRule
-    public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
 
     @Autowired
     protected WebApplicationContext webApplicationContext;
@@ -55,8 +50,8 @@ public class OntologyUserQueryScoringIT {
 
     protected MockMvc mockMvc;
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         repository.deleteAll();
 
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
@@ -64,7 +59,7 @@ public class OntologyUserQueryScoringIT {
     }
 
     @Test
-    public void nonMatchingIdInQueryReturnsNoEntries() throws Exception {
+    void nonMatchingIdInQueryReturnsNoEntries() throws Exception {
         OntologyDocument doc1 = createDoc("GO:0000001", "go1");
         OntologyDocument doc2 = createDoc("GO:0000002", "go2");
         OntologyDocument doc3 = createDoc("GO:0000003", "go3");
@@ -79,7 +74,7 @@ public class OntologyUserQueryScoringIT {
     }
 
     @Test
-    public void idInQueryMatchesExactlyOneEntryReturnsThatEntry() throws Exception {
+    void idInQueryMatchesExactlyOneEntryReturnsThatEntry() throws Exception {
         OntologyDocument doc1 = createDoc("GO:0000001", "go1");
         OntologyDocument doc2 = createDoc("GO:0000002", "go2");
         OntologyDocument doc3 = createDoc("GO:0000003", "go3");
@@ -96,7 +91,7 @@ public class OntologyUserQueryScoringIT {
     }
 
     @Test
-    public void partiallyMatchingIdInQueryReturnsNoEntries() throws Exception {
+    void partiallyMatchingIdInQueryReturnsNoEntries() throws Exception {
         OntologyDocument doc1 = createDoc("GO:0000001", "go1");
         OntologyDocument doc2 = createDoc("GO:0000002", "go2");
         OntologyDocument doc3 = createDoc("GO:0000003", "go3");
@@ -111,7 +106,7 @@ public class OntologyUserQueryScoringIT {
     }
 
     @Test
-    public void nonMatchingNameInQueryReturnsNoEntries() throws Exception {
+    void nonMatchingNameInQueryReturnsNoEntries() throws Exception {
         OntologyDocument doc1 = createDoc("GO:0000001", "go1");
         OntologyDocument doc2 = createDoc("GO:0000002", "go2");
         OntologyDocument doc3 = createDoc("GO:0000003", "go3");
@@ -126,7 +121,7 @@ public class OntologyUserQueryScoringIT {
     }
 
     @Test
-    public void substringQueryPartiallyMatchesNameInEntry2ReturnsEntry2() throws Exception {
+    void substringQueryPartiallyMatchesNameInEntry2ReturnsEntry2() throws Exception {
         OntologyDocument doc1 = createDoc("GO:0000001", "substring1");
         OntologyDocument doc2 = createDoc("GO:0000002", "substitute2");
         OntologyDocument doc3 = createDoc("GO:0000003", "subsistence3");
@@ -142,7 +137,7 @@ public class OntologyUserQueryScoringIT {
     }
 
     @Test
-    public void substringQueryPartiallyMatchesSynonymInEntry2ReturnsEntry2() throws Exception {
+    void substringQueryPartiallyMatchesSynonymInEntry2ReturnsEntry2() throws Exception {
         OntologyDocument doc1 = createDoc("GO:0000001", "go1", "substring1");
         OntologyDocument doc2 = createDoc("GO:0000002", "go2", "substitute2");
         OntologyDocument doc3 = createDoc("GO:0000003", "go3", "subsistence3");
@@ -158,7 +153,7 @@ public class OntologyUserQueryScoringIT {
     }
 
     @Test
-    public void queryPartiallyMatchesNameInEntry1AndPartiallyMatchesSynonymInEntry2ReturnsEntry1FirstAndEntry2Second()
+    void queryPartiallyMatchesNameInEntry1AndPartiallyMatchesSynonymInEntry2ReturnsEntry1FirstAndEntry2Second()
             throws Exception {
         OntologyDocument doc1 = createDoc("GO:0000001", "go1 with something");
         OntologyDocument doc2 = createDoc("GO:0000002", "go2", "synonym of go1");
@@ -176,7 +171,7 @@ public class OntologyUserQueryScoringIT {
     }
 
     @Test
-    public void queryPartiallyMatchesNameInEntry1AndExactMatchesNameInEntry2ReturnsEntry2FirstAndEntry1Second()
+    void queryPartiallyMatchesNameInEntry1AndExactMatchesNameInEntry2ReturnsEntry2FirstAndEntry1Second()
             throws Exception {
         OntologyDocument doc1 = createDoc("GO:0000001", "go1 with something");
         OntologyDocument doc2 = createDoc("GO:0000002", "go1");
@@ -194,7 +189,7 @@ public class OntologyUserQueryScoringIT {
     }
 
     @Test
-    public void queryPartiallyMatchesNameInEntry1AndExactMatchesSynonymInEntry2ReturnsEntry2FirstAndEntry1Second()
+    void queryPartiallyMatchesNameInEntry1AndExactMatchesSynonymInEntry2ReturnsEntry2FirstAndEntry1Second()
             throws Exception {
         OntologyDocument doc1 = createDoc("GO:0000001", "go1 with something");
         OntologyDocument doc2 = createDoc("GO:0000002", "go2", "go1");
@@ -212,7 +207,7 @@ public class OntologyUserQueryScoringIT {
     }
 
     @Test
-    public void namesInEntriesDoNotMatchMultiWordQueryReturnsZeroEntries() throws Exception {
+    void namesInEntriesDoNotMatchMultiWordQueryReturnsZeroEntries() throws Exception {
         OntologyDocument doc1 = createDoc("GO:0000001", "go1 with something");
         OntologyDocument doc2 = createDoc("GO:0000002", "go1 do something else");
         OntologyDocument doc3 = createDoc("GO:0000003", "go1 up then down");
@@ -227,7 +222,7 @@ public class OntologyUserQueryScoringIT {
     }
 
     @Test
-    public void namesInEntryMatchAllWordsInMultiWordQueryReturnsMatchingEntry() throws Exception {
+    void namesInEntryMatchAllWordsInMultiWordQueryReturnsMatchingEntry() throws Exception {
         OntologyDocument doc1 = createDoc("GO:0000001", "go1 up and down");
 
         repository.save(doc1);
@@ -239,7 +234,7 @@ public class OntologyUserQueryScoringIT {
     }
 
     @Test
-    public void multiWordQueryMatchesPartiallyNameInEntry1AndExactMatchesNameInEntry2ReturnsEntry2ThenEntry1()
+    void multiWordQueryMatchesPartiallyNameInEntry1AndExactMatchesNameInEntry2ReturnsEntry2ThenEntry1()
             throws Exception {
         OntologyDocument doc1 = createDoc("GO:0000001", "go1 up and down");
         OntologyDocument doc2 = createDoc("GO:0000002", "go1 and ");
@@ -255,7 +250,7 @@ public class OntologyUserQueryScoringIT {
     }
 
     @Test
-    public void multiWordQueryMatchesPartiallyNameInEntry1AndExactMatchesSynonymInEntry2ReturnsEntry2ThenEntry1()
+    void multiWordQueryMatchesPartiallyNameInEntry1AndExactMatchesSynonymInEntry2ReturnsEntry2ThenEntry1()
             throws Exception {
         OntologyDocument doc1 = createDoc("GO:0000001", "go1 up and down");
         OntologyDocument doc2 = createDoc("GO:0000002", "go2", "go1 and");
@@ -271,7 +266,7 @@ public class OntologyUserQueryScoringIT {
     }
 
     @Test
-    public void termFrequencyDoesNotInfluenceScoring() throws Exception {
+    void termFrequencyDoesNotInfluenceScoring() throws Exception {
         OntologyDocument docContainingTwoGo1s = createDoc("GO:0000001", "go1 go2", "go1");
         OntologyDocument docContaining6Go1s = createDoc(
                 "GO:0000002",
@@ -291,7 +286,7 @@ public class OntologyUserQueryScoringIT {
     }
 
     @Test
-    public void whenQueryMatchesDocumentsEquallyResultsAreOrderedByShortestToLongest() throws Exception {
+    void whenQueryMatchesDocumentsEquallyResultsAreOrderedByShortestToLongest() throws Exception {
         OntologyDocument doc1 = createDoc("GO:0000001", "go1 has a particularly long function");
         OntologyDocument doc2 = createDoc("GO:0000002", "go1 has a long function");
         OntologyDocument doc3 = createDoc("GO:0000003", "go1 has a function");
@@ -309,7 +304,7 @@ public class OntologyUserQueryScoringIT {
     }
 
     @Test
-    public void whenQueryMatches2FieldsInFirstDocAnd1FieldInSecondDocResultsAreOrderedByNumOfMatches() throws
+    void whenQueryMatches2FieldsInFirstDocAnd1FieldInSecondDocResultsAreOrderedByNumOfMatches() throws
                                                                                                        Exception {
         OntologyDocument doc2 = createDoc("GO:0000001", "name one", "some synonym");
         OntologyDocument doc1 = createDoc("GO:0000002", "name one", "synonym one");
@@ -327,7 +322,7 @@ public class OntologyUserQueryScoringIT {
     }
 
     @Test
-    public void hyphenatedQueryMatchesHyphenatedName() throws Exception {
+    void hyphenatedQueryMatchesHyphenatedName() throws Exception {
         OntologyDocument doc1 = createDoc("GO:0000001", "go1 a function", "synonym one");
         OntologyDocument doc2 = createDoc("GO:0000002", "name-2-two", "some synonym");
         OntologyDocument doc3 = createDoc("GO:0000003", "go3 a function");
@@ -344,7 +339,7 @@ public class OntologyUserQueryScoringIT {
     }
 
     @Test
-    public void nonHyphenatedQueryMatchesHyphenatedName() throws Exception {
+    void nonHyphenatedQueryMatchesHyphenatedName() throws Exception {
         OntologyDocument doc1 = createDoc("GO:0000001", "go1 a function", "synonym one");
         OntologyDocument doc2 = createDoc("GO:0000002", "name-2-two", "some synonym");
         OntologyDocument doc3 = createDoc("GO:0000003", "go3 a function");
@@ -361,7 +356,7 @@ public class OntologyUserQueryScoringIT {
     }
 
     @Test
-    public void searchForASecondaryIdIsSuccessful() throws Exception {
+    void searchForASecondaryIdIsSuccessful() throws Exception {
         OntologyDocument doc1 = createDoc("GO:0000001", "something");
         OntologyDocument doc2 = createDoc("GO:0000002", "something");
         OntologyDocument doc3 = createDoc("GO:0000003", "something");
@@ -382,7 +377,7 @@ public class OntologyUserQueryScoringIT {
     }
 
     @Test
-    public void scoringWorks() throws Exception {
+    void scoringWorks() throws Exception {
         OntologyDocument idDoc = createDoc("GO:0000001", "something");
         OntologyDocument nameExactDoc = createDoc("GO:0000002", "GO:0000001");
         OntologyDocument nameEdgeDoc = createDoc("GO:0000003", "GO:000000123456");

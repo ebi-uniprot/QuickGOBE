@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.ontology.service.converter;
-
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.ac.ebi.quickgo.common.converter.FlatFieldBuilder;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 
@@ -9,8 +10,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import org.junit.Before;
-import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
@@ -25,7 +24,7 @@ import static uk.ac.ebi.quickgo.common.converter.FlatFieldLeaf.*;
  * Created 01/12/15
  * @author Edd
  */
-public class TaxonConstraintsFieldConverterTest {
+class TaxonConstraintsFieldConverterTest {
     private static final String ANCESTOR_ID = "GO:0005623";
     private static final String ANCESTOR_NAME = "cell";
     private static final String RELATIONSHIP = "only_in_taxon";
@@ -38,13 +37,13 @@ public class TaxonConstraintsFieldConverterTest {
 
     private TaxonConstraintsFieldConverter converter;
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         this.converter = new TaxonConstraintsFieldConverter();
     }
 
     @Test
-    public void convertsTaxonConstraintWithNoCitations() {
+    void convertsTaxonConstraintWithNoCitations() {
         List<String> rawTaxonConstraints = new ArrayList<>();
 
         rawTaxonConstraints.add(newFlatField()
@@ -71,7 +70,7 @@ public class TaxonConstraintsFieldConverterTest {
     }
 
     @Test
-    public void convertsTaxonConstraintWithWith1Citation() {
+    void convertsTaxonConstraintWithWith1Citation() {
         List<String> rawTaxonConstraints = new ArrayList<>();
 
         rawTaxonConstraints.add(newFlatField()
@@ -104,7 +103,7 @@ public class TaxonConstraintsFieldConverterTest {
     }
 
     @Test
-    public void convertsTaxonConstraintWithWith2Citations() {
+    void convertsTaxonConstraintWithWith2Citations() {
         List<String> rawTaxonConstraints = new ArrayList<>();
 
         rawTaxonConstraints.add(newFlatField()
@@ -140,7 +139,7 @@ public class TaxonConstraintsFieldConverterTest {
     }
 
     @Test
-    public void converts2TaxonConstraints() {
+    void converts2TaxonConstraints() {
         String ancestorId2 = "GO:0005624";
 
         List<String> rawTaxonConstraints = new ArrayList<>();
@@ -174,7 +173,7 @@ public class TaxonConstraintsFieldConverterTest {
     }
 
     @Test
-    public void gracefullyHandleWrongFieldCount() {
+    void gracefullyHandleWrongFieldCount() {
         Optional<OBOTerm.TaxonConstraint> result = converter.apply(newFlatField().addField(
                 newFlatFieldLeaf("wrong " +
                         "format"))

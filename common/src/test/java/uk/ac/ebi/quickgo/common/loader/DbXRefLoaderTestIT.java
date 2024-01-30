@@ -1,10 +1,8 @@
 package uk.ac.ebi.quickgo.common.loader;
-
+import org.junit.jupiter.api.Test;
 import uk.ac.ebi.quickgo.common.validator.DbXRefEntity;
 
 import java.util.List;
-import org.junit.Ignore;
-import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -16,14 +14,14 @@ import static org.hamcrest.Matchers.hasSize;
  *         Time: 09:27
  *         Created with IntelliJ IDEA.
  */
-public class DbXRefLoaderTestIT {
+class DbXRefLoaderTestIT {
 
 	private static final String NOWHERE_CANTFIND = "OVER/RAINBOW";
 	private static final String FIND_IT_HERE = "src/test/resources/DB_XREFS_ENTITIES.dat.gz";
 	private static final boolean CASE_SENSITIVE_MATCHING  = false;
 
 	@Test
-	public void loadFileUnsuccessfully(){
+	void loadFileUnsuccessfully(){
 
 		DbXRefLoader dbXRefLoader = new DbXRefLoader(NOWHERE_CANTFIND, CASE_SENSITIVE_MATCHING );
 		List<DbXRefEntity> list = dbXRefLoader.load();
@@ -31,7 +29,7 @@ public class DbXRefLoaderTestIT {
 	}
 
 	@Test
-	public void loadFileSuccessfully(){
+	void loadFileSuccessfully(){
 		DbXRefLoader dbXRefLoader = new DbXRefLoader(FIND_IT_HERE, CASE_SENSITIVE_MATCHING );
 		List<DbXRefEntity> list = dbXRefLoader.load();
 		assertThat(list, hasSize(142));

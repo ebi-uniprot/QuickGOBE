@@ -1,69 +1,55 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests the behaviour of the {@link StatisticsValue} class.
  */
-public class StatisticsValueTest {
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
+class StatisticsValueTest {
 
     @Test
-    public void nullIdThrowsException() {
+    void nullIdThrowsException() {
         String key = null;
         long total = 2;
         long occurrence = 1;
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Stats key cannot be null or empty");
-
-        new StatisticsValue(key, occurrence, total);
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> new StatisticsValue(key, occurrence, total));
+        assertTrue(exception.getMessage().contains("Stats key cannot be null or empty"));
     }
 
     @Test
-    public void emptyIdThrowsException() {
+    void emptyIdThrowsException() {
         String key = "";
         long total = 2;
         long occurrence = 1;
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Stats key cannot be null or empty");
-
-        new StatisticsValue(key, occurrence, total);
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> new StatisticsValue(key, occurrence, total));
+        assertTrue(exception.getMessage().contains("Stats key cannot be null or empty"));
     }
 
     @Test
-    public void negativeOccurrenceThrowsException() {
+    void negativeOccurrenceThrowsException() {
         String key = "key";
         long total = 2;
         long occurrence = -1;
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Stats hits cannot be a negative value: " + occurrence);
-
-        new StatisticsValue(key, occurrence, total);
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> new StatisticsValue(key, occurrence, total));
+        assertTrue(exception.getMessage().contains("Stats hits cannot be a negative value: " + occurrence));
     }
 
     @Test
-    public void negativeTotalThrowsException() {
+    void negativeTotalThrowsException() {
         String key = "key";
         long total = -1;
         long occurrence = 2;
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Stats total cannot be a negative value: " + total);
-
-        new StatisticsValue(key, occurrence, total);
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> new StatisticsValue(key, occurrence, total));
+        assertTrue(exception.getMessage().contains("Stats total cannot be a negative value: " + total));
     }
 
     @Test
-    public void statisticsModelWithIdAndPositiveTotalGreaterThanOccurrence() {
+    void statisticsModelWithIdAndPositiveTotalGreaterThanOccurrence() {
         String key = "key";
         long total = 2;
         long occurrence = 1;

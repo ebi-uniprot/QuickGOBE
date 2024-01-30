@@ -1,9 +1,8 @@
 package uk.ac.ebi.quickgo.index.geneproduct;
 
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.MockitoAnnotations;
@@ -18,7 +17,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductDocument;
 import uk.ac.ebi.quickgo.index.DocumentWriteRetryHelper;
@@ -37,14 +35,11 @@ import static uk.ac.ebi.quickgo.index.DocumentWriteRetryHelper.validateWriteAtte
 /**
  * Tests whether Spring Batch is correctly wired up to run the Gene product indexing.
  */
+@ExtendWith(TemporarySolrDataStore.class)
 @ActiveProfiles(profiles = {"embeddedServer", "twoSolrRemoteHostErrors"})
-@RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {GeneProductConfig.class, JobTestRunnerConfig.class, GeneProductIndexingRetrySucceedsBatchIT
                 .RetryConfig.class})
-public class GeneProductIndexingRetrySucceedsBatchIT {
-    @ClassRule
-    public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
-
+class GeneProductIndexingRetrySucceedsBatchIT {
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
 
@@ -64,13 +59,13 @@ public class GeneProductIndexingRetrySucceedsBatchIT {
             DocumentWriteRetryHelper.SolrResponse.REMOTE_EXCEPTION // never called
             );
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         MockitoAnnotations.initMocks(this);
     }
 
     @Test
-    public void successfulJobRun() throws Exception {
+    void successfulJobRun() throws Exception {
         JobExecution jobExecution = jobLauncherTestUtils.launchJob();
 
         StepExecution indexingStep = getStepByName(GeneProductConfig.GENE_PRODUCT_INDEXING_STEP_NAME, jobExecution);

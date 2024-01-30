@@ -1,5 +1,5 @@
 package uk.ac.ebi.quickgo.index.ontology.converter;
-
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.ac.ebi.quickgo.model.ontology.generic.AuditRecord;
 import uk.ac.ebi.quickgo.model.ontology.generic.TermOntologyHistory;
 import uk.ac.ebi.quickgo.model.ontology.go.GOTerm;
@@ -11,18 +11,17 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ebi.quickgo.index.ontology.converter.GenericTermToODocConverterTest.extractFieldFromDocument;
@@ -31,8 +30,8 @@ import static uk.ac.ebi.quickgo.index.ontology.converter.GenericTermToODocConver
  * Created 14/12/15
  * @author Edd
  */
-@RunWith(MockitoJUnitRunner.class)
-public class GOTermToODocConverterTest {
+@ExtendWith(MockitoExtension.class)
+class GOTermToODocConverterTest {
     private static final String TERM_ID = "id1";
 
     @Mock
@@ -40,14 +39,14 @@ public class GOTermToODocConverterTest {
 
     private GOTermToODocConverter converter = new GOTermToODocConverter();
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         when(term.getId()).thenReturn(TERM_ID);
     }
 
     // annotation guidelines
     @Test
-    public void extractsAnnGuideLinesWhenExists() {
+    void extractsAnnGuideLinesWhenExists() {
         GOTerm.NamedURL namedURL = mock(GOTerm.NamedURL.class);
         when(namedURL.getTitle()).thenReturn("title");
         when(namedURL.getUrl()).thenReturn("url");
@@ -62,7 +61,7 @@ public class GOTermToODocConverterTest {
     }
 
     @Test
-    public void extractsAnnGuideLinesWhenNotExists() {
+    void extractsAnnGuideLinesWhenNotExists() {
         when(term.getGuidelines()).thenReturn(null);
 
         OntologyDocument docConverted = converter.apply(term);
@@ -74,7 +73,7 @@ public class GOTermToODocConverterTest {
 
     // taxon constraints
     @Test
-    public void extractsTaxonConstraintsWhenExists() {
+    void extractsTaxonConstraintsWhenExists() {
         TaxonConstraint taxonConstraint = mock(TaxonConstraint.class);
         when(taxonConstraint.getSourcesIds()).thenReturn(Arrays.asList("pubmed1", "pubmed2"));
         when(taxonConstraint.getGoId()).thenReturn("goId1");
@@ -104,7 +103,7 @@ public class GOTermToODocConverterTest {
     }
 
     @Test
-    public void extractsTaxonConstraintsWhenNotExists() {
+    void extractsTaxonConstraintsWhenNotExists() {
         when(term.getTaxonConstraints()).thenReturn(null);
 
         OntologyDocument docConverted = converter.apply(term);
@@ -116,7 +115,7 @@ public class GOTermToODocConverterTest {
 
     // simple fields
     @Test
-    public void convertsSimpleFieldsWhenExists() {
+    void convertsSimpleFieldsWhenExists() {
         when(term.getUsage()).thenReturn(GOTerm.ETermUsage.E);
         when(term.getAspect()).thenReturn(GOTerm.EGOAspect.C);
 
@@ -127,7 +126,7 @@ public class GOTermToODocConverterTest {
     }
 
     @Test
-    public void convertsSimpleFieldsWhenNotExists() {
+    void convertsSimpleFieldsWhenNotExists() {
         when(term.getUsage()).thenReturn(null);
         when(term.getAspect()).thenReturn(null);
 
@@ -139,7 +138,7 @@ public class GOTermToODocConverterTest {
 
     // blacklist
     @Test
-    public void extractsBlacklistWhenExists() {
+    void extractsBlacklistWhenExists() {
         GOTermBlacklist goTermBlacklist = mock(GOTermBlacklist.class);
         when(goTermBlacklist.getAncestorGOID()).thenReturn("GO:0007005");
         when(goTermBlacklist.getGoId()).thenReturn("GO:0000001");
@@ -175,7 +174,7 @@ public class GOTermToODocConverterTest {
     }
 
     @Test
-    public void extractsBlacklistWhenNotExists() {
+    void extractsBlacklistWhenNotExists() {
         when(term.getBlacklist()).thenReturn(null);
 
         OntologyDocument docConverted = converter.apply(term);
@@ -187,7 +186,7 @@ public class GOTermToODocConverterTest {
 
     //GO discussions
     @Test
-    public void extractingGoDiscussionsFromEmptyPlannedChangesListReturnsNull() {
+    void extractingGoDiscussionsFromEmptyPlannedChangesListReturnsNull() {
         when(term.getPlannedChanges()).thenReturn(null);
 
         OntologyDocument docConverted = converter.apply(term);
@@ -198,7 +197,7 @@ public class GOTermToODocConverterTest {
     }
 
     @Test
-    public void extracts1GoDiscussionsFrom1ElementPlannedChangesList() {
+    void extracts1GoDiscussionsFrom1ElementPlannedChangesList() {
         String title = "Viral Processes";
         String url = "http://wiki.geneontology.org/index.php/Virus_terms";
 
@@ -216,7 +215,7 @@ public class GOTermToODocConverterTest {
     }
 
     @Test
-    public void extracts2GoDiscussionsFrom2ElementPlannedChangesList() {
+    void extracts2GoDiscussionsFrom2ElementPlannedChangesList() {
         String title1 = "Viral Processes";
         String url1 = "http://wiki.geneontology.org/index.php/Virus_terms";
 
@@ -246,7 +245,7 @@ public class GOTermToODocConverterTest {
     }
 
     @Test
-    public void historyCategoryIsSlim() {
+    void historyCategoryIsSlim() {
         when(term.getHistory()).thenReturn(termOntologyHistoryForSlim());
 
         OntologyDocument result = converter.apply(term);
@@ -257,7 +256,7 @@ public class GOTermToODocConverterTest {
     }
 
     @Test
-    public void historyCategoryIsConstraint() {
+    void historyCategoryIsConstraint() {
         when(term.getHistory()).thenReturn(termOntologyHistoryForConstraint());
 
         OntologyDocument document = converter.apply(term);

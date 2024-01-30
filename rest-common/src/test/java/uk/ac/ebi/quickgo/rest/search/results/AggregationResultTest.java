@@ -2,58 +2,47 @@ package uk.ac.ebi.quickgo.rest.search.results;
 
 import uk.ac.ebi.quickgo.rest.search.AggregateFunction;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests the behaviour of the {@link AggregationResult}
  */
-public class AggregationResultTest {
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
+class AggregationResultTest {
 
     @Test
-    public void nullFunctionInConstructorThrowsException() throws Exception {
+    void nullFunctionInConstructorThrowsException() {
         AggregateFunction func = null;
         String name = "name";
         double hits = 0;
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("AggregateRequest function cannot be null.");
-
-        new AggregationResult(func, name, hits);
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> new AggregationResult(func, name, hits));
+        assertTrue(exception.getMessage().contains("AggregateRequest function cannot be null."));
     }
 
     @Test
-    public void nullAggregationNameInConstructorThrowsException() throws Exception {
+    void nullAggregationNameInConstructorThrowsException() {
         AggregateFunction func = AggregateFunction.COUNT;
         String name = null;
         double hits = 0;
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("AggregateRequest field cannot be null or empty.");
-
-        new AggregationResult(func, name, hits);
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> new AggregationResult(func, name, hits));
+        assertTrue(exception.getMessage().contains("AggregateRequest field cannot be null or empty."));
     }
 
     @Test
-    public void emptyAggregationNameInConstructorThrowsException() throws Exception {
+    void emptyAggregationNameInConstructorThrowsException() {
         AggregateFunction func = AggregateFunction.COUNT;
         String name = "";
         double hits = 0;
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("AggregateRequest field cannot be null or empty.");
-
-        new AggregationResult(func, name, hits);
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> new AggregationResult(func, name, hits));
+        assertTrue(exception.getMessage().contains("AggregateRequest field cannot be null or empty."));
     }
 
     @Test
-    public void creatingAggregationResultWithFunctionAndNameAndResultIsSuccessful() throws Exception {
+    void creatingAggregationResultWithFunctionAndNameAndResultIsSuccessful() {
         AggregateFunction func = AggregateFunction.COUNT;
         String name = "name";
         double hits = 0;

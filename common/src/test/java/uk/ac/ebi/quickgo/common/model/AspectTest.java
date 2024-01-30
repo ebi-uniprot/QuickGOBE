@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.common.model;
 
 import java.util.Optional;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static java.util.Optional.*;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -15,76 +15,76 @@ import static org.hamcrest.core.IsEqual.equalTo;
  * Time: 16:47
  * findd with IntelliJ IDEA.
  */
-public class AspectTest {
+class AspectTest {
 
     @Test
-    public void findAspectFromExistingScientificName(){
+    void findAspectFromExistingScientificName(){
         assertThat(Aspect.fromScientificName("biological_process"), equalTo(of(Aspect.BIOLOGICAL_PROCESS)));
         assertThat(Aspect.fromScientificName("molecular_function"), equalTo(of(Aspect.MOLECULAR_FUNCTION)));
         assertThat(Aspect.fromScientificName("cellular_component"), equalTo(of(Aspect.CELLULAR_COMPONENT)));
     }
 
     @Test
-    public void findAspectFromInvalidScientificNameReturnsOptionalEmpty(){
+    void findAspectFromInvalidScientificNameReturnsOptionalEmpty(){
         assertThat(Aspect.fromScientificName("dish-washing"), equalTo(empty()));
     }
 
     @Test
-    public void findAspectFromNullScientificNameReturnsOptionalEmpty(){
+    void findAspectFromNullScientificNameReturnsOptionalEmpty(){
         assertThat(Aspect.fromScientificName(null), equalTo(empty()));
     }
 
     @Test
-    public void findAspectFromEmptyScientificNameReturnsOptionalEmpty(){
+    void findAspectFromEmptyScientificNameReturnsOptionalEmpty(){
         assertThat(Aspect.fromScientificName(""), equalTo(empty()));
     }
 
     @Test
-    public void findAspectFromExistingShortName(){
+    void findAspectFromExistingShortName(){
         assertThat(Aspect.fromShortName("Process"), equalTo(of(Aspect.BIOLOGICAL_PROCESS)));
         assertThat(Aspect.fromShortName("Function"), equalTo(of(Aspect.MOLECULAR_FUNCTION)));
         assertThat(Aspect.fromShortName("Component"), equalTo(of(Aspect.CELLULAR_COMPONENT)));
     }
 
     @Test
-    public void findAspectFromInvalidShortNameReturnsOptionalEmpty(){
+    void findAspectFromInvalidShortNameReturnsOptionalEmpty(){
         assertThat(Aspect.fromShortName("dish-washing"), equalTo(empty()));
     }
 
     @Test
-    public void findAspectFromNullShortNameReturnsOptionalEmpty(){
+    void findAspectFromNullShortNameReturnsOptionalEmpty(){
         assertThat(Aspect.fromShortName(null), equalTo(empty()));
     }
 
     @Test
-    public void findAspectFromEmptyShortNameReturnsOptionalEmpty(){
+    void findAspectFromEmptyShortNameReturnsOptionalEmpty(){
         assertThat(Aspect.fromShortName(""), equalTo(empty()));
     }
 
     @Test
-    public void findAspectFromExistingCharacter(){
+    void findAspectFromExistingCharacter(){
         assertThat(Aspect.fromCharacter("P"), equalTo(of(Aspect.BIOLOGICAL_PROCESS)));
         assertThat(Aspect.fromCharacter("F"), equalTo(of(Aspect.MOLECULAR_FUNCTION)));
         assertThat(Aspect.fromCharacter("C"), equalTo(of(Aspect.CELLULAR_COMPONENT)));
     }
 
     @Test
-    public void findAspectFromInvalidCharacterReturnsOptionalEmpty(){
+    void findAspectFromInvalidCharacterReturnsOptionalEmpty(){
         assertThat(Aspect.fromCharacter("dish-washing"), equalTo(empty()));
     }
 
     @Test
-    public void findAspectFromNullCharacterReturnsOptionalEmpty(){
+    void findAspectFromNullCharacterReturnsOptionalEmpty(){
         assertThat(Aspect.fromCharacter(null), equalTo(empty()));
     }
 
     @Test
-    public void findAspectFromEmptyCharacterReturnsOptionalEmpty(){
+    void findAspectFromEmptyCharacterReturnsOptionalEmpty(){
         assertThat(Aspect.fromCharacter(""), equalTo(empty()));
     }
 
     @Test
-    public void valueOfWorks(){
+    void valueOfWorks(){
         assertThat(Aspect.valueOf("BIOLOGICAL_PROCESS"),equalTo(Aspect.BIOLOGICAL_PROCESS));
     }
 }

@@ -1,12 +1,13 @@
 package uk.ac.ebi.quickgo.rest.search.query;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.SELECT_ALL_WHERE_FIELD_IS_NOT_EMPTY;
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.and;
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.not;
@@ -15,39 +16,39 @@ import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.or;
 /**
  * Created by edd on 03/08/2016.
  */
-public class QuickGOQueryTest {
-    @Test(expected = IllegalArgumentException.class)
-    public void generalisedOrWithNullQueryCausesException() {
-        or((QuickGOQuery) null);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void generalisedAndWithNullQueryCausesException() {
-        QuickGOQuery.and((QuickGOQuery) null);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void generalisedOrWithNullArrayCausesException() {
-        or((QuickGOQuery[]) null);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void generalisedAndWithNullArrayCausesException() {
-        QuickGOQuery.and((QuickGOQuery[]) null);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void generalisedOrWithNoQueriesCausesException() {
-        or();
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void generalisedAndWithNoQueriesCausesException() {
-        QuickGOQuery.and();
+class QuickGOQueryTest {
+    @Test
+    void generalisedOrWithNullQueryCausesException() {
+        assertThrows(IllegalArgumentException.class, () -> or((QuickGOQuery) null));
     }
 
     @Test
-    public void generalisedOrWith1QueryReturnsThatQuery() {
+    void generalisedAndWithNullQueryCausesException() {
+        assertThrows(IllegalArgumentException.class, () -> QuickGOQuery.and((QuickGOQuery) null));
+    }
+
+    @Test
+    void generalisedOrWithNullArrayCausesException() {
+        assertThrows(IllegalArgumentException.class, () -> or((QuickGOQuery[]) null));
+    }
+
+    @Test
+    void generalisedAndWithNullArrayCausesException() {
+        assertThrows(IllegalArgumentException.class, () -> QuickGOQuery.and((QuickGOQuery[]) null));
+    }
+
+    @Test
+    void generalisedOrWithNoQueriesCausesException() {
+        assertThrows(IllegalArgumentException.class, () -> or());
+    }
+
+    @Test
+    void generalisedAndWithNoQueriesCausesException() {
+        assertThrows(IllegalArgumentException.class, () -> QuickGOQuery.and());
+    }
+
+    @Test
+    void generalisedOrWith1QueryReturnsThatQuery() {
         FieldQuery originalQuery = new FieldQuery("field1", "value1");
         QuickGOQuery quickGOQuery = or(originalQuery);
 
@@ -55,7 +56,7 @@ public class QuickGOQueryTest {
     }
 
     @Test
-    public void generalisedAndWith1QueryReturnsThatQuery() {
+    void generalisedAndWith1QueryReturnsThatQuery() {
         FieldQuery originalQuery = new FieldQuery("field1", "value1");
         QuickGOQuery quickGOQuery = and(originalQuery);
 
@@ -63,7 +64,7 @@ public class QuickGOQueryTest {
     }
 
     @Test
-    public void canCreateGeneralisedOr() {
+    void canCreateGeneralisedOr() {
         FieldQuery query1 = new FieldQuery("field1", "value1");
         FieldQuery query2 = new FieldQuery("field2", "value2");
         FieldQuery query3 = new FieldQuery("field3", "value3");
@@ -75,7 +76,7 @@ public class QuickGOQueryTest {
     }
 
     @Test
-    public void canCreateGeneralisedAnd() {
+    void canCreateGeneralisedAnd() {
         FieldQuery query1 = new FieldQuery("field1", "value1");
         FieldQuery query2 = new FieldQuery("field2", "value2");
         FieldQuery query3 = new FieldQuery("field3", "value3");
@@ -87,7 +88,7 @@ public class QuickGOQueryTest {
     }
 
     @Test
-    public void canCreateOrQuery() {
+    void canCreateOrQuery() {
         QuickGOQuery query1 = new FieldQuery("field1", "value1");
         QuickGOQuery query2 = new FieldQuery("field2", "value2");
 
@@ -98,7 +99,7 @@ public class QuickGOQueryTest {
     }
 
     @Test
-    public void canCreateAndQuery() {
+    void canCreateAndQuery() {
         QuickGOQuery query1 = new FieldQuery("field1", "value1");
         QuickGOQuery query2 = new FieldQuery("field2", "value2");
 
@@ -109,7 +110,7 @@ public class QuickGOQueryTest {
     }
 
     @Test
-    public void canCreateNotQuery() {
+    void canCreateNotQuery() {
         QuickGOQuery query1 = new FieldQuery("field1", "value1");
 
         QuickGOQuery compositeQuery = not(query1);
@@ -118,28 +119,28 @@ public class QuickGOQueryTest {
         assertThat(((CompositeQuery) compositeQuery).queryOperator(), is(CompositeQuery.QueryOp.NOT));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void notWithNullQueryCausesException() {
+    @Test
+    void notWithNullQueryCausesException() {
         QuickGOQuery query1 = null;
-        not(query1);
+        assertThrows(IllegalArgumentException.class, () -> not(query1));
     }
 
     @Test
-    public void canCreateFieldQuery() {
+    void canCreateFieldQuery() {
         QuickGOQuery query = QuickGOQuery.createQuery("field1", "value1");
 
         assertThat(query, instanceOf(FieldQuery.class));
     }
 
     @Test
-    public void canCreateAllNotEmptyQuery() {
+    void canCreateAllNotEmptyQuery() {
         QuickGOQuery query = QuickGOQuery.createQuery("field1", SELECT_ALL_WHERE_FIELD_IS_NOT_EMPTY);
 
         assertThat(query, instanceOf(AllNonEmptyFieldQuery.class));
     }
 
     @Test
-    public void canCreateContainFieldQuery() {
+    void canCreateContainFieldQuery() {
         QuickGOQuery query = QuickGOQuery.createContainQuery("field1", "value1");
 
         assertThat(query, instanceOf(ContainsFieldQuery.class));

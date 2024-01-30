@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.download.converter;
-
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationMocker;
 import uk.ac.ebi.quickgo.common.model.Aspect;
@@ -8,8 +9,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -26,7 +25,7 @@ import static uk.ac.ebi.quickgo.annotation.model.AnnotationMocker.*;
  * Time: 16:45
  * Created with IntelliJ IDEA.
  */
-public class AnnotationToTSVTest {
+class AnnotationToTSVTest {
 
     private Annotation annotation;
     private AnnotationToTSV annotationToTSV;
@@ -54,14 +53,14 @@ public class AnnotationToTSVTest {
         unSlimmedFieldNames2Data.add(new String[]{INTERACTING_TAXON_ID_FIELD_NAME, Integer.toString(INTERACTING_TAXON_ID)});
     }
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         annotation = AnnotationMocker.createValidComplexPortalAnnotationWithInteractingTaxon();
         annotationToTSV = new AnnotationToTSV();
     }
 
     @Test
-    public void complexPortal() {
+    void complexPortal() {
         String[] elements = annotationToElements(annotation);
         assertThat(elements[DefaultColumns.COL_GENE_PRODUCT_DB], is(DB_COMPLEX_PORTAL));
         assertThat(elements[DefaultColumns.COL_GENE_PRODUCT_ID], is(ID_COMPLEX_PORTAL));
@@ -81,7 +80,7 @@ public class AnnotationToTSVTest {
     }
 
     @Test
-    public void createTsvStringFromAnnotationModelContainingSlimmedToIds(){
+    void createTsvStringFromAnnotationModelContainingSlimmedToIds(){
         annotation.slimmedIds = SLIMMED_TO_IDS;
         String[] elements = annotationToElements(annotation);
         assertThat(elements[DefaultColumnsWithSlimming.COL_GENE_PRODUCT_DB], is(DB_COMPLEX_PORTAL));
@@ -103,7 +102,7 @@ public class AnnotationToTSVTest {
     }
 
     @Test
-    public void multipleSlimmedToGoIdsCreatesEqualQuantityOfAnnotationRecords() {
+    void multipleSlimmedToGoIdsCreatesEqualQuantityOfAnnotationRecords() {
         final String slimmedToGoId0 = "GO:0005524";
         final String slimmedToGoId1 = "GO:1005524";
         final String slimmedToGoId2 = "GO:2005524";
@@ -119,7 +118,7 @@ public class AnnotationToTSVTest {
     }
 
     @Test
-    public void outputForIndividualSelectedFieldsWithNoSlimming() {
+    void outputForIndividualSelectedFieldsWithNoSlimming() {
         for(String[] fieldName2Data : unSlimmedFieldNames2Data){
 
             String[] elements = annotationToElements(annotation, Collections.singletonList(fieldName2Data[0]));
@@ -134,7 +133,7 @@ public class AnnotationToTSVTest {
     }
 
     @Test
-    public void outputCreatedInOrderOfSelectedFields(){
+    void outputCreatedInOrderOfSelectedFields(){
         List<String> selectedFields = Arrays.asList(ASSIGNED_BY_FIELD_NAME, ECO_ID_FIELD_NAME, QUALIFIER_FIELD_NAME );
 
         String[] elements = annotationToElements(annotation, selectedFields);
@@ -145,77 +144,77 @@ public class AnnotationToTSVTest {
     }
 
     @Test
-    public void nullSymbol() {
+    void nullSymbol() {
         annotation.symbol = null;
         String[] elements = annotationToElements(annotation);
         assertThat(elements[DefaultColumns.COL_DB_OBJECT_SYMBOL], is(""));
     }
 
     @Test
-    public void nullQualifier() {
+    void nullQualifier() {
         annotation.qualifier = null;
         String[] elements = annotationToElements(annotation);
         assertThat(elements[DefaultColumns.COL_QUALIFIER], is(""));
     }
 
     @Test
-    public void nullGoId() {
+    void nullGoId() {
         annotation.goId = null;
         String[] elements = annotationToElements(annotation);
         assertThat(elements[DefaultColumns.COL_GO_ID], is(""));
     }
 
     @Test
-    public void nullAspect() {
+    void nullAspect() {
         annotation.goAspect = null;
         String[] elements = annotationToElements(annotation);
         assertThat(elements[DefaultColumns.COL_GO_ASPECT], is(""));
     }
 
     @Test
-    public void emptyAspect() {
+    void emptyAspect() {
         annotation.goAspect = "";
         String[] elements = annotationToElements(annotation);
         assertThat(elements[DefaultColumns.COL_GO_ASPECT], is(""));
     }
 
     @Test
-    public void unknownAspect() {
+    void unknownAspect() {
         annotation.goAspect = "Dish_Washing";
         String[] elements = annotationToElements(annotation);
         assertThat(elements[DefaultColumns.COL_GO_ASPECT], is(""));
     }
 
     @Test
-    public void nullReference() {
+    void nullReference() {
         annotation.reference = null;
         String[] elements = annotationToElements(annotation);
         assertThat(elements[DefaultColumns.COL_REFERENCE], is(""));
     }
 
     @Test
-    public void nullEcoId() {
+    void nullEcoId() {
         annotation.evidenceCode = null;
         String[] elements = annotationToElements(annotation);
         assertThat(elements[DefaultColumns.COL_ECO_ID], is(""));
     }
 
     @Test
-    public void emptyEcoId() {
+    void emptyEcoId() {
         annotation.evidenceCode = "";
         String[] elements = annotationToElements(annotation);
         assertThat(elements[DefaultColumns.COL_ECO_ID], is(""));
     }
 
     @Test
-    public void nullGoEvidence() {
+    void nullGoEvidence() {
         annotation.goEvidence = null;
         String[] elements = annotationToElements(annotation);
         assertThat(elements[DefaultColumns.COL_GO_EVIDENCE], is(""));
     }
 
     @Test
-    public void emptyGoEvidence() {
+    void emptyGoEvidence() {
         annotation.goEvidence = null;
         String[] elements = annotationToElements(annotation);
         assertThat(elements[DefaultColumns.COL_GO_EVIDENCE], is(""));
@@ -223,63 +222,63 @@ public class AnnotationToTSVTest {
 
 
     @Test
-    public void nullWithFrom() {
+    void nullWithFrom() {
         annotation.withFrom = null;
         String[] elements = annotationToElements(annotation);
         assertThat(elements[DefaultColumns.COL_WITH], is(""));
     }
 
     @Test
-    public void emptyWithFrom() {
+    void emptyWithFrom() {
         annotation.withFrom = new ArrayList<>();
         String[] elements = annotationToElements(annotation);
         assertThat(elements[DefaultColumns.COL_WITH], is(""));
     }
 
     @Test
-    public void emptyTaxonId() {
+    void emptyTaxonId() {
         annotation.taxonId = 0;
         String[] elements = annotationToElements(annotation);
         assertThat(elements[DefaultColumns.COL_TAXON], is(""));
     }
 
     @Test
-    public void emptyInteractingTaxonId() {
+    void emptyInteractingTaxonId() {
         annotation.interactingTaxonId = 0;
         String[] elements = annotationToElements(annotation, Collections.singletonList("interactingtaxonid"));
         assertThat(elements[0], is(""));
     }
 
     @Test
-    public void nullAssignedBy() {
+    void nullAssignedBy() {
         annotation.assignedBy = null;
         String[] elements = annotationToElements(annotation);
         assertThat(elements[DefaultColumns.COL_ASSIGNED_BY], is(""));
     }
 
     @Test
-    public void nullInExtensions() {
+    void nullInExtensions() {
         annotation.extensions = null;
         String[] elements = annotationToElements(annotation);
         assertThat(elements[DefaultColumns.COL_ANNOTATION_EXTENSION], is(""));
     }
 
     @Test
-    public void emptyExtensions() {
+    void emptyExtensions() {
         annotation.extensions = new ArrayList<>();
         String[] elements = annotationToElements(annotation);
         assertThat(elements[DefaultColumns.COL_ANNOTATION_EXTENSION], is(""));
     }
 
     @Test
-    public void nullDate() {
+    void nullDate() {
         annotation.date = null;
         String[] elements = annotationToElements(annotation);
         assertThat(elements[DefaultColumns.COL_DATE], is(""));
     }
 
     @Test
-    public void onlyGetRequestedColumn() {
+    void onlyGetRequestedColumn() {
         List<String> selectedFields = Collections.singletonList("qualifier");
 
         List<String> converted = annotationToTSV.apply(annotation, selectedFields);

@@ -1,11 +1,11 @@
 package uk.ac.ebi.quickgo.annotation.coterms;
 
 import java.io.IOException;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
 import org.springframework.core.io.Resource;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -16,70 +16,73 @@ import static org.mockito.Mockito.when;
  * Time: 14:57
  * Created with IntelliJ IDEA.
  */
-public class CoTermRepositorySimpleMapTest {
+class CoTermRepositorySimpleMapTest {
 
     private static final int headerLines = 1;
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
 
     @Test
-    public void createFailsIfManualResourceIsNull() throws IOException {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Resource manualCoTermsSource is null.");
+    void createFailsIfManualResourceIsNull() throws IOException {
         Resource mockAllResource = mock(Resource.class);
-        CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(null, mockAllResource, headerLines);
+        Throwable exception = assertThrows(IllegalArgumentException.class, () ->
+            CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(null, mockAllResource, headerLines)
+        );
+        assertTrue(exception.getMessage().contains("Resource manualCoTermsSource is null."));
     }
 
     @Test
-    public void createFailsIfAllResourceIsNull() throws IOException {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Resource allCoTermSource is null.");
+    void createFailsIfAllResourceIsNull() throws IOException {
         Resource mockManualResource = mock(Resource.class);
-        CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(mockManualResource, null, headerLines);
+        Throwable exception = assertThrows(IllegalArgumentException.class, () ->
+            CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(mockManualResource, null, headerLines)
+        );
+        assertTrue(exception.getMessage().contains("Resource allCoTermSource is null."));
     }
 
     @Test
-    public void createFailsIfManualResourceIsNonExistent() throws IOException {
-        thrown.expect(IllegalStateException.class);
-        thrown.expectMessage("Resource manualCoTermsSource does not exist.");
-
+    void createFailsIfManualResourceIsNonExistent() throws IOException {
         Resource mockManualResource = mock(Resource.class);
         Resource mockAllResource = mock(Resource.class);
         when(mockManualResource.exists()).thenReturn(false);
-        CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(mockManualResource, mockAllResource, headerLines);
+        Throwable exception = assertThrows(IllegalStateException.class, () ->
+            CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(mockManualResource, mockAllResource, headerLines)
+        );
+        assertTrue(exception.getMessage().contains("Resource manualCoTermsSource does not exist."));
     }
 
     @Test
-    public void createFailsIfAllResourceIsNonExistent() throws Exception {
-        thrown.expect(IllegalStateException.class);
-        thrown.expectMessage("Resource allCoTermSource does not exist.");
-
+    void createFailsIfAllResourceIsNonExistent() throws Exception {
         Resource mockManualResource = mock(Resource.class);
         Resource mockAllResource = mock(Resource.class);
         when(mockManualResource.exists()).thenReturn(true);
         when(mockAllResource.exists()).thenReturn(false);
-        CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(mockManualResource, mockAllResource, headerLines);
+        Throwable exception = assertThrows(IllegalStateException.class, () ->
+            CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(mockManualResource, mockAllResource, headerLines)
+        );
+        assertTrue(exception.getMessage().contains("Resource allCoTermSource does not exist."));
     }
 
-    @Test(expected = IOException.class)
-    public void createFailsWithIfAllResourceIsBad() throws Exception {
+    @Test
+    void createFailsWithIfAllResourceIsBad() throws Exception {
         Resource mockManualResource = mock(Resource.class);
         Resource mockAllResource = mock(Resource.class);
         when(mockManualResource.exists()).thenReturn(true);
         when(mockAllResource.exists()).thenReturn(true);
         doThrow(IOException.class).when(mockAllResource).getURI();
-        CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(mockManualResource, mockAllResource, headerLines);
+        assertThrows(IOException.class, () ->
+            CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(mockManualResource, mockAllResource, headerLines)
+        );
     }
 
     @Test
-    public void createFailsIfHeaderLinesNegative() throws IOException {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("The number of header lines is less than zero.");
+    void createFailsIfHeaderLinesNegative() throws IOException {
         Resource mockManualResource = mock(Resource.class);
         Resource mockAllResource = mock(Resource.class);
         when(mockManualResource.exists()).thenReturn(true);
         when(mockAllResource.exists()).thenReturn(true);
         int negHeaderLines = -1;
-        CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(mockManualResource, mockAllResource, negHeaderLines);
+        Throwable exception = assertThrows(IllegalArgumentException.class, () ->
+            CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(mockManualResource, mockAllResource, negHeaderLines)
+        );
+        assertTrue(exception.getMessage().contains("The number of header lines is less than zero."));
     }
 }

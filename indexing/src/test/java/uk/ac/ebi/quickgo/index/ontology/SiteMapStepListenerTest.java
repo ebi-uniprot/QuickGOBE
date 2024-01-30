@@ -1,16 +1,17 @@
 package uk.ac.ebi.quickgo.index.ontology;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepExecution;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -18,30 +19,32 @@ import static org.mockito.Mockito.verify;
  * Created 04/04/17
  * @author Edd
  */
-@RunWith(MockitoJUnitRunner.class)
-public class SiteMapStepListenerTest {
+@ExtendWith(MockitoExtension.class)
+class SiteMapStepListenerTest {
     @Mock
     private MockableWebSitemapGenerator webSitemapGenerator;
 
     private SiteMapStepListener listener;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         listener = new SiteMapStepListener(webSitemapGenerator);
     }
 
     @Test
-    public void canCreateValidInstance() {
+    void canCreateValidInstance() {
         assertThat(listener, is(notNullValue()));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void nullSiteMapGeneratorCausesException() {
-        new SiteMapStepListener(null);
+    @Test
+    void nullSiteMapGeneratorCausesException() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            new SiteMapStepListener(null);
+        });
     }
 
     @Test
-    public void afterStepCausesInvokesMapWriting() {
+    void afterStepCausesInvokesMapWriting() {
         ExitStatus exitStatus = new ExitStatus("MyRandomExitStatus");
         StepExecution stepExecution = new StepExecution("PretendStepName", null);
         stepExecution.setExitStatus(exitStatus);

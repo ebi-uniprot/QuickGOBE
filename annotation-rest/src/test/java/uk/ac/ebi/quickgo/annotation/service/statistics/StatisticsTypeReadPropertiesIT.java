@@ -1,8 +1,7 @@
 package uk.ac.ebi.quickgo.annotation.service.statistics;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -10,7 +9,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.List;
 
@@ -23,9 +21,8 @@ import static uk.ac.ebi.quickgo.annotation.service.statistics.RequiredStatisticT
  * @author Edd
  */
 @ActiveProfiles("stats-type-limit-properties-test")
-@RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = StatisticsTypeReadPropertiesIT.FakeApplication.class)
-public class StatisticsTypeReadPropertiesIT {
+class StatisticsTypeReadPropertiesIT {
     private static final String GO_ID = "goId";
     private static final String TAXON_ID = "taxonId";
 
@@ -33,13 +30,13 @@ public class StatisticsTypeReadPropertiesIT {
     private RequiredStatisticsProvider requiredStatisticsProvider;
     private List<RequiredStatistic> statistics;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         statistics = requiredStatisticsProvider.getStandardUsage();
     }
 
     @Test
-    public void checkLimitsReadAndSetForCorrectTypes() {
+    void checkLimitsReadAndSetForCorrectTypes() {
         for (RequiredStatistic request : statistics) {
             for (RequiredStatisticType type : request.getTypes()) {
                 switch (type.getName()) {

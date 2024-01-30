@@ -12,19 +12,17 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.EVIDENCE_CODE_USAGE_RELATIONS_PARAM;
 import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.GO_ID_PARAM;
 import static uk.ac.ebi.quickgo.annotation.AnnotationParameters.GO_USAGE_RELATIONS_PARAM;
-import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.*;
 import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.*;
 
 /**
@@ -36,25 +34,23 @@ import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.*;
  * Time: 11:25
  * Created with IntelliJ IDEA.
  */
-public class AnnotationRequestTest {
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
+class AnnotationRequestTest {
 
     private AnnotationRequest annotationRequest;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         annotationRequest = new AnnotationRequest();
     }
 
     @Test
-    public void defaultPageAndLimitValuesAreCorrect() {
+    void defaultPageAndLimitValuesAreCorrect() {
         assertThat(annotationRequest.getPage(), equalTo(1));
         assertThat(annotationRequest.getLimit(), equalTo(25));
     }
 
     @Test
-    public void successfullySetAndGetPageAndLimitValues() {
+    void successfullySetAndGetPageAndLimitValues() {
         annotationRequest.setPage(4);
         annotationRequest.setLimit(15);
 
@@ -63,7 +59,7 @@ public class AnnotationRequestTest {
     }
 
     @Test
-    public void setAndGetAssignedBy() {
+    void setAndGetAssignedBy() {
         String assignedBy = "UniProt";
         annotationRequest.setAssignedBy(assignedBy);
 
@@ -71,14 +67,14 @@ public class AnnotationRequestTest {
     }
 
     @Test
-    public void setAndGetWithFrom() {
+    void setAndGetWithFrom() {
         String WITH_FROM = "RGD:1623038";
         annotationRequest.setWithFrom(WITH_FROM);
         assertThat(annotationRequest.getWithFrom(), arrayContaining(WITH_FROM));
     }
 
     @Test
-    public void setAndGetOntologyAspect() {
+    void setAndGetOntologyAspect() {
         String aspect = "function";
 
         annotationRequest.setAspect(aspect);
@@ -87,42 +83,42 @@ public class AnnotationRequestTest {
     }
 
     @Test
-    public void setAndGetGeneProductID() {
+    void setAndGetGeneProductID() {
         String geneProductID = "A0A000";
         annotationRequest.setGeneProductId(geneProductID);
         assertThat(annotationRequest.getGeneProductId(), arrayContaining(geneProductID));
     }
 
     @Test
-    public void setAndGetMultipleGeneProductIDs() {
+    void setAndGetMultipleGeneProductIDs() {
         String[] geneProductID = {"A0A000", "A0A001"};
         annotationRequest.setGeneProductId(geneProductID);
         assertThat(annotationRequest.getGeneProductId(), arrayContaining(geneProductID));
     }
 
     @Test
-    public void setAndGetEvidence() {
+    void setAndGetEvidence() {
         String EVIDENCE_IEA = "IEA";
         annotationRequest.setGoIdEvidence(EVIDENCE_IEA);
         assertThat(annotationRequest.getGoIdEvidence(), arrayContaining(EVIDENCE_IEA));
     }
 
     @Test
-    public void setAndGetEvidenceMulti() {
+    void setAndGetEvidenceMulti() {
         String[] EVIDENCE_MULTI = {"IEA", "IBD"};
         annotationRequest.setGoIdEvidence(EVIDENCE_MULTI);
         assertThat(annotationRequest.getGoIdEvidence(), arrayContaining(EVIDENCE_MULTI));
     }
 
     @Test
-    public void setAndGetEvidenceMultiInLowerCase() {
+    void setAndGetEvidenceMultiInLowerCase() {
         String[] EVIDENCE_MULTI = {"iea", "ibd"};
         annotationRequest.setGoIdEvidence(EVIDENCE_MULTI);
         assertThat(annotationRequest.getGoIdEvidence(), is(EVIDENCE_MULTI));
     }
 
     @Test
-    public void setAndGetGoUsage() {
+    void setAndGetGoUsage() {
         String usage = EXACT_USAGE;
 
         annotationRequest.setGoUsage(usage);
@@ -131,12 +127,12 @@ public class AnnotationRequestTest {
     }
 
     @Test
-    public void getDefaultGoUsage() {
+    void getDefaultGoUsage() {
         assertThat(annotationRequest.getGoUsage(), is(DEFAULT_GO_USAGE));
     }
 
     @Test
-    public void setAndGetGoIds() {
+    void setAndGetGoIds() {
         String[] usageIds = {"GO:0000001", "GO:0000002"};
 
         annotationRequest.setGoId(usageIds);
@@ -145,7 +141,7 @@ public class AnnotationRequestTest {
     }
 
     @Test
-    public void setAndGetGoUsageRelationships() {
+    void setAndGetGoUsageRelationships() {
         String[] usageRelationships = {"iS_", "paRt_of"};
 
         annotationRequest.setGoUsageRelationships(usageRelationships);
@@ -158,7 +154,7 @@ public class AnnotationRequestTest {
     }
 
     @Test
-    public void canCreateDefaultFilterWithGoIds() {
+    void canCreateDefaultFilterWithGoIds() {
         String goId = "GO:0000001";
 
         annotationRequest.setGoId(goId);
@@ -173,7 +169,7 @@ public class AnnotationRequestTest {
     }
 
     @Test
-    public void canCreateDefaultFilterWithGoIdsAndGoUsageRelationships() {
+    void canCreateDefaultFilterWithGoIdsAndGoUsageRelationships() {
         String goId = "GO:0000001";
         String relationships = "is_A";
 
@@ -190,7 +186,7 @@ public class AnnotationRequestTest {
     }
 
     @Test
-    public void canCreateExactFilterWithGoIds() {
+    void canCreateExactFilterWithGoIds() {
         String goId = "GO:0000001";
 
         annotationRequest.setGoId(goId);
@@ -204,7 +200,7 @@ public class AnnotationRequestTest {
     }
 
     @Test
-    public void canCreateExactFilterWithGoIdsAndUnusedGoUsageRelationships() {
+    void canCreateExactFilterWithGoIdsAndUnusedGoUsageRelationships() {
         String goId = "GO:0000001";
         String relationships = "is_A";
 
@@ -220,7 +216,7 @@ public class AnnotationRequestTest {
     }
 
     @Test
-    public void createsFilterWithCaseInsensitiveGoUsageAndGoIds() {
+    void createsFilterWithCaseInsensitiveGoUsageAndGoIds() {
         String usage = "descEndants";
         String goId = "GO:0000001";
 
@@ -237,7 +233,7 @@ public class AnnotationRequestTest {
     }
 
     @Test
-    public void createsFilterWithCaseInsensitiveUsageAndGoIdsAndGoUsageRelationships() {
+    void createsFilterWithCaseInsensitiveUsageAndGoIdsAndGoUsageRelationships() {
         String usage = "deSCendants";
         String goId = "GO:0000001";
         String relationships = "is_A";
@@ -255,16 +251,15 @@ public class AnnotationRequestTest {
         assertThat(filterRequests, contains(request));
     }
 
-    @Test(expected = ParameterException.class)
-    public void cannotCreateFilterWithUsageAndNoGoUsageIds() {
+    @Test
+    void cannotCreateFilterWithUsageAndNoGoUsageIds() {
         annotationRequest.setGoUsage(DESCENDANTS_USAGE);
-
-        annotationRequest.createFilterRequests();
+        assertThrows(ParameterException.class, () -> annotationRequest.createFilterRequests());
     }
 
     //-----------------
     @Test
-    public void setAndGetTaxon() {
+    void setAndGetTaxon() {
         String taxonId = "1";
 
         annotationRequest.setTaxonId(taxonId);
@@ -273,7 +268,7 @@ public class AnnotationRequestTest {
     }
 
     @Test
-    public void setAndGetTaxonUsage() {
+    void setAndGetTaxonUsage() {
         String taxonUsage = "exact";
         annotationRequest.setTaxonUsage(taxonUsage);
 
@@ -281,14 +276,14 @@ public class AnnotationRequestTest {
     }
 
     @Test
-    public void useCorrectDefaultTaxonUsage() {
+    void useCorrectDefaultTaxonUsage() {
         annotationRequest.createFilterRequests();
 
         assertThat(annotationRequest.getTaxonUsage(), is(AnnotationRequest.DEFAULT_TAXON_USAGE));
     }
 
     @Test
-    public void canCreateDefaultTaxonFilterWithTaxonIds() {
+    void canCreateDefaultTaxonFilterWithTaxonIds() {
         annotationRequest.setTaxonId("1", "2");
 
         FilterRequest request = FilterRequest.newBuilder()
@@ -300,7 +295,7 @@ public class AnnotationRequestTest {
     }
 
     @Test
-    public void canCreateTaxonDescendantsFilterWithTaxonUsageAndTaxonIds() {
+    void canCreateTaxonDescendantsFilterWithTaxonUsageAndTaxonIds() {
         annotationRequest.setTaxonId("1", "2");
         annotationRequest.setTaxonUsage("descendants");
 
@@ -313,7 +308,7 @@ public class AnnotationRequestTest {
     }
 
     @Test
-    public void canCreateTaxonExactFilterWithTaxonUsageAndTaxonIds() {
+    void canCreateTaxonExactFilterWithTaxonUsageAndTaxonIds() {
         annotationRequest.setTaxonId("1", "2");
         annotationRequest.setTaxonUsage("exact");
 
@@ -325,16 +320,15 @@ public class AnnotationRequestTest {
         assertThat(filterRequests, contains(request));
     }
 
-    @Test(expected = ParameterException.class)
-    public void cannotCreateFilterWithTaxonUsageAndNoTaxonIds() {
+    @Test
+    void cannotCreateFilterWithTaxonUsageAndNoTaxonIds() {
         annotationRequest.setTaxonUsage("descendants");
-
-        annotationRequest.createFilterRequests();
+        assertThrows(ParameterException.class, () -> annotationRequest.createFilterRequests());
     }
 
     //-----------------
     @Test
-    public void setAndGetEvidenceCodeUsage() {
+    void setAndGetEvidenceCodeUsage() {
         String usage = DESCENDANTS_USAGE;
 
         annotationRequest.setEvidenceCodeUsage(usage);
@@ -343,12 +337,12 @@ public class AnnotationRequestTest {
     }
 
     @Test
-    public void getDefaultEvidenceCodeUsage() {
+    void getDefaultEvidenceCodeUsage() {
         assertThat(annotationRequest.getEvidenceCodeUsage(), is(DEFAULT_EVIDENCE_CODE_USAGE));
     }
 
     @Test
-    public void setAndGetEvidenceCodeIds() {
+    void setAndGetEvidenceCodeIds() {
         String[] usageIds = {"GO:0000001", "GO:0000002"};
 
         annotationRequest.setEvidenceCode(usageIds);
@@ -357,7 +351,7 @@ public class AnnotationRequestTest {
     }
 
     @Test
-    public void setAndGetEvidenceCodeUsageRelationships() {
+    void setAndGetEvidenceCodeUsageRelationships() {
         String[] usageRelationships = {"iS_", "paRt_of"};
 
         annotationRequest.setEvidenceCodeUsageRelationships(usageRelationships);
@@ -370,7 +364,7 @@ public class AnnotationRequestTest {
     }
 
     @Test
-    public void canCreateDefaultFilterWithEcoIds() {
+    void canCreateDefaultFilterWithEcoIds() {
         String ecoId = "ECO:0000001";
 
         annotationRequest.setEvidenceCode(ecoId);
@@ -385,7 +379,7 @@ public class AnnotationRequestTest {
     }
 
     @Test
-    public void canCreateDefaultFilterWithEcoIdsAndEcoUsageRelationships() {
+    void canCreateDefaultFilterWithEcoIdsAndEcoUsageRelationships() {
         String ecoId = "ECO:0000001";
         String relationships = "is_A";
 
@@ -402,7 +396,7 @@ public class AnnotationRequestTest {
     }
 
     @Test
-    public void canCreateExactFilterWithEcoIds() {
+    void canCreateExactFilterWithEcoIds() {
         String ecoId = "ECO:0000001";
 
         annotationRequest.setEvidenceCode(ecoId);
@@ -416,7 +410,7 @@ public class AnnotationRequestTest {
     }
 
     @Test
-    public void canCreateExactFilterWithECOIdsAndUnusedECOUsageRelationships() {
+    void canCreateExactFilterWithECOIdsAndUnusedECOUsageRelationships() {
         String ecoId = "ECO:0000001";
         String relationships = "is_A";
 
@@ -432,7 +426,7 @@ public class AnnotationRequestTest {
     }
 
     @Test
-    public void createsFilterWithCaseInsensitiveEvidenceCodeUsageAndIds() {
+    void createsFilterWithCaseInsensitiveEvidenceCodeUsageAndIds() {
         String usage = "descEndants";
         String id = "ECO:0000001";
 
@@ -449,7 +443,7 @@ public class AnnotationRequestTest {
     }
 
     @Test
-    public void createsFilterWithCaseInsensitiveEvidenceCodeUsageAndIdsAndRelationships() {
+    void createsFilterWithCaseInsensitiveEvidenceCodeUsageAndIdsAndRelationships() {
         String usage = "deSCendants";
         String id = "ECO:0000001";
         String relationships = "is_A";
@@ -466,15 +460,14 @@ public class AnnotationRequestTest {
                         .build()));
     }
 
-    @Test(expected = ParameterException.class)
-    public void cannotCreateFilterWithEvidenceCodeUsageAndNoIds() {
+    @Test
+    void cannotCreateFilterWithEvidenceCodeUsageAndNoIds() {
         annotationRequest.setEvidenceCodeUsage("descendants");
-
-        annotationRequest.createFilterRequests();
+        assertThrows(ParameterException.class, () -> annotationRequest.createFilterRequests());
     }
 
     @Test
-    public void setAndGetQualifier() {
+    void setAndGetQualifier() {
         String qualifier = "NOT";
         annotationRequest.setQualifier(qualifier);
         assertThat(annotationRequest.getQualifier(), arrayContaining(qualifier));
@@ -482,28 +475,28 @@ public class AnnotationRequestTest {
     //-----------------
 
     @Test
-    public void setAndGetReference() {
+    void setAndGetReference() {
         String ONE_GOREF = "GO_REF:123456";
         annotationRequest.setReference(ONE_GOREF);
         assertThat(annotationRequest.getReference(), arrayContaining(ONE_GOREF));
     }
 
     @Test
-    public void setAndGetECOId() {
+    void setAndGetECOId() {
         String ecoId = "ECO:0000256";
         annotationRequest.setEvidenceCode(ecoId);
         assertThat(annotationRequest.getEvidenceCode(), arrayContaining(ecoId));
     }
 
     @Test
-    public void setAndGetDownloadLimit() {
+    void setAndGetDownloadLimit() {
         int limit = 12345;
         annotationRequest.setDownloadLimit(limit);
         assertThat(annotationRequest.getDownloadLimit(), is(limit));
     }
 
     @Test
-    public void setAndGetExtension() {
+    void setAndGetExtension() {
         String extension = "part_of(CL:0000023),part_of(UBERON:0001305)|part_of(CL:0000501),part_of(UBERON:0001305)";
 
         annotationRequest.setExtension(extension);
@@ -512,7 +505,7 @@ public class AnnotationRequestTest {
     }
 
     @Test
-    public void setAndGetExtensionForWildcard() {
+    void setAndGetExtensionForWildcard() {
         String extension = "*";
 
         annotationRequest.setExtension(extension);
@@ -521,7 +514,7 @@ public class AnnotationRequestTest {
     }
 
     @Test
-    public void setAndGetGeneProductSubset() {
+    void setAndGetGeneProductSubset() {
         String geneProductSubset = "TrEMBL";
 
         annotationRequest.setGeneProductSubset(geneProductSubset);
@@ -530,7 +523,7 @@ public class AnnotationRequestTest {
     }
 
     @Test
-    public void setAndGetProteome() {
+    void setAndGetProteome() {
         String proteome = "none";
 
         annotationRequest.setProteome(proteome);
@@ -540,14 +533,14 @@ public class AnnotationRequestTest {
 
     //-----------------
     @Test
-    public void setAndGetIncludeFields() {
+    void setAndGetIncludeFields() {
         String field = "goName";
         annotationRequest.setIncludeFields(field);
         assertThat(annotationRequest.getIncludeFields(), arrayContaining(field));
     }
 
     @Test
-    public void setAndGetSelectedFields() {
+    void setAndGetSelectedFields() {
         List<String> selectedFields = Arrays.asList("geneProductId", "symbol", "qualifier", "goId", "goName",
                                                "evidenceCode", "goEvidence","reference","withFrom","taxonId",
                                                     "taxonName", "assignedBy", "extensions", "date", "name", "synonyms",
@@ -559,12 +552,12 @@ public class AnnotationRequestTest {
     }
 
     @Test
-    public void zeroIncludedFieldResultsInZeroResultTransformationRequest() {
+    void zeroIncludedFieldResultsInZeroResultTransformationRequest() {
         assertThat(annotationRequest.createResultTransformationRequests().getRequests(), hasSize(0));
     }
 
     @Test
-    public void oneIncludedFieldResultsInOneResultTransformationRequest() {
+    void oneIncludedFieldResultsInOneResultTransformationRequest() {
         String field = "goName";
         annotationRequest.setIncludeFields(field);
 
@@ -575,7 +568,7 @@ public class AnnotationRequestTest {
     }
 
     @Test
-    public void twoIncludedFieldResultsInTwoResultTransformationRequests() {
+    void twoIncludedFieldResultsInTwoResultTransformationRequests() {
         String goName = "goName";
         String taxonName = "taxonName";
         String[] fields = {goName, taxonName};
@@ -591,28 +584,28 @@ public class AnnotationRequestTest {
     }
 
     //// GOA-3266 and GOA-3130
-    @Test(expected = ParameterException.class)
-    public void cannotCreateFilterWithGeneProductSubsetAndNoGeneProductType() {
+    @Test
+    void cannotCreateFilterWithGeneProductSubsetAndNoGeneProductType() {
         annotationRequest.setGeneProductSubset("Swiss-Prot");
-        annotationRequest.createFilterRequests();
-    }
-
-    @Test(expected = ParameterException.class)
-    public void cannotCreateFilterWithProteomeAndNoGeneProductType() {
-        annotationRequest.setProteome("none");
-        annotationRequest.createFilterRequests();
-    }
-
-    @Test(expected = ParameterException.class)
-    public void cannotCreateFilterWithProteomeAndGeneProductSubsetAndGeneProductTypeValueOtherThanProtein() {
-        annotationRequest.setGeneProductSubset("TrEMBL");
-        annotationRequest.setProteome("complete");
-        annotationRequest.setGeneProductType("miRNA");
-        annotationRequest.createFilterRequests();
+        assertThrows(ParameterException.class, () -> annotationRequest.createFilterRequests());
     }
 
     @Test
-    public void canCreateFilterWithProteomeAndGeneProductSubsetAndWhenGeneProductTypeValueIsProtein() {
+    void cannotCreateFilterWithProteomeAndNoGeneProductType() {
+        annotationRequest.setProteome("none");
+        assertThrows(ParameterException.class, () -> annotationRequest.createFilterRequests());
+    }
+
+    @Test
+    void cannotCreateFilterWithProteomeAndGeneProductSubsetAndGeneProductTypeValueOtherThanProtein() {
+        annotationRequest.setGeneProductSubset("TrEMBL");
+        annotationRequest.setProteome("complete");
+        annotationRequest.setGeneProductType("miRNA");
+        assertThrows(ParameterException.class, () -> annotationRequest.createFilterRequests());
+    }
+
+    @Test
+    void canCreateFilterWithProteomeAndGeneProductSubsetAndWhenGeneProductTypeValueIsProtein() {
         String type = "protein";
         String proteome = "gcrpIso";
         String gpSubset = "TrEMBL";
@@ -631,7 +624,7 @@ public class AnnotationRequestTest {
     }
 
     @Test
-    public void canSetGetAnyString_downloadFileType() {
+    void canSetGetAnyString_downloadFileType() {
         annotationRequest.setDownloadFileType("notValidType");
         assertThat(annotationRequest.getDownloadFileType(), equalTo("notValidType"));
     }

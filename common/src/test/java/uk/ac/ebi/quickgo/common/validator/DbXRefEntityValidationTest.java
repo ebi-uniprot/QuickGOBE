@@ -2,16 +2,17 @@ package uk.ac.ebi.quickgo.common.validator;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 /**
@@ -20,10 +21,9 @@ import static org.mockito.Mockito.when;
  *         Time: 14:04
  *         Created with IntelliJ IDEA.
  */
-@RunWith(MockitoJUnitRunner.class)
-public class DbXRefEntityValidationTest {
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
+class DbXRefEntityValidationTest {
 
 	private DbXRefEntityValidation dbXrefEntities;
 
@@ -36,8 +36,8 @@ public class DbXRefEntityValidationTest {
 	@Mock
 	private DbXRefEntity uniprotEntity;
 
-	@Before
-	public void setup(){
+	@BeforeEach
+	void setup(){
 		List<DbXRefEntity> listOfFormats = new ArrayList<>();
 		listOfFormats.add(rnaCentralEntity);
 		listOfFormats.add(intactEntity);
@@ -63,38 +63,39 @@ public class DbXRefEntityValidationTest {
 	}
 
 	@Test
-	public void isValidId(){
+	void isValidId(){
 		assertThat(dbXrefEntities.test("A0A000"), is(true));
 	}
 
 	@Test
-	public void isValidRNACentralID(){
+	void isValidRNACentralID(){
 		assertThat(dbXrefEntities.test("71URS0000000001_733"), is(true));
 	}
 
     @Test
-    public void isValidIntActID() {
+    void isValidIntActID() {
         assertThat(dbXrefEntities.test("EBI-11166735"), is(true));
     }
 
 	@Test
-    public void isValidComplexID() {
+    void isValidComplexID() {
         assertThat(dbXrefEntities.test("CPX-101"), is(true));
 	}
 
 	@Test
-	public void invalidDatabaseAndTypeName(){
+	void invalidDatabaseAndTypeName(){
 		assertThat(dbXrefEntities.test("ABC"), is(false));
 	}
 
 	@Test
-	public void isInvalidId(){
+	void isInvalidId(){
 		assertThat(dbXrefEntities.test("9999"), is(false));
 	}
 
 	@Test
-	public void throwsErrorIfEntitiesIsNull(){
-		thrown.expect(IllegalArgumentException.class);
-		dbXrefEntities = DbXRefEntityValidation.createWithData(null);
-	}
+	void throwsErrorIfEntitiesIsNull(){
+        assertThrows(IllegalArgumentException.class, () -> {
+            dbXrefEntities = DbXRefEntityValidation.createWithData(null);
+        });
+    }
 }

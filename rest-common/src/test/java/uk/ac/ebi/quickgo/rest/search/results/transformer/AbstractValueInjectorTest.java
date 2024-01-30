@@ -7,17 +7,18 @@ import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
 import uk.ac.ebi.quickgo.rest.search.request.converter.RESTFilterConverterFactory;
 
 import java.util.concurrent.ExecutionException;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
@@ -30,21 +31,21 @@ import static org.mockito.Mockito.when;
  * Created 12/04/17
  * @author Edd
  */
-@RunWith(MockitoJUnitRunner.class)
-public class AbstractValueInjectorTest {
+@ExtendWith(MockitoExtension.class)
+class AbstractValueInjectorTest {
 
     @Mock
     private RESTFilterConverterFactory mockRestFetcher;
 
     private ConcreteValueInjector injector;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         injector = new ConcreteValueInjector();
     }
 
     @Test
-    public void validResponseCausesSuccessfulValueInjection() {
+    void validResponseCausesSuccessfulValueInjection() {
         String idFromResponse = "response id";
         ConcreteResponse concreteResponse = new ConcreteResponse(idFromResponse);
         ConvertedFilter<ConcreteResponse> stubConvertedFilter = new ConvertedFilter<>(concreteResponse);
@@ -58,7 +59,7 @@ public class AbstractValueInjectorTest {
     }
 
     @Test
-    public void nonFatalRestResponseLeavesNullModelId() {
+    void nonFatalRestResponseLeavesNullModelId() {
         ExecutionException executionException =
                 new ExecutionException(new HttpClientErrorException(HttpStatus.NOT_FOUND));
         doThrow(new RetrievalException(executionException)).when(mockRestFetcher).convert(any());
@@ -70,14 +71,13 @@ public class AbstractValueInjectorTest {
         assertThat(model.id, is(nullValue()));
     }
 
-    @Test(expected = RetrievalException.class)
-    public void fatalRestResponseCausesException() {
+    @Test
+    void fatalRestResponseCausesException() {
         ExecutionException executionException =
-                new ExecutionException(new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
+          new ExecutionException(new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
         doThrow(new RetrievalException(executionException)).when(mockRestFetcher).convert(any());
         ConcreteModel model = new ConcreteModel();
-
-        injector.inject(mockRestFetcher, model);
+        assertThrows(RetrievalException.class, () -> injector.inject(mockRestFetcher, model));
     }
 
     private static class ConcreteValueInjector extends AbstractValueInjector<ConcreteResponse, ConcreteModel> {

@@ -1,13 +1,14 @@
 package uk.ac.ebi.quickgo.rest.period;
 
 import java.time.*;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Test calculation of remaining time calculated by AlarmClockMonthTime.
@@ -17,16 +18,16 @@ import static org.hamcrest.core.Is.is;
  * Time: 15:07
  * Created with IntelliJ IDEA.
  */
-@RunWith(MockitoJUnitRunner.class)
-public class AlarmClockMonthTimeTest {
+@ExtendWith(MockitoExtension.class)
+class AlarmClockMonthTimeTest {
 
     private MonthTime monthTimeMarch;
     private MonthTime monthTimeOctober;
     private AlarmClockMonthTime alarmClock;
     private LocalDateTime input;
 
-    @Before
-    public void setup(){
+    @BeforeEach
+    void setup(){
         //MARCH(3)(10:15)-OCTOBER(2)(19:45)
         monthTimeMarch = new MonthTime(MonthDay.of(3, 1), LocalTime.of(10, 15));
         monthTimeOctober =  new MonthTime(MonthDay.of(10, 11), LocalTime.of(19, 45));
@@ -35,7 +36,7 @@ public class AlarmClockMonthTimeTest {
     }
 
     @Test
-    public void secondsLeftWhenStartAndEndInSameYear(){
+    void secondsLeftWhenStartAndEndInSameYear(){
         long timeLeft = alarmClock.remainingTime(input).getSeconds();
 
         assertThat(timeLeft, is(12728700L));
@@ -43,7 +44,7 @@ public class AlarmClockMonthTimeTest {
 
     //OCTOBER(2)(10:15)-MARCH(3)(19:45)
     @Test
-    public void secondsLeftWhenEndInYearAfterStart(){
+    void secondsLeftWhenEndInYearAfterStart(){
         AlarmClockMonthTime alarmClockOctToMarch = new AlarmClockMonthTime(monthTimeOctober, monthTimeMarch);
         LocalDateTime inputNov = LocalDateTime.of(2017, 11, 17, 12, 00);
 
@@ -53,7 +54,7 @@ public class AlarmClockMonthTimeTest {
     }
 
     @Test
-    public void noTimeLeftWhenJustBeforeStart(){
+    void noTimeLeftWhenJustBeforeStart(){
         LocalDateTime inputBeforeStart = LocalDateTime.of(2017, 3, 1, 10, 14);
 
         long timeLeft = alarmClock.remainingTime(inputBeforeStart).getSeconds();
@@ -62,7 +63,7 @@ public class AlarmClockMonthTimeTest {
     }
 
     @Test
-    public void noTimeLeftWhenJustAfterEnd(){
+    void noTimeLeftWhenJustAfterEnd(){
         LocalDateTime inputAfterEnd = LocalDateTime.of(2017, 10, 11, 19, 46);
 
         long timeLeft = alarmClock.remainingTime(inputAfterEnd).getSeconds();
@@ -70,18 +71,18 @@ public class AlarmClockMonthTimeTest {
         assertThat(timeLeft, is(0L));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void exceptionIfEndIsNull(){
-        new AlarmClockMonthTime(monthTimeMarch, null);
+    @Test
+    void exceptionIfEndIsNull(){
+        assertThrows(IllegalArgumentException.class, () -> new AlarmClockMonthTime(monthTimeMarch, null));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void exceptionIfStartIsNull(){
-        new AlarmClockMonthTime(null, monthTimeMarch);
+    @Test
+    void exceptionIfStartIsNull(){
+        assertThrows(IllegalArgumentException.class, () -> new AlarmClockMonthTime(null, monthTimeMarch));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void exceptionIfStartAndEndIsNull(){
-        new AlarmClockMonthTime(null, null);
+    @Test
+    void exceptionIfStartAndEndIsNull(){
+        assertThrows(IllegalArgumentException.class, () -> new AlarmClockMonthTime(null, null));
     }
 }

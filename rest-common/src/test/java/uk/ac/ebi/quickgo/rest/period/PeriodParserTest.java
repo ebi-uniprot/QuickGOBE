@@ -1,13 +1,11 @@
 package uk.ac.ebi.quickgo.rest.period;
 
+import org.junit.jupiter.api.Test;
+
 import java.util.Optional;
 
-import org.junit.Test;
-
-import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.Matchers.equalTo;
-
-
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 
@@ -18,34 +16,34 @@ import static org.hamcrest.MatcherAssert.assertThat;
  * Time: 09:26
  * Created with IntelliJ IDEA.
  */
-public class PeriodParserTest {
+class PeriodParserTest {
 
     private static final AlarmClock ALARM_CLOCK = target -> null;
     private final PeriodParser periodParser = getPeriodParser();
 
     @Test
-    public void parseValidInputString() throws Exception {
+    void parseValidInputString()  {
         Optional<AlarmClock> alarmClock = periodParser.parse("START-END");
 
         assertTrue(alarmClock.isPresent());
     }
 
     @Test
-    public void nullInputStringReturnsEmptyOptional(){
+    void nullInputStringReturnsEmptyOptional(){
         Optional<AlarmClock> alarmClock = periodParser.parse(null);
 
         assertThat(alarmClock, equalTo(Optional.empty()));
     }
 
     @Test
-    public void zeroLengthInputStringReturnsEmptyOptional(){
+    void zeroLengthInputStringReturnsEmptyOptional(){
         Optional<AlarmClock> alarmClock = periodParser.parse("");
 
         assertThat(alarmClock, equalTo(Optional.empty()));
     }
 
     @Test
-    public void toDateModifierReturnsEmptyOptional() throws Exception {
+    void toDateModifierReturnsEmptyOptional()  {
         PeriodParser periodParser = getPeriodParserToAlarmClockReturnsEmptyOptional();
 
         Optional<AlarmClock> alarmClock = periodParser.parse("START-END");

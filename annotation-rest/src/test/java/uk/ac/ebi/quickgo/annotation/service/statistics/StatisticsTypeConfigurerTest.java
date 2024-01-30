@@ -1,8 +1,8 @@
 package uk.ac.ebi.quickgo.annotation.service.statistics;
 
 import java.util.*;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
@@ -19,7 +19,7 @@ import static uk.ac.ebi.quickgo.annotation.service.statistics.RequiredStatisticT
  * Created 15/08/17
  * @author Edd
  */
-public class StatisticsTypeConfigurerTest {
+class StatisticsTypeConfigurerTest {
 
     public static final String GO_ID = "goId";
     private static final String TAXON_ID = "taxonId";
@@ -30,15 +30,15 @@ public class StatisticsTypeConfigurerTest {
     private Map<String, Integer> typeLimitProperties;
     private List<RequiredStatisticType> types;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         typeLimitProperties = new HashMap<>();
         typeConfigurer = new StatisticsTypeConfigurer(typeLimitProperties);
         types = new ArrayList<>();
     }
 
     @Test
-    public void emptyRequiredStatsRemainEmpty() {
+    void emptyRequiredStatsRemainEmpty() {
         // Given
         typeLimitProperties.put(GO_ID, 1111);
 
@@ -52,7 +52,7 @@ public class StatisticsTypeConfigurerTest {
     }
 
     @Test
-    public void noMatchingTypeLeavesRequiredStatsUntouched() {
+    void noMatchingTypeLeavesRequiredStatsUntouched() {
         // Given
         typeLimitProperties.put(GO_ID, 1111);
         RequiredStatisticType statsType = statsType(TAXON_ID);
@@ -69,7 +69,7 @@ public class StatisticsTypeConfigurerTest {
     }
 
     @Test
-    public void emptyTypePropertiesLeavesRequiredStatsUntouched() {
+    void emptyTypePropertiesLeavesRequiredStatsUntouched() {
         // Given
         RequiredStatisticType statsType = statsType(TAXON_ID);
         types.add(statsType);
@@ -86,7 +86,7 @@ public class StatisticsTypeConfigurerTest {
     }
 
     @Test
-    public void matchingTypeUpdatesRequiredStats() {
+    void matchingTypeUpdatesRequiredStats() {
         // Given
         typeLimitProperties.put(GO_ID, GO_ID_LIMIT);
         typeLimitProperties.put("aspectId", 20);

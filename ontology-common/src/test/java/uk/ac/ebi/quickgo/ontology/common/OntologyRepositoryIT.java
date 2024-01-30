@@ -1,16 +1,14 @@
 package uk.ac.ebi.quickgo.ontology.common;
 
 import org.apache.solr.client.solrj.SolrServerException;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.solr.core.SolrTemplate;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.ac.ebi.quickgo.common.QueryUtils;
 import uk.ac.ebi.quickgo.common.SolrCollectionName;
 import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
@@ -34,13 +32,12 @@ import static org.hamcrest.core.IsNull.notNullValue;
  *
  * @author Edd
  */
-@RunWith(SpringJUnit4ClassRunner.class)
+
+// temporary data store for solr's data, which is automatically cleaned on exit
+@ExtendWith(TemporarySolrDataStore.class)
 @SpringBootTest(classes = OntologyRepoConfig.class)
-public class OntologyRepositoryIT {
+class OntologyRepositoryIT {
     private static final String COLLECTION = SolrCollectionName.ONTOLOGY;
-    // temporary data store for solr's data, which is automatically cleaned on exit
-    @ClassRule
-    public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
 
     @Autowired
     private OntologyRepository ontologyRepository;
@@ -48,20 +45,20 @@ public class OntologyRepositoryIT {
     @Autowired
     private SolrTemplate ontologyTemplate;
 
-    @Before
-    public void before() {
+    @BeforeEach
+    void before() {
         ontologyRepository.deleteAll();
     }
 
     @Test
-    public void add1DocumentThenFind1Documents() throws IOException, SolrServerException {
+    void add1DocumentThenFind1Documents() throws IOException, SolrServerException {
         ontologyRepository.save(OntologyDocMocker.createGODoc("A", "Alice Cooper"));
 
         assertThat(ontologyRepository.findAll(PageRequest.of(0, 10)).getTotalElements(), is(1L));
     }
 
     @Test
-    public void add3DocumentsThenFind3Documents() {
+    void add3DocumentsThenFind3Documents() {
         ontologyRepository.save(OntologyDocMocker.createGODoc("A", "Alice Cooper"));
         ontologyRepository.save(OntologyDocMocker.createGODoc("B", "Bob The Builder"));
         ontologyRepository.save(OntologyDocMocker.createGODoc("C", "Clint Eastwood"));
@@ -70,7 +67,7 @@ public class OntologyRepositoryIT {
     }
 
     @Test
-    public void retrieves1DocCoreFieldsOnly() {
+    void retrieves1DocCoreFieldsOnly() {
         String id = "GO:0000001";
         ontologyRepository.save(OntologyDocMocker.createGODoc(id, "GO name 1"));
 
@@ -83,7 +80,7 @@ public class OntologyRepositoryIT {
     }
 
     @Test
-    public void retrieves2DocsCoreFieldsOnly() {
+    void retrieves2DocsCoreFieldsOnly() {
         String id1 = "GO:0000001";
         String id2 = "GO:0000002";
         ontologyRepository.save(OntologyDocMocker.createGODoc(id1, "GO name 1"));
@@ -99,7 +96,7 @@ public class OntologyRepositoryIT {
     }
 
     @Test
-    public void retrievesReplacesField() {
+    void retrievesReplacesField() {
         String id = "GO:0000001";
         OntologyDocument doc = OntologyDocMocker.createGODoc(id, "GO name 1");
         ontologyRepository.save(doc);
@@ -115,7 +112,7 @@ public class OntologyRepositoryIT {
     }
 
     @Test
-    public void retrievesReplacementField() {
+    void retrievesReplacementField() {
         String id = "GO:0000001";
         OntologyDocument doc = OntologyDocMocker.createGODoc(id, "GO name 1");
         ontologyRepository.save(doc);
@@ -131,7 +128,7 @@ public class OntologyRepositoryIT {
     }
 
     @Test
-    public void retrievesHistoryField() {
+    void retrievesHistoryField() {
         String id = "GO:0000001";
         ontologyRepository.save(OntologyDocMocker.createGODoc(id, "GO name 1"));
 
@@ -148,7 +145,7 @@ public class OntologyRepositoryIT {
     }
 
     @Test
-    public void retrievesXrefsField() {
+    void retrievesXrefsField() {
         String id = "GO:0000001";
         ontologyRepository.save(OntologyDocMocker.createGODoc(id, "GO name 1"));
 
@@ -165,7 +162,7 @@ public class OntologyRepositoryIT {
     }
 
     @Test
-    public void retrievesAnnotationGuidelinesField() {
+    void retrievesAnnotationGuidelinesField() {
         String id = "GO:0000001";
         ontologyRepository.save(OntologyDocMocker.createGODoc(id, "GO name 1"));
 
@@ -183,7 +180,7 @@ public class OntologyRepositoryIT {
     }
 
     @Test
-    public void retrievesTaxonConstraintsField() {
+    void retrievesTaxonConstraintsField() {
         String id = "GO:0000001";
         ontologyRepository.save(OntologyDocMocker.createGODoc(id, "GO name 1"));
 
@@ -202,7 +199,7 @@ public class OntologyRepositoryIT {
     }
 
     @Test
-    public void retrievesXOntologyRelationsField() {
+    void retrievesXOntologyRelationsField() {
         String id = "GO:0000001";
         ontologyRepository.save(OntologyDocMocker.createGODoc(id, "GO name 1"));
 
@@ -220,7 +217,7 @@ public class OntologyRepositoryIT {
     }
 
     @Test
-    public void add1DocumentAndFailToFindForWrongId() {
+    void add1DocumentAndFailToFindForWrongId() {
         ontologyRepository.save(OntologyDocMocker.createGODoc("A", "Alice Cooper"));
 
         assertThat(ontologyRepository.findCoreAttrByTermId(OntologyType.GO.name(), buildIdList("B")).size(), is(0));
@@ -229,7 +226,7 @@ public class OntologyRepositoryIT {
     }
 
     @Test
-    public void add1GoDocumentAndFindItById() {
+    void add1GoDocumentAndFindItById() {
         ontologyRepository.save(OntologyDocMocker.createGODoc("A", "Alice Cooper"));
 
         assertThat(ontologyRepository.findCoreAttrByTermId(OntologyType.GO.name(), buildIdList("A")).size(), is(1));
@@ -238,7 +235,7 @@ public class OntologyRepositoryIT {
     }
 
     @Test
-    public void add1GoAnd1EcoDocumentsAndFindAllOfTypeGO() {
+    void add1GoAnd1EcoDocumentsAndFindAllOfTypeGO() {
         OntologyDocument goDoc = OntologyDocMocker.createGODoc("A", "Alice Cooper");
         OntologyDocument ecoDoc = OntologyDocMocker.createECODoc("B", "Bob The Builder");
 
@@ -253,7 +250,7 @@ public class OntologyRepositoryIT {
     }
 
     @Test
-    public void add3GoDocumentsAndFindAllOfTypeGOWith1DocPerPage() {
+    void add3GoDocumentsAndFindAllOfTypeGOWith1DocPerPage() {
         List<OntologyDocument> ontologyDocuments = Arrays.asList(
                 OntologyDocMocker.createGODoc("A", "Alice Cooper"),
                 OntologyDocMocker.createGODoc("B", "Bob The Builder"),
@@ -280,7 +277,7 @@ public class OntologyRepositoryIT {
      * @throws SolrServerException
      */
     @Test
-    public void saveDirectlyToSolrServer() throws IOException, SolrServerException {
+    void saveDirectlyToSolrServer() throws IOException, SolrServerException {
         ontologyTemplate.getSolrClient().addBean(COLLECTION,OntologyDocMocker.createGODoc("A", "Alice Cooper"));
         ontologyTemplate.getSolrClient().addBean(COLLECTION,OntologyDocMocker.createGODoc("B", "Alice Cooper"));
         ontologyTemplate.getSolrClient().addBean(COLLECTION,OntologyDocMocker.createGODoc("C", "Alice Cooper"));
@@ -297,17 +294,17 @@ public class OntologyRepositoryIT {
     }
 
     @Test
-    public void retrievesSecondaryIdByPrimary(){
+    void retrievesSecondaryIdByPrimary(){
         retrievesSecondaryIdField(buildIdList("GO:0000001"));
     }
 
     @Test
-    public void retrievesSecondaryIdBySecondary(){
+    void retrievesSecondaryIdBySecondary(){
         retrievesSecondaryIdField(buildIdList("GO:0000003"));
     }
 
     @Test
-    public void retrievesSecondaryIdMix(){
+    void retrievesSecondaryIdMix(){
         retrievesSecondaryIdField(buildIdList("GO:0000001", "GO:0000003", "GO:0000004"));
     }
 

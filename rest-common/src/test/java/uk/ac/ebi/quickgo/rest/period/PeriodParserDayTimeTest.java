@@ -1,13 +1,14 @@
 package uk.ac.ebi.quickgo.rest.period;
 
+import org.junit.jupiter.api.Test;
+
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.Optional;
-import org.junit.Test;
 
 import static java.util.Optional.empty;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertThat;
 
 /**
  * Tests the creation of DayTime instances from DailyPeriodParser.
@@ -17,12 +18,12 @@ import static org.junit.Assert.assertThat;
  * Time: 15:27
  * Created with IntelliJ IDEA.
  */
-public class PeriodParserDayTimeTest {
+class PeriodParserDayTimeTest {
 
     private final PeriodParserDayTime periodParserDayTime = new PeriodParserDayTime();
 
     @Test
-    public void validInputCreatesPeriodSuccessfully(){
+    void validInputCreatesPeriodSuccessfully(){
         String validInput="MONDAY(21:30)-TUESDAY(21:30)";
         DayTime start = new DayTime(DayOfWeek.MONDAY, LocalTime.of(21, 30));
         DayTime end = new DayTime(DayOfWeek.TUESDAY, LocalTime.of(21, 30));
@@ -35,21 +36,21 @@ public class PeriodParserDayTimeTest {
     }
 
     @Test
-    public void nullInputCreatesEmptyPeriod(){
+    void nullInputCreatesEmptyPeriod(){
         Optional<AlarmClock> result = periodParserDayTime.parse(null);
 
         assertThat(result, equalTo(empty()));
     }
 
     @Test
-    public void emptyInputCreatesEmptyPeriod(){
+    void emptyInputCreatesEmptyPeriod(){
         Optional<AlarmClock> result = periodParserDayTime.parse("");
 
         assertThat(result, equalTo(empty()));
     }
 
     @Test
-    public void missingEndValueCreatesEmptyPeriod(){
+    void missingEndValueCreatesEmptyPeriod(){
         String invalidInput="MONDAY(21:30)-";
 
         Optional<AlarmClock> result = periodParserDayTime.parse(invalidInput);
@@ -58,7 +59,7 @@ public class PeriodParserDayTimeTest {
     }
 
     @Test
-    public void tooMuchDataCreatesEmptyPeriod(){
+    void tooMuchDataCreatesEmptyPeriod(){
         String invalidInput="MONDAY(21:30)-TUESDAY(21:30)-WEDNESDAY(21:30)";
 
         Optional<AlarmClock> result = periodParserDayTime.parse(invalidInput);
@@ -67,7 +68,7 @@ public class PeriodParserDayTimeTest {
     }
 
     @Test
-    public void invalidDayOfWeekCreateEmptyPeriod(){
+    void invalidDayOfWeekCreateEmptyPeriod(){
         String invalidInput="MONDAY(21:30)-FEBRUARY(21:30)";
 
         Optional<AlarmClock> result = periodParserDayTime.parse(invalidInput);
@@ -76,7 +77,7 @@ public class PeriodParserDayTimeTest {
     }
 
     @Test
-    public void invalidEndTimeCreatesEmptyPeriod(){
+    void invalidEndTimeCreatesEmptyPeriod(){
         String invalidInput="MONDAY(21:30)-TUESDAY(33:30)";
 
         Optional<AlarmClock> result = periodParserDayTime.parse(invalidInput);

@@ -1,12 +1,10 @@
 package uk.ac.ebi.quickgo.index.annotation.coterms;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 
 import java.util.ArrayList;
@@ -27,10 +25,9 @@ import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.c
  * Time: 14:16
  * Created with IntelliJ IDEA.
  */
-@RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {CoTermsConfig.class})
 @DirtiesContext(classMode = AFTER_EACH_TEST_METHOD)
-public class CoTermsProcessingAndCalculationIT {
+class CoTermsProcessingAndCalculationIT {
 
     private static final String NON_IEA_EVIDENCE = "ABC";
     @Autowired
@@ -43,7 +40,7 @@ public class CoTermsProcessingAndCalculationIT {
     private CoTermsAggregationWriter coTermsAllAggregationWriter;
 
     @Test
-    public void similarityRatioIsAlwaysOneHundredForATermThatCoOccursWithItsSelf() throws Exception {
+    void similarityRatioIsAlwaysOneHundredForATermThatCoOccursWithItsSelf() throws Exception {
         final int noOfDocs = 1;
         List<AnnotationDocument> docsToWrite = createGenericDocs(noOfDocs);
         assertThat(docsToWrite, hasSize(noOfDocs));
@@ -58,7 +55,7 @@ public class CoTermsProcessingAndCalculationIT {
     }
 
     @Test
-    public void coTermCalculationForSingleTermDifferentGeneProducts() throws Exception {
+    void coTermCalculationForSingleTermDifferentGeneProducts() throws Exception {
         List<AnnotationDocument> docsToWrite = createGenericDocs(10);
         assertThat(docsToWrite, hasSize(10));
         writeDocsToAllAggregationInstance(docsToWrite);
@@ -77,7 +74,7 @@ public class CoTermsProcessingAndCalculationIT {
     }
 
     @Test
-    public void coTermCalculationForTenTermsSameGeneProduct() throws Exception {
+    void coTermCalculationForTenTermsSameGeneProduct() throws Exception {
         Supplier<String> gpSupplier = () -> "A0A000";
         List<AnnotationDocument> docsToWrite = createGenericDocs(10, gpSupplier);
         assertThat(docsToWrite, hasSize(10));
@@ -97,7 +94,7 @@ public class CoTermsProcessingAndCalculationIT {
     }
 
     @Test
-    public void checkCoTermCalculationForMixOfTermAndGeneProductAndEvidenceCode() throws Exception {
+    void checkCoTermCalculationForMixOfTermAndGeneProductAndEvidenceCode() throws Exception {
         List<AnnotationDocument> docsToWrite = new ArrayList<>();
 
         final String gp1 = "A0A000";
@@ -161,7 +158,7 @@ public class CoTermsProcessingAndCalculationIT {
     }
 
     @Test
-    public void thereShouldBeZeroCoTermRecordsIfTheAnnotationHasANonManualSource() throws Exception {
+    void thereShouldBeZeroCoTermRecordsIfTheAnnotationHasANonManualSource() throws Exception {
         final int noOfDocs = 1;
         List<AnnotationDocument> docsToWrite = createGenericDocs(noOfDocs);
         assertThat(docsToWrite, hasSize(noOfDocs));
@@ -171,7 +168,7 @@ public class CoTermsProcessingAndCalculationIT {
     }
 
     @Test
-    public void simpleCalculationForManualOnlyAnnotationsProvesManualOpWorks() throws Exception {
+    void simpleCalculationForManualOnlyAnnotationsProvesManualOpWorks() throws Exception {
         List<AnnotationDocument> docsToWrite = createGenericDocs(10).stream()
                                                                     .map(ad -> {
                                                                         ad.goEvidence = NON_IEA_EVIDENCE;

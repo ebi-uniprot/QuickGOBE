@@ -1,15 +1,13 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -46,13 +44,12 @@ import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.totalNumO
  * Created 16/08/17
  * @author Edd
  */
-@RunWith(SpringJUnit4ClassRunner.class)
+
+// temporary data store for solr's data, which is automatically cleaned on exit
+@ExtendWith(TemporarySolrDataStore.class)
 @SpringBootTest(classes = {AnnotationREST.class, StatsConfigsAreAppliedIT.TestStatsTypeConfig.class})
 @WebAppConfiguration
-public class StatsConfigsAreAppliedIT {
-    // temporary data store for solr's data, which is automatically cleaned on exit
-    @ClassRule
-    public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
+class StatsConfigsAreAppliedIT {
     private static final String GO_ID = "goId";
     private static final String TAXON_ID = "taxonId";
 
@@ -78,8 +75,8 @@ public class StatsConfigsAreAppliedIT {
     @Autowired
     private AnnotationRepository repository;
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         repository.deleteAll();
 
         mockMvc = MockMvcBuilders.
@@ -88,7 +85,7 @@ public class StatsConfigsAreAppliedIT {
     }
 
     @Test
-    public void goIdConfigReadAndApplied() throws Exception {
+    void goIdConfigReadAndApplied() throws Exception {
         List<AnnotationDocument> docs =
                 createDocsAndApply((i, doc) -> doc.goId = createGOId(i));
         repository.saveAll(docs);
@@ -105,7 +102,7 @@ public class StatsConfigsAreAppliedIT {
     }
 
     @Test
-    public void taxonIdConfigReadAndApplied() throws Exception {
+    void taxonIdConfigReadAndApplied() throws Exception {
         List<AnnotationDocument> docs =
                 createDocsAndApply((i, doc) -> doc.taxonId = i);
         repository.saveAll(docs);
@@ -122,7 +119,7 @@ public class StatsConfigsAreAppliedIT {
     }
 
     @Test
-    public void noConfigForReferenceMeansThereAreDefaultNumber() throws Exception {
+    void noConfigForReferenceMeansThereAreDefaultNumber() throws Exception {
         List<AnnotationDocument> docs =
                 createDocsAndApply((i, doc) -> doc.reference = createRef(i));
         repository.saveAll(docs);

@@ -5,10 +5,8 @@ import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 
 import java.util.Collection;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -27,25 +25,23 @@ import static org.hamcrest.core.IsEqual.equalTo;
  * Time: 11:25
  * Created with IntelliJ IDEA.
  */
-public class GeneProductRequestTest {
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
+class GeneProductRequestTest {
 
     private GeneProductRequest geneProductRequest;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         geneProductRequest = new GeneProductRequest();
     }
 
     @Test
-    public void defaultPageAndLimitValuesAreCorrect() {
+    void defaultPageAndLimitValuesAreCorrect() {
         assertThat(geneProductRequest.getPage(), equalTo(1));
         assertThat(geneProductRequest.getLimit(), equalTo(25));
     }
 
     @Test
-    public void successfullySetAndGetPageAndLimitValues() {
+    void successfullySetAndGetPageAndLimitValues() {
         geneProductRequest.setPage(4);
         geneProductRequest.setLimit(15);
 
@@ -54,7 +50,7 @@ public class GeneProductRequestTest {
     }
 
     @Test
-    public void setAndGetType() {
+    void setAndGetType() {
         String type = "protein";
         geneProductRequest.setType(type);
 
@@ -62,7 +58,7 @@ public class GeneProductRequestTest {
     }
 
     @Test
-    public void setAndGetTaxonId() {
+    void setAndGetTaxonId() {
         String[] taxonIds = {"1", "2", "3"};
 
         geneProductRequest.setTaxonId(taxonIds);
@@ -70,7 +66,7 @@ public class GeneProductRequestTest {
     }
 
     @Test
-    public void setAndGetDbSubset() {
+    void setAndGetDbSubset() {
         String dbSubset = "TrEMBL";
         geneProductRequest.setType(dbSubset);
 
@@ -78,7 +74,7 @@ public class GeneProductRequestTest {
     }
 
     @Test
-    public void setAndCreateQuery() {
+    void setAndCreateQuery() {
         String queryStr = "I am a query";
         QuickGOQuery query = QuickGOQuery.createQuery(queryStr);
 
@@ -88,14 +84,14 @@ public class GeneProductRequestTest {
     }
 
     @Test
-    public void emptyGeneProductCreatesNoFilterRequests() {
+    void emptyGeneProductCreatesNoFilterRequests() {
         List<FilterRequest> filters = geneProductRequest.createFilterRequests();
 
         assertThat(filters, hasSize(0));
     }
 
     @Test
-    public void createsFilterForDbSubset() {
+    void createsFilterForDbSubset() {
         String dbSubset = "TrEMBL";
 
         geneProductRequest.setDbSubset(dbSubset);
@@ -110,7 +106,7 @@ public class GeneProductRequestTest {
     }
 
     @Test
-    public void createsFilterForTaxonId() {
+    void createsFilterForTaxonId() {
         String taxonId = "1";
 
         geneProductRequest.setTaxonId(taxonId);
@@ -125,7 +121,7 @@ public class GeneProductRequestTest {
     }
 
     @Test
-    public void createsFilterForType() {
+    void createsFilterForType() {
         String protein = "protein";
 
         geneProductRequest.setDbSubset(protein);
@@ -140,7 +136,7 @@ public class GeneProductRequestTest {
     }
 
     @Test
-    public void createsFilterForProteome() {
+    void createsFilterForProteome() {
         String proteomeStatus = "complete";
 
         geneProductRequest.setProteome(proteomeStatus);

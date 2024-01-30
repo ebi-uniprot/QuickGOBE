@@ -1,10 +1,12 @@
 package uk.ac.ebi.quickgo.geneproduct.controller;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.http.ResponseEntity;
 import uk.ac.ebi.quickgo.geneproduct.model.GeneProduct;
 import uk.ac.ebi.quickgo.geneproduct.service.GeneProductService;
@@ -23,6 +25,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
@@ -32,8 +35,9 @@ import static org.mockito.Mockito.when;
  * Time: 16:33
  * Created with IntelliJ IDEA.
  */
-@RunWith(MockitoJUnitRunner.class)
-public class GeneProductControllerTest {
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
+class GeneProductControllerTest {
 
     private static final String GENE_PRODUCT_ID1 = "A0A001";
     private static final String GENE_PRODUCT_ID2 = "A0A002";
@@ -61,8 +65,8 @@ public class GeneProductControllerTest {
     @Mock
     private FilterConverterFactory converterFactory;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         geneProduct1 = createGeneProduct(GENE_PRODUCT_ID1);
         geneProduct2 = createGeneProduct(GENE_PRODUCT_ID2);
         geneProduct3 = createGeneProduct(GENE_PRODUCT_ID3);
@@ -88,72 +92,72 @@ public class GeneProductControllerTest {
     }
 
     @Test
-    public void retrieveEmptyList() {
+    void retrieveEmptyList() {
         ResponseEntity<QueryResult<GeneProduct>> response = controller.findById("");
         assertThat(response.getHeaders().isEmpty(), is(true));
         assertThat(response.getBody().getResults(), is(empty()));
     }
 
     @Test
-    public void retrieveSingleGeneProduct() {
+    void retrieveSingleGeneProduct() {
         ResponseEntity<QueryResult<GeneProduct>> response = controller.findById(GENE_PRODUCT_ID1);
         assertThat(response.getBody().getResults(), contains(geneProduct1));
         assertThat(response.getBody().getResults(), hasSize(1));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void retrieveMultipleGeneProductOverLimit() {
-        controller.findById(multiCSVTooBig);
+    @Test
+    void retrieveMultipleGeneProductOverLimit() {
+        assertThrows(IllegalArgumentException.class, () -> controller.findById(multiCSVTooBig));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void controllerInstantiationFailsOnNullGeneProductService() {
-        new GeneProductController(
+    @Test
+    void controllerInstantiationFailsOnNullGeneProductService() {
+        assertThrows(IllegalArgumentException.class, () -> new GeneProductController(
                 null,
                 geneProductSearchService,
                 geneProductRetrievalConfig,
                 validationHelper,
-                converterFactory);
+                converterFactory));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void controllerInstantiationFailsOnNullSearchService() {
-        new GeneProductController(
+    @Test
+    void controllerInstantiationFailsOnNullSearchService() {
+        assertThrows(IllegalArgumentException.class, () -> new GeneProductController(
                 geneProductService,
                 null,
                 geneProductRetrievalConfig,
                 validationHelper,
-                converterFactory);
+                converterFactory));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void controllerInstantiationFailsOnNullRetrievalConfig() {
-        new GeneProductController(
+    @Test
+    void controllerInstantiationFailsOnNullRetrievalConfig() {
+        assertThrows(IllegalArgumentException.class, () -> new GeneProductController(
                 geneProductService,
                 geneProductSearchService,
                 null,
                 validationHelper,
-                converterFactory);
+                converterFactory));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void controllerInstantiationFailsOnNullValidationHelper() {
-        new GeneProductController(
+    @Test
+    void controllerInstantiationFailsOnNullValidationHelper() {
+        assertThrows(IllegalArgumentException.class, () -> new GeneProductController(
                 geneProductService,
                 geneProductSearchService,
                 geneProductRetrievalConfig,
                 null,
-                converterFactory);
+                converterFactory));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void controllerInstantiationFailsOnNullFilterConverterHelper() {
-        new GeneProductController(
+    @Test
+    void controllerInstantiationFailsOnNullFilterConverterHelper() {
+        assertThrows(IllegalArgumentException.class, () -> new GeneProductController(
                 geneProductService,
                 geneProductSearchService,
                 geneProductRetrievalConfig,
                 validationHelper,
-                null);
+                null));
     }
 
     private String createOversizedCSVRequest() {

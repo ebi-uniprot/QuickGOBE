@@ -1,8 +1,7 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
@@ -10,7 +9,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -35,10 +33,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Time: 16:32
  * Created with IntelliJ IDEA.
  */
-@RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {AnnotationREST.class, CoTermControllerFailedLoadIT.CoTermConfig.class})
 @WebAppConfiguration
-public class CoTermControllerFailedLoadIT {
+class CoTermControllerFailedLoadIT {
 
     private static final String RESOURCE_URL = "/annotation/coterms";
     private static final String VALID_GO_TERM = "GO:7777771";
@@ -47,13 +44,13 @@ public class CoTermControllerFailedLoadIT {
     private WebApplicationContext webApplicationContext;
     private MockMvc mockMvc;
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
     }
 
     @Test
-    public void internalServerErrorIfCoTermFilesNotLoaded() throws Exception {
+    void internalServerErrorIfCoTermFilesNotLoaded() throws Exception {
         ResultActions response = mockMvc.perform(get(buildPathToResource(VALID_GO_TERM)));
         response.andDo(print())
                 .andExpect(status().isInternalServerError());

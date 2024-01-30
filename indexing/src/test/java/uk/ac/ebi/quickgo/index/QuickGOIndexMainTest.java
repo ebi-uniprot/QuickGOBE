@@ -1,9 +1,9 @@
 package uk.ac.ebi.quickgo.index;
 
 import org.apache.solr.client.solrj.SolrServerException;
+import org.junit.jupiter.api.Test;
 import uk.ac.ebi.quickgo.index.common.listener.LogJobListener;
 
-import org.junit.Test;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -26,18 +26,18 @@ import static org.hamcrest.Matchers.not;
  * Created 19/06/17
  * @author Edd
  */
-public class QuickGOIndexMainTest {
+class QuickGOIndexMainTest {
     private static final int SUCCESS_EXIT_CODE = 0;
 
     @Test
-    public void successfulSpringBootApplicationHasCorrectExitStatus() {
+    void successfulSpringBootApplicationHasCorrectExitStatus() {
         assertThat(
                 QuickGOIndexMain.run(QuickGOIndexMainTest.SuccessfulTestApp.class, new String[]{}),
                 is(SUCCESS_EXIT_CODE));
     }
 
     @Test
-    public void failedSpringBootApplicationHasCorrectExitStatus() {
+    void failedSpringBootApplicationHasCorrectExitStatus() {
         assertThat(
                 QuickGOIndexMain.run(QuickGOIndexMainTest.FailingTestApp.class, new String[]{}),
                 is(not(SUCCESS_EXIT_CODE)));

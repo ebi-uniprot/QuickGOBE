@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -9,10 +9,10 @@ import static org.hamcrest.core.Is.is;
 import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.DEFAULT_GO_USAGE;
 import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.DEFAULT_GO_USAGE_RELATIONSHIPS;
 
-public class AnnotationRequestBodyTest {
+class AnnotationRequestBodyTest {
 
   @Test
-  public void beforeDefaultValues() {
+  void beforeDefaultValues() {
     AnnotationRequestBody requestBody = AnnotationRequestBody.builder().build();
 
     assertThat(requestBody, notNullValue());
@@ -21,7 +21,7 @@ public class AnnotationRequestBodyTest {
   }
 
   @Test
-  public void defaultValues() {
+  void defaultValues() {
     AnnotationRequestBody requestBody = AnnotationRequestBody.builder().build();
 
     AnnotationRequestBody.putDefaultValuesIfAbsent(requestBody);
@@ -39,7 +39,7 @@ public class AnnotationRequestBodyTest {
   }
 
   @Test
-  public void relationshipPresent_defaultGoUsage() {
+  void relationshipPresent_defaultGoUsage() {
     AnnotationRequestBody body = AnnotationRequestBody.builder()
       .and(AnnotationRequestBody.GoDescription.builder().goUsageRelationships(new String[]{"is_A"}).build())
       .build();
@@ -49,7 +49,7 @@ public class AnnotationRequestBodyTest {
   }
 
   @Test
-  public void usagePresent_defaultGoUsageRelations() {
+  void usagePresent_defaultGoUsageRelations() {
     AnnotationRequestBody body = AnnotationRequestBody.builder()
       .not(AnnotationRequestBody.GoDescription.builder().goUsage("abc").build())
       .build();
@@ -60,7 +60,7 @@ public class AnnotationRequestBodyTest {
   }
 
   @Test
-  public void multipleGoUsageRelationships_shouldBeLowerCase() {
+  void multipleGoUsageRelationships_shouldBeLowerCase() {
     AnnotationRequestBody body = AnnotationRequestBody.builder()
       .and(AnnotationRequestBody.GoDescription.builder().goUsageRelationships(new String[]{"is_A", "Part_OF"}).build())
       .build();
@@ -70,7 +70,7 @@ public class AnnotationRequestBodyTest {
   }
 
   @Test
-  public void singleGoUsageRelationships_shouldBeLowerCase() {
+  void singleGoUsageRelationships_shouldBeLowerCase() {
     AnnotationRequestBody body = AnnotationRequestBody.builder()
       .and(AnnotationRequestBody.GoDescription.builder().goUsageRelationships("is_A").build())
       .build();
@@ -80,7 +80,7 @@ public class AnnotationRequestBodyTest {
   }
 
   @Test
-  public void goUsageRelationshipsFromStringSetter_commaSeparated() {
+  void goUsageRelationshipsFromStringSetter_commaSeparated() {
     AnnotationRequestBody.GoDescription and = new AnnotationRequestBody.GoDescription();
     and.setGoUsageRelationships("is_a,type_of");
     AnnotationRequestBody body = AnnotationRequestBody.builder()
@@ -92,7 +92,7 @@ public class AnnotationRequestBodyTest {
   }
 
   @Test
-  public void goUsageRelationshipsFromStringSetter_null() {
+  void goUsageRelationshipsFromStringSetter_null() {
     AnnotationRequestBody.GoDescription and = new AnnotationRequestBody.GoDescription();
     and.setGoUsageRelationships(null);
     AnnotationRequestBody body = AnnotationRequestBody.builder()
@@ -103,7 +103,7 @@ public class AnnotationRequestBodyTest {
   }
 
   @Test
-  public void goUsageRelationshipsFromStringSetter_empty() {
+  void goUsageRelationshipsFromStringSetter_empty() {
     AnnotationRequestBody.GoDescription and = new AnnotationRequestBody.GoDescription();
     and.setGoUsageRelationships("");
     AnnotationRequestBody body = AnnotationRequestBody.builder()
@@ -114,7 +114,7 @@ public class AnnotationRequestBodyTest {
   }
 
   @Test
-  public void goUsageRelationshipsFromStringSetter_shouldBeLowerCase() {
+  void goUsageRelationshipsFromStringSetter_shouldBeLowerCase() {
     AnnotationRequestBody.GoDescription and = new AnnotationRequestBody.GoDescription();
     and.setGoUsageRelationships("ParT_oF");
     AnnotationRequestBody body = AnnotationRequestBody.builder()
@@ -126,7 +126,7 @@ public class AnnotationRequestBodyTest {
   }
 
   @Test
-  public void goUsageFromBuilder_shouldBeLowerCase() {
+  void goUsageFromBuilder_shouldBeLowerCase() {
     AnnotationRequestBody body = AnnotationRequestBody.builder()
       .not(AnnotationRequestBody.GoDescription.builder().goUsage("abcD").build())
       .build();
@@ -137,7 +137,7 @@ public class AnnotationRequestBodyTest {
   }
 
   @Test
-  public void goUsageFromSetter_shouldBeLowerCase() {
+  void goUsageFromSetter_shouldBeLowerCase() {
     AnnotationRequestBody.GoDescription not = new AnnotationRequestBody.GoDescription();
     not.setGoUsage("ABCD");
     AnnotationRequestBody body = AnnotationRequestBody.builder()
@@ -150,7 +150,7 @@ public class AnnotationRequestBodyTest {
   }
 
   @Test
-  public void goUsage_nullTest() {
+  void goUsage_nullTest() {
     AnnotationRequestBody body = AnnotationRequestBody.builder()
       .not(AnnotationRequestBody.GoDescription.builder().goUsage(null).build())
       .build();

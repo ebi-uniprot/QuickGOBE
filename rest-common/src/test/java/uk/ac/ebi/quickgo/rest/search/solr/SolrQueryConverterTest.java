@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.rest.search.solr;
-
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.ac.ebi.quickgo.common.SolrCollectionName;
 import uk.ac.ebi.quickgo.rest.search.query.*;
 
@@ -7,8 +8,6 @@ import java.util.HashSet;
 import java.util.Set;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.common.params.CursorMarkParams;
-import org.junit.Before;
-import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -17,51 +16,52 @@ import static org.hamcrest.Matchers.arrayContaining;
 import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.createCursorPage;
 import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.createFirstCursorPage;
 
 /**
  * Tests the implementations of the {@link SolrQueryConverter} implementation.
  */
-public class SolrQueryConverterTest {
+class SolrQueryConverterTest {
     private static final String REQUEST_HANDLER_NAME = "/select";
     private static final String COLLECTION = SolrCollectionName.COLLECTION;
     private static final Set<String> WILDCARD_COMPATIBLE_FIELDS = new HashSet<>();
 
     private SolrQueryConverter converter;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp()  {
         converter = SolrQueryConverter.create(REQUEST_HANDLER_NAME);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void nullRequestHandlerArgumentInConstructorThrowsException() throws Exception {
-        converter = SolrQueryConverter.createWithWildCardSupport(null, WILDCARD_COMPATIBLE_FIELDS);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void emptyRequestHandlerArgumentInConstructorThrowsException() throws Exception {
-        converter = SolrQueryConverter.createWithWildCardSupport("", WILDCARD_COMPATIBLE_FIELDS);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void nullWildCardListPassedToInstantiatingMethodThrowsException() throws Exception {
-        converter = SolrQueryConverter.createWithWildCardSupport("validValue", null);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void nullSerializerInConstructorThrowsException() throws Exception {
-        converter = new SolrQueryConverter("validValue", null);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void nullQueryRequestThrowsException() throws Exception {
-        converter.convert(null);
+    @Test
+    void nullRequestHandlerArgumentInConstructorThrowsException()  {
+        assertThrows(IllegalArgumentException.class, () -> converter = SolrQueryConverter.createWithWildCardSupport(null, WILDCARD_COMPATIBLE_FIELDS));
     }
 
     @Test
-    public void solrQueryReferencesCorrectRequestHandlerName() throws Exception {
+    void emptyRequestHandlerArgumentInConstructorThrowsException()  {
+        assertThrows(IllegalArgumentException.class, () -> converter = SolrQueryConverter.createWithWildCardSupport("", WILDCARD_COMPATIBLE_FIELDS));
+    }
+
+    @Test
+    void nullWildCardListPassedToInstantiatingMethodThrowsException()  {
+        assertThrows(IllegalArgumentException.class, () -> converter = SolrQueryConverter.createWithWildCardSupport("validValue", null));
+    }
+
+    @Test
+    void nullSerializerInConstructorThrowsException()  {
+        assertThrows(IllegalArgumentException.class, () -> converter = new SolrQueryConverter("validValue", null));
+    }
+
+    @Test
+    void nullQueryRequestThrowsException()  {
+        assertThrows(IllegalArgumentException.class, () -> converter.convert(null));
+    }
+
+    @Test
+    void solrQueryReferencesCorrectRequestHandlerName()  {
         QuickGOQuery fieldQuery = createBasicQuery();
 
         QueryRequest request = new QueryRequest.Builder(fieldQuery, COLLECTION).build();
@@ -72,7 +72,7 @@ public class SolrQueryConverterTest {
     }
 
     @Test
-    public void convertQueryRequestWithQueryAndPageParameters() throws Exception {
+    void convertQueryRequestWithQueryAndPageParameters()  {
         QuickGOQuery fieldQuery = createBasicQuery();
 
         int currentPage = 2;
@@ -89,7 +89,7 @@ public class SolrQueryConverterTest {
     }
 
     @Test
-    public void convertQueryRequestWithQueryAndFacets() throws Exception {
+    void convertQueryRequestWithQueryAndFacets()  {
         QuickGOQuery fieldQuery = createBasicQuery();
 
         String facetField1 = "facet1";
@@ -106,7 +106,7 @@ public class SolrQueryConverterTest {
     }
 
     @Test
-    public void convertQueryRequestWithQueryAndFilterQuery() throws Exception {
+    void convertQueryRequestWithQueryAndFilterQuery()  {
         QuickGOQuery fieldQuery = createBasicQuery();
 
         String filterField = "filterField1";
@@ -123,7 +123,7 @@ public class SolrQueryConverterTest {
     }
 
     @Test
-    public void defaultConvertQueryRequestDoesNotUseHighlighting() {
+    void defaultConvertQueryRequestDoesNotUseHighlighting() {
         QuickGOQuery fieldQuery = createBasicQuery();
 
         QueryRequest request = new QueryRequest.Builder(fieldQuery, COLLECTION).build();
@@ -134,7 +134,7 @@ public class SolrQueryConverterTest {
     }
 
     @Test
-    public void convertQueryRequestWithHighlightingOffWillNotUseHighlighting() {
+    void convertQueryRequestWithHighlightingOffWillNotUseHighlighting() {
         QuickGOQuery fieldQuery = createBasicQuery();
 
         QueryRequest request = new QueryRequest
@@ -147,7 +147,7 @@ public class SolrQueryConverterTest {
     }
 
     @Test
-    public void convertQueryRequestWithHighlightingWillUseHighlighting() {
+    void convertQueryRequestWithHighlightingWillUseHighlighting() {
         QuickGOQuery fieldQuery = createBasicQuery();
 
         String highlightedField = "highlightedField";
@@ -164,7 +164,7 @@ public class SolrQueryConverterTest {
     }
 
     @Test
-    public void convertQueryRequestWithProjectedFieldWillProjectThatField() {
+    void convertQueryRequestWithProjectedFieldWillProjectThatField() {
         QuickGOQuery fieldQuery = createBasicQuery();
 
         String projectedField = "projectedField";
@@ -180,7 +180,7 @@ public class SolrQueryConverterTest {
     }
 
     @Test
-    public void convertQueryRequestWithTwoProjectedFieldsWillProjectTwoFields() {
+    void convertQueryRequestWithTwoProjectedFieldsWillProjectTwoFields() {
         QuickGOQuery fieldQuery = createBasicQuery();
 
         String projectedField1 = "projectedField1";
@@ -198,7 +198,7 @@ public class SolrQueryConverterTest {
     }
 
     @Test
-    public void convertQueryRequestWithNoProjectedFieldWillProjectNoFields() {
+    void convertQueryRequestWithNoProjectedFieldWillProjectNoFields() {
         QuickGOQuery fieldQuery = createBasicQuery();
 
         QueryRequest request = new QueryRequest
@@ -211,7 +211,7 @@ public class SolrQueryConverterTest {
     }
 
     @Test
-    public void convertFirstQueryRequestWithCursorUsage() {
+    void convertFirstQueryRequestWithCursorUsage() {
         QuickGOQuery fieldQuery = createBasicQuery();
 
         int pageSize = 10;
@@ -228,7 +228,7 @@ public class SolrQueryConverterTest {
     }
 
     @Test
-    public void convertQueryRequestWithCursorPosition() {
+    void convertQueryRequestWithCursorPosition() {
         QuickGOQuery fieldQuery = createBasicQuery();
 
         int pageSize = 10;
@@ -246,7 +246,7 @@ public class SolrQueryConverterTest {
     }
 
     @Test
-    public void convertQueryRequestWithZeroSortCriteria() {
+    void convertQueryRequestWithZeroSortCriteria() {
         QuickGOQuery fieldQuery = createBasicQuery();
 
         QueryRequest request = new QueryRequest
@@ -259,7 +259,7 @@ public class SolrQueryConverterTest {
     }
 
     @Test
-    public void convertQueryRequestWithSortCriterion() {
+    void convertQueryRequestWithSortCriterion() {
         QuickGOQuery fieldQuery = createBasicQuery();
 
         String sortField = "field";
@@ -276,7 +276,7 @@ public class SolrQueryConverterTest {
     }
 
     @Test
-    public void convertQueryRequestWithSortCriteria() {
+    void convertQueryRequestWithSortCriteria() {
         QuickGOQuery fieldQuery = createBasicQuery();
 
         String sortField0 = "field0";

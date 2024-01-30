@@ -1,10 +1,11 @@
 package uk.ac.ebi.quickgo.annotation.validation.service;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.ac.ebi.quickgo.annotation.validation.service.DbCrossReferenceId.*;
 
 /**
@@ -13,84 +14,84 @@ import static uk.ac.ebi.quickgo.annotation.validation.service.DbCrossReferenceId
  * Time: 14:36
  * Created with IntelliJ IDEA.
  */
-public class DbCrossReferenceIdTest {
+class DbCrossReferenceIdTest {
 
     private static final String DB = "UniProt";
     private static final String ID = "12345";
     private static final String ID_WITH_DB = DB + DELIMITER + ID;
 
     @Test
-    public void retrieveDbSectionSuccessfully(){
+    void retrieveDbSectionSuccessfully(){
         assertThat(db(ID_WITH_DB), is(DB));
     }
 
     @Test
-    public void retrieveIdSectionSuccessfully(){
+    void retrieveIdSectionSuccessfully(){
         assertThat(id(ID_WITH_DB), is(ID));
     }
 
     @Test
-    public void retrieveIdSectionSuccessfullyWithUpperCaseLettersInTheId(){
+    void retrieveIdSectionSuccessfullyWithUpperCaseLettersInTheId(){
         assertThat(id("UniProt:AA"), is("AA"));
     }
 
     @Test
-    public void returnNullIfValueDoesNotContainDelimiterDb(){
+    void returnNullIfValueDoesNotContainDelimiterDb(){
         assertThat(db("ABC"), is(equalTo(null)));
     }
 
     @Test
-    public void throwExceptionIfValueDoesNotContainDelimiterForId(){
+    void throwExceptionIfValueDoesNotContainDelimiterForId(){
         assertThat(id("ABC"), is(equalTo(null)));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void throwExceptionIfValueIsNullForDb(){
-        db(null);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void throwExceptionIfValueIsNullForId(){
-        id(null);
+    @Test
+    void throwExceptionIfValueIsNullForDb(){
+        assertThrows(IllegalArgumentException.class, () -> db(null));
     }
 
     @Test
-    public void retrieveDbSectionFromJustTheDelimiterGivesEmptyString(){
+    void throwExceptionIfValueIsNullForId(){
+        assertThrows(IllegalArgumentException.class, () -> id(null));
+    }
+
+    @Test
+    void retrieveDbSectionFromJustTheDelimiterGivesEmptyString(){
         assertThat(db(DELIMITER), is(""));
     }
 
     @Test
-    public void retrieveIdSectionFromJustTheDelimiterGivesEmptyString(){
+    void retrieveIdSectionFromJustTheDelimiterGivesEmptyString(){
         assertThat(id(DELIMITER), is(""));
     }
 
     @Test
-    public void retrieveDbSectionWhereDoesNotExistGivesEmptyString(){
+    void retrieveDbSectionWhereDoesNotExistGivesEmptyString(){
         assertThat(db(DELIMITER+ID), is(""));
     }
 
     @Test
-    public void retrieveIdSectionWhereDoesNotExistGivesEmptyString(){
+    void retrieveIdSectionWhereDoesNotExistGivesEmptyString(){
         assertThat(id(DB+DELIMITER), is(""));
     }
 
     @Test
-    public void retrieveDbSectionWhereDbSectionContainsSpaces(){
+    void retrieveDbSectionWhereDbSectionContainsSpaces(){
         assertThat(db("   " + DB + "   " + DELIMITER), is(DB));
     }
 
     @Test
-    public void retrieveIdSectionWhereIdSectionContainsSpaces(){
+    void retrieveIdSectionWhereIdSectionContainsSpaces(){
         assertThat(id(DELIMITER + "    " + ID + "    "), is(ID));
     }
 
     @Test
-    public void detectWhenValueContainsDelimiter(){
+    void detectWhenValueContainsDelimiter(){
         assertThat(isFullId("DB" + DELIMITER + "ID"), is(true));
     }
 
     @Test
-    public void detectWhenValueDoesNotContainDelimiter(){
+    void detectWhenValueDoesNotContainDelimiter(){
         assertThat(isFullId("DBID"), is(false));
     }
 }

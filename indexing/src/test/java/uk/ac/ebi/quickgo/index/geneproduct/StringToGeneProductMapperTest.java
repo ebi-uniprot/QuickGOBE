@@ -1,41 +1,46 @@
 package uk.ac.ebi.quickgo.index.geneproduct;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.file.transform.DefaultFieldSet;
 import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.batch.item.file.transform.IncorrectTokenCountException;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.ac.ebi.quickgo.index.geneproduct.Columns.*;
 
 /**
  * Tests the behaviour of the {@link StringToGeneProductMapper} class.
  */
-public class StringToGeneProductMapperTest {
+class StringToGeneProductMapperTest {
     private StringToGeneProductMapper mapper;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() throws Exception {
         mapper = new StringToGeneProductMapper();
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void nullFieldSetThrowsException() throws Exception {
-        mapper.mapFieldSet(null);
-    }
-
-    @Test(expected = IncorrectTokenCountException.class)
-    public void fieldSetWithInsufficientValuesThrowsException() throws Exception {
-        String[] tokens = new String[numColumns() - 1];
-        FieldSet fieldSet = new DefaultFieldSet(tokens);
-
-        mapper.mapFieldSet(fieldSet);
+    @Test
+    void nullFieldSetThrowsException() throws Exception {
+        assertThrows(IllegalArgumentException.class, () -> {
+            mapper.mapFieldSet(null);
+        });
     }
 
     @Test
-    public void convertFieldSetWithNullValuesIntoGeneProduct() throws Exception {
+    void fieldSetWithInsufficientValuesThrowsException() throws Exception {
+        assertThrows(IncorrectTokenCountException.class, () -> {
+            String[] tokens = new String[numColumns() - 1];
+            FieldSet fieldSet = new DefaultFieldSet(tokens);
+
+            mapper.mapFieldSet(fieldSet);
+        });
+    }
+
+    @Test
+    void convertFieldSetWithNullValuesIntoGeneProduct() throws Exception {
         String[] tokens = new String[numColumns()];
         tokens[COLUMN_DB.getPosition()] = null;
         tokens[COLUMN_ID.getPosition()] = null;
@@ -65,7 +70,7 @@ public class StringToGeneProductMapperTest {
     }
 
     @Test
-    public void convertValidFieldSetIntoGeneProduct() throws Exception {
+    void convertValidFieldSetIntoGeneProduct() throws Exception {
         String[] tokens = new String[numColumns()];
         tokens[COLUMN_DB.getPosition()] = "UniProtKB";
         tokens[COLUMN_ID.getPosition()] = "A0A000";
@@ -95,7 +100,7 @@ public class StringToGeneProductMapperTest {
     }
 
     @Test
-    public void trimFieldsFromFieldSetWhenConvertingToGeneProduct() throws Exception {
+    void trimFieldsFromFieldSetWhenConvertingToGeneProduct() throws Exception {
         String[] tokens = new String[numColumns()];
         tokens[COLUMN_DB.getPosition()] = "UniProtKB ";
         tokens[COLUMN_ID.getPosition()] = " A0A000";

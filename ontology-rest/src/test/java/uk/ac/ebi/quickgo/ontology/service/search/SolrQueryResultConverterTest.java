@@ -1,5 +1,5 @@
 package uk.ac.ebi.quickgo.ontology.service.search;
-
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
 import uk.ac.ebi.quickgo.ontology.model.ECOTerm;
 import uk.ac.ebi.quickgo.ontology.model.GOTerm;
@@ -13,15 +13,15 @@ import java.util.Map;
 import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 /**
@@ -30,8 +30,8 @@ import static org.mockito.Mockito.when;
  * Created 09/02/16
  * @author Edd
  */
-@RunWith(MockitoJUnitRunner.class)
-public class SolrQueryResultConverterTest {
+@ExtendWith(MockitoExtension.class)
+class SolrQueryResultConverterTest {
     private SolrQueryResultConverter converter;
 
     @Mock
@@ -46,18 +46,18 @@ public class SolrQueryResultConverterTest {
     @Mock
     private Map<String, String> fieldNameMap;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() throws Exception {
         converter = new SolrQueryResultConverter(binderMock, goConverterMock, ecoConverterMock, fieldNameMap);
     }
 
-    @Test(expected = AssertionError.class)
-    public void nullResultsListThrowsAssertionError() throws Exception {
-        converter.convertResults(null);
+    @Test
+    void nullResultsListThrowsAssertionError() throws Exception {
+        assertThrows(AssertionError.class, () -> converter.convertResults(null));
     }
 
     @Test
-    public void emptySolrDocListReturnsEmptyResults() throws Exception {
+    void emptySolrDocListReturnsEmptyResults() throws Exception {
         SolrDocumentList solrDocList = new SolrDocumentList();
         List<OntologyDocument> docTerms = Collections.emptyList();
 
@@ -69,7 +69,7 @@ public class SolrQueryResultConverterTest {
     }
 
     @Test
-    public void goSolrDocumentIsConvertedIntoGoTerm() throws Exception {
+    void goSolrDocumentIsConvertedIntoGoTerm() throws Exception {
         String termId = "GO:0006915";
         String termOntologyType = "GO";
         OntologyDocument ontologyDoc = createOntologyDoc(termId, termOntologyType);
@@ -90,7 +90,7 @@ public class SolrQueryResultConverterTest {
     }
 
     @Test
-    public void ecoSolrDocumentIsConvertedIntoGoTerm() throws Exception {
+    void ecoSolrDocumentIsConvertedIntoGoTerm() throws Exception {
         String termId = "ECO:0000200";
         String termOntologyType = "ECO";
         OntologyDocument ontologyDoc = createOntologyDoc(termId, termOntologyType);

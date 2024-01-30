@@ -2,8 +2,7 @@ package uk.ac.ebi.quickgo.client.service.loader.presets;
 
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.collection.IsIterableContainingInOrder;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.test.JobLauncherTestUtils;
@@ -11,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import uk.ac.ebi.quickgo.client.model.presets.CompositePreset;
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
@@ -40,11 +38,10 @@ import static uk.ac.ebi.quickgo.client.model.presets.PresetItem.Property.*;
  * Created 31/08/16
  * @author Edd
  */
-@RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {PresetsConfig.class, MockPresetDataConfig.class, JobTestRunnerConfig.class})
 @WebAppConfiguration
 @ActiveProfiles(profiles = {MockPresetDataConfig.SUCCESSFUL_FETCHING, MockPresetDataConfig.NO_SEARCH_ATTRIBUTES})
-public class PresetsSuccessfulRelevancyFetchingIT {
+class PresetsSuccessfulRelevancyFetchingIT {
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
 
@@ -52,7 +49,7 @@ public class PresetsSuccessfulRelevancyFetchingIT {
     private CompositePreset presets;
 
     @Test
-    public void loadAssignedByPresetsAfterSuccessfulRESTInfoFetching() {
+    void loadAssignedByPresetsAfterSuccessfulRESTInfoFetching() {
         assertThat(presets.getAssignedBy(), hasSize(0));
 
         JobExecution jobExecution =
@@ -67,7 +64,7 @@ public class PresetsSuccessfulRelevancyFetchingIT {
 
     @Test
     @DirtiesContext
-    public void loadGenericReferencePresetsAfterSuccessfulRESTInfoFetching() {
+    void loadGenericReferencePresetsAfterSuccessfulRESTInfoFetching() {
         assertThat(presets.getReferences(), hasSize(0));
 
         JobExecution jobExecution =
@@ -82,7 +79,7 @@ public class PresetsSuccessfulRelevancyFetchingIT {
 
     @Test
     @DirtiesContext
-    public void loadSpecificReferencePresetsAfterSuccessfulRESTInfoFetching() {
+    void loadSpecificReferencePresetsAfterSuccessfulRESTInfoFetching() {
         assertThat(presets.getReferences(), hasSize(0));
 
         JobExecution jobExecution =
@@ -96,7 +93,7 @@ public class PresetsSuccessfulRelevancyFetchingIT {
     }
 
     @Test
-    public void loadEvidencesPresets() {
+    void loadEvidencesPresets() {
         assertThat(presets.getEvidences(), hasSize(0));
 
         JobExecution jobExecution =
@@ -115,7 +112,7 @@ public class PresetsSuccessfulRelevancyFetchingIT {
     }
 
     @Test
-    public void loadWithFromPresetsAfterSuccessfulRESTInfoFetching() {
+    void loadWithFromPresetsAfterSuccessfulRESTInfoFetching() {
         assertThat(presets.getWithFrom(), hasSize(0));
 
         JobExecution jobExecution =
@@ -130,7 +127,7 @@ public class PresetsSuccessfulRelevancyFetchingIT {
     }
 
     @Test
-    public void loadGeneProductPresets() {
+    void loadGeneProductPresets() {
         assertThat(presets.getGeneProducts(), hasSize(0));
 
         JobExecution jobExecution =
@@ -149,7 +146,7 @@ public class PresetsSuccessfulRelevancyFetchingIT {
     }
 
     @Test
-    public void loadGOSlimSetPresets() {
+    void loadGOSlimSetPresets() {
         assertThat(presets.getGoSlimSets(), hasSize(0));
 
         JobExecution jobExecution =
@@ -167,7 +164,7 @@ public class PresetsSuccessfulRelevancyFetchingIT {
     }
 
     @Test
-    public void loadTaxonPresets() {
+    void loadTaxonPresets() {
         assertThat(presets.getTaxons(), hasSize(0));
 
         JobExecution jobExecution =
@@ -181,7 +178,7 @@ public class PresetsSuccessfulRelevancyFetchingIT {
     }
 
     @Test
-    public void loadQualifierPresetsAfterSuccessfulRESTInfoFetching() {
+    void loadQualifierPresetsAfterSuccessfulRESTInfoFetching() {
         assertThat(presets.getQualifiers(), hasSize(0));
 
         JobExecution jobExecution =

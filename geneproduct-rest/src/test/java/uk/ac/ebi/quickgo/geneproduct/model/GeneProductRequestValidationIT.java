@@ -2,12 +2,10 @@ package uk.ac.ebi.quickgo.geneproduct.model;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import uk.ac.ebi.quickgo.common.FacetableField;
 
@@ -26,9 +24,8 @@ import static org.hamcrest.Matchers.hasSize;
 /**
  * Tests that the validation added to the {@link GeneProductRequest} class is correct.
  */
-@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = GeneProductRequestValidationIT.GeneProductRequestValidationConfig.class)
-public class GeneProductRequestValidationIT {
+class GeneProductRequestValidationIT {
     private static final String INVALID_FACET_1 = "invalid1";
 
     @Configuration
@@ -60,21 +57,21 @@ public class GeneProductRequestValidationIT {
     private GeneProductRequest geneProductRequest;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         geneProductRequest = new GeneProductRequest();
         geneProductRequest.setQuery("query");
     }
 
     //TYPE PARAMETER
     @Test
-    public void nullTypeIsValid() {
+    void nullTypeIsValid() {
         geneProductRequest.setType(null);
 
         assertThat(validator.validate(geneProductRequest), hasSize(0));
     }
 
     @Test
-    public void emptyTypeIsInvalid() {
+    void emptyTypeIsInvalid() {
         geneProductRequest.setType("");
 
         Set<ConstraintViolation<GeneProductRequest>> violations = validator.validate(geneProductRequest);
@@ -85,7 +82,7 @@ public class GeneProductRequestValidationIT {
     }
 
     @Test
-    public void proteinTypeIsValid() {
+    void proteinTypeIsValid() {
         String type = "protein";
         geneProductRequest.setType(type);
 
@@ -93,7 +90,7 @@ public class GeneProductRequestValidationIT {
     }
 
     @Test
-    public void miRNATypeIsValid() {
+    void miRNATypeIsValid() {
         String type = "miRNA";
         geneProductRequest.setType(type);
 
@@ -101,7 +98,7 @@ public class GeneProductRequestValidationIT {
     }
 
     @Test
-    public void caseInsensitiveTypeIsValid() {
+    void caseInsensitiveTypeIsValid() {
         String type = "mirna";
         geneProductRequest.setType(type);
 
@@ -109,7 +106,7 @@ public class GeneProductRequestValidationIT {
     }
 
     @Test
-    public void incorrectTypeIsInvalid() {
+    void incorrectTypeIsInvalid() {
         String type = "Incorrect";
         geneProductRequest.setType(type);
 
@@ -117,14 +114,14 @@ public class GeneProductRequestValidationIT {
     }
 
     @Test
-    public void nullDbSubsetIsValid() {
+    void nullDbSubsetIsValid() {
         geneProductRequest.setDbSubset(null);
 
         assertThat(validator.validate(geneProductRequest), hasSize(0));
     }
 
     @Test
-    public void emptyDbSubsetIsInvalid() {
+    void emptyDbSubsetIsInvalid() {
         geneProductRequest.setDbSubset("");
 
         Set<ConstraintViolation<GeneProductRequest>> violations = validator.validate(geneProductRequest);
@@ -135,7 +132,7 @@ public class GeneProductRequestValidationIT {
     }
 
     @Test
-    public void tremblDbSubsetIsValid() {
+    void tremblDbSubsetIsValid() {
         String type = "TrEMBL";
         geneProductRequest.setDbSubset(type);
 
@@ -143,7 +140,7 @@ public class GeneProductRequestValidationIT {
     }
 
     @Test
-    public void swissprotDbSubsetIsValid() {
+    void swissprotDbSubsetIsValid() {
         String type = "Swiss-Prot";
         geneProductRequest.setDbSubset(type);
 
@@ -151,7 +148,7 @@ public class GeneProductRequestValidationIT {
     }
 
     @Test
-    public void caseInsensitiveDbSubsetIsValid() {
+    void caseInsensitiveDbSubsetIsValid() {
         String type = "swiss-prot";
         geneProductRequest.setDbSubset(type);
 
@@ -159,14 +156,14 @@ public class GeneProductRequestValidationIT {
     }
 
     @Test
-    public void nullTaxonIdIsValid() {
+    void nullTaxonIdIsValid() {
         geneProductRequest.setTaxonId();
 
         assertThat(validator.validate(geneProductRequest), hasSize(0));
     }
 
     @Test
-    public void emptyTaxonIdIsInvalid() {
+    void emptyTaxonIdIsInvalid() {
         geneProductRequest.setTaxonId("");
 
         Set<ConstraintViolation<GeneProductRequest>> violations = validator.validate(geneProductRequest);
@@ -177,14 +174,14 @@ public class GeneProductRequestValidationIT {
     }
 
     @Test
-    public void singlePositiveTaxonIdIsValid() {
+    void singlePositiveTaxonIdIsValid() {
         geneProductRequest.setTaxonId("1");
 
         assertThat(validator.validate(geneProductRequest), hasSize(0));
     }
 
     @Test
-    public void multiplePositiveTaxonIdIsValid() {
+    void multiplePositiveTaxonIdIsValid() {
         String[] taxonId = {"1","2","3"};
 
         geneProductRequest.setTaxonId(taxonId);
@@ -193,7 +190,7 @@ public class GeneProductRequestValidationIT {
     }
 
     @Test
-    public void negativeTaxonIdIsInvalid() {
+    void negativeTaxonIdIsInvalid() {
         String taxonId = "-1";
 
         geneProductRequest.setTaxonId(taxonId);
@@ -206,7 +203,7 @@ public class GeneProductRequestValidationIT {
     }
 
     @Test
-    public void negativeTaxonIdMixedWithPositiveTaxonIdsIsInvalid() {
+    void negativeTaxonIdMixedWithPositiveTaxonIdsIsInvalid() {
         String[] taxonId = {"1","-1","2"};
 
         geneProductRequest.setTaxonId(taxonId);
@@ -219,7 +216,7 @@ public class GeneProductRequestValidationIT {
     }
 
     @Test
-    public void emptyTaxonIdMixedWithPositiveTaxonIdsIsInvalid() {
+    void emptyTaxonIdMixedWithPositiveTaxonIdsIsInvalid() {
         String[] taxonId = {"1","","2"};
 
         geneProductRequest.setTaxonId(taxonId);
@@ -232,14 +229,14 @@ public class GeneProductRequestValidationIT {
     }
 
     @Test
-    public void successfullyValidateNullForProteome() {
+    void successfullyValidateNullForProteome() {
         geneProductRequest.setProteome(null);
 
         assertThat(validator.validate(geneProductRequest), hasSize(0));
     }
 
     @Test
-    public void successfullyValidateIsoFormForProteome() {
+    void successfullyValidateIsoFormForProteome() {
         String proteome = "gcrpIso";
 
         geneProductRequest.setProteome(proteome);
@@ -248,7 +245,7 @@ public class GeneProductRequestValidationIT {
     }
 
     @Test
-    public void successfullyValidateProteomeCaseInsensitive() {
+    void successfullyValidateProteomeCaseInsensitive() {
         String proteome = "GcrPiso";
 
         geneProductRequest.setProteome(proteome);
@@ -257,7 +254,7 @@ public class GeneProductRequestValidationIT {
     }
 
     @Test
-    public void successfullyValidateNoneForProteome() {
+    void successfullyValidateNoneForProteome() {
         String proteome = "None";
 
         geneProductRequest.setProteome(proteome);
@@ -266,7 +263,7 @@ public class GeneProductRequestValidationIT {
     }
 
     @Test
-    public void successfullyValidateReferenceForProteome() {
+    void successfullyValidateReferenceForProteome() {
         String proteome = "gcrpCan";
 
         geneProductRequest.setProteome(proteome);
@@ -275,7 +272,7 @@ public class GeneProductRequestValidationIT {
     }
 
     @Test
-    public void successfullyValidateCompleteForProteome() {
+    void successfullyValidateCompleteForProteome() {
         String proteome = "complete";
 
         geneProductRequest.setProteome(proteome);
@@ -284,7 +281,7 @@ public class GeneProductRequestValidationIT {
     }
 
     @Test
-    public void emptyProteomeIsInvalid() {
+    void emptyProteomeIsInvalid() {
         String proteome = "";
 
         geneProductRequest.setProteome(proteome);
@@ -297,7 +294,7 @@ public class GeneProductRequestValidationIT {
     }
 
     @Test
-    public void proteomeIsInvalid() {
+    void proteomeIsInvalid() {
         String proteome = "asdfasdgfas";
 
         geneProductRequest.setProteome(proteome);

@@ -1,5 +1,7 @@
 package uk.ac.ebi.quickgo.annotation.service.search;
-
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.service.converter.AnnotationDocConverter;
@@ -10,11 +12,10 @@ import java.util.List;
 import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
@@ -26,8 +27,9 @@ import static org.mockito.Mockito.when;
  * Time: 16:37
  * Created with IntelliJ IDEA.
  */
-@RunWith(MockitoJUnitRunner.class)
-public class SolrQueryResultConverterTest {
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
+class SolrQueryResultConverterTest {
 
     @Mock
     private DocumentObjectBinder mockBinder;
@@ -50,8 +52,8 @@ public class SolrQueryResultConverterTest {
 
     SolrQueryResultConverter converter;
 
-    @Before
-    public void setup(){
+    @BeforeEach
+    void setup(){
         mockAnnotationDocument = new AnnotationDocument();
         mockResults = new SolrDocumentList();
         solrTermDocs = new ArrayList<>();
@@ -63,7 +65,7 @@ public class SolrQueryResultConverterTest {
     }
 
     @Test
-    public void successfullyConvertOneResult(){
+    void successfullyConvertOneResult(){
         mockResults.add(new SolrDocument());
         solrTermDocs.add(mockAnnotationDocument);
         List<Annotation> domainObjs = converter.convertResults(mockResults);
@@ -71,7 +73,7 @@ public class SolrQueryResultConverterTest {
     }
 
     @Test
-    public void successfullyConvertMultipleResults(){
+    void successfullyConvertMultipleResults(){
         //Add another result
         solrTermDocs.add(mockAnnotationDocument);
         solrTermDocs.add(mockAnnotationDocument);
@@ -84,7 +86,7 @@ public class SolrQueryResultConverterTest {
     }
     @Test
 
-    public void EmptyList(){
+    void EmptyList(){
         List<Annotation> domainObjs = converter.convertResults(new SolrDocumentList());
         assertThat(domainObjs, hasSize(0));
     }

@@ -1,12 +1,11 @@
 package uk.ac.ebi.quickgo.index.geneproduct;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.splitValue;
 import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingUtil.concatProperty;
 import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductParsingHelper.extractTaxonIdFromValue;
@@ -16,24 +15,21 @@ import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductUtil.createUnconver
 /**
  * Tests the methods of the {@link GeneProductParsingHelper} class.
  */
-public class GeneProductParsingHelperTest {
+class GeneProductParsingHelperTest {
     private static final String INTRA_VALUE_DELIMITER = "=";
-
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
 
 
     @Test
-    public void nullDelimiterThrowsException() throws Exception {
-        String value = "";
+    void nullDelimiterThrowsException() throws Exception {
+        assertThrows(IllegalArgumentException.class, () -> {
+            String value = "";
 
-        thrown.expect(IllegalArgumentException.class);
-
-        splitValue(value, null);
+            splitValue(value, null);
+        });
     }
 
     @Test
-    public void nullPropertyReturnsEmptyArray() throws Exception {
+    void nullPropertyReturnsEmptyArray() throws Exception {
         String prop = null;
 
         String[] splitArray = splitValue(prop, INTRA_VALUE_DELIMITER);
@@ -42,7 +38,7 @@ public class GeneProductParsingHelperTest {
     }
 
     @Test
-    public void emptyPropertyReturnsEmptyArray() throws Exception {
+    void emptyPropertyReturnsEmptyArray() throws Exception {
         String prop = "";
 
         String[] splitArray = splitValue(prop, INTRA_VALUE_DELIMITER);
@@ -51,7 +47,7 @@ public class GeneProductParsingHelperTest {
     }
 
     @Test
-    public void propWithNoDelimiterReturnsArrayWithOneElement() throws Exception {
+    void propWithNoDelimiterReturnsArrayWithOneElement() throws Exception {
         String key = "key";
         String prop = key;
 
@@ -62,7 +58,7 @@ public class GeneProductParsingHelperTest {
     }
 
     @Test
-    public void propWithDelimiterReturnsArrayWithTwoElements() throws Exception {
+    void propWithDelimiterReturnsArrayWithTwoElements() throws Exception {
         String key = "key";
         String value = "value";
         String prop = concatProperty(key, value, INTRA_VALUE_DELIMITER);
@@ -74,28 +70,28 @@ public class GeneProductParsingHelperTest {
     }
 
     @Test
-    public void nullTaxonValueReturnsDefaultTaxonId() throws Exception {
+    void nullTaxonValueReturnsDefaultTaxonId() throws Exception {
         int taxonId = extractTaxonIdFromValue(null);
 
         assertThat(taxonId, is(GeneProductParsingHelper.DEFAULT_TAXON_ID));
     }
 
     @Test
-    public void emptyTaxonValueReturnsDefaultTaxonId() throws Exception {
+    void emptyTaxonValueReturnsDefaultTaxonId() throws Exception {
         int taxonId = extractTaxonIdFromValue("");
 
         assertThat(taxonId, is(GeneProductParsingHelper.DEFAULT_TAXON_ID));
     }
 
     @Test
-    public void nonMatchingTaxonValueReturnsDefaultTaxonId() throws Exception {
+    void nonMatchingTaxonValueReturnsDefaultTaxonId() throws Exception {
         int taxonId = extractTaxonIdFromValue("undefined");
 
         assertThat(taxonId, is(GeneProductParsingHelper.DEFAULT_TAXON_ID));
     }
 
     @Test
-    public void validTaxonValueReturnsCorrespondingTaxonId() throws Exception {
+    void validTaxonValueReturnsCorrespondingTaxonId() throws Exception {
         int expectedTaxonId = 33;
 
         int taxonId = extractTaxonIdFromValue(createUnconvertedTaxonId(expectedTaxonId));
@@ -104,7 +100,7 @@ public class GeneProductParsingHelperTest {
     }
 
     @Test
-    public void nullTaxonValueDoesNotMatchRegex() throws Exception {
+    void nullTaxonValueDoesNotMatchRegex() throws Exception {
         String taxonValue = null;
 
         boolean matches = taxonIdMatchesRegex(taxonValue);
@@ -113,7 +109,7 @@ public class GeneProductParsingHelperTest {
     }
 
     @Test
-    public void emptyTaxonValueDoesNotMatchRegex() throws Exception {
+    void emptyTaxonValueDoesNotMatchRegex() throws Exception {
         String taxonValue = "";
 
         boolean matches = taxonIdMatchesRegex(taxonValue);
@@ -122,7 +118,7 @@ public class GeneProductParsingHelperTest {
     }
 
     @Test
-    public void incorrectTaxonValueDoesNotMatchRegex() throws Exception {
+    void incorrectTaxonValueDoesNotMatchRegex() throws Exception {
         String taxonValue = "undefined";
 
         boolean matches = taxonIdMatchesRegex(taxonValue);
@@ -131,7 +127,7 @@ public class GeneProductParsingHelperTest {
     }
 
     @Test
-    public void taxonValueWithNoTaxonIdDoesNotMatchRegex() throws Exception {
+    void taxonValueWithNoTaxonIdDoesNotMatchRegex() throws Exception {
         String taxonValue = "taxon:";
 
         boolean matches = taxonIdMatchesRegex(taxonValue);
@@ -140,7 +136,7 @@ public class GeneProductParsingHelperTest {
     }
 
     @Test
-    public void taxonValueWithNegativeTaxonIdDoesNotMatchRegex() throws Exception {
+    void taxonValueWithNegativeTaxonIdDoesNotMatchRegex() throws Exception {
         String taxonValue = createUnconvertedTaxonId(-1);
 
         boolean matches = taxonIdMatchesRegex(taxonValue);
@@ -149,7 +145,7 @@ public class GeneProductParsingHelperTest {
     }
 
     @Test
-    public void taxonValueWithPositiveTaxonIdDoesMatchRegex() throws Exception {
+    void taxonValueWithPositiveTaxonIdDoesMatchRegex() throws Exception {
         String taxonValue = createUnconvertedTaxonId(1);
 
         boolean matches = taxonIdMatchesRegex(taxonValue);

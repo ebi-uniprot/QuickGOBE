@@ -3,14 +3,13 @@ package uk.ac.ebi.quickgo.common.loader;
 import java.io.File;
 import java.io.UncheckedIOException;
 import java.util.List;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
 
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Tony Wardell
@@ -18,13 +17,10 @@ import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
  * Time: 15:35
  * Created with IntelliJ IDEA.
  */
-public class GZIPFilesTest {
-
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
+class GZIPFilesTest {
 
     @Test
-    public void successfullyReadFile(){
+    void successfullyReadFile(){
 
         File tmpGZIPFile = GZIPFileMocker.createTestFile();
         List<String> lines = GZIPFiles.lines(tmpGZIPFile.toPath())
@@ -37,11 +33,8 @@ public class GZIPFilesTest {
     }
 
     @Test
-    public void noFileThrowsException(){
-        thrown.expect(UncheckedIOException.class);
+    void noFileThrowsException(){
         File tmpGZIPFile = new File("Timbucktoo");  //doesn't exist.
-        GZIPFiles.lines(tmpGZIPFile.toPath())
-                .collect(toList());
-
+        assertThrows(UncheckedIOException.class, () -> GZIPFiles.lines(tmpGZIPFile.toPath()).collect(toList()));
     }
 }

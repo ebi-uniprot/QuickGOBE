@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.slim;
-
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.SlimmingConversionInfo;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.annotation.SlimResultsTransformer;
@@ -7,8 +8,6 @@ import uk.ac.ebi.quickgo.rest.comm.FilterContext;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import java.util.ArrayList;
-import org.junit.Before;
-import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
@@ -20,15 +19,15 @@ import static org.hamcrest.core.Is.is;
  * Created 11/08/16
  * @author Edd
  */
-public class SlimResultsTransformerTest {
+class SlimResultsTransformerTest {
 
     private SlimResultsTransformer transformer;
     private FilterContext context;
     private ArrayList<Annotation> results;
     private SlimmingConversionInfo conversionInfo;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         conversionInfo = new SlimmingConversionInfo();
         transformer = new SlimResultsTransformer();
         context = new FilterContext();
@@ -37,7 +36,7 @@ public class SlimResultsTransformerTest {
     }
 
     @Test
-    public void emptyContextOnEmptyResultsCausesNoTransformation() {
+    void emptyContextOnEmptyResultsCausesNoTransformation() {
         QueryResult<Annotation> emptyQueryResult = createQueryResult();
         QueryResult<Annotation> transformedResults = transformer.transform(emptyQueryResult, context);
 
@@ -45,7 +44,7 @@ public class SlimResultsTransformerTest {
     }
 
     @Test
-    public void emptyContextOnExistingResultsCausesNoTransformation() {
+    void emptyContextOnExistingResultsCausesNoTransformation() {
         addAnnotationToResults("goId1");
 
         QueryResult<Annotation> queryResult = createQueryResult();
@@ -56,7 +55,7 @@ public class SlimResultsTransformerTest {
     }
 
     @Test
-    public void oneResultThatMatchesOneSlimTermInContextIsTransformed() {
+    void oneResultThatMatchesOneSlimTermInContextIsTransformed() {
         String goId1 = "goId1";
         String slimmedId1 = "slimmedId1";
 
@@ -73,7 +72,7 @@ public class SlimResultsTransformerTest {
     }
 
     @Test
-    public void oneResultThatMatchesTwoSlimTermsInContextIsTransformed() {
+    void oneResultThatMatchesTwoSlimTermsInContextIsTransformed() {
         String goId1 = "goId1";
         String slimmedId1 = "slimmedId1";
         String slimmedId2 = "slimmedId2";
@@ -92,7 +91,7 @@ public class SlimResultsTransformerTest {
     }
 
     @Test
-    public void resultThatDoesNotMatchSlimTermInContextIsNotTransformed() {
+    void resultThatDoesNotMatchSlimTermInContextIsNotTransformed() {
         String goId1 = "goId1";
         addAnnotationToResults(goId1);
 

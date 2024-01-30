@@ -3,12 +3,13 @@ package uk.ac.ebi.quickgo.rest.period;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.IsNull.notNullValue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Test instantiation and modification methods of the DayTime class.
@@ -18,37 +19,37 @@ import static org.hamcrest.core.IsNull.notNullValue;
  * Time: 10:43
  * Created with IntelliJ IDEA.
  */
-public class DayTimeTest {
+class DayTimeTest {
 
     private DayTime dayTime;
     private LocalDateTime input;
 
-    @Before
-    public void setup(){
+    @BeforeEach
+    void setup(){
         dayTime = new DayTime(DayOfWeek.FRIDAY, LocalTime.of(12, 37));
         input = LocalDateTime.of(2017, 5, 17, 18, 47); //is a WED
     }
 
 
     @Test
-    public void instantiateDayTimeWithValidValues(){
+    void instantiateDayTimeWithValidValues(){
        DayTime validDayTime = new DayTime(DayOfWeek.FRIDAY, LocalTime.of(12, 37));
 
        assertThat(validDayTime, notNullValue());
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void nullDayOfWeekCreatesException(){
-        new DayTime(null, LocalTime.of(12, 37));
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void nullLocalTimeCreatesException(){
-        new DayTime(DayOfWeek.FRIDAY, null);
+    @Test
+    void nullDayOfWeekCreatesException(){
+        assertThrows(IllegalArgumentException.class, () -> new DayTime(null, LocalTime.of(12, 37)));
     }
 
     @Test
-    public void modifySuccessfullyToNext(){
+    void nullLocalTimeCreatesException(){
+        assertThrows(IllegalArgumentException.class, () -> new DayTime(DayOfWeek.FRIDAY, null));
+    }
+
+    @Test
+    void modifySuccessfullyToNext(){
         LocalDateTime expected = LocalDateTime.of(2017, 5, 19, 12, 37);
 
         LocalDateTime modified = dayTime.modifyToNext(input);
@@ -57,7 +58,7 @@ public class DayTimeTest {
     }
 
     @Test
-    public void modifySuccessfullyToPrevious(){
+    void modifySuccessfullyToPrevious(){
         LocalDateTime expected = LocalDateTime.of(2017, 5, 12, 12, 37);
 
         LocalDateTime modified = dayTime.modifyToPrevious(input);
@@ -65,13 +66,13 @@ public class DayTimeTest {
         assertThat(modified, equalTo(expected));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void modifyToNextNullThrowsException(){
-        dayTime.modifyToNext(null);
+    @Test
+    void modifyToNextNullThrowsException(){
+        assertThrows(IllegalArgumentException.class, () -> dayTime.modifyToNext(null));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void modifyToPreviousThrowsException(){
-        dayTime.modifyToPrevious(null);
+    @Test
+    void modifyToPreviousThrowsException(){
+        assertThrows(IllegalArgumentException.class, () -> dayTime.modifyToPrevious(null));
     }
 }

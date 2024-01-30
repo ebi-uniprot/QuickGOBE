@@ -1,21 +1,20 @@
 package uk.ac.ebi.quickgo.rest.search.request.config;
-
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.ac.ebi.quickgo.rest.search.request.FilterUtil;
 
 import java.util.Optional;
 import java.util.Set;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -25,10 +24,8 @@ import static uk.ac.ebi.quickgo.rest.search.request.config.FilterConfig.Executio
 /**
  * Test the behaviour of the {@link GlobalFilterConfigRetrieval} class.
  */
-@RunWith(MockitoJUnitRunner.class)
-public class GlobalFilterConfigRetrievalTest {
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
+@ExtendWith(MockitoExtension.class)
+class GlobalFilterConfigRetrievalTest {
 
     private GlobalFilterConfigRetrieval config;
 
@@ -38,45 +35,37 @@ public class GlobalFilterConfigRetrievalTest {
     @Mock
     private InternalFilterConfigRetrieval internalConfigMock;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         config = new GlobalFilterConfigRetrieval(internalConfigMock, externalConfigMock);
     }
 
     @Test
-    public void nullInternalExecutionConfigThrowsException() {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("InternalExecutionConfiguration cannot be null.");
-
-        config = new GlobalFilterConfigRetrieval(null, externalConfigMock);
+    void nullInternalExecutionConfigThrowsException() {
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> config = new GlobalFilterConfigRetrieval(null, externalConfigMock));
+        assertTrue(exception.getMessage().contains("InternalExecutionConfiguration cannot be null."));
     }
 
     @Test
-    public void nullExternalExecutionConfigThrowsException() {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("ExternalExecutionConfiguration cannot be null.");
-
-        config = new GlobalFilterConfigRetrieval(internalConfigMock, null);
+    void nullExternalExecutionConfigThrowsException() {
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> config = new GlobalFilterConfigRetrieval(internalConfigMock, null));
+        assertTrue(exception.getMessage().contains("ExternalExecutionConfiguration cannot be null."));
     }
 
     @Test
-    public void nullSearchableFieldThrowsException() {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Signature cannot be null or empty");
-
-        config.getBySignature(null);
+    void nullSearchableFieldThrowsException() {
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> config.getBySignature(null));
+        assertTrue(exception.getMessage().contains("Signature cannot be null or empty"));
     }
 
     @Test
-    public void emptySignatureThrowsException() {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Signature cannot be null or empty");
-
-        config.getBySignature(asSet());
+    void emptySignatureThrowsException() {
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> config.getBySignature(asSet()));
+        assertTrue(exception.getMessage().contains("Signature cannot be null or empty"));
     }
 
     @Test
-    public void searchableFieldNameKnownToInternalConfigReturnsPopulatedOptional() {
+    void searchableFieldNameKnownToInternalConfigReturnsPopulatedOptional() {
         String internalFieldName = "field";
         Set<String> internalFieldSet = asSet(internalFieldName);
 
@@ -93,7 +82,7 @@ public class GlobalFilterConfigRetrievalTest {
     }
 
     @Test
-    public void searchableFieldNameKnownToExternalConfigReturnsPopulatedOptional() {
+    void searchableFieldNameKnownToExternalConfigReturnsPopulatedOptional() {
         String externalFieldName = "field";
         Set<String> externalFieldSet = asSet(externalFieldName);
 
@@ -110,7 +99,7 @@ public class GlobalFilterConfigRetrievalTest {
     }
 
     @Test
-    public void unknownSearchableFieldNameReturnsEmptyOptional() {
+    void unknownSearchableFieldNameReturnsEmptyOptional() {
         String unknownFieldName = "unknown";
         Set<String> unknownFieldSet = asSet(unknownFieldName);
 
@@ -123,7 +112,7 @@ public class GlobalFilterConfigRetrievalTest {
     }
 
     @Test
-    public void searchableFieldExistsInInternalAndExternalExecutionConfigSoInternalTakesPrecedence() {
+    void searchableFieldExistsInInternalAndExternalExecutionConfigSoInternalTakesPrecedence() {
         String searchableField = "field";
         Set<String> searchableFieldSet = asSet(searchableField);
 
@@ -147,7 +136,7 @@ public class GlobalFilterConfigRetrievalTest {
     }
 
     @Test
-    public void checkConfigCacheIsPopulatedWhenSignatureIsFetched() {
+    void checkConfigCacheIsPopulatedWhenSignatureIsFetched() {
         String externalFieldName = "field";
         Set<String> signature = asSet(externalFieldName);
 
@@ -167,7 +156,7 @@ public class GlobalFilterConfigRetrievalTest {
     }
 
     @Test
-    public void checkConfigCacheIsUsedWhenFetchingSameSignatureMultipleTimes() {
+    void checkConfigCacheIsUsedWhenFetchingSameSignatureMultipleTimes() {
         String externalFieldName = "field";
         Set<String> signature = asSet(externalFieldName);
 

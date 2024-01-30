@@ -1,8 +1,8 @@
 package uk.ac.ebi.quickgo.client.service.search.ontology;
 
 import org.apache.http.HttpStatus;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import uk.ac.ebi.quickgo.client.QuickGOREST;
@@ -25,7 +25,7 @@ import static uk.ac.ebi.quickgo.ontology.common.OntologyFields.Facetable;
 import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.MAX_PAGE_NUMBER;
 
 @SpringBootTest(classes = {QuickGOREST.class})
-public class OntologySearchIT extends SearchControllerSetup {
+class OntologySearchIT extends SearchControllerSetup {
     private static final String ONTOLOGY_RESOURCE_URL = "/internal/search/ontology";
 
     private static final String ASPECT_PARAM = "aspect";
@@ -37,15 +37,15 @@ public class OntologySearchIT extends SearchControllerSetup {
     @Autowired
     private OntologyRepository repository;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() throws Exception {
         repository.deleteAll();
         resourceUrl = ONTOLOGY_RESOURCE_URL;
     }
 
     // response format ---------------------------------------------------------
     @Test
-    public void requestWhichFindsNothingReturnsValidResponse() throws Exception {
+    void requestWhichFindsNothingReturnsValidResponse() throws Exception {
         OntologyDocument doc1 = createGODoc("GO:0000001", "go1");
         saveToRepository(doc1);
 
@@ -53,7 +53,7 @@ public class OntologySearchIT extends SearchControllerSetup {
     }
 
     @Test
-    public void requestWhichAsksForPage0WithLimit0Returns400Response() throws Exception {
+    void requestWhichAsksForPage0WithLimit0Returns400Response() throws Exception {
         OntologyDocument doc1 = createGODoc("GO:0000001", "go1");
         saveToRepository(doc1);
 
@@ -61,7 +61,7 @@ public class OntologySearchIT extends SearchControllerSetup {
     }
 
     @Test
-    public void pageRequestHigherThanPaginationLimitReturns400() throws Exception {
+    void pageRequestHigherThanPaginationLimitReturns400() throws Exception {
         int totalEntries = MAX_PAGE_NUMBER + 1;
         int pageSize = 1;
         int pageNumWhichIsTooHigh = totalEntries;
@@ -72,7 +72,7 @@ public class OntologySearchIT extends SearchControllerSetup {
     }
 
     @Test
-    public void requestWithNegativePageNumberReturns400Response() throws Exception {
+    void requestWithNegativePageNumberReturns400Response() throws Exception {
         OntologyDocument doc1 = createGODoc("GO:0000001", "go1");
         OntologyDocument doc2 = createGODoc("GO:0000002", "go2");
         OntologyDocument doc3 = createGODoc("GO:0000003", "go3");
@@ -86,7 +86,7 @@ public class OntologySearchIT extends SearchControllerSetup {
     }
 
     @Test
-    public void requestWithNegativeLimitNumberReturns400Response() throws Exception {
+    void requestWithNegativeLimitNumberReturns400Response() throws Exception {
         OntologyDocument doc1 = createGODoc("GO:0000001", "go1");
         OntologyDocument doc2 = createGODoc("GO:0000002", "go2");
         OntologyDocument doc3 = createGODoc("GO:0000003", "go3");
@@ -100,7 +100,7 @@ public class OntologySearchIT extends SearchControllerSetup {
     }
 
     @Test
-    public void requestForOntologyFindsAllFieldsInModelPopulated() throws Exception {
+    void requestForOntologyFindsAllFieldsInModelPopulated() throws Exception {
         String id = "GO:0000001";
         String name = "go1";
         boolean isObsolete = true;
@@ -116,7 +116,7 @@ public class OntologySearchIT extends SearchControllerSetup {
     }
 
     @Test
-    public void requestForFirstPageWithLimitOf10ReturnsAllResults() throws Exception {
+    void requestForFirstPageWithLimitOf10ReturnsAllResults() throws Exception {
         OntologyDocument doc1 = createGODoc("GO:0000001", "go1");
         OntologyDocument doc2 = createGODoc("GO:0000002", "go2");
         OntologyDocument doc3 = createGODoc("GO:0000003", "go3");
@@ -130,7 +130,7 @@ public class OntologySearchIT extends SearchControllerSetup {
     }
 
     @Test
-    public void requestForSecondPageWithLimitOf2ReturnsLastEntry() throws Exception {
+    void requestForSecondPageWithLimitOf2ReturnsLastEntry() throws Exception {
         OntologyDocument doc1 = createGODoc("GO:0000001", "go1");
         OntologyDocument doc2 = createGODoc("GO:0000002", "go2");
         OntologyDocument doc3 = createGODoc("GO:0000003", "go3");
@@ -144,7 +144,7 @@ public class OntologySearchIT extends SearchControllerSetup {
     }
 
     @Test
-    public void requestForPageThatIsLargerThanTotalNumberOfPagesInResponseReturns400Response() throws Exception {
+    void requestForPageThatIsLargerThanTotalNumberOfPagesInResponseReturns400Response() throws Exception {
         OntologyDocument doc1 = createGODoc("GO:0000001", "go1");
         OntologyDocument doc2 = createGODoc("GO:0000002", "go2");
         OntologyDocument doc3 = createGODoc("GO:0000003", "go3");
@@ -159,7 +159,7 @@ public class OntologySearchIT extends SearchControllerSetup {
 
     // facets ---------------------------------------------------------
     @Test
-    public void requestWithInValidFacetFieldReturns400Response() throws Exception {
+    void requestWithInValidFacetFieldReturns400Response() throws Exception {
         OntologyDocument doc1 = createGODoc("GO:0000001", "go1");
         OntologyDocument doc2 = createGODoc("GO:0000002", "go2");
         OntologyDocument doc3 = createGODoc("GO:0000003", "go3");
@@ -170,7 +170,7 @@ public class OntologySearchIT extends SearchControllerSetup {
     }
 
     @Test
-    public void requestWithValidFacetFieldReturnsResponseWithFacetInResult() throws Exception {
+    void requestWithValidFacetFieldReturnsResponseWithFacetInResult() throws Exception {
         OntologyDocument doc1 = createGODoc("GO:0000001", "go1");
         OntologyDocument doc2 = createGODoc("GO:0000002", "go2");
         OntologyDocument doc3 = createGODoc("GO:0000003", "go3");
@@ -181,7 +181,7 @@ public class OntologySearchIT extends SearchControllerSetup {
     }
 
     @Test
-    public void requestWithMultipleValidFacetFieldsReturnsResponseWithMultipleFacetsInResult() throws Exception {
+    void requestWithMultipleValidFacetFieldsReturnsResponseWithMultipleFacetsInResult() throws Exception {
         OntologyDocument doc1 = createGODoc("GO:0000001", "go1");
         OntologyDocument doc2 = createGODoc("GO:0000002", "go2");
         OntologyDocument doc3 = createGODoc("GO:0000003", "go3");
@@ -193,7 +193,7 @@ public class OntologySearchIT extends SearchControllerSetup {
 
     // filter queries ---------------------------------------------------------
     @Test
-    public void requestWithInvalidFilterQueryIgnoresFilter() throws Exception {
+    void requestWithInvalidFilterQueryIgnoresFilter() throws Exception {
         OntologyDocument doc1 = createGODoc("GO:0000001", "go1");
         OntologyDocument doc2 = createGODoc("GO:0000002", "go2");
         OntologyDocument doc3 = createGODoc("GO:0000003", "go3");
@@ -206,7 +206,7 @@ public class OntologySearchIT extends SearchControllerSetup {
     }
 
     @Test
-    public void requestWithAFilterQueryReturnsFilteredResponse() throws Exception {
+    void requestWithAFilterQueryReturnsFilteredResponse() throws Exception {
         OntologyDocument doc1 = createGODoc("GO:0000001", "go function 1");
         doc1.aspect = BIOLOGICAL_PROCESS;
         OntologyDocument doc2 = createGODoc("GO:0000002", "go function 2");
@@ -224,7 +224,7 @@ public class OntologySearchIT extends SearchControllerSetup {
     }
 
     @Test
-    public void requestWith2FilterQueriesThatFilterOutAllResults() throws Exception {
+    void requestWith2FilterQueriesThatFilterOutAllResults() throws Exception {
         OntologyDocument doc1 = createGODoc("GO:0000001", "go function 1");
         doc1.aspect = BIOLOGICAL_PROCESS;
         doc1.ontologyType = "GO";
@@ -246,7 +246,7 @@ public class OntologySearchIT extends SearchControllerSetup {
     }
 
     @Test
-    public void requestWithFilterQueryThatDoesNotFilterOutAnyEntryReturnsAllResults() throws Exception {
+    void requestWithFilterQueryThatDoesNotFilterOutAnyEntryReturnsAllResults() throws Exception {
         OntologyDocument doc1 = createGODoc("GO:0000001", "go function 1");
         doc1.aspect = BIOLOGICAL_PROCESS;
         OntologyDocument doc2 = createGODoc("GO:0000002", "go function 2");
@@ -264,7 +264,7 @@ public class OntologySearchIT extends SearchControllerSetup {
     }
 
     @Test
-    public void requestWith1ValidFilterQueryReturnsFilteredResponse() throws Exception {
+    void requestWith1ValidFilterQueryReturnsFilteredResponse() throws Exception {
         OntologyDocument doc1 = createGODoc("GO:0000001", "go function 1");
         doc1.aspect = BIOLOGICAL_PROCESS;
         OntologyDocument doc2 = createGODoc("GO:0000002", "go function 2");
@@ -284,7 +284,7 @@ public class OntologySearchIT extends SearchControllerSetup {
     }
 
     @Test
-    public void requestWithValidAspectComponentFilterQueryReturnsFilteredResponse() throws Exception {
+    void requestWithValidAspectComponentFilterQueryReturnsFilteredResponse() throws Exception {
         OntologyDocument doc1 = createGODoc("GO:0000001", "go function 1");
         doc1.aspect = COMPONENT;
         OntologyDocument doc2 = createGODoc("GO:0000002", "go function 1");
@@ -304,7 +304,7 @@ public class OntologySearchIT extends SearchControllerSetup {
     }
 
     @Test
-    public void requestWithInvalidAspectFilterQueryReturns500() throws Exception {
+    void requestWithInvalidAspectFilterQueryReturns500() throws Exception {
         OntologyDocument doc1 = createGODoc("GO:0000001", "go function 1");
         doc1.aspect = COMPONENT;
         OntologyDocument doc2 = createGODoc("GO:0000002", "go function 1");
@@ -323,7 +323,7 @@ public class OntologySearchIT extends SearchControllerSetup {
 
     // highlighting ------------------------------------------------
     @Test
-    public void requestWithHighlightingOnAndOneHitReturnsValidResponse() throws Exception {
+    void requestWithHighlightingOnAndOneHitReturnsValidResponse() throws Exception {
         OntologyDocument doc1 = createGODoc("GO:0000001", "go function 1");
         OntologyDocument doc2 = createGODoc("GO:0000002", "go function 2");
 
@@ -334,7 +334,7 @@ public class OntologySearchIT extends SearchControllerSetup {
     }
 
     @Test
-    public void requestWithHighlightingOnAndTwoHitsReturnsValidResponse() throws Exception {
+    void requestWithHighlightingOnAndTwoHitsReturnsValidResponse() throws Exception {
         OntologyDocument doc1 = createGODoc("GO:0000001", "go function 1");
         OntologyDocument doc2 = createGODoc("GO:0000002", "go anotherFunction 2");
         OntologyDocument doc3 = createGODoc("GO:0000003", "go anotherFunction 3");
@@ -347,7 +347,7 @@ public class OntologySearchIT extends SearchControllerSetup {
     }
 
     @Test
-    public void requestWithHighlightingOnAndZeroHitsReturnsValidResponse() throws Exception {
+    void requestWithHighlightingOnAndZeroHitsReturnsValidResponse() throws Exception {
         OntologyDocument doc1 = createGODoc("GO:0000001", "go function 1");
         OntologyDocument doc2 = createGODoc("GO:0000002", "go function 2");
 
@@ -358,7 +358,7 @@ public class OntologySearchIT extends SearchControllerSetup {
     }
 
     @Test
-    public void requestWithHighlightingOffAndOneHitReturnsValidResponse() throws Exception {
+    void requestWithHighlightingOffAndOneHitReturnsValidResponse() throws Exception {
         OntologyDocument doc1 = createGODoc("GO:0000001", "go function 1");
         OntologyDocument doc2 = createGODoc("GO:0000002", "go function 2");
 
@@ -369,7 +369,7 @@ public class OntologySearchIT extends SearchControllerSetup {
     }
 
     @Test
-    public void requestWithHighlightingOffAndOnZeroHitsReturnsValidResponse() throws Exception {
+    void requestWithHighlightingOffAndOnZeroHitsReturnsValidResponse() throws Exception {
         OntologyDocument doc1 = createGODoc("GO:0000001", "go function 1");
         OntologyDocument doc2 = createGODoc("GO:0000002", "go function 2");
 
@@ -380,7 +380,7 @@ public class OntologySearchIT extends SearchControllerSetup {
     }
 
     @Test
-    public void requestWithHighlightingOnReturnsTwoHighlightedValuesInResponse() throws Exception {
+    void requestWithHighlightingOnReturnsTwoHighlightedValuesInResponse() throws Exception {
         OntologyDocument doc1 = createGODoc("GO:0000001", "go function 1");
         OntologyDocument doc2 = createGODoc("GO:0000002", "go anotherFunction 2");
         OntologyDocument doc3 = createGODoc("GO:0000003", "go anotherFunction 3");

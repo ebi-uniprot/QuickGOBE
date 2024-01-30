@@ -1,31 +1,29 @@
 package uk.ac.ebi.quickgo.rest.search.results;
-
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.ac.ebi.quickgo.rest.search.AggregateFunction;
 
 import java.util.Optional;
 import java.util.Set;
-import org.junit.Before;
-import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
 import static uk.ac.ebi.quickgo.rest.search.results.AggregationResultTest.assertAggregateResult;
 
 /**
  * Tests the behaviour of the {@link AggregationResultsManager} class.
  */
-public class AggregationResultManagerTest {
+class AggregationResultManagerTest {
     private AggregationResultsManager manager;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp()  {
         manager = new AggregationResultsManager();
     }
 
     @Test
-    public void findsAggregationResultByFunctionAndName() throws Exception {
+    void findsAggregationResultByFunctionAndName()  {
         AggregateFunction func = AggregateFunction.COUNT;
         String name = "name";
         double hits = 0;
@@ -42,7 +40,7 @@ public class AggregationResultManagerTest {
     }
 
     @Test
-    public void doesNotFindAggregationResultWithUnknownName() throws Exception {
+    void doesNotFindAggregationResultWithUnknownName()  {
         AggregateFunction func = AggregateFunction.COUNT;
         String name = "name";
         double hits = 0;
@@ -56,7 +54,7 @@ public class AggregationResultManagerTest {
     }
 
     @Test
-    public void aggregationResultGetStoredCorrectly() throws Exception {
+    void aggregationResultGetStoredCorrectly()  {
         AggregateFunction func = AggregateFunction.COUNT;
         String name = "name";
         double hits = 0;

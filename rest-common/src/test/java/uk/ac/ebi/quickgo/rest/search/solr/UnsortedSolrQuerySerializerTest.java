@@ -2,18 +2,18 @@ package uk.ac.ebi.quickgo.rest.search.solr;
 
 import uk.ac.ebi.quickgo.rest.search.query.*;
 
-import de.bechte.junit.runners.context.HierarchicalContextRunner;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.ac.ebi.quickgo.rest.TestUtil.asSet;
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.and;
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.or;
@@ -25,8 +25,7 @@ import static uk.ac.ebi.quickgo.rest.search.solr.UnsortedSolrQuerySerializer.TER
  *
  * @author Edd
  */
-@RunWith(HierarchicalContextRunner.class)
-public class UnsortedSolrQuerySerializerTest {
+class UnsortedSolrQuerySerializerTest {
     private static final String TERMS_COMPATIBLE_FIELD_1 = "termsCompatibleField1";
     private static final String TERMS_COMPATIBLE_FIELD_2 = "termsCompatibleField2";
     private static final String TERMS_COMPATIBLE_FIELD_3 = "termsCompatibleField3";
@@ -36,8 +35,8 @@ public class UnsortedSolrQuerySerializerTest {
     private UnsortedSolrQuerySerializer serializer;
     private Set<String> nonEmptyFieldQueryCompatibleFields = new HashSet<>();
     private Set<String> termsQueryCompatibleFields;
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         termsQueryCompatibleFields = Stream.of(
                 TERMS_COMPATIBLE_FIELD_1,
                 TERMS_COMPATIBLE_FIELD_2,
@@ -47,21 +46,23 @@ public class UnsortedSolrQuerySerializerTest {
         this.serializer = new UnsortedSolrQuerySerializer(termsQueryCompatibleFields, nonEmptyFieldQueryCompatibleFields);
     }
 
-    public class Initialization {
-        @Test(expected = IllegalArgumentException.class)
-        public void initWithNullSetOfFieldsThatAreTermsQueryCompatibleCausesIllegalArgumentException() {
-            new UnsortedSolrQuerySerializer(null, nonEmptyFieldQueryCompatibleFields);
+    @Nested
+    class Initialization {
+        @Test
+        void initWithNullSetOfFieldsThatAreTermsQueryCompatibleCausesIllegalArgumentException() {
+            assertThrows(IllegalArgumentException.class, () -> new UnsortedSolrQuerySerializer(null, nonEmptyFieldQueryCompatibleFields));
         }
 
-        @Test(expected = IllegalArgumentException.class)
-        public void initWithNullSetOfFieldsThatAreWildCardCompatibleCausesIllegalArgumentException() {
-            new UnsortedSolrQuerySerializer(termsQueryCompatibleFields, null);
+        @Test
+        void initWithNullSetOfFieldsThatAreWildCardCompatibleCausesIllegalArgumentException() {
+            assertThrows(IllegalArgumentException.class, () -> new UnsortedSolrQuerySerializer(termsQueryCompatibleFields, null));
         }
     }
 
-    public class TransformationsWithFieldsIncompatibleWithTermsQuery {
+    @Nested
+    class TransformationsWithFieldsIncompatibleWithTermsQuery {
         @Test
-        public void visitTransformsFieldQueryToString() throws Exception {
+        void visitTransformsFieldQueryToString()  {
             String field = TERMS_INCOMPATIBLE_FIELD_1;
             String value = "value1";
             FieldQuery fieldQuery = new FieldQuery(field, value);
@@ -72,7 +73,7 @@ public class UnsortedSolrQuerySerializerTest {
         }
 
         @Test
-        public void visitTransformsContainFieldQueryToString() throws Exception {
+        void visitTransformsContainFieldQueryToString()  {
             String field = TERMS_INCOMPATIBLE_FIELD_1;
             String value = "value1";
             ContainsFieldQuery fieldQuery = new ContainsFieldQuery(field, value);
@@ -83,7 +84,7 @@ public class UnsortedSolrQuerySerializerTest {
         }
 
         @Test
-        public void visitTransformsNoFieldQueryToString() throws Exception {
+        void visitTransformsNoFieldQueryToString()  {
             String value = "value1";
             NoFieldQuery noFieldQuery = new NoFieldQuery(value);
 
@@ -93,7 +94,7 @@ public class UnsortedSolrQuerySerializerTest {
         }
 
         @Test
-        public void visitTransformsFieldQueryWithSolrReservedCharacterToString() throws Exception {
+        void visitTransformsFieldQueryWithSolrReservedCharacterToString()  {
             String field = TERMS_INCOMPATIBLE_FIELD_1;
             String value = "prefix:value1";
             String escapedValue = "prefix\\:value1";
@@ -106,7 +107,7 @@ public class UnsortedSolrQuerySerializerTest {
         }
 
         @Test
-        public void visitTransformsCompositeQueryToString() throws Exception {
+        void visitTransformsCompositeQueryToString()  {
             CompositeQuery complexQuery = createComplexQuery();
 
             String queryString = serializer.visit(complexQuery);
@@ -118,7 +119,7 @@ public class UnsortedSolrQuerySerializerTest {
         }
 
         @Test
-        public void visitTransformsAllQueryToString() {
+        void visitTransformsAllQueryToString() {
             AllQuery allQuery = new AllQuery();
 
             String queryString = serializer.visit(allQuery);
@@ -128,7 +129,7 @@ public class UnsortedSolrQuerySerializerTest {
         }
 
         @Test
-        public void visitTransformsNegatedAllQueryToString() {
+        void visitTransformsNegatedAllQueryToString() {
             CompositeQuery nothingQuery =
                     new CompositeQuery(asSet(QuickGOQuery.createAllQuery()), CompositeQuery.QueryOp.NOT);
 
@@ -139,7 +140,7 @@ public class UnsortedSolrQuerySerializerTest {
         }
 
         @Test
-        public void visitTransformsJoinQueryWithNoFromFilterToString() {
+        void visitTransformsJoinQueryWithNoFromFilterToString() {
             String joinFromTable = "annotation";
             String joinFromAttribute = TERMS_INCOMPATIBLE_FIELD_1;
             String joinToTable = "ontology";
@@ -156,7 +157,7 @@ public class UnsortedSolrQuerySerializerTest {
         }
 
         @Test
-        public void visitTransformsJoinQueryWithAFromFilterToString() {
+        void visitTransformsJoinQueryWithAFromFilterToString() {
             String joinFromTable = "annotation";
             String joinFromAttribute = TERMS_INCOMPATIBLE_FIELD_1;
             String joinToTable = "ontology";
@@ -197,9 +198,10 @@ public class UnsortedSolrQuerySerializerTest {
         }
     }
 
-    public class TransformationsToTermsQueries {
+    @Nested
+    class TransformationsToTermsQueries {
         @Test
-        public void visitTransformsOneQueryToTermsQueryString() {
+        void visitTransformsOneQueryToTermsQueryString() {
             FieldQuery query = new FieldQuery(TERMS_COMPATIBLE_FIELD_1, "value1");
 
             String queryString = serializer.visit(query);
@@ -211,7 +213,7 @@ public class UnsortedSolrQuerySerializerTest {
         }
 
         @Test
-        public void visitTransformsTwoOrsOnSameFieldToTermsQueryString() {
+        void visitTransformsTwoOrsOnSameFieldToTermsQueryString() {
             FieldQuery query1 = new FieldQuery(TERMS_COMPATIBLE_FIELD_1, "value1");
             FieldQuery query2 = new FieldQuery(TERMS_COMPATIBLE_FIELD_1, "value2");
 
@@ -226,7 +228,7 @@ public class UnsortedSolrQuerySerializerTest {
         }
 
         @Test
-        public void visitTransformsThreeOrsOnSameFieldToString() {
+        void visitTransformsThreeOrsOnSameFieldToString() {
             FieldQuery query1 = new FieldQuery(TERMS_COMPATIBLE_FIELD_1, "value1");
             FieldQuery query2 = new FieldQuery(TERMS_COMPATIBLE_FIELD_1, "value2");
             FieldQuery query3 = new FieldQuery(TERMS_COMPATIBLE_FIELD_1, "value3");
@@ -242,7 +244,7 @@ public class UnsortedSolrQuerySerializerTest {
         }
 
         @Test
-        public void visitTransformsTwoOrsOnDifferentFieldsWithinAndToString() {
+        void visitTransformsTwoOrsOnDifferentFieldsWithinAndToString() {
             FieldQuery query1 = new FieldQuery(TERMS_COMPATIBLE_FIELD_1, "value1");
             FieldQuery query2 = new FieldQuery(TERMS_COMPATIBLE_FIELD_1, "value2");
 
@@ -265,7 +267,7 @@ public class UnsortedSolrQuerySerializerTest {
         }
 
         @Test
-        public void visitTransformsTwoOrsWhereOneClauseIsAnAndToString() {
+        void visitTransformsTwoOrsWhereOneClauseIsAnAndToString() {
             FieldQuery query1 = new FieldQuery(TERMS_COMPATIBLE_FIELD_1, "value1");
             FieldQuery query2 = new FieldQuery(TERMS_COMPATIBLE_FIELD_1, "value2");
 
@@ -289,7 +291,7 @@ public class UnsortedSolrQuerySerializerTest {
         }
 
         @Test
-        public void visitTransformsTwoOrsWhereOneClauseIsAnOrToString() {
+        void visitTransformsTwoOrsWhereOneClauseIsAnOrToString() {
             FieldQuery query1 = new FieldQuery(TERMS_COMPATIBLE_FIELD_1, "value1");
             FieldQuery query2 = new FieldQuery(TERMS_COMPATIBLE_FIELD_1, "value2");
 
@@ -310,7 +312,7 @@ public class UnsortedSolrQuerySerializerTest {
         }
 
         @Test
-        public void canTransformOrOfFieldAndAnotherCompositeOr() {
+        void canTransformOrOfFieldAndAnotherCompositeOr() {
             FieldQuery innerQuery1 = new FieldQuery(TERMS_COMPATIBLE_FIELD_1, "value1");
             FieldQuery innerQuery2 = new FieldQuery(TERMS_COMPATIBLE_FIELD_1, "value2");
             QuickGOQuery innerOr = or(

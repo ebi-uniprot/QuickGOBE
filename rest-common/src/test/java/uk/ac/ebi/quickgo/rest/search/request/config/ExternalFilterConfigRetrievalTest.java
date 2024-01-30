@@ -3,10 +3,8 @@ package uk.ac.ebi.quickgo.rest.search.request.config;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
@@ -20,39 +18,37 @@ import static uk.ac.ebi.quickgo.rest.search.request.config.FilterConfig.Executio
 /**
  * Tests the behaviour of the {@link ExternalFilterConfigRetrieval} class.
  */
-public class ExternalFilterConfigRetrievalTest {
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
+class ExternalFilterConfigRetrievalTest {
 
     private ExternalFilterConfigRetrieval config;
 
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp()  {
         config = new ExternalFilterConfigRetrieval();
     }
 
     @Test
-    public void newExternalFilterConfigHasNoFields() {
+    void newExternalFilterConfigHasNoFields() {
         assertThat(config.getFilterConfigs(), hasSize(0));
     }
 
     @Test
-    public void newExternalFilterConfigReturnsEmptyOptionalWhenCallingGetField() {
+    void newExternalFilterConfigReturnsEmptyOptionalWhenCallingGetField() {
         Optional<FilterConfig> fieldConfigOpt = config.getBySignature(asSet("field"));
 
         assertThat(fieldConfigOpt.isPresent(), is(false));
     }
 
     @Test
-    public void settingFieldsToNullReturnsAnEmptyListWhenCallingGetFields() {
+    void settingFieldsToNullReturnsAnEmptyListWhenCallingGetFields() {
         config.setFilterConfigs(null);
 
         assertThat(config.getFilterConfigs(), hasSize(0));
     }
 
     @Test
-    public void settingFieldsToNullReturnsEmptyOptionalWhenCallingGetField(){
+    void settingFieldsToNullReturnsEmptyOptionalWhenCallingGetField(){
         config.setFilterConfigs(null);
 
         Optional<FilterConfig> fieldConfigOpt = config.getBySignature(asSet("field"));
@@ -61,7 +57,7 @@ public class ExternalFilterConfigRetrievalTest {
     }
 
     @Test
-    public void settingFieldsWithOneFieldExecutionConfigReturnsAListWithThatField() {
+    void settingFieldsWithOneFieldExecutionConfigReturnsAListWithThatField() {
         String name = "name";
         FilterConfig.ExecutionType type = SIMPLE;
 
@@ -73,7 +69,7 @@ public class ExternalFilterConfigRetrievalTest {
     }
 
     @Test
-    public void gettingFieldWithRecognizedFieldNameReturnsAnPopulatedOptional() {
+    void gettingFieldWithRecognizedFieldNameReturnsAnPopulatedOptional() {
         String name = "aspect";
         FilterConfig.ExecutionType type = JOIN;
 
@@ -85,7 +81,7 @@ public class ExternalFilterConfigRetrievalTest {
     }
 
     @Test
-    public void gettingFieldWithUnrecognizedFieldNameReturnsAnEmptyOptional() {
+    void gettingFieldWithUnrecognizedFieldNameReturnsAnEmptyOptional() {
         String name = "aspect";
         FilterConfig.ExecutionType type = JOIN;
 
@@ -97,7 +93,7 @@ public class ExternalFilterConfigRetrievalTest {
     }
 
     @Test
-    public void getsFirstOfTwoFieldsWithTheSameName() {
+    void getsFirstOfTwoFieldsWithTheSameName() {
         String name = "field";
         FilterConfig.ExecutionType type1 = JOIN;
         FilterConfig.ExecutionType type2 = SIMPLE;

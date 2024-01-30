@@ -1,31 +1,29 @@
 package uk.ac.ebi.quickgo.rest.search.results;
 
-import uk.ac.ebi.quickgo.rest.search.results.Category;
-import uk.ac.ebi.quickgo.rest.search.results.FieldFacet;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Tests the behaviour of the {@link uk.ac.ebi.quickgo.rest.search.results.FieldFacet} implementation.
  */
-public class FieldFacetTest {
-    @Test(expected = IllegalArgumentException.class)
-    public void nullFieldThrowsException() throws Exception {
-        new uk.ac.ebi.quickgo.rest.search.results.FieldFacet(null);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void emptyFieldThrowsException() throws Exception {
-        new uk.ac.ebi.quickgo.rest.search.results.FieldFacet("");
+class FieldFacetTest {
+    @Test
+    void nullFieldThrowsException() {
+        assertThrows(IllegalArgumentException.class, () -> new FieldFacet(null));
     }
 
     @Test
-    public void retrievesFacetField() throws Exception {
+    void emptyFieldThrowsException() {
+        assertThrows(IllegalArgumentException.class, () -> new FieldFacet(""));
+    }
+
+    @Test
+    void retrievesFacetField() {
         String field = "field1";
 
         uk.ac.ebi.quickgo.rest.search.results.FieldFacet
@@ -35,7 +33,7 @@ public class FieldFacetTest {
     }
 
     @Test
-    public void returnsEmptyMapWhenNothingAddedToCategories() throws Exception {
+    void returnsEmptyMapWhenNothingAddedToCategories() {
         String field = "field1";
 
         uk.ac.ebi.quickgo.rest.search.results.FieldFacet
@@ -45,7 +43,7 @@ public class FieldFacetTest {
     }
 
     @Test
-    public void addCategoryAndCountToFacet() throws Exception {
+    void addCategoryAndCountToFacet() {
         String field = "field1";
         String categoryName = "cat1";
         long count = 3;
@@ -59,62 +57,67 @@ public class FieldFacetTest {
         assertThat(fieldFacet.getCategories(), contains(category));
     }
 
-    @Test(expected = UnsupportedOperationException.class)
-    public void deletingElementInCategoriesThrowsException() throws Exception {
+    @Test
+    void deletingElementInCategoriesThrowsException() {
         String field = "field1";
         String categoryName = "cat1";
         long count = 3;
 
         uk.ac.ebi.quickgo.rest.search.results.FieldFacet
-                fieldFacet = new uk.ac.ebi.quickgo.rest.search.results.FieldFacet(field);
+          fieldFacet = new uk.ac.ebi.quickgo.rest.search.results.FieldFacet(field);
         fieldFacet.addCategory(categoryName, count);
 
-		Category category = new Category(categoryName, count);
-
-        fieldFacet.getCategories().remove(category);
+        Category category = new Category(categoryName, count);
+        assertThrows(UnsupportedOperationException.class, () -> fieldFacet.getCategories().remove(category));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void addNullCategoryToFacetThrowsException() throws Exception {
+    @Test
+    void addNullCategoryToFacetThrowsException() {
         String field = "field1";
         String categoryName = null;
         long count = 3;
 
         uk.ac.ebi.quickgo.rest.search.results.FieldFacet
-                fieldFacet = new uk.ac.ebi.quickgo.rest.search.results.FieldFacet(field);
-        fieldFacet.addCategory(categoryName, count);
+          fieldFacet = new uk.ac.ebi.quickgo.rest.search.results.FieldFacet(field);
+        assertThrows(IllegalArgumentException.class, () -> {
+            fieldFacet.addCategory(categoryName, count);
 
-		Category category = new Category(categoryName, count);
+            Category category = new Category(categoryName, count);
 
-        assertThat(fieldFacet.getCategories(), contains(category));
+            assertThat(fieldFacet.getCategories(), contains(category));
+        });
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void addEmptyCategoryToFacetThrowsException() throws Exception {
+    @Test
+    void addEmptyCategoryToFacetThrowsException() {
         String field = "field1";
         String categoryName = "";
         long count = 3;
 
         uk.ac.ebi.quickgo.rest.search.results.FieldFacet
-                fieldFacet = new uk.ac.ebi.quickgo.rest.search.results.FieldFacet(field);
-        fieldFacet.addCategory(categoryName, count);
+          fieldFacet = new uk.ac.ebi.quickgo.rest.search.results.FieldFacet(field);
+        assertThrows(IllegalArgumentException.class, () -> {
+            fieldFacet.addCategory(categoryName, count);
 
-		Category category = new Category(categoryName, count);
+            Category category = new Category(categoryName, count);
 
-		assertThat(fieldFacet.getCategories(), contains(category));
+            assertThat(fieldFacet.getCategories(), contains(category));
+        });
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void addNegativeValueToFacetThrowsException() throws Exception {
+    @Test
+    void addNegativeValueToFacetThrowsException() {
         String field = "field1";
         String categoryName = "cat1";
         long count = -1;
 
         uk.ac.ebi.quickgo.rest.search.results.FieldFacet fieldFacet = new FieldFacet(field);
-        fieldFacet.addCategory(categoryName, count);
+        assertThrows(IllegalArgumentException.class, () -> {
+            fieldFacet.addCategory(categoryName, count);
 
-		Category category = new Category(categoryName, count);
+            Category category = new Category(categoryName, count);
 
-		assertThat(fieldFacet.getCategories(), contains(category));
+            assertThat(fieldFacet.getCategories(), contains(category));
+        });
     }
 }

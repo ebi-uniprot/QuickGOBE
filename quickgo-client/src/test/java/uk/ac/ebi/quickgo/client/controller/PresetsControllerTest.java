@@ -1,17 +1,16 @@
 package uk.ac.ebi.quickgo.client.controller;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Created 05/09/16
  * @author Edd
  */
-@RunWith(MockitoJUnitRunner.class)
-public class PresetsControllerTest {
-    @Test(expected = IllegalArgumentException.class)
-    public void controllerInstantiationFailsOnNullPresets() {
-        new PresetsController(null);
+class PresetsControllerTest {
+    @Test
+    void controllerInstantiationFailsOnNullPresets() {
+        assertThrows(IllegalArgumentException.class, () -> new PresetsController(null));
     }
 }

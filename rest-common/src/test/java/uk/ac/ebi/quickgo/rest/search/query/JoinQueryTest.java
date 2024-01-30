@@ -1,23 +1,22 @@
 package uk.ac.ebi.quickgo.rest.search.query;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 
 /**
  * Tests the behaviour of the {@link JoinQuery} class.
  */
-@RunWith(MockitoJUnitRunner.class)
-public class JoinQueryTest {
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
+@ExtendWith(MockitoExtension.class)
+class JoinQueryTest {
 
     @Mock
     private QueryVisitor visitor;
@@ -32,79 +31,71 @@ public class JoinQueryTest {
     private QuickGOQuery fromFilter = QuickGOQuery.createAllQuery();
 
     @Test
-    public void throwsExceptionWhenJoinFromTableIsNull() throws Exception {
+    void throwsExceptionWhenJoinFromTableIsNull()  {
         joinFromTable = null;
 
-        assertNullOrEmpty("Join From Table cannot be null or empty");
-
-        query = new JoinQuery(joinFromTable, joinFromAttribute, joinToTable, joinToAttribute);
+        assertNullOrEmpty("Join From Table cannot be null or empty",
+          () -> new JoinQuery(joinFromTable, joinFromAttribute, joinToTable, joinToAttribute));
     }
 
     @Test
-    public void throwsExceptionWhenJoinFromTableIsEmpty() throws Exception {
+    void throwsExceptionWhenJoinFromTableIsEmpty()  {
         joinFromTable = "";
 
-        assertNullOrEmpty("Join From Table cannot be null or empty");
-
-        query = new JoinQuery(joinFromTable, joinFromAttribute, joinToTable, joinToAttribute);
+        assertNullOrEmpty("Join From Table cannot be null or empty",
+          () -> new JoinQuery(joinFromTable, joinFromAttribute, joinToTable, joinToAttribute));
     }
 
     @Test
-    public void throwsExceptionWhenJoinFromAttributeIsNull() throws Exception {
+    void throwsExceptionWhenJoinFromAttributeIsNull()  {
         joinFromAttribute = null;
 
-        assertNullOrEmpty("Join From Attribute cannot be null or empty");
-
-        query = new JoinQuery(joinFromTable, joinFromAttribute, joinToTable, joinToAttribute);
+        assertNullOrEmpty("Join From Attribute cannot be null or empty",
+          () -> new JoinQuery(joinFromTable, joinFromAttribute, joinToTable, joinToAttribute));
     }
 
     @Test
-    public void throwsExceptionWhenJoinFromAttributeIsEmpty() throws Exception {
+    void throwsExceptionWhenJoinFromAttributeIsEmpty()  {
         joinFromAttribute = "";
 
-        assertNullOrEmpty("Join From Attribute cannot be null or empty");
-
-        query = new JoinQuery(joinFromTable, joinFromAttribute, joinToTable, joinToAttribute);
+        assertNullOrEmpty("Join From Attribute cannot be null or empty",
+          () -> new JoinQuery(joinFromTable, joinFromAttribute, joinToTable, joinToAttribute));
     }
 
     @Test
-    public void throwsExceptionWhenJoinToTableIsNull() throws Exception {
+    void throwsExceptionWhenJoinToTableIsNull()  {
         joinToTable = null;
 
-        assertNullOrEmpty("Join To Table cannot be null or empty");
-
-        query = new JoinQuery(joinFromTable, joinFromAttribute, joinToTable, joinToAttribute);
+        assertNullOrEmpty("Join To Table cannot be null or empty",
+          () -> new JoinQuery(joinFromTable, joinFromAttribute, joinToTable, joinToAttribute));
     }
 
     @Test
-    public void throwsExceptionWhenJoinToTableIsEmpty() throws Exception {
+    void throwsExceptionWhenJoinToTableIsEmpty()  {
         joinToTable = "";
 
-        assertNullOrEmpty("Join To Table cannot be null or empty");
-
-        query = new JoinQuery(joinFromTable, joinFromAttribute, joinToTable, joinToAttribute);
+        assertNullOrEmpty("Join To Table cannot be null or empty",
+          () -> new JoinQuery(joinFromTable, joinFromAttribute, joinToTable, joinToAttribute));
     }
 
     @Test
-    public void throwsExceptionWhenJoinToAttributeIsNull() throws Exception {
+    void throwsExceptionWhenJoinToAttributeIsNull()  {
         joinToAttribute = null;
 
-        assertNullOrEmpty("Join To Attribute cannot be null or empty");
-
-        query = new JoinQuery(joinFromTable, joinFromAttribute, joinToTable, joinToAttribute);
+        assertNullOrEmpty("Join To Attribute cannot be null or empty",
+          () -> new JoinQuery(joinFromTable, joinFromAttribute, joinToTable, joinToAttribute));
     }
 
     @Test
-    public void throwsExceptionWhenJoinToAttributeIsEmpty() throws Exception {
+    void throwsExceptionWhenJoinToAttributeIsEmpty()  {
         joinToAttribute = "";
 
-        assertNullOrEmpty("Join To Attribute cannot be null or empty");
-
-        query = new JoinQuery(joinFromTable, joinFromAttribute, joinToTable, joinToAttribute);
+        assertNullOrEmpty("Join To Attribute cannot be null or empty",
+          () -> new JoinQuery(joinFromTable, joinFromAttribute, joinToTable, joinToAttribute));
     }
 
     @Test
-    public void createsJoinQueryWithJoinParametersInitializedCorrectly() {
+    void createsJoinQueryWithJoinParametersInitializedCorrectly() {
         query = new JoinQuery(joinFromTable, joinFromAttribute, joinToTable, joinToAttribute);
 
         assertThat(query.getJoinFromTable(), is(joinFromTable));
@@ -114,16 +105,15 @@ public class JoinQueryTest {
     }
 
     @Test
-    public void throwsExceptionWhenQueryIsNull() throws Exception {
+    void throwsExceptionWhenQueryIsNull()  {
         fromFilter = null;
 
-        assertNullOrEmpty("Filter cannot be null");
-
-        query = new JoinQuery(joinFromTable, joinFromAttribute, joinToTable, joinToAttribute, fromFilter);
+        assertNullOrEmpty("Filter cannot be null",
+          () -> new JoinQuery(joinFromTable, joinFromAttribute, joinToTable, joinToAttribute, fromFilter));
     }
 
     @Test
-    public void createsJoinQueryWithJoinParametersAndFilterQueryInitializedCorrectly() {
+    void createsJoinQueryWithJoinParametersAndFilterQueryInitializedCorrectly() {
         query = new JoinQuery(joinFromTable, joinFromAttribute, joinToTable, joinToAttribute, fromFilter);
 
         assertThat(query.getJoinFromTable(), is(joinFromTable));
@@ -134,14 +124,14 @@ public class JoinQueryTest {
     }
 
     @Test
-    public void visitorIsCalledCorrectly() throws Exception {
+    void visitorIsCalledCorrectly()  {
         FieldQuery query = new FieldQuery("field1", "value1");
         query.accept(visitor);
         verify(visitor).visit(query);
     }
 
-    private void assertNullOrEmpty(String errorMsg) {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage(errorMsg);
+    private void assertNullOrEmpty(String errorMsg, Executable executable) {
+        Throwable exception = assertThrows(IllegalArgumentException.class, executable);
+        assertTrue(exception.getMessage().contains(errorMsg));
     }
 }

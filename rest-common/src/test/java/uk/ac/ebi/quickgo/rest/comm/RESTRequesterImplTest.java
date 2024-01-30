@@ -4,13 +4,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.internal.stubbing.answers.Returns;
 import org.mockito.invocation.InvocationOnMock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Stubber;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -18,14 +18,15 @@ import org.springframework.web.client.RestTemplate;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 /**
  * Created 31/05/16
  * @author Edd
  */
-@RunWith(MockitoJUnitRunner.class)
-public class RESTRequesterImplTest {
+@ExtendWith(MockitoExtension.class)
+class RESTRequesterImplTest {
 
     private static final String SERVICE_ENDPOINT = "useful/endpoint";
     private RESTRequesterImpl.Builder requesterBuilder;
@@ -35,61 +36,61 @@ public class RESTRequesterImplTest {
     private RestTemplate restTemplateMock;
     private Map<String, String> requestParameters;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         requesterBuilder = RESTRequesterImpl.newBuilder(restTemplateMock, SERVICE_ENDPOINT, EMPTY_BACKUP_URL);
 
         requestParameters = new HashMap<>();
     }
 
     @Test
-    public void canCreateNonNullRequester() {
+    void canCreateNonNullRequester() {
         RESTRequesterImpl requester = this.requesterBuilder.build();
         assertThat(requester, is(notNullValue()));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void creatingWithNullRestOperationsThrowsException() {
-        RESTRequesterImpl.newBuilder(null, "value", EMPTY_BACKUP_URL);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void creatingWithNullURLThrowsException() {
-        RESTRequesterImpl.newBuilder(restTemplateMock, null, EMPTY_BACKUP_URL);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void creatingWithEmptyURLThrowsException() {
-        RESTRequesterImpl.newBuilder(restTemplateMock, "", EMPTY_BACKUP_URL);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void resettingURLWithNullValueThrowsException() {
-        requesterBuilder.resetURL(null);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void resettingURLWithEmptyValueThrowsException() {
-        requesterBuilder.resetURL("");
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void addingRequestParamWithNullNameThrowsException() {
-        requesterBuilder.addRequestParameter(null, "value");
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void addingRequestParamWithEmptyNameThrowsException() {
-        requesterBuilder.addRequestParameter("", "value");
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void addingRequestParamWithNullValueThrowsException() {
-        requesterBuilder.addRequestParameter("name", null);
+    @Test
+    void creatingWithNullRestOperationsThrowsException() {
+        assertThrows(IllegalArgumentException.class, () -> RESTRequesterImpl.newBuilder(null, "value", EMPTY_BACKUP_URL));
     }
 
     @Test
-    public void addingRequestParamsResultsInTheseParamsBeingUsed() throws ExecutionException, InterruptedException {
+    void creatingWithNullURLThrowsException() {
+        assertThrows(IllegalArgumentException.class, () -> RESTRequesterImpl.newBuilder(restTemplateMock, null, EMPTY_BACKUP_URL));
+    }
+
+    @Test
+    void creatingWithEmptyURLThrowsException() {
+        assertThrows(IllegalArgumentException.class, () -> RESTRequesterImpl.newBuilder(restTemplateMock, "", EMPTY_BACKUP_URL));
+    }
+
+    @Test
+    void resettingURLWithNullValueThrowsException() {
+        assertThrows(IllegalArgumentException.class, () -> requesterBuilder.resetURL(null));
+    }
+
+    @Test
+    void resettingURLWithEmptyValueThrowsException() {
+        assertThrows(IllegalArgumentException.class, () -> requesterBuilder.resetURL(""));
+    }
+
+    @Test
+    void addingRequestParamWithNullNameThrowsException() {
+        assertThrows(IllegalArgumentException.class, () -> requesterBuilder.addRequestParameter(null, "value"));
+    }
+
+    @Test
+    void addingRequestParamWithEmptyNameThrowsException() {
+        assertThrows(IllegalArgumentException.class, () -> requesterBuilder.addRequestParameter("", "value"));
+    }
+
+    @Test
+    void addingRequestParamWithNullValueThrowsException() {
+        assertThrows(IllegalArgumentException.class, () -> requesterBuilder.addRequestParameter("name", null));
+    }
+
+    @Test
+    void addingRequestParamsResultsInTheseParamsBeingUsed() throws ExecutionException, InterruptedException {
         String param1 = "param1";
         String value1 = "value1";
         String url = SERVICE_ENDPOINT + "/something-else";
@@ -110,7 +111,7 @@ public class RESTRequesterImplTest {
     }
 
     @Test
-    public void resettingURLResultsInNewURLBeingAccessed() throws ExecutionException, InterruptedException {
+    void resettingURLResultsInNewURLBeingAccessed() throws ExecutionException, InterruptedException {
         String newURL = "new url";
         String dtoValue = "value";
         when(restTemplateMock.getForObject(newURL, FakeDTO.class, requestParameters))
@@ -128,7 +129,7 @@ public class RESTRequesterImplTest {
     }
 
     @Test
-    public void showSuccessfulURLGetWithNoDelay() throws ExecutionException, InterruptedException {
+    void showSuccessfulURLGetWithNoDelay() throws ExecutionException, InterruptedException {
         String dtoValue = "value";
         when(restTemplateMock.getForObject(SERVICE_ENDPOINT, FakeDTO.class, requestParameters))
                 .thenReturn(new FakeDTO(dtoValue));
@@ -142,7 +143,7 @@ public class RESTRequesterImplTest {
     }
 
     @Test
-    public void showSuccessfulURLGetWithDelay() throws ExecutionException, InterruptedException {
+    void showSuccessfulURLGetWithDelay() throws ExecutionException, InterruptedException {
         String dtoValue = "value";
         delayAnswer(500, new FakeDTO(dtoValue)).when(restTemplateMock)
                 .getForObject(SERVICE_ENDPOINT, FakeDTO.class, requestParameters);
@@ -156,7 +157,7 @@ public class RESTRequesterImplTest {
     }
 
     @Test
-    public void showHandlingOfAFailedURLGet() throws ExecutionException, InterruptedException {
+    void showHandlingOfAFailedURLGet() throws ExecutionException, InterruptedException {
         doThrow(new RestClientException("Didn't work", new Exception("For some reason"))).when(restTemplateMock)
                 .getForObject(SERVICE_ENDPOINT, FakeDTO.class, requestParameters);
 
@@ -171,25 +172,25 @@ public class RESTRequesterImplTest {
     }
 
     @Test
-    public void whenBackupUrlEmpty_hasBackup_returnFalse() {
+    void whenBackupUrlEmpty_hasBackup_returnFalse() {
         RESTRequesterImpl requester = requesterBuilder.build();
         assertThat(requester.hasBackup(), is(false));
     }
 
     @Test
-    public void whenBackupUrlNull_hasBackup_returnFalse() {
+    void whenBackupUrlNull_hasBackup_returnFalse() {
         RESTRequesterImpl requester = RESTRequesterImpl.newBuilder(restTemplateMock, SERVICE_ENDPOINT, null).build();
         assertThat(requester.hasBackup(), is(false));
     }
 
     @Test
-    public void whenBackupUrlEmptySpaces_hasBackup_returnFalse() {
+    void whenBackupUrlEmptySpaces_hasBackup_returnFalse() {
         RESTRequesterImpl requester = RESTRequesterImpl.newBuilder(restTemplateMock, SERVICE_ENDPOINT, "  ").build();
         assertThat(requester.hasBackup(), is(false));
     }
 
     @Test
-    public void whenBackupUrlNonEmpty_hasBackup_returnTrue() {
+    void whenBackupUrlNonEmpty_hasBackup_returnTrue() {
         RESTRequesterImpl requester = RESTRequesterImpl.newBuilder(restTemplateMock, SERVICE_ENDPOINT, "nonEmpty").build();
         assertThat(requester.hasBackup(), is(true));
     }

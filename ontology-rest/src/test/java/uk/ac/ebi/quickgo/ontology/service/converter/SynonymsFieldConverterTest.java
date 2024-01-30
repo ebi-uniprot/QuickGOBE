@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.ontology.service.converter;
-
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.ac.ebi.quickgo.common.converter.FlatFieldBuilder;
 import uk.ac.ebi.quickgo.common.converter.FlatFieldLeaf;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
@@ -8,8 +9,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import org.junit.Before;
-import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -19,12 +18,12 @@ import static org.hamcrest.Matchers.is;
  * Created 01/12/15
  * @author Edd
  */
-public class SynonymsFieldConverterTest {
+class SynonymsFieldConverterTest {
 
     private SynonymsFieldConverter converter;
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         this.converter = new SynonymsFieldConverter();
     }
 
@@ -34,7 +33,7 @@ public class SynonymsFieldConverterTest {
      * DTO.
      */
     @Test
-    public void convertingBadlyFlattenedSynonymsFailsWithoutError() {
+    void convertingBadlyFlattenedSynonymsFailsWithoutError() {
         List<String> rawSynonyms = Arrays.asList("syn name 0-syn type 0", "syn name 1-syn type 1");
         List<OBOTerm.Synonym> synonyms = converter.convertFieldList(rawSynonyms);
         assertThat(synonyms.size(), is(0));
@@ -46,7 +45,7 @@ public class SynonymsFieldConverterTest {
      * DTO.
      */
     @Test
-    public void converts0FlattenedSynonymsToSynonymsDTO() {
+    void converts0FlattenedSynonymsToSynonymsDTO() {
         List<String> rawSynonyms = Collections.emptyList();
         List<OBOTerm.Synonym> synonyms = converter.convertFieldList(rawSynonyms);
         assertThat(synonyms.size(), is(0));
@@ -58,7 +57,7 @@ public class SynonymsFieldConverterTest {
      * DTO.
      */
     @Test
-    public void converts1FlattenedSynonymToSynonymsDTO() {
+    void converts1FlattenedSynonymToSynonymsDTO() {
         List<String> rawSynonyms = Collections.singletonList(
                 FlatFieldBuilder.newFlatField()
                 .addField(FlatFieldLeaf.newFlatFieldLeaf("syn name 0"))
@@ -76,7 +75,7 @@ public class SynonymsFieldConverterTest {
      * DTO.
      */
     @Test
-    public void converts2FlattenedSynonymsToSynonymsDTO() {
+    void converts2FlattenedSynonymsToSynonymsDTO() {
         List<String> rawSynonyms = Arrays.asList(
                 FlatFieldBuilder.newFlatField()
                         .addField(FlatFieldLeaf.newFlatFieldLeaf("syn name 0"))
@@ -97,7 +96,7 @@ public class SynonymsFieldConverterTest {
     }
 
     @Test
-    public void gracefullyHandleWrongFieldCount() {
+    void gracefullyHandleWrongFieldCount() {
         Optional<OBOTerm.Synonym> result = converter.apply(
                 FlatFieldBuilder.newFlatField().addField(FlatFieldLeaf.newFlatFieldLeaf("wrong " +
                 "format"))

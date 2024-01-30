@@ -1,16 +1,16 @@
 package uk.ac.ebi.quickgo.annotation.download.converter.helpers;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.Taxon.taxonIdToCurie;
 import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.Taxon.taxonIdToString;
 
-public class TaxonTest {
+class TaxonTest {
 
     @Test
-    public void singleIdNoInteractingId() {
+    void singleIdNoInteractingId() {
 
         String output = taxonIdToCurie(234, 0);
 
@@ -18,7 +18,7 @@ public class TaxonTest {
     }
 
     @Test
-    public void bothTaxonAndInteractingId() {
+    void bothTaxonAndInteractingId() {
 
         String output = taxonIdToCurie(234, 563);
 
@@ -26,7 +26,7 @@ public class TaxonTest {
     }
 
     @Test
-    public void onlyInteractingId() {
+    void onlyInteractingId() {
 
         String output = taxonIdToCurie(0, 563);
 
@@ -34,7 +34,7 @@ public class TaxonTest {
     }
 
     @Test
-    public void bothZero() {
+    void bothZero() {
 
         String output = taxonIdToCurie(0, 0);
 
@@ -42,7 +42,7 @@ public class TaxonTest {
     }
 
     @Test
-    public void taxonIdToStringNoTaxId() {
+    void taxonIdToStringNoTaxId() {
 
         String output = taxonIdToString(0);
 
@@ -50,7 +50,7 @@ public class TaxonTest {
     }
 
     @Test
-    public void taxonIdToStringHasTaxId() {
+    void taxonIdToStringHasTaxId() {
 
         String output = taxonIdToString(12345);
 

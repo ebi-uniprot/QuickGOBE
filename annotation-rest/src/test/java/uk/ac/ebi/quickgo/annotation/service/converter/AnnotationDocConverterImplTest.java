@@ -1,5 +1,4 @@
 package uk.ac.ebi.quickgo.annotation.service.converter;
-
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.model.GeneProduct;
@@ -10,10 +9,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -38,8 +35,7 @@ import static uk.ac.ebi.quickgo.annotation.service.converter.AnnotationDocConver
  * Date: 29/04/2016
  * Time: 17:39
  */
-@RunWith(MockitoJUnitRunner.class)
-public class AnnotationDocConverterImplTest {
+class AnnotationDocConverterImplTest {
 
     //Formatting
     private static final String COMMA = ",";
@@ -76,48 +72,48 @@ public class AnnotationDocConverterImplTest {
     //Output model
     private Annotation model;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         model = docConverter.convert(DOCUMENT);
     }
 
     @Test
-    public void convertIdSuccessfully() {
+    void convertIdSuccessfully() {
         assertThat(model.id, is(ID));
     }
 
     @Test
-    public void convertGeneProductIdSuccessfully() {
+    void convertGeneProductIdSuccessfully() {
         assertThat(model.geneProductId, is(GENE_PRODUCT_ID));
     }
 
     @Test
-    public void convertQualifierSuccessfully() {
+    void convertQualifierSuccessfully() {
         assertThat(model.qualifier, is(QUALIFIER));
     }
 
     @Test
-    public void convertGoIdSuccessfully() {
+    void convertGoIdSuccessfully() {
         assertThat(model.goId, is(GO_ID));
     }
 
     @Test
-    public void convertECOIdSuccessfully() {
+    void convertECOIdSuccessfully() {
         assertThat(model.evidenceCode, is(ECO_ID));
     }
 
     @Test
-    public void convertTaxonIdSuccessfully() {
+    void convertTaxonIdSuccessfully() {
         assertThat(model.taxonId, is(TAXON_ID));
     }
 
     @Test
-    public void convertWithFromSuccessfully() {
+    void convertWithFromSuccessfully() {
         assertThat(model.withFrom, is(connectedXrefs(WITH_FROM)));
     }
 
     @Test
-    public void convertNullWithFromSuccessfully() {
+    void convertNullWithFromSuccessfully() {
         AnnotationDocument doc = createStubDocument();
         doc.withFrom = null;
 
@@ -127,7 +123,7 @@ public class AnnotationDocConverterImplTest {
     }
 
     @Test
-    public void convertExtensionSuccessfully() {
+    void convertExtensionSuccessfully() {
         List<Annotation.ConnectedXRefs<Annotation.RelationXref>> convertedExtensions =
                 connectedXrefs(EXTENSIONS_CONVERTED);
 
@@ -135,7 +131,7 @@ public class AnnotationDocConverterImplTest {
     }
 
     @Test
-    public void convertNullExtensionsSuccessfully() {
+    void convertNullExtensionsSuccessfully() {
         AnnotationDocument doc = createStubDocument();
         doc.extensions = null;
 
@@ -144,17 +140,17 @@ public class AnnotationDocConverterImplTest {
     }
 
     @Test
-    public void convertAssignedBySuccessfully() {
+    void convertAssignedBySuccessfully() {
         assertThat(model.assignedBy, is(ASSIGNED_BY));
     }
 
     @Test
-    public void convertSymbolSuccessfully() {
+    void convertSymbolSuccessfully() {
         assertThat(model.symbol, is(SYMBOL));
     }
 
     @Test
-    public void convertNullAspectSuccessfully() {
+    void convertNullAspectSuccessfully() {
         AnnotationDocument doc = createStubDocument();
         doc.goAspect = null;
 
@@ -163,22 +159,22 @@ public class AnnotationDocConverterImplTest {
     }
 
     @Test
-    public void convertAspectSuccessfully() {
+    void convertAspectSuccessfully() {
         assertThat(model.goAspect, is(GO_ASPECT));
     }
 
     @Test
-    public void convertsTargetSetsSuccessfully() {
+    void convertsTargetSetsSuccessfully() {
         assertThat(model.targetSets, is(TARGET_SETS));
     }
 
     @Test
-    public void convertsDateSuccessfully() {
+    void convertsDateSuccessfully() {
         assertThat(model.date, is(DATE));
     }
 
     @Test
-    public void convertsNullDateSuccessfully() {
+    void convertsNullDateSuccessfully() {
         AnnotationDocument doc = createStubDocument();
         doc.date = null;
 
@@ -187,17 +183,17 @@ public class AnnotationDocConverterImplTest {
     }
 
     @Test
-    public void convertsInteractingTaxIdSuccessfully() {
+    void convertsInteractingTaxIdSuccessfully() {
         assertThat(model.interactingTaxonId, is(interactingTaxId));
     }
 
     @Test
-    public void createsCanonicalDateSuccessfully() {
+    void createsCanonicalDateSuccessfully() {
         assertThat(model.canonicalId, is(GENE_PRODUCT_ID));
     }
 
     @Test
-    public void populatesGeneProductModelSuccessfully() {
+    void populatesGeneProductModelSuccessfully() {
         assertThat(model.getGeneProduct(), is(notNullValue(GeneProduct.class)));
     }
 

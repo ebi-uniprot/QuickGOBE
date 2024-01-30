@@ -1,10 +1,9 @@
 package uk.ac.ebi.quickgo.index.geneproduct;
 
 import com.google.common.collect.Lists;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
@@ -12,7 +11,6 @@ import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductDocument;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepository;
@@ -30,26 +28,23 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 /**
  * Tests whether Spring Batch is correctly wired up to run the Gene product indexing.
  */
+@ExtendWith(TemporarySolrDataStore.class)
 @ActiveProfiles(profiles = {"embeddedServer"})
-@RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {GeneProductConfig.class, JobTestRunnerConfig.class})
-public class GeneProductIndexingBatchIT {
-    @ClassRule
-    public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
-
+class GeneProductIndexingBatchIT {
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
 
     @Autowired
     private GeneProductRepository geneProductRepository;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         geneProductRepository.deleteAll();
     }
 
     @Test
-    public void successfulJobRun() throws Exception {
+    void successfulJobRun() throws Exception {
         JobExecution jobExecution = jobLauncherTestUtils.launchJob();
 
         BatchStatus status = jobExecution.getStatus();

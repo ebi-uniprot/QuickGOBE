@@ -1,16 +1,16 @@
 package uk.ac.ebi.quickgo.annotation.service.converter;
-
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.ac.ebi.quickgo.annotation.model.StatisticsByType;
 import uk.ac.ebi.quickgo.annotation.model.StatisticsGroup;
 import uk.ac.ebi.quickgo.annotation.model.StatisticsValue;
 
 import java.util.*;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.junit.Before;
-import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.ac.ebi.quickgo.annotation.service.converter.SheetLayout.buildLayout;
 import static uk.ac.ebi.quickgo.annotation.service.converter.WorkbookFromStatisticsImpl.ANNOTATIONS_SUMMARY;
 import static uk.ac.ebi.quickgo.annotation.service.converter.WorkbookFromStatisticsImpl.GENE_PRODUCTS_SUMMARY;
@@ -23,7 +23,7 @@ import static uk.ac.ebi.quickgo.annotation.service.converter.WorkbookFromStatist
  * Time: 12:20
  * Created with IntelliJ IDEA.
  */
-public class WorkbookFromStatisticsImplTest {
+class WorkbookFromStatisticsImplTest {
     private static final LinkedHashSet<SheetLayout> SHEET_LAYOUT_SET = new LinkedHashSet<>();
     private static final StatisticsWorkBookLayout.AnnotationSectionLayout SL_ANNOTATION_GOID =
             new StatisticsWorkBookLayout.AnnotationSectionLayout("GO IDs (by annotation)");
@@ -44,13 +44,13 @@ public class WorkbookFromStatisticsImplTest {
 
     private List<StatisticsGroup> statisticsGroups;
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         buildStatisticGroups();
     }
 
     @Test
-    public void workbookMatchesInputData() {
+    void workbookMatchesInputData() {
         WorkbookFromStatisticsImpl statisticsToWorkbook =
                 new WorkbookFromStatisticsImpl(SHEET_LAYOUT_SET);
 
@@ -91,9 +91,9 @@ public class WorkbookFromStatisticsImplTest {
         assertThat(workbook.getSheetAt(2).getPhysicalNumberOfRows(), is(4));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void creatingStatisticsToWorkbookWithNullLayoutMapThrowsException() {
-        new WorkbookFromStatisticsImpl(null);
+    @Test
+    void creatingStatisticsToWorkbookWithNullLayoutMapThrowsException() {
+        assertThrows(IllegalArgumentException.class, () -> new WorkbookFromStatisticsImpl(null));
     }
 
     private void testColumnHeaders(Workbook workbook, int startingCol) {

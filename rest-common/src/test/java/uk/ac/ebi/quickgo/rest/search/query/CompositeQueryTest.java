@@ -1,33 +1,34 @@
 package uk.ac.ebi.quickgo.rest.search.query;
-
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.ac.ebi.quickgo.rest.TestUtil;
 
 import java.util.Collections;
 import java.util.Set;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.verify;
 import static uk.ac.ebi.quickgo.rest.search.query.CompositeQuery.QueryOp;
 
 /**
  * Tests the behaviour of the {@link CompositeQuery} implementation
  */
-@RunWith(MockitoJUnitRunner.class)
-public class CompositeQueryTest {
+@ExtendWith(MockitoExtension.class)
+class CompositeQueryTest {
     @Mock
     private uk.ac.ebi.quickgo.rest.search.query.QueryVisitor visitor;
 
     @Test
-    public void nullQuerySetThrowsException() throws Exception {
+    void nullQuerySetThrowsException() {
         Set<QuickGOQuery> queries = null;
         QueryOp queryOp = QueryOp.AND;
 
@@ -40,7 +41,7 @@ public class CompositeQueryTest {
     }
 
     @Test
-    public void emptyQuerySetThrowsException() throws Exception {
+    void emptyQuerySetThrowsException() {
         Set<QuickGOQuery> queries = Collections.emptySet();
         QueryOp queryOp = QueryOp.AND;
 
@@ -53,7 +54,7 @@ public class CompositeQueryTest {
     }
 
     @Test
-    public void nullQueryOperatorThrowsException() throws Exception {
+    void nullQueryOperatorThrowsException() {
         QuickGOQuery query = createFieldQuery("field", "name");
 
         Set<QuickGOQuery> queries = Collections.singleton(query);
@@ -67,26 +68,25 @@ public class CompositeQueryTest {
         }
     }
 
-    @Test(expected = UnsupportedOperationException.class)
-    public void deleteFromQueryCollectionThrowsException() throws Exception {
+    @Test
+    void deleteFromQueryCollectionThrowsException() {
         QuickGOQuery query1 = createFieldQuery("field1", "value1");
         QuickGOQuery query2 = createFieldQuery("field2", "value2");
 
         Set<QuickGOQuery> queries = TestUtil.asSet(query1, query2);
 
         uk.ac.ebi.quickgo.rest.search.query.CompositeQuery
-                compositeQuery = new uk.ac.ebi.quickgo.rest.search.query.CompositeQuery(queries, QueryOp.AND);
-
-        compositeQuery.queries().remove(query1);
+          compositeQuery = new uk.ac.ebi.quickgo.rest.search.query.CompositeQuery(queries, QueryOp.AND);
+        assertThrows(UnsupportedOperationException.class, () -> compositeQuery.queries().remove(query1));
     }
 
     @Test
-    public void andMultipleFieldQueries() throws Exception {
+    void andMultipleFieldQueries() {
         verifyMultipleFieldQuery(QueryOp.AND);
     }
 
     @Test
-    public void orMultipleFieldQueries() throws Exception {
+    void orMultipleFieldQueries() {
         verifyMultipleFieldQuery(QueryOp.OR);
     }
 
@@ -106,16 +106,16 @@ public class CompositeQueryTest {
     }
 
     @Test
-    public void andMultipleCompositeQueries() throws Exception {
+    void andMultipleCompositeQueries() {
         verifyMultipleCompositeQueries(QueryOp.AND);
     }
 
     @Test
-    public void orMultipleCompositeQueries() throws Exception {
+    void orMultipleCompositeQueries() {
         verifyMultipleCompositeQueries(QueryOp.OR);
     }
 
-    private void verifyMultipleCompositeQueries(QueryOp op) throws Exception {
+    private void verifyMultipleCompositeQueries(QueryOp op) {
         QuickGOQuery query1 = createFieldQuery("field1", "value1");
         QuickGOQuery query2 = createFieldQuery("field2", "value2");
 
@@ -143,7 +143,7 @@ public class CompositeQueryTest {
     }
 
     @Test
-    public void negateFieldQuery() throws Exception {
+    void negateFieldQuery() {
         QuickGOQuery query = createFieldQuery("field1", "value1");
 
         uk.ac.ebi.quickgo.rest.search.query.CompositeQuery
@@ -155,7 +155,7 @@ public class CompositeQueryTest {
     }
 
     @Test
-    public void negateAllQuery() throws Exception {
+    void negateAllQuery() {
         QuickGOQuery query = QuickGOQuery.createAllQuery();
 
         uk.ac.ebi.quickgo.rest.search.query.CompositeQuery
@@ -166,7 +166,7 @@ public class CompositeQueryTest {
     }
 
     @Test
-    public void nestANDAndORAndNOTQueries() throws Exception {
+    void nestANDAndORAndNOTQueries() {
         QuickGOQuery query1 = createFieldQuery("field1", "value1");
         QuickGOQuery query2 = createFieldQuery("field2", "value2");
         QuickGOQuery query3 = createFieldQuery("field3", "value3");
@@ -195,7 +195,7 @@ public class CompositeQueryTest {
     }
 
     @Test
-    public void visitorIsCalledCorrectly() throws Exception {
+    void visitorIsCalledCorrectly() {
         uk.ac.ebi.quickgo.rest.search.query.FieldQuery
                 query = new uk.ac.ebi.quickgo.rest.search.query.FieldQuery("field1", "value1");
 

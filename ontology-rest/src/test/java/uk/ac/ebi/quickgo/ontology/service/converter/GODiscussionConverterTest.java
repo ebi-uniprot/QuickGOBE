@@ -1,12 +1,11 @@
 package uk.ac.ebi.quickgo.ontology.service.converter;
-
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.ac.ebi.quickgo.common.converter.FlatFieldBuilder;
 import uk.ac.ebi.quickgo.common.converter.FlatFieldLeaf;
 import uk.ac.ebi.quickgo.ontology.model.GOTerm;
 
 import java.util.Optional;
-import org.junit.Before;
-import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -14,16 +13,16 @@ import static org.hamcrest.MatcherAssert.assertThat;
 /**
  * Tests the behaviour of the {@link GODiscussionConverter} class.
  */
-public class GODiscussionConverterTest {
+class GODiscussionConverterTest {
     private GODiscussionConverter converter;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() throws Exception {
         converter = new GODiscussionConverter();
     }
 
     @Test
-    public void convertsValidTextBasedGoDiscussion() throws Exception {
+    void convertsValidTextBasedGoDiscussion() throws Exception {
         String title = "Viral Processes";
         String url = "http://wiki.geneontology.org/index.php/Virus_terms";
 
@@ -40,7 +39,7 @@ public class GODiscussionConverterTest {
     }
 
     @Test
-    public void returnsEmptyOptionalWhenTextBasedGoDiscussionHasWrongNumberOfFields() throws Exception {
+    void returnsEmptyOptionalWhenTextBasedGoDiscussionHasWrongNumberOfFields() throws Exception {
         String wrongTextFormatGoDiscussion = "Wrong format";
 
         Optional<GOTerm.GODiscussion> expectedGoDiscussionOpt = converter.apply(wrongTextFormatGoDiscussion);

@@ -1,11 +1,9 @@
 package uk.ac.ebi.quickgo.client.controller;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -26,10 +24,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Created 05/09/16
  * @author Edd
  */
-@RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {QuickGOREST.class})
 @WebAppConfiguration
-public class PresetsRetrievalIT {
+class PresetsRetrievalIT {
     private static final String RESOURCE_URL = "/internal/presets";
     private static final String FIELDS_PARAM = "fields";
 
@@ -37,13 +34,13 @@ public class PresetsRetrievalIT {
 
     private MockMvc mockMvc;
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
     }
 
     @Test
-    public void canRetrieveAssignedByPresets() throws Exception {
+    void canRetrieveAssignedByPresets() throws Exception {
         mockMvc.perform(get(RESOURCE_URL))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -51,7 +48,7 @@ public class PresetsRetrievalIT {
     }
 
     @Test
-    public void canRetrieveReferencePresets() throws Exception {
+    void canRetrieveReferencePresets() throws Exception {
         mockMvc.perform(get(RESOURCE_URL))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -59,7 +56,7 @@ public class PresetsRetrievalIT {
     }
 
     @Test
-    public void canRetrieveEvidencePresets() throws Exception {
+    void canRetrieveEvidencePresets() throws Exception {
         mockMvc.perform(get(RESOURCE_URL))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -67,7 +64,7 @@ public class PresetsRetrievalIT {
     }
 
     @Test
-    public void canRetrieveWithFromPresets() throws Exception {
+    void canRetrieveWithFromPresets() throws Exception {
         mockMvc.perform(get(RESOURCE_URL))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -75,7 +72,7 @@ public class PresetsRetrievalIT {
     }
 
     @Test
-    public void canRetrieveGeneProductPresets() throws Exception {
+    void canRetrieveGeneProductPresets() throws Exception {
         mockMvc.perform(get(RESOURCE_URL))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -83,7 +80,7 @@ public class PresetsRetrievalIT {
     }
 
     @Test
-    public void canRetrieveGOSlimSetsPresets() throws Exception {
+    void canRetrieveGOSlimSetsPresets() throws Exception {
         mockMvc.perform(get(RESOURCE_URL))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -91,7 +88,7 @@ public class PresetsRetrievalIT {
     }
 
     @Test
-    public void canRetrieveTaxonPresets() throws Exception {
+    void canRetrieveTaxonPresets() throws Exception {
         mockMvc.perform(get(RESOURCE_URL))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -99,7 +96,7 @@ public class PresetsRetrievalIT {
     }
 
     @Test
-    public void canRetrieveQualifierPresets() throws Exception {
+    void canRetrieveQualifierPresets() throws Exception {
         mockMvc.perform(get(RESOURCE_URL))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -107,7 +104,7 @@ public class PresetsRetrievalIT {
     }
 
     @Test
-    public void canRetrieveAspectPresets() throws Exception {
+    void canRetrieveAspectPresets() throws Exception {
         mockMvc.perform(get(RESOURCE_URL))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -115,7 +112,7 @@ public class PresetsRetrievalIT {
     }
 
     @Test
-    public void canRetrieveGeneProductTypesPresets() throws Exception {
+    void canRetrieveGeneProductTypesPresets() throws Exception {
         mockMvc.perform(get(RESOURCE_URL))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -123,7 +120,7 @@ public class PresetsRetrievalIT {
     }
 
     @Test
-    public void canRetrieveAnnotationExtensionRelationsPresets() throws Exception {
+    void canRetrieveAnnotationExtensionRelationsPresets() throws Exception {
         mockMvc.perform(get(RESOURCE_URL))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -131,7 +128,7 @@ public class PresetsRetrievalIT {
     }
 
     @Test
-    public void canRetrieveAnnotationExtensionDatabasesPresets() throws Exception {
+    void canRetrieveAnnotationExtensionDatabasesPresets() throws Exception {
         mockMvc.perform(get(RESOURCE_URL))
                .andDo(print())
                .andExpect(status().isOk())
@@ -139,7 +136,7 @@ public class PresetsRetrievalIT {
     }
 
     @Test
-    public void canRetrieveSingleDesiredPreset() throws Exception {
+    void canRetrieveSingleDesiredPreset() throws Exception {
         mockMvc.perform(get(RESOURCE_URL).param(FIELDS_PARAM, "goSlimSets"))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -152,7 +149,7 @@ public class PresetsRetrievalIT {
     }
 
     @Test
-    public void canRetrieveMultipleDesiredPresets() throws Exception {
+    void canRetrieveMultipleDesiredPresets() throws Exception {
         mockMvc.perform(get(RESOURCE_URL).param(FIELDS_PARAM, "goSlimSets,geneProducts"))
                 .andDo(print())
                 .andExpect(status().isOk())

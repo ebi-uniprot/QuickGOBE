@@ -1,57 +1,58 @@
 package uk.ac.ebi.quickgo.client.service.loader.presets.ff;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Created 13/09/16
  * @author Edd
  */
-public class RawNamedPresetColumnsBuilderTest {
-    @Test(expected = IllegalArgumentException.class)
-    public void creatingWithNegativeNamePositionCausesException() {
-        RawNamedPresetColumnsBuilder.createWithNamePosition(-1);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void creatingWithNegativeRelevancyPositionCausesException() {
-        RawNamedPresetColumnsBuilder
-                .createWithNamePosition(0)
-                .withRelevancyPosition(-1);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void creatingWithNegativeDescriptionPositionCausesException() {
-        RawNamedPresetColumnsBuilder
-                .createWithNamePosition(0)
-                .withDescriptionPosition(-1);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void creatingWithNegativeIdPositionCausesException() {
-        RawNamedPresetColumnsBuilder
-                .createWithNamePosition(0)
-                .withIdPosition(-1);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void creatingWithNegativeURLPositionCausesException() {
-        RawNamedPresetColumnsBuilder
-                .createWithNamePosition(0)
-                .withURLPosition(-1);
+class RawNamedPresetColumnsBuilderTest {
+    @Test
+    void creatingWithNegativeNamePositionCausesException() {
+        assertThrows(IllegalArgumentException.class, () -> RawNamedPresetColumnsBuilder.createWithNamePosition(-1));
     }
 
     @Test
-    public void canCreateWithValidNamePosition() {
+    void creatingWithNegativeRelevancyPositionCausesException() {
+        assertThrows(IllegalArgumentException.class, () -> RawNamedPresetColumnsBuilder
+                .createWithNamePosition(0)
+                .withRelevancyPosition(-1));
+    }
+
+    @Test
+    void creatingWithNegativeDescriptionPositionCausesException() {
+        assertThrows(IllegalArgumentException.class, () -> RawNamedPresetColumnsBuilder
+                .createWithNamePosition(0)
+                .withDescriptionPosition(-1));
+    }
+
+    @Test
+    void creatingWithNegativeIdPositionCausesException() {
+        assertThrows(IllegalArgumentException.class, () -> RawNamedPresetColumnsBuilder
+                .createWithNamePosition(0)
+                .withIdPosition(-1));
+    }
+
+    @Test
+    void creatingWithNegativeURLPositionCausesException() {
+        assertThrows(IllegalArgumentException.class, () -> RawNamedPresetColumnsBuilder
+                .createWithNamePosition(0)
+                .withURLPosition(-1));
+    }
+
+    @Test
+    void canCreateWithValidNamePosition() {
         int position = 0;
         RawNamedPresetColumns presetColumns = RawNamedPresetColumnsBuilder.createWithNamePosition(position).build();
         assertThat(presetColumns.getNamePosition(), is(position));
     }
 
     @Test
-    public void canCreateWithValidRelevancyPosition() {
+    void canCreateWithValidRelevancyPosition() {
         int position = 0;
         RawNamedPresetColumns presetColumns = RawNamedPresetColumnsBuilder
                 .createWithNamePosition(0)
@@ -61,7 +62,7 @@ public class RawNamedPresetColumnsBuilderTest {
     }
 
     @Test
-    public void canCreateWithValidDescriptionPosition() {
+    void canCreateWithValidDescriptionPosition() {
         int position = 0;
         RawNamedPresetColumns presetColumns = RawNamedPresetColumnsBuilder
                 .createWithNamePosition(0)
@@ -71,7 +72,7 @@ public class RawNamedPresetColumnsBuilderTest {
     }
 
     @Test
-    public void canCreateWithValidIdPosition() {
+    void canCreateWithValidIdPosition() {
         int position = 0;
         RawNamedPresetColumns presetColumns = RawNamedPresetColumnsBuilder
                 .createWithNamePosition(0)
@@ -81,7 +82,7 @@ public class RawNamedPresetColumnsBuilderTest {
     }
 
     @Test
-    public void canCreateWithValidURLPosition() {
+    void canCreateWithValidURLPosition() {
         int position = 0;
         RawNamedPresetColumns presetColumns = RawNamedPresetColumnsBuilder
                 .createWithNamePosition(0)

@@ -6,13 +6,14 @@ import uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPreset;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.ItemWriter;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Tony Wardell
@@ -20,17 +21,17 @@ import static org.hamcrest.Matchers.is;
  * Time: 11:11
  * Created with IntelliJ IDEA.
  */
-public class QualifierPresetsConfigTest {
+class QualifierPresetsConfigTest {
 
     private CompositePresetImpl presetBuilder;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         presetBuilder = new CompositePresetImpl();
     }
 
     @Test
-    public void lowercaseNotBecomesUpperCaseNot() throws Exception {
+    void lowercaseNotBecomesUpperCaseNot() throws Exception {
         QualifierPresetsConfig config = new QualifierPresetsConfig();
 
         List<RawNamedPreset> rawNamedPresets = new ArrayList<>();
@@ -50,7 +51,7 @@ public class QualifierPresetsConfigTest {
     }
 
     @Test
-    public void valuesWithoutNotAreUnaffected() throws Exception {
+    void valuesWithoutNotAreUnaffected() throws Exception {
         QualifierPresetsConfig config = new QualifierPresetsConfig();
 
         List<RawNamedPreset> rawNamedPresets = new ArrayList<>();
@@ -69,8 +70,8 @@ public class QualifierPresetsConfigTest {
         assertThat(qualifiers.get(0).getProperty(PresetItem.Property.ID), is(part_of));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void avoidsNullPointerExceptionIfNameIsNull() throws Exception {
+    @Test
+    void avoidsNullPointerExceptionIfNameIsNull() throws Exception {
         QualifierPresetsConfig config = new QualifierPresetsConfig();
 
         List<RawNamedPreset> rawNamedPresets = new ArrayList<>();
@@ -81,6 +82,6 @@ public class QualifierPresetsConfigTest {
         rawNamedPresets.add(raw1);
 
         ItemWriter<RawNamedPreset> writer = config.rawPresetWriter(presetBuilder);
-        writer.write(rawNamedPresets);
+        assertThrows(IllegalArgumentException.class, () -> writer.write(rawNamedPresets));
     }
 }

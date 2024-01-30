@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.rest.search;
-
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.ac.ebi.quickgo.common.SearchableField;
 
 import java.util.ArrayList;
@@ -7,8 +8,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.junit.Before;
-import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -22,7 +21,7 @@ import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.*;
  * Created 07/04/16
  * @author Edd
  */
-public class SearchDispatcherTest {
+class SearchDispatcherTest {
     private static class MockSearchableField implements SearchableField {
 
         private static final String SEARCHABLE_FIELD = "searchableField";
@@ -38,76 +37,76 @@ public class SearchDispatcherTest {
 
     private MockSearchableField searchableField;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         this.searchableField = new MockSearchableField();
     }
 
     // validate query ----------------------------------------------
     @Test
-    public void determinesThatQueryIsValidForProcessing() {
+    void determinesThatQueryIsValidForProcessing() {
         assertThat(isValidQuery("query"), is(true));
     }
 
     @Test
-    public void determinesThatNullQueryIsInvalidForProcessing() {
+    void determinesThatNullQueryIsInvalidForProcessing() {
         assertThat(isValidQuery(null), is(false));
     }
 
     @Test
-    public void determinesThatEmptyQueryIsInvalidForProcessing() {
+    void determinesThatEmptyQueryIsInvalidForProcessing() {
         assertThat(isValidQuery(""), is(false));
     }
 
     // validate row num in request ----------------------------------------------
     @Test
-    public void determinesThat1IsAValidRowNumsRequest() {
+    void determinesThat1IsAValidRowNumsRequest() {
         assertThat(isValidNumRows(1), is(true));
     }
 
     @Test
-    public void determinesThat0IsAnInvalidRowNumsRequest() {
+    void determinesThat0IsAnInvalidRowNumsRequest() {
         assertThat(isValidNumRows(0), is(false));
     }
 
     @Test
-    public void determinesThatMinus1IsAnInvalidRowNumsRequest() {
+    void determinesThatMinus1IsAnInvalidRowNumsRequest() {
         assertThat(isValidNumRows(-1), is(false));
     }
 
     // validate page num in request ----------------------------------------------
     @Test
-    public void determinesThat1IsAValidPageNumRequest() {
+    void determinesThat1IsAValidPageNumRequest() {
         assertThat(isValidPage(1), is(true));
     }
 
     @Test
-    public void determinesThat0IsAnInvalidPageNumRequest() {
+    void determinesThat0IsAnInvalidPageNumRequest() {
         assertThat(isValidPage(0), is(false));
     }
 
     @Test
-    public void determinesThatMinus1IsAnInvalidPageNumRequest() {
+    void determinesThatMinus1IsAnInvalidPageNumRequest() {
         assertThat(isValidPage(-1), is(false));
     }
 
     // validate facets ----------------------------------------------
     @Test
-    public void allSearchableFieldsColonValueAreValidForFacets() {
+    void allSearchableFieldsColonValueAreValidForFacets() {
         List<String> facets = Collections.singletonList(MockSearchableField.SEARCHABLE_FIELD);
 
         assertThat(isValidFacets(searchableField, facets), is(true));
     }
 
     @Test
-    public void aNonSearchableFieldsCannotBeInFacets() {
+    void aNonSearchableFieldsCannotBeInFacets() {
         List<String> facets = new ArrayList<>();
         facets.add("aFieldThatDoesntExist");
         assertThat(isValidFacets(searchableField, facets), is(false));
     }
 
     @Test
-    public void aSearchableFieldAndANonSearchableFieldsCannotBothBeInFacets() {
+    void aSearchableFieldAndANonSearchableFieldsCannotBothBeInFacets() {
         List<String> facets = new ArrayList<>();
 
         // add a searchable, valid filter query
@@ -120,7 +119,7 @@ public class SearchDispatcherTest {
 
     // validate filter queries ----------------------------------------------
     @Test
-    public void allSearchableFieldsColonValueAreValidForFilterQueries() {
+    void allSearchableFieldsColonValueAreValidForFilterQueries() {
         List<String> filterQueries = Stream.of(MockSearchableField.SEARCHABLE_FIELD)
                 .map(field -> field + ":pretendValue")
                 .collect(Collectors.toList());
@@ -129,14 +128,14 @@ public class SearchDispatcherTest {
     }
 
     @Test
-    public void aNonSearchableFieldsCannotBeInAFilterQuery() {
+    void aNonSearchableFieldsCannotBeInAFilterQuery() {
         List<String> filterQueries = new ArrayList<>();
         filterQueries.add("aFieldThatDoesntExist:value");
         assertThat(isValidFilterQueries(searchableField, filterQueries), is(false));
     }
 
     @Test
-    public void aSearchableFieldAndANonSearchableFieldsCannotBothBeInAFilterQuery() {
+    void aSearchableFieldAndANonSearchableFieldsCannotBothBeInAFilterQuery() {
         List<String> filterQueries = new ArrayList<>();
 
         // add a searchable, valid filter query

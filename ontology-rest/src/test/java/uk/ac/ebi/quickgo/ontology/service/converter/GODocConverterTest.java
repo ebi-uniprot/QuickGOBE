@@ -1,10 +1,8 @@
 package uk.ac.ebi.quickgo.ontology.service.converter;
-
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
 import uk.ac.ebi.quickgo.ontology.model.GOTerm;
-
-import org.junit.Before;
-import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -18,32 +16,32 @@ import static uk.ac.ebi.quickgo.ontology.common.document.OntologyDocMocker.creat
  * Created 24/11/15
  * @author Edd
  */
-public class GODocConverterTest {
+class GODocConverterTest {
     private GODocConverter converter;
     private OntologyDocument goDoc;
     private GOTerm goTerm;
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         converter = new GODocConverter();
         goDoc = createGODoc("GO:0000001", "name1");
         goTerm = converter.convert(goDoc);
     }
 
     @Test
-    public void validateUsageWithoutError() {
+    void validateUsageWithoutError() {
         assertThat(goTerm.usage, is(notNullValue()));
         assertThat(goTerm.usage.getFullName(), is(equalTo(goDoc.usage)));
     }
 
     @Test
-    public void convertsAspectWithoutError() {
+    void convertsAspectWithoutError() {
         assertThat(goTerm.aspect, is(notNullValue()));
         assertThat(goTerm.aspect.getShortName(), is(equalTo(goDoc.aspect)));
     }
 
     @Test
-    public void convertsSubsetsWithoutError() {
+    void convertsSubsetsWithoutError() {
         assertThat(goTerm.subsets, is(notNullValue()));
         assertThat(goTerm.subsets, is(equalTo(goDoc.subsets)));
     }
@@ -53,7 +51,7 @@ public class GODocConverterTest {
      * to a corresponding OBOTerm
      */
     @Test
-    public void documentWithNullFieldsCanBeConverted() {
+    void documentWithNullFieldsCanBeConverted() {
         OntologyDocument doc = new OntologyDocument();
         doc.id = "id field";
         doc.usage = "Electronic";
@@ -64,7 +62,7 @@ public class GODocConverterTest {
     }
 
     @Test
-    public void convertsGoDiscussionsWithoutError() throws Exception {
+    void convertsGoDiscussionsWithoutError() throws Exception {
         assertThat(goTerm.goDiscussions, hasSize(2));
     }
 }

@@ -1,13 +1,11 @@
 package uk.ac.ebi.quickgo.rest.controller.request;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import uk.ac.ebi.quickgo.common.FacetableField;
 
@@ -26,9 +24,8 @@ import static org.hamcrest.Matchers.hasSize;
 /**
  * Tests the behaviour of the {@link AllowableFacetsImpl} class.
  */
-@RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = AllowableFacetsImplIT.AllowableFacetsConfig.class)
-public class AllowableFacetsImplIT {
+class AllowableFacetsImplIT {
     private static final String INVALID_FACET_1 = "invalid1";
     private static final String INVALID_FACET_2 = "invalid2";
 
@@ -65,13 +62,13 @@ public class AllowableFacetsImplIT {
 
     private StubFacet stubFacet;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp()  {
         stubFacet = new StubFacet();
     }
 
     @Test
-    public void nullFacetArrayIsValid() throws Exception {
+    void nullFacetArrayIsValid()  {
         stubFacet.facets = null;
 
         validator.validate(stubFacet);
@@ -82,12 +79,12 @@ public class AllowableFacetsImplIT {
     }
 
     @Test
-    public void emptyFacetArrayIsValid() throws Exception {
+    void emptyFacetArrayIsValid()  {
         validator.validate(stubFacet);
     }
 
     @Test
-    public void facetArrayWithInvalidFacetsIsInvalid() throws Exception {
+    void facetArrayWithInvalidFacetsIsInvalid()  {
         stubFacet.facets = new String[]{INVALID_FACET_1};
 
         validator.validate(stubFacet);
@@ -99,7 +96,7 @@ public class AllowableFacetsImplIT {
     }
 
     @Test
-    public void facetArrayWithJustValidFacetsIsValid() throws Exception {
+    void facetArrayWithJustValidFacetsIsValid()  {
         stubFacet.facets = new String[]{"valid1", "valid2", "valid3",};
 
         validator.validate(stubFacet);
@@ -110,7 +107,7 @@ public class AllowableFacetsImplIT {
     }
 
     @Test
-    public void facetArrayWithASeveralValidFacetsAndAnInvalidFacetIsInValid() throws Exception {
+    void facetArrayWithASeveralValidFacetsAndAnInvalidFacetIsInValid()  {
         stubFacet.facets = new String[]{"valid1", INVALID_FACET_1, "valid3"};
 
         validator.validate(stubFacet);
@@ -122,7 +119,7 @@ public class AllowableFacetsImplIT {
     }
 
     @Test
-    public void facetArrayWithSeveralInvalidFacetsIsInValid() throws Exception {
+    void facetArrayWithSeveralInvalidFacetsIsInValid()  {
         stubFacet.facets = new String[]{"valid1", INVALID_FACET_1, INVALID_FACET_2};
 
         validator.validate(stubFacet);

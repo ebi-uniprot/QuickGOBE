@@ -1,10 +1,10 @@
 package uk.ac.ebi.quickgo.rest.search.request.converter;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.client.RestOperations;
 import uk.ac.ebi.quickgo.rest.comm.ResponseType;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
@@ -17,6 +17,7 @@ import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
@@ -27,8 +28,8 @@ import static uk.ac.ebi.quickgo.rest.search.request.converter.RESTFilterConverte
  * Created 05/09/16
  * @author Edd
  */
-@RunWith(MockitoJUnitRunner.class)
-public class RESTFilterConverterFactoryTest {
+@ExtendWith(MockitoExtension.class)
+class RESTFilterConverterFactoryTest {
     @Mock
     private FilterConfigRetrieval filterConfigRetrievalMock;
     @Mock
@@ -36,36 +37,35 @@ public class RESTFilterConverterFactoryTest {
 
     private RESTFilterConverterFactory converter;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         this.converter = new RESTFilterConverterFactory(filterConfigRetrievalMock, restOperationsMock);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void nullRestOperationsThrowsException() {
-        new RESTFilterConverterFactory(filterConfigRetrievalMock, null);
+    @Test
+    void nullRestOperationsThrowsException() {
+        assertThrows(IllegalArgumentException.class, () -> new RESTFilterConverterFactory(filterConfigRetrievalMock, null));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void nullConfigRetrievalThrowsException() {
-        new RESTFilterConverterFactory(null, restOperationsMock);
+    @Test
+    void nullConfigRetrievalThrowsException() {
+        assertThrows(IllegalArgumentException.class, () -> new RESTFilterConverterFactory(null, restOperationsMock));
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void requestThatIsNotREST_COMMCausesIllegalStateException() {
+    @Test
+    void requestThatIsNotREST_COMMCausesIllegalStateException() {
         FilterConfig filterConfig = createRestFilterConfig("somewhere", String.class, String.class);
         filterConfig.setExecution(FilterConfig.ExecutionType.JOIN);
 
         FilterRequest request = FilterRequest.newBuilder().addProperty("anything").build();
 
         when(filterConfigRetrievalMock.getBySignature(request.getSignature()))
-                .thenReturn(Optional.of(filterConfig));
-
-        converter.convert(request);
+          .thenReturn(Optional.of(filterConfig));
+        assertThrows(IllegalStateException.class, () -> converter.convert(request));
     }
 
     @Test
-    public void restTransformationThroughConvertersIsInvoked() {
+    void restTransformationThroughConvertersIsInvoked() {
         String value = "valueX";
         String field = "fieldX";
         FilterRequest request = FilterRequest.newBuilder().addProperty(field, value).build();

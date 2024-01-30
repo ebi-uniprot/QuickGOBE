@@ -41,7 +41,7 @@ class RESTFilterConverterTest {
         private RESTRequesterImpl restRequesterMock;
 
         @BeforeEach
-        public void setUp() {
+        void setUp() {
             restRequestBuilderMock = mock(RESTRequesterImpl.Builder.class);
             restRequesterMock = mock(RESTRequesterImpl.class, RETURNS_DEEP_STUBS);
         }
@@ -350,7 +350,7 @@ class RESTFilterConverterTest {
         }
 
         @Test
-        public void invalidCharacterInHostNameThrowsException() {
+        void invalidCharacterInHostNameThrowsException() {
             FilterConfig config = createRestFilterConfig();
             Map<String, String> configMap = createValidConfigMap();
             configMap.put(HOST, (DEFAULT_HOST + "?:8082") + "/");
@@ -361,7 +361,7 @@ class RESTFilterConverterTest {
         }
 
         @Test
-        public void invalidCharacterInHostsPortThrowsException() {
+        void invalidCharacterInHostsPortThrowsException() {
             FilterConfig config = createRestFilterConfig();
             Map<String, String> configMap = createValidConfigMap();
             configMap.put(HOST, (DEFAULT_HOST + "&") + "/");
@@ -468,7 +468,7 @@ class RESTFilterConverterTest {
         }
 
         @Test
-        public void invalidCharacterInHostsPortThrowsException() {
+        void invalidCharacterInHostsPortThrowsException() {
             FilterConfig config = createRestFilterConfig();
             Map<String, String> configMap = createValidConfigMap();
             configMap.put(BACKUP_HOST, (DEFAULT_BACKUP_HOST + "&") + "/");
@@ -501,7 +501,7 @@ class RESTFilterConverterTest {
         private RestOperations restOperationsMock;
 
         @BeforeEach
-        public void setUp() {
+        void setUp() {
             this.filterConfig = new FilterConfig();
             this.filterConfig.setProperties(new HashMap<>());
             this.restOperationsMock = mock(RestOperations.class);

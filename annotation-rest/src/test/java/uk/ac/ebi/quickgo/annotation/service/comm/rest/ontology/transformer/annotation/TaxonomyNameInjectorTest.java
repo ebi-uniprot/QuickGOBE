@@ -1,12 +1,10 @@
 package uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.annotation;
-
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.BasicTaxonomyNode;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
-
-import org.junit.Before;
-import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -25,23 +23,23 @@ import static uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transforme
  * Created 12/04/17
  * @author Edd
  */
-public class TaxonomyNameInjectorTest {
+class TaxonomyNameInjectorTest {
     private TaxonomyNameInjector nameInjector;
     private Annotation annotation;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         nameInjector = new TaxonomyNameInjector();
         annotation = new Annotation();
     }
 
     @Test
-    public void injectorIdIsGoName() {
+    void injectorIdIsGoName() {
         assertThat(nameInjector.getId(), is(TAXON_NAME));
     }
 
     @Test
-    public void responseValueIsInjectedToAnnotation() {
+    void responseValueIsInjectedToAnnotation() {
         ConvertedFilter<BasicTaxonomyNode> stubConvertedFilter = new ConvertedFilter<>(basicTaxonomyNode);
         assertThat(annotation.taxonName, is(nullValue()));
 
@@ -51,7 +49,7 @@ public class TaxonomyNameInjectorTest {
     }
 
     @Test
-    public void correctFilterRequestIsBuilt() {
+    void correctFilterRequestIsBuilt() {
         annotation.taxonId = TEST_TAXON_ID;
         FilterRequest filterRequest = nameInjector.buildFilterRequest(annotation);
 

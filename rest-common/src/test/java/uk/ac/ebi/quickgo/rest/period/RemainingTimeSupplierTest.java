@@ -5,13 +5,15 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
 
@@ -23,8 +25,8 @@ import static org.mockito.Mockito.when;
  * Time: 13:57
  * Created with IntelliJ IDEA.
  */
-@RunWith(MockitoJUnitRunner.class)
-public class RemainingTimeSupplierTest {
+@ExtendWith(MockitoExtension.class)
+class RemainingTimeSupplierTest {
 
     @Mock
     private AlarmClock alarmClock;
@@ -32,7 +34,7 @@ public class RemainingTimeSupplierTest {
     private static final Duration TWO_HOUR = Duration.ofHours(2);
 
     @Test
-    public void durationReturnedFromSinglePeriod() {
+    void durationReturnedFromSinglePeriod() {
         when(alarmClock.remainingTime(any(LocalDateTime.class))).thenReturn(ONE_HOUR);
 
         RemainingTimeSupplier remainingTimeSupplier =
@@ -42,7 +44,7 @@ public class RemainingTimeSupplierTest {
     }
 
     @Test
-    public void durationReturnedFromFirstNonZeroPeriod() {
+    void durationReturnedFromFirstNonZeroPeriod() {
         when(alarmClock.remainingTime(any(LocalDateTime.class))).thenReturn(Duration.ZERO)
                                                                 .thenReturn(Duration.ZERO)
                                                                 .thenReturn(ONE_HOUR)
@@ -56,7 +58,7 @@ public class RemainingTimeSupplierTest {
     }
 
     @Test
-    public void noActivePeriodSoDurationIsZero() {
+    void noActivePeriodSoDurationIsZero() {
         when(alarmClock.remainingTime(any(LocalDateTime.class))).thenReturn(Duration.ZERO)
                                                                 .thenReturn(Duration.ZERO)
                                                                 .thenReturn(Duration.ZERO);
@@ -69,7 +71,7 @@ public class RemainingTimeSupplierTest {
     }
 
     @Test
-    public void noDurationFoundFromEmptyPeriodList() {
+    void noDurationFoundFromEmptyPeriodList() {
         RemainingTimeSupplier remainingTimeSupplier = new RemainingTimeSupplier(new ArrayList<>());
 
         final Duration timeLeft = remainingTimeSupplier.getDuration();
@@ -77,8 +79,8 @@ public class RemainingTimeSupplierTest {
         assertThat(timeLeft, is(Duration.ZERO));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void collectionOfPeriodsWhenNullThrowsException() {
-        new RemainingTimeSupplier(null);
+    @Test
+    void collectionOfPeriodsWhenNullThrowsException() {
+        assertThrows(IllegalArgumentException.class, () -> new RemainingTimeSupplier(null));
     }
 }

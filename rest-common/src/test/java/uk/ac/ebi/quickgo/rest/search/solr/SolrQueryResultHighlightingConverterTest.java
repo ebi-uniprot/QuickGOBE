@@ -1,5 +1,5 @@
 package uk.ac.ebi.quickgo.rest.search.solr;
-
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.ac.ebi.quickgo.rest.search.results.DocHighlight;
 import uk.ac.ebi.quickgo.rest.search.results.FieldHighlight;
 
@@ -8,11 +8,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -26,8 +25,8 @@ import static org.mockito.Mockito.when;
  * Created 10/02/16
  * @author Edd
  */
-@RunWith(MockitoJUnitRunner.class)
-public class SolrQueryResultHighlightingConverterTest {
+@ExtendWith(MockitoExtension.class)
+class SolrQueryResultHighlightingConverterTest {
 
     private static final String ID2 = "id2";
     private static final String ID1 = "id1";
@@ -39,15 +38,15 @@ public class SolrQueryResultHighlightingConverterTest {
     @Mock
     private SolrDocumentList results;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         highlightedFieldsNameMap = new HashMap<>();
 
         createResultHighlights();
     }
 
     @Test
-    public void highlightsOneFieldInOneDocumentContainingOneField() {
+    void highlightsOneFieldInOneDocumentContainingOneField() {
         highlightedFieldsNameMap.put("a", "newA");
         highlightedFieldsNameMap.put("b", "newB");
 
@@ -65,7 +64,7 @@ public class SolrQueryResultHighlightingConverterTest {
     }
 
     @Test
-    public void useFirstOfMultipleMappingsToSameFieldWhenResultsContainBothFields() {
+    void useFirstOfMultipleMappingsToSameFieldWhenResultsContainBothFields() {
         // field transformation map contains mappings to the same field
         highlightedFieldsNameMap.put("internalA1", "a");
         highlightedFieldsNameMap.put("internalA2", "a");
@@ -92,7 +91,7 @@ public class SolrQueryResultHighlightingConverterTest {
     }
 
     @Test
-    public void highlightsOneFieldInOneDocumentContainingTwoFields() {
+    void highlightsOneFieldInOneDocumentContainingTwoFields() {
         highlightedFieldsNameMap.put("a", "newA");
         highlightedFieldsNameMap.put("b", "newB");
 
@@ -111,7 +110,7 @@ public class SolrQueryResultHighlightingConverterTest {
     }
 
     @Test
-    public void highlightsTwoFieldsInOneDocumentContainingTwoFields() {
+    void highlightsTwoFieldsInOneDocumentContainingTwoFields() {
         highlightedFieldsNameMap.put("a", "newA");
         highlightedFieldsNameMap.put("b", "newB");
 
@@ -130,7 +129,7 @@ public class SolrQueryResultHighlightingConverterTest {
     }
 
     @Test
-    public void highlightsOneFieldInOneDocAndTwoInAnother() {
+    void highlightsOneFieldInOneDocAndTwoInAnother() {
         highlightedFieldsNameMap.put("a", "newA");
         highlightedFieldsNameMap.put("b", "newB");
         highlightedFieldsNameMap.put("c", "newC");
@@ -155,7 +154,7 @@ public class SolrQueryResultHighlightingConverterTest {
     }
 
     @Test
-    public void highlightsNothing() {
+    void highlightsNothing() {
         SolrQueryResultHighlightingConverter converter = createConverter();
 
         SolrDocument doc1 = new SolrDocument();

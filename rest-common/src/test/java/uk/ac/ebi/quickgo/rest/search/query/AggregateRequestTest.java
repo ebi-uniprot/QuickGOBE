@@ -3,41 +3,37 @@ package uk.ac.ebi.quickgo.rest.search.query;
 import uk.ac.ebi.quickgo.rest.search.AggregateFunction;
 
 import java.util.Set;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.ac.ebi.quickgo.rest.search.query.AggregateRequest.DEFAULT_AGGREGATE_LIMIT;
 
 /**
  * Tests the behaviour of the {@link AggregateRequest} class.
  */
-public class AggregateRequestTest {
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
+class AggregateRequestTest {
 
     private AggregateRequest aggregate;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() {
         aggregate = new AggregateRequest("field");
     }
 
     @Test
-    public void nullFieldInConstructorThrowsException() throws Exception {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Cannot create aggregate with null name");
-
-        new AggregateRequest(null);
+    void nullFieldInConstructorThrowsException() {
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> new AggregateRequest(null));
+        assertTrue(exception.getMessage().contains("Cannot create aggregate with null name"));
     }
 
     @Test
-    public void adding2AggregateFieldsStoresBoth() throws Exception {
+    void adding2AggregateFieldsStoresBoth() {
         AggregateFunction count = AggregateFunction.COUNT;
 
         String goIdField = "geneProductId";
@@ -56,15 +52,13 @@ public class AggregateRequestTest {
     }
 
     @Test
-    public void addingNullNestedAggregateThrowsException() throws Exception {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Cannot add null nested aggregate");
-
-        aggregate.addNestedAggregate(null);
+    void addingNullNestedAggregateThrowsException() {
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> aggregate.addNestedAggregate(null));
+        assertTrue(exception.getMessage().contains("Cannot add null nested aggregate"));
     }
 
     @Test
-    public void adding2NestedAggregatesStoresBoth() throws Exception {
+    void adding2NestedAggregatesStoresBoth() {
         AggregateRequest nestedAggregate1 = new AggregateRequest("field1");
         AggregateRequest nestedAggregate2 = new AggregateRequest("field2");
 
@@ -80,7 +74,7 @@ public class AggregateRequestTest {
     }
 
     @Test
-    public void canCreateAggregateWithPositiveLimit() {
+    void canCreateAggregateWithPositiveLimit() {
         int limit = 1;
         AggregateRequest agg = new AggregateRequest("field1", limit);
 
@@ -88,18 +82,18 @@ public class AggregateRequestTest {
     }
 
     @Test
-    public void aggregateWithoutLimitSetIndicatesEmptyLimit() {
+    void aggregateWithoutLimitSetIndicatesEmptyLimit() {
         assertThat(aggregate.getLimit(), is(DEFAULT_AGGREGATE_LIMIT));
     }
 
     @Test
-    public void aggregateWithLimitZeroMeansUseDefaultLimit() {
+    void aggregateWithLimitZeroMeansUseDefaultLimit() {
         AggregateRequest agg = new AggregateRequest("field1", 0);
         assertThat(agg.getLimit(), is(DEFAULT_AGGREGATE_LIMIT));
     }
 
     @Test
-    public void aggregateWithNegativeLimitMeansUseDefaultLimit() {
+    void aggregateWithNegativeLimitMeansUseDefaultLimit() {
         AggregateRequest agg = new AggregateRequest("field1", -1);
         assertThat(agg.getLimit(), is(DEFAULT_AGGREGATE_LIMIT));
     }

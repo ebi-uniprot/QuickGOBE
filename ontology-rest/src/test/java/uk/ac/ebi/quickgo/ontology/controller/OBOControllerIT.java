@@ -1,17 +1,15 @@
 package uk.ac.ebi.quickgo.ontology.controller;
 
 import org.apache.http.HttpHeaders;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -41,7 +39,6 @@ import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -57,13 +54,11 @@ import static uk.ac.ebi.quickgo.ontology.controller.OBOController.*;
  *
  * Created by edd on 14/01/2016.
  */
-@RunWith(SpringJUnit4ClassRunner.class)
+// temporary data store for solr's data, which is automatically cleaned on exit
+@ExtendWith(TemporarySolrDataStore.class)
 @SpringBootTest(classes = {OntologyREST.class})
 @WebAppConfiguration
 public abstract class OBOControllerIT {
-    // temporary data store for solr's data, which is automatically cleaned on exit
-    @ClassRule
-    public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
     private static final int WAIT_PERIOD = 10;
     private static final String QUERY_PARAM = "query";
     private static final String PAGE_PARAM = "page";
@@ -107,8 +102,8 @@ public abstract class OBOControllerIT {
     @Value("${ontology.cache.control.end.time:18}")
     private int cacheControlEndTime;
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
                 .build();
 
@@ -133,13 +128,13 @@ public abstract class OBOControllerIT {
         defaultPresentation = graphBuilder.build();
     }
 
-    @After
-    public void after() {
+    @AfterEach
+    void after() {
         reset(graphImageService);
     }
 
     @Test
-    public void whenNoGraphDataExistsForTermWeCanStillRetrieveOtherTermInfo() throws Exception {
+    void whenNoGraphDataExistsForTermWeCanStillRetrieveOtherTermInfo() throws Exception {
         List<OntologyDocument> docsWithGraphIds = createNDocs(RELATIONSHIP_CHAIN_LENGTH + 1);
         OntologyDocument validDocWithNoGraphData = docsWithGraphIds.get(docsWithGraphIds.size() - 1);
         ontologyRepository.save(validDocWithNoGraphData);
@@ -153,7 +148,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canRetrieveOntologyViaSecondaryId() throws Exception {
+    void canRetrieveOntologyViaSecondaryId() throws Exception {
         ontologyRepository.deleteAll();
 
         String primaryId = createId(1);
@@ -173,7 +168,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canRetrieveOntologyViaLowerCasedSecondaryId() throws Exception {
+    void canRetrieveOntologyViaLowerCasedSecondaryId() throws Exception {
         ontologyRepository.deleteAll();
 
         String primaryId = createId(1);
@@ -193,7 +188,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canRetrieveCoreAttrByOneId() throws Exception {
+    void canRetrieveCoreAttrByOneId() throws Exception {
         ResultActions response = mockMvc.perform(get(buildTermsURL(validId)));
 
         expectCoreFieldsInResults(response, singletonList(validId))
@@ -203,7 +198,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canRetrieveCoreAttrByOneIdInLowercase() throws Exception {
+    void canRetrieveCoreAttrByOneIdInLowercase() throws Exception {
         ResultActions response = mockMvc.perform(get(buildTermsURL(validId.toLowerCase())));
 
         expectCoreFieldsInResults(response, singletonList(validId))
@@ -213,7 +208,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canRetrieveCoreAttrBySubsetOfSavedIds() throws Exception {
+    void canRetrieveCoreAttrBySubsetOfSavedIds() throws Exception {
 
         ResultActions response = mockMvc.perform(get(buildTermsURL(validIdsCSV)));
 
@@ -224,7 +219,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canRetrieveCoreAttrByAllIds() throws Exception {
+    void canRetrieveCoreAttrByAllIds() throws Exception {
         ResultActions response = mockMvc.perform(get(buildTermsURL(validIdsShortCSV)));
 
         expectCoreFieldsInResults(response, validIdShortList)
@@ -235,7 +230,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canRetrieveCompleteByOneId() throws Exception {
+    void canRetrieveCompleteByOneId() throws Exception {
         ResultActions response = mockMvc.perform(get(buildTermsURLWithSubResource(validId, COMPLETE_SUB_RESOURCE)));
 
         expectCompleteFieldsInResults(response, singletonList(validId))
@@ -245,7 +240,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canRetrieveCompleteByTwoIds() throws Exception {
+    void canRetrieveCompleteByTwoIds() throws Exception {
         ResultActions response =
                 mockMvc.perform(get(buildTermsURLWithSubResource(validIdsShortCSV, COMPLETE_SUB_RESOURCE)));
 
@@ -256,7 +251,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canRetrieveHistoryByOneId() throws Exception {
+    void canRetrieveHistoryByOneId() throws Exception {
         ResultActions response = mockMvc.perform(get(buildTermsURLWithSubResource(validId, HISTORY_SUB_RESOURCE)));
 
         expectBasicFieldsInResults(response, singletonList(validId))
@@ -266,7 +261,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canRetrieveHistoryByTwoIds() throws Exception {
+    void canRetrieveHistoryByTwoIds() throws Exception {
         ResultActions response =
                 mockMvc.perform(get(buildTermsURLWithSubResource(validIdsShortCSV, HISTORY_SUB_RESOURCE)));
 
@@ -277,7 +272,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canRetrieveXRefsByOneId() throws Exception {
+    void canRetrieveXRefsByOneId() throws Exception {
         ResultActions response = mockMvc.perform(get(buildTermsURLWithSubResource(validId, XREFS_SUB_RESOURCE)));
 
         expectBasicFieldsInResults(response, singletonList(validId))
@@ -287,7 +282,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canRetrieveXRefsByTwoIds() throws Exception {
+    void canRetrieveXRefsByTwoIds() throws Exception {
         ResultActions response =
                 mockMvc.perform(get(buildTermsURLWithSubResource(validIdsShortCSV, XREFS_SUB_RESOURCE)));
 
@@ -298,7 +293,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canRetrieveTaxonConstraintsByOneId() throws Exception {
+    void canRetrieveTaxonConstraintsByOneId() throws Exception {
         ResultActions response = mockMvc.perform(get(buildTermsURLWithSubResource(validId, CONSTRAINTS_SUB_RESOURCE)));
 
         expectBasicFieldsInResults(response, singletonList(validId))
@@ -308,7 +303,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canRetrieveTaxonConstraintsByTwoIds() throws Exception {
+    void canRetrieveTaxonConstraintsByTwoIds() throws Exception {
         ResultActions response =
                 mockMvc.perform(get(buildTermsURLWithSubResource(validIdsShortCSV, CONSTRAINTS_SUB_RESOURCE)));
 
@@ -319,7 +314,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canRetrieveAnnotationGuideLinesByOneId() throws Exception {
+    void canRetrieveAnnotationGuideLinesByOneId() throws Exception {
         ResultActions response = mockMvc.perform(get(buildTermsURLWithSubResource(validId, GUIDELINES_SUB_RESOURCE)));
 
         expectBasicFieldsInResults(response, singletonList(validId))
@@ -329,7 +324,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canRetrieveAnnotationGuideLinesByTwoIds() throws Exception {
+    void canRetrieveAnnotationGuideLinesByTwoIds() throws Exception {
         ResultActions response =
                 mockMvc.perform(get(buildTermsURLWithSubResource(validIdsShortCSV, GUIDELINES_SUB_RESOURCE)));
 
@@ -340,7 +335,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canRetrieveXORelsByOneId() throws Exception {
+    void canRetrieveXORelsByOneId() throws Exception {
         ResultActions response = mockMvc.perform(get(buildTermsURLWithSubResource(validId, XRELATIONS_SUB_RESOURCE)));
 
         expectBasicFieldsInResults(response, singletonList(validId))
@@ -350,7 +345,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canRetrieveXORelsByTwoIds() throws Exception {
+    void canRetrieveXORelsByTwoIds() throws Exception {
         ResultActions response =
                 mockMvc.perform(get(buildTermsURLWithSubResource(validIdsShortCSV, XRELATIONS_SUB_RESOURCE)));
 
@@ -361,28 +356,28 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void finds400IfUrlIsEmpty() throws Exception {
+    void finds400IfUrlIsEmpty() throws Exception {
         mockMvc.perform(get(resourceUrl + "/"))
                 .andDo(print())
                 .andExpect(status().isBadRequest());
     }
 
     @Test
-    public void finds400IfUrlIsJustWrong() throws Exception {
+    void finds400IfUrlIsJustWrong() throws Exception {
         mockMvc.perform(get(resourceUrl + "/thisIsAnEndPointThatDoesNotExist"))
                 .andDo(print())
                 .andExpect(status().isBadRequest());
     }
 
     @Test
-    public void finds200IfNoResultsBecauseIdsDoNotExist() throws Exception {
+    void finds200IfNoResultsBecauseIdsDoNotExist() throws Exception {
         mockMvc.perform(get(buildTermsURL(idMissingInRepository())))
                 .andDo(print())
                 .andExpect(status().isOk());
     }
 
     @Test
-    public void finds400OnInvalidId() throws Exception {
+    void finds400OnInvalidId() throws Exception {
         ResultActions response = mockMvc.perform(get(buildTermsURL(invalidId())))
                 .andDo(print())
                 .andExpect(status().isBadRequest());
@@ -391,7 +386,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void searchesForTermSuccessfullyAndReceivesValidResults() throws Exception {
+    void searchesForTermSuccessfullyAndReceivesValidResults() throws Exception {
         ResultActions response = mockMvc.perform(
                 get(buildSearchURL())
                         .param(QUERY_PARAM, validId));
@@ -402,7 +397,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void searchesForInvalidIdAndReceivesZeroValidResults() throws Exception {
+    void searchesForInvalidIdAndReceivesZeroValidResults() throws Exception {
         ResultActions response = mockMvc.perform(
                 get(buildSearchURL())
                         .param(QUERY_PARAM, invalidId()));
@@ -413,7 +408,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void searchesForMissingIdAndReceivesZeroValidResults() throws Exception {
+    void searchesForMissingIdAndReceivesZeroValidResults() throws Exception {
         ResultActions response = mockMvc.perform(
                 get(buildSearchURL())
                         .param(QUERY_PARAM, idMissingInRepository()));
@@ -424,7 +419,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void searchesForFieldThatDoesNotExistAndReceivesZeroValidResults() throws Exception {
+    void searchesForFieldThatDoesNotExistAndReceivesZeroValidResults() throws Exception {
         ResultActions response = mockMvc.perform(
                 get(buildSearchURL())
                         .param(QUERY_PARAM, "fieldDoesNotExist:sandwiches"));
@@ -435,7 +430,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void negativePageRequestOfAllEntriesRequestReturns400() throws Exception {
+    void negativePageRequestOfAllEntriesRequestReturns400() throws Exception {
         ontologyRepository.deleteAll();
 
         int existingPages = 4;
@@ -449,7 +444,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void pageRequestHigherThanAvailablePagesForAllEntriesRequestReturns400() throws Exception {
+    void pageRequestHigherThanAvailablePagesForAllEntriesRequestReturns400() throws Exception {
         ontologyRepository.deleteAll();
 
         int existingPages = 4;
@@ -463,7 +458,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void pageRequestHigherThanPaginationLimitReturns400() throws Exception {
+    void pageRequestHigherThanPaginationLimitReturns400() throws Exception {
         ontologyRepository.deleteAll();
 
         int totalEntries = defaultPageSize + 1;
@@ -482,7 +477,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void retrievesFirstPageOfAllEntriesRequest() throws Exception {
+    void retrievesFirstPageOfAllEntriesRequest() throws Exception {
         ontologyRepository.deleteAll();
 
         int existingPages = 4;
@@ -498,7 +493,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void retrievesSecondPageOfAllEntriesRequest() throws Exception {
+    void retrievesSecondPageOfAllEntriesRequest() throws Exception {
         ontologyRepository.deleteAll();
 
         int existingPages = 4;
@@ -514,7 +509,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void retrievesLastPageOfAllEntriesRequest() throws Exception {
+    void retrievesLastPageOfAllEntriesRequest() throws Exception {
         ontologyRepository.deleteAll();
 
         int existingPages = 4;
@@ -530,7 +525,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void retrieveDefaultPageSizeWhenNoIdsSpecified() throws Exception {
+    void retrieveDefaultPageSizeWhenNoIdsSpecified() throws Exception {
         ontologyRepository.deleteAll();
         int createPages = 2;
         final int recordsToCreate = defaultPageSize * createPages;
@@ -544,7 +539,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canRetrieveMaxPageSizeWhenIdsAreSpecified() throws Exception {
+    void canRetrieveMaxPageSizeWhenIdsAreSpecified() throws Exception {
         ontologyRepository.deleteAll();
         List<OntologyDocument> nDocs = createAndSaveDocs(maxPageSize);
         List<String> ids = nDocs.stream()
@@ -559,7 +554,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void numberOfTermsRequestedGreaterThanTermLimitReturns400() throws Exception {
+    void numberOfTermsRequestedGreaterThanTermLimitReturns400() throws Exception {
         ontologyRepository.deleteAll();
         List<OntologyDocument> nDocs = createAndSaveDocs(maxPageSize + 1);
         List<String> ids = nDocs.stream()
@@ -570,7 +565,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canFetchAllAncestorsFrom1Term() throws Exception {
+    void canFetchAllAncestorsFrom1Term() throws Exception {
         String lowestChild = relationships.get(0).child;
         ResultActions response = mockMvc.perform(
                 get(buildTermsURLWithSubResource(lowestChild, ANCESTORS_SUB_RESOURCE)));
@@ -581,7 +576,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canFetchAllAncestorsFrom2Terms() throws Exception {
+    void canFetchAllAncestorsFrom2Terms() throws Exception {
         String bottom = relationships.get(0).child;
         String secondBottom = relationships.get(1).child;
 
@@ -595,7 +590,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canFetchAllAncestorsFromRelation() throws Exception {
+    void canFetchAllAncestorsFromRelation() throws Exception {
 
         String bottom = relationships.get(0).child;
 
@@ -609,7 +604,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void invalidAncestorsProduces400AndErrorMessage() throws Exception {
+    void invalidAncestorsProduces400AndErrorMessage() throws Exception {
         ResultActions response = mockMvc.perform(
                 get(buildTermsURLWithSubResource(invalidId(), ANCESTORS_SUB_RESOURCE)));
 
@@ -617,7 +612,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void invalidAncestorsRelationProduces400AndErrorMessage() throws Exception {
+    void invalidAncestorsRelationProduces400AndErrorMessage() throws Exception {
         String bottom = relationships.get(0).child;
 
         ResultActions response = mockMvc.perform(
@@ -628,7 +623,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void invalidChildrenProduces400AndErrorMessage() throws Exception {
+    void invalidChildrenProduces400AndErrorMessage() throws Exception {
         ResultActions response = mockMvc.perform(
           get(buildTermsURLWithSubResource(invalidId(), CHILDREN_SUB_RESOURCE)));
 
@@ -636,7 +631,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void noChildren_notHaveChildrenInJson() throws Exception {
+    void noChildren_notHaveChildrenInJson() throws Exception {
         int relCount = relationships.size();
         String highestParent = relationships.get(0).child;
 
@@ -652,7 +647,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canFetchAllChildrenFrom1Term() throws Exception {
+    void canFetchAllChildrenFrom1Term() throws Exception {
         int relCount = relationships.size();
         String highestParent = relationships.get(relCount - 1).parent;
 
@@ -669,7 +664,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canFetchAllChildrenFrom2Terms() throws Exception {
+    void canFetchAllChildrenFrom2Terms() throws Exception {
         int relCount = relationships.size();
         String top = relationships.get(relCount - 1).parent;
         String secondTop = relationships.get(relCount - 2).parent;
@@ -689,7 +684,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canFetchAllDescendantsFrom1Term() throws Exception {
+    void canFetchAllDescendantsFrom1Term() throws Exception {
         int relCount = relationships.size();
         String highestParent = relationships.get(relCount - 1).parent;
 
@@ -705,7 +700,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canFetchAllDescendantsFrom2Terms() throws Exception {
+    void canFetchAllDescendantsFrom2Terms() throws Exception {
         int relCount = relationships.size();
         String top = relationships.get(relCount - 1).parent;
         String secondTop = relationships.get(relCount - 2).parent;
@@ -723,7 +718,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canFetchAllDescendantsFromRelation() throws Exception {
+    void canFetchAllDescendantsFromRelation() throws Exception {
         int relCount = relationships.size();
         String highestParent = relationships.get(relCount - 1).parent;
 
@@ -740,7 +735,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canFetchChildrenFromTerm() throws Exception {
+    void canFetchChildrenFromTerm() throws Exception {
         ResultActions response = mockMvc.perform(get(buildTermsURL()));
 
         response.andDo(print())
@@ -749,7 +744,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void invalidDescendantsProduces400AndErrorMessage() throws Exception {
+    void invalidDescendantsProduces400AndErrorMessage() throws Exception {
         ResultActions response = mockMvc.perform(
                 get(buildTermsURLWithSubResource(invalidId(), DESCENDANTS_SUB_RESOURCE)));
 
@@ -757,7 +752,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void invalidDescendantsRelationProduces400AndErrorMessage() throws Exception {
+    void invalidDescendantsRelationProduces400AndErrorMessage() throws Exception {
         String highestParent = relationships.get(relationships.size() - 1).parent;
 
         ResultActions response = mockMvc.perform(
@@ -768,7 +763,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canFetchAllPathsFrom1Term() throws Exception {
+    void canFetchAllPathsFrom1Term() throws Exception {
         String bottomChild = relationships.get(0).child;
         String highestParent = relationships.get(relationships.size() - 1).parent;
 
@@ -781,7 +776,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canFetchAllPathsFrom2Terms() throws Exception {
+    void canFetchAllPathsFrom2Terms() throws Exception {
         String bottom = relationships.get(0).child;
         String secondBottom = relationships.get(1).child;
         String highest = relationships.get(relationships.size() - 1).parent;
@@ -795,7 +790,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canFetchAllPathsTo2Terms() throws Exception {
+    void canFetchAllPathsTo2Terms() throws Exception {
         String bottom = relationships.get(0).child;
 
         String top = relationships.get(relationships.size() - 1).parent;
@@ -810,7 +805,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canFetchAllPathsFrom1TermWithRelation() throws Exception {
+    void canFetchAllPathsFrom1TermWithRelation() throws Exception {
         String bottomChild = relationships.get(0).child;
         String highestParent = relationships.get(relationships.size() - 1).parent;
 
@@ -824,7 +819,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void invalidStartPathsProduces400AndErrorMessage() throws Exception {
+    void invalidStartPathsProduces400AndErrorMessage() throws Exception {
         String highest = relationships.get(relationships.size() - 1).parent;
         ResultActions response = mockMvc.perform(
                 get(buildPathsURL(invalidId(), highest)));
@@ -833,7 +828,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void invalidEndPathsProduces400AndErrorMessage() throws Exception {
+    void invalidEndPathsProduces400AndErrorMessage() throws Exception {
         String bottom = relationships.get(0).child;
         ResultActions response = mockMvc.perform(
                 get(buildPathsURL(bottom, invalidId())));
@@ -842,7 +837,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void invalidPathsRelationProduces400AndErrorMessage() throws Exception {
+    void invalidPathsRelationProduces400AndErrorMessage() throws Exception {
         String bottomChild = relationships.get(0).child;
         String highestParent = relationships.get(relationships.size() - 1).parent;
 
@@ -854,7 +849,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canLoadDefaultChartImageIfSourcesWereLoaded() throws Exception {
+    void canLoadDefaultChartImageIfSourcesWereLoaded() throws Exception {
         requestToChartServiceReturnsValidImage();
 
         ResultActions response = mockMvc.perform(
@@ -870,7 +865,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canLoadChartImageIfSourcesWereLoaded() throws Exception {
+    void canLoadChartImageIfSourcesWereLoaded() throws Exception {
         requestToChartServiceReturnsValidImage();
 
         ResultActions response = mockMvc.perform(
@@ -887,7 +882,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canLoadBase64EncodedChartIfSourcesWereLoaded() throws Exception {
+    void canLoadBase64EncodedChartIfSourcesWereLoaded() throws Exception {
         requestToChartServiceReturnsValidImage();
 
         ResultActions response = mockMvc.perform(
@@ -904,7 +899,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void failedChartRequestProduces500() throws Exception {
+    void failedChartRequestProduces500() throws Exception {
         String exceptionDescription = "Error encountered during creation of ontology chart graphics.";
         when(graphImageService.createChart(anyList(), anyString(), any(GraphPresentation.class)))
                 .thenThrow(
@@ -918,7 +913,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void failedChartRequestDueToInvalidIdProduces400() throws Exception {
+    void failedChartRequestDueToInvalidIdProduces400() throws Exception {
         requestToChartServiceReturnsValidImage();
 
         ResultActions response = mockMvc.perform(
@@ -928,7 +923,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canLoadChartCoordsIfSourcesWereLoaded() throws Exception {
+    void canLoadChartCoordsIfSourcesWereLoaded() throws Exception {
         requestToChartServiceReturnsValidImage();
 
         ResultActions response = mockMvc.perform(
@@ -945,7 +940,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void failedChartCoordsRequestProduces500() throws Exception {
+    void failedChartCoordsRequestProduces500() throws Exception {
         String exceptionDescription = "Error encountered during creation of ontology chart graphics.";
         when(graphImageService.createChart(anyList(), anyString(), any(GraphPresentation.class)))
                 .thenThrow(
@@ -959,7 +954,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void failedChartCoordsRequestDueToInvalidIdProduces400() throws Exception {
+    void failedChartCoordsRequestDueToInvalidIdProduces400() throws Exception {
         requestToChartServiceReturnsValidImage();
 
         ResultActions response = mockMvc.perform(
@@ -969,7 +964,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canFetchAncestorGraphFor1Term() throws Exception {
+    void canFetchAncestorGraphFor1Term() throws Exception {
         String startIds = relationships.get(0).child;
         ResultActions response = mockMvc.perform(get(resourceUrl + "/terms/graph").param("startIds", startIds));
 
@@ -979,7 +974,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canFetchAncestorGraphForMultipleTerms() throws Exception {
+    void canFetchAncestorGraphForMultipleTerms() throws Exception {
         String startIds = relationships.stream().limit(10).map(r -> r.child).collect(Collectors.joining(","));
 
         ResultActions response = mockMvc.perform(get(resourceUrl + "/terms/graph").param("startIds", startIds));
@@ -990,7 +985,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void fetchingGraphForUnknownTermResultsInEmptyResult() throws Exception {
+    void fetchingGraphForUnknownTermResultsInEmptyResult() throws Exception {
         ResultActions response = mockMvc.perform(get(resourceUrl + "/terms/graph").param("startIds",
                                                                                          idMissingInRepository()));
 
@@ -1000,7 +995,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canUseValidRelationsForSubGraph() throws Exception {
+    void canUseValidRelationsForSubGraph() throws Exception {
         String startIds = relationships.get(0).child;
         ResultActions response = mockMvc.perform(get(getResourceURL() + "/terms/graph")
                                                          .param("startIds", startIds)
@@ -1012,7 +1007,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void cannotUseInvalidRelationsForSubGraph() throws Exception {
+    void cannotUseInvalidRelationsForSubGraph() throws Exception {
         String startIds = relationships.get(0).child;
         ResultActions response = mockMvc.perform(get(getResourceURL() + "/terms/graph")
                                                          .param("startIds", startIds)
@@ -1022,7 +1017,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void invalidGraphParameterProduces400() throws Exception {
+    void invalidGraphParameterProduces400() throws Exception {
 
         final String urlTarget = buildTermsURLWithSubResource(validId, CHART_SUB_RESOURCE) + "?showKey=bloom";
         ResultActions response = mockMvc.perform(get(urlTarget));
@@ -1031,7 +1026,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void defaultGraphParametersUsed() throws Exception {
+    void defaultGraphParametersUsed() throws Exception {
         final String urlTarget = buildTermsURLWithSubResource(validId, CHART_SUB_RESOURCE);
         requestToChartServiceReturnsValidImage();
 
@@ -1048,7 +1043,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void validGraphParametersCanBeSet() throws Exception {
+    void validGraphParametersCanBeSet() throws Exception {
         final String urlTarget = buildTermsURLWithSubResource(validId, CHART_SUB_RESOURCE) + graphParamsNegated();
         requestToChartServiceReturnsValidImage();
 
@@ -1065,7 +1060,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canCallChartCoordsWithGraphPresentationDefaultUsed() throws Exception {
+    void canCallChartCoordsWithGraphPresentationDefaultUsed() throws Exception {
         requestToChartServiceReturnsValidImage();
 
         final String urlTarget = buildTermsURLWithSubResource(validId, CHART_COORDINATES_SUB_RESOURCE);
@@ -1077,7 +1072,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void canCallChartCoordsWithGraphPresentationParametersSpecified() throws Exception {
+    void canCallChartCoordsWithGraphPresentationParametersSpecified() throws Exception {
         requestToChartServiceReturnsValidImage();
 
         final String urlTarget = buildTermsURLWithSubResource(validId, CHART_COORDINATES_SUB_RESOURCE)
@@ -1090,7 +1085,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void getSecondaryIdsByOneId() throws Exception {
+    void getSecondaryIdsByOneId() throws Exception {
         ResultActions response = mockMvc.perform(get(buildTermsURLWithSubResource(validId, SECONDARY_IDS_SUB_RESOURCE)));
 
         expectBasicFieldsInResults(response, singletonList(validId))
@@ -1100,7 +1095,7 @@ public abstract class OBOControllerIT {
     }
 
     @Test
-    public void getSecondaryIdsByTwoIds() throws Exception {
+    void getSecondaryIdsByTwoIds() throws Exception {
         ResultActions response = mockMvc.perform(get(buildTermsURLWithSubResource(validIdsShortCSV, SECONDARY_IDS_SUB_RESOURCE)));
 
         expectBasicFieldsInResults(response, validIdShortList)
@@ -1111,7 +1106,7 @@ public abstract class OBOControllerIT {
 
     //-----------------------  Check Http Header for Cache-Control content ------------------------------------------
     @Test
-    public void cacheControlMaxAgeReducesOnSubsequentRequests() throws Exception {
+    void cacheControlMaxAgeReducesOnSubsequentRequests() throws Exception {
         MvcResult mvcResult = mockMvc.perform(get(buildTermsURL(validId))).andReturn();
 
         String ccHeader = mvcResult.getResponse().getHeader(HttpHeaders.CACHE_CONTROL);

@@ -1,9 +1,9 @@
 package uk.ac.ebi.quickgo.index.annotation;
 
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
@@ -14,15 +14,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
-import uk.ac.ebi.quickgo.common.store.BasicTemporaryFolder;
 import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 import uk.ac.ebi.quickgo.index.annotation.coterms.CoTermsConfigProperties;
 import uk.ac.ebi.quickgo.index.common.JobTestRunnerConfig;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -42,17 +41,13 @@ import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermsConfig.CO_TERM_M
  * Created 22/04/16
  * @author Edd
  */
+@ExtendWith(TemporarySolrDataStore.class)
 @ActiveProfiles(profiles = {"embeddedServer"})
-@RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {AnnotationIndexingBatchIT.TestConfig.class,
                 AnnotationIndexingConfig.class, JobTestRunnerConfig.class})
-public class AnnotationIndexingBatchIT {
-
-    @ClassRule
-    public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
-
-    @ClassRule
-    public static BasicTemporaryFolder basicTemporaryFolder = new BasicTemporaryFolder();
+class AnnotationIndexingBatchIT {
+    @TempDir
+    private static Path basicTemporaryFolder;
 
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
@@ -60,13 +55,13 @@ public class AnnotationIndexingBatchIT {
     @Autowired
     private AnnotationRepository annotationRepository;
 
-    @Before
-    public void setUp() throws IOException {
+    @BeforeEach
+    void setUp() throws IOException {
         annotationRepository.deleteAll();
     }
 
     @Test
-    public void successfulIndexingJob() throws Exception {
+    void successfulIndexingJob() throws Exception {
         JobExecution jobExecution = jobLauncherTestUtils.launchJob();
         assertThat(jobExecution.getJobInstance().getJobName(), is(ANNOTATION_INDEXING_JOB_NAME));
 
@@ -140,8 +135,8 @@ public class AnnotationIndexingBatchIT {
             CoTermsConfigProperties properties = new CoTermsConfigProperties();
             properties.setChunkSize(1);
             properties.setLoginterval(100);
-            properties.setManual(basicTemporaryFolder.getRoot().getAbsolutePath() + "/CoTermsManual");
-            properties.setAll(basicTemporaryFolder.getRoot().getAbsolutePath() + "/CoTermsAll");
+            properties.setManual(basicTemporaryFolder + "/CoTermsManual");
+            properties.setAll(basicTemporaryFolder + "/CoTermsAll");
             return properties;
         }
     }

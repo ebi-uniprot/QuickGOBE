@@ -1,5 +1,5 @@
 package uk.ac.ebi.quickgo.rest.search.results.transformer;
-
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.ac.ebi.quickgo.rest.search.request.converter.RESTFilterConverterFactory;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
@@ -7,17 +7,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 /**
  * @author Tony Wardell
@@ -25,8 +24,8 @@ import static org.mockito.Mockito.when;
  * Time: 15:54
  * Created with IntelliJ IDEA.
  */
-@RunWith(MockitoJUnitRunner.class)
-public class ValueInjectionToQueryResultsTest {
+@ExtendWith(MockitoExtension.class)
+class ValueInjectionToQueryResultsTest {
     private static final String GO_NAME_REQUEST = "goName";
     private static final String TAXON_NAME_REQUEST = "taxonName";
     private final List<ResponseValueInjector<FakeResponseModel>> requiredInjectors = new ArrayList<>();
@@ -38,20 +37,20 @@ public class ValueInjectionToQueryResultsTest {
     private FakeValueInjector mockTaxonNameInjector;
     private QueryResult<FakeResponseModel> results;
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         requiredInjectors.add(mockGoNameInjector);
         requiredInjectors.add(mockTaxonNameInjector);
         results = createMockedAnnotationList(2);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void nullArgumentForRestFilterConverterFactoryToConstructorThrowsException() {
-        new ValueInjectionToQueryResults(null);
+    @Test
+    void nullArgumentForRestFilterConverterFactoryToConstructorThrowsException() {
+        assertThrows(IllegalArgumentException.class, () -> new ValueInjectionToQueryResults(null));
     }
 
     @Test
-    public void everyInjectorUsedForEveryModel() {
+    void everyInjectorUsedForEveryModel() {
         ValueInjectionToQueryResults<FakeResponseModel> resultMutator =
                 new ValueInjectionToQueryResults<>(mockRestFetcher);
 
@@ -64,7 +63,7 @@ public class ValueInjectionToQueryResultsTest {
     }
 
     @Test
-    public void emptyModelListDoesNotGetUpdated() {
+    void emptyModelListDoesNotGetUpdated() {
         ValueInjectionToQueryResults<FakeResponseModel> resultMutator =
                 new ValueInjectionToQueryResults<>(mockRestFetcher);
         QueryResult<FakeResponseModel> emptyResults = createMockedAnnotationList(0);

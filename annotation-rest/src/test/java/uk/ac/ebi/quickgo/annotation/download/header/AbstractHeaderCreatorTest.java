@@ -1,11 +1,13 @@
 package uk.ac.ebi.quickgo.annotation.download.header;
 
 import java.io.IOException;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -16,7 +18,7 @@ import static org.mockito.Mockito.verify;
  * Time: 17:02
  * Created with IntelliJ IDEA.
  */
-public class AbstractHeaderCreatorTest {
+class AbstractHeaderCreatorTest {
 
     private final ResponseBodyEmitter mockEmitter = mock(ResponseBodyEmitter.class);
     private final HeaderContent mockContent = mock(HeaderContent.class);
@@ -27,14 +29,14 @@ public class AbstractHeaderCreatorTest {
     };
 
     @Test
-    public void callToWriteInvokesOutput() throws Exception{
+    void callToWriteInvokesOutput() throws Exception{
         abstractHeaderCreator.write(mockEmitter, mockContent);
 
         verify(mockEmitter).send(mockContent);
     }
 
     @Test
-    public void whenEmitterThrowsIOExceptionNoExceptionIsThrown() throws Exception {
+    void whenEmitterThrowsIOExceptionNoExceptionIsThrown() throws Exception {
         Exception exception = null;
         doThrow(new IOException("Test IOException")).when(mockEmitter).send(mockContent);
 
@@ -47,13 +49,13 @@ public class AbstractHeaderCreatorTest {
         assertThat(exception, nullValue());
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void nullEmitterCausesExceptionToBeThrown(){
-        abstractHeaderCreator.write(null, mockContent);
+    @Test
+    void nullEmitterCausesExceptionToBeThrown(){
+        assertThrows(IllegalArgumentException.class, () -> abstractHeaderCreator.write(null, mockContent));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void nullContentCausesExceptionToBeThrown(){
-        abstractHeaderCreator.write(mockEmitter, null);
+    @Test
+    void nullContentCausesExceptionToBeThrown(){
+        assertThrows(IllegalArgumentException.class, () -> abstractHeaderCreator.write(mockEmitter, null));
     }
 }

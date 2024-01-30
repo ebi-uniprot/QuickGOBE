@@ -1,18 +1,17 @@
 package uk.ac.ebi.quickgo.rest.search.results.transformer;
-
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.ac.ebi.quickgo.rest.search.request.converter.RESTFilterConverterFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 /**
  * @author Tony Wardell
@@ -20,8 +19,8 @@ import static org.mockito.Mockito.when;
  * Time: 15:54
  * Created with IntelliJ IDEA.
  */
-@RunWith(MockitoJUnitRunner.class)
-public class ValueInjectionToSingleResultTest {
+@ExtendWith(MockitoExtension.class)
+class ValueInjectionToSingleResultTest {
 
     private static final String GO_NAME_REQUEST = "goName";
     private static final String TAXON_NAME_REQUEST = "taxonName";
@@ -35,21 +34,21 @@ public class ValueInjectionToSingleResultTest {
     private FakeResponseModel result;
     private ValueInjectionToSingleResult<FakeResponseModel> resultMutator;
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         requiredInjectors.add(mockGoNameInjector);
         requiredInjectors.add(mockTaxonNameInjector);
         result = new FakeResponseModel();
         resultMutator = new ValueInjectionToSingleResult<>(mockRestFetcher);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void nullArgumentForRestFilterConverterFactoryToConstructorThrowsException() {
-        new ValueInjectionToSingleResult(null);
+    @Test
+    void nullArgumentForRestFilterConverterFactoryToConstructorThrowsException() {
+        assertThrows(IllegalArgumentException.class, () -> new ValueInjectionToSingleResult(null));
     }
 
     @Test
-    public void everyInjectorUsedForEveryModel() {
+    void everyInjectorUsedForEveryModel() {
         resultMutator.mutate(result, requiredInjectors);
 
         verify(mockGoNameInjector, times(1)).inject(mockRestFetcher, result);

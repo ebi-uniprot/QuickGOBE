@@ -4,11 +4,11 @@ import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.ac.ebi.quickgo.common.SolrCollectionName;
 import uk.ac.ebi.quickgo.rest.search.query.Page;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.when;
 import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.createCursorPage;
 import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.createFirstCursorPage;
@@ -33,8 +33,8 @@ import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.createFirstCursorPa
  *
  * @author Edd
  */
-@RunWith(MockitoJUnitRunner.class)
-public class AbstractSolrQueryResultConverterTest {
+@ExtendWith(MockitoExtension.class)
+class AbstractSolrQueryResultConverterTest {
     private static final QuickGOQuery DEFAULT_QUERY = QuickGOQuery.createQuery("field1", "value1");
     private static final String COLLECTION = SolrCollectionName.COLLECTION;
 
@@ -46,8 +46,8 @@ public class AbstractSolrQueryResultConverterTest {
     @Mock
     private Map<String, String> highlightedFieldNameMap;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp()  {
         converter = new AbstractSolrQueryResultConverter<String>() {
 
             @Override
@@ -63,7 +63,7 @@ public class AbstractSolrQueryResultConverterTest {
     }
 
     @Test
-    public void nullQueryResponseThrowsException() throws Exception {
+    void nullQueryResponseThrowsException()  {
         responseMock = null;
         QueryRequest request = createDefaultRequest(DEFAULT_QUERY);
 
@@ -76,7 +76,7 @@ public class AbstractSolrQueryResultConverterTest {
     }
 
     @Test
-    public void nullQueryRequestThrowsException() throws Exception {
+    void nullQueryRequestThrowsException()  {
         QueryRequest request = null;
 
         try {
@@ -88,7 +88,7 @@ public class AbstractSolrQueryResultConverterTest {
     }
 
     @Test
-    public void responseWithNoResults() throws Exception {
+    void responseWithNoResults()  {
         QueryRequest request = createDefaultRequest(DEFAULT_QUERY);
 
         QueryResult result = converter.convert(responseMock, request);
@@ -100,7 +100,7 @@ public class AbstractSolrQueryResultConverterTest {
     }
 
     @Test
-    public void requestWithRegularPagingRendersResponseWithNoResults() throws Exception {
+    void requestWithRegularPagingRendersResponseWithNoResults()  {
         QueryRequest request = createRequestWithPaging(DEFAULT_QUERY, new RegularPage(1, 1));
 
         QueryResult result = converter.convert(responseMock, request);
@@ -118,7 +118,7 @@ public class AbstractSolrQueryResultConverterTest {
     }
 
     @Test
-    public void requestWithFirstCursorPageRendersResponseWithNoResults() throws Exception {
+    void requestWithFirstCursorPageRendersResponseWithNoResults()  {
         QueryRequest request = createRequestWithPaging(DEFAULT_QUERY, createFirstCursorPage(1));
         String expectedNextCursor = "fakeCursor";
 
@@ -136,7 +136,7 @@ public class AbstractSolrQueryResultConverterTest {
     }
 
     @Test
-    public void requestWithNextCursorPageRendersResponseWithNoResults() throws Exception {
+    void requestWithNextCursorPageRendersResponseWithNoResults()  {
         QueryRequest request = createRequestWithPaging(DEFAULT_QUERY, createCursorPage("cursor", 1));
         String expectedNextCursor = "fakeCursor";
 
@@ -154,7 +154,7 @@ public class AbstractSolrQueryResultConverterTest {
     }
 
     @Test
-    public void requestWithFacetingRendersResponseWithNoResults() throws Exception {
+    void requestWithFacetingRendersResponseWithNoResults()  {
         String facet1 = "facet1";
         String facet2 = "facet2";
 
@@ -171,7 +171,7 @@ public class AbstractSolrQueryResultConverterTest {
     }
 
     @Test
-    public void responseWith2Results() {
+    void responseWith2Results() {
         QueryRequest request = createDefaultRequest(DEFAULT_QUERY);
 
         SolrDocumentList docList = new SolrDocumentList();
@@ -188,7 +188,7 @@ public class AbstractSolrQueryResultConverterTest {
     }
 
     @Test
-    public void responseWith2ResultsAndRegularPaging() {
+    void responseWith2ResultsAndRegularPaging() {
         QueryRequest request = createRequestWithPaging(DEFAULT_QUERY, new RegularPage(1, 1));
 
         SolrDocumentList docList = new SolrDocumentList();
@@ -204,7 +204,7 @@ public class AbstractSolrQueryResultConverterTest {
     }
 
     @Test
-    public void responseWith2ResultsAndCursorPaging() {
+    void responseWith2ResultsAndCursorPaging() {
         QueryRequest request = createRequestWithPaging(DEFAULT_QUERY, createCursorPage("anyCursor", 1));
         String expectedNextCursor = "fakeCursor";
 
@@ -222,7 +222,7 @@ public class AbstractSolrQueryResultConverterTest {
     }
 
     @Test
-    public void responseWith2ResultsAndSingleFacet() {
+    void responseWith2ResultsAndSingleFacet() {
         String facetFieldField = "field1";
         QueryRequest request = createRequestWithFaceting(DEFAULT_QUERY, Collections.singletonList(facetFieldField));
 
@@ -247,7 +247,7 @@ public class AbstractSolrQueryResultConverterTest {
     }
 
     @Test
-    public void responseWithOneResultAndZeroHitsInHighlighting() {
+    void responseWithOneResultAndZeroHitsInHighlighting() {
         QueryRequest request = createDefaultRequest(DEFAULT_QUERY);
 
         SolrDocumentList docList = new SolrDocumentList();
@@ -266,7 +266,7 @@ public class AbstractSolrQueryResultConverterTest {
     }
 
     @Test
-    public void responseWithOneResultAnd1HitInHighlighting() {
+    void responseWithOneResultAnd1HitInHighlighting() {
         QueryRequest request = createDefaultRequest(DEFAULT_QUERY);
 
         SolrDocumentList docList = new SolrDocumentList();

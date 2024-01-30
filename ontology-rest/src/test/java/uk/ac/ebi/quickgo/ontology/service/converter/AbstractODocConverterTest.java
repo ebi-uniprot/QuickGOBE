@@ -1,10 +1,8 @@
 package uk.ac.ebi.quickgo.ontology.service.converter;
-
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
-
-import org.junit.Before;
-import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
@@ -16,7 +14,7 @@ import static uk.ac.ebi.quickgo.ontology.common.document.OntologyDocMocker.creat
  * Created 24/11/15
  * @author Edd
  */
-public class AbstractODocConverterTest {
+class AbstractODocConverterTest {
     private MockODocConverter converter;
     private OntologyDocument validGODoc;
     private OBOTerm oboTermFromValidGODoc;
@@ -28,8 +26,8 @@ public class AbstractODocConverterTest {
         }
     }
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         this.converter = new MockODocConverter();
         this.validGODoc = createGODoc("id1", "name1");
         this.oboTermFromValidGODoc = new OBOTerm();
@@ -41,52 +39,52 @@ public class AbstractODocConverterTest {
      * classes
      */
     @Test
-    public void convertsIdWithoutError() {
+    void convertsIdWithoutError() {
         assertThat(oboTermFromValidGODoc.id, is("id1"));
     }
 
     @Test
-    public void convertsNameWithoutError() {
+    void convertsNameWithoutError() {
         assertThat(oboTermFromValidGODoc.name, is("name1"));
     }
 
     @Test
-    public void convertsSecondaryIdsWithoutError() {
+    void convertsSecondaryIdsWithoutError() {
         assertThat(oboTermFromValidGODoc.secondaryIds, is(validGODoc.secondaryIds));
     }
 
     @Test
-    public void convertsCommentWithoutError() {
+    void convertsCommentWithoutError() {
         assertThat(oboTermFromValidGODoc.comment, is(validGODoc.comment));
     }
 
     @Test
-    public void convertsReplacements() throws Exception {
+    void convertsReplacements() throws Exception {
         assertThat(oboTermFromValidGODoc.replacements, hasSize(validGODoc.replacements.size()));
     }
 
     @Test
-    public void convertsReplacedBy() throws Exception {
+    void convertsReplacedBy() throws Exception {
         assertThat(oboTermFromValidGODoc.replaces, hasSize(validGODoc.replaces.size()));
     }
 
     @Test
-    public void convertsIsObsoleteWithoutError() {
+    void convertsIsObsoleteWithoutError() {
         assertThat(oboTermFromValidGODoc.isObsolete, is(validGODoc.isObsolete));
     }
 
     @Test
-    public void convertsSubsetsWithoutError() {
+    void convertsSubsetsWithoutError() {
         assertThat(oboTermFromValidGODoc.subsets, is(validGODoc.subsets));
     }
 
     @Test
-    public void convertsSynonymsWithoutError() {
+    void convertsSynonymsWithoutError() {
         assertThat(oboTermFromValidGODoc.synonyms.size(), is(validGODoc.synonyms.size()));
     }
 
     @Test
-    public void convertsCreditsWithoutError() {
+    void convertsCreditsWithoutError() {
         assertThat(oboTermFromValidGODoc.credits.size(), is(validGODoc.credits.size()));
     }
 
@@ -95,7 +93,7 @@ public class AbstractODocConverterTest {
      * to a corresponding OBOTerm
      */
     @Test
-    public void documentWithNullFieldsCanBeConverted() {
+    void documentWithNullFieldsCanBeConverted() {
         OntologyDocument doc = new OntologyDocument();
         doc.id = "id field";
         OBOTerm term = new OBOTerm();

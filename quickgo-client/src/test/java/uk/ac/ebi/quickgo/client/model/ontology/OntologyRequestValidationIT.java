@@ -1,13 +1,11 @@
 package uk.ac.ebi.quickgo.client.model.ontology;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import uk.ac.ebi.quickgo.common.FacetableField;
 
@@ -19,8 +17,8 @@ import java.util.stream.Stream;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.startsWith;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.Assert.assertThat;
 import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.MAX_ENTRIES_PER_PAGE;
 import static uk.ac.ebi.quickgo.rest.controller.request.AllowableFacets.DEFAULT_ERROR_MESSAGE;
 import static uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern.DEFAULT_ERROR_MSG;
@@ -28,9 +26,8 @@ import static uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern.DEFAULT_ERR
 /**
  * Tests that the validation added to the {@link OntologyRequest} class is correct.
  */
-@RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = OntologyRequestValidationIT.OntologyRequestValidationConfig.class)
-public class OntologyRequestValidationIT {
+class OntologyRequestValidationIT {
     private static final String VALID_FACET = "valid";
 
     @Configuration
@@ -59,15 +56,15 @@ public class OntologyRequestValidationIT {
 
     private OntologyRequest ontologyRequest;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() throws Exception {
         ontologyRequest = new OntologyRequest();
         ontologyRequest.setQuery("query");
     }
 
     //QUERY PARAMETER
     @Test
-    public void nullQueryIsInvalid() {
+    void nullQueryIsInvalid() {
         ontologyRequest.setQuery(null);
 
         Set<ConstraintViolation<OntologyRequest>> violations = validator.validate(ontologyRequest);
@@ -77,7 +74,7 @@ public class OntologyRequestValidationIT {
     }
 
     @Test
-    public void emptyQueryIsInvalid() {
+    void emptyQueryIsInvalid() {
         ontologyRequest.setQuery("");
 
         Set<ConstraintViolation<OntologyRequest>> violations = validator.validate(ontologyRequest);
@@ -87,7 +84,7 @@ public class OntologyRequestValidationIT {
     }
 
     @Test
-    public void populatedQueryIsInvalid() {
+    void populatedQueryIsInvalid() {
         ontologyRequest.setQuery("query");
 
         assertThat(validator.validate(ontologyRequest), hasSize(0));
@@ -95,7 +92,7 @@ public class OntologyRequestValidationIT {
 
     //PAGE PARAMETER
     @Test
-    public void negativePageValueIsInvalid() {
+    void negativePageValueIsInvalid() {
         ontologyRequest.setPage(-1);
 
         Set<ConstraintViolation<OntologyRequest>> violations = validator.validate(ontologyRequest);
@@ -106,7 +103,7 @@ public class OntologyRequestValidationIT {
     }
 
     @Test
-    public void zeroPageValueIsInvalid() {
+    void zeroPageValueIsInvalid() {
         ontologyRequest.setPage(0);
 
         Set<ConstraintViolation<OntologyRequest>> violations = validator.validate(ontologyRequest);
@@ -116,7 +113,7 @@ public class OntologyRequestValidationIT {
     }
 
     @Test
-    public void positivePageValueIsValid() {
+    void positivePageValueIsValid() {
         ontologyRequest.setPage(1);
 
         assertThat(validator.validate(ontologyRequest), hasSize(0));
@@ -124,7 +121,7 @@ public class OntologyRequestValidationIT {
 
     //LIMIT PARAMETER
     @Test
-    public void negativeLimitValueIsInvalid() {
+    void negativeLimitValueIsInvalid() {
         ontologyRequest.setLimit(-1);
 
         Set<ConstraintViolation<OntologyRequest>> violations = validator.validate(ontologyRequest);
@@ -134,28 +131,28 @@ public class OntologyRequestValidationIT {
     }
 
     @Test
-    public void zeroLimitValueIsValid() {
+    void zeroLimitValueIsValid() {
         ontologyRequest.setLimit(0);
 
         assertThat(validator.validate(ontologyRequest), hasSize(0));
     }
 
     @Test
-    public void positiveLimitValueIsValid() {
+    void positiveLimitValueIsValid() {
         ontologyRequest.setLimit(1);
 
         assertThat(validator.validate(ontologyRequest), hasSize(0));
     }
 
     @Test
-    public void limitValueEqualToMaxEntriesPerPageIsInvalid() {
+    void limitValueEqualToMaxEntriesPerPageIsInvalid() {
         ontologyRequest.setLimit(MAX_ENTRIES_PER_PAGE);
 
         assertThat(validator.validate(ontologyRequest), hasSize(0));
     }
 
     @Test
-    public void limitValueAboveMaxEntriesPerPageIsInvalid() {
+    void limitValueAboveMaxEntriesPerPageIsInvalid() {
         ontologyRequest.setLimit(MAX_ENTRIES_PER_PAGE + 1);
 
         Set<ConstraintViolation<OntologyRequest>> violations = validator.validate(ontologyRequest);
@@ -167,7 +164,7 @@ public class OntologyRequestValidationIT {
 
     //ASPECT FILTER
     @Test
-    public void unrecognizedFilterByAspectValueIsInvalid() {
+    void unrecognizedFilterByAspectValueIsInvalid() {
         String incorrectAspect = "unrecognized";
         ontologyRequest.setAspect(incorrectAspect);
 
@@ -179,7 +176,7 @@ public class OntologyRequestValidationIT {
     }
 
     @Test
-    public void providedFilterByAspectValuesAreAllValid() throws Exception {
+    void providedFilterByAspectValuesAreAllValid() throws Exception {
         Arrays.asList("Process", "PRoceSs", "Function", "funCtioN", "Component", "compONent")
                 .forEach(aspect -> {
                             ontologyRequest.setAspect(aspect);
@@ -190,7 +187,7 @@ public class OntologyRequestValidationIT {
     }
 
     @Test
-    public void providedFilterByAspectValuesAreAllInvalid() throws Exception {
+    void providedFilterByAspectValuesAreAllInvalid() throws Exception {
         Arrays.asList("biological_process", "molecular_function", "cellular_component")
                 .forEach(aspect -> {
                             ontologyRequest.setAspect(aspect);
@@ -202,7 +199,7 @@ public class OntologyRequestValidationIT {
 
     //TYPE FILTER
     @Test
-    public void unrecognizedFilterByTypeValueIsInvalid() {
+    void unrecognizedFilterByTypeValueIsInvalid() {
         String incorrectType = "incorrect";
         ontologyRequest.setOntologyType(incorrectType);
 
@@ -214,7 +211,7 @@ public class OntologyRequestValidationIT {
     }
 
     @Test
-    public void typeWithMixedCasingIsValid() {
+    void typeWithMixedCasingIsValid() {
         String mixedCaseType = "EcO";
         ontologyRequest.setOntologyType(mixedCaseType);
 
@@ -222,7 +219,7 @@ public class OntologyRequestValidationIT {
     }
 
     @Test
-    public void providedFilterByTypeValuesAreAllValid() throws Exception {
+    void providedFilterByTypeValuesAreAllValid() throws Exception {
         Arrays.asList("go", "eco")
                 .forEach(type -> {
                             ontologyRequest.setOntologyType(type);
@@ -234,7 +231,7 @@ public class OntologyRequestValidationIT {
 
     //isObsolete FILTER
     @Test
-    public void unrecognizedFilterByTypeObsoleteIsInvalid() {
+    void unrecognizedFilterByTypeObsoleteIsInvalid() {
         String incorrectVal = "incorrect";
         ontologyRequest.setIsObsolete(incorrectVal);
 
@@ -246,7 +243,7 @@ public class OntologyRequestValidationIT {
     }
 
     @Test
-    public void obsoleteWithMixedCasingIsInvalid() {
+    void obsoleteWithMixedCasingIsInvalid() {
         String mixedCaseBool = "TruE";
         ontologyRequest.setIsObsolete(mixedCaseBool);
 
@@ -258,7 +255,7 @@ public class OntologyRequestValidationIT {
     }
 
     @Test
-    public void providedFilterByObsoleteValuesAreAllValid() throws Exception {
+    void providedFilterByObsoleteValuesAreAllValid() throws Exception {
         Arrays.asList("true", "false")
           .forEach(type -> {
                 ontologyRequest.setIsObsolete(type);
@@ -269,7 +266,7 @@ public class OntologyRequestValidationIT {
     }
 
     @Test
-    public void unrecognizedFacetIsInvalid() throws Exception {
+    void unrecognizedFacetIsInvalid() throws Exception {
         ontologyRequest.setFacet(new String[]{"invalidFacet"});
 
         Set<ConstraintViolation<OntologyRequest>> violations = validator.validate(ontologyRequest);
@@ -280,7 +277,7 @@ public class OntologyRequestValidationIT {
     }
 
     @Test
-    public void recognizedFacetIsValid() throws Exception {
+    void recognizedFacetIsValid() throws Exception {
         ontologyRequest.setFacet(new String[]{VALID_FACET});
 
         Set<ConstraintViolation<OntologyRequest>> violations = validator.validate(ontologyRequest);

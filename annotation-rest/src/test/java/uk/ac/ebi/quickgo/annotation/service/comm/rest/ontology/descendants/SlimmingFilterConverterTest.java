@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.descendants;
-
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.SlimmingConversionInfo;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.SlimmingFilterConverter;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.OntologyRelatives;
@@ -9,8 +10,6 @@ import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import org.junit.Before;
-import org.junit.Test;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -26,19 +25,19 @@ import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.or;
  * Created 10/08/16
  * @author Edd
  */
-public class SlimmingFilterConverterTest {
+class SlimmingFilterConverterTest {
     private OntologyRelatives response;
     private SlimmingFilterConverter converter;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         response = new OntologyRelatives();
         response.setResults(new ArrayList<>());
         converter = new SlimmingFilterConverter();
     }
 
     @Test
-    public void descendantsFromSingleResourceAreConvertedToQuickGOQuery() {
+    void descendantsFromSingleResourceAreConvertedToQuickGOQuery() {
         String id1 = createGoId(1);
         String slim1 = createGoId(11);
 
@@ -50,7 +49,7 @@ public class SlimmingFilterConverterTest {
     }
 
     @Test
-    public void differentDescendantsFromMultipleResourcesAreConvertedToQuickGOQuery() {
+    void differentDescendantsFromMultipleResourcesAreConvertedToQuickGOQuery() {
         String id1 = createGoId(1);
         String id2 = createGoId(2);
         String slim1 = createGoId(11);
@@ -68,7 +67,7 @@ public class SlimmingFilterConverterTest {
     }
 
     @Test
-    public void sameDescendantsFromMultipleResourcesAreConvertedToQuickGOQuery() {
+    void sameDescendantsFromMultipleResourcesAreConvertedToQuickGOQuery() {
         String id1 = createGoId(1);
         String id2 = createGoId(2);
         String slim1 = createGoId(11);
@@ -86,7 +85,7 @@ public class SlimmingFilterConverterTest {
     }
 
     @Test
-    public void nullResultsMeansFilterEverything() {
+    void nullResultsMeansFilterEverything() {
         response.setResults(null);
         ConvertedFilter<QuickGOQuery> convertedFilter = converter.transform(response);
 
@@ -94,14 +93,14 @@ public class SlimmingFilterConverterTest {
     }
 
     @Test
-    public void emptyResultsMeansFilterEverything() {
+    void emptyResultsMeansFilterEverything() {
         ConvertedFilter<QuickGOQuery> convertedFilter = converter.transform(response);
 
         assertThat(convertedFilter.getConvertedValue(), is(not(QuickGOQuery.createAllQuery())));
     }
 
     @Test
-    public void conversionContextContainsOneMapping() {
+    void conversionContextContainsOneMapping() {
         String id1 = createGoId(1);
         String slim1 = createGoId(11);
 
@@ -112,7 +111,7 @@ public class SlimmingFilterConverterTest {
     }
 
     @Test
-    public void conversionContextContainsTwoMappings() {
+    void conversionContextContainsTwoMappings() {
         String id1 = createGoId(1);
         String id2 = createGoId(2);
         String slim1 = createGoId(11);

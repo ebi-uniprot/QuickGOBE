@@ -3,9 +3,8 @@ package uk.ac.ebi.quickgo.rest.search;
 import java.util.Arrays;
 import java.util.Collection;
 import org.apache.solr.client.solrj.util.ClientUtils;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -17,18 +16,16 @@ import static org.hamcrest.Matchers.is;
  * Created 01/03/16
  * @author Edd
  */
-@RunWith(Parameterized.class)
-public class SolrQueryStringSanitizerTest {
+class SolrQueryStringSanitizerTest {
 
-    private final String escapeString;
+    private String escapeString;
     private SolrQueryStringSanitizer solrQueryStringSanitizer;
 
-    public SolrQueryStringSanitizerTest(String escapeString) {
+    public void initSolrQueryStringSanitizerTest(String escapeString) {
         this.solrQueryStringSanitizer = new SolrQueryStringSanitizer();
         this.escapeString = escapeString;
     }
 
-    @Parameterized.Parameters(name = "{index}: checking \"{0}\"")
     public static Collection<String> escapeChars() {
         return Arrays.asList(
                 "\\",
@@ -54,8 +51,10 @@ public class SolrQueryStringSanitizerTest {
                 "\t");
     }
 
-    @Test
-    public void checkString() {
+    @MethodSource("escapeChars")
+    @ParameterizedTest(name = "{index}: checking \"{0}\"")
+    void checkString(String escapeString) {
+        initSolrQueryStringSanitizerTest(escapeString);
         String query = "values "+escapeString+" values";
         assertThat(solrQueryStringSanitizer.sanitize(query), is(equalTo(ClientUtils.escapeQueryChars(query))));
     }

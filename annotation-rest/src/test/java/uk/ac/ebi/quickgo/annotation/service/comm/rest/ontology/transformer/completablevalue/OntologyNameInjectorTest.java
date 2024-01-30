@@ -1,14 +1,11 @@
 package uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.completablevalue;
-
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.BasicOntology;
 import uk.ac.ebi.quickgo.rest.model.CompletableValue;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -27,24 +24,23 @@ import static uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transforme
  * Created 11/04/17
  * @author Edd
  */
-@RunWith(MockitoJUnitRunner.class)
-public class OntologyNameInjectorTest {
+class OntologyNameInjectorTest {
     private OntologyNameInjector nameInjector;
     private CompletableValue completableValue;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         nameInjector = new OntologyNameInjector();
         completableValue = new CompletableValue(TEST_GO_ID);
     }
 
     @Test
-    public void injectorIdIsGoName() {
+    void injectorIdIsGoName() {
         assertThat(nameInjector.getId(), is("goName"));
     }
 
     @Test
-    public void responseValueIsInjectedToAnnotation() {
+    void responseValueIsInjectedToAnnotation() {
         ConvertedFilter<BasicOntology> stubConvertedFilter = new ConvertedFilter<>(basicOntology);
         assertThat(completableValue.value, is(nullValue()));
 
@@ -54,7 +50,7 @@ public class OntologyNameInjectorTest {
     }
 
     @Test
-    public void correctFilterRequestIsBuilt() {
+    void correctFilterRequestIsBuilt() {
         FilterRequest filterRequest = nameInjector.buildFilterRequest(completableValue);
 
         buildFilterRequestSuccessfully(filterRequest, nameInjector);

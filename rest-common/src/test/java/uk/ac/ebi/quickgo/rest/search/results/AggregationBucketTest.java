@@ -1,33 +1,28 @@
 package uk.ac.ebi.quickgo.rest.search.results;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests the behaviour of the {@link AggregationBucket} class.
  *
  * Note: tests dealing with {@link AggregationResult} are tested in {@link AggregationResultsManager}.
  */
-public class AggregationBucketTest {
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
+class AggregationBucketTest {
 
     @Test
-    public void nullBucketValueThrowsException() throws Exception {
+    void nullBucketValueThrowsException() {
         String name = null;
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("AggregationBucket name cannot be null");
-
-        new AggregationBucket(name);
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> new AggregationBucket(name));
+        assertTrue(exception.getMessage().contains("AggregationBucket name cannot be null"));
     }
 
     @Test
-    public void creatingBucketWithValidValueIsSuccessful() throws Exception {
+    void creatingBucketWithValidValueIsSuccessful() {
         String name = "name";
 
         AggregationBucket bucket = new AggregationBucket(name);

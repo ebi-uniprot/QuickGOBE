@@ -15,7 +15,7 @@ import java.util.stream.IntStream;
  * Created 24/11/15
  * @author Edd
  */
-public class ECOControllerIT extends OBOControllerIT {
+class ECOControllerIT extends OBOControllerIT {
     private static final String RESOURCE_URL = "/ontology/eco";
     private static final String ECO_0000001 = "ECO:0000001";
     private static final String ECO_0000002 = "ECO:0000002";

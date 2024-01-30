@@ -1,37 +1,37 @@
 package uk.ac.ebi.quickgo.client.service.loader.presets.ff;
 
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
-import static org.junit.Assert.assertThat;
 
 /**
  * Created 01/09/16
  * @author Edd
  */
-public class RawNamedPresetRelevanceAssignationTest {
+class RawNamedPresetRelevanceAssignationTest {
     private static final String UNIPARC = "UniParc";
     private static final String UNIPROT = "UniProt";
     private final static List<String> UNIPROT_OR_UNIPARC = asList(UNIPROT, UNIPARC);
     private RawNamedPresetRelevanceAssignation relevanceChecker;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         this.relevanceChecker = new RawNamedPresetRelevanceAssignation(UNIPROT_OR_UNIPARC);
     }
 
     @Test
-    public void invalidItemIsFiltered() throws Exception {
+    void invalidItemIsFiltered() throws Exception {
         assertThat(relevanceChecker.process(createAssignedBy("invalid")), is(nullValue()));
     }
 
     @Test
-    public void validItemIsNotFiltered() throws Exception {
+    void validItemIsNotFiltered() throws Exception {
         assertThat(relevanceChecker.process(createAssignedBy(UNIPROT)), is(not(nullValue())));
         assertThat(relevanceChecker.process(createAssignedBy(UNIPROT)).name, is(UNIPROT));
     }

@@ -1,14 +1,12 @@
 package uk.ac.ebi.quickgo.client.service.loader.presets;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import uk.ac.ebi.quickgo.client.model.presets.CompositePreset;
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
@@ -32,11 +30,10 @@ import static org.hamcrest.Matchers.hasSize;
  * Created 31/08/16
  * @author Edd
  */
-@RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {PresetsConfig.class, MockPresetDataConfig.class, JobTestRunnerConfig.class})
 @WebAppConfiguration
 @ActiveProfiles(profiles = {MockPresetDataConfig.FAILED_FETCHING, MockPresetDataConfig.NO_SEARCH_ATTRIBUTES})
-public class PresetsFailedRelevancyFetchingIT {
+class PresetsFailedRelevancyFetchingIT {
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
 
@@ -44,7 +41,7 @@ public class PresetsFailedRelevancyFetchingIT {
     private CompositePreset presets;
 
     @Test
-    public void loadDefaultAssignedByPresetsAfterFailedRESTInfoFetching() {
+    void loadDefaultAssignedByPresetsAfterFailedRESTInfoFetching() {
         assertThat(presets.getAssignedBy(), hasSize(0));
 
         JobExecution jobExecution =
@@ -58,7 +55,7 @@ public class PresetsFailedRelevancyFetchingIT {
     }
 
     @Test
-    public void loadDefaultQualifierPresetsAfterFailedRESTInfoFetching() {
+    void loadDefaultQualifierPresetsAfterFailedRESTInfoFetching() {
         assertThat(presets.getQualifiers(), hasSize(0));
 
         JobExecution jobExecution =
@@ -72,7 +69,7 @@ public class PresetsFailedRelevancyFetchingIT {
     }
 
     @Test
-    public void loadDefaultWithFromPresetsAfterFailedRESTInfoFetching() {
+    void loadDefaultWithFromPresetsAfterFailedRESTInfoFetching() {
         assertThat(presets.getWithFrom(), hasSize(0));
 
         JobExecution jobExecution =

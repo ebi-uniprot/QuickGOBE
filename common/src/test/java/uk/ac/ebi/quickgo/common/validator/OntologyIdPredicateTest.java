@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.common.validator;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -13,35 +13,35 @@ import static uk.ac.ebi.quickgo.common.validator.OntologyIdPredicate.isValidGOTe
  * Time: 11:16
  * Created with IntelliJ IDEA.
  */
-public class OntologyIdPredicateTest {
+class OntologyIdPredicateTest {
 
     @Test
-    public void validUpperCaseGOIdentifierReturnsTrue(){
+    void validUpperCaseGOIdentifierReturnsTrue(){
         assertThat(isValidGOTermId().test("GO:1234123"),is(true));
     }
 
     @Test
-    public void validLowercaseGOIdentifierReturnsTrue(){
+    void validLowercaseGOIdentifierReturnsTrue(){
         assertThat(isValidGOTermId().test("go:1234123"),is(true));
     }
 
     @Test
-    public void invalidGOIdentifierReturnsFalse(){
+    void invalidGOIdentifierReturnsFalse(){
         assertThat(isValidGOTermId().test("GO:ABCDEFGH"),is(false));
     }
 
     @Test
-    public void validUpperCaseECOIdentifierReturnsTrue(){
+    void validUpperCaseECOIdentifierReturnsTrue(){
         assertThat(isValidECOTermId().test("ECO:1234123"),is(true));
     }
 
     @Test
-    public void validLowercaseECOIdentifierReturnsTrue(){
+    void validLowercaseECOIdentifierReturnsTrue(){
         assertThat(isValidECOTermId().test("eco:1234123"),is(true));
     }
 
     @Test
-    public void invalidECOIdentifierReturnsFalse(){
+    void invalidECOIdentifierReturnsFalse(){
         assertThat(isValidECOTermId().test("ECO:ABCDEFGH"),is(false));
     }
 }

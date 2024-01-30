@@ -2,11 +2,11 @@ package uk.ac.ebi.quickgo.index.common.listener;
 
 import java.time.Instant;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -17,8 +17,8 @@ import static uk.ac.ebi.quickgo.index.common.listener.ItemRateWriterListener.WRI
  * Created 27/04/16
  * @author Edd
  */
-@RunWith(MockitoJUnitRunner.class)
-public class ItemRateWriterListenerTest {
+@ExtendWith(MockitoExtension.class)
+class ItemRateWriterListenerTest {
 
     private Instant start;
     private ItemRateWriterListener<Object> itemRateWriterListener;
@@ -26,14 +26,14 @@ public class ItemRateWriterListenerTest {
     @Mock
     private List<Object> mockedWrittenDocList;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         start = Instant.now();
         itemRateWriterListener = new ItemRateWriterListener<>(start);
     }
 
     @Test
-    public void computesRateAfterOneWrite() throws Exception {
+    void computesRateAfterOneWrite() throws Exception {
         int numDocs = 40;
         Instant fiveSecsAfterStart = start.plusSeconds(5);
 
@@ -48,7 +48,7 @@ public class ItemRateWriterListenerTest {
     }
 
     @Test
-    public void computesRateAfterMultipleWrites() throws Exception {
+    void computesRateAfterMultipleWrites() throws Exception {
         int tenDocs = 10;
         long twoSeconds = 2L;
         Instant twoSecsAfterStart = start.plusSeconds(twoSeconds);

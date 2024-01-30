@@ -1,11 +1,11 @@
 package uk.ac.ebi.quickgo.ontology.service.converter;
 
 import uk.ac.ebi.quickgo.common.converter.FieldConverter;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.ac.ebi.quickgo.common.FieldType;
 
 import java.util.Optional;
-import org.junit.Before;
-import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -16,7 +16,7 @@ import static org.hamcrest.core.IsNull.nullValue;
  * Created 01/12/15
  * @author Edd
  */
-public class FieldConverterTest {
+class FieldConverterTest {
     private FakeFieldConverter converter;
 
     static class MockFieldType implements FieldType {
@@ -29,23 +29,23 @@ public class FieldConverterTest {
         }
     }
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         this.converter = new FakeFieldConverter();
     }
 
     @Test
-    public void helperReturnsNullforEmptyString() {
+    void helperReturnsNullforEmptyString() {
         assertThat(converter.cleanFieldValue(""), is(nullValue()));
     }
 
     @Test
-    public void helperReturnsStringForNonEmptyString() {
+    void helperReturnsStringForNonEmptyString() {
         assertThat(converter.cleanFieldValue("hello"), is(equalTo("hello")));
     }
 
     @Test
-    public void helperReturnsNullForNullString() {
+    void helperReturnsNullForNullString() {
         assertThat(converter.cleanFieldValue(null), is(nullValue()));
     }
 

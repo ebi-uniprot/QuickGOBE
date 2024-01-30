@@ -1,8 +1,8 @@
 package uk.ac.ebi.quickgo.rest.comm;
 
 import java.util.Optional;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -11,23 +11,23 @@ import static org.hamcrest.core.Is.is;
  * Created 11/08/16
  * @author Edd
  */
-public class FilterContextTest {
+class FilterContextTest {
 
     private FilterContext context;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         context = new FilterContext();
     }
 
     @Test
-    public void canFetchingFromEmptyContextFindsNull() {
+    void canFetchingFromEmptyContextFindsNull() {
         Optional<FakeEntity> fakeEntity = context.get(FakeEntity.class);
         assertThat(fakeEntity, is(Optional.empty()));
     }
 
     @Test
-    public void canPutAndGetFromContext() {
+    void canPutAndGetFromContext() {
         FakeEntity entity = new FakeEntity();
         entity.value = "something interesting";
         context.save(FakeEntity.class, entity);
@@ -37,7 +37,7 @@ public class FilterContextTest {
     }
 
     @Test
-    public void canMergeTwoContextsIntoOne() {
+    void canMergeTwoContextsIntoOne() {
         FakeEntity fakeEntity = new FakeEntity();
         fakeEntity.value = "something interesting";
         context.save(FakeEntity.class, fakeEntity);

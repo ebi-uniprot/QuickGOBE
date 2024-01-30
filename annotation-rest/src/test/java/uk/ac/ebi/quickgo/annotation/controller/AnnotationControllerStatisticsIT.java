@@ -1,13 +1,11 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.cache.CacheManager;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.servlet.MockMvc;
@@ -48,14 +46,11 @@ import static uk.ac.ebi.quickgo.annotation.controller.StatsResponseVerifier.*;
 /**
  * Tests the behaviour of the statistics endpoint of the {@link AnnotationController}.
  */
-@RunWith(SpringJUnit4ClassRunner.class)
+// temporary data store for solr's data, which is automatically cleaned on exit
+@ExtendWith(TemporarySolrDataStore.class)
 @SpringBootTest(classes = {AnnotationREST.class})
 @WebAppConfiguration
-public class AnnotationControllerStatisticsIT {
-    // temporary data store for solr's data, which is automatically cleaned on exit
-    @ClassRule
-    public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
-
+class AnnotationControllerStatisticsIT {
     private static final String RESOURCE_URL = "/annotation";
     private static final String STATS_ENDPOINT = RESOURCE_URL + "/stats";
     private static final String GO_TERM_NAME = "catalytic activity";
@@ -96,8 +91,8 @@ public class AnnotationControllerStatisticsIT {
     @Autowired
     private AnnotationRepository repository;
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         repository.deleteAll();
 
         mockMvc = MockMvcBuilders.
@@ -109,7 +104,7 @@ public class AnnotationControllerStatisticsIT {
     }
 
     @Test
-    public void statsRequestFailsIfNoFilteringParametersAreIncluded() throws Exception {
+    void statsRequestFailsIfNoFilteringParametersAreIncluded() throws Exception {
         ResultActions response = mockMvc.perform(get(STATS_ENDPOINT));
 
         response.andDo(print())
@@ -119,7 +114,7 @@ public class AnnotationControllerStatisticsIT {
     }
 
     @Test
-    public void queryWithNoHitsProducesEmptyStats() throws Exception {
+    void queryWithNoHitsProducesEmptyStats() throws Exception {
         repository.deleteAll();
 
         ResultActions response = mockMvc.perform(get(STATS_ENDPOINT)
@@ -133,12 +128,12 @@ public class AnnotationControllerStatisticsIT {
 
     //----------- Ontology ID -----------//
     @Test
-    public void statsForAllDocsContaining1OntologyIdReturns1OntologyIdStat() throws Exception {
+    void statsForAllDocsContaining1OntologyIdReturns1OntologyIdStat() throws Exception {
         executesAndAssertsCalculatedStatsForAttribute(GO_ID_STATS_FIELD, savedDocs, doc -> doc.goId, 1);
     }
 
     @Test
-    public void statsForAllDocsContaining2OntologyIdsReturns2OntologyIdStats() throws Exception {
+    void statsForAllDocsContaining2OntologyIdsReturns2OntologyIdStats() throws Exception {
         AnnotationDocument extraDoc = createAnnotationDoc("P99999");
         extraDoc.goId = "GO:0016020";
         repository.save(extraDoc);
@@ -150,7 +145,7 @@ public class AnnotationControllerStatisticsIT {
     }
 
     @Test
-    public void statsForFilteredDocsContaining2OntologyIdsReturns2OntologyIdStats() throws Exception {
+    void statsForFilteredDocsContaining2OntologyIdsReturns2OntologyIdStats() throws Exception {
         AnnotationDocument extraDoc1 = createAnnotationDoc("P99999");
         extraDoc1.goId = "GO:1111111";
         extraDoc1.taxonId = 42;
@@ -174,7 +169,7 @@ public class AnnotationControllerStatisticsIT {
 
     //----------- Names for GO ids, taxon ids and eco codes -----------//
     @Test
-    public void namesForGoIdsAndTaxonIdsAndEvidenceCodes() throws Exception {
+    void namesForGoIdsAndTaxonIdsAndEvidenceCodes() throws Exception {
         cacheManager.getCache("names").clear();
         final int expectedDistinctValueCount = 1;
         StatsSetupHelper statsSetupHelper = new StatsSetupHelper(mockRestServiceServer);
@@ -187,13 +182,13 @@ public class AnnotationControllerStatisticsIT {
 
     //----------- Taxon ID -----------//
     @Test
-    public void statsForAllDocsContaining1TaxonIdReturns1TaxonIdStat() throws Exception {
+    void statsForAllDocsContaining1TaxonIdReturns1TaxonIdStat() throws Exception {
         executesAndAssertsCalculatedStatsForAttribute(TAXON_ID_STATS_FIELD, savedDocs,
                 doc -> String.valueOf(doc.taxonId), 1);
     }
 
     @Test
-    public void statsForAllDocsContaining2TaxonIdsReturns2TaxonIdStats() throws Exception {
+    void statsForAllDocsContaining2TaxonIdsReturns2TaxonIdStats() throws Exception {
         AnnotationDocument extraDoc = createAnnotationDoc("P99999");
         extraDoc.taxonId = 7890;
         repository.save(extraDoc);
@@ -206,7 +201,7 @@ public class AnnotationControllerStatisticsIT {
     }
 
     @Test
-    public void statsForFilteredDocsContaining2TaxonIdsReturns2TaxonIdStats() throws Exception {
+    void statsForFilteredDocsContaining2TaxonIdsReturns2TaxonIdStats() throws Exception {
         String filteringGoId = "GO:9999999";
 
         AnnotationDocument extraDoc1 = createAnnotationDoc("P99999");
@@ -232,12 +227,12 @@ public class AnnotationControllerStatisticsIT {
 
     //----------- Reference -----------//
     @Test
-    public void statsForAllDocsContaining1ReferenceIdReturns1ReferenceIdStat() throws Exception {
+    void statsForAllDocsContaining1ReferenceIdReturns1ReferenceIdStat() throws Exception {
         executesAndAssertsCalculatedStatsForAttribute(REFERENCE_STATS_FIELD, savedDocs, doc -> doc.reference, 1);
     }
 
     @Test
-    public void statsForAllDocsContaining2ReferencesReturns2ReferenceStats() throws Exception {
+    void statsForAllDocsContaining2ReferencesReturns2ReferenceStats() throws Exception {
         AnnotationDocument extraDoc = createAnnotationDoc("P99999");
         extraDoc.reference = "PMID:19864465";
         repository.save(extraDoc);
@@ -249,7 +244,7 @@ public class AnnotationControllerStatisticsIT {
     }
 
     @Test
-    public void statsForFilteredDocsContaining2RefernecesReturns2ReferenceStats() throws Exception {
+    void statsForFilteredDocsContaining2RefernecesReturns2ReferenceStats() throws Exception {
         String filteringGoId = "GO:9999999";
 
         AnnotationDocument extraDoc1 = createAnnotationDoc("P99999");
@@ -275,13 +270,13 @@ public class AnnotationControllerStatisticsIT {
 
     //----------- Evidence code -----------//
     @Test
-    public void statsForAllDocsContaining1EvidenceCodeReturns1EvidenceCodeStat() throws Exception {
+    void statsForAllDocsContaining1EvidenceCodeReturns1EvidenceCodeStat() throws Exception {
         executesAndAssertsCalculatedStatsForAttribute(EVIDENCE_CODE_STATS_FIELD, savedDocs, doc -> doc.evidenceCode,
                 1);
     }
 
     @Test
-    public void statsForAllDocsContaining2evidenceCodesReturns2EvidenceCodeStats() throws Exception {
+    void statsForAllDocsContaining2evidenceCodesReturns2EvidenceCodeStats() throws Exception {
         AnnotationDocument extraDoc = createAnnotationDoc("P99999");
         extraDoc.evidenceCode = "ECO:0000888";
         repository.save(extraDoc);
@@ -294,7 +289,7 @@ public class AnnotationControllerStatisticsIT {
     }
 
     @Test
-    public void statsForFilteredDocsContaining2EvidenceCodesReturns2EvidenceCodesStats() throws Exception {
+    void statsForFilteredDocsContaining2EvidenceCodesReturns2EvidenceCodesStats() throws Exception {
         String filteringGoId = "GO:9999999";
 
         AnnotationDocument extraDoc1 = createAnnotationDoc("P99999");
@@ -320,12 +315,12 @@ public class AnnotationControllerStatisticsIT {
 
     //----------- Assigned by -----------//
     @Test
-    public void statsForAllDocsContaining1AssignedByReturns1AssignedByStat() throws Exception {
+    void statsForAllDocsContaining1AssignedByReturns1AssignedByStat() throws Exception {
         executesAndAssertsCalculatedStatsForAttribute(ASSIGNED_BY_STATS_FIELD, savedDocs, doc -> doc.assignedBy, 1);
     }
 
     @Test
-    public void statsForAllDocsContaining2AssignedByReturns2AssignedByStats() throws Exception {
+    void statsForAllDocsContaining2AssignedByReturns2AssignedByStats() throws Exception {
         AnnotationDocument extraDoc = createAnnotationDoc("P99999");
         extraDoc.assignedBy = "Agbase";
         repository.save(extraDoc);
@@ -338,7 +333,7 @@ public class AnnotationControllerStatisticsIT {
     }
 
     @Test
-    public void statsForFilteredDocsContaining2AssignedByReturns2AssignedByStats() throws Exception {
+    void statsForFilteredDocsContaining2AssignedByReturns2AssignedByStats() throws Exception {
         String filteringGoId = "GO:9999999";
 
         AnnotationDocument extraDoc1 = createAnnotationDoc("P99999");
@@ -364,12 +359,12 @@ public class AnnotationControllerStatisticsIT {
 
     //----------- GO aspect -----------//
     @Test
-    public void statsForAllDocsContaining1AspectReturns1AspectByStat() throws Exception {
+    void statsForAllDocsContaining1AspectReturns1AspectByStat() throws Exception {
         executesAndAssertsCalculatedStatsForAttribute(GO_ASPECT_STATS_FIELD, savedDocs, doc -> doc.goAspect, 1);
     }
 
     @Test
-    public void statsForAllDocsContaining2AspectsReturns2AspectsStats() throws Exception {
+    void statsForAllDocsContaining2AspectsReturns2AspectsStats() throws Exception {
         AnnotationDocument extraDoc = createAnnotationDoc("P99999");
         extraDoc.goAspect = "molecular_function";
         repository.save(extraDoc);
@@ -381,7 +376,7 @@ public class AnnotationControllerStatisticsIT {
     }
 
     @Test
-    public void statsForFilteredDocsContaining2AspectsReturns2AspectStats() throws Exception {
+    void statsForFilteredDocsContaining2AspectsReturns2AspectStats() throws Exception {
         String filteringGoId = "GO:9999999";
 
         AnnotationDocument extraDoc1 = createAnnotationDoc("P99999");
@@ -408,7 +403,7 @@ public class AnnotationControllerStatisticsIT {
     //----------- Gene Product Id -----------//
 
     @Test
-    public void statsWhenFilteredByGeneProductContainsGeneProductIdBucket() throws Exception {
+    void statsWhenFilteredByGeneProductContainsGeneProductIdBucket() throws Exception {
         final String gene = "P99999";
         repository.save(createAnnotationDoc(gene));
 

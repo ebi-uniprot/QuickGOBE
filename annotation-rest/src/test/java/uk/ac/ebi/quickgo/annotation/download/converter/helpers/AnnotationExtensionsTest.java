@@ -1,16 +1,16 @@
 package uk.ac.ebi.quickgo.annotation.download.converter.helpers;
 
+import org.junit.jupiter.api.Test;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
-import org.junit.Test;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.AnnotationExtensionsTest.FakeExtensionItem
         .OCCURS_IN_CL_1;
 import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.AnnotationExtensionsTest.FakeExtensionItem
@@ -27,7 +27,7 @@ import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.TestHelper
  * Time: 08:05
  * Created with IntelliJ IDEA.
  */
-public class AnnotationExtensionsTest {
+class AnnotationExtensionsTest {
 
     private static final String EMPTY_STRING = "";
     private static final List<List<Supplier<Annotation.RelationXref>>> EXTENSIONS = asList(
@@ -37,17 +37,17 @@ public class AnnotationExtensionsTest {
             "(CL:0000003)";
 
     @Test
-    public void nullReferenceComesBackAsEmptyString() {
+    void nullReferenceComesBackAsEmptyString() {
         assertThat(AnnotationExtensions.nullOrEmptyListToEmptyString(null), is(EMPTY_STRING));
     }
 
     @Test
-    public void emptyReferenceComesBackAsEmptyString() {
+    void emptyReferenceComesBackAsEmptyString() {
         assertThat(AnnotationExtensions.nullOrEmptyListToEmptyString(Collections.emptyList()), is(EMPTY_STRING));
     }
 
     @Test
-    public void mixOfOrAndAnd() {
+    void mixOfOrAndAnd() {
         List<Annotation.ConnectedXRefs<Annotation.RelationXref>> extensionsModel = connectedXrefs(EXTENSIONS);
         assertThat(AnnotationExtensions.nullOrEmptyListToEmptyString(extensionsModel), is(EXPECTED_EXTENSION));
     }

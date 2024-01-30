@@ -1,11 +1,12 @@
 package uk.ac.ebi.quickgo.index.annotation.coterms;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Tony Wardell
@@ -13,7 +14,7 @@ import static org.hamcrest.core.IsEqual.equalTo;
  * Time: 13:52
  * Created with IntelliJ IDEA.
  */
-public class CoTermTest {
+class CoTermTest {
 
     private static final String TARGET_TERM = "GO:00000200";
     private static final String COMPARED_TERM = "GO:0003824";
@@ -26,8 +27,8 @@ public class CoTermTest {
 
     private CoTerm coTerm;
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         coTerm =
                 new CoTerm.Builder().setTarget(TARGET_TERM).setComparedTerm(COMPARED_TERM).setCompared(COMPARED)
                         .setTogether(TOGETHER).setProbabilityRatio(PROBABILITY_RATIO)
@@ -35,52 +36,66 @@ public class CoTermTest {
     }
 
     @Test
-    public void successfullyCalculateSimilarityRatio() {
+    void successfullyCalculateSimilarityRatio() {
         assertThat(CoTerm.calculateSimilarityRatio(SELECTED, TOGETHER, COMPARED), equalTo(SIMILARITY_RATIO));
     }
 
     @Test
-    public void successfullyProbabilityRatio() {
+    void successfullyProbabilityRatio() {
         assertThat(CoTerm.calculateProbabilityRatio(SELECTED, TOGETHER, ALL, COMPARED), equalTo(PROBABILITY_RATIO));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void calculateSimilarityRatioSelectEqualToZeroThrowsException() {
-        CoTerm.calculateSimilarityRatio(0, TOGETHER, COMPARED);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void calculateProbabilityRatioSelectEqualToZeroThrowsException() {
-        CoTerm.calculateProbabilityRatio(0L, TOGETHER, ALL, COMPARED);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void calculateProbabilityRatioAllEqualToZeroThrowsException() {
-        CoTerm.calculateProbabilityRatio(SELECTED, TOGETHER, 0L, COMPARED);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void ifSetTargetIsPassedNullAnExceptionIsThrown() {
-        new CoTerm.Builder().setTarget(null);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void ifSetTargetIsPassedEmptyStringAnExceptionIsThrown() {
-        new CoTerm.Builder().setTarget("   ");
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void ifSetComparedTermIsPassedNullAnExceptionIsThrown() {
-        new CoTerm.Builder().setComparedTerm(null);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void ifSetComparedTermIsPassedEmptyStringAnExceptionIsThrown() {
-        new CoTerm.Builder().setComparedTerm("   ");
+    @Test
+    void calculateSimilarityRatioSelectEqualToZeroThrowsException() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            CoTerm.calculateSimilarityRatio(0, TOGETHER, COMPARED);
+        });
     }
 
     @Test
-    public void builtCoTermSuccessfully() {
+    void calculateProbabilityRatioSelectEqualToZeroThrowsException() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            CoTerm.calculateProbabilityRatio(0L, TOGETHER, ALL, COMPARED);
+        });
+    }
+
+    @Test
+    void calculateProbabilityRatioAllEqualToZeroThrowsException() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            CoTerm.calculateProbabilityRatio(SELECTED, TOGETHER, 0L, COMPARED);
+        });
+    }
+
+    @Test
+    void ifSetTargetIsPassedNullAnExceptionIsThrown() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            new CoTerm.Builder().setTarget(null);
+        });
+    }
+
+    @Test
+    void ifSetTargetIsPassedEmptyStringAnExceptionIsThrown() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            new CoTerm.Builder().setTarget("   ");
+        });
+    }
+
+    @Test
+    void ifSetComparedTermIsPassedNullAnExceptionIsThrown() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            new CoTerm.Builder().setComparedTerm(null);
+        });
+    }
+
+    @Test
+    void ifSetComparedTermIsPassedEmptyStringAnExceptionIsThrown() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            new CoTerm.Builder().setComparedTerm("   ");
+        });
+    }
+
+    @Test
+    void builtCoTermSuccessfully() {
         assertThat(coTerm.getTarget(), is(TARGET_TERM));
         assertThat(coTerm.getComparedTerm(), is(COMPARED_TERM));
         assertThat(coTerm.getCompared(), is(COMPARED));
@@ -90,7 +105,7 @@ public class CoTermTest {
     }
 
     @Test
-    public void similarityRatioNotCalculatedAsZero() {
+    void similarityRatioNotCalculatedAsZero() {
         long selected = 1;
         long together = 1;
         long compared = 3201;

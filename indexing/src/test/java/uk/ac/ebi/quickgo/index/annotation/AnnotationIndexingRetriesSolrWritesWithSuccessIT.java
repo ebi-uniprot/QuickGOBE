@@ -1,9 +1,8 @@
 package uk.ac.ebi.quickgo.index.annotation;
 
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.MockitoAnnotations;
@@ -19,7 +18,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 import uk.ac.ebi.quickgo.index.common.JobTestRunnerConfig;
@@ -49,16 +47,11 @@ import static uk.ac.ebi.quickgo.index.annotation.AnnotationConfig.ANNOTATION_IND
  *
  * @author Edd
  */
+@ExtendWith(TemporarySolrDataStore.class)
 @ActiveProfiles(profiles = {"embeddedServer", "twoSolrRemoteHostErrors"})
-//@ActiveProfiles(profiles = {"embeddedServer"})
-@RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {AnnotationIndexingConfig.class, JobTestRunnerConfig.class,
                 AnnotationIndexingRetriesSolrWritesWithSuccessIT.RetryConfig.class})
-public class AnnotationIndexingRetriesSolrWritesWithSuccessIT {
-
-    @ClassRule
-    public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
-
+class AnnotationIndexingRetriesSolrWritesWithSuccessIT {
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
 
@@ -77,13 +70,13 @@ public class AnnotationIndexingRetriesSolrWritesWithSuccessIT {
             SolrResponse.OK,                // simulate writing fourth chunk (size 1: only 1 valid document in chunk)
             SolrResponse.OK);               // never called
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         MockitoAnnotations.initMocks(this);
     }
 
     @Test
-    public void twoRetriesAndSuccessfulIndexingJob() throws Exception {
+    void twoRetriesAndSuccessfulIndexingJob() throws Exception {
         JobExecution jobExecution = jobLauncherTestUtils.launchJob();
         assertThat(jobExecution.getJobInstance().getJobName(), is(ANNOTATION_INDEXING_JOB_NAME));
 

@@ -8,15 +8,16 @@ import uk.ac.ebi.quickgo.rest.search.request.config.FilterConfigRetrieval;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.client.RestOperations;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 import static uk.ac.ebi.quickgo.rest.search.request.config.FilterConfig.ExecutionType.JOIN;
 import static uk.ac.ebi.quickgo.rest.search.request.config.FilterConfig.ExecutionType.SIMPLE;
@@ -29,8 +30,8 @@ import static uk.ac.ebi.quickgo.rest.search.request.converter.JoinFilterConverte
  * Created 06/06/16
  * @author Edd
  */
-@RunWith(MockitoJUnitRunner.class)
-public class FilterConverterFactoryTest {
+@ExtendWith(MockitoExtension.class)
+class FilterConverterFactoryTest {
     @Mock
     private FilterConfigRetrieval filterConfigRetrievalMock;
     @Mock
@@ -40,24 +41,24 @@ public class FilterConverterFactoryTest {
 
     private FilterConverterFactory converter;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         this.converter = new FilterConverterFactory(filterConfigRetrievalMock, restOperationsMock);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void nullRestOperationsThrowsException() {
-        new FilterConverterFactory(filterConfigRetrievalMock, null);
+    @Test
+    void nullRestOperationsThrowsException() {
+        assertThrows(IllegalArgumentException.class, () -> new FilterConverterFactory(filterConfigRetrievalMock, null));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void nullConfigRetrievalThrowsException() {
-        new FilterConverterFactory(null, restOperationsMock);
+    @Test
+    void nullConfigRetrievalThrowsException() {
+        assertThrows(IllegalArgumentException.class, () -> new FilterConverterFactory(null, restOperationsMock));
     }
 
     // simple request -> QuickGOQuery tests
     @Test
-    public void createsQueryForCorrectlyConfiguredSimpleRequest() {
+    void createsQueryForCorrectlyConfiguredSimpleRequest() {
         String value = "valueX";
         String field = "fieldX";
         FilterRequest request = FilterRequest.newBuilder().addProperty(field, value).build();
@@ -72,21 +73,20 @@ public class FilterConverterFactoryTest {
         assertThat(resultingQuery, is(expectedQuery));
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void missingSignatureInConfigForSimpleRequestCausesException() {
+    @Test
+    void missingSignatureInConfigForSimpleRequestCausesException() {
         String value = "valueX";
         String field = "fieldX";
         FilterRequest request = FilterRequest.newBuilder().addProperty(field, value).build();
 
         when(filterConfigRetrievalMock.getBySignature(request.getSignature()))
-                .thenReturn(Optional.empty());
-
-        converter.convert(request);
+          .thenReturn(Optional.empty());
+        assertThrows(IllegalStateException.class, () -> converter.convert(request));
     }
 
     // join request -> QuickGOQuery tests
     @Test
-    public void createsQueryForCorrectlyConfiguredJoinRequest() {
+    void createsQueryForCorrectlyConfiguredJoinRequest() {
         String value = "valueX";
         String field = "fieldX";
         FilterRequest request = FilterRequest.newBuilder().addProperty(field, value).build();
@@ -118,18 +118,17 @@ public class FilterConverterFactoryTest {
         assertThat(resultingQuery, is(expectedQuery));
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void missingSignatureInConfigForJoinRequestCausesException() {
+    @Test
+    void missingSignatureInConfigForJoinRequestCausesException() {
         String value = "valueX";
         String field = "fieldX";
         FilterRequest request = FilterRequest.newBuilder().addProperty(field, value).build();
 
         when(filterConfigRetrievalMock.getBySignature(request.getSignature()))
-                .thenReturn(Optional.empty());
+          .thenReturn(Optional.empty());
 
         setConfigPropertiesMap();
-
-        converter.convert(request);
+        assertThrows(IllegalStateException.class, () -> converter.convert(request));
     }
 
     private void setConfigPropertiesMap() {

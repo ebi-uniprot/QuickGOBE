@@ -1,22 +1,23 @@
 package uk.ac.ebi.quickgo.rest.search.request.converter;
 
+import org.junit.jupiter.api.Test;
 import uk.ac.ebi.quickgo.rest.comm.FilterContext;
 
 import java.util.Optional;
-import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.notNullValue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Created 19/08/16
  * @author Edd
  */
-public class ConvertedFilterTest {
+class ConvertedFilterTest {
     @Test
-    public void canCreateWithOnlyValue() {
+    void canCreateWithOnlyValue() {
         String value = "value";
 
         ConvertedFilter<String> convertedFilter = new ConvertedFilter<>(value);
@@ -27,7 +28,7 @@ public class ConvertedFilterTest {
     }
 
     @Test
-    public void canCreateWithValueAndContext() {
+    void canCreateWithValueAndContext() {
         String value = "value";
         FilterContext filterContext = new FilterContext();
 
@@ -40,9 +41,9 @@ public class ConvertedFilterTest {
 
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void cannotCreateWithNullValue() {
-        new ConvertedFilter<>(null);
+    @Test
+    void cannotCreateWithNullValue() {
+        assertThrows(IllegalArgumentException.class, () -> new ConvertedFilter<>(null));
     }
 
 }

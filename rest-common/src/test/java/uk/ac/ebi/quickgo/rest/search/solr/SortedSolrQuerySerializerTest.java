@@ -1,14 +1,14 @@
 package uk.ac.ebi.quickgo.rest.search.solr;
-
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.ac.ebi.quickgo.rest.search.query.*;
 
 import java.util.HashSet;
 import java.util.Set;
-import org.junit.Before;
-import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.ac.ebi.quickgo.rest.TestUtil.asSet;
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.SELECT_ALL_WHERE_FIELD_IS_NOT_EMPTY;
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.and;
@@ -20,7 +20,7 @@ import static uk.ac.ebi.quickgo.rest.search.solr.SortedSolrQuerySerializer.RETRI
  * Created 02/08/16
  * @author Edd
  */
-public class SortedSolrQuerySerializerTest {
+class SortedSolrQuerySerializerTest {
     private static final String FIELD_WILDCARD = "fieldWC";
     private SortedSolrQuerySerializer serializer;
     private static Set<String> wildCardCompatibleFields = new HashSet<>();
@@ -29,13 +29,13 @@ public class SortedSolrQuerySerializerTest {
         wildCardCompatibleFields.add(FIELD_WILDCARD);
     }
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         this.serializer = new SortedSolrQuerySerializer();
     }
 
     @Test
-    public void visitTransformsFieldQueryToString() throws Exception {
+    void visitTransformsFieldQueryToString()  {
         String field = "field1";
         String value = "value1";
         FieldQuery fieldQuery = new FieldQuery(field, value);
@@ -46,7 +46,7 @@ public class SortedSolrQuerySerializerTest {
     }
 
     @Test
-    public void visitTransformsNoFieldQueryToString() throws Exception {
+    void visitTransformsNoFieldQueryToString()  {
         String value = "value1";
         NoFieldQuery noFieldQuery = new NoFieldQuery(value);
 
@@ -56,7 +56,7 @@ public class SortedSolrQuerySerializerTest {
     }
 
     @Test
-    public void visitTransformsFieldQueryWithSolrReservedCharacterToString() throws Exception {
+    void visitTransformsFieldQueryWithSolrReservedCharacterToString()  {
         String field = "field1";
         String value = "prefix:value1";
         String escapedValue = "prefix\\:value1";
@@ -69,7 +69,7 @@ public class SortedSolrQuerySerializerTest {
     }
 
     @Test
-    public void visitTransformsCompositeQueryToString() throws Exception {
+    void visitTransformsCompositeQueryToString()  {
         CompositeQuery complexQuery = createComplexQuery();
 
         String queryString = serializer.visit(complexQuery);
@@ -79,7 +79,7 @@ public class SortedSolrQuerySerializerTest {
     }
 
     @Test
-    public void visitTransformsAllQueryToString() {
+    void visitTransformsAllQueryToString() {
         AllQuery allQuery = new AllQuery();
 
         String queryString = serializer.visit(allQuery);
@@ -89,7 +89,7 @@ public class SortedSolrQuerySerializerTest {
     }
 
     @Test
-    public void visitTransformsNegatedAllQueryToString() {
+    void visitTransformsNegatedAllQueryToString() {
         CompositeQuery nothingQuery =
                 new CompositeQuery(asSet(QuickGOQuery.createAllQuery()), CompositeQuery.QueryOp.NOT);
 
@@ -100,7 +100,7 @@ public class SortedSolrQuerySerializerTest {
     }
 
     @Test
-    public void visitTransformsJoinQueryWithNoFromFilterToString() {
+    void visitTransformsJoinQueryWithNoFromFilterToString() {
         String joinFromTable = "annotation";
         String joinFromAttribute = "id";
         String joinToTable = "ontology";
@@ -117,7 +117,7 @@ public class SortedSolrQuerySerializerTest {
     }
 
     @Test
-    public void visitTransformsJoinQueryWithAFromFilterToString() {
+    void visitTransformsJoinQueryWithAFromFilterToString() {
         String joinFromTable = "annotation";
         String joinFromAttribute = "id";
         String joinToTable = "ontology";
@@ -139,7 +139,7 @@ public class SortedSolrQuerySerializerTest {
     }
 
     @Test
-    public void visitTransforms3OrQueriesToString() {
+    void visitTransforms3OrQueriesToString() {
         FieldQuery query1 = new FieldQuery("field1", "value1");
         FieldQuery query2 = new FieldQuery("field2", "value2");
         FieldQuery query3 = new FieldQuery("field3", "value3");
@@ -158,7 +158,7 @@ public class SortedSolrQuerySerializerTest {
     }
 
     @Test
-    public void visitTransforms3AndQueriesToString() {
+    void visitTransforms3AndQueriesToString() {
         FieldQuery query1 = new FieldQuery("field1", "value1");
         FieldQuery query2 = new FieldQuery("field2", "value2");
         FieldQuery query3 = new FieldQuery("field3", "value3");
@@ -177,7 +177,7 @@ public class SortedSolrQuerySerializerTest {
     }
 
     @Test
-    public void visitWithWildCard(){
+    void visitWithWildCard(){
         SortedSolrQuerySerializer serializerWithWildCard = new SortedSolrQuerySerializer(wildCardCompatibleFields);
         AllNonEmptyFieldQuery allNonEmptyFieldQuery = new AllNonEmptyFieldQuery(FIELD_WILDCARD, SELECT_ALL_WHERE_FIELD_IS_NOT_EMPTY);
 
@@ -186,13 +186,13 @@ public class SortedSolrQuerySerializerTest {
         assertThat(queryString, is(String.format("(%s:%s)", allNonEmptyFieldQuery.field(), RETRIEVE_ALL_NON_EMPTY )));
     }
 
-    @Test (expected = IllegalArgumentException.class)
-    public void passingNullWildcardCompatibleSetThrowsException(){
-        new SortedSolrQuerySerializer(null);
+    @Test
+    void passingNullWildcardCompatibleSetThrowsException(){
+        assertThrows(IllegalArgumentException.class, () -> new SortedSolrQuerySerializer(null));
     }
 
     @Test
-    public void visitTransformsContainFieldQueryToString() throws Exception {
+    void visitTransformsContainFieldQueryToString()  {
         String field = "field1";
         String value = "value1";
         ContainsFieldQuery fieldQuery = new ContainsFieldQuery(field, value);
@@ -203,7 +203,7 @@ public class SortedSolrQuerySerializerTest {
     }
 
     @Test
-    public void visitTransformsContainFieldQueryWithSolrEscape() throws Exception {
+    void visitTransformsContainFieldQueryWithSolrEscape()  {
         String field = "field1";
         String value = "*value1*";
         ContainsFieldQuery fieldQuery = new ContainsFieldQuery(field, value);

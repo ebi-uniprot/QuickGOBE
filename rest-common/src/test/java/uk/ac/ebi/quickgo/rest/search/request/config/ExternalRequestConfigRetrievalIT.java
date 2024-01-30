@@ -1,7 +1,6 @@
 package uk.ac.ebi.quickgo.rest.search.request.config;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -11,7 +10,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.ac.ebi.quickgo.common.SearchableField;
 import uk.ac.ebi.quickgo.rest.search.request.FilterUtil;
 
@@ -25,14 +23,13 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static uk.ac.ebi.quickgo.rest.search.request.config.FilterConfig.ExecutionType;
 
-@RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = ExternalRequestConfigRetrievalIT.TestApplication.class)
 @ActiveProfiles(profiles = {"ExternalFilterExecutionConfigIT"})
-public class ExternalRequestConfigRetrievalIT {
+class ExternalRequestConfigRetrievalIT {
     @Configuration
     @ComponentScan
     @EnableConfigurationProperties
-    public static class TestApplication {
+    static class TestApplication {
 
         @Profile(value = "ExternalFilterExecutionConfigIT")
         @Bean
@@ -57,7 +54,7 @@ public class ExternalRequestConfigRetrievalIT {
     private ExternalFilterConfigRetrieval externalFilterExecutionConfig;
 
     @Test
-    public void yamlPropertiesLoadedCorrectlyIntoBean() {
+    void yamlPropertiesLoadedCorrectlyIntoBean() {
         List<FilterConfig> fieldConfigs = externalFilterExecutionConfig.getFilterConfigs();
 
         FilterConfig aspectField = createStubAspectSignature();

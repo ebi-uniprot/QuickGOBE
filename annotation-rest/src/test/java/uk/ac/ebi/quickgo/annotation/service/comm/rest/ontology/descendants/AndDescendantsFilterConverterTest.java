@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.descendants;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationFields;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.converter.AndDescendantsFilterConverter;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.OntologyRelatives;
@@ -17,14 +17,14 @@ import static org.hamcrest.core.Is.is;
 import static uk.ac.ebi.quickgo.annotation.IdGeneratorUtil.createGoId;
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.*;
 
-public class AndDescendantsFilterConverterTest {
+class AndDescendantsFilterConverterTest {
   private OntologyRelatives response;
   private AndDescendantsFilterConverter converter;
   private String field = AnnotationFields.Searchable.GP_RELATED_GO_IDS;
   private String goField = AnnotationFields.Searchable.GO_ID;
 
-  @Before
-  public void setUp() {
+  @BeforeEach
+  void setUp() {
     response = new OntologyRelatives();
     response.setResults(new ArrayList<>());
     converter = new AndDescendantsFilterConverter();
@@ -32,7 +32,7 @@ public class AndDescendantsFilterConverterTest {
 
 
   @Test
-  public void descendantsFromSingleResourceAreConvertedToQuickGOQuery() {
+  void descendantsFromSingleResourceAreConvertedToQuickGOQuery() {
     String id1 = createGoId(1);
     String desc1 = createGoId(2);
 
@@ -45,7 +45,7 @@ public class AndDescendantsFilterConverterTest {
   }
 
   @Test
-  public void differentDescendantsFromMultipleResourcesAreConvertedToQuickGOQuery() {
+  void differentDescendantsFromMultipleResourcesAreConvertedToQuickGOQuery() {
     String id1 = createGoId(1);
     String id2 = createGoId(2);
     String desc1 = createGoId(11);
@@ -63,7 +63,7 @@ public class AndDescendantsFilterConverterTest {
   }
 
   @Test
-  public void sameDescendantsFromMultipleResourcesAreConvertedToQuickGOQuery() {
+  void sameDescendantsFromMultipleResourcesAreConvertedToQuickGOQuery() {
     String id1 = createGoId(1);
     String id2 = createGoId(2);
     String desc1 = createGoId(11);
@@ -79,7 +79,7 @@ public class AndDescendantsFilterConverterTest {
   }
 
   @Test
-  public void nullResultsMeansFilterEverything() {
+  void nullResultsMeansFilterEverything() {
     response.setResults(null);
     ConvertedFilter<QuickGOQuery> convertedFilter = converter.transform(response);
 
@@ -88,7 +88,7 @@ public class AndDescendantsFilterConverterTest {
   }
 
   @Test
-  public void emptyResultsMeansFilterEverything() {
+  void emptyResultsMeansFilterEverything() {
     ConvertedFilter<QuickGOQuery> convertedFilter = converter.transform(response);
 
     assertThat(convertedFilter.getConvertedValue(), is(not(QuickGOQuery.createAllQuery())));

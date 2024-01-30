@@ -1,10 +1,11 @@
 package uk.ac.ebi.quickgo.rest.period;
 
-import java.time.DayOfWeek;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static junit.framework.TestCase.assertFalse;
-import static junit.framework.TestCase.assertTrue;
+import java.time.DayOfWeek;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Test DayOfWeekRange.
@@ -13,10 +14,10 @@ import static junit.framework.TestCase.assertTrue;
  * Time: 11:50
  * Created with IntelliJ IDEA.
  */
-public class DayOfWeekRangeTest {
+class DayOfWeekRangeTest {
 
     @Test
-    public void testIncludes(){
+    void testIncludes(){
         assertTrue(new DayOfWeekRange(DayOfWeek.SATURDAY, DayOfWeek.SATURDAY).includes(DayOfWeek.SATURDAY));
         assertTrue(new DayOfWeekRange(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY).includes(DayOfWeek.SATURDAY));
         assertTrue(new DayOfWeekRange(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY).includes(DayOfWeek.SUNDAY));

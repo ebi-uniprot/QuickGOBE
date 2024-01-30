@@ -1,14 +1,12 @@
 package uk.ac.ebi.quickgo.ontology.traversal.read;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.ac.ebi.quickgo.ontology.traversal.OntologyGraph;
 
 import java.util.Set;
@@ -25,10 +23,9 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
  * Created 18/05/16
  * @author Edd
  */
-@RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {OntologyGraphConfig.class, JobTestRunnerConfig.class})
 @TestPropertySource(properties = "ontology.traversal.source=classpath:/relations/RELATIONS.dat.gz,classpath:/relations/ECO_RELATIONS.dat.gz")
-public class OntologyGraphConfigIT {
+class OntologyGraphConfigIT {
 
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
@@ -37,7 +34,7 @@ public class OntologyGraphConfigIT {
     private OntologyGraph ontologyGraph;
 
     @Test
-    public void runOntologyGraphLoading() throws Exception {
+    void runOntologyGraphLoading() throws Exception {
         JobExecution jobExecution = jobLauncherTestUtils.launchJob();
 
         BatchStatus status = jobExecution.getStatus();

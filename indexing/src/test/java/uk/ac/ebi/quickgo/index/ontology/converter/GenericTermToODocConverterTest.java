@@ -1,41 +1,44 @@
 package uk.ac.ebi.quickgo.index.ontology.converter;
-
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import uk.ac.ebi.quickgo.model.ontology.generic.*;
 import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
 
 import java.util.*;
 import java.util.function.Function;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
  * Tests the behaviour of the {@link GenericTermToODocConverter} class.
  */
-@RunWith(MockitoJUnitRunner.class)
-public class GenericTermToODocConverterTest {
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
+class GenericTermToODocConverterTest {
     private static final String TERM_ID = "id1";
 
     @Mock public GenericTerm term;
 
     private GenericTermToODocConverter converter = new GenericTermToODocConverter();
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         when(term.getId()).thenReturn(TERM_ID);
     }
 
     //replacements
     @Test
-    public void extractsNoReplacementsWhenGenericTermHasNullReplacements() {
+    void extractsNoReplacementsWhenGenericTermHasNullReplacements() {
         when(term.getReplacements()).thenReturn(null);
 
         OntologyDocument docOpt = converter.apply(term);
@@ -46,7 +49,7 @@ public class GenericTermToODocConverterTest {
     }
 
     @Test
-    public void extractsAConsiderWhenGenericTermHasReplacementsWithAConsider() {
+    void extractsAConsiderWhenGenericTermHasReplacementsWithAConsider() {
         RelationType relation = RelationType.CONSIDER;
         String replacedByTermId = "id2";
         String replacedWithTermId = "id3";
@@ -65,7 +68,7 @@ public class GenericTermToODocConverterTest {
     }
 
     @Test
-    public void extractsAReplacedByWhenGenericTermHasReplacementsWithReplacedBy() {
+    void extractsAReplacedByWhenGenericTermHasReplacementsWithReplacedBy() {
         RelationType relation = RelationType.REPLACEDBY;
         String replacedByTermId = "id2";
         String replacedWithTermId = "id2";
@@ -84,7 +87,7 @@ public class GenericTermToODocConverterTest {
     }
 
     @Test
-    public void extracts2ReplacementsWhenGenericTermHas2Replacements() {
+    void extracts2ReplacementsWhenGenericTermHas2Replacements() {
         TermRelation replacedByMock = mockReplaceRelation("id2", "id3", RelationType.REPLACEDBY);
         TermRelation considerMock = mockReplaceRelation("id4", "id5", RelationType.CONSIDER);
 
@@ -100,7 +103,7 @@ public class GenericTermToODocConverterTest {
     }
 
     @Test
-    public void convertsATermWith2RelationsInReplacementsSectionIntoDocWith2ReplacementElementsInReplacementsSection() {
+    void convertsATermWith2RelationsInReplacementsSectionIntoDocWith2ReplacementElementsInReplacementsSection() {
         TermRelation replacedByMock = mockReplaceRelation("id2", "id3", RelationType.REPLACEDBY);
         TermRelation considerMock = mockReplaceRelation("id4", "id5", RelationType.CONSIDER);
 
@@ -117,7 +120,7 @@ public class GenericTermToODocConverterTest {
 
     //replaces
     @Test
-    public void extractsNoReplacesWhenGenericTermHasNullReplaces() {
+    void extractsNoReplacesWhenGenericTermHasNullReplaces() {
         when(term.getReplacements()).thenReturn(null);
 
         OntologyDocument docOpt = converter.apply(term);
@@ -127,7 +130,7 @@ public class GenericTermToODocConverterTest {
     }
 
     @Test
-    public void extractsAConsiderWhenGenericTermHasReplacesWithAConsider() {
+    void extractsAConsiderWhenGenericTermHasReplacesWithAConsider() {
         RelationType relation = RelationType.CONSIDER;
         String replacedWithTermId = "id2";
         String replacedByTermId = "id3";
@@ -145,7 +148,7 @@ public class GenericTermToODocConverterTest {
     }
 
     @Test
-    public void extractsAReplacedByWhenGenericTermHasReplacesWithReplacedBy() {
+    void extractsAReplacedByWhenGenericTermHasReplacesWithReplacedBy() {
         RelationType relation = RelationType.REPLACEDBY;
         String replacedWIthTermId = "id2";
         String replacedByTermId = "id2";
@@ -163,7 +166,7 @@ public class GenericTermToODocConverterTest {
     }
 
     @Test
-    public void extracts2ReplacesWhenGenericTermHas2Replaces() {
+    void extracts2ReplacesWhenGenericTermHas2Replaces() {
         TermRelation replacedByMock = mockReplaceRelation("id2", "id3", RelationType.REPLACEDBY);
         TermRelation considerMock = mockReplaceRelation("id4", "id5", RelationType.CONSIDER);
 
@@ -178,7 +181,7 @@ public class GenericTermToODocConverterTest {
     }
 
     @Test
-    public void convertsATermWith2RelationsInReplacesSectionIntoDocWith2ReplacementElementsInReplacesSection() {
+    void convertsATermWith2RelationsInReplacesSectionIntoDocWith2ReplacementElementsInReplacesSection() {
         TermRelation replacedByMock = mockReplaceRelation("id2", "id3", RelationType.REPLACEDBY);
         TermRelation considerModk = mockReplaceRelation("id4", "id5", RelationType.CONSIDER);
 
@@ -210,7 +213,7 @@ public class GenericTermToODocConverterTest {
 
     // history
     @Test
-    public void extractsHistoryWhenExists() {
+    void extractsHistoryWhenExists() {
         AuditRecord auditRecord = mock(AuditRecord.class);
 
         when(auditRecord.getTermName()).thenReturn("term name");
@@ -232,7 +235,7 @@ public class GenericTermToODocConverterTest {
     }
 
     @Test
-    public void extractHistoryWhenNotExists() {
+    void extractHistoryWhenNotExists() {
         when(term.getHistory()).thenReturn(null);
 
         OntologyDocument docOpt = converter.apply(term);
@@ -243,7 +246,7 @@ public class GenericTermToODocConverterTest {
 
     // xrelations
     @Test
-    public void extractXRelationsWhenExist() {
+    void extractXRelationsWhenExist() {
         CrossOntologyRelation xrelationMock = mock(CrossOntologyRelation.class);
         when(xrelationMock.getForeignID()).thenReturn("foreignId");
         when(xrelationMock.getForeignTerm()).thenReturn("foreignTerm");
@@ -262,7 +265,7 @@ public class GenericTermToODocConverterTest {
     }
 
     @Test
-    public void extractXRelationsWhenNotExist() {
+    void extractXRelationsWhenNotExist() {
         when(term.getCrossOntologyRelations()).thenReturn(null);
 
         OntologyDocument docOpt = converter.apply(term);
@@ -273,7 +276,7 @@ public class GenericTermToODocConverterTest {
 
     // xrefs
     @Test
-    public void extractXRefsWhenExist() {
+    void extractXRefsWhenExist() {
         NamedXRef namedXRef = mock(NamedXRef.class);
         when(namedXRef.getName()).thenReturn("name");
         when(namedXRef.getDb()).thenReturn("db");
@@ -289,7 +292,7 @@ public class GenericTermToODocConverterTest {
     }
 
     @Test
-    public void extractXrefsWhenNotExist() {
+    void extractXrefsWhenNotExist() {
         when(term.getXrefs()).thenReturn(null);
 
         OntologyDocument docOpt = converter.apply(term);
@@ -300,7 +303,7 @@ public class GenericTermToODocConverterTest {
 
     // synonyms
     @Test
-    public void extractSynonymsWhenExist() {
+    void extractSynonymsWhenExist() {
         Synonym synonym = mock(Synonym.class);
         when(synonym.getName()).thenReturn("name1");
         when(synonym.getType()).thenReturn("type1");
@@ -316,7 +319,7 @@ public class GenericTermToODocConverterTest {
     }
 
     @Test
-    public void extractSynonymsWhenNotExist() {
+    void extractSynonymsWhenNotExist() {
         when(term.getSynonyms()).thenReturn(null);
 
         OntologyDocument docOpt = converter.apply(term);
@@ -330,7 +333,7 @@ public class GenericTermToODocConverterTest {
 
     // simple fields
     @Test
-    public void convertSimpleFields() {
+    void convertSimpleFields() {
         boolean isObsolete = false;
         when(term.isObsolete()).thenReturn(isObsolete);
         when(term.getComment()).thenReturn("comment1");
@@ -357,7 +360,7 @@ public class GenericTermToODocConverterTest {
     }
 
     @Test
-    public void convertsSimpleNullFields() {
+    void convertsSimpleNullFields() {
         OntologyDocument result = converter.apply(term);
         OntologyDocument document = result;
         assertThat(document.isObsolete, is(false));
@@ -369,7 +372,7 @@ public class GenericTermToODocConverterTest {
     }
 
     @Test
-    public void extractDefinitionXref() {
+    void extractDefinitionXref() {
         String db1 = "db1";
         String id1 = "id1";
 
@@ -388,7 +391,7 @@ public class GenericTermToODocConverterTest {
     }
 
     @Test
-    public void extractionOfEmptyDefinitionXrefListReturnsEmptyList() {
+    void extractionOfEmptyDefinitionXrefListReturnsEmptyList() {
         when(term.getDefinitionXrefs()).thenReturn(Collections.emptyList());
 
         OntologyDocument docOpt = converter.apply(term);
@@ -400,7 +403,7 @@ public class GenericTermToODocConverterTest {
 
     //credits
     @Test
-    public void extractsNoCreditElementsWhenCreditsInTermIsNull() {
+    void extractsNoCreditElementsWhenCreditsInTermIsNull() {
         when(term.getCredits()).thenReturn(null);
 
         OntologyDocument docOpt = converter.apply(term);
@@ -410,7 +413,7 @@ public class GenericTermToODocConverterTest {
     }
 
     @Test
-    public void extractsNoCreditElementsWhenCreditsInTermIsEmpty() {
+    void extractsNoCreditElementsWhenCreditsInTermIsEmpty() {
         when(term.getCredits()).thenReturn(Collections.emptyList());
 
         OntologyDocument docOpt = converter.apply(term);
@@ -420,7 +423,7 @@ public class GenericTermToODocConverterTest {
     }
 
     @Test
-    public void extracts1CreditElementWhenCreditsInTermHas1Element() {
+    void extracts1CreditElementWhenCreditsInTermHas1Element() {
         String code1 = "BHF";
         String url1 = "http://www.ucl.ac.uk/cardiovasculargeneontology/";
 
@@ -441,9 +444,11 @@ public class GenericTermToODocConverterTest {
         assertThat(creditExists(credit2, extractedCredits), is(true));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void cannotConvertNullGenericTerm() {
-        converter.apply(null);
+    @Test
+    void cannotConvertNullGenericTerm() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            converter.apply(null);
+        });
     }
 
     private boolean creditExists(TermCredit credit, Collection<String> extractedCredits) {

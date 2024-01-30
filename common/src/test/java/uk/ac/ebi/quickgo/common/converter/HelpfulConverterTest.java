@@ -1,8 +1,7 @@
 package uk.ac.ebi.quickgo.common.converter;
 
-import org.junit.Test;
-
 import java.util.List;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -14,15 +13,15 @@ import static uk.ac.ebi.quickgo.common.converter.HelpfulConverter.toCSV;
  * Time: 13:55
  * Created with IntelliJ IDEA.
  */
-public class HelpfulConverterTest {
+class HelpfulConverterTest {
 
     @Test
-    public void makeArrayOfStringsIntoSingleCSVString(){
+    void makeArrayOfStringsIntoSingleCSVString(){
         assertThat(toCSV("AAA", "BBB", "CCC"), is("AAA,BBB,CCC"));
     }
 
     @Test
-    public void canConvertNullListToEmptyCSV() {
+    void canConvertNullListToEmptyCSV() {
         assertThat(toCSV((List<String>) null), is(""));
     }
 }

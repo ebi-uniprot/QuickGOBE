@@ -1,32 +1,32 @@
 package uk.ac.ebi.quickgo.rest.service;
 
-import uk.ac.ebi.quickgo.rest.service.ServiceConfigException;
+import org.junit.jupiter.api.Test;
 
 import java.util.Map;
-import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.ac.ebi.quickgo.rest.service.ServiceRetrievalConfigHelper.extractFieldMappings;
 
 /**
  * Created 08/02/16
  * @author Edd
  */
-public class ServiceRetrievalConfigHelperTest {
+class ServiceRetrievalConfigHelperTest {
     private static final String COMMA = ",";
 
     @Test
-    public void canConvertEmptyNameMappingProperty() {
+    void canConvertEmptyNameMappingProperty() {
         Map<String, String> mappings = extractFieldMappings("", COMMA);
         assertThat(mappings, is(notNullValue()));
         assertThat(mappings.isEmpty(), is(true));
     }
 
     @Test
-    public void canConvertSingleNameMappingPropertyWithNoSpaces() {
+    void canConvertSingleNameMappingPropertyWithNoSpaces() {
         Map<String, String> mappings = extractFieldMappings("a->b", COMMA);
 
         assertThat(mappings, is(notNullValue()));
@@ -37,7 +37,7 @@ public class ServiceRetrievalConfigHelperTest {
     }
 
     @Test
-    public void canConvertSingleNameMappingPropertyWithSpaces() {
+    void canConvertSingleNameMappingPropertyWithSpaces() {
         Map<String, String> mappings = extractFieldMappings(" a->b", COMMA);
 
         assertThat(mappings, is(notNullValue()));
@@ -48,7 +48,7 @@ public class ServiceRetrievalConfigHelperTest {
     }
 
     @Test
-    public void canConvertTwoNameMappingPropertiesWithNoSpaces() {
+    void canConvertTwoNameMappingPropertiesWithNoSpaces() {
         Map<String, String> mappings = extractFieldMappings("a->b,x->b", COMMA);
 
         assertThat(mappings, is(notNullValue()));
@@ -60,7 +60,7 @@ public class ServiceRetrievalConfigHelperTest {
     }
 
     @Test
-    public void canConvertTwoNameMappingPropertiesWithSpaces() {
+    void canConvertTwoNameMappingPropertiesWithSpaces() {
         Map<String, String> mappings = extractFieldMappings("a->b, x ->b", COMMA);
 
         assertThat(mappings, is(notNullValue()));
@@ -71,8 +71,8 @@ public class ServiceRetrievalConfigHelperTest {
         assertThat(mappings, hasEntry("x", "b"));
     }
 
-    @Test(expected = ServiceConfigException.class)
-    public void expectsServiceConfigExceptionWhenFieldMappingsAreOneToManyNotManyToOne() {
-        extractFieldMappings("a->b, a ->b", COMMA);
+    @Test
+    void expectsServiceConfigExceptionWhenFieldMappingsAreOneToManyNotManyToOne() {
+        assertThrows(ServiceConfigException.class, () -> extractFieldMappings("a->b, a ->b", COMMA));
     }
 }

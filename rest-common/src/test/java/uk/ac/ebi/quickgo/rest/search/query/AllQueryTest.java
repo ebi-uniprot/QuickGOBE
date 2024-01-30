@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.rest.search.query;
 
 import org.hamcrest.core.IsNot;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -10,9 +10,9 @@ import static org.hamcrest.core.Is.is;
  * Created 25/08/16
  * @author Edd
  */
-public class AllQueryTest {
+class AllQueryTest {
     @Test
-    public void equalsFindsEqualObjectsEqual() {
+    void equalsFindsEqualObjectsEqual() {
         AllQuery allQuery1 = new AllQuery();
         AllQuery allQuery2 = new AllQuery();
 
@@ -20,7 +20,7 @@ public class AllQueryTest {
     }
 
     @Test
-    public void equalsFindsNonEqualObjectsDifferent() {
+    void equalsFindsNonEqualObjectsDifferent() {
         AllQuery allQuery1 = new AllQuery();
         QuickGOQuery otherQuery = QuickGOQuery.not(allQuery1);
 
@@ -28,14 +28,14 @@ public class AllQueryTest {
     }
 
     @Test
-    public void hashCodeIsSameWhenCalledMultipleTimesOnSameObject() {
+    void hashCodeIsSameWhenCalledMultipleTimesOnSameObject() {
         AllQuery allQuery1 = new AllQuery();
 
         assertThat(allQuery1.hashCode(), is(allQuery1.hashCode()));
     }
 
     @Test
-    public void equalObjectsHaveSameHashCode() {
+    void equalObjectsHaveSameHashCode() {
         AllQuery allQuery1 = new AllQuery();
         AllQuery allQuery2 = new AllQuery();
 
@@ -49,7 +49,7 @@ public class AllQueryTest {
      * a sanity check.
      */
     @Test
-    public void allQueryAndNotAllQueryObjectsAreDifferentAndHaveDifferentHashCodes() {
+    void allQueryAndNotAllQueryObjectsAreDifferentAndHaveDifferentHashCodes() {
         AllQuery allQuery1 = new AllQuery();
         QuickGOQuery otherQuery = QuickGOQuery.not(allQuery1);
 

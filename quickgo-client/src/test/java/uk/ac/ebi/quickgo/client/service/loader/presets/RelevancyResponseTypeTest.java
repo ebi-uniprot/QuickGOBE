@@ -1,7 +1,8 @@
 package uk.ac.ebi.quickgo.client.service.loader.presets;
 
+import org.junit.jupiter.api.Test;
+
 import java.util.List;
-import org.junit.Test;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -20,9 +21,9 @@ import static org.hamcrest.core.Is.is;
  * Created 23/09/16
  * @author Edd
  */
-public class RelevancyResponseTypeTest {
+class RelevancyResponseTypeTest {
     @Test
-    public void canSetAndRetrieveRelevanciesFromResponseWith0Elements() {
+    void canSetAndRetrieveRelevanciesFromResponseWith0Elements() {
         RelevancyResponseType responseType = new RelevancyResponseType();
         responseType.terms = new RelevancyResponseType.Terms();
 
@@ -33,7 +34,7 @@ public class RelevancyResponseTypeTest {
     }
 
     @Test
-    public void canSetAndRetrieveRelevanciesFromResponseWith1Element() {
+    void canSetAndRetrieveRelevanciesFromResponseWith1Element() {
         RelevancyResponseType responseType = new RelevancyResponseType();
         responseType.terms = new RelevancyResponseType.Terms();
         String termName = "field1";
@@ -46,7 +47,7 @@ public class RelevancyResponseTypeTest {
     }
 
     @Test
-    public void canSetAndRetrieveRelevanciesFromResponseWith2Elements() {
+    void canSetAndRetrieveRelevanciesFromResponseWith2Elements() {
         RelevancyResponseType responseType = new RelevancyResponseType();
         responseType.terms = new RelevancyResponseType.Terms();
         String termName = "field1";

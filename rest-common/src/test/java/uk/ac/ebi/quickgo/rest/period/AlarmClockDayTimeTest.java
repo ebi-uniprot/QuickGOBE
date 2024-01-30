@@ -4,13 +4,14 @@ import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Test AlarmClockDayTime.
@@ -21,16 +22,16 @@ import static org.hamcrest.core.Is.is;
  * Time: 15:07
  * Created with IntelliJ IDEA.
  */
-@RunWith(MockitoJUnitRunner.class)
-public class AlarmClockDayTimeTest {
+@ExtendWith(MockitoExtension.class)
+class AlarmClockDayTimeTest {
 
     private LocalDateTime input;
     private DayTime startDayTime;
     private DayTime endDayTime;
     private AlarmClockDayTime alarmClock;
 
-    @Before
-    public void setup(){
+    @BeforeEach
+    void setup(){
        input = LocalDateTime.of(2017, 5, 17, 12, 00);   //WED
        startDayTime = new DayTime(DayOfWeek.MONDAY, LocalTime.of(12, 00));
        endDayTime = new DayTime(DayOfWeek.FRIDAY, LocalTime.of(11, 59));
@@ -38,14 +39,14 @@ public class AlarmClockDayTimeTest {
     }
 
     @Test
-    public void secondsLeftWhenComparingStartTimeAndEndTimeWithFixedTime(){
+    void secondsLeftWhenComparingStartTimeAndEndTimeWithFixedTime(){
         long timeLeft = alarmClock.remainingTime(input).getSeconds();
 
         assertThat(timeLeft, is(172740L));
     }
 
     @Test
-    public void durationZeroWhenInputAfterEndTime(){
+    void durationZeroWhenInputAfterEndTime(){
         input = input.withDayOfMonth(19);
 
         final Duration remainingTime = alarmClock.remainingTime(input);
@@ -54,7 +55,7 @@ public class AlarmClockDayTimeTest {
     }
 
     @Test
-    public void durationZeroWhenInputBeforeStartTime(){
+    void durationZeroWhenInputBeforeStartTime(){
         input = input.withDayOfMonth(15);
         input = input.withHour(11);
         input = input.withMinute(59);
@@ -64,18 +65,18 @@ public class AlarmClockDayTimeTest {
         assertThat(remainingTime, is(Duration.ZERO));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void exceptionIfStartIsNull(){
-        new AlarmClockDayTime(null, endDayTime);
+    @Test
+    void exceptionIfStartIsNull(){
+        assertThrows(IllegalArgumentException.class, () -> new AlarmClockDayTime(null, endDayTime));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void exceptionIfEndIsNull(){
-        new AlarmClockDayTime(startDayTime, null);
+    @Test
+    void exceptionIfEndIsNull(){
+        assertThrows(IllegalArgumentException.class, () -> new AlarmClockDayTime(startDayTime, null));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void exceptionIfStartAndEndIsNull(){
-        new AlarmClockDayTime(null, null);
+    @Test
+    void exceptionIfStartAndEndIsNull(){
+        assertThrows(IllegalArgumentException.class, () -> new AlarmClockDayTime(null, null));
     }
 }

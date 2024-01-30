@@ -1,14 +1,12 @@
 package uk.ac.ebi.quickgo.geneproduct.common;
 
 import org.apache.solr.client.solrj.SolrServerException;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.solr.core.SolrTemplate;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.ac.ebi.quickgo.common.SolrCollectionName;
 import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 
@@ -26,11 +24,9 @@ import static uk.ac.ebi.quickgo.geneproduct.common.common.GeneProductDocMocker.c
 /**
  * Tests the behaviour of the {@link GeneProductRepository}
  */
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(TemporarySolrDataStore.class)
 @SpringBootTest(classes = GeneProductRepoConfig.class)
-public class GeneProductRepositoryIT {
-    @ClassRule
-    public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
+class GeneProductRepositoryIT {
     private static final String COLLECTION = SolrCollectionName.GENE_PRODUCT;
 
     @Autowired
@@ -39,13 +35,13 @@ public class GeneProductRepositoryIT {
     @Autowired
     private SolrTemplate geneProductTemplate;
 
-    @Before
-    public void before() {
+    @BeforeEach
+    void before() {
         geneProductRepository.deleteAll();
     }
 
     @Test
-    public void addGeneProductToRepository() throws Exception {
+    void addGeneProductToRepository() throws Exception {
         String id = "geneProduct1";
 
         GeneProductDocument doc = createDocWithId(id);
@@ -56,7 +52,7 @@ public class GeneProductRepositoryIT {
     }
 
     @Test
-    public void add3GeneProductTosRepository() throws Exception {
+    void add3GeneProductTosRepository() throws Exception {
         String id1 = "geneProduct1";
         String id2 = "geneProduct2";
         String id3 = "geneProduct3";
@@ -83,7 +79,7 @@ public class GeneProductRepositoryIT {
     }
 
     @Test
-    public void removeGeneProductFromRepository() throws IOException, SolrServerException {
+    void removeGeneProductFromRepository() throws IOException, SolrServerException {
         String id = "geneProduct1";
 
         GeneProductDocument doc = createDocWithId(id);
@@ -98,7 +94,7 @@ public class GeneProductRepositoryIT {
     }
 
     @Test
-    public void lookupGeneProductById() {
+    void lookupGeneProductById() {
         String id = "geneProduct1";
 
         GeneProductDocument doc = createDocWithId(id);

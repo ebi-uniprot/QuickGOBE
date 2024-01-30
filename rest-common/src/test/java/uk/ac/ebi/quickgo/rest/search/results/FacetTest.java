@@ -1,9 +1,7 @@
 package uk.ac.ebi.quickgo.rest.search.results;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
@@ -11,38 +9,35 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests the implementation of the {@link Facet} implementation.
  */
-public class FacetTest {
-    @Rule
-    public final ExpectedException thrown = ExpectedException.none();
+class FacetTest {
 
     private Facet facet;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() {
         facet = new Facet();
     }
 
     @Test
-    public void newlyCreateFacetHasNoFacets() throws Exception {
+    void newlyCreateFacetHasNoFacets() {
         assertThat(facet.getFacetFields(), is(empty()));
     }
 
     @Test
-    public void addingNullFacetFieldThrowsException() throws Exception {
+    void addingNullFacetFieldThrowsException() {
         FieldFacet fieldFacet = null;
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Cannot add null field facet.");
-
-        facet.addFacetField(fieldFacet);
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> facet.addFacetField(fieldFacet));
+        assertTrue(exception.getMessage().contains("Cannot add null field facet."));
     }
 
     @Test
-    public void addFacetField() throws Exception {
+    void addFacetField() {
         FieldFacet fieldFacet1 = new FieldFacet("field1");
         FieldFacet fieldFacet2 = new FieldFacet("field2");
         FieldFacet fieldFacet3 = new FieldFacet("field3");
@@ -56,28 +51,22 @@ public class FacetTest {
     }
 
     @Test
-    public void deletingFacetFieldThrowsException() throws Exception {
+    void deletingFacetFieldThrowsException() {
         FieldFacet fieldFacet1 = new FieldFacet("field1");
 
-        thrown.expect(UnsupportedOperationException.class);
-
         facet.addFacetField(fieldFacet1);
-
-        facet.getFacetFields().remove(0);
+        assertThrows(UnsupportedOperationException.class, () -> facet.getFacetFields().remove(0));
     }
 
     @Test
-    public void addingNullPivotThrowsException() throws Exception {
+    void addingNullPivotThrowsException() {
         PivotFacet pivotFacet = null;
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Cannot add null pivot facet.");
-
-        facet.addPivotFacet(pivotFacet);
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> facet.addPivotFacet(pivotFacet));
+        assertTrue(exception.getMessage().contains("Cannot add null pivot facet."));
     }
 
     @Test
-    public void addingNonNullPivotFacetIsSuccessful() throws Exception {
+    void addingNonNullPivotFacetIsSuccessful() {
         String[] pivotFields = {"field1", "field2"};
         PivotFacet pivotFacet = new PivotFacet(pivotFields);
 

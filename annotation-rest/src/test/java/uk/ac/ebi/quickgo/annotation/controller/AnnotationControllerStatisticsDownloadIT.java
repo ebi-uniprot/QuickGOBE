@@ -1,14 +1,12 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.cache.CacheManager;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.servlet.MockMvc;
@@ -47,13 +45,10 @@ import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.*;
  * Time: 13:41
  * Created with IntelliJ IDEA.
  */
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(TemporarySolrDataStore.class)
 @SpringBootTest(classes = {AnnotationREST.class})
 @WebAppConfiguration
-public class AnnotationControllerStatisticsDownloadIT {
-    // temporary data store for solr's data, which is automatically cleaned on exit
-    @ClassRule
-    public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
+class AnnotationControllerStatisticsDownloadIT {
     private static final int NUMBER_OF_GENERIC_DOCS = 5;
     private static final String DOWNLOAD_STATISTICS_SEARCH_URL = "/annotation/downloadStats";
     private static final String NUMBER_OF_GO_ID_RESULTS_FOR_ANNOTATIONS =
@@ -83,8 +78,8 @@ public class AnnotationControllerStatisticsDownloadIT {
     private String[] goNames;
     private StatsSetupHelper setupHelper;
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         annotationRepository.deleteAll();
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
         MockRestServiceServer mockRestServiceServer = MockRestServiceServer.createServer((RestTemplate) restOperations);
@@ -98,7 +93,7 @@ public class AnnotationControllerStatisticsDownloadIT {
     }
 
     @Test
-    public void canDownloadInExcelFormat() throws Exception {
+    void canDownloadInExcelFormat() throws Exception {
         setupSuccessfullyReceivingRestNames();
 
         ResultActions response = mockMvc.perform(get(DOWNLOAD_STATISTICS_SEARCH_URL)
@@ -109,7 +104,7 @@ public class AnnotationControllerStatisticsDownloadIT {
     }
 
     @Test
-    public void canDownloadInJsonFormat() throws Exception {
+    void canDownloadInJsonFormat() throws Exception {
         setupSuccessfullyReceivingRestNames();
 
         ResultActions response = mockMvc.perform(get(DOWNLOAD_STATISTICS_SEARCH_URL)
@@ -129,7 +124,7 @@ public class AnnotationControllerStatisticsDownloadIT {
     }
 
     @Test
-    public void downloadStatisticsSuccessfulAfterFailedToRetrieveGONames() throws Exception {
+    void downloadStatisticsSuccessfulAfterFailedToRetrieveGONames() throws Exception {
         setExpectationsForUnsuccessfulOntologyServiceRestResponse();
         setupHelper.expectTaxonIdHasNameViaRest(TAXON_ID, TAXON_NAME);
         setupHelper.expectEcoCodeHasNameViaRest(ECO_ID, ECO_TERM_NAME, NUMBER_OF_GENERIC_DOCS);
@@ -153,7 +148,7 @@ public class AnnotationControllerStatisticsDownloadIT {
     }
 
     @Test
-    public void downloadStatisticsSuccessfulAfterFailedToRetrieveTaxonNames() throws Exception {
+    void downloadStatisticsSuccessfulAfterFailedToRetrieveTaxonNames() throws Exception {
         setupHelper.expectGoTermHasNameViaRest(NUMBER_OF_GENERIC_DOCS, toId, toName);
         setExpectationsForUnsuccessfulTaxonomyServiceRestResponse();
         setupHelper.expectEcoCodeHasNameViaRest(ECO_ID, ECO_TERM_NAME, NUMBER_OF_GENERIC_DOCS);
@@ -175,7 +170,7 @@ public class AnnotationControllerStatisticsDownloadIT {
     }
 
     @Test
-    public void downloadStatisticsSuccessfulAfterFailedToRetrieveECONames() throws Exception {
+    void downloadStatisticsSuccessfulAfterFailedToRetrieveECONames() throws Exception {
         setupHelper.expectGoTermHasNameViaRest(NUMBER_OF_GENERIC_DOCS, toId, toName);
         setupHelper.expectTaxonIdHasNameViaRest(TAXON_ID, TAXON_NAME);
         setExpectationsForUnsuccessfulOntologyServiceRestResponseForEcoCodes();

@@ -1,16 +1,16 @@
 package uk.ac.ebi.quickgo.annotation.download.converter.helpers;
 
+import org.junit.jupiter.api.Test;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
-import org.junit.Test;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.TestHelper.connectedXrefs;
 import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.WithFrom.*;
 import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.WithFromTest.FakeWithFromItem.GO_1;
@@ -24,24 +24,24 @@ import static uk.ac.ebi.quickgo.annotation.download.converter.helpers.WithFromTe
  * Time: 08:26
  * Created with IntelliJ IDEA.
  */
-public class WithFromTest {
+class WithFromTest {
 
     private static final String EMPTY_STRING = "";
     private static final List<List<Supplier<Annotation.SimpleXRef>>> WITH_FROM = asList(
             singletonList(GO_1), asList(GO_2, GO_3));
 
     @Test
-    public void nullReferenceComesBackAsEmptyString() {
+    void nullReferenceComesBackAsEmptyString() {
         assertThat(nullOrEmptyListToString(null), is(EMPTY_STRING));
     }
 
     @Test
-    public void emptyReferenceComesBackAsEmptyString() {
+    void emptyReferenceComesBackAsEmptyString() {
         assertThat(nullOrEmptyListToString(Collections.emptyList()), is(EMPTY_STRING));
     }
 
     @Test
-    public void successfulConversionToString() {
+    void successfulConversionToString() {
         List<Annotation.ConnectedXRefs<Annotation.SimpleXRef>> model = connectedXrefs(WITH_FROM);
         assertThat(nullOrEmptyListToString(model), is("GO:0000001|GO:0000002,GO:0000003"));
     }

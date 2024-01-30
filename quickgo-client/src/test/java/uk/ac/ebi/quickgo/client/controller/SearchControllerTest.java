@@ -1,21 +1,21 @@
 package uk.ac.ebi.quickgo.client.controller;
-
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.ac.ebi.quickgo.client.model.ontology.OntologyTerm;
 import uk.ac.ebi.quickgo.client.service.search.SearchServiceConfig;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
 import uk.ac.ebi.quickgo.rest.search.request.converter.FilterConverterFactory;
+import org.junit.jupiter.api.Test;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * Created 28/04/16
  * @author Edd
  */
-@RunWith(MockitoJUnitRunner.class)
-public class SearchControllerTest {
+@ExtendWith(MockitoExtension.class)
+class SearchControllerTest {
     @Mock
     private SearchService<OntologyTerm> searchService;
 
@@ -25,35 +25,35 @@ public class SearchControllerTest {
     @Mock
     private FilterConverterFactory converterFactory;
 
-    @Test(expected = IllegalArgumentException.class)
-    public void controllerInstantiationFailsOnNullSearchService() {
-        new SearchController(
+    @Test
+    void controllerInstantiationFailsOnNullSearchService() {
+        assertThrows(IllegalArgumentException.class, () -> new SearchController(
                 null,
                 retrievalConfig,
-                converterFactory);
+                converterFactory));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void controllerInstantiationFailsOnNullSearchableField() {
-        new SearchController(
+    @Test
+    void controllerInstantiationFailsOnNullSearchableField() {
+        assertThrows(IllegalArgumentException.class, () -> new SearchController(
                 null,
                 retrievalConfig,
-                converterFactory);
+                converterFactory));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void controllerInstantiationFailsOnNullRetrievalConfig() {
-        new SearchController(
+    @Test
+    void controllerInstantiationFailsOnNullRetrievalConfig() {
+        assertThrows(IllegalArgumentException.class, () -> new SearchController(
                 searchService,
                 null,
-                converterFactory);
+                converterFactory));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void controllerInstantiationFailsOnNullConverterFactory() {
-        new SearchController(
+    @Test
+    void controllerInstantiationFailsOnNullConverterFactory() {
+        assertThrows(IllegalArgumentException.class, () -> new SearchController(
                 searchService,
                 retrievalConfig,
-                null);
+                null));
     }
 }

@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.ontology.service.converter;
-
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.ac.ebi.quickgo.common.converter.FlatFieldBuilder;
 import uk.ac.ebi.quickgo.common.converter.FlatFieldLeaf;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
@@ -7,8 +8,6 @@ import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import org.junit.Before;
-import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -17,17 +16,17 @@ import static org.hamcrest.Matchers.is;
  * Created 01/12/15
  * @author Edd
  */
-public class AnnotationGuideLineFieldConverterTest {
+class AnnotationGuideLineFieldConverterTest {
 
     private AnnotationGuideLineFieldConverter converter;
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         this.converter = new AnnotationGuideLineFieldConverter();
     }
 
     @Test
-    public void convertsAnnotationGuideLines() {
+    void convertsAnnotationGuideLines() {
         List<String> rawAnnotationGuideLines = new ArrayList<>();
         String description0 = "description 0";
         rawAnnotationGuideLines.add(FlatFieldBuilder.newFlatField()
@@ -49,7 +48,7 @@ public class AnnotationGuideLineFieldConverterTest {
     }
 
     @Test
-    public void gracefullyHandleWrongFieldCount() {
+    void gracefullyHandleWrongFieldCount() {
         Optional<OBOTerm.AnnotationGuideLine> result = converter.apply(
                 FlatFieldBuilder.newFlatField().addField(FlatFieldLeaf.newFlatFieldLeaf("wrong " +
                 "format"))

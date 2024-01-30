@@ -1,15 +1,16 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class GeneProductTest {
+class GeneProductTest {
 
     @Test
-    public void uniprot() {
+    void uniprot() {
         final String fullId = "UniProtKB:A0A000";
 
         GeneProduct uniprot = GeneProduct.fromCurieId(fullId);
@@ -21,7 +22,7 @@ public class GeneProductTest {
     }
 
     @Test
-    public void uniprotWithIsoformOrVarient() {
+    void uniprotWithIsoformOrVarient() {
         final String fullId = "UniProtKB:A0A000-2";
 
         GeneProduct uniprot = GeneProduct.fromCurieId(fullId);
@@ -33,7 +34,7 @@ public class GeneProductTest {
     }
 
     @Test
-    public void rna() {
+    void rna() {
         final String fullId = "RNAcentral:URS00000064B1_559292";
 
         GeneProduct uniprot = GeneProduct.fromCurieId(fullId);
@@ -45,7 +46,7 @@ public class GeneProductTest {
     }
 
     @Test
-    public void complexPortal() {
+    void complexPortal() {
         final String fullId = "ComplexPortal:CPX-1004";
 
         GeneProduct uniprot = GeneProduct.fromCurieId(fullId);
@@ -57,7 +58,7 @@ public class GeneProductTest {
     }
 
     @Test
-    public void uniprotWithIsoformOrVarient2() {
+    void uniprotWithIsoformOrVarient2() {
         final String fullId = "UniProtKB:Q92583-PRO_0000005211";
 
         GeneProduct uniprot = GeneProduct.fromCurieId(fullId);
@@ -70,7 +71,7 @@ public class GeneProductTest {
 
 
     @Test
-    public void uniprotWithIsoformOrVarient3() {
+    void uniprotWithIsoformOrVarient3() {
         final String fullId = "UniProtKB:P02649-VAR_000652";
 
         GeneProduct uniprot = GeneProduct.fromCurieId(fullId);
@@ -81,26 +82,25 @@ public class GeneProductTest {
         assertThat(uniprot.type(), is("protein"));
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void nulThrowsException() {
-        GeneProduct.fromCurieId(null);
+    @Test
+    void nulThrowsException() {
+        assertThrows(IllegalStateException.class, () -> GeneProduct.fromCurieId(null));
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void emptyThrowsException() {
-        GeneProduct.fromCurieId("");
+    @Test
+    void emptyThrowsException() {
+        assertThrows(IllegalStateException.class, () -> GeneProduct.fromCurieId(""));
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void garbageGeneProductIdThrowsException() {
-        GeneProduct.fromCurieId("siasdfia'sif'a");
+    @Test
+    void garbageGeneProductIdThrowsException() {
+        assertThrows(IllegalStateException.class, () -> GeneProduct.fromCurieId("siasdfia'sif'a"));
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void uniprotIdIsBrokenThrowsException() {
+    @Test
+    void uniprotIdIsBrokenThrowsException() {
         final String fullId = "UniProtKB:123444444444444";
-
-        GeneProduct.fromCurieId(fullId);
+        assertThrows(IllegalStateException.class, () -> GeneProduct.fromCurieId(fullId));
     }
 
 }

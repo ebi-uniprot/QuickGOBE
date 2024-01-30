@@ -1,9 +1,10 @@
 package uk.ac.ebi.quickgo.rest.search.query;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Tests {@link SortCriterion}.
@@ -11,9 +12,9 @@ import static org.hamcrest.Matchers.is;
  * Created 16/01/17
  * @author Edd
  */
-public class SortCriterionTest {
+class SortCriterionTest {
     @Test
-    public void canCreateSortCriterion() {
+    void canCreateSortCriterion() {
         String field = "fieldValue";
         SortCriterion.SortOrder order = SortCriterion.SortOrder.ASC;
         SortCriterion criterion = new SortCriterion(field, order);
@@ -21,8 +22,8 @@ public class SortCriterionTest {
         assertThat(criterion.getSortOrder(), is(order));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void sortCriterionWithNullOrderCausesException() {
-        new SortCriterion("value", null);
+    @Test
+    void sortCriterionWithNullOrderCausesException() {
+        assertThrows(IllegalArgumentException.class, () -> new SortCriterion("value", null));
     }
 }

@@ -12,7 +12,7 @@ import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.c
  * Created 02/11/16
  * @author Edd
  */
-public class FilterAnnotationByECORESTIT extends AbstractFilterAnnotationByOntologyRESTIT {
+class FilterAnnotationByECORESTIT extends AbstractFilterAnnotationByOntologyRESTIT {
     private static final String ECO_DESCENDANTS_RESOURCE_FORMAT = "/ontology/eco/terms/%s/descendants?relations=%s";
 
     public FilterAnnotationByECORESTIT() {

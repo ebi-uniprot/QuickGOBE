@@ -1,11 +1,11 @@
 package uk.ac.ebi.quickgo.annotation.validation.service;
-
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.ac.ebi.quickgo.annotation.validation.model.ValidationProperties;
 
 import java.util.Arrays;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.hamcrest.CoreMatchers.is;
@@ -19,7 +19,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
  * Time: 09:38
  * Created with IntelliJ IDEA.
  */
-public class ReferenceValuesValidationTest {
+class ReferenceValuesValidationTest {
 
     private static final String ID_SUCCEEDS_1 = "PMID:123456";
     private static final String ID_SUCCEEDS_2 = "PMID:223456";
@@ -30,8 +30,8 @@ public class ReferenceValuesValidationTest {
     private final List<String> referenceDatabases = Arrays.asList("pmid","doi","go_ref","reactome");
     private ReferenceValuesValidation refValidator;
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         ValidationEntityChecker validationEntityChecker = mock(ValidationEntityChecker.class);
         ValidationProperties validationProperties = mock(ValidationProperties.class);
         refValidator = new ReferenceValuesValidation(validationEntityChecker, validationProperties);
@@ -44,58 +44,58 @@ public class ReferenceValuesValidationTest {
         when(validationProperties.getReferenceDbs()).thenReturn(referenceDatabases);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void failsConstructionIfPassedInValidatorIsNull(){
-        new ReferenceValuesValidation(null,mock(ValidationProperties.class) );
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void failsConstructionIfPassedInValidationPropertiesIsNull(){
-        new ReferenceValuesValidation(mock(ValidationEntityChecker.class),null);
+    @Test
+    void failsConstructionIfPassedInValidatorIsNull(){
+        assertThrows(IllegalArgumentException.class, () -> new ReferenceValuesValidation(null, mock(ValidationProperties.class) ));
     }
 
     @Test
-    public void validationSucceedsIfKnownDb(){
+    void failsConstructionIfPassedInValidationPropertiesIsNull(){
+        assertThrows(IllegalArgumentException.class, () -> new ReferenceValuesValidation(mock(ValidationEntityChecker.class), null));
+    }
+
+    @Test
+    void validationSucceedsIfKnownDb(){
         assertThat(refValidator.isValid(new String[]{ID_SUCCEEDS_1}, null), is(true));
     }
 
     @Test
-    public void validationSucceedsIfDbNotSpecified(){
+    void validationSucceedsIfDbNotSpecified(){
         assertThat(refValidator.isValid(new String[]{"123456"}, null), is(true));
     }
 
     @Test
-    public void validationSucceedsIfArgumentListIsNull(){
+    void validationSucceedsIfArgumentListIsNull(){
         assertThat(refValidator.isValid(null, null), is(true));
     }
 
     @Test
-    public void validationFailsIfDbKnownButIdIsIncorrect(){
+    void validationFailsIfDbKnownButIdIsIncorrect(){
         assertThat(refValidator.isValid(new String[]{ID_FAILS_1}, null), is(false));
     }
 
     @Test
-    public void validationFailsIfUnknownDb(){
+    void validationFailsIfUnknownDb(){
         assertThat(refValidator.isValid(new String[]{"XXXX:123456"}, null), is(false));
     }
 
     @Test
-    public void validationFailsIfArgumentListContainsNull(){
+    void validationFailsIfArgumentListContainsNull(){
         assertThat(refValidator.isValid(new String[]{null}, null), is(false));
     }
 
     @Test
-    public void validationSucceedsForMultipleValidValues(){
+    void validationSucceedsForMultipleValidValues(){
         assertThat(refValidator.isValid(new String[]{ID_SUCCEEDS_1, ID_SUCCEEDS_2, ID_SUCCEEDS_3}, null), is(true));
     }
 
     @Test
-    public void validationFailsForMultipleInvalidValues(){
+    void validationFailsForMultipleInvalidValues(){
         assertThat(refValidator.isValid(new String[]{ID_FAILS_1, ID_FAILS_2, ID_FAILS_3}, null), is(false));
     }
 
     @Test
-    public void validationFailsForMixtureOfValidAndInvalidValues(){
+    void validationFailsForMixtureOfValidAndInvalidValues(){
         assertThat(refValidator.isValid(new String[]{ID_SUCCEEDS_1, ID_FAILS_2, ID_SUCCEEDS_3}, null), is(false));
     }
 }

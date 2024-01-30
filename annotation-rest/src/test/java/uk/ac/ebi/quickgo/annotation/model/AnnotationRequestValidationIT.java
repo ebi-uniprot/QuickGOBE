@@ -3,9 +3,7 @@ package uk.ac.ebi.quickgo.annotation.model;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
@@ -13,7 +11,6 @@ import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.ac.ebi.quickgo.annotation.IdGeneratorUtil;
 import uk.ac.ebi.quickgo.annotation.validation.loader.ValidationConfig;
 import uk.ac.ebi.quickgo.annotation.validation.service.JobTestRunnerConfig;
@@ -40,9 +37,8 @@ import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.*
 /**
  * Tests that the validation added to the {@link AnnotationRequest} class is correct.
  */
-@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {AnnotationRequestConfig.class, ValidationConfig.class, JobTestRunnerConfig.class})
-public class AnnotationRequestValidationIT {
+class AnnotationRequestValidationIT {
     private static final String[] VALID_GENE_PRODUCT_ID = {"A0A000", "A0A003"};
     private static boolean HAS_RUN = false;
 
@@ -55,20 +51,20 @@ public class AnnotationRequestValidationIT {
     private AnnotationRequest annotationRequest;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         annotationRequest = new AnnotationRequest();
     }
 
     //ASSIGNED BY PARAMETER
     @Test
-    public void nullAssignedByIsValid() {
+    void nullAssignedByIsValid() {
         annotationRequest.setAssignedBy();
 
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
-    public void allAssignedByValuesAreValid() {
+    void allAssignedByValuesAreValid() {
         String[] validAssignedBy = {"ASPGD", "Agbase", "ASPGD_", "Agbase_", "BHF-UCL", "Roslin_Institute"};
         annotationRequest.setAssignedBy(validAssignedBy);
 
@@ -76,7 +72,7 @@ public class AnnotationRequestValidationIT {
     }
 
     @Test
-    public void allAssignedByValuesAreInvalid() {
+    void allAssignedByValuesAreInvalid() {
         String[] invalidAssignedBy = {"_ASPGD", "_Agbase", "5555,", "4444"};
         annotationRequest.setAssignedBy(invalidAssignedBy);
 
@@ -89,14 +85,14 @@ public class AnnotationRequestValidationIT {
 
     //GO EVIDENCE PARAMETER
     @Test
-    public void nullGoEvidenceIsValid() {
+    void nullGoEvidenceIsValid() {
         annotationRequest.setGoIdEvidence();
 
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
-    public void allGoEvidenceValuesAreValid() {
+    void allGoEvidenceValuesAreValid() {
         String[] goEvidence = {"IEA", "IBD", "IC"};
         annotationRequest.setGoIdEvidence(goEvidence);
 
@@ -104,7 +100,7 @@ public class AnnotationRequestValidationIT {
     }
 
     @Test
-    public void allGoEvidenceValuesAreInvalid() {
+    void allGoEvidenceValuesAreInvalid() {
         String[] invalidGoEvidence = {"9EA", "IBDD", "I"};
         annotationRequest.setGoIdEvidence(invalidGoEvidence);
 
@@ -117,35 +113,35 @@ public class AnnotationRequestValidationIT {
 
     //ASPECT PARAMETER
     @Test
-    public void nullAspectIsValid() {
+    void nullAspectIsValid() {
         annotationRequest.setAspect();
 
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
-    public void processAspectIsValid() {
+    void processAspectIsValid() {
         annotationRequest.setAspect("biological_process");
 
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
-    public void functionAspectIsValid() {
+    void functionAspectIsValid() {
         annotationRequest.setAspect("molecular_function");
 
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
-    public void componentAspectIsValid() {
+    void componentAspectIsValid() {
         annotationRequest.setAspect("cellular_component");
 
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
-    public void unknownAspectIsInvalid() {
+    void unknownAspectIsInvalid() {
         String invalidAspect = "unknown";
 
         annotationRequest.setAspect(invalidAspect);
@@ -158,7 +154,7 @@ public class AnnotationRequestValidationIT {
     }
 
     @Test
-    public void mixedCaseAspectIsValid() {
+    void mixedCaseAspectIsValid() {
         String[] aspects = {"MoLeCuLaR_FuNcTiOn", "BiOlOgIcAl_pRoCeSs", "CeLlULaR_CoMpOnEnT"};
 
         annotationRequest.setAspect(aspects);
@@ -170,7 +166,7 @@ public class AnnotationRequestValidationIT {
 
     //TAXONOMY ID PARAMETER (applicable to all taxonUsage values)
     @Test
-    public void negativeTaxonIdIsInvalid() {
+    void negativeTaxonIdIsInvalid() {
         String invalidTaxonId = "-1";
 
         annotationRequest.setTaxonId(invalidTaxonId);
@@ -183,7 +179,7 @@ public class AnnotationRequestValidationIT {
     }
 
     @Test
-    public void taxonIdWithNonNumberCharactersIsInvalid() {
+    void taxonIdWithNonNumberCharactersIsInvalid() {
         String[] invalidTaxonIds = {"1a", "a", "$1"};
 
         annotationRequest.setTaxonId(invalidTaxonIds);
@@ -196,7 +192,7 @@ public class AnnotationRequestValidationIT {
     }
 
     @Test
-    public void positiveNumericTaxonIdIsValid() {
+    void positiveNumericTaxonIdIsValid() {
         String taxonId = "2";
 
         annotationRequest.setTaxonId(taxonId);
@@ -205,7 +201,7 @@ public class AnnotationRequestValidationIT {
     }
 
     @Test
-    public void multiplePositiveNumericTaxonIdsIsValid() {
+    void multiplePositiveNumericTaxonIdsIsValid() {
         String[] taxonId = {"2", "3", "4", "5"};
 
         annotationRequest.setTaxonId(taxonId);
@@ -214,7 +210,7 @@ public class AnnotationRequestValidationIT {
     }
 
     @Test
-    public void oneValidTaxIdAndOneInvalidTaxIdIsInvalid() {
+    void oneValidTaxIdAndOneInvalidTaxIdIsInvalid() {
         String invalidTaxonId = "-1";
         String[] taxonIds = {"2", invalidTaxonId};
 
@@ -228,7 +224,7 @@ public class AnnotationRequestValidationIT {
     }
 
     @Test
-    public void exceedingMaximumNumberOfTaxonIdentifiesSendsError() {
+    void exceedingMaximumNumberOfTaxonIdentifiesSendsError() {
         int numIds = AnnotationRequest.MAX_TAXON_IDS + 1;
 
         String[] taxIds = IntStream.rangeClosed(1, numIds)
@@ -246,7 +242,7 @@ public class AnnotationRequestValidationIT {
 
     //TAXON USAGE
     @Test
-    public void exactTaxonUsageIsValid() {
+    void exactTaxonUsageIsValid() {
         String usage = "exact";
 
         annotationRequest.setTaxonUsage(usage);
@@ -255,7 +251,7 @@ public class AnnotationRequestValidationIT {
     }
 
     @Test
-    public void descendantsTaxonUsageIsValid() {
+    void descendantsTaxonUsageIsValid() {
         String usage = "descendants";
 
         annotationRequest.setTaxonUsage(usage);
@@ -264,7 +260,7 @@ public class AnnotationRequestValidationIT {
     }
 
     @Test
-    public void multipleTaxonUsageIsInvalid() {
+    void multipleTaxonUsageIsInvalid() {
         String usage = "descendants,exact";
 
         annotationRequest.setTaxonUsage(usage);
@@ -277,7 +273,7 @@ public class AnnotationRequestValidationIT {
     }
 
     @Test
-    public void taxonUsageIsInvalid() {
+    void taxonUsageIsInvalid() {
         String usage = "thisisnotokay";
 
         annotationRequest.setTaxonUsage(usage);
@@ -291,14 +287,14 @@ public class AnnotationRequestValidationIT {
 
     // GENE PRODUCT ID
     @Test
-    public void allGeneProductValuesAreValid() {
+    void allGeneProductValuesAreValid() {
         annotationRequest.setGeneProductId(VALID_GENE_PRODUCT_ID);
 
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
-    public void geneProductIDValidationIsCaseSensitive() {
+    void geneProductIDValidationIsCaseSensitive() {
         String[] geneProductIdValues = Stream.of(VALID_GENE_PRODUCT_ID)
                 .map(String::toLowerCase)
                 .toArray(String[]::new);
@@ -309,7 +305,7 @@ public class AnnotationRequestValidationIT {
     }
 
     @Test
-    public void allGeneProductValuesAreInvalid() {
+    void allGeneProductValuesAreInvalid() {
         String[] invalidGpIds = {"99999", "&12345"};
 
         annotationRequest.setGeneProductId(invalidGpIds);
@@ -322,7 +318,7 @@ public class AnnotationRequestValidationIT {
     }
 
     @Test
-    public void exceedingMaximumNumberOfGeneProductsIdentifiersSendsError() {
+    void exceedingMaximumNumberOfGeneProductsIdentifiersSendsError() {
         int numIds = AnnotationRequest.MAX_GENE_PRODUCT_IDS + 1;
 
         String[] gpIds = generateValues(IdGeneratorUtil::createGPId, numIds);
@@ -338,7 +334,7 @@ public class AnnotationRequestValidationIT {
 
     // GO ID PARAMETER
     @Test
-    public void goIdIsValid() {
+    void goIdIsValid() {
         String[] goIds = {"GO:0003824", "GO:0009999", "GO:0003333"};
 
         annotationRequest.setGoId(goIds);
@@ -349,7 +345,7 @@ public class AnnotationRequestValidationIT {
     }
 
     @Test
-    public void mixedCaseGoIdIsValid() {
+    void mixedCaseGoIdIsValid() {
         String[] goIds = {"GO:0003824", "gO:0003824", "Go:0003824"};
 
         annotationRequest.setGoId(goIds);
@@ -360,7 +356,7 @@ public class AnnotationRequestValidationIT {
     }
 
     @Test
-    public void goIdIsInvalid() {
+    void goIdIsInvalid() {
         String[] invalidGoIds = {"GO:4", "xxx:0009999", "-"};
 
         annotationRequest.setGoId(invalidGoIds);
@@ -373,7 +369,7 @@ public class AnnotationRequestValidationIT {
     }
 
     @Test
-    public void requestingMaximumNumberOfGOIdentifiersIsValid() {
+    void requestingMaximumNumberOfGOIdentifiersIsValid() {
         String[] goIds = generateValues(IdGeneratorUtil::createGoId, AnnotationRequest.MAX_GO_IDS);
         annotationRequest.setGoId(goIds);
         Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
@@ -381,7 +377,7 @@ public class AnnotationRequestValidationIT {
     }
 
     @Test
-    public void exceedingMaximumNumberOfGOIdentifiersSendsError() {
+    void exceedingMaximumNumberOfGOIdentifiersSendsError() {
         int numIds = AnnotationRequest.MAX_GO_IDS + 1;
 
         String[] goIds = generateValues(IdGeneratorUtil::createGoId, numIds);
@@ -396,7 +392,7 @@ public class AnnotationRequestValidationIT {
 
     // EVIDENCE CODE PARAMETER
     @Test
-    public void evidenceCodeIsValid() {
+    void evidenceCodeIsValid() {
         String[] ecoIds = {"ECO:0000256", "ECO:0000888", "ECO:0000777"};
 
         annotationRequest.setEvidenceCode(ecoIds);
@@ -405,7 +401,7 @@ public class AnnotationRequestValidationIT {
     }
 
     @Test
-    public void mixedCaseEvidenceCodeIsValid() {
+    void mixedCaseEvidenceCodeIsValid() {
         String[] ecoIds = {"ECO:0000256", "EcO:0000256", "eCO:0000256"};
 
         annotationRequest.setEvidenceCode(ecoIds);
@@ -414,7 +410,7 @@ public class AnnotationRequestValidationIT {
     }
 
     @Test
-    public void evidenceCodeIsInvalid() {
+    void evidenceCodeIsInvalid() {
         String[] invalidEvCodeIds = {"ECO:9", "xxx:0000888", "-"};
 
         annotationRequest.setEvidenceCode(invalidEvCodeIds);
@@ -427,7 +423,7 @@ public class AnnotationRequestValidationIT {
     }
 
     @Test
-    public void exceedingMaximumNumberOfEvidenceCodesSendsError() {
+    void exceedingMaximumNumberOfEvidenceCodesSendsError() {
         int numIds = AnnotationRequest.MAX_EVIDENCE_CODE + 1;
 
         String[] evCodes = generateValues(IdGeneratorUtil::createEvidenceCode, numIds);
@@ -443,7 +439,7 @@ public class AnnotationRequestValidationIT {
 
     // GENE PRODUCT TYPE PARAMETER
     @Test
-    public void validGeneProductTypeValuesDontCauseAnError() {
+    void validGeneProductTypeValuesDontCauseAnError() {
         String[] gpTypes = {"complex", "miRNA", "protein"};
 
         annotationRequest.setGeneProductType(gpTypes);
@@ -452,7 +448,7 @@ public class AnnotationRequestValidationIT {
     }
 
     @Test
-    public void setGpTypeNotCaseSensitive() {
+    void setGpTypeNotCaseSensitive() {
         String[] gpTypes = {"comPlex", "mirna", "pRotein"};
 
         annotationRequest.setGeneProductType(gpTypes);
@@ -461,7 +457,7 @@ public class AnnotationRequestValidationIT {
     }
 
     @Test
-    public void invalidGeneProductTypesCauseError() {
+    void invalidGeneProductTypesCauseError() {
         String[] invalidGPTypes = {"xxx", "000", "..."};
 
         annotationRequest.setGeneProductType(invalidGPTypes);
@@ -474,7 +470,7 @@ public class AnnotationRequestValidationIT {
 
     // GENE PRODUCT SUBSET PARAMETER
     @Test
-    public void setGpSubsetSuccessfully() {
+    void setGpSubsetSuccessfully() {
         String[] gpSubsets = {"BHF-UCL", "Exosome", "KRUK", "ParkinsonsUK-UCL", "ReferenceGenome"};
 
         annotationRequest.setGeneProductSubset(gpSubsets);
@@ -483,7 +479,7 @@ public class AnnotationRequestValidationIT {
     }
 
     @Test
-    public void invalidGpSubsetValuesResultInError() {
+    void invalidGpSubsetValuesResultInError() {
         String[] invalidSubsets = {"9999", "Reference:Genome", "*"};
 
         annotationRequest.setGeneProductSubset(invalidSubsets);
@@ -496,7 +492,7 @@ public class AnnotationRequestValidationIT {
 
     // PAGE PARAMETER
     @Test
-    public void negativePageValueIsInvalid() {
+    void negativePageValueIsInvalid() {
         int invalidPage = -1;
 
         annotationRequest.setPage(invalidPage);
@@ -509,14 +505,14 @@ public class AnnotationRequestValidationIT {
     }
 
     @Test
-    public void zeroPageValueIsInvalid() {
+    void zeroPageValueIsInvalid() {
         annotationRequest.setPage(0);
 
         assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
     }
 
     @Test
-    public void positivePageValueIsValid() {
+    void positivePageValueIsValid() {
         annotationRequest.setPage(1);
 
         assertThat(validator.validate(annotationRequest), hasSize(0));
@@ -524,7 +520,7 @@ public class AnnotationRequestValidationIT {
 
     // LIMIT PARAMETER
     @Test
-    public void negativeLimitValueIsInvalid() {
+    void negativeLimitValueIsInvalid() {
         int invalidEntriesPerPage = -1;
         annotationRequest.setLimit(invalidEntriesPerPage);
 
@@ -537,28 +533,28 @@ public class AnnotationRequestValidationIT {
     }
 
     @Test
-    public void zeroLimitValueIsValid() {
+    void zeroLimitValueIsValid() {
         annotationRequest.setLimit(0);
 
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
-    public void positiveLimitValueIsValid() {
+    void positiveLimitValueIsValid() {
         annotationRequest.setLimit(1);
 
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
-    public void limitValueEqualToMaxEntriesPerPageIsInvalid() {
+    void limitValueEqualToMaxEntriesPerPageIsInvalid() {
         annotationRequest.setLimit(MAX_ANNOTATION_PER_PAGE_RESULT);
 
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
-    public void limitValueAboveMaxEntriesPerPageIsInvalid() {
+    void limitValueAboveMaxEntriesPerPageIsInvalid() {
         int invalidEntriesPerPage = MAX_ANNOTATION_PER_PAGE_RESULT + 1;
         annotationRequest.setLimit(invalidEntriesPerPage);
 
@@ -574,42 +570,42 @@ public class AnnotationRequestValidationIT {
 
     // GO USAGE PARAMETERS
     @Test
-    public void descendantsGoUsageIsValid() {
+    void descendantsGoUsageIsValid() {
         annotationRequest.setGoUsage("descendants");
 
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
-    public void slimGoUsageIsValid() {
+    void slimGoUsageIsValid() {
         annotationRequest.setGoUsage("slim");
 
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
-    public void exactGoUsageIsValid() {
+    void exactGoUsageIsValid() {
         annotationRequest.setGoUsage("exact");
 
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
-    public void goUsageValueIsInvalid() {
+    void goUsageValueIsInvalid() {
         annotationRequest.setGoUsage("thisDoesNotExistAsAValidUsage");
 
         assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
     }
 
     @Test
-    public void goUsageRelationshipIsValid() {
+    void goUsageRelationshipIsValid() {
         annotationRequest.setGoUsageRelationships("is_a");
 
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
-    public void goUsageRelationshipIsInvalid() {
+    void goUsageRelationshipIsInvalid() {
         String invalidRel = "invalid_relationship";
 
         annotationRequest.setGoUsageRelationships(invalidRel);
@@ -622,7 +618,7 @@ public class AnnotationRequestValidationIT {
     }
 
     @Test
-    public void cannotCreateFilterWithGoUsageAndNoUsageIds() {
+    void cannotCreateFilterWithGoUsageAndNoUsageIds() {
         annotationRequest.setGoUsage("descendants");
 
         Assertions.assertThrows(ParameterException.class, () -> annotationRequest.createFilterRequests());
@@ -631,42 +627,42 @@ public class AnnotationRequestValidationIT {
     //---------------------------------------
     // ECO USAGE PARAMETERS
     @Test
-    public void descendantsEcoUsageIsValid() {
+    void descendantsEcoUsageIsValid() {
         annotationRequest.setEvidenceCodeUsage("descendants");
 
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
-    public void exactEcoUsageIsValid() {
+    void exactEcoUsageIsValid() {
         annotationRequest.setEvidenceCodeUsage("exact");
 
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
-    public void slimEcoUsageIsInvalid() {
+    void slimEcoUsageIsInvalid() {
         annotationRequest.setEvidenceCodeUsage("slim");
 
         assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
     }
 
     @Test
-    public void ecoUsageValueIsInvalid() {
+    void ecoUsageValueIsInvalid() {
         annotationRequest.setEvidenceCodeUsage("thisDoesNotExistAsAValidUsage");
 
         assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
     }
 
     @Test
-    public void ecoUsageRelationshipIsValid() {
+    void ecoUsageRelationshipIsValid() {
         annotationRequest.setEvidenceCodeUsageRelationships("is_a");
 
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
-    public void ecoUsageRelationshipIsInvalid() {
+    void ecoUsageRelationshipIsInvalid() {
         String invalidRel = "invalid_relationship";
 
         annotationRequest.setEvidenceCodeUsageRelationships(invalidRel);
@@ -679,7 +675,7 @@ public class AnnotationRequestValidationIT {
     }
 
     @Test
-    public void cannotCreateFilterWithEcoUsageAndNoUsageIds() {
+    void cannotCreateFilterWithEcoUsageAndNoUsageIds() {
         annotationRequest.setEvidenceCodeUsage("descendants");
 
         Assertions.assertThrows(ParameterException.class, () -> annotationRequest.createFilterRequests());
@@ -688,7 +684,7 @@ public class AnnotationRequestValidationIT {
     //---------------------------------------
     // WITH/FROM PARAMETER
     @Test
-    public void withFromIsValid() {
+    void withFromIsValid() {
         setupDbXrefValidationData();
         String[] refs = new String[]{"PMID:123456"};
         annotationRequest.setWithFrom(refs);
@@ -697,7 +693,7 @@ public class AnnotationRequestValidationIT {
     }
 
     @Test
-    public void withFromIsInvalid() {
+    void withFromIsInvalid() {
         setupDbXrefValidationData();
         String[] refs = new String[]{"PMID:ZZZZZZZZ"};
         annotationRequest.setWithFrom(refs);
@@ -707,7 +703,7 @@ public class AnnotationRequestValidationIT {
 
     // REFERENCE PARAMETER
     @Test
-    public void exceedingMaximumNumberOfReferencesSendsError() {
+    void exceedingMaximumNumberOfReferencesSendsError() {
         setupDbXrefValidationData();
 
         int numRefs = AnnotationRequest.MAX_REFERENCES + 1;
@@ -723,7 +719,7 @@ public class AnnotationRequestValidationIT {
     }
 
     @Test
-    public void referenceIsValid() {
+    void referenceIsValid() {
         setupDbXrefValidationData();
         String[] refs = new String[]{"PMID:123456"};
         annotationRequest.setReference(refs);
@@ -732,7 +728,7 @@ public class AnnotationRequestValidationIT {
     }
 
     @Test
-    public void referenceIsInvalid() {
+    void referenceIsInvalid() {
         setupDbXrefValidationData();
         String[] refs = new String[]{"PMID:ZZZZZZZZ"};
         annotationRequest.setReference(refs);
@@ -742,19 +738,19 @@ public class AnnotationRequestValidationIT {
 
     // QUALIFIER
     @Test
-    public void qualifierWithUnderscoreNoSpacesOrNumbersIsValid() {
+    void qualifierWithUnderscoreNoSpacesOrNumbersIsValid() {
         annotationRequest.setQualifier("foobar", "foo_bar");
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
-    public void qualifierWithNoSpacesAroundPipeIsValid() {
+    void qualifierWithNoSpacesAroundPipeIsValid() {
         annotationRequest.setQualifier("NOT|enables");
         assertThat(validator.validate(annotationRequest), hasSize(0));
     }
 
     @Test
-    public void qualifierWithSpacesAroundPipeIsInvalid() {
+    void qualifierWithSpacesAroundPipeIsInvalid() {
         annotationRequest.setQualifier("NOT | enables");
         assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
         annotationRequest.setQualifier("NOT |enables");
@@ -764,7 +760,7 @@ public class AnnotationRequestValidationIT {
     }
 
     @Test
-    public void qualifierNotValueCaseInsensitiveIsValid() {
+    void qualifierNotValueCaseInsensitiveIsValid() {
         annotationRequest.setQualifier("Not|enable");
         assertThat(validator.validate(annotationRequest), hasSize(0));
         annotationRequest.setQualifier("nOT|enable");
@@ -772,76 +768,76 @@ public class AnnotationRequestValidationIT {
     }
 
     @Test
-    public void qualifierWithNotAndNoPipeIsInvalid() {
+    void qualifierWithNotAndNoPipeIsInvalid() {
         annotationRequest.setQualifier("not boo");
         assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
     }
 
     @Test
-    public void stringWithNumbersIsAnInvalidQualifier() {
+    void stringWithNumbersIsAnInvalidQualifier() {
         annotationRequest.setQualifier("foo3bar");
         assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
     }
 
     // DOWNLOAD LIMIT
     @Test
-    public void negativeDownloadLimitIsInvalid() {
+    void negativeDownloadLimitIsInvalid() {
         annotationRequest.setDownloadLimit(-1);
         assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
     }
 
     @Test
-    public void zeroDownloadLimitIsInvalid() {
+    void zeroDownloadLimitIsInvalid() {
         annotationRequest.setDownloadLimit(0);
         assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
     }
 
     @Test
-    public void positiveDownloadLimitLessThanMaxIsValid() {
+    void positiveDownloadLimitLessThanMaxIsValid() {
         annotationRequest.setDownloadLimit(MAX_DOWNLOAD_NUMBER - 1);
         assertThat(validator.validate(annotationRequest), is(empty()));
     }
 
     @Test
-    public void positiveDownloadLimitEqualToMaxIsValid() {
+    void positiveDownloadLimitEqualToMaxIsValid() {
         annotationRequest.setDownloadLimit(MAX_DOWNLOAD_NUMBER);
         assertThat(validator.validate(annotationRequest), is(empty()));
     }
 
     @Test
-    public void positiveDownloadLimitGreaterThanMaxIsInvalid() {
+    void positiveDownloadLimitGreaterThanMaxIsInvalid() {
         annotationRequest.setDownloadLimit(MAX_DOWNLOAD_NUMBER + 1);
         assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
     }
 
     // OPTIONALLY INCLUDED RESPONSE FIELDS
     @Test
-    public void goNameAsIncludedFieldIsValid() {
+    void goNameAsIncludedFieldIsValid() {
         annotationRequest.setIncludeFields("goName");
         assertThat(validator.validate(annotationRequest), is(empty()));
     }
 
     @Test
-    public void taxonNameAsIncludedFieldIsValid() {
+    void taxonNameAsIncludedFieldIsValid() {
         annotationRequest.setIncludeFields("taxonName");
         assertThat(validator.validate(annotationRequest), is(empty()));
     }
 
     @Test
-    public void multipleValidIncludedFieldsAreValid() {
+    void multipleValidIncludedFieldsAreValid() {
         annotationRequest.setIncludeFields("goName", "taxonName");
         assertThat(validator.validate(annotationRequest), is(empty()));
     }
 
     @Test
-    public void invalidIncludedFieldProducesValidationError() {
+    void invalidIncludedFieldProducesValidationError() {
         annotationRequest.setIncludeFields("XXXXXXXXX");
         assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
     }
 
     // SELECTED FIELDS
     @Test
-    public void validSelectedFieldsAreAllValidatedCorrectly() {
+    void validSelectedFieldsAreAllValidatedCorrectly() {
         String[] validSelectedFields =
                 ("geneProductId|symbol|qualifier|goId|goAspect|goName|evidenceCode|goEvidence|reference" +
                 "|withFrom|taxonId|taxonName|assignedBy|extensions|date|name|synonyms|type|interactingTaxonId").split("\\|");
@@ -853,20 +849,20 @@ public class AnnotationRequestValidationIT {
     }
 
     @Test
-    public void multipleValidSelectedFieldsAreValid() {
+    void multipleValidSelectedFieldsAreValid() {
         annotationRequest.setSelectedFields("geneProductId", "symbol");
         assertThat(validator.validate(annotationRequest), is(empty()));
     }
 
     @Test
-    public void invalidSelectedFieldProducesValidationError() {
+    void invalidSelectedFieldProducesValidationError() {
         annotationRequest.setSelectedFields("XXXXXXXXXX");
         assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"tsv","gpad","gaf"})
-    public void downloadFileTypeValidValues(String mediaType) {
+    void downloadFileTypeValidValues(String mediaType) {
         annotationRequest.setDownloadFileType(mediaType);
         assertThat(validator.validate(annotationRequest), is(empty()));
     }
@@ -874,7 +870,7 @@ public class AnnotationRequestValidationIT {
     @ParameterizedTest
     @ValueSource(strings = {MediaType.ALL_VALUE,MediaType.APPLICATION_JSON_VALUE,MediaType.APPLICATION_PDF_VALUE,
     MediaType.APPLICATION_XML_VALUE, MediaType.TEXT_PLAIN_VALUE, MediaType.TEXT_HTML_VALUE, MediaType.IMAGE_JPEG_VALUE})
-    public void downloadFileTypeOthersMediaTypeAreInValid(String mediaType) {
+    void downloadFileTypeOthersMediaTypeAreInValid(String mediaType) {
         annotationRequest.setDownloadFileType(mediaType);
         assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
     }
@@ -882,7 +878,7 @@ public class AnnotationRequestValidationIT {
     @ParameterizedTest
     @ValueSource(strings = {"abc", "", "   ", "not/valid/check", "TEXT/tsv", "text/GPAD", "TEXT/GAF", "text/tsv",
         "text/gpad", "text/gaf"})
-    public void downloadFileTypeInValid_valuesWhichAreNotMediaTypeSyntax(String mediaType) {
+    void downloadFileTypeInValid_valuesWhichAreNotMediaTypeSyntax(String mediaType) {
         annotationRequest.setDownloadFileType(mediaType);
         assertThat(validator.validate(annotationRequest), hasSize(greaterThan(0)));
     }

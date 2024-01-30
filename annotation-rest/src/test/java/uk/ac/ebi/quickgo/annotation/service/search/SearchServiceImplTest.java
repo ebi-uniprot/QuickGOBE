@@ -1,16 +1,17 @@
 package uk.ac.ebi.quickgo.annotation.service.search;
 
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.rest.search.RequestRetrieval;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
 import uk.ac.ebi.quickgo.rest.search.query.QueryRequest;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
-import static org.mockito.Mockito.verify;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
 
 /**
  * @author Tony Wardell
@@ -18,9 +19,8 @@ import static org.mockito.Mockito.verify;
  * Time: 13:29
  * Created with IntelliJ IDEA.
  */
-public class SearchServiceImplTest {
-    @Rule
-    public ExpectedException thrown= ExpectedException.none();
+@ExtendWith(MockitoExtension.class)
+class SearchServiceImplTest {
 
     @Mock
     RequestRetrieval<Annotation> requestRetrieval;
@@ -29,16 +29,14 @@ public class SearchServiceImplTest {
     QueryRequest queryRequest;
 
     @Test
-    public void errorIfConstructorIsPassedANull(){
-        thrown.expect(IllegalArgumentException.class);
-        new SearchServiceImpl(null);
+    void errorIfConstructorIsPassedANull(){
+        assertThrows(IllegalArgumentException.class, () -> new SearchServiceImpl(null));
     }
 
     @Test
-    public void findByQueryCalled(){
-        thrown.expect(IllegalArgumentException.class);
-        SearchService searchService =new SearchServiceImpl(requestRetrieval);
+    void findByQueryCalled(){
+        SearchService<Annotation> searchService = new SearchServiceImpl(requestRetrieval);
         searchService.findByQuery(queryRequest);
-        verify(requestRetrieval.findByQuery(queryRequest));
+        verify(requestRetrieval, atLeastOnce()).findByQuery(queryRequest);
     }
 }

@@ -1,5 +1,7 @@
 package uk.ac.ebi.quickgo.geneproduct.service;
-
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductDocument;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepository;
 import uk.ac.ebi.quickgo.geneproduct.common.common.GeneProductDocMocker;
@@ -11,11 +13,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
@@ -28,8 +29,9 @@ import static org.mockito.Mockito.when;
  * Time: 13:01
  * Created with IntelliJ IDEA.
  */
-@RunWith(MockitoJUnitRunner.class)
-public class GeneProductServiceImplTest {
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
+class GeneProductServiceImplTest {
 
     private final static List<String> id = Collections.singletonList("A0A000");
     private final static List<String> ids = Arrays.asList("A0A001", "A0A002", "A0A003", "A0A004");
@@ -54,8 +56,8 @@ public class GeneProductServiceImplTest {
 
     private GeneProductService geneProductService;
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         geneProductService = new GeneProductServiceImpl(serviceHelper, geneProductRepository, geneProductDocConverter);
 
         stubSingleGeneProduct();
@@ -96,27 +98,27 @@ public class GeneProductServiceImplTest {
     }
 
     @Test
-    public void findSingleId() {
+    void findSingleId() {
         List<GeneProduct> geneProducts = geneProductService.findById(id);
         assertThat(geneProducts, contains(geneProduct));
         assertThat(geneProducts, hasSize(1));
     }
 
     @Test
-    public void findForMultipleIDs() {
+    void findForMultipleIDs() {
         List<GeneProduct> geneProducts = geneProductService.findById(ids);
         assertThat(geneProducts, contains(geneProduct0, geneProduct1, geneProduct2, geneProduct3));
         assertThat(geneProducts, hasSize(4));
     }
 
     @Test
-    public void idDoesntExist() {
+    void idDoesntExist() {
         List<GeneProduct> geneProducts = geneProductService.findById(Collections.singletonList("QWERTY"));
         assertThat(geneProducts, hasSize(0));
     }
 
     @Test
-    public void findTargetSet() {
+    void findTargetSet() {
         List<GeneProduct> geneProducts = geneProductService.findByTargetSet(targetSet);
         assertThat(geneProducts, contains(geneProduct0, geneProduct1, geneProduct2, geneProduct3));
         assertThat(geneProducts, hasSize(4));

@@ -2,15 +2,13 @@ package uk.ac.ebi.quickgo.annotation.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.servlet.MockMvc;
@@ -68,13 +66,10 @@ import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.*;
  *
  * @author Edd
  */
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(TemporarySolrDataStore.class)
 @SpringBootTest(classes = {AnnotationREST.class})
 @WebAppConfiguration
-public class AnnotationControllerDownloadIT {
-    // temporary data store for solr's data, which is automatically cleaned on exit
-    @ClassRule
-    public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
+class AnnotationControllerDownloadIT {
     private static final int NUMBER_OF_GENERIC_DOCS = 200;
     private static final String DOWNLOAD_SEARCH_URL = "/annotation/downloadSearch";
     private static final String DOWNLOAD_LIMIT_PARAM = "downloadLimit";
@@ -108,8 +103,8 @@ public class AnnotationControllerDownloadIT {
     private MockRestServiceServer mockRestServiceServer;
     private ObjectMapper dtoMapper;
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         repository.deleteAll();
 
         mockMvc = MockMvcBuilders.
@@ -127,7 +122,7 @@ public class AnnotationControllerDownloadIT {
     }
 
     @Test
-    public void canDownloadAnAnnotationAmountFewerThanPageSize() throws Exception {
+    void canDownloadAnAnnotationAmountFewerThanPageSize() throws Exception {
         int expectedDownloadCount = 1;
         genericDocs.forEach(e -> {
             expectToLoadGeneProductValuesViaRest(singletonList(e.geneProductId),
@@ -145,7 +140,7 @@ public class AnnotationControllerDownloadIT {
     }
 
     @Test
-    public void canDownloadInGafFormat() throws Exception {
+    void canDownloadInGafFormat() throws Exception {
         genericDocs.forEach(e -> {
             expectToLoadGeneProductValuesViaRest(singletonList(e.geneProductId),
                     singletonList(AnnotationMocker.SYNONYMS));
@@ -156,7 +151,7 @@ public class AnnotationControllerDownloadIT {
     }
 
     @Test
-    public void canDownloadWithFilterInGafFormat() throws Exception {
+    void canDownloadWithFilterInGafFormat() throws Exception {
         genericDocs.forEach(e -> {
             expectToLoadGeneProductValuesViaRest(singletonList(e.geneProductId),
                     singletonList(AnnotationMocker.SYNONYMS));
@@ -166,7 +161,7 @@ public class AnnotationControllerDownloadIT {
     }
 
     @Test
-    public void canDownloadWithFilterAllAvailableItemsInGafFormat() throws Exception {
+    void canDownloadWithFilterAllAvailableItemsInGafFormat() throws Exception {
         genericDocs.forEach(e -> {
             expectToLoadGeneProductValuesViaRest(singletonList(e.geneProductId),
                     singletonList(AnnotationMocker.SYNONYMS));
@@ -176,22 +171,22 @@ public class AnnotationControllerDownloadIT {
     }
 
     @Test
-    public void canDownloadInGpadFormat() throws Exception {
+    void canDownloadInGpadFormat() throws Exception {
         canDownload(GPAD_MEDIA_TYPE);
     }
 
     @Test
-    public void canDownloadWithFilterInGpadFormat() throws Exception {
+    void canDownloadWithFilterInGpadFormat() throws Exception {
         canDownloadWithFilter(GPAD_MEDIA_TYPE);
     }
 
     @Test
-    public void canDownloadWithFilterAllAvailableItemsInGpadFormat() throws Exception {
+    void canDownloadWithFilterAllAvailableItemsInGpadFormat() throws Exception {
         canDownloadWithFilterAllAvailableItems(GPAD_MEDIA_TYPE);
     }
 
     @Test
-    public void canDownloadWhenBodyIsProvidedAsPost() throws Exception {
+    void canDownloadWhenBodyIsProvidedAsPost() throws Exception {
         int expectedDownloadCount = 5;
 
         createGenericDocsChangingGoId(expectedDownloadCount).forEach(this::saveToRepo);
@@ -216,7 +211,7 @@ public class AnnotationControllerDownloadIT {
     }
 
     @Test
-    public void downloadLimitTooLargeCausesBadRequest() throws Exception {
+    void downloadLimitTooLargeCausesBadRequest() throws Exception {
         ResultActions response = mockMvc.perform(
                 get(DOWNLOAD_SEARCH_URL)
                         .header(ACCEPT, GPAD_MEDIA_TYPE)
@@ -228,7 +223,7 @@ public class AnnotationControllerDownloadIT {
     }
 
     @Test
-    public void downloadLimitTooSmallCausesBadRequest() throws Exception {
+    void downloadLimitTooSmallCausesBadRequest() throws Exception {
         ResultActions response = mockMvc.perform(
                 get(DOWNLOAD_SEARCH_URL)
                         .header(ACCEPT, GPAD_MEDIA_TYPE)
@@ -240,7 +235,7 @@ public class AnnotationControllerDownloadIT {
     }
 
     @Test
-    public void canDownloadInTSVFormat() throws Exception {
+    void canDownloadInTSVFormat() throws Exception {
         int downloadCount = 97;
         for(int i=1; i<=downloadCount; i++) {
             expectGoTermsHaveGoNamesViaRest(singletonList(IdGeneratorUtil.createGoId(3824)), singletonList
@@ -250,12 +245,12 @@ public class AnnotationControllerDownloadIT {
     }
 
     @Test
-    public void canDownloadInTSVFormatWithSelectedFieldsCaseInsensitive() throws Exception {
+    void canDownloadInTSVFormatWithSelectedFieldsCaseInsensitive() throws Exception {
         canDownloadWithSelectedFields();
     }
 
     @Test
-    public void whenDownloadFileTypeProvidedAsPartOfRequestParam_acceptHeaderWillBeIgnored() throws Exception {
+    void whenDownloadFileTypeProvidedAsPartOfRequestParam_acceptHeaderWillBeIgnored() throws Exception {
             int expectedDownloadCount = 97;
             ResultActions response = mockMvc.perform(
                 get(DOWNLOAD_SEARCH_URL)
@@ -268,17 +263,17 @@ public class AnnotationControllerDownloadIT {
     }
 
     @Test
-    public void whenDownloadFileTypeRequest_invalidValue_isBadReqeust() throws Exception {
+    void whenDownloadFileTypeRequest_invalidValue_isBadReqeust() throws Exception {
         badRequest("fileType", "Invalid download file type: fileType. Only allowed gpad or gaf or tsv");
     }
 
     @Test
-    public void whenDownloadFileTypeRequest_empty_isBadReqeust() throws Exception {
+    void whenDownloadFileTypeRequest_empty_isBadReqeust() throws Exception {
         badRequest("", "Invalid download file type: . Only allowed gpad or gaf or tsv");
     }
 
     @Test
-    public void canProvideCommaSeparatedHeaders() throws Exception {
+    void canProvideCommaSeparatedHeaders() throws Exception {
         ResultActions response = mockMvc.perform(
             get(DOWNLOAD_SEARCH_URL)
                 .header(ACCEPT, "*/*,text/gpad,text/html"));
@@ -288,7 +283,7 @@ public class AnnotationControllerDownloadIT {
     }
 
     @Test
-    public void whenMultipleAcceptHeaders_firstValidWillBeUsed() throws Exception {
+    void whenMultipleAcceptHeaders_firstValidWillBeUsed() throws Exception {
         ResultActions response = mockMvc.perform(
             get(DOWNLOAD_SEARCH_URL)
                 .header(ACCEPT, "image/jpg","text/*","text/tsv","text/gaf","text/html","text/gpad"));
@@ -298,7 +293,7 @@ public class AnnotationControllerDownloadIT {
     }
 
     @Test
-    public void whenMultipleAcceptHeaders_notHaveSingleValid_BadRequest() throws Exception {
+    void whenMultipleAcceptHeaders_notHaveSingleValid_BadRequest() throws Exception {
         ResultActions response = mockMvc.perform(
             get(DOWNLOAD_SEARCH_URL)
                 .header(ACCEPT, "image/jpg")

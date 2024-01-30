@@ -1,33 +1,34 @@
 package uk.ac.ebi.quickgo.index.annotation.coterms;
 
 import java.util.List;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 /**
  * @author Tony Wardell
  * Date: 09/09/2016
  * Time: 12:06
  * Created with IntelliJ IDEA.
  */
-@RunWith(MockitoJUnitRunner.class)
-public class CoTermsForSelectedTermTest {
+@ExtendWith(MockitoExtension.class)
+class CoTermsForSelectedTermTest {
 
     @Mock
     CoTerm mockCoTerm;
 
     @Test
-    public void testCalculationCalledOnAllTerms(){
+    void testCalculationCalledOnAllTerms(){
 
         long totalNumberGeneProducts = 10;
         long selected = 2;  //Total count of proteins annotated to selected term
@@ -48,7 +49,7 @@ public class CoTermsForSelectedTermTest {
 
 
     @Test
-    public void callingHighestSimilaritySortingWorks(){
+    void callingHighestSimilaritySortingWorks(){
 
         long totalNumberGeneProducts = 10;
         long selected = 2;  //Total count of proteins annotated to selected term
@@ -86,37 +87,47 @@ public class CoTermsForSelectedTermTest {
 
 
 
-    @Test(expected=IllegalArgumentException.class)
-    public void passingNullToAddAndCalculateCausesException(){
-        new CoTermsForSelectedTerm.Builder().addCoTerm(null);
+    @Test
+    void passingNullToAddAndCalculateCausesException(){
+        assertThrows(IllegalArgumentException.class, () -> {
+            new CoTermsForSelectedTerm.Builder().addCoTerm(null);
+        });
     }
 
 
-    @Test(expected=IllegalArgumentException.class)
-    public void passingTotalNumberGeneProductsEqualToZeroToConstructorCausesException(){
-        long totalNumberGeneProducts = 0;
-        new CoTermsForSelectedTerm.Builder()
-                .setTotalNumberOfGeneProducts(totalNumberGeneProducts);
+    @Test
+    void passingTotalNumberGeneProductsEqualToZeroToConstructorCausesException(){
+        assertThrows(IllegalArgumentException.class, () -> {
+            long totalNumberGeneProducts = 0;
+            new CoTermsForSelectedTerm.Builder()
+                    .setTotalNumberOfGeneProducts(totalNumberGeneProducts);
+        });
     }
 
-    @Test(expected=IllegalArgumentException.class)
-    public void passingSelectedEqualToZeroToConstructorCausesException(){
-        long selected = 0;
-        new CoTermsForSelectedTerm.Builder().setSelected(selected);
+    @Test
+    void passingSelectedEqualToZeroToConstructorCausesException(){
+        assertThrows(IllegalArgumentException.class, () -> {
+            long selected = 0;
+            new CoTermsForSelectedTerm.Builder().setSelected(selected);
+        });
     }
 
-    @Test(expected=IllegalStateException.class)
-    public void buildingCoTermsForSelectedTermWithoutSpecifyingTotalNumberOfGeneProductsCausesException(){
-        CoTermsForSelectedTerm.Builder builder = new CoTermsForSelectedTerm.Builder()
-                .setSelected(4).addCoTerm(mock(CoTerm.class, "One"));
-        builder.build();
+    @Test
+    void buildingCoTermsForSelectedTermWithoutSpecifyingTotalNumberOfGeneProductsCausesException(){
+        assertThrows(IllegalStateException.class, () -> {
+            CoTermsForSelectedTerm.Builder builder = new CoTermsForSelectedTerm.Builder()
+                    .setSelected(4).addCoTerm(mock(CoTerm.class, "One"));
+            builder.build();
+        });
     }
 
-    @Test(expected=IllegalArgumentException.class)
-    public void buildingCoTermsForSelectedTermWithoutSpecifyingSelectedCausesException(){
-        CoTermsForSelectedTerm.Builder builder = new CoTermsForSelectedTerm.Builder()
-                .setTotalNumberOfGeneProducts(4)
-                .addCoTerm( mock(CoTerm.class, "One"));
-        builder.build();
+    @Test
+    void buildingCoTermsForSelectedTermWithoutSpecifyingSelectedCausesException(){
+        assertThrows(IllegalArgumentException.class, () -> {
+            CoTermsForSelectedTerm.Builder builder = new CoTermsForSelectedTerm.Builder()
+                    .setTotalNumberOfGeneProducts(4)
+                    .addCoTerm(mock(CoTerm.class, "One"));
+            builder.build();
+        });
     }
 }

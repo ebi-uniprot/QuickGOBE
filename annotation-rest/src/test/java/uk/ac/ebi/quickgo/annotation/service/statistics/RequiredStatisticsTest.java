@@ -1,15 +1,17 @@
 package uk.ac.ebi.quickgo.annotation.service.statistics;
 
+import org.junit.jupiter.api.Test;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.core.IsNot.not;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -23,15 +25,15 @@ import static uk.ac.ebi.quickgo.annotation.service.statistics.RequiredStatistics
  * Created 17/08/17
  * @author Edd
  */
-public class RequiredStatisticsTest {
+class RequiredStatisticsTest {
 
-    @Test(expected = IllegalArgumentException.class)
-    public void cannotCreateWithNullConfigurer() {
-        new RequiredStatistics(null);
+    @Test
+    void cannotCreateWithNullConfigurer() {
+        assertThrows(IllegalArgumentException.class, () -> new RequiredStatistics(null));
     }
 
     @Test
-    public void configurationTakesPlaceUponCreation() {
+    void configurationTakesPlaceUponCreation() {
         StatisticsTypeConfigurer mockConfigurer = mock(StatisticsTypeConfigurer.class);
 
         new RequiredStatistics(mockConfigurer);
@@ -40,7 +42,7 @@ public class RequiredStatisticsTest {
     }
 
     @Test
-    public void ensureCorrectStatsGroupsAreCreated() {
+    void ensureCorrectStatsGroupsAreCreated() {
         StatisticsTypeConfigurer configurer = configurerWithProperties();
 
         RequiredStatistics reqStats = new RequiredStatistics(configurer);
@@ -51,7 +53,7 @@ public class RequiredStatisticsTest {
     }
 
     @Test
-    public void ensureStatsGroupsAreConfiguredWhenConfigurerIsNotDefault() {
+    void ensureStatsGroupsAreConfiguredWhenConfigurerIsNotDefault() {
         StatisticsTypeConfigurer configurer = configurerWithProperties();
 
         RequiredStatistics reqStats = new RequiredStatistics(configurer);
@@ -64,7 +66,7 @@ public class RequiredStatisticsTest {
     }
 
     @Test
-    public void ensureStatsGroupsAreNotConfiguredWhenConfigurerIsDefault() {
+    void ensureStatsGroupsAreNotConfiguredWhenConfigurerIsDefault() {
         StatisticsTypeConfigurer configurer = configurerWithNoProperties();
 
         RequiredStatistics reqStats = new RequiredStatistics(configurer);

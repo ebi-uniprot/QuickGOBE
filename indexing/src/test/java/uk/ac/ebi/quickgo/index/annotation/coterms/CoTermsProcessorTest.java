@@ -2,13 +2,15 @@ package uk.ac.ebi.quickgo.index.annotation.coterms;
 
 import java.util.Arrays;
 import java.util.List;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -24,8 +26,8 @@ import static org.mockito.Mockito.when;
  * Time: 16:26
  * Created with IntelliJ IDEA.
  */
-@RunWith(MockitoJUnitRunner.class)
-public class CoTermsProcessorTest {
+@ExtendWith(MockitoExtension.class)
+class CoTermsProcessorTest {
 
     private static final String GO_TERM = "GO:0003824";
     @Mock
@@ -34,7 +36,7 @@ public class CoTermsProcessorTest {
     private CoTermsAggregationWriter aggregator;
 
     @Test
-    public void singleGoTermHasCooccurrenceWithTwoOtherTerms() {
+    void singleGoTermHasCooccurrenceWithTwoOtherTerms() {
 
         CoTerm mockTermA = mock(CoTerm.class);
         CoTerm mockTermB = mock(CoTerm.class);
@@ -48,15 +50,19 @@ public class CoTermsProcessorTest {
         assertThat(coTermsCalculator.process(GO_TERM), is(returnList));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void processNullCausesException() {
-        CoTermsProcessor calculator = new CoTermsProcessor(aggregator);
-        calculator.process(null);
+    @Test
+    void processNullCausesException() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            CoTermsProcessor calculator = new CoTermsProcessor(aggregator);
+            calculator.process(null);
+        });
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void aggregatorIsNullCausesException() {
-        new CoTermsProcessor(null);
+    @Test
+    void aggregatorIsNullCausesException() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            new CoTermsProcessor(null);
+        });
     }
 
 }

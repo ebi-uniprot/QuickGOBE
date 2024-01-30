@@ -1,40 +1,33 @@
 package uk.ac.ebi.quickgo.rest.search;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests the behaviour of the {@link AggregateFunction} class.
  */
-public class AggregationFunctionTest {
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
+class AggregationFunctionTest {
 
     @Test
-    public void nullFunctionTextInLookupThrowsException() throws Exception {
+    void nullFunctionTextInLookupThrowsException() {
         String functionText = null;
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Unable to find aggregation function for: null");
-
-        AggregateFunction.typeOf(functionText);
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> AggregateFunction.typeOf(functionText));
+        assertTrue(exception.getMessage().contains("Unable to find aggregation function for: null"));
     }
 
     @Test
-    public void nonSupportedFunctionTextInLookupThrowsException() throws Exception {
+    void nonSupportedFunctionTextInLookupThrowsException() {
         String functionText = "function";
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Unable to find aggregation function for: " + functionText);
-
-        AggregateFunction.typeOf(functionText);
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> AggregateFunction.typeOf(functionText));
+        assertTrue(exception.getMessage().contains("Unable to find aggregation function for: " + functionText));
     }
 
     @Test
-    public void supportedFunctionTextInLookupReturnsTheRightAggregateFunction() throws Exception {
+    void supportedFunctionTextInLookupReturnsTheRightAggregateFunction() {
         String functionText = AggregateFunction.UNIQUE.getName();
 
         AggregateFunction retrievedFunction = AggregateFunction.typeOf(functionText);

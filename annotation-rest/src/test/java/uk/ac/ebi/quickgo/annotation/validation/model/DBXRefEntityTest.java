@@ -1,8 +1,8 @@
 package uk.ac.ebi.quickgo.annotation.validation.model;
 
 import java.util.regex.Pattern;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -13,12 +13,12 @@ import static org.hamcrest.Matchers.is;
  * Time: 10:44
  * Created with IntelliJ IDEA.
  */
-public class DBXRefEntityTest {
+class DBXRefEntityTest {
 
     private DBXRefEntity entity1;
 
-    @Before
-    public void setup() throws Exception {
+    @BeforeEach
+    void setup() throws Exception {
 
         entity1 = new DBXRefEntity();
 
@@ -30,22 +30,22 @@ public class DBXRefEntityTest {
     }
 
     @Test
-    public void passes() {
+    void passes() {
         assertThat(entity1.test("IPR123456"), is(true));
     }
 
     @Test
-    public void fails() {
+    void fails() {
         assertThat(entity1.test("ZZZ123456"), is(false));
     }
 
     @Test
-    public void retrieveKeyValueSuccessfully(){
+    void retrieveKeyValueSuccessfully(){
         assertThat(entity1.keyValue(), is(entity1.database));
     }
 
     @Test
-    public void ifPatternIsNullAllNonNullValuesAreValid(){
+    void ifPatternIsNullAllNonNullValuesAreValid(){
         entity1.idValidationPattern = null;
         assertThat(entity1.test("ZZZ123456"), is(true));
         assertThat(entity1.test(null), is(false));

@@ -2,7 +2,7 @@ package uk.ac.ebi.quickgo.common.converter;
 
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -13,14 +13,14 @@ import static uk.ac.ebi.quickgo.common.converter.FlatFieldLeaf.newFlatFieldLeaf;
  * Created 26/11/15
  * @author Edd
  */
-public class FlatFieldBuilderTest {
+class FlatFieldBuilderTest {
 
     private static final String START_DELIM = LEVEL_SEPARATOR_START;
     private static final String END_DELIM = LEVEL_SEPARATOR_END;
     private static final String SEPARATOR = VALUE_SEPARATOR;
 
     @Test
-    public void createStringUsingEmptyFlatField() throws Exception {
+    void createStringUsingEmptyFlatField()  {
         FlatField emptyFlatField = newFlatField();
 
         String actualString = emptyFlatField.buildString();
@@ -29,7 +29,7 @@ public class FlatFieldBuilderTest {
     }
 
     @Test
-    public void createStringUsingFlatFieldWith1Value() throws Exception {
+    void createStringUsingFlatFieldWith1Value()  {
         FlatField flatField = newFlatField()
                 .addField(newFlatFieldLeaf("level1:A"));
 
@@ -39,7 +39,7 @@ public class FlatFieldBuilderTest {
     }
 
     @Test
-    public void createStringUsingFlatFieldWith2ValuesAtLevel1() throws Exception {
+    void createStringUsingFlatFieldWith2ValuesAtLevel1()  {
         FlatField flatField = newFlatField()
                 .addField(newFlatFieldLeaf("level1:A"))
                 .addField(newFlatFieldLeaf("level1:B"));
@@ -50,7 +50,7 @@ public class FlatFieldBuilderTest {
     }
 
     @Test
-    public void createStringUsingFlatFieldWith2Values1AtEachLevel() throws Exception {
+    void createStringUsingFlatFieldWith2Values1AtEachLevel()  {
         FlatField flatField = newFlatField()
                 .addField(newFlatFieldLeaf("level1:A"))
                 .addField(newFlatField()
@@ -63,7 +63,7 @@ public class FlatFieldBuilderTest {
     }
 
     @Test
-    public void createStringWithFlatFieldWith2ValuesAtFirstLevelAnd1ValueAtSecondLevel() throws Exception {
+    void createStringWithFlatFieldWith2ValuesAtFirstLevelAnd1ValueAtSecondLevel()  {
         FlatField flatField = newFlatField()
                 .addField(newFlatFieldLeaf("level1:A"))
                 .addField(newFlatField()
@@ -77,7 +77,7 @@ public class FlatFieldBuilderTest {
     }
 
     @Test
-    public void createStringUsingFlatFieldWith2ValuesAtSecondLevelAnd1ValueAtFirstLevel() throws Exception {
+    void createStringUsingFlatFieldWith2ValuesAtSecondLevelAnd1ValueAtFirstLevel()  {
         FlatField flatField = newFlatField()
                 .addField(newFlatFieldLeaf("level1:A"))
                 .addField(newFlatField()
@@ -91,7 +91,7 @@ public class FlatFieldBuilderTest {
     }
 
     @Test
-    public void createStringUsingFlatFieldWith3LevelDepthWith1ValueEach() throws Exception {
+    void createStringUsingFlatFieldWith3LevelDepthWith1ValueEach()  {
         FlatField flatField = newFlatField()
                 .addField(newFlatFieldLeaf("level1:A"))
                 .addField(newFlatField()
@@ -106,14 +106,14 @@ public class FlatFieldBuilderTest {
     }
 
     @Test
-    public void createsFlatFieldFromEmptyString() throws Exception {
+    void createsFlatFieldFromEmptyString()  {
         FlatField actualFlatField = parse(expectedField());
 
         assertThat(actualFlatField, is(newFlatField()));
     }
 
     @Test
-    public void createsFlatFieldFromStringWith1ValueAtLevel1() throws Exception {
+    void createsFlatFieldFromStringWith1ValueAtLevel1()  {
         FlatField actualFlatField = parse(expectedField("level1:A"));
 
         FlatField expectedField = newFlatField().addField(newFlatFieldLeaf("level1:A"));
@@ -122,7 +122,7 @@ public class FlatFieldBuilderTest {
     }
 
     @Test
-    public void createsFlatFieldFromStringWith2ValuesAtLevel1() throws Exception {
+    void createsFlatFieldFromStringWith2ValuesAtLevel1()  {
         FlatField actualFlatField = parse(expectedField("level1:A", "level1:B"));
 
         FlatField expectedField = newFlatField()
@@ -133,7 +133,7 @@ public class FlatFieldBuilderTest {
     }
 
     @Test
-    public void createsFlatFieldFromStringWith1ValueAtLevel1And1ValueAtLevel2() throws Exception {
+    void createsFlatFieldFromStringWith1ValueAtLevel1And1ValueAtLevel2()  {
         FlatField actualFlatField = parse(expectedField("level1:A", expectedField("level2:A")));
 
         FlatField expectedField = newFlatField()
@@ -145,7 +145,7 @@ public class FlatFieldBuilderTest {
     }
 
     @Test
-    public void createsFlatFieldFromStringWith2ValuesAtLevel1And1ValueAtLevel2() throws Exception {
+    void createsFlatFieldFromStringWith2ValuesAtLevel1And1ValueAtLevel2()  {
         FlatField actualFlatField = parse(expectedField("level1:A", expectedField("level2:A"), "level1:B"));
 
         FlatField expectedField = newFlatField()
@@ -158,7 +158,7 @@ public class FlatFieldBuilderTest {
     }
 
     @Test
-    public void createsFlatFieldFromStringWith1ValueAtLevel1And2ValuesAtLevel2() throws Exception {
+    void createsFlatFieldFromStringWith1ValueAtLevel1And2ValuesAtLevel2()  {
         FlatField actualFlatField = parse(expectedField("level1:A", expectedField("level2:A", "level2:B")));
 
         FlatField expectedField = newFlatField()
@@ -171,7 +171,7 @@ public class FlatFieldBuilderTest {
     }
 
     @Test
-    public void createsFlatFieldFromStringWith3Levels1ValueForEachLevel() throws Exception {
+    void createsFlatFieldFromStringWith3Levels1ValueForEachLevel()  {
         FlatField actualFlatField =
                 parse(
                         expectedField("level1:A",
@@ -189,7 +189,7 @@ public class FlatFieldBuilderTest {
     }
 
     @Test
-    public void handleEmptyFieldsConsistently() {
+    void handleEmptyFieldsConsistently() {
         String origStr = FlatFieldBuilder.newFlatField()
                 .addField(FlatFieldLeaf.newFlatFieldLeaf("1"))
                 .addField(FlatFieldLeaf.newFlatFieldLeaf(""))
@@ -204,7 +204,7 @@ public class FlatFieldBuilderTest {
     }
 
     @Test
-    public void handleEmptyFieldsConsistentlyAtEnd() {
+    void handleEmptyFieldsConsistentlyAtEnd() {
         FlatFieldBuilder origFlatFieldBuilder = FlatFieldBuilder.newFlatField()
                 .addField(FlatFieldLeaf.newFlatFieldLeaf("XX:00001"))
                 .addField(FlatFieldLeaf.newFlatFieldLeaf("XX"))
@@ -226,7 +226,7 @@ public class FlatFieldBuilderTest {
      * must be equal.
      */
     @Test
-    public void parseFlatFieldBuilderString2NestingLevels() {
+    void parseFlatFieldBuilderString2NestingLevels() {
         FlatFieldBuilder flatFieldBuilderOrig = FlatFieldBuilder.newFlatField()
                 .addField(FlatFieldLeaf.newFlatFieldLeaf("1"))
                 .addField(FlatFieldLeaf.newFlatFieldLeaf("2"))
@@ -246,7 +246,7 @@ public class FlatFieldBuilderTest {
     }
 
     @Test
-    public void parseFlatFieldBuilderString3NestingLevels() {
+    void parseFlatFieldBuilderString3NestingLevels() {
         FlatFieldBuilder flatFieldBuilderOrig = FlatFieldBuilder.newFlatField()
                 .addField(FlatFieldLeaf.newFlatFieldLeaf("level1:A"))
                 .addField(FlatFieldLeaf.newFlatFieldLeaf("level1:B"))
@@ -270,7 +270,7 @@ public class FlatFieldBuilderTest {
     }
 
     @Test
-    public void parseFlatFieldBuilderString4NestingLevels() {
+    void parseFlatFieldBuilderString4NestingLevels() {
         FlatFieldBuilder flatFieldBuilderOrig = newFlatField()
                 .addField(newFlatFieldLeaf("level1:A"))
                 .addField(newFlatFieldLeaf("level1:B"))
@@ -304,7 +304,7 @@ public class FlatFieldBuilderTest {
     }
 
     @Test
-    public void canConvertTerminatingNullFlatFieldLeaf() {
+    void canConvertTerminatingNullFlatFieldLeaf() {
         FlatFieldBuilder ff1Model = FlatFieldBuilder.newFlatField()
                 .addField(FlatFieldLeaf.newFlatFieldLeaf("level1:A"))
                 .addField(FlatFieldLeaf.newFlatFieldLeaf("level1:B"))
@@ -322,7 +322,7 @@ public class FlatFieldBuilderTest {
     }
 
     @Test
-    public void canConvertTerminatingEmptyFlatFieldLeaf() {
+    void canConvertTerminatingEmptyFlatFieldLeaf() {
         FlatFieldBuilder ff1Model = FlatFieldBuilder.newFlatField()
                 .addField(FlatFieldLeaf.newFlatFieldLeaf("level1:A"))
                 .addField(FlatFieldLeaf.newFlatFieldLeaf("level1:B"))
@@ -341,7 +341,7 @@ public class FlatFieldBuilderTest {
     }
 
     @Test
-    public void canConvertFieldContainingSquareBrackets() {
+    void canConvertFieldContainingSquareBrackets() {
         String fieldValue = "holo-[acyl-carrier-protein] synthase complex";
         FlatField actualFlatField = parse(expectedField(fieldValue));
 
@@ -352,7 +352,7 @@ public class FlatFieldBuilderTest {
     }
 
     @Test
-    public void canConvertMultipleFieldsContainingSquareBrackets() {
+    void canConvertMultipleFieldsContainingSquareBrackets() {
         String complex = "fatty acid [synthase] complex";
         String date = "2007-08-09";
         String action = "Deleted";
@@ -379,7 +379,7 @@ public class FlatFieldBuilderTest {
     }
 
     @Test
-    public void canConvertNestedFieldsContainingSquareBrackets() {
+    void canConvertNestedFieldsContainingSquareBrackets() {
         FlatField actualFlatField =
                 parse(expectedField("level1:value [1]",
                         expectedField("level2:value [2]",
@@ -396,7 +396,7 @@ public class FlatFieldBuilderTest {
     }
 
     @Test
-    public void canConvertNestedFieldsContainingSpecialCharacters() {
+    void canConvertNestedFieldsContainingSpecialCharacters() {
         String specialChars = "`¬|\\£$%^&*()_-=+./<>?:@~#{}[]";
         String flatFieldText = expectedField("level1:" + specialChars,
                 expectedField("level2:" + specialChars,

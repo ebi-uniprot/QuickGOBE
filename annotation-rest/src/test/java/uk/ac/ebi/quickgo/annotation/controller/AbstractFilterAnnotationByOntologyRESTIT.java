@@ -2,16 +2,14 @@ package uk.ac.ebi.quickgo.annotation.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.client.ResponseCreator;
@@ -56,14 +54,11 @@ import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.*;
  * Created 02/11/16
  * @author Edd
  */
-@RunWith(SpringJUnit4ClassRunner.class)
+// temporary data store for solr's data, which is automatically cleaned on exit
+@ExtendWith(TemporarySolrDataStore.class)
 @SpringBootTest(classes = {AnnotationREST.class, OntologyRepoConfig.class})
 @WebAppConfiguration
 public abstract class AbstractFilterAnnotationByOntologyRESTIT {
-    // temporary data store for solr's data, which is automatically cleaned on exit
-    @ClassRule
-    public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
-
     static final String FAILED_REST_FETCH_PREFIX = "Failed to fetch REST response due to: ";
     static final String IS_A = "is_a";
     static final String SLIM_USAGE = "slim";
@@ -89,8 +84,8 @@ public abstract class AbstractFilterAnnotationByOntologyRESTIT {
     private MockRestServiceServer mockRestServiceServer;
     private ObjectMapper dtoMapper;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() throws Exception {
         mockMvc = MockMvcBuilders.
                 webAppContextSetup(webApplicationContext)
                 .build();
@@ -99,7 +94,7 @@ public abstract class AbstractFilterAnnotationByOntologyRESTIT {
     }
 
     @Test
-    public void filterFor1TermBy0ValidDescendantMeansFilterEverything() throws Exception {
+    void filterFor1TermBy0ValidDescendantMeansFilterEverything() throws Exception {
         annotationRepository.save(createAnnotationDocWithId(createGPId(1), ontologyId(1)));
         annotationRepository.save(createAnnotationDocWithId(createGPId(2), ontologyId(2)));
 
@@ -118,7 +113,7 @@ public abstract class AbstractFilterAnnotationByOntologyRESTIT {
     }
 
     @Test
-    public void defaultFilterFor1TermBy1ValidDescendant() throws Exception {
+    void defaultFilterFor1TermBy1ValidDescendant() throws Exception {
         annotationRepository.save(createAnnotationDocWithId(createGPId(1), ontologyId(1)));
         annotationRepository.save(createAnnotationDocWithId(createGPId(2), ontologyId(2)));
         annotationRepository.save(createAnnotationDocWithId(createGPId(3), ontologyId(3)));
@@ -141,7 +136,7 @@ public abstract class AbstractFilterAnnotationByOntologyRESTIT {
     }
 
     @Test
-    public void filterFor1TermBy1ValidDescendant() throws Exception {
+    void filterFor1TermBy1ValidDescendant() throws Exception {
         annotationRepository.save(createAnnotationDocWithId(createGPId(1), ontologyId(1)));
         annotationRepository.save(createAnnotationDocWithId(createGPId(2), ontologyId(2)));
         annotationRepository.save(createAnnotationDocWithId(createGPId(3), ontologyId(3)));
@@ -165,7 +160,7 @@ public abstract class AbstractFilterAnnotationByOntologyRESTIT {
     }
 
     @Test
-    public void filterFor1TermBy2ValidDescendants() throws Exception {
+    void filterFor1TermBy2ValidDescendants() throws Exception {
         annotationRepository.save(createAnnotationDocWithId(createGPId(1), ontologyId(1)));
         annotationRepository.save(createAnnotationDocWithId(createGPId(2), ontologyId(2)));
         annotationRepository.save(createAnnotationDocWithId(createGPId(3), ontologyId(3)));
@@ -192,7 +187,7 @@ public abstract class AbstractFilterAnnotationByOntologyRESTIT {
     }
 
     @Test
-    public void filterFor2TermsBy0ValidDescendantsMeansFilterEverything() throws Exception {
+    void filterFor2TermsBy0ValidDescendantsMeansFilterEverything() throws Exception {
         annotationRepository.save(createAnnotationDocWithId(createGPId(1), ontologyId(1)));
         annotationRepository.save(createAnnotationDocWithId(createGPId(2), ontologyId(2)));
         annotationRepository.save(createAnnotationDocWithId(createGPId(3), ontologyId(3)));
@@ -215,7 +210,7 @@ public abstract class AbstractFilterAnnotationByOntologyRESTIT {
     }
 
     @Test
-    public void filterFor2TermsBy1ValidDescendant() throws Exception {
+    void filterFor2TermsBy1ValidDescendant() throws Exception {
         annotationRepository.save(createAnnotationDocWithId(createGPId(1), ontologyId(1)));
         annotationRepository.save(createAnnotationDocWithId(createGPId(2), ontologyId(2)));
         annotationRepository.save(createAnnotationDocWithId(createGPId(3), ontologyId(3)));
@@ -241,7 +236,7 @@ public abstract class AbstractFilterAnnotationByOntologyRESTIT {
     }
 
     @Test
-    public void filterFor2TermsBy2ValidDescendants() throws Exception {
+    void filterFor2TermsBy2ValidDescendants() throws Exception {
         annotationRepository.save(createAnnotationDocWithId(createGPId(1), ontologyId(1)));
         annotationRepository.save(createAnnotationDocWithId(createGPId(2), ontologyId(2)));
         annotationRepository.save(createAnnotationDocWithId(createGPId(3), ontologyId(3)));
@@ -270,7 +265,7 @@ public abstract class AbstractFilterAnnotationByOntologyRESTIT {
     }
 
     @Test
-    public void termWithNullDescendantsProducesErrorMessage() throws Exception {
+    void termWithNullDescendantsProducesErrorMessage() throws Exception {
         expectRestCallHasDescendants(singletonList(ontologyId(1)), emptyList(), singletonList(null));
 
         ResultActions response = mockMvc.perform(
@@ -286,7 +281,7 @@ public abstract class AbstractFilterAnnotationByOntologyRESTIT {
     }
 
     @Test
-    public void termWithOneNullDescendantsListAndOneValidDescendantsProducesError() throws Exception {
+    void termWithOneNullDescendantsListAndOneValidDescendantsProducesError() throws Exception {
         expectRestCallHasDescendants(
                 asList(ontologyId(1), ontologyId(2)),
                 emptyList(),
@@ -307,7 +302,7 @@ public abstract class AbstractFilterAnnotationByOntologyRESTIT {
     }
 
     @Test
-    public void termWithTwoNullDescendantsListAndOneValidDescendantsProducesErrorShowingBothIds() throws Exception {
+    void termWithTwoNullDescendantsListAndOneValidDescendantsProducesErrorShowingBothIds() throws Exception {
         expectRestCallHasDescendants(
                 asList(ontologyId(1), ontologyId(2), ontologyId(3)),
                 emptyList(),
@@ -330,7 +325,7 @@ public abstract class AbstractFilterAnnotationByOntologyRESTIT {
     }
 
     @Test
-    public void oneTermWithOneDescendantIdThatIsNullAndOneNonNullSucceeds() throws Exception {
+    void oneTermWithOneDescendantIdThatIsNullAndOneNonNullSucceeds() throws Exception {
         annotationRepository.save(createAnnotationDocWithId(createGPId(2), ontologyId(2)));
 
         expectRestCallHasDescendants(
@@ -351,7 +346,7 @@ public abstract class AbstractFilterAnnotationByOntologyRESTIT {
     }
 
     @Test
-    public void wrongResourcePathForDescendantsCausesErrorMessage() throws Exception {
+    void wrongResourcePathForDescendantsCausesErrorMessage() throws Exception {
         annotationRepository.save(createAnnotationDocWithId(createGPId(1), ontologyId(1)));
         annotationRepository.save(createAnnotationDocWithId(createGPId(2), ontologyId(2)));
 
@@ -367,7 +362,7 @@ public abstract class AbstractFilterAnnotationByOntologyRESTIT {
     }
 
     @Test
-    public void fetchTimeoutForDescendantFilteringCauses500() throws Exception {
+    void fetchTimeoutForDescendantFilteringCauses500() throws Exception {
         annotationRepository.save(createAnnotationDocWithId(createGPId(1), ontologyId(1)));
         annotationRepository.save(createAnnotationDocWithId(createGPId(2), ontologyId(2)));
 
@@ -385,7 +380,7 @@ public abstract class AbstractFilterAnnotationByOntologyRESTIT {
     }
 
     @Test
-    public void serverErrorForDescendantFilteringCauses500() throws Exception {
+    void serverErrorForDescendantFilteringCauses500() throws Exception {
         annotationRepository.save(createAnnotationDocWithId(createGPId(1), ontologyId(1)));
         annotationRepository.save(createAnnotationDocWithId(createGPId(2), ontologyId(2)));
 
@@ -403,7 +398,7 @@ public abstract class AbstractFilterAnnotationByOntologyRESTIT {
     }
 
     @Test
-    public void badRequestForDescendantFilteringCauses500() throws Exception {
+    void badRequestForDescendantFilteringCauses500() throws Exception {
         annotationRepository.save(createAnnotationDocWithId(createGPId(1), ontologyId(1)));
         annotationRepository.save(createAnnotationDocWithId(createGPId(2), ontologyId(2)));
 
@@ -420,8 +415,8 @@ public abstract class AbstractFilterAnnotationByOntologyRESTIT {
                 .andExpect(valueStartingWithOccursInErrorMessage(FAILED_REST_FETCH_PREFIX));
     }
 
-    @After
-    public void deleteCoreContents() {
+    @AfterEach
+    void deleteCoreContents() {
         annotationRepository.deleteAll();
     }
 

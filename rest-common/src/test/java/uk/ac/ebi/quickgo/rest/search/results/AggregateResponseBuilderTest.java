@@ -4,15 +4,15 @@ import uk.ac.ebi.quickgo.rest.search.AggregateFunction;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Tony Wardell
@@ -20,49 +20,39 @@ import static org.hamcrest.Matchers.hasSize;
  * Time: 15:27
  * Created with IntelliJ IDEA.
  */
-public class AggregateResponseBuilderTest {
-
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
+class AggregateResponseBuilderTest {
 
     private AggregateResponseBuilder aggregateResponseBuilder;
     private AggregateResponse nestedAggregation;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() {
         aggregateResponseBuilder = new AggregateResponseBuilder("agg");
         nestedAggregation = new AggregateResponse("nestedAggregation", new AggregationResultsManager(),
                 new LinkedHashSet<>(), new LinkedHashSet<>(), 5);
     }
 
     @Test
-    public void nullNameInConstructorThrowsException() throws Exception {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Name cannot be null or empty");
-
-        new AggregateResponseBuilder(null);
+    void nullNameInConstructorThrowsException() {
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> new AggregateResponseBuilder(null));
+        assertTrue(exception.getMessage().contains("Name cannot be null or empty"));
     }
 
     @Test
-    public void emptyNameInConstructorThrowsException() throws Exception {
+    void emptyNameInConstructorThrowsException() {
         String name = "";
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Name cannot be null or empty");
-
-        new AggregateResponseBuilder(name);
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> new AggregateResponseBuilder(name));
+        assertTrue(exception.getMessage().contains("Name cannot be null or empty"));
     }
 
     @Test
-    public void addingNullBucketThrowsException() throws Exception {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("AggregationBucket cannot be null");
-
-        aggregateResponseBuilder.addBucket(null);
+    void addingNullBucketThrowsException() {
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> aggregateResponseBuilder.addBucket(null));
+        assertTrue(exception.getMessage().contains("AggregationBucket cannot be null"));
     }
 
     @Test
-    public void bucketGetsAddedToStoredBuckets() throws Exception {
+    void bucketGetsAddedToStoredBuckets() {
         AggregationBucket bucket = new AggregationBucket("value");
 
         aggregateResponseBuilder.addBucket(bucket);
@@ -74,15 +64,13 @@ public class AggregateResponseBuilderTest {
     }
 
     @Test
-    public void addingNullNestedAggregateThrowsException() throws Exception {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Nested aggregation cannot be null");
-
-        aggregateResponseBuilder.addNestedAggregation(null);
+    void addingNullNestedAggregateThrowsException() {
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> aggregateResponseBuilder.addNestedAggregation(null));
+        assertTrue(exception.getMessage().contains("Nested aggregation cannot be null"));
     }
 
     @Test
-    public void nestedAggregateGetsAddedToStoredAggregates() throws Exception {
+    void nestedAggregateGetsAddedToStoredAggregates() {
         aggregateResponseBuilder.addNestedAggregation(nestedAggregation);
 
         Set<AggregateResponse> retrievedAggregates =
@@ -93,56 +81,53 @@ public class AggregateResponseBuilderTest {
     }
 
     @Test
-    public void aggregationWithNoNestedAggregationsReturnsFalseWhenQueriedAboutThePresenceOfNestedAggregations()
-            throws Exception {
+    void aggregationWithNoNestedAggregationsReturnsFalseWhenQueriedAboutThePresenceOfNestedAggregations() {
         assertThat(aggregateResponseBuilder.createAggregateResponse().hasNestedAggregations(), is(false));
     }
 
     @Test
-    public void aggregationWithANestedAggregationsReturnsTrueWhenQueriedAboutThePresenceOfNestedAggregations()
-            throws Exception {
+    void aggregationWithANestedAggregationsReturnsTrueWhenQueriedAboutThePresenceOfNestedAggregations() {
         aggregateResponseBuilder.addNestedAggregation(nestedAggregation);
 
         assertThat(aggregateResponseBuilder.createAggregateResponse().hasNestedAggregations(), is(true));
     }
 
     @Test
-    public void aggregationWithNoAggregationsResultsReturnsFalseWhenQueriedAboutThePresenceOfAggregationResults()
-            throws Exception {
+    void aggregationWithNoAggregationsResultsReturnsFalseWhenQueriedAboutThePresenceOfAggregationResults() {
         assertThat(aggregateResponseBuilder.createAggregateResponse().hasAggregationResults(), is(false));
     }
 
     @Test
-    public void aggregationWithAnAggregationsResultsReturnsTrueWhenQueriedAboutThePresenceOfAggregationResults()
-            throws Exception {
+    void aggregationWithAnAggregationsResultsReturnsTrueWhenQueriedAboutThePresenceOfAggregationResults()
+            {
         aggregateResponseBuilder.addAggregationResult(AggregateFunction.COUNT, "field", 0);
 
         assertThat(aggregateResponseBuilder.createAggregateResponse().hasAggregationResults(), is(true));
     }
 
     @Test
-    public void aggregationWithNoResultsOrNestedingsOrBucketsReturnsFalseWhenQueriedIfItsPopulated() throws Exception {
+    void aggregationWithNoResultsOrNestedingsOrBucketsReturnsFalseWhenQueriedIfItsPopulated() {
         assertThat(aggregateResponseBuilder.createAggregateResponse().isPopulated(), is(false));
     }
 
     @Test
-    public void aggregationWithAResultAndNoNestingsAndNoBucketsReturnsTrueWhenQueriedIfItsPopulated() throws Exception {
+    void aggregationWithAResultAndNoNestingsAndNoBucketsReturnsTrueWhenQueriedIfItsPopulated() {
         aggregateResponseBuilder.addAggregationResult(AggregateFunction.COUNT, "field", 0);
 
         assertThat(aggregateResponseBuilder.createAggregateResponse().isPopulated(), is(true));
     }
 
     @Test
-    public void aggregationWithANestingAndNoResultAndNoBucketsReturnsTrueWhenQueriedIfItsPopulated()
-            throws Exception {
+    void aggregationWithANestingAndNoResultAndNoBucketsReturnsTrueWhenQueriedIfItsPopulated()
+            {
         aggregateResponseBuilder.addNestedAggregation(nestedAggregation);
 
         assertThat(aggregateResponseBuilder.createAggregateResponse().isPopulated(), is(true));
     }
 
     @Test
-    public void aggregationWithABucketAndNoResultAndNoNestingsReturnsTrueWhenQueriedIfItsPopulated()
-            throws Exception {
+    void aggregationWithABucketAndNoResultAndNoNestingsReturnsTrueWhenQueriedIfItsPopulated()
+            {
         AggregationBucket bucket = new AggregationBucket("value");
         aggregateResponseBuilder.addBucket(bucket);
 
@@ -150,7 +135,7 @@ public class AggregateResponseBuilderTest {
     }
 
     @Test
-    public void aggregationSetDistinctValueCount() {
+    void aggregationSetDistinctValueCount() {
         aggregateResponseBuilder.setDistinctValuesCount(12);
         assertThat(aggregateResponseBuilder.createAggregateResponse().getDistinctValuesCount(), is(12));
     }

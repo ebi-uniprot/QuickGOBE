@@ -1,17 +1,17 @@
 package uk.ac.ebi.quickgo.rest.search.request.converter;
-
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 import uk.ac.ebi.quickgo.rest.search.request.config.FilterConfig;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.*;
 import static uk.ac.ebi.quickgo.rest.search.request.converter.SimpleFilterConverter.*;
 
@@ -19,8 +19,8 @@ import static uk.ac.ebi.quickgo.rest.search.request.converter.SimpleFilterConver
  * Created 06/06/16
  * @author Edd
  */
-@RunWith(MockitoJUnitRunner.class)
-public class SimpleFilterConverterTest {
+@ExtendWith(MockitoExtension.class)
+class SimpleFilterConverterTest {
     private static final String FIELD1 = "field1";
     private static final String FIELD2 = "field2";
     private static final String FIELD_VALUE_1 = "value1";
@@ -30,29 +30,29 @@ public class SimpleFilterConverterTest {
     private FilterConfig filterConfigMock;
     private SimpleFilterConverter converter;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         this.converter = new SimpleFilterConverter(filterConfigMock);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void nullRequestConfigForConverterThrowsException() {
-        new SimpleFilterConverter(null);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void nullRequestForConverterThrowsException() {
-        converter.transform(null);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void requestNoPropertyThrowsException() {
-        FilterRequest request = FilterRequest.newBuilder().build();
-        converter.transform(request);
+    @Test
+    void nullRequestConfigForConverterThrowsException() {
+        assertThrows(IllegalArgumentException.class, () -> new SimpleFilterConverter(null));
     }
 
     @Test
-    public void transformsRequestWithSingleValueIntoAQuickGOQuery() {
+    void nullRequestForConverterThrowsException() {
+        assertThrows(IllegalArgumentException.class, () -> converter.transform(null));
+    }
+
+    @Test
+    void requestNoPropertyThrowsException() {
+        FilterRequest request = FilterRequest.newBuilder().build();
+        assertThrows(IllegalArgumentException.class, () -> converter.transform(request));
+    }
+
+    @Test
+    void transformsRequestWithSingleValueIntoAQuickGOQuery() {
         FilterRequest request = FilterRequest.newBuilder().addProperty(FIELD1, FIELD_VALUE_1).build();
         QuickGOQuery resultingQuery = converter.transform(request).getConvertedValue();
         QuickGOQuery expectedQuery = QuickGOQuery.createQuery(FIELD1, FIELD_VALUE_1);
@@ -61,7 +61,7 @@ public class SimpleFilterConverterTest {
     }
 
     @Test
-    public void transformsRequestWithMultipleValuesIntoAQuickGOQuery() {
+    void transformsRequestWithMultipleValuesIntoAQuickGOQuery() {
         FilterRequest request = FilterRequest.newBuilder().addProperty(FIELD1, FIELD_VALUE_1, FIELD_VALUE_2).build();
         QuickGOQuery resultingQuery = converter.transform(request).getConvertedValue();
 
@@ -74,7 +74,7 @@ public class SimpleFilterConverterTest {
     }
 
     @Test
-    public void transformsRequestWithMultiplePropertiesIntoAQuickGOQuery() {
+    void transformsRequestWithMultiplePropertiesIntoAQuickGOQuery() {
         FilterRequest request = FilterRequest.newBuilder()
                 .addProperty(FIELD1, FIELD_VALUE_1)
                 .addProperty(FIELD2, FIELD_VALUE_2)
@@ -90,7 +90,7 @@ public class SimpleFilterConverterTest {
     }
 
     @Test
-    public void transformsRequestWithMultiplePropertiesAndMultipleValuesIntoAQuickGOQuery() {
+    void transformsRequestWithMultiplePropertiesAndMultipleValuesIntoAQuickGOQuery() {
         FilterRequest request = FilterRequest.newBuilder()
                 .addProperty(FIELD1, FIELD_VALUE_1, FIELD_VALUE_2)
                 .addProperty(FIELD2, FIELD_VALUE_2, FIELD_VALUE_1)
@@ -113,7 +113,7 @@ public class SimpleFilterConverterTest {
     }
 
     @Test
-    public void transformsRequestContainingAdvanceFilter_goIdAnd() {
+    void transformsRequestContainingAdvanceFilter_goIdAnd() {
         FilterRequest request = FilterRequest.newBuilder().addProperty(GP_RELATED_AND_GO_IDS, FIELD_VALUE_1).build();
         QuickGOQuery resultingQuery = converter.transform(request).getConvertedValue();
         QuickGOQuery expectedQuery =
@@ -126,7 +126,7 @@ public class SimpleFilterConverterTest {
     }
 
     @Test
-    public void transformsRequestContainingAdvanceFilter_goIdAndMultipleValues() {
+    void transformsRequestContainingAdvanceFilter_goIdAndMultipleValues() {
         FilterRequest request = FilterRequest.newBuilder()
           .addProperty(GP_RELATED_AND_GO_IDS, FIELD_VALUE_1, FIELD_VALUE_2).build();
         QuickGOQuery resultingQuery = converter.transform(request).getConvertedValue();
@@ -146,7 +146,7 @@ public class SimpleFilterConverterTest {
     }
 
     @Test
-    public void transformsRequestContainingAdvanceFilter_goIdNot() {
+    void transformsRequestContainingAdvanceFilter_goIdNot() {
         FilterRequest request = FilterRequest.newBuilder().addProperty(GP_RELATED_NOT_GO_IDS, FIELD_VALUE_1).build();
         QuickGOQuery resultingQuery = converter.transform(request).getConvertedValue();
         QuickGOQuery expectedQuery =
@@ -158,7 +158,7 @@ public class SimpleFilterConverterTest {
     }
 
     @Test
-    public void transformsRequestContainingAdvanceFilter_goIdNotMultipleValues() {
+    void transformsRequestContainingAdvanceFilter_goIdNotMultipleValues() {
         FilterRequest request = FilterRequest.newBuilder()
           .addProperty(GP_RELATED_NOT_GO_IDS, FIELD_VALUE_1, FIELD_VALUE_2).build();
         QuickGOQuery resultingQuery = converter.transform(request).getConvertedValue();
@@ -174,7 +174,7 @@ public class SimpleFilterConverterTest {
     }
 
     @Test
-    public void transformsRequestContaining_extensionAll() {
+    void transformsRequestContaining_extensionAll() {
         FilterRequest request = FilterRequest.newBuilder().addProperty(EXTENSION, "*").build();
         QuickGOQuery resultingQuery = converter.transform(request).getConvertedValue();
         QuickGOQuery expectedQuery = QuickGOQuery.createQuery(EXTENSION, "*");
@@ -183,7 +183,7 @@ public class SimpleFilterConverterTest {
     }
 
     @Test
-    public void transformsRequestContaining_extension() {
+    void transformsRequestContaining_extension() {
         FilterRequest request = FilterRequest.newBuilder().addProperty(EXTENSION, FIELD_VALUE_1).build();
         QuickGOQuery resultingQuery = converter.transform(request).getConvertedValue();
         QuickGOQuery expectedQuery = QuickGOQuery.createContainQuery(EXTENSION, FIELD_VALUE_1);
@@ -192,7 +192,7 @@ public class SimpleFilterConverterTest {
     }
 
     @Test
-    public void transformsRequestContaining_extensionMultipleValues() {
+    void transformsRequestContaining_extensionMultipleValues() {
         FilterRequest request = FilterRequest.newBuilder()
           .addProperty(EXTENSION, FIELD_VALUE_1, FIELD_VALUE_2).build();
         QuickGOQuery resultingQuery = converter.transform(request).getConvertedValue();
@@ -206,7 +206,7 @@ public class SimpleFilterConverterTest {
     }
 
     @Test
-    public void transformsRequestContaining_extensionAND() {
+    void transformsRequestContaining_extensionAND() {
         FilterRequest request = FilterRequest.newBuilder().addProperty(EXTENSION, "a AND b").build();
         QuickGOQuery resultingQuery = converter.transform(request).getConvertedValue();
         QuickGOQuery expectedQuery =
@@ -219,7 +219,7 @@ public class SimpleFilterConverterTest {
     }
 
     @Test
-    public void transformsRequestContaining_extensionOR() {
+    void transformsRequestContaining_extensionOR() {
         FilterRequest request = FilterRequest.newBuilder().addProperty(EXTENSION, "a OR b").build();
         QuickGOQuery resultingQuery = converter.transform(request).getConvertedValue();
         QuickGOQuery expectedQuery =
@@ -232,7 +232,7 @@ public class SimpleFilterConverterTest {
     }
 
     @Test
-    public void transformsRequestContaining_extension_AND_OR() {
+    void transformsRequestContaining_extension_AND_OR() {
         FilterRequest request = FilterRequest.newBuilder().addProperty(EXTENSION, "a AND b OR c").build();
         QuickGOQuery resultingQuery = converter.transform(request).getConvertedValue();
         QuickGOQuery expectedQuery =
@@ -248,7 +248,7 @@ public class SimpleFilterConverterTest {
     }
 
     @Test
-    public void transformsRequest_geneproductOnly() {
+    void transformsRequest_geneproductOnly() {
         FilterRequest request = FilterRequest.newBuilder()
           .addProperty(GENE_PRODUCT_TYPE, FIELD_VALUE_1)
           .addProperty(FIELD2, FIELD_VALUE_2)
@@ -261,7 +261,7 @@ public class SimpleFilterConverterTest {
     }
 
     @Test
-    public void transformsRequest_geneproduct_proteins() {
+    void transformsRequest_geneproduct_proteins() {
         FilterRequest request = FilterRequest.newBuilder()
           .addProperty(GENE_PRODUCT_TYPE, FIELD_VALUE_1,PROTEIN)
           .addProperty(FIELD2, FIELD_VALUE_2)
@@ -278,7 +278,7 @@ public class SimpleFilterConverterTest {
     }
 
     @Test
-    public void transformsRequest_geneproduct_proteins_geneProductSubset() {
+    void transformsRequest_geneproduct_proteins_geneProductSubset() {
         FilterRequest request = FilterRequest.newBuilder()
           .addProperty(GENE_PRODUCT_TYPE, FIELD_VALUE_1, PROTEIN)
           .addProperty(GENE_PRODUCT_SUBSET, FIELD_VALUE_2)
@@ -298,7 +298,7 @@ public class SimpleFilterConverterTest {
     }
 
     @Test
-    public void transformsRequest_geneproduct_proteins_proteome() {
+    void transformsRequest_geneproduct_proteins_proteome() {
         FilterRequest request = FilterRequest.newBuilder()
           .addProperty(GENE_PRODUCT_TYPE, FIELD_VALUE_1, PROTEIN)
           .addProperty(PROTEOME, FIELD_VALUE_2)
@@ -318,7 +318,7 @@ public class SimpleFilterConverterTest {
     }
 
     @Test
-    public void transformsRequest_geneproduct_proteins_geneProductSubset_proteome() {
+    void transformsRequest_geneproduct_proteins_geneProductSubset_proteome() {
         String VALUE3 = "value3";
         FilterRequest request = FilterRequest.newBuilder()
           .addProperty(GENE_PRODUCT_TYPE, FIELD_VALUE_1, PROTEIN)

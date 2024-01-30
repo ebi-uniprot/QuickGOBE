@@ -3,22 +3,19 @@ package uk.ac.ebi.quickgo.index.annotation;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 
 import java.util.function.Function;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.StringStartsWith.startsWith;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.ac.ebi.quickgo.index.annotation.AnnotationPartitionKeyGenerator.PARTITION_DELIMITER;
 
 /**
  * Tests the behaviour of the {@link AnnotationPartitionKeyGenerator} class.
  */
-public class AnnotationPartitionKeyGeneratorTest {
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
+class AnnotationPartitionKeyGeneratorTest {
 
     private static final String DOC_ID = "P12345";
     private static final String GENE_PRODUCT_ID = "cac1";
@@ -29,8 +26,8 @@ public class AnnotationPartitionKeyGeneratorTest {
 
     private final AnnotationDocument doc = new AnnotationDocument();
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() {
         geneProductShardingKey = (AnnotationDocument doc) -> doc.geneProductId;
 
         generator = new AnnotationPartitionKeyGenerator(geneProductShardingKey);
@@ -40,47 +37,37 @@ public class AnnotationPartitionKeyGeneratorTest {
     }
 
     @Test
-    public void nullShardingFunctionThrowsException() throws Exception {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Sharding key generator cannot be null");
-
-        generator = new AnnotationPartitionKeyGenerator(null);
+    void nullShardingFunctionThrowsException() {
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> generator = new AnnotationPartitionKeyGenerator(null));
+        assertTrue(exception.getMessage().contains("Sharding key generator cannot be null"));
     }
 
     @Test
-    public void nullAnnotationDocumentIdThrowsException() throws Exception {
+    void nullAnnotationDocumentIdThrowsException() {
         AnnotationDocument doc = new AnnotationDocument();
         doc.id = null;
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Annotation identifier cannot be null or empty.");
-
-        generator.process(doc);
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> generator.process(doc));
+        assertTrue(exception.getMessage().contains("Annotation identifier cannot be null or empty."));
     }
 
     @Test
-    public void emptyAnnotationDocumentIdThrowsException() throws Exception {
+    void emptyAnnotationDocumentIdThrowsException() {
         AnnotationDocument doc = new AnnotationDocument();
         doc.id = "";
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Annotation identifier cannot be null or empty.");
-
-        generator.process(doc);
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> generator.process(doc));
+        assertTrue(exception.getMessage().contains("Annotation identifier cannot be null or empty."));
     }
 
     @Test
-    public void nullShardingKeyThrowsException() throws Exception {
+    void nullShardingKeyThrowsException() {
         generator = new AnnotationPartitionKeyGenerator((AnnotationDocument aDoc) -> null);
 
-        thrown.expect(RuntimeException.class);
-        thrown.expectMessage(startsWith("Unable to generate a sharding key for:"));
-
-        generator.process(doc);
+        Throwable exception = assertThrows(RuntimeException.class, () -> generator.process(doc));
+        assertTrue(exception.getMessage().startsWith("Unable to generate a sharding key for:"));
     }
 
     @Test
-    public void emptyShardingKeyReturnsJust() throws Exception {
+    void emptyShardingKeyReturnsJust() throws Exception {
         generator = new AnnotationPartitionKeyGenerator((AnnotationDocument aDoc) -> "");
 
         AnnotationDocument modifiedDoc = generator.process(doc);
@@ -89,7 +76,7 @@ public class AnnotationPartitionKeyGeneratorTest {
     }
 
     @Test
-    public void processorModifiesDocumentIdSuccessfully() throws Exception {
+    void processorModifiesDocumentIdSuccessfully() throws Exception {
         AnnotationDocument modifiedDoc = generator.process(doc);
 
         assertThat(modifiedDoc.id, is(generateIdentifierWithShardingKey(DOC_ID)));

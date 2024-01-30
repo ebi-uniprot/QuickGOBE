@@ -1,5 +1,4 @@
 package uk.ac.ebi.quickgo.annotation.service.comm.rest.geneproduct.transformer;
-
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.geneproduct.model.BasicGeneProduct;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
@@ -7,10 +6,8 @@ import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
@@ -28,22 +25,21 @@ import static uk.ac.ebi.quickgo.annotation.service.comm.rest.geneproduct.transfo
  * Created 11/04/17
  * @author Edd
  */
-@RunWith(MockitoJUnitRunner.class)
-public class GeneProductNameInjectorTest {
+class GeneProductNameInjectorTest {
     private GeneProductNameInjector nameInjector;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         nameInjector = new GeneProductNameInjector();
     }
 
     @Test
-    public void injectorIdIsGeneProductName() {
+    void injectorIdIsGeneProductName() {
         assertThat(nameInjector.getId(), is(GENE_PRODUCT_NAME));
     }
 
     @Test
-    public void responseValueIsInjectedToAnnotation() {
+    void responseValueIsInjectedToAnnotation() {
         BasicGeneProduct mockedResponse = createBasicGeneProduct();
         ConvertedFilter<BasicGeneProduct> stubConvertedFilter = new ConvertedFilter<>(mockedResponse);
         Annotation annotation = new Annotation();
@@ -56,7 +52,7 @@ public class GeneProductNameInjectorTest {
     }
 
     @Test
-    public void correctFilterRequestIsBuilt() {
+    void correctFilterRequestIsBuilt() {
         Annotation annotation = new Annotation();
         annotation.canonicalId = "A0A000";
         FilterRequest filterRequest = nameInjector.buildFilterRequest(annotation);

@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.index.annotation;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.springframework.batch.item.file.transform.DefaultFieldSet;
 import org.springframework.batch.item.file.transform.FieldSet;
@@ -9,6 +9,7 @@ import org.springframework.batch.item.file.transform.IncorrectTokenCountExceptio
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.slf4j.LoggerFactory.getLogger;
 import static uk.ac.ebi.quickgo.index.annotation.Columns.*;
 
@@ -18,31 +19,35 @@ import static uk.ac.ebi.quickgo.index.annotation.Columns.*;
  * @author Edd
  */
 
-public class StringToAnnotationMapperTest {
+class StringToAnnotationMapperTest {
 
     private static final Logger LOGGER = getLogger(StringToAnnotationMapper.class);
     private StringToAnnotationMapper mapper;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         mapper = new StringToAnnotationMapper();
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void nullFieldSetThrowsException() throws Exception {
-        mapper.mapFieldSet(null);
-    }
-
-    @Test(expected = IncorrectTokenCountException.class)
-    public void fieldSetWithInsufficientValuesThrowsException() throws Exception {
-        String[] tokens = new String[numColumns() - 1];
-        FieldSet fieldSet = new DefaultFieldSet(tokens);
-
-        mapper.mapFieldSet(fieldSet);
+    @Test
+    void nullFieldSetThrowsException() throws Exception {
+        assertThrows(IllegalArgumentException.class, () -> {
+            mapper.mapFieldSet(null);
+        });
     }
 
     @Test
-    public void convertFieldSetWithNullValuesIntoAnnotation() throws Exception {
+    void fieldSetWithInsufficientValuesThrowsException() throws Exception {
+        assertThrows(IncorrectTokenCountException.class, () -> {
+            String[] tokens = new String[numColumns() - 1];
+            FieldSet fieldSet = new DefaultFieldSet(tokens);
+
+            mapper.mapFieldSet(fieldSet);
+        });
+    }
+
+    @Test
+    void convertFieldSetWithNullValuesIntoAnnotation() throws Exception {
         String[] tokens = new String[Columns.numColumns()];
 
         tokens[COLUMN_DB.getPosition()] = null;
@@ -66,7 +71,7 @@ public class StringToAnnotationMapperTest {
     }
 
     @Test
-    public void convertValidFieldSetIntoAnnotation() throws Exception {
+    void convertValidFieldSetIntoAnnotation() throws Exception {
         String[] tokens = new String[Columns.numColumns()];
 
         tokens[COLUMN_DB.getPosition()] = "IntAct";
@@ -90,7 +95,7 @@ public class StringToAnnotationMapperTest {
     }
 
     @Test
-    public void convertValidButUntrimmedFieldSetIntoAnnotation() throws Exception {
+    void convertValidButUntrimmedFieldSetIntoAnnotation() throws Exception {
         String[] tokens = new String[Columns.numColumns()];
 
         tokens[COLUMN_DB.getPosition()] = "   IntAct   ";

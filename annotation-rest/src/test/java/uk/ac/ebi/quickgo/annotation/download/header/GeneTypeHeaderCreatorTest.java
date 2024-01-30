@@ -1,13 +1,14 @@
 package uk.ac.ebi.quickgo.annotation.download.header;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 
 import java.io.IOException;
 import java.util.Arrays;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -18,7 +19,7 @@ import static org.mockito.Mockito.*;
  * Time: 12:10
  * Created with IntelliJ IDEA.
  */
-public class GeneTypeHeaderCreatorTest {
+class GeneTypeHeaderCreatorTest {
 
     private static final String DATE = "2017-05-23";
     private static final String REQUEST_URI =
@@ -31,8 +32,8 @@ public class GeneTypeHeaderCreatorTest {
     private HeaderContent mockContent = mock(HeaderContent.class);
     private GeneTypeHeaderCreator gTypeHeaderCreator;
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         when(mockContent.getDate()).thenReturn(DATE);
         when(mockContent.getUri()).thenReturn(REQUEST_URI);
         when(mockOntology.versions()).thenReturn(Arrays.asList(FORMAT_VERSION_1, FORMAT_VERSION_2));
@@ -40,7 +41,7 @@ public class GeneTypeHeaderCreatorTest {
     }
 
     @Test
-    public void writeIsComplete() throws Exception {
+    void writeIsComplete() throws Exception {
         GeneTypeHeaderCreator gTypeHeaderCreator = new TestGTypeHeaderCreator(mockOntology);
 
         gTypeHeaderCreator.write(mockEmitter, mockContent);
@@ -61,23 +62,23 @@ public class GeneTypeHeaderCreatorTest {
                 .TEXT_PLAIN);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void exceptionThrownIfOntologyIsNull() {
-        new TestGTypeHeaderCreator(null);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void exceptionThrownIfEmitterIsNull() {
-        gTypeHeaderCreator.write(null, mockContent);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void exceptionThrownIfContentIsNull() {
-        gTypeHeaderCreator.write(mockEmitter, null);
+    @Test
+    void exceptionThrownIfOntologyIsNull() {
+        assertThrows(IllegalArgumentException.class, () -> new TestGTypeHeaderCreator(null));
     }
 
     @Test
-    public void noExceptionThrownIfEmitterThrowsIOException() throws Exception{
+    void exceptionThrownIfEmitterIsNull() {
+        assertThrows(IllegalArgumentException.class, () -> gTypeHeaderCreator.write(null, mockContent));
+    }
+
+    @Test
+    void exceptionThrownIfContentIsNull() {
+        assertThrows(IllegalArgumentException.class, () -> gTypeHeaderCreator.write(mockEmitter, null));
+    }
+
+    @Test
+    void noExceptionThrownIfEmitterThrowsIOException() throws Exception{
         doThrow(new IOException("Test IOException")).when(mockEmitter).send(any(Object.class), eq(MediaType
                                                                                                           .TEXT_PLAIN));
         gTypeHeaderCreator.write(mockEmitter, mockContent);

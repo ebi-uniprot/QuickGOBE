@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.service.comm.rest.geneproduct.converter;
-
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.geneproduct.model.BasicGeneProduct;
 import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
 
@@ -7,8 +8,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import org.junit.Before;
-import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -19,16 +18,16 @@ import static org.hamcrest.core.Is.is;
  * Time: 15:23
  * Created with IntelliJ IDEA.
  */
-public class GeneProductFilterConverterTest {
+class GeneProductFilterConverterTest {
     private GeneProductFilterConverter converter;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         converter = new GeneProductFilterConverter();
     }
 
     @Test
-    public void inputIsValueInConvertedFilter() {
+    void inputIsValueInConvertedFilter() {
         BasicGeneProduct geneProduct = createBasicGeneProduct();
 
         ConvertedFilter<BasicGeneProduct> convertedFilter = converter.transform(geneProduct);

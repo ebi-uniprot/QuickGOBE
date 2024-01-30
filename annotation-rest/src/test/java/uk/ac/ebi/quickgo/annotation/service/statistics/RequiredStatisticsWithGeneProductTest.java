@@ -1,8 +1,9 @@
 package uk.ac.ebi.quickgo.annotation.service.statistics;
 
+import org.junit.jupiter.api.Test;
+
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
@@ -15,12 +16,12 @@ import static org.mockito.Mockito.*;
  * Time: 11:05
  * Created with IntelliJ IDEA.
  */
-public class RequiredStatisticsWithGeneProductTest {
+class RequiredStatisticsWithGeneProductTest {
 
     private final StatisticsTypeConfigurer configurer = mock(StatisticsTypeConfigurer.class);
 
     @Test
-    public void isConstructedProperly() {
+    void isConstructedProperly() {
         List<RequiredStatisticType> requiredStatisticTypes = new ArrayList<>();
         when(configurer.getConfiguredStatsTypes(anyList())).thenReturn(requiredStatisticTypes);
 

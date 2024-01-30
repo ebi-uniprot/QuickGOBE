@@ -1,13 +1,14 @@
 package uk.ac.ebi.quickgo.ontology.traversal.read;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.file.transform.DefaultFieldSet;
 import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.batch.item.file.transform.IncorrectTokenCountException;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.ac.ebi.quickgo.ontology.traversal.read.Columns.COLUMN_CHILD;
 import static uk.ac.ebi.quickgo.ontology.traversal.read.Columns.COLUMN_PARENT;
 import static uk.ac.ebi.quickgo.ontology.traversal.read.Columns.COLUMN_RELATIONSHIP;
@@ -17,29 +18,28 @@ import static uk.ac.ebi.quickgo.ontology.traversal.read.Columns.numColumns;
  * Created 20/05/16
  * @author Edd
  */
-public class StringToOntologyRelationshipMapperTest {
+class StringToOntologyRelationshipMapperTest {
     private StringToOntologyRelationshipMapper mapper;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         this.mapper = new StringToOntologyRelationshipMapper();
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void nullFieldSetThrowsException() throws Exception {
-        mapper.mapFieldSet(null);
-    }
-
-    @Test(expected = IncorrectTokenCountException.class)
-    public void fieldSetWithInsufficientValuesThrowsException() throws Exception {
-        String[] tokens = new String[numColumns() - 1];
-        FieldSet fieldSet = new DefaultFieldSet(tokens);
-
-        mapper.mapFieldSet(fieldSet);
+    @Test
+    void nullFieldSetThrowsException() throws Exception {
+        assertThrows(IllegalArgumentException.class, () -> mapper.mapFieldSet(null));
     }
 
     @Test
-    public void convertFieldSetWithNullValuesIntoOntologyRelationship() throws Exception {
+    void fieldSetWithInsufficientValuesThrowsException() throws Exception {
+        String[] tokens = new String[numColumns() - 1];
+        FieldSet fieldSet = new DefaultFieldSet(tokens);
+        assertThrows(IncorrectTokenCountException.class, () -> mapper.mapFieldSet(fieldSet));
+    }
+
+    @Test
+    void convertFieldSetWithNullValuesIntoOntologyRelationship() throws Exception {
         String[] tokens = new String[numColumns()];
         tokens[COLUMN_CHILD.getPosition()] = null;
         tokens[COLUMN_PARENT.getPosition()] = null;
@@ -55,7 +55,7 @@ public class StringToOntologyRelationshipMapperTest {
     }
 
     @Test
-    public void convertFieldSetWithValidValuesIntoOntologyRelationship() throws Exception {
+    void convertFieldSetWithValidValuesIntoOntologyRelationship() throws Exception {
         String[] tokens = new String[numColumns()];
         tokens[COLUMN_CHILD.getPosition()] = "GO:1";
         tokens[COLUMN_PARENT.getPosition()] = "GO:2";
@@ -71,7 +71,7 @@ public class StringToOntologyRelationshipMapperTest {
     }
 
     @Test
-    public void convertFieldSetWithTrimmableValuesIntoOntologyRelationship() throws Exception {
+    void convertFieldSetWithTrimmableValuesIntoOntologyRelationship() throws Exception {
         String[] tokens = new String[numColumns()];
         tokens[COLUMN_CHILD.getPosition()] = " GO:1";
         tokens[COLUMN_PARENT.getPosition()] = "\tGO:2 ";

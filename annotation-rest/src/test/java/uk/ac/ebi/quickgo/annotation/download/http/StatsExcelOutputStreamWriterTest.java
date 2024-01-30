@@ -8,11 +8,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collections;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 /**
@@ -21,10 +20,7 @@ import static org.mockito.Mockito.*;
  * Time: 13:41
  * Created with IntelliJ IDEA.
  */
-public class StatsExcelOutputStreamWriterTest {
-
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
+class StatsExcelOutputStreamWriterTest {
 
     private Workbook mockWorkbook;
     private OutputStream mockOutputStream;
@@ -32,8 +28,8 @@ public class StatsExcelOutputStreamWriterTest {
     private StatsExcelDispatchWriter dispatchWriter;
     private QueryResult inputObject;
 
-    @Before
-    public void setup(){
+    @BeforeEach
+    void setup(){
         WorkbookFromStatistics mockConverter = mock(WorkbookFromStatistics.class);
         mockWorkbook = mock(Workbook.class);
         mockOutputStream = mock(OutputStream.class);
@@ -43,7 +39,7 @@ public class StatsExcelOutputStreamWriterTest {
     }
 
     @Test
-    public void successfulOutputWorkbook() throws Exception{
+    void successfulOutputWorkbook() throws Exception{
         dispatchWriter.write(inputObject, mockOutputStream);
 
         verify(mockWorkbook).write(mockOutputStream);
@@ -51,14 +47,14 @@ public class StatsExcelOutputStreamWriterTest {
     }
 
     @Test
-    public void exceptionFromWorkBookWriteIsNotPropagated() throws Exception{
+    void exceptionFromWorkBookWriteIsNotPropagated() throws Exception{
         doThrow(new IOException()).when(mockWorkbook).write(mockOutputStream);
 
         dispatchWriter.write(inputObject, mockOutputStream);
     }
 
     @Test
-    public void writeErrorIfDispatchWriterIsPassedAnError() throws Exception{
+    void writeErrorIfDispatchWriterIsPassedAnError() throws Exception{
         Object errorObject = new ResponseExceptionHandler.ErrorInfo("","");
 
         dispatchWriter.write(errorObject, mockOutputStream);
@@ -68,8 +64,7 @@ public class StatsExcelOutputStreamWriterTest {
     }
 
     @Test
-    public void exceptionThrownIfConverterIsNull(){
-        exception.expect(IllegalArgumentException.class);
-        new StatsExcelDispatchWriter(null);
+    void exceptionThrownIfConverterIsNull(){
+        assertThrows(IllegalArgumentException.class, () -> new StatsExcelDispatchWriter(null));
     }
 }

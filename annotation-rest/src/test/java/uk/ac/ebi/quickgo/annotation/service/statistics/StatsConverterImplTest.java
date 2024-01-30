@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.service.statistics;
-
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.ac.ebi.quickgo.rest.search.AggregateFunction;
 import uk.ac.ebi.quickgo.rest.search.query.AggregateFunctionRequest;
 import uk.ac.ebi.quickgo.rest.search.query.AggregateRequest;
@@ -9,8 +10,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.junit.Before;
-import org.junit.Test;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -19,6 +18,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.ac.ebi.quickgo.annotation.service.statistics.RequiredStatisticType.statsType;
 import static uk.ac.ebi.quickgo.annotation.service.statistics.StatsConverterImpl.DEFAULT_GLOBAL_AGGREGATE_NAME;
 
@@ -26,31 +26,31 @@ import static uk.ac.ebi.quickgo.annotation.service.statistics.StatsConverterImpl
  * Created 15/07/16
  * @author Edd
  */
-public class StatsConverterImplTest {
+class StatsConverterImplTest {
     private static final String UNIQUE_FUNCTION = AggregateFunction.UNIQUE.getName();
     private static final String COUNT_FUNCTION = AggregateFunction.COUNT.getName();
 
     private ArrayList<RequiredStatistic> statsRequests;
     private StatsConverter converter;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         this.statsRequests = new ArrayList<>();
         this.converter = new StatsConverterImpl();
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void initWithNullStatsRequestCausesException() {
-        converter.convert(null);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void initWithEmptyStatsRequestCausesException() {
-        converter.convert(Collections.emptyList());
+    @Test
+    void initWithNullStatsRequestCausesException() {
+        assertThrows(IllegalArgumentException.class, () -> converter.convert(null));
     }
 
     @Test
-    public void oneStatsRequestWithNoTypesMakeGlobalAggregateWithOneField() {
+    void initWithEmptyStatsRequestCausesException() {
+        assertThrows(IllegalArgumentException.class, () -> converter.convert(Collections.emptyList()));
+    }
+
+    @Test
+    void oneStatsRequestWithNoTypesMakeGlobalAggregateWithOneField() {
         useStatsRequest(
                 new RequiredStatistic("group1", "groupField1", UNIQUE_FUNCTION, Collections.emptyList()));
 
@@ -62,7 +62,7 @@ public class StatsConverterImplTest {
     }
 
     @Test
-    public void twoStatsRequestWithNoTypesMakeGlobalAggregateWithTwoFields() {
+    void twoStatsRequestWithNoTypesMakeGlobalAggregateWithTwoFields() {
         useStatsRequest(
                 new RequiredStatistic("group1", "groupField1", UNIQUE_FUNCTION, Collections.emptyList()));
         useStatsRequest(
@@ -78,7 +78,7 @@ public class StatsConverterImplTest {
     }
 
     @Test
-    public void oneStatsRequestWithMultipleTypesMakeGlobalAggregateAndMultipleAggregatesWithOneField() {
+    void oneStatsRequestWithMultipleTypesMakeGlobalAggregateAndMultipleAggregatesWithOneField() {
         String group = "group1";
         String groupField = "groupField1";
         String type1 = "type1";
@@ -107,7 +107,7 @@ public class StatsConverterImplTest {
     }
 
     @Test
-    public void twoStatsRequestsWithMultipleTypesMakeGlobalAggregateAndMultipleAggregatesWithTwoFields() {
+    void twoStatsRequestsWithMultipleTypesMakeGlobalAggregateAndMultipleAggregatesWithTwoFields() {
         String group1 = "group1";
         String groupField1 = "groupField1";
         String group2 = "group2";

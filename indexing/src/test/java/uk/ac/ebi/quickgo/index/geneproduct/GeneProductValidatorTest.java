@@ -1,26 +1,24 @@
 package uk.ac.ebi.quickgo.index.geneproduct;
 
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductType;
-import uk.ac.ebi.quickgo.index.ExceptionMatcher;
 import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
 import uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.validator.ValidationException;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static uk.ac.ebi.quickgo.index.geneproduct.Columns.*;
 import static uk.ac.ebi.quickgo.index.geneproduct.GeneProductUtil.createUnconvertedTaxonId;
 
 /**
  * Tests the behaviour of the {@link GeneProductValidator} class.
  */
-public class GeneProductValidatorTest {
+class GeneProductValidatorTest {
     private static final String INTER_VALUE_DELIMITER_REGEX = "\\|";
     private static final String INTER_VALUE_DELIMITER = "|";
     private static final String INTRA_VALUE_DELIMITER = "=";
@@ -29,15 +27,12 @@ public class GeneProductValidatorTest {
     private static final String EMPTY_FIELD_MESSAGE = "Found empty value in field: %s";
     private static final String INVALID_FIELD_MESSAGE = "Found invalid value for field: %s";
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-
     private GeneProductValidator validator;
 
     private GeneProduct geneProduct;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() {
         validator = new GeneProductValidator(INTER_VALUE_DELIMITER_REGEX, INTRA_VALUE_DELIMITER);
         geneProduct = createGeneProductWithPopulatedMandatoryFields();
     }
@@ -56,214 +51,198 @@ public class GeneProductValidatorTest {
     }
 
     @Test
-    public void nullInterValueDelimiterThrowsException() throws Exception {
+    void nullInterValueDelimiterThrowsException() {
         String interValueDelimiter = null;
         String intraValueDelimiter = INTRA_VALUE_DELIMITER;
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Inter value delimiter can not be null or empty");
-        validator = new GeneProductValidator(interValueDelimiter, intraValueDelimiter);
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> validator = new GeneProductValidator(interValueDelimiter, intraValueDelimiter));
+        assertTrue(exception.getMessage().contains("Inter value delimiter can not be null or empty"));
     }
 
     @Test
-    public void nullIntraValueDelimiterThrowsException() throws Exception {
+    void nullIntraValueDelimiterThrowsException() {
         String interValueDelimiter = INTER_VALUE_DELIMITER_REGEX;
         String intraValueDelimiter = null;
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Intra value delimiter can not be null or empty");
-        validator = new GeneProductValidator(interValueDelimiter, intraValueDelimiter);
-    }
-
-    @Test(expected = DocumentReaderException.class)
-    public void nullGeneProductThrowsException() throws Exception {
-        validator.validate(null);
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> validator = new GeneProductValidator(interValueDelimiter, intraValueDelimiter));
+        assertTrue(exception.getMessage().contains("Intra value delimiter can not be null or empty"));
     }
 
     @Test
-    public void nullDatabaseThrowsException() throws Exception {
+    void nullGeneProductThrowsException() {
+        assertThrows(DocumentReaderException.class, () -> validator.validate(null));
+    }
+
+    @Test
+    void nullDatabaseThrowsException() {
         geneProduct.database = null;
 
-        assertExceptionThrown(createValidationException(String.format(NULL_FIELD_MESSAGE, COLUMN_DB.getName())));
-        validator.validate(geneProduct);
+        assertActualCauseUponValidation(createValidationException(String.format(NULL_FIELD_MESSAGE, COLUMN_DB.getName())));
     }
 
     @Test
-    public void emptyDatabaseThrowsException() throws Exception {
+    void emptyDatabaseThrowsException() {
         geneProduct.database = "";
 
-        assertExceptionThrown(createValidationException(String.format(EMPTY_FIELD_MESSAGE, COLUMN_DB.getName())));
-        validator.validate(geneProduct);
+        assertActualCauseUponValidation(createValidationException(String.format(EMPTY_FIELD_MESSAGE, COLUMN_DB.getName())));
     }
 
     @Test
-    public void databaseValidates() throws Exception {
+    void databaseValidates() {
         geneProduct.database = "UniProtKB";
 
         validator.validate(geneProduct);
     }
 
     @Test
-    public void nullIdThrowsException() throws Exception {
+    void nullIdThrowsException() {
         geneProduct.id = null;
 
-        assertExceptionThrown(createValidationException(String.format(NULL_FIELD_MESSAGE, COLUMN_ID.getName())));
-        validator.validate(geneProduct);
+        assertActualCauseUponValidation(createValidationException(String.format(NULL_FIELD_MESSAGE, COLUMN_ID.getName())));
     }
 
     @Test
-    public void emptyIdThrowsException() throws Exception {
+    void emptyIdThrowsException() {
         geneProduct.id = "";
 
-        assertExceptionThrown(createValidationException(String.format(EMPTY_FIELD_MESSAGE, COLUMN_ID.getName())));
-        validator.validate(geneProduct);
+        assertActualCauseUponValidation(createValidationException(String.format(EMPTY_FIELD_MESSAGE, COLUMN_ID.getName())));
     }
 
     @Test
-    public void idValidates() throws Exception {
+    void idValidates() {
         geneProduct.id = "moeA5";
 
         validator.validate(geneProduct);
     }
 
     @Test
-    public void nullSymbolThrowsException() throws Exception {
+    void nullSymbolThrowsException() {
         geneProduct.symbol = null;
 
-        assertExceptionThrown(createValidationException(String.format(NULL_FIELD_MESSAGE, COLUMN_SYMBOL.getName())));
-        validator.validate(geneProduct);
+        assertActualCauseUponValidation(createValidationException(String.format(NULL_FIELD_MESSAGE, COLUMN_SYMBOL.getName())));
     }
 
     @Test
-    public void emptySymbolThrowsException() throws Exception {
+    void emptySymbolThrowsException() {
         geneProduct.symbol = "";
 
-        assertExceptionThrown(createValidationException(String.format(EMPTY_FIELD_MESSAGE, COLUMN_SYMBOL.getName())));
-        validator.validate(geneProduct);
+        assertActualCauseUponValidation(createValidationException(String.format(EMPTY_FIELD_MESSAGE, COLUMN_SYMBOL.getName())));
     }
 
     @Test
-    public void symbolValidates() throws Exception {
+    void symbolValidates() {
         geneProduct.symbol = "A0A000";
 
         validator.validate(geneProduct);
     }
 
     @Test
-    public void nullTypeThrowsException() throws Exception {
+    void nullTypeThrowsException() {
         geneProduct.type = null;
 
-        assertExceptionThrown(createValidationException(String.format(NULL_FIELD_MESSAGE, COLUMN_TYPE.getName())));
-        validator.validate(geneProduct);
+        assertActualCauseUponValidation(createValidationException(String.format(NULL_FIELD_MESSAGE, COLUMN_TYPE.getName())));
     }
 
     @Test
-    public void emptyTypeThrowsException() throws Exception {
+    void emptyTypeThrowsException() {
         geneProduct.type = "";
 
-        assertExceptionThrown(createValidationException(String.format(EMPTY_FIELD_MESSAGE, COLUMN_TYPE.getName())));
-        validator.validate(geneProduct);
+        assertActualCauseUponValidation(createValidationException(String.format(EMPTY_FIELD_MESSAGE, COLUMN_TYPE.getName())));
     }
 
     @Test
-    public void invalidTypeThrowsException() throws Exception {
+    void invalidTypeThrowsException() {
         geneProduct.type = "invalid";
 
         String errorMsg = "Error in field: " + COLUMN_TYPE.getName() + " - [No type maps to provided name: " +
                 geneProduct.type + "]";
 
-        assertExceptionThrown(createValidationException(errorMsg));
-        validator.validate(geneProduct);
+        assertActualCauseUponValidation(createValidationException(errorMsg));
     }
 
     @Test
-    public void typeIsValid() throws Exception {
+    void typeIsValid() {
         geneProduct.type = GeneProductType.PROTEIN.getName();
 
         validator.validate(geneProduct);
     }
 
     @Test
-    public void nullParentIdIsValid() throws Exception {
+    void nullParentIdIsValid() {
         geneProduct.parentId = null;
 
         validator.validate(geneProduct);
     }
 
     @Test
-    public void emptyParentIdIsValid() throws Exception {
+    void emptyParentIdIsValid() {
         geneProduct.parentId = "";
 
         validator.validate(geneProduct);
     }
 
     @Test
-    public void singleParentIdIsValid() throws Exception {
+    void singleParentIdIsValid() {
         geneProduct.parentId = "A0A001";
 
         validator.validate(geneProduct);
     }
 
     @Test
-    public void multipleParentIdThrowsException() throws Exception {
+    void multipleParentIdThrowsException() {
         geneProduct.parentId = "A0A001" + INTER_VALUE_DELIMITER + "A0A002";
 
         String errorMsg = "Found more than one id in field: " + COLUMN_PARENT_ID.getName();
 
-        assertExceptionThrown(createValidationException(errorMsg));
-        validator.validate(geneProduct);
+        assertActualCauseUponValidation(createValidationException(errorMsg));
     }
 
     @Test
-    public void nullTaxonIdThrowsException() throws Exception {
+    void nullTaxonIdThrowsException() {
         geneProduct.taxonId = null;
 
-        assertExceptionThrown(createValidationException(String.format(NULL_FIELD_MESSAGE, COLUMN_TAXON_ID.getName())));
-        validator.validate(geneProduct);
+        assertActualCauseUponValidation(createValidationException(String.format(NULL_FIELD_MESSAGE, COLUMN_TAXON_ID.getName())));
     }
 
     @Test
-    public void emptyTaxonIdThrowsException() throws Exception {
+    void emptyTaxonIdThrowsException() {
         geneProduct.taxonId = "";
 
-        assertExceptionThrown(createValidationException(String.format(EMPTY_FIELD_MESSAGE, COLUMN_TAXON_ID.getName())));
-        validator.validate(geneProduct);
+        assertActualCauseUponValidation(createValidationException(String.format(EMPTY_FIELD_MESSAGE, COLUMN_TAXON_ID.getName())));
     }
 
     @Test
-    public void taxonIdIsValid() throws Exception {
+    void taxonIdIsValid() {
         geneProduct.taxonId = createUnconvertedTaxonId(9606);
 
         validator.validate(geneProduct);
     }
 
     @Test
-    public void negativeTaxonIdThrowsException() throws Exception {
+    void negativeTaxonIdThrowsException() {
         geneProduct.taxonId = createUnconvertedTaxonId(-9606);
 
-        assertExceptionThrown(createValidationException("Taxon id column does not conform to regex: "
+        assertActualCauseUponValidation(createValidationException("Taxon id column does not conform to regex: "
                 + createUnconvertedTaxonId(-9606)));
+    }
 
+    @Test
+    void noIsIsoformIsValid() {
         validator.validate(geneProduct);
     }
 
     @Test
-    public void noIsIsoformIsValid() throws Exception {
+    void noCompleteProteomeIsValid() {
         validator.validate(geneProduct);
     }
 
     @Test
-    public void noCompleteProteomeIsValid() throws Exception {
+    void noReferenceProteomeIsValid() {
         validator.validate(geneProduct);
     }
 
-    @Test
-    public void noReferenceProteomeIsValid() throws Exception {
-        validator.validate(geneProduct);
-    }
-
-    private void assertExceptionThrown(Exception exception) {
-        thrown.expectCause(new ExceptionMatcher(exception.getClass(), exception.getMessage()));
+    private void assertActualCauseUponValidation(Exception expectedException) {
+        var actualException = assertThrows(ValidationException.class, () -> validator.validate(geneProduct));
+        assertEquals(expectedException.getMessage(), actualException.getCause().getMessage());
+        assertEquals(expectedException.getClass(), actualException.getCause().getClass());
     }
 
     private void assertYValue(String field) {

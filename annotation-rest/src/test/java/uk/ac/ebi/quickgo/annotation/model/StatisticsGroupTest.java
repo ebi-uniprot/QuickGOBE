@@ -1,68 +1,55 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests the behaviour of the {@link StatisticsGroup} class.
  */
-public class StatisticsGroupTest {
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
+class StatisticsGroupTest {
 
     @Test
-    public void nullGroupNameThrowsException() {
+    void nullGroupNameThrowsException() {
         String groupName = null;
         int totalHits = 0;
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Stats groupName cannot be null or empty");
-
-        new StatisticsGroup(groupName, totalHits);
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> new StatisticsGroup(groupName, totalHits));
+        assertTrue(exception.getMessage().contains("Stats groupName cannot be null or empty"));
     }
 
     @Test
-    public void emptyGroupNameThrowsException() {
+    void emptyGroupNameThrowsException() {
         String groupName = "";
         int totalHits = 0;
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Stats groupName cannot be null or empty");
-
-        new StatisticsGroup(groupName, totalHits);
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> new StatisticsGroup(groupName, totalHits));
+        assertTrue(exception.getMessage().contains("Stats groupName cannot be null or empty"));
     }
 
     @Test
-    public void negativeTotalHitsNameThrowsException() {
+    void negativeTotalHitsNameThrowsException() {
         String groupName = "group";
         int totalHits = -1;
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Stats total hits can not be negative");
-
-        new StatisticsGroup(groupName, totalHits);
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> new StatisticsGroup(groupName, totalHits));
+        assertTrue(exception.getMessage().contains("Stats total hits can not be negative"));
     }
 
     @Test
-    public void addingNullStatisticsTypeThrowsException() {
+    void addingNullStatisticsTypeThrowsException() {
         String groupName = "group";
         int totalHits = 0;
 
         StatisticsByType statsType = null;
 
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Statistics type cannot be null");
-
         StatisticsGroup statsGroup = new StatisticsGroup(groupName, totalHits);
-        statsGroup.addStatsType(statsType);
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> statsGroup.addStatsType(statsType));
+        assertTrue(exception.getMessage().contains("Statistics type cannot be null"));
     }
 
     @Test
-    public void addedStatisticsTypeIsRetrievedCorrectly() {
+    void addedStatisticsTypeIsRetrievedCorrectly() {
         String groupName = "group";
         int totalHits = 0;
 

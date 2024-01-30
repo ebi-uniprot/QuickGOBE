@@ -2,8 +2,8 @@ package uk.ac.ebi.quickgo.rest.search.query;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.ac.ebi.quickgo.common.SolrCollectionName;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -11,6 +11,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.FIRST_CURSOR;
 import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.createCursorPage;
 import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.createFirstCursorPage;
@@ -18,32 +19,32 @@ import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.createFirstCursorPa
 /**
  * Tests the {@link QueryRequest} implementation
  */
-public class QueryRequestTest {
+class QueryRequestTest {
     private static final String COLLECTION = SolrCollectionName.COLLECTION;
     private QuickGOQuery query;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         this.query = QuickGOQuery.createQuery("field1", "value1");
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void nullQueryThrowsException() {
-        new QueryRequest.Builder(null, COLLECTION);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void nullCollectionThrowsException() {
-        new QueryRequest.Builder(query, null);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void emptyCollectionThrowsException() {
-        new QueryRequest.Builder(query, "");
+    @Test
+    void nullQueryThrowsException() {
+        assertThrows(IllegalArgumentException.class, () -> new QueryRequest.Builder(null, COLLECTION));
     }
 
     @Test
-    public void buildsQueryRequestOnlyWithQuery() {
+    void nullCollectionThrowsException() {
+        assertThrows(IllegalArgumentException.class, () -> new QueryRequest.Builder(query, null));
+    }
+
+    @Test
+    void emptyCollectionThrowsException() {
+        assertThrows(IllegalArgumentException.class, () -> new QueryRequest.Builder(query, ""));
+    }
+
+    @Test
+    void buildsQueryRequestOnlyWithQuery() {
         QueryRequest request = new QueryRequest.Builder(query, COLLECTION).build();
 
         assertThat(request.getQuery(), is(equalTo(query)));
@@ -53,13 +54,13 @@ public class QueryRequestTest {
         assertThat(request.getFilters(), hasSize(0));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void invalidPageParametersThrowsException() {
-        new QueryRequest.Builder(query, COLLECTION).setPage(new RegularPage(-1, 2)).build();
+    @Test
+    void invalidPageParametersThrowsException() {
+        assertThrows(IllegalArgumentException.class, () -> new QueryRequest.Builder(query, COLLECTION).setPage(new RegularPage(-1, 2)).build());
     }
 
     @Test
-    public void buildsQueryRequestWithQueryAndRegularPageParameterComponents() {
+    void buildsQueryRequestWithQueryAndRegularPageParameterComponents() {
         int pageNumber = 1;
         int pageSize = 2;
         QueryRequest request = new QueryRequest.Builder(query, COLLECTION)
@@ -78,15 +79,15 @@ public class QueryRequestTest {
         assertThat(request.getFilters(), hasSize(0));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void invalidFacetFieldThrowsException() {
-        new QueryRequest.Builder(query, COLLECTION)
+    @Test
+    void invalidFacetFieldThrowsException() {
+        assertThrows(IllegalArgumentException.class, () -> new QueryRequest.Builder(query, COLLECTION)
                 .addFacetField(null)
-                .build();
+                .build());
     }
 
     @Test
-    public void buildsQueryRequestWithQueryAndTwoFacetFields() {
+    void buildsQueryRequestWithQueryAndTwoFacetFields() {
         String facetField1 = "facet1";
         String facetField2 = "facet2";
 
@@ -106,7 +107,7 @@ public class QueryRequestTest {
     }
 
     @Test
-    public void buildsQueryRequestWithQueryAndFilterQuery() {
+    void buildsQueryRequestWithQueryAndFilterQuery() {
         QuickGOQuery filterQuery1 = QuickGOQuery.createQuery("field2", "value2");
         QuickGOQuery filterQuery2 = QuickGOQuery.createQuery("field3", "value3");
 
@@ -123,7 +124,7 @@ public class QueryRequestTest {
     }
 
     @Test
-    public void addFilterQueryToQueryRequest() {
+    void addFilterQueryToQueryRequest() {
         QueryRequest request = new QueryRequest.Builder(query, COLLECTION)
                 .build();
 
@@ -135,7 +136,7 @@ public class QueryRequestTest {
     }
 
     @Test
-    public void buildsQueryWithHighlightingOn() {
+    void buildsQueryWithHighlightingOn() {
         String highlightField = "highlightField";
         QueryRequest request = new QueryRequest.Builder(query, COLLECTION)
                 .addHighlightedField(highlightField)
@@ -145,7 +146,7 @@ public class QueryRequestTest {
     }
 
     @Test
-    public void buildsQueryWithHighlightingOff() {
+    void buildsQueryWithHighlightingOff() {
         QueryRequest request = new QueryRequest.Builder(query, COLLECTION)
                 .build();
 
@@ -153,7 +154,7 @@ public class QueryRequestTest {
     }
 
     @Test
-    public void buildsQueryWithProjectedField() {
+    void buildsQueryWithProjectedField() {
         String projectedField = "projectedField";
         QueryRequest request = new QueryRequest.Builder(query, COLLECTION)
                 .addProjectedField(projectedField)
@@ -163,7 +164,7 @@ public class QueryRequestTest {
     }
 
     @Test
-    public void buildsQueryWithNoProjectedField() {
+    void buildsQueryWithNoProjectedField() {
         QueryRequest request = new QueryRequest.Builder(query, COLLECTION)
                 .build();
 
@@ -171,7 +172,7 @@ public class QueryRequestTest {
     }
 
     @Test
-    public void buildsQueryWithFirstCursor() {
+    void buildsQueryWithFirstCursor() {
         int pageSize = 25;
         QueryRequest request = new QueryRequest.Builder(query, COLLECTION)
                 .setPage(createFirstCursorPage(pageSize))
@@ -184,7 +185,7 @@ public class QueryRequestTest {
     }
 
     @Test
-    public void buildsQueryWithNextCursor() {
+    void buildsQueryWithNextCursor() {
         int pageSize = 25;
         String cursor = "fakeCursor";
         QueryRequest request = new QueryRequest.Builder(query, COLLECTION)
@@ -198,7 +199,7 @@ public class QueryRequestTest {
     }
 
     @Test
-    public void buildsQueryWithSortCriteria() {
+    void buildsQueryWithSortCriteria() {
         String sortField = "sortField";
         SortCriterion.SortOrder sortOrder = SortCriterion.SortOrder.ASC;
         QueryRequest request = new QueryRequest.Builder(query, COLLECTION)
@@ -211,7 +212,7 @@ public class QueryRequestTest {
     }
 
     @Test
-    public void buildsQueryWithSortCriteriaInInsertionOrder() {
+    void buildsQueryWithSortCriteriaInInsertionOrder() {
         String sortField0 = "sortField0";
         SortCriterion.SortOrder sortOrder0 = SortCriterion.SortOrder.ASC;
         String sortField1 = "sortField1";
@@ -235,7 +236,7 @@ public class QueryRequestTest {
     }
 
     @Test
-    public void buildsQueryWithNoSortCriteria() {
+    void buildsQueryWithNoSortCriteria() {
         QueryRequest request = new QueryRequest.Builder(query, COLLECTION)
                 .build();
 

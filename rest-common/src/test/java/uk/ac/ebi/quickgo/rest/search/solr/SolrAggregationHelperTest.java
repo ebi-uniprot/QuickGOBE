@@ -2,132 +2,115 @@ package uk.ac.ebi.quickgo.rest.search.solr;
 
 import uk.ac.ebi.quickgo.rest.search.AggregateFunction;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.isEmptyString;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.ac.ebi.quickgo.rest.search.solr.AggregateToStringConverter.NUM_BUCKETS;
 import static uk.ac.ebi.quickgo.rest.search.solr.SolrAggregationHelper.*;
 
 /**
  * Tests the behaviour of the {@link SolrAggregationHelper} class.
  */
-public class SolrAggregationHelperTest {
+class SolrAggregationHelperTest {
     private static final AggregateFunction COUNT_FUNCTION = AggregateFunction.COUNT;
 
     private static final String GP_ID_FIELD = "geneProductId";
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-
     @Test
-    public void nullAggregateFunctionThrowsExceptionWhenCreatingAggregateFieldTitle() throws Exception {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Cannot create aggregate field title with null aggregate function");
-
-        aggregateFieldTitle(null, GP_ID_FIELD);
+    void nullAggregateFunctionThrowsExceptionWhenCreatingAggregateFieldTitle()  {
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> aggregateFieldTitle(null, GP_ID_FIELD));
+        assertTrue(exception.getMessage().contains("Cannot create aggregate field title with null aggregate function"));
     }
 
     @Test
-    public void nullFieldThrowsExceptionWhenCreatingAggregateFieldTitle() throws Exception {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Cannot create aggregate field title with null field");
-
-        aggregateFieldTitle(COUNT_FUNCTION, null);
+    void nullFieldThrowsExceptionWhenCreatingAggregateFieldTitle()  {
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> aggregateFieldTitle(COUNT_FUNCTION, null));
+        assertTrue(exception.getMessage().contains("Cannot create aggregate field title with null field"));
     }
 
     @Test
-    public void emptyFieldThrowsExceptionWhenCreatingAggregateFieldTitle() throws Exception {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Cannot create aggregate field title with null field");
-
-        aggregateFieldTitle(COUNT_FUNCTION, "");
+    void emptyFieldThrowsExceptionWhenCreatingAggregateFieldTitle()  {
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> aggregateFieldTitle(COUNT_FUNCTION, ""));
+        assertTrue(exception.getMessage().contains("Cannot create aggregate field title with null field"));
     }
 
     @Test
-    public void validFunctionAndFieldCreateAggregateFieldTitle() throws Exception {
+    void validFunctionAndFieldCreateAggregateFieldTitle()  {
         String aggTitleField = aggregateFieldTitle(COUNT_FUNCTION, GP_ID_FIELD);
 
         assertThat(aggTitleField, is(COUNT_FUNCTION.getName() + AGG_NAME_SEPARATOR + GP_ID_FIELD));
     }
 
     @Test
-    public void nullTypeThrowsExceptionWhenCreatingAggregateTypeTitle() throws Exception {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Cannot create aggregate type title with null or empty type");
-
-        aggregatePrefixWithTypeTitle(null);
+    void nullTypeThrowsExceptionWhenCreatingAggregateTypeTitle()  {
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> aggregatePrefixWithTypeTitle(null));
+        assertTrue(exception.getMessage().contains("Cannot create aggregate type title with null or empty type"));
     }
 
     @Test
-    public void emptyTypeThrowsExceptionWhenCreatingAggregateTypeTitle() throws Exception {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Cannot create aggregate type title with null or empty type");
-
-        aggregatePrefixWithTypeTitle("");
+    void emptyTypeThrowsExceptionWhenCreatingAggregateTypeTitle()  {
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> aggregatePrefixWithTypeTitle(""));
+        assertTrue(exception.getMessage().contains("Cannot create aggregate type title with null or empty type"));
     }
 
     @Test
-    public void populatedTypeCreatesAggregateTypeTitle() throws Exception {
+    void populatedTypeCreatesAggregateTypeTitle()  {
         String typeTitle = aggregatePrefixWithTypeTitle(GP_ID_FIELD);
 
         assertThat(typeTitle, is(AGG_TYPE_PREFIX + AGG_NAME_SEPARATOR + GP_ID_FIELD));
     }
 
     @Test
-    public void nullPrefixedFieldThrowsExceptionWhenExtractingPrefix() throws Exception {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Cannot extract prefix from null input");
-
-        fieldPrefixExtractor(null);
+    void nullPrefixedFieldThrowsExceptionWhenExtractingPrefix()  {
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> fieldPrefixExtractor(null));
+        assertTrue(exception.getMessage().contains("Cannot extract prefix from null input"));
     }
 
     @Test
-    public void fieldWithNoPrefixReturnsAnEmptyPrefixWhenExtractingPrefix() throws Exception {
+    void fieldWithNoPrefixReturnsAnEmptyPrefixWhenExtractingPrefix()  {
         String prefix = fieldPrefixExtractor(GP_ID_FIELD);
 
         assertThat(prefix, isEmptyString());
     }
 
     @Test
-    public void fieldWithCountPrefixReturnsCountPrefixWhenExtractingPrefix() throws Exception {
+    void fieldWithCountPrefixReturnsCountPrefixWhenExtractingPrefix()  {
         String prefix = fieldPrefixExtractor(aggregateFieldTitle(COUNT_FUNCTION, GP_ID_FIELD));
 
         assertThat(prefix, is(COUNT_FUNCTION.getName()));
     }
 
     @Test
-    public void nullPrefixedFieldThrowsExceptionWhenExtractingField() throws Exception {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Cannot extract field from null input");
-
-        fieldNameExtractor(null);
+    void nullPrefixedFieldThrowsExceptionWhenExtractingField()  {
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> fieldNameExtractor(null));
+        assertTrue(exception.getMessage().contains("Cannot extract field from null input"));
     }
 
     @Test
-    public void emptyPrefixedFieldThrowsExceptionWhenExtractingField() throws Exception {
+    void emptyPrefixedFieldThrowsExceptionWhenExtractingField()  {
         String fieldName = fieldNameExtractor("");
 
         assertThat(fieldName, isEmptyString());
     }
 
     @Test
-    public void fieldWithCountPrefixReturnsFieldWhenExtractingField() throws Exception {
+    void fieldWithCountPrefixReturnsFieldWhenExtractingField()  {
         String field = fieldNameExtractor(aggregateFieldTitle(COUNT_FUNCTION, GP_ID_FIELD));
 
         assertThat(field, is(GP_ID_FIELD));
     }
 
     @Test
-    public void testForNumBucketsReturnsTrue(){
+    void testForNumBucketsReturnsTrue(){
         assertThat(isDistinctValueCount(NUM_BUCKETS), is(true));
     }
 
     @Test
-    public void testForNumBucketsReturnsFalse(){
+    void testForNumBucketsReturnsFalse(){
         assertThat(isDistinctValueCount("bucketHead"), is(false));
     }
 }

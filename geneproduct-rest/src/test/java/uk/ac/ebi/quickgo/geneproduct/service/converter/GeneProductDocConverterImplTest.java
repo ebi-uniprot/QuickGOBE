@@ -1,25 +1,25 @@
 package uk.ac.ebi.quickgo.geneproduct.service.converter;
-
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductDocument;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductType;
 import uk.ac.ebi.quickgo.geneproduct.model.GeneProduct;
 
 import java.util.Arrays;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.ac.ebi.quickgo.geneproduct.service.converter.GeneProductDocConverterImpl.DEFAULT_TAXON_ID;
 
 /**
  * Unit tests the {@link GeneProductDocConverterImpl} class.
  */
-public class GeneProductDocConverterImplTest {
+class GeneProductDocConverterImplTest {
     private static final String ID = "A0A000";
 
     private static final int TAX_ID = 789;
@@ -37,8 +37,8 @@ public class GeneProductDocConverterImplTest {
     private GeneProductDocConverter geneProductDocConverter;
     private GeneProductDocument geneProductDocument;
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         geneProductDocConverter = new GeneProductDocConverterImpl();
 
         geneProductDocument = new GeneProductDocument();
@@ -56,7 +56,7 @@ public class GeneProductDocConverterImplTest {
     }
 
     @Test
-    public void convertOne() {
+    void convertOne() {
         GeneProduct convertedGeneProduct = geneProductDocConverter.convert(geneProductDocument);
 
         assertThat(convertedGeneProduct.id, is(equalTo(ID)));
@@ -72,7 +72,7 @@ public class GeneProductDocConverterImplTest {
     }
 
     @Test
-    public void noTaxIdInDocResultsInNullModelTaxId() {
+    void noTaxIdInDocResultsInNullModelTaxId() {
         geneProductDocument.taxonId = DEFAULT_TAXON_ID;
         GeneProduct convertedGeneProduct = geneProductDocConverter.convert(geneProductDocument);
 
@@ -80,7 +80,7 @@ public class GeneProductDocConverterImplTest {
     }
 
     @Test
-    public void nullDocDbSubsetConvertsToNullModelDbSubset() {
+    void nullDocDbSubsetConvertsToNullModelDbSubset() {
         geneProductDocument.databaseSubset = null;
 
         GeneProduct convertedGeneProduct = geneProductDocConverter.convert(geneProductDocument);
@@ -89,7 +89,7 @@ public class GeneProductDocConverterImplTest {
     }
 
     @Test
-    public void nullDocSynonymsConvertsToNullModelSynonyms() {
+    void nullDocSynonymsConvertsToNullModelSynonyms() {
         geneProductDocument.synonyms = null;
 
         GeneProduct convertedGeneProduct = geneProductDocConverter.convert(geneProductDocument);
@@ -97,17 +97,15 @@ public class GeneProductDocConverterImplTest {
         assertThat(convertedGeneProduct.synonyms, is(nullValue()));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void invalidGeneProductTypeCausesError() {
+    @Test
+    void invalidGeneProductTypeCausesError() {
         geneProductDocument.type = "this is not a valid gene product type, I promise.";
-
-        geneProductDocConverter.convert(geneProductDocument);
+        assertThrows(IllegalArgumentException.class, () -> geneProductDocConverter.convert(geneProductDocument));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void nullGeneProductTypeCausesError() {
+    @Test
+    void nullGeneProductTypeCausesError() {
         geneProductDocument.type = null;
-
-        geneProductDocConverter.convert(geneProductDocument);
+        assertThrows(IllegalArgumentException.class, () -> geneProductDocConverter.convert(geneProductDocument));
     }
 }

@@ -1,7 +1,6 @@
 package uk.ac.ebi.quickgo.index.annotation;
 
 import org.hamcrest.CoreMatchers;
-import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,25 +25,25 @@ import static uk.ac.ebi.quickgo.index.annotation.AnnotationParsingHelper.*;
  * Created 21/04/16
  * @author Edd
  */
-public class AnnotationDocumentConverterTest {
+class AnnotationDocumentConverterTest {
     private AnnotationDocumentConverter converter;
     private Annotation annotation;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         converter = new AnnotationDocumentConverter();
         annotation = createValidAnnotation();
     }
 
     @Test
-    public void nullAnnotationThrowsException() {
+    void nullAnnotationThrowsException() {
         Assertions.assertThrows(DocumentReaderException.class, () -> {
             converter.process(null);
         });
     }
 
     @Test
-    public void convertsDirectlyTranslatableFieldsInAnnotation() {
+    void convertsDirectlyTranslatableFieldsInAnnotation() {
         annotation.db = "IntAct";
         annotation.dbObjectId = "EBI-10043081";
         annotation.dbReferences = "PMID:12871976";
@@ -82,7 +81,7 @@ public class AnnotationDocumentConverterTest {
 
     // interacting taxon
     @Test
-    public void convertsEmptyInteractingTaxonToDefaultTaxon() {
+    void convertsEmptyInteractingTaxonToDefaultTaxon() {
         annotation.interactingTaxonId = null;
 
         AnnotationDocument doc = converter.process(annotation);
@@ -91,7 +90,7 @@ public class AnnotationDocumentConverterTest {
     }
 
     @Test
-    public void convertsValidNonEmptyInteractingTaxon() {
+    void convertsValidNonEmptyInteractingTaxon() {
         annotation.interactingTaxonId = "taxon:12345";
 
         AnnotationDocument doc = converter.process(annotation);
@@ -100,7 +99,7 @@ public class AnnotationDocumentConverterTest {
     }
 
     @Test
-    public void convertsInvalidNonEmptyInteractingTaxon() {
+    void convertsInvalidNonEmptyInteractingTaxon() {
         annotation.interactingTaxonId = "taxon:12345d";
 
         AnnotationDocument doc = converter.process(annotation);
@@ -110,7 +109,7 @@ public class AnnotationDocumentConverterTest {
 
     // with
     @Test
-    public void convertsEmptyWithToNullValue() {
+    void convertsEmptyWithToNullValue() {
         annotation.with = null;
 
         AnnotationDocument doc = converter.process(annotation);
@@ -119,7 +118,7 @@ public class AnnotationDocumentConverterTest {
     }
 
     @Test
-    public void convertsSingleValuedWithToListOfSize1() {
+    void convertsSingleValuedWithToListOfSize1() {
         annotation.with = "GO:0036376";
 
         AnnotationDocument doc = converter.process(annotation);
@@ -128,7 +127,7 @@ public class AnnotationDocumentConverterTest {
     }
 
     @Test
-    public void convertsMultiValuedWithToCorrectListOfSize2() {
+    void convertsMultiValuedWithToCorrectListOfSize2() {
         annotation.with = "GO:0036376|GO:0036377";
 
         AnnotationDocument doc = converter.process(annotation);
@@ -138,7 +137,7 @@ public class AnnotationDocumentConverterTest {
 
     // annotation properties: go evidence
     @Test
-    public void convertsNullGOEvidenceAnnotationPropertiesToNullValue() {
+    void convertsNullGOEvidenceAnnotationPropertiesToNullValue() {
         annotation.annotationProperties = null;
 
         AnnotationDocument doc = converter.process(annotation);
@@ -147,7 +146,7 @@ public class AnnotationDocumentConverterTest {
     }
 
     @Test
-    public void convertsGOEvidenceAnnotationProperties() {
+    void convertsGOEvidenceAnnotationProperties() {
         String evidence = "FIND_ME";
         annotation.annotationProperties = buildKeyValuesPair(GO_EVIDENCE, evidence);
 
@@ -158,7 +157,7 @@ public class AnnotationDocumentConverterTest {
 
     // annotation properties: taxon id
     @Test
-    public void convertsNullTaxonIdAnnotationPropertiesToDefaultTaxon() {
+    void convertsNullTaxonIdAnnotationPropertiesToDefaultTaxon() {
         annotation.annotationProperties = null;
 
         AnnotationDocument doc = converter.process(annotation);
@@ -167,7 +166,7 @@ public class AnnotationDocumentConverterTest {
     }
 
     @Test
-    public void convertsTaxonIdAnnotationProperties() {
+    void convertsTaxonIdAnnotationProperties() {
         int taxon = 12345;
         annotation.annotationProperties = buildKeyValuesPair(TAXON_ID, String.valueOf(taxon));
 
@@ -177,7 +176,7 @@ public class AnnotationDocumentConverterTest {
     }
 
     @Test
-    public void convertsInvalidTaxonIdAnnotationPropertiesToDefaultTaxon() {
+    void convertsInvalidTaxonIdAnnotationPropertiesToDefaultTaxon() {
         String taxon = "12345a";
         annotation.annotationProperties = buildKeyValuesPair(TAXON_ID, taxon);
 
@@ -188,7 +187,7 @@ public class AnnotationDocumentConverterTest {
 
     // annotation properties: db object type
     @Test
-    public void convertsNullDbObjectTypeAnnotationPropertiesToNullValue() {
+    void convertsNullDbObjectTypeAnnotationPropertiesToNullValue() {
         annotation.annotationProperties = null;
 
         AnnotationDocument doc = converter.process(annotation);
@@ -197,7 +196,7 @@ public class AnnotationDocumentConverterTest {
     }
 
     @Test
-    public void convertsDbObjectTypeAnnotationProperties() {
+    void convertsDbObjectTypeAnnotationProperties() {
         String value = "FINDME";
         annotation.annotationProperties = buildKeyValuesPair(DB_OBJECT_TYPE, value);
 
@@ -208,7 +207,7 @@ public class AnnotationDocumentConverterTest {
 
     // annotation properties: db object symbol
     @Test
-    public void convertsNullDbObjectSymbolAnnotationPropertiesToNullValue() {
+    void convertsNullDbObjectSymbolAnnotationPropertiesToNullValue() {
         annotation.annotationProperties = null;
 
         AnnotationDocument doc = converter.process(annotation);
@@ -217,7 +216,7 @@ public class AnnotationDocumentConverterTest {
     }
 
     @Test
-    public void convertsDbObjectSymbolAnnotationProperties() {
+    void convertsDbObjectSymbolAnnotationProperties() {
         String value = "FINDME";
         annotation.annotationProperties = buildKeyValuesPair(DB_OBJECT_SYMBOL, value);
 
@@ -228,7 +227,7 @@ public class AnnotationDocumentConverterTest {
 
     // annotation properties: db subset
     @Test
-    public void convertsNullDbSubsetAnnotationPropertiesToNullValue() {
+    void convertsNullDbSubsetAnnotationPropertiesToNullValue() {
         annotation.annotationProperties = null;
 
         AnnotationDocument doc = converter.process(annotation);
@@ -237,7 +236,7 @@ public class AnnotationDocumentConverterTest {
     }
 
     @Test
-    public void convertsDbSubsetAnnotationProperties() {
+    void convertsDbSubsetAnnotationProperties() {
         String value = "FINDME";
         annotation.annotationProperties = buildKeyValuesPair(DB_OBJECT_SUBSET, value);
 
@@ -248,7 +247,7 @@ public class AnnotationDocumentConverterTest {
 
     // annotation extensions
     @Test
-    public void convertsNullAnnotationExtensionToNullValue() {
+    void convertsNullAnnotationExtensionToNullValue() {
         annotation.annotationExtension = null;
 
         AnnotationDocument doc = converter.process(annotation);
@@ -257,7 +256,7 @@ public class AnnotationDocumentConverterTest {
     }
 
     @Test
-    public void keepsRawExtensionUnchanged() {
+    void keepsRawExtensionUnchanged() {
         String annotationExtension = "x,y|z";
         annotation.annotationExtension = annotationExtension;
 
@@ -268,7 +267,7 @@ public class AnnotationDocumentConverterTest {
 
     // annotation properties: target sets
     @Test
-    public void convertsEmptyTargetSetToNullValue() {
+    void convertsEmptyTargetSetToNullValue() {
         annotation.annotationProperties = mergeKeyValuesPairs(
                 buildKeyValuesPair(DB_OBJECT_TYPE, "protein"),
                 buildKeyValuesPair(DB_OBJECT_SYMBOL, "moeA5"));
@@ -279,7 +278,7 @@ public class AnnotationDocumentConverterTest {
 
     // annotation properties: go aspect
     @Test
-    public void convertsNullGoAspectAnnotationPropertiesToNullValue() {
+    void convertsNullGoAspectAnnotationPropertiesToNullValue() {
         annotation.annotationProperties = null;
 
         AnnotationDocument doc = converter.process(annotation);
@@ -288,7 +287,7 @@ public class AnnotationDocumentConverterTest {
     }
 
     @Test
-    public void convertsGoAspectAnnotationProperties() {
+    void convertsGoAspectAnnotationProperties() {
         String value = "cellular_component";
         annotation.annotationProperties = buildKeyValuesPair(GO_ASPECT, value);
 
@@ -299,7 +298,7 @@ public class AnnotationDocumentConverterTest {
 
     // annotation properties: taxon ancestors
     @Test
-    public void convertsNullAnnotationPropertiesToDefaultTaxonAncestorsList() {
+    void convertsNullAnnotationPropertiesToDefaultTaxonAncestorsList() {
         annotation.annotationProperties = null;
 
         AnnotationDocument doc = converter.process(annotation);
@@ -308,7 +307,7 @@ public class AnnotationDocumentConverterTest {
     }
 
     @Test
-    public void convertsNullTaxonAncestorsAnnotationPropertiesToDefaultTaxonAncestorsList() {
+    void convertsNullTaxonAncestorsAnnotationPropertiesToDefaultTaxonAncestorsList() {
         String value = null;
         annotation.annotationProperties = buildKeyValuesPair(TAXON_ANCESTORS, value);
 
@@ -318,7 +317,7 @@ public class AnnotationDocumentConverterTest {
     }
 
     @Test
-    public void convertsEmptyTaxonAncestorsAnnotationPropertiesToDefaultTaxonAncestorsList() {
+    void convertsEmptyTaxonAncestorsAnnotationPropertiesToDefaultTaxonAncestorsList() {
         String value = "";
         annotation.annotationProperties = buildKeyValuesPair(TAXON_ANCESTORS, value);
 
@@ -328,7 +327,7 @@ public class AnnotationDocumentConverterTest {
     }
 
     @Test
-    public void convertsInvalidTaxonAncestorsAnnotationPropertiesToDefaultTaxonAncestorsList() {
+    void convertsInvalidTaxonAncestorsAnnotationPropertiesToDefaultTaxonAncestorsList() {
         String value = "1234d";
         annotation.annotationProperties = buildKeyValuesPair(TAXON_ANCESTORS, value);
 
@@ -338,7 +337,7 @@ public class AnnotationDocumentConverterTest {
     }
 
     @Test
-    public void convertsSingleTaxonAncestorsAnnotationProperties() {
+    void convertsSingleTaxonAncestorsAnnotationProperties() {
         String value = "1234";
         annotation.annotationProperties = buildKeyValuesPair(TAXON_ANCESTORS, value);
 
@@ -348,7 +347,7 @@ public class AnnotationDocumentConverterTest {
     }
 
     @Test
-    public void convertsMultipleTaxonAncestorsAnnotationProperties() {
+    void convertsMultipleTaxonAncestorsAnnotationProperties() {
         String taxon1 = "1234";
         String taxon2 = "55";
         String value = taxon1 + "," + taxon2;
@@ -361,7 +360,7 @@ public class AnnotationDocumentConverterTest {
 
     // date
     @Test
-    public void convertsValidDateSuccessfully() {
+    void convertsValidDateSuccessfully() {
         annotation.date = "20150122";
         LocalDate expectedLocalDate = LocalDate.of(2015, 1, 22);
         Date expectedDate = Date.from(expectedLocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
@@ -372,7 +371,7 @@ public class AnnotationDocumentConverterTest {
     }
 
     @Test
-    public void convertsInvalidDateToNull() {
+    void convertsInvalidDateToNull() {
         annotation.date = "3dd333stopAskingMeForADate320150122";
 
         AnnotationDocument doc = converter.process(annotation);
@@ -381,7 +380,7 @@ public class AnnotationDocumentConverterTest {
     }
 
     @Test
-    public void convertsEmptyDateToNull() {
+    void convertsEmptyDateToNull() {
         annotation.date = "";
 
         AnnotationDocument doc = converter.process(annotation);
@@ -390,7 +389,7 @@ public class AnnotationDocumentConverterTest {
     }
 
     @Test
-    public void convertsSpaceFilledDateToNull() {
+    void convertsSpaceFilledDateToNull() {
         annotation.date = "    ";
 
         AnnotationDocument doc = converter.process(annotation);
@@ -399,7 +398,7 @@ public class AnnotationDocumentConverterTest {
     }
 
     @Test
-    public void convertsNullDateToNull() {
+    void convertsNullDateToNull() {
         annotation.date = null;
 
         AnnotationDocument doc = converter.process(annotation);
@@ -408,79 +407,79 @@ public class AnnotationDocumentConverterTest {
     }
 
     @Test
-    public void forUniProtKBDefaultSortStartsWith3AndRemainingIsTheIdentifier() {
+    void forUniProtKBDefaultSortStartsWith3AndRemainingIsTheIdentifier() {
         annotation.db = "UniProtKB";
 
         AnnotationDocument doc = converter.process(annotation);
 
-        Assert.assertTrue(doc.defaultSort.startsWith("3"));
+        Assertions.assertTrue(doc.defaultSort.startsWith("3"));
         assertThat(doc.defaultSort, is("3" + annotation.dbObjectId));
     }
 
     @Test
-    public void forUniprotkbIgnoreCaseDefaultSortStartsWith3AndRemainingIsTheIdentifier() {
+    void forUniprotkbIgnoreCaseDefaultSortStartsWith3AndRemainingIsTheIdentifier() {
         annotation.db = "uniprotkb";
 
         AnnotationDocument doc = converter.process(annotation);
 
-        Assert.assertTrue(doc.defaultSort.startsWith("3"));
+        Assertions.assertTrue(doc.defaultSort.startsWith("3"));
         assertThat(doc.defaultSort, is("3" + annotation.dbObjectId));
     }
 
     @Test
-    public void forComplexPortalDefaultSortStartsWith5AndRemainingIsTheIdentifier() {
+    void forComplexPortalDefaultSortStartsWith5AndRemainingIsTheIdentifier() {
         annotation.db = "ComplexPortal";
 
         AnnotationDocument doc = converter.process(annotation);
 
-        Assert.assertTrue(doc.defaultSort.startsWith("5"));
+        Assertions.assertTrue(doc.defaultSort.startsWith("5"));
         assertThat(doc.defaultSort, is("5" + annotation.dbObjectId));
     }
 
     @Test
-    public void forComplexportalIgnoreCaseDefaultSortStartsWith5AndRemainingIsTheIdentifier() {
+    void forComplexportalIgnoreCaseDefaultSortStartsWith5AndRemainingIsTheIdentifier() {
         annotation.db = "complexportal";
 
         AnnotationDocument doc = converter.process(annotation);
 
-        Assert.assertTrue(doc.defaultSort.startsWith("5"));
+        Assertions.assertTrue(doc.defaultSort.startsWith("5"));
         assertThat(doc.defaultSort, is("5" + annotation.dbObjectId));
     }
 
     @Test
-    public void forRNAcentralDefaultSortStartsWith7AndRemainingIsTheIdentifier() {
+    void forRNAcentralDefaultSortStartsWith7AndRemainingIsTheIdentifier() {
         annotation.db = "RNAcentral";
 
         AnnotationDocument doc = converter.process(annotation);
 
-        Assert.assertTrue(doc.defaultSort.startsWith("7"));
+        Assertions.assertTrue(doc.defaultSort.startsWith("7"));
         assertThat(doc.defaultSort, is("7" + annotation.dbObjectId));
     }
 
     @Test
-    public void forRnacentralIgnoreCaseDefaultSortStartsWith7AndRemainingIsTheIdentifier() {
+    void forRnacentralIgnoreCaseDefaultSortStartsWith7AndRemainingIsTheIdentifier() {
         annotation.db = "rnacentral";
 
         AnnotationDocument doc = converter.process(annotation);
 
-        Assert.assertTrue(doc.defaultSort.startsWith("7"));
+        Assertions.assertTrue(doc.defaultSort.startsWith("7"));
         assertThat(doc.defaultSort, is("7" + annotation.dbObjectId));
     }
 
     @Test
-    public void forAnyOtherDatabaseDefaultSortStartsWith9AndRemainingIsTheIdentifier() {
+    void forAnyOtherDatabaseDefaultSortStartsWith9AndRemainingIsTheIdentifier() {
         annotation.db = "anyDb";
 
         AnnotationDocument doc = converter.process(annotation);
 
-        Assert.assertTrue(doc.defaultSort.startsWith("9"));
+        Assertions.assertTrue(doc.defaultSort.startsWith("9"));
         assertThat(doc.defaultSort, is("9" + annotation.dbObjectId));
     }
 
 
     // annotation properties: gpRelatedGoIds
     @Test
-    public void convertsNullAnnotationPropertiesToDefaultGpRelatedGoIdsList() {
+    void convertsNullAnnotationPropertiesToDefaultGpRelatedGoIdsList() {
         annotation.annotationProperties = null;
 
         AnnotationDocument doc = converter.process(annotation);
@@ -489,7 +488,7 @@ public class AnnotationDocumentConverterTest {
     }
 
     @Test
-    public void convertsNullGpRelatedGoIdsAnnotationPropertiesToDefaultGpRelatedGoIdsList() {
+    void convertsNullGpRelatedGoIdsAnnotationPropertiesToDefaultGpRelatedGoIdsList() {
         String value = null;
         annotation.annotationProperties = buildKeyValuesPair(GP_RELATED_GO_IDS, value);
 
@@ -499,7 +498,7 @@ public class AnnotationDocumentConverterTest {
     }
 
     @Test
-    public void convertsEmptyGpRelatedGoIdsAnnotationPropertiesToDefaultGpRelatedGoIdsList() {
+    void convertsEmptyGpRelatedGoIdsAnnotationPropertiesToDefaultGpRelatedGoIdsList() {
         String value = "";
         annotation.annotationProperties = buildKeyValuesPair(GP_RELATED_GO_IDS, value);
 
@@ -509,7 +508,7 @@ public class AnnotationDocumentConverterTest {
     }
 
     @Test
-    public void convertsInvalidGpRelatedGoIdsAnnotationPropertiesToDefaultGpRelatedGoIdsList() {
+    void convertsInvalidGpRelatedGoIdsAnnotationPropertiesToDefaultGpRelatedGoIdsList() {
         String value = "go123";
         annotation.annotationProperties = buildKeyValuesPair(GP_RELATED_GO_IDS, value);
 
@@ -519,7 +518,7 @@ public class AnnotationDocumentConverterTest {
     }
 
     @Test
-    public void convertsMultipleGpRelatedGoIdsAnnotationProperties() {
+    void convertsMultipleGpRelatedGoIdsAnnotationProperties() {
         String go1 = "GO:0033014";
         String go2 = "GO:0005524";
         String value = go1 + "," + go2;

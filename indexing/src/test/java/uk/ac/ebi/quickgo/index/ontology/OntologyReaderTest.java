@@ -6,20 +6,20 @@ import uk.ac.ebi.quickgo.model.ontology.generic.GenericTerm;
 import uk.ac.ebi.quickgo.model.ontology.go.GOTerm;
 import uk.ac.ebi.quickgo.model.ontology.go.GeneOntology;
 
-import de.bechte.junit.runners.context.HierarchicalContextRunner;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.ExecutionContext;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -27,14 +27,13 @@ import static org.mockito.Mockito.when;
  * Created 11/01/16
  * @author Edd
  */
-@RunWith(HierarchicalContextRunner.class)
-public class OntologyReaderTest {
+class OntologyReaderTest {
 
     private OntologyReader ontologyReader;
     private int docCount;
 
-    @After
-    public void after() {
+    @AfterEach
+    void after() {
         if (ontologyReader != null) {
             ontologyReader.close();
         }
@@ -56,10 +55,11 @@ public class OntologyReaderTest {
         return Arrays.asList(term1, term2);
     }
 
-    public class DocReaderAccessingValidOntologies {
+    @Nested
+    class DocReaderAccessingValidOntologies {
 
-        @Before
-        public void setUp() {
+        @BeforeEach
+        void setUp() {
             GeneOntology go = mock(GeneOntology.class);
             EvidenceCodeOntology eco = mock(EvidenceCodeOntology.class);
 
@@ -73,7 +73,7 @@ public class OntologyReaderTest {
         }
 
         @Test
-        public void readsAllDocsWithoutError() {
+        void readsAllDocsWithoutError() {
             int count = 0;
             while (ontologyReader.read() != null) {
                 count++;
@@ -82,12 +82,13 @@ public class OntologyReaderTest {
         }
     }
 
-    public class DocReaderAccessingInvalidOntologies {
+    @Nested
+    class DocReaderAccessingInvalidOntologies {
         private GeneOntology validGO;
         private EvidenceCodeOntology validECO;
 
-        @Before
-        public void setUp() {
+        @BeforeEach
+        void setUp() {
             validGO = mock(GeneOntology.class);
             when(validGO.getTerms()).thenReturn(createGOTerms());
 
@@ -95,32 +96,37 @@ public class OntologyReaderTest {
             when(validECO.getTerms()).thenReturn(createECOTerms());
         }
 
-        @Test(expected = IllegalArgumentException.class)
-        public void openingEmptyGOWillCauseDocumentReaderException() {
-            ontologyReader = new OntologyReader(validGO, null);
-        }
-
-        @Test(expected = IllegalArgumentException.class)
-        public void openingEmptyECOWillCauseDocumentReaderException() {
-            ontologyReader = new OntologyReader(null, validECO);
+        @Test
+        void openingEmptyGOWillCauseDocumentReaderException() {
+            assertThrows(IllegalArgumentException.class, () -> {
+                ontologyReader = new OntologyReader(validGO, null);
+            });
         }
 
         @Test
-        public void opensSuccessfully() {
+        void openingEmptyECOWillCauseDocumentReaderException() {
+            assertThrows(IllegalArgumentException.class, () -> {
+                ontologyReader = new OntologyReader(null, validECO);
+            });
+        }
+
+        @Test
+        void opensSuccessfully() {
             ontologyReader = new OntologyReader(validGO, validECO);
             ontologyReader.open(new ExecutionContext());
             assertThat(ontologyReader, is(not(nullValue())));
         }
     }
 
-    public class DocReaderAccessingEmptyOntologies {
+    @Nested
+    class DocReaderAccessingEmptyOntologies {
         private GeneOntology validGO;
         private EvidenceCodeOntology validECO;
         private GeneOntology emptyGO;
         private EvidenceCodeOntology emptyECO;
 
-        @Before
-        public void setUp() {
+        @BeforeEach
+        void setUp() {
             validGO = mock(GeneOntology.class);
             when(validGO.getTerms()).thenReturn(createGOTerms());
 
@@ -132,14 +138,14 @@ public class OntologyReaderTest {
         }
 
         @Test
-        public void openingEmptyGoOntologyIsSuccessful() {
+        void openingEmptyGoOntologyIsSuccessful() {
             ontologyReader = new OntologyReader(emptyGO, validECO);
             ontologyReader.open(new ExecutionContext());
             assertThat(ontologyReader, is(not(nullValue())));
         }
 
         @Test
-        public void openingEmptyEcoOntologyIsSuccessful() {
+        void openingEmptyEcoOntologyIsSuccessful() {
             ontologyReader = new OntologyReader(validGO, emptyECO);
             ontologyReader.open(new ExecutionContext());
             assertThat(ontologyReader, is(not(nullValue())));

@@ -1,141 +1,117 @@
 package uk.ac.ebi.quickgo.rest.search.results;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests the {@link PageInfo} implementation.
  */
-public class PageInfoTest {
-
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
+class PageInfoTest {
 
     @Test
-    public void negativeTotalNumberThrowsException() throws Exception {
+    void negativeTotalNumberThrowsException() {
         int totalPages = -1;
         int currentPage = 0;
         int resultsPerPage = 1;
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Total number of pages cannot be negative");
-
-        new PageInfo.Builder()
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> new PageInfo.Builder()
                 .withTotalPages(totalPages)
                 .withCurrentPage(currentPage)
                 .withResultsPerPage(resultsPerPage)
-                .build();
+                .build());
+        assertTrue(exception.getMessage().contains("Total number of pages cannot be negative"));
     }
 
     @Test
-    public void negativeCurrentPageThrowsException() throws Exception {
+    void negativeCurrentPageThrowsException() {
         int totalPages = 1;
         int currentPage = -1;
         int resultsPerPage = 1;
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Current page cannot be negative");
-
-        new PageInfo.Builder()
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> new PageInfo.Builder()
                 .withTotalPages(totalPages)
                 .withCurrentPage(currentPage)
                 .withResultsPerPage(resultsPerPage)
-                .build();
+                .build());
+        assertTrue(exception.getMessage().contains("Current page cannot be negative"));
     }
 
     @Test
-    public void negativeResultsPerPageThrowsException() throws Exception {
+    void negativeResultsPerPageThrowsException() {
         int totalPages = 1;
         int currentPage = 0;
         int resultsPerPage = -1;
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Results per page cannot be less than 0");
-
-        new PageInfo.Builder()
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> new PageInfo.Builder()
                 .withTotalPages(totalPages)
                 .withCurrentPage(currentPage)
                 .withResultsPerPage(resultsPerPage)
-                .build();
+                .build());
+        assertTrue(exception.getMessage().contains("Results per page cannot be less than 0"));
     }
 
     @Test
-    public void currentPageLargerThanTotalPagesThrowsException() throws Exception {
+    void currentPageLargerThanTotalPagesThrowsException() {
         int totalPages = 1;
         int currentPage = 2;
         int resultsPerPage = 1;
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Current page cannot be larger than total amount of pages");
-
-        new PageInfo.Builder()
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> new PageInfo.Builder()
                 .withTotalPages(totalPages)
                 .withCurrentPage(currentPage)
                 .withResultsPerPage(resultsPerPage)
-                .build();
+                .build());
+        assertTrue(exception.getMessage().contains("Current page cannot be larger than total amount of pages"));
     }
 
     @Test
-    public void settingNextCursorAndCurrentPageThrowsException() throws Exception {
+    void settingNextCursorAndCurrentPageThrowsException() {
         int totalPages = 10;
         int currentPage = 1;
         int resultsPerPage = 1;
         String cursor = "fakeCursor";
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Cannot set both next cursor and current page");
-
-        new PageInfo.Builder()
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> new PageInfo.Builder()
                 .withTotalPages(totalPages)
                 .withCurrentPage(currentPage)
                 .withNextCursor(cursor)
                 .withResultsPerPage(resultsPerPage)
-                .build();
+                .build());
+        assertTrue(exception.getMessage().contains("Cannot set both next cursor and current page"));
     }
 
     @Test
-    public void settingCurrentPageAndNextCursorThrowsException() throws Exception {
+    void settingCurrentPageAndNextCursorThrowsException() {
         int totalPages = 10;
         int currentPage = 1;
         int resultsPerPage = 1;
         String cursor = "fakeCursor";
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Cannot set both current page and next cursor");
-
-        new PageInfo.Builder()
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> new PageInfo.Builder()
                 .withTotalPages(totalPages)
                 .withNextCursor(cursor)
                 .withCurrentPage(currentPage)
                 .withResultsPerPage(resultsPerPage)
-                .build();
+                .build());
+        assertTrue(exception.getMessage().contains("Cannot set both current page and next cursor"));
     }
 
     @Test
-    public void settingNullNextCursorThrowsException() throws Exception {
+    void settingNullNextCursorThrowsException() {
         int totalPages = 10;
         int currentPage = 1;
         int resultsPerPage = 1;
         String cursor = null;
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Next cursor cannot be null or empty");
-
-        new PageInfo.Builder()
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> new PageInfo.Builder()
                 .withTotalPages(totalPages)
                 .withNextCursor(cursor)
                 .withCurrentPage(currentPage)
                 .withResultsPerPage(resultsPerPage)
-                .build();
+                .build());
+        assertTrue(exception.getMessage().contains("Next cursor cannot be null or empty"));
     }
 
     @Test
-    public void validResultsPerRegularPage() throws Exception {
+    void validResultsPerRegularPage() {
         int totalPages = 1;
         int currentPage = 0;
         int resultsPerPage = 1;
@@ -153,7 +129,7 @@ public class PageInfoTest {
     }
 
     @Test
-    public void validResultsPerCursorPage() throws Exception {
+    void validResultsPerCursorPage() {
         int totalPages = 1;
         String cursor = "fakeCursor";
         int resultsPerPage = 1;

@@ -1,47 +1,38 @@
 package uk.ac.ebi.quickgo.rest.search.results;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.ac.ebi.quickgo.rest.search.results.PivotFacet.*;
 
 /**
  * Tests the behaviour of the {@link PivotFacet} class.
  */
-public class PivotFacetTest {
+class PivotFacetTest {
     private String[] pivotFields = {"field1", "field2"};
     private String field = "field";
     private String value = "value";
     private Long count = 1L;
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-
     @Test
-    public void nullFieldsInPivotFacetCreationThrowsException() throws Exception {
+    void nullFieldsInPivotFacetCreationThrowsException()  {
         String[] fields = null;
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Pivot fields cannot be null or empty");
-
-        new PivotFacet(fields);
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> new PivotFacet(fields));
+        assertTrue(exception.getMessage().contains("Pivot fields cannot be null or empty"));
     }
 
     @Test
-    public void emptyFieldsInPivotFacetCreationThrowsException() throws Exception {
+    void emptyFieldsInPivotFacetCreationThrowsException()  {
         String[] pivotFields = {};
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Pivot fields cannot be null or empty");
-
-        new PivotFacet(pivotFields);
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> new PivotFacet(pivotFields));
+        assertTrue(exception.getMessage().contains("Pivot fields cannot be null or empty"));
     }
 
     @Test
-    public void retrievingFieldsInPivotFacetIsSuccessful() throws Exception {
+    void retrievingFieldsInPivotFacetIsSuccessful()  {
         String[] pivotFields = {"field1", "field2", "field3"};
 
         PivotFacet pivotFacet = new PivotFacet(pivotFields);
@@ -51,19 +42,16 @@ public class PivotFacetTest {
     }
 
     @Test
-    public void addingNullPivotToPivotFacetThrowsException() throws Exception {
+    void addingNullPivotToPivotFacetThrowsException()  {
         Pivot pivot = null;
 
         PivotFacet pivotFacet = new PivotFacet(pivotFields);
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Cannot add null pivot to facet");
-
-        pivotFacet.addPivot(pivot);
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> pivotFacet.addPivot(pivot));
+        assertTrue(exception.getMessage().contains("Cannot add null pivot to facet"));
     }
 
     @Test
-    public void addingMultiplePopulatedPivotsToPivotFacetIsSuccessful() throws Exception {
+    void addingMultiplePopulatedPivotsToPivotFacetIsSuccessful()  {
         Pivot pivot1 = new Pivot(field + "1", value, count);
         Pivot pivot2 = new Pivot(field + "2", value, count);
         Pivot pivot3 = new Pivot(field + "3", value, count);
@@ -79,57 +67,42 @@ public class PivotFacetTest {
     }
 
     @Test
-    public void nullFieldNameInPivotCreationThrowsException() throws Exception {
+    void nullFieldNameInPivotCreationThrowsException()  {
         String field = null;
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Field cannot be null or empty");
-
-        new Pivot(field, value, count);
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> new Pivot(field, value, count));
+        assertTrue(exception.getMessage().contains("Field cannot be null or empty"));
     }
 
     @Test
-    public void emptyFieldNameInPivotCreationThrowsException() throws Exception {
+    void emptyFieldNameInPivotCreationThrowsException()  {
         String field = "";
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Field cannot be null or empty");
-
-        new Pivot(field, value, count);
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> new Pivot(field, value, count));
+        assertTrue(exception.getMessage().contains("Field cannot be null or empty"));
     }
 
     @Test
-    public void nullValueInPivotCreationThrowsException() throws Exception {
+    void nullValueInPivotCreationThrowsException()  {
         String value = null;
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Value cannot be null or empty");
-
-        new Pivot(field, value, count);
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> new Pivot(field, value, count));
+        assertTrue(exception.getMessage().contains("Value cannot be null or empty"));
     }
 
     @Test
-    public void emptyValueInPivotCreationThrowsException() throws Exception {
+    void emptyValueInPivotCreationThrowsException()  {
         String value = "";
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Value cannot be null or empty");
-
-        new Pivot(field, value, count);
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> new Pivot(field, value, count));
+        assertTrue(exception.getMessage().contains("Value cannot be null or empty"));
     }
 
     @Test
-    public void negativeCountNameInPivotCreationThrowsException() throws Exception {
+    void negativeCountNameInPivotCreationThrowsException()  {
         Long count = -1L;
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Count cannot be negative");
-
-        new Pivot(field, value, count);
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> new Pivot(field, value, count));
+        assertTrue(exception.getMessage().contains("Count cannot be negative"));
     }
 
     @Test
-    public void canCreatePivotWithFieldAndValueAndCount() throws Exception {
+    void canCreatePivotWithFieldAndValueAndCount()  {
         Pivot pivotFacet = new Pivot(field, value, count);
         assertThat(pivotFacet, is(notNullValue()));
 
@@ -139,19 +112,16 @@ public class PivotFacetTest {
     }
 
     @Test
-    public void nullChildPivotThrowsException() throws Exception {
+    void nullChildPivotThrowsException()  {
         Pivot pivot = new Pivot(field, value, count);
 
         Pivot childPivot = null;
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Cannot add null child pivot");
-
-        pivot.addPivot(childPivot);
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> pivot.addPivot(childPivot));
+        assertTrue(exception.getMessage().contains("Cannot add null child pivot"));
     }
 
     @Test
-    public void canAddMultipleChildrenToParentPivot() throws Exception {
+    void canAddMultipleChildrenToParentPivot()  {
         String parentName = "parent";
         String childName1 = "child1";
         String childName2 = "child2";
@@ -168,7 +138,7 @@ public class PivotFacetTest {
     }
 
     @Test
-    public void canAddChildToParentWithGrandParentPivot() throws Exception {
+    void canAddChildToParentWithGrandParentPivot()  {
         String grandparentName = "grandparent";
         String parentName = "parent";
         String childName = "child";

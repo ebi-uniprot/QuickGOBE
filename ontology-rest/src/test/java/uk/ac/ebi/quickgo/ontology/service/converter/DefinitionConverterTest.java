@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.ontology.service.converter;
-
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.ac.ebi.quickgo.common.converter.FlatFieldBuilder;
 import uk.ac.ebi.quickgo.common.converter.FlatFieldLeaf;
 import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
@@ -9,8 +10,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -20,19 +19,19 @@ import static uk.ac.ebi.quickgo.ontology.common.document.OntologyDocMocker.creat
 /**
  * Tests the behaviour of the {@link DefinitionConverter} class.
  */
-public class DefinitionConverterTest {
+class DefinitionConverterTest {
     private DefinitionConverter converter;
 
     private OntologyDocument doc;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() throws Exception {
         converter = new DefinitionConverter();
         doc = createOBODoc("id", "name");
     }
 
     @Test
-    public void convertsDocWithDefinitionTextAndNoTextXrefsIntoADefinitionObjectWithJustTheText() throws Exception {
+    void convertsDocWithDefinitionTextAndNoTextXrefsIntoADefinitionObjectWithJustTheText() throws Exception {
         String text = "This is the definition of the ontology term";
 
         doc.definition = text;
@@ -45,7 +44,7 @@ public class DefinitionConverterTest {
     }
 
     @Test
-    public void convertsDocWithNullDefinitionXrefListIntoDefinitionObjectWithEmptyXrefs() throws Exception {
+    void convertsDocWithNullDefinitionXrefListIntoDefinitionObjectWithEmptyXrefs() throws Exception {
         String text = "This is the definition of the ontology term";
 
         doc.definition = text;
@@ -58,7 +57,7 @@ public class DefinitionConverterTest {
     }
 
     @Test
-    public void convertsDocWithNoDefinitionTextAndWithASingleTextXrefIntoADefinitionObjectWithJustTheXref()
+    void convertsDocWithNoDefinitionTextAndWithASingleTextXrefIntoADefinitionObjectWithJustTheXref()
             throws Exception {
         String text = null;
 
@@ -82,7 +81,7 @@ public class DefinitionConverterTest {
     }
 
     @Test
-    public void convertsDocWithADefinitionTextAndWithMultipleTextXrefsIntoADefinitionObjectWithADefinitionAndXrefs()
+    void convertsDocWithADefinitionTextAndWithMultipleTextXrefsIntoADefinitionObjectWithADefinitionAndXrefs()
             throws Exception {
         String text = "This is the definition of the ontology term";
 

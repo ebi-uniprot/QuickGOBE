@@ -1,32 +1,31 @@
 package uk.ac.ebi.quickgo.client.service.converter.ontology;
-
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.ac.ebi.quickgo.client.model.ontology.OntologyTerm;
 import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
 
-import org.junit.Before;
-import org.junit.Test;
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Tests the behaviour of the {@link uk.ac.ebi.quickgo.client.service.converter.ontology.AbstractDocConverter} class
  */
-public class AbstractDocConverterTest {
+class AbstractDocConverterTest {
     private AbstractDocConverter<FakeOntologyTerm> converter;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() throws Exception {
         converter = new FakeDocConverter();
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void nullOntologyDocumentThrowsException() throws Exception {
-        converter.convert(null);
+    @Test
+    void nullOntologyDocumentThrowsException() throws Exception {
+        assertThrows(IllegalArgumentException.class, () -> converter.convert(null));
     }
 
     @Test
-    public void ontologyDocumentWithNullFieldsIsConvertedToOntologyTermWithNullFields() throws Exception {
+    void ontologyDocumentWithNullFieldsIsConvertedToOntologyTermWithNullFields() throws Exception {
         OntologyDocument emptyDoc = new OntologyDocument();
 
         FakeOntologyTerm term = converter.convert(emptyDoc);
@@ -35,7 +34,7 @@ public class AbstractDocConverterTest {
     }
 
     @Test
-    public void ontologyDocumentWithPopulatedFieldsIsConvertedToOntologyTermWithPopulatedFields() throws Exception {
+    void ontologyDocumentWithPopulatedFieldsIsConvertedToOntologyTermWithPopulatedFields() throws Exception {
         String id = "id";
         String name = "name";
         boolean isObsolete = true;

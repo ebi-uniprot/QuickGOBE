@@ -8,7 +8,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 import org.springframework.test.web.servlet.ResultActions;
 
 import static java.util.Arrays.asList;
@@ -30,7 +31,7 @@ import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.*;
  * Created 02/11/16
  * @author Edd
  */
-public class FilterAnnotationByGORESTIT extends AbstractFilterAnnotationByOntologyRESTIT {
+class FilterAnnotationByGORESTIT extends AbstractFilterAnnotationByOntologyRESTIT {
     private static final String GO_DESCENDANTS_RESOURCE_FORMAT = "/ontology/go/terms/%s/descendants?relations=%s";
     private static final String GO_SLIM_RESOURCE_FORMAT = "/ontology/go/slim?slimsToIds=%s&relations=%s";
     private static final String STATS_RESOURCE = "/annotation/stats";
@@ -48,7 +49,7 @@ public class FilterAnnotationByGORESTIT extends AbstractFilterAnnotationByOntolo
 
     // slimming tests (which is GO specific)
     @Test
-    public void slimFilterThatSlimsToItself() throws Exception {
+    void slimFilterThatSlimsToItself() throws Exception {
         annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(1), ontologyId(1)));
         annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(2), ontologyId(2)));
 
@@ -73,7 +74,7 @@ public class FilterAnnotationByGORESTIT extends AbstractFilterAnnotationByOntolo
     }
 
     @Test
-    public void slimFilterHasSlimStatsShown() throws Exception {
+    void slimFilterHasSlimStatsShown() throws Exception {
         annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(1), ontologyId(1)));
         annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(2), ontologyId(2)));
 
@@ -96,7 +97,7 @@ public class FilterAnnotationByGORESTIT extends AbstractFilterAnnotationByOntolo
     }
 
     @Test
-    public void slimFilterFor1TermWith1Slim() throws Exception {
+    void slimFilterFor1TermWith1Slim() throws Exception {
         annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(1), ontologyId(1)));
         annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(2), ontologyId(2)));
         annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(3), ontologyId(3)));
@@ -119,7 +120,7 @@ public class FilterAnnotationByGORESTIT extends AbstractFilterAnnotationByOntolo
     }
 
     @Test
-    public void slimFilterFor1TermWith2Slims() throws Exception {
+    void slimFilterFor1TermWith2Slims() throws Exception {
         annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(1), ontologyId(1)));
         annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(2), ontologyId(2)));
         annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(3), ontologyId(3)));
@@ -147,7 +148,7 @@ public class FilterAnnotationByGORESTIT extends AbstractFilterAnnotationByOntolo
     }
 
     @Test
-    public void slimFilterFor2TermsWith1Slim() throws Exception {
+    void slimFilterFor2TermsWith1Slim() throws Exception {
         annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(1), ontologyId(1)));
         annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(2), ontologyId(2)));
         annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(3), ontologyId(3)));
@@ -175,7 +176,7 @@ public class FilterAnnotationByGORESTIT extends AbstractFilterAnnotationByOntolo
     }
 
     @Test
-    public void slimFilterFor2TermsWith2Slims() throws Exception {
+    void slimFilterFor2TermsWith2Slims() throws Exception {
         annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(1), ontologyId(1)));
         annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(2), ontologyId(2)));
         annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(3), ontologyId(3)));
@@ -207,7 +208,7 @@ public class FilterAnnotationByGORESTIT extends AbstractFilterAnnotationByOntolo
     }
 
     @Test
-    public void wrongResourcePathForSlimCausesErrorMessage() throws Exception {
+    void wrongResourcePathForSlimCausesErrorMessage() throws Exception {
         annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(1), ontologyId(1)));
         annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(2), ontologyId(2)));
 
@@ -223,7 +224,7 @@ public class FilterAnnotationByGORESTIT extends AbstractFilterAnnotationByOntolo
     }
 
     @Test
-    public void fetchTimeoutForSlimFilteringCauses500() throws Exception {
+    void fetchTimeoutForSlimFilteringCauses500() throws Exception {
         annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(1), ontologyId(1)));
         annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(2), ontologyId(2)));
 
@@ -241,7 +242,7 @@ public class FilterAnnotationByGORESTIT extends AbstractFilterAnnotationByOntolo
     }
 
     @Test
-    public void serverErrorForSlimFilteringCauses500() throws Exception {
+    void serverErrorForSlimFilteringCauses500() throws Exception {
         annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(1), ontologyId(1)));
         annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(2), ontologyId(2)));
 
@@ -259,7 +260,7 @@ public class FilterAnnotationByGORESTIT extends AbstractFilterAnnotationByOntolo
     }
 
     @Test
-    public void badRequestForSlimFilteringCauses500() throws Exception {
+    void badRequestForSlimFilteringCauses500() throws Exception {
         annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(1), ontologyId(1)));
         annotationRepository.save(createAnnotationDocWithId(IdGeneratorUtil.createGPId(2), ontologyId(2)));
 

@@ -3,9 +3,7 @@ package uk.ac.ebi.quickgo.annotation.validation.loader;
 import uk.ac.ebi.quickgo.annotation.validation.model.DBXRefEntity;
 
 import java.util.regex.Pattern;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.file.transform.DefaultFieldSet;
 import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.validation.BindException;
@@ -19,7 +17,7 @@ import static org.hamcrest.Matchers.*;
  * Time: 16:17
  * Created with IntelliJ IDEA.
  */
-public class StringToDbXrefEntityMapperTest {
+class StringToDbXrefEntityMapperTest {
 
     private static final String[] VALID_ROW = {"AGI_LocusCode","SO:0000704","gene",
             "A[Tt][MmCc0-5][Gg][0-9]{5}(\\).[0-9]{1})?",
@@ -27,11 +25,8 @@ public class StringToDbXrefEntityMapperTest {
 
     private final Pattern patternInstance = Pattern.compile(VALID_ROW[3]);
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-
     @Test
-    public void mappingIsSuccessful() throws BindException {
+    void mappingIsSuccessful() throws BindException {
         FieldSet validFieldSet = new DefaultFieldSet(VALID_ROW);
         StringToDbXrefEntityMapper mapper = new StringToDbXrefEntityMapper();
         DBXRefEntity instance = mapper.mapFieldSet(validFieldSet);
@@ -43,7 +38,7 @@ public class StringToDbXrefEntityMapperTest {
     }
 
     @Test
-    public void mappingIsSuccessfulWhenDatabaseIsEmpty() throws BindException {
+    void mappingIsSuccessfulWhenDatabaseIsEmpty() throws BindException {
         String[] empty1 = {"", VALID_ROW[1], VALID_ROW[2], VALID_ROW[3], VALID_ROW[4]};
         FieldSet validFieldSet = new DefaultFieldSet(empty1);
         StringToDbXrefEntityMapper mapper = new StringToDbXrefEntityMapper();
@@ -56,7 +51,7 @@ public class StringToDbXrefEntityMapperTest {
     }
 
     @Test
-    public void mappingIsSuccessfulWhenEntityTypeNameIsEmpty() throws BindException {
+    void mappingIsSuccessfulWhenEntityTypeNameIsEmpty() throws BindException {
         String[] empty1 = {VALID_ROW[0], VALID_ROW[1], "", VALID_ROW[3], VALID_ROW[4]};
         FieldSet validFieldSet = new DefaultFieldSet(empty1);
         StringToDbXrefEntityMapper mapper = new StringToDbXrefEntityMapper();
@@ -69,7 +64,7 @@ public class StringToDbXrefEntityMapperTest {
     }
 
     @Test
-    public void mappingIsSuccessfulWhenEntityTypeIsEmpty() throws BindException {
+    void mappingIsSuccessfulWhenEntityTypeIsEmpty() throws BindException {
         String[] empty1 = {VALID_ROW[0], "", VALID_ROW[2], VALID_ROW[3], VALID_ROW[4]};
         FieldSet validFieldSet = new DefaultFieldSet(empty1);
         StringToDbXrefEntityMapper mapper = new StringToDbXrefEntityMapper();
@@ -82,7 +77,7 @@ public class StringToDbXrefEntityMapperTest {
     }
 
     @Test
-    public void mappingIsSuccessfulWhenDatabaseUrlIsEmpty() throws BindException {
+    void mappingIsSuccessfulWhenDatabaseUrlIsEmpty() throws BindException {
         String[] empty1 = {VALID_ROW[0], VALID_ROW[1], VALID_ROW[2], VALID_ROW[3], ""};
         FieldSet validFieldSet = new DefaultFieldSet(empty1);
         StringToDbXrefEntityMapper mapper = new StringToDbXrefEntityMapper();

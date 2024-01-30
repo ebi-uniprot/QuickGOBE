@@ -1,10 +1,10 @@
 package uk.ac.ebi.quickgo.ontology.traversal;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.ac.ebi.quickgo.ontology.common.OntologyType;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
@@ -17,6 +17,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.ac.ebi.quickgo.ontology.common.OntologyType.ECO;
 import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.*;
 import static uk.ac.ebi.quickgo.ontology.traversal.TermSlimmer.DEFAULT_RELATION_TYPES;
@@ -28,8 +29,8 @@ import static uk.ac.ebi.quickgo.ontology.traversal.TermSlimmer.DEFAULT_RELATION_
  * Created 09/10/17
  * @author Edd
  */
-@RunWith(MockitoJUnitRunner.class)
-public class TermSlimmerTest {
+@ExtendWith(MockitoExtension.class)
+class TermSlimmerTest {
     public static final String GO = "GO";
     private static final String CELLULAR_COMPONENT = "GO:0005575";
     private static final String CELL = "GO:0005623";
@@ -47,51 +48,51 @@ public class TermSlimmerTest {
     private List<String> mockSlimSet;
     private OntologyGraphTraversal ontology;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         OntologyGraph ontology = new OntologyGraph();
         ontology.addRelationships(createRelationships());
         this.ontology = ontology;
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void nullOntologyTypeCausesCreationException() {
-        TermSlimmer.createSlims(null, mockOntologyGraph, mockSlimSet);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void nullOntologyCausesCreationException() {
-        TermSlimmer.createSlims(OntologyType.GO, null, mockSlimSet);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void nullSlimsCausesCreationException() {
-        TermSlimmer.createSlims(OntologyType.GO, mockOntologyGraph, null);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void emptySlimsCausesCreationException() {
-        TermSlimmer.createSlims(OntologyType.GO, mockOntologyGraph, emptyList());
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void unsupportedOntologyTypeCausesCreationException() {
-        TermSlimmer.createSlims(ECO, mockOntologyGraph, mockSlimSet);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void nullRelationshipsCauseCreationException() {
-        TermSlimmer.createSlims(OntologyType.GO, mockOntologyGraph, mockSlimSet, null);
+    @Test
+    void nullOntologyTypeCausesCreationException() {
+        assertThrows(IllegalArgumentException.class, () -> TermSlimmer.createSlims(null, mockOntologyGraph, mockSlimSet));
     }
 
     @Test
-    public void noRelationshipsResultsInDefaultsUsed() {
+    void nullOntologyCausesCreationException() {
+        assertThrows(IllegalArgumentException.class, () -> TermSlimmer.createSlims(OntologyType.GO, null, mockSlimSet));
+    }
+
+    @Test
+    void nullSlimsCausesCreationException() {
+        assertThrows(IllegalArgumentException.class, () -> TermSlimmer.createSlims(OntologyType.GO, mockOntologyGraph, null));
+    }
+
+    @Test
+    void emptySlimsCausesCreationException() {
+        assertThrows(IllegalArgumentException.class, () -> TermSlimmer.createSlims(OntologyType.GO, mockOntologyGraph, emptyList()));
+    }
+
+    @Test
+    void unsupportedOntologyTypeCausesCreationException() {
+        assertThrows(IllegalArgumentException.class, () -> TermSlimmer.createSlims(ECO, mockOntologyGraph, mockSlimSet));
+    }
+
+    @Test
+    void nullRelationshipsCauseCreationException() {
+        assertThrows(IllegalArgumentException.class, () -> TermSlimmer.createSlims(OntologyType.GO, mockOntologyGraph, mockSlimSet, null));
+    }
+
+    @Test
+    void noRelationshipsResultsInDefaultsUsed() {
         TermSlimmer termSlimmer = TermSlimmer.createSlims(OntologyType.GO, ontology, singletonList(CELLULAR_COMPONENT));
         assertThat(termSlimmer.getRelationTypes(), is(DEFAULT_RELATION_TYPES));
     }
 
     @Test
-    public void nonEmptyRelationshipsAreUsed() {
+    void nonEmptyRelationshipsAreUsed() {
         OntologyRelationType[] requestedRelationships = new OntologyRelationType[]{HAS_PART, CAPABLE_OF_PART_OF};
         TermSlimmer termSlimmer = TermSlimmer.createSlims(OntologyType.GO, ontology, singletonList(CELLULAR_COMPONENT),
                 requestedRelationships);
@@ -99,7 +100,7 @@ public class TermSlimmerTest {
     }
 
     @Test
-    public void termsSlimToSingleTerm() {
+    void termsSlimToSingleTerm() {
         List<String> slimSetVertices = singletonList(MEMBRANE);
         TermSlimmer termSlimmer = TermSlimmer.createSlims(OntologyType.GO, ontology, slimSetVertices);
         assertThat(termSlimmer.getSlimmedTermsMap().size(), is(5));
@@ -111,7 +112,7 @@ public class TermSlimmerTest {
     }
 
     @Test
-    public void termsSlimToMultipleTerms() {
+    void termsSlimToMultipleTerms() {
         List<String> slimSetVertices = asList(CELL_PART, MEMBRANE_PART);
         TermSlimmer termSlimmer = TermSlimmer.createSlims(OntologyType.GO, ontology, slimSetVertices);
         assertThat(termSlimmer.getSlimmedTermsMap().size(), is(6));
@@ -124,7 +125,7 @@ public class TermSlimmerTest {
     }
 
     @Test
-    public void slimmedTermsAreHidden() {
+    void slimmedTermsAreHidden() {
         List<String> slimSetVertices = asList(CELL_PART, MEMBRANE_PART, PLASMA_MEMBRANE_PART);
         TermSlimmer termSlimmer = TermSlimmer.createSlims(OntologyType.GO, ontology, slimSetVertices);
         assertThat(termSlimmer.getSlimmedTermsMap().size(), is(6));
@@ -137,13 +138,13 @@ public class TermSlimmerTest {
     }
 
     @Test
-    public void termInOntologySlimsToNothing() {
+    void termInOntologySlimsToNothing() {
         TermSlimmer termSlimmer = TermSlimmer.createSlims(OntologyType.GO, ontology, singletonList(CELL));
         assertThat(termSlimmer.findSlimmedToTerms(CELLULAR_COMPONENT), is(empty()));
     }
 
     @Test
-    public void termNotInOntologySlimsToNothing() {
+    void termNotInOntologySlimsToNothing() {
         TermSlimmer termSlimmer = TermSlimmer.createSlims(OntologyType.GO, ontology, singletonList(CELLULAR_COMPONENT));
         assertThat(termSlimmer.findSlimmedToTerms("XXXXXX"), is(empty()));
     }

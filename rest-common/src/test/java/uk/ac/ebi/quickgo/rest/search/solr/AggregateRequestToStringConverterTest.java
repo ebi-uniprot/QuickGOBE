@@ -3,10 +3,8 @@ package uk.ac.ebi.quickgo.rest.search.solr;
 import uk.ac.ebi.quickgo.rest.search.AggregateFunction;
 import uk.ac.ebi.quickgo.rest.search.query.AggregateRequest;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.CoreMatchers.endsWith;
 import static org.hamcrest.CoreMatchers.is;
@@ -14,6 +12,8 @@ import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.core.IsNot.not;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.ac.ebi.quickgo.rest.search.query.AggregateRequest.DEFAULT_AGGREGATE_LIMIT;
 import static uk.ac.ebi.quickgo.rest.search.solr.AggregateToStringConverter.NUM_BUCKETS_TRUE;
 import static uk.ac.ebi.quickgo.rest.search.solr.AggregateToStringConverter.convertToSolrAggregation;
@@ -25,7 +25,7 @@ import static uk.ac.ebi.quickgo.rest.search.solr.SolrAggregationHelper.*;
 /**
  * Tests the behaviour of the {@link AggregateToStringConverter} class.
  */
-public class AggregateRequestToStringConverterTest {
+class AggregateRequestToStringConverterTest {
     private static final AggregateFunction UNIQUE_FUNCTION = AggregateFunction.UNIQUE;
     private static final AggregateFunction COUNT_FUNCTION = AggregateFunction.COUNT;
 
@@ -33,103 +33,84 @@ public class AggregateRequestToStringConverterTest {
     private static final String ANN_ID_FIELD = "annId";
     private static final String GO_ID_TYPE = "goId";
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-
     private AggregateToStringConverter converter;
 
     private AggregateRequest aggregate;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() {
         converter = new AggregateToStringConverter();
 
         aggregate = new AggregateRequest(GLOBAL_ID);
     }
 
     @Test
-    public void nullFieldInSolrAggregationConversionThrowsException() throws Exception {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Cannot merge null or empty field");
-
-        convertToSolrAggregation(null, UNIQUE_FUNCTION);
+    void nullFieldInSolrAggregationConversionThrowsException() {
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> convertToSolrAggregation(null, UNIQUE_FUNCTION));
+        assertTrue(exception.getMessage().contains("Cannot merge null or empty field"));
     }
 
     @Test
-    public void emptyFieldInSolrAggregationConversionThrowsException() throws Exception {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Cannot merge null or empty field");
-
-        convertToSolrAggregation("", UNIQUE_FUNCTION);
+    void emptyFieldInSolrAggregationConversionThrowsException() {
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> convertToSolrAggregation("", UNIQUE_FUNCTION));
+        assertTrue(exception.getMessage().contains("Cannot merge null or empty field"));
     }
 
     @Test
-    public void nullFunctionInSolrAggregationConversionThrowsException() throws Exception {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Cannot merge null aggregation function");
-
-        convertToSolrAggregation(GP_ID_FIELD, null);
+    void nullFunctionInSolrAggregationConversionThrowsException() {
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> convertToSolrAggregation(GP_ID_FIELD, null));
+        assertTrue(exception.getMessage().contains("Cannot merge null aggregation function"));
     }
 
     @Test
-    public void fieldAndFunctionAreConvertedSuccessfully() throws Exception {
+    void fieldAndFunctionAreConvertedSuccessfully() {
         String mergedText = convertToSolrAggregation(GP_ID_FIELD, COUNT_FUNCTION);
 
         assertThat(mergedText, is("\""+COUNT_FUNCTION.getName() + "(" + GP_ID_FIELD + ")\""));
     }
 
     @Test
-    public void nullTypeThrowsExceptionWhenCreatingFacetTypeDeclaration() throws Exception {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Cannot create facet type declaration with null or empty input parameter");
-
-        createFacetType(null);
+    void nullTypeThrowsExceptionWhenCreatingFacetTypeDeclaration() {
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> createFacetType(null));
+        assertTrue(exception.getMessage().contains("Cannot create facet type declaration with null or empty input parameter"));
     }
 
     @Test
-    public void emptyTypeThrowsExceptionWhenCreatingFacetTypeDeclaration() throws Exception {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Cannot create facet type declaration with null or empty input parameter");
-
-        createFacetType("");
+    void emptyTypeThrowsExceptionWhenCreatingFacetTypeDeclaration() {
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> createFacetType(""));
+        assertTrue(exception.getMessage().contains("Cannot create facet type declaration with null or empty input parameter"));
     }
 
     @Test
-    public void termFacetTypeCreatingFacetTypeDeclarationSuccessfully() throws Exception {
+    void termFacetTypeCreatingFacetTypeDeclarationSuccessfully() {
         assertThat(createFacetType(FACET_TYPE_TERM), is("type:" + FACET_TYPE_TERM));
     }
 
     @Test
-    public void nullFacetFieldThrowsExceptionWhenCreatingFacetFieldDeclaration() throws Exception {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Cannot create facet field declaration with null or empty input parameter");
-
-        createFacetField(null);
+    void nullFacetFieldThrowsExceptionWhenCreatingFacetFieldDeclaration() {
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> createFacetField(null));
+        assertTrue(exception.getMessage().contains("Cannot create facet field declaration with null or empty input parameter"));
     }
 
     @Test
-    public void emptyFacetFieldThrowsExceptionWhenCreatingFacetFieldDeclaration() throws Exception {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Cannot create facet field declaration with null or empty input parameter");
-
-        createFacetField("");
+    void emptyFacetFieldThrowsExceptionWhenCreatingFacetFieldDeclaration() {
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> createFacetField(""));
+        assertTrue(exception.getMessage().contains("Cannot create facet field declaration with null or empty input parameter"));
     }
 
     @Test
-    public void gpIdFacetFieldCreatingFacetTypeDeclarationSuccessfully() throws Exception {
+    void gpIdFacetFieldCreatingFacetTypeDeclarationSuccessfully() {
         assertThat(createFacetField(GP_ID_FIELD), is("field:" + GP_ID_FIELD));
     }
 
     @Test
-    public void nullAggregateThrowsException() throws Exception {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("AggregateRequest to convert cannot be null");
-
-        converter.convert(null);
+    void nullAggregateThrowsException() {
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> converter.convert(null));
+        assertTrue(exception.getMessage().contains("AggregateRequest to convert cannot be null"));
     }
 
     @Test
-    public void aggregateWith1AggregationFieldIsConvertedInto1SolrFunction() throws Exception {
+    void aggregateWith1AggregationFieldIsConvertedInto1SolrFunction() {
         aggregate.addField(GP_ID_FIELD, UNIQUE_FUNCTION);
 
         String convertedAggregation = converter.convert(aggregate);
@@ -138,7 +119,7 @@ public class AggregateRequestToStringConverterTest {
     }
 
     @Test
-    public void aggregateWith2AggregationFieldsIsConvertedInto2SolrFunctions() throws Exception {
+    void aggregateWith2AggregationFieldsIsConvertedInto2SolrFunctions() {
         aggregate.addField(GP_ID_FIELD, UNIQUE_FUNCTION);
         aggregate.addField(ANN_ID_FIELD, COUNT_FUNCTION);
 
@@ -149,7 +130,7 @@ public class AggregateRequestToStringConverterTest {
     }
 
     @Test
-    public void aggregateWith2AggregationFieldsIsConvertedInto2SolrFunctionsSeparatedCorrectly() throws Exception {
+    void aggregateWith2AggregationFieldsIsConvertedInto2SolrFunctionsSeparatedCorrectly() {
         aggregate.addField(GP_ID_FIELD, UNIQUE_FUNCTION);
         aggregate.addField(ANN_ID_FIELD, COUNT_FUNCTION);
 
@@ -161,7 +142,7 @@ public class AggregateRequestToStringConverterTest {
     }
 
     @Test
-    public void aggregateWithNestedAggregateIsConvertedIntoSolrSubFacet() throws Exception {
+    void aggregateWithNestedAggregateIsConvertedIntoSolrSubFacet() {
         AggregateRequest goIDAggregate = new AggregateRequest(GO_ID_TYPE);
 
         aggregate.addNestedAggregate(goIDAggregate);
@@ -175,7 +156,7 @@ public class AggregateRequestToStringConverterTest {
     }
 
     @Test
-    public void aggregateWithNestedAggregateAndLimitIsConvertedIntoSolrSubFacet() {
+    void aggregateWithNestedAggregateAndLimitIsConvertedIntoSolrSubFacet() {
         int limit = 200;
         AggregateRequest goIDAggregate = new AggregateRequest(GO_ID_TYPE, limit);
 
@@ -191,7 +172,7 @@ public class AggregateRequestToStringConverterTest {
     }
 
     @Test
-    public void aggregateWithNestedAggregateAndNoLimitIsConvertedIntoSolrSubFacet() {
+    void aggregateWithNestedAggregateAndNoLimitIsConvertedIntoSolrSubFacet() {
         AggregateRequest goIDAggregate = new AggregateRequest(GO_ID_TYPE);
 
         aggregate.addNestedAggregate(goIDAggregate);
@@ -206,7 +187,7 @@ public class AggregateRequestToStringConverterTest {
     }
 
     @Test
-    public void aggregateWithNestedAggregateWithFunctionsOnFieldsIsConvertedIntoSolrSubFacet() throws Exception {
+    void aggregateWithNestedAggregateWithFunctionsOnFieldsIsConvertedIntoSolrSubFacet() {
         AggregateRequest goIDAggregate = new AggregateRequest(GO_ID_TYPE);
         goIDAggregate.addField(GO_ID_TYPE, COUNT_FUNCTION);
 

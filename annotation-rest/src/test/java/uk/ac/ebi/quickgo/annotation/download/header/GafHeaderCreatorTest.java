@@ -1,8 +1,8 @@
 package uk.ac.ebi.quickgo.annotation.download.header;
 
 import java.util.Collections;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 
@@ -16,19 +16,19 @@ import static org.mockito.Mockito.when;
  * Time: 11:41
  * Created with IntelliJ IDEA.
  */
-public class GafHeaderCreatorTest {
+class GafHeaderCreatorTest {
 
     private final OntologyHeaderInfo mockOntology = mock(OntologyHeaderInfo.class);
     private final ResponseBodyEmitter mockEmitter = mock(ResponseBodyEmitter.class);
     private final HeaderContent mockContent = mock(HeaderContent.class);
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         when(mockOntology.versions()).thenReturn(Collections.emptyList());
     }
 
     @Test
-    public void versionIsGaf() throws Exception {
+    void versionIsGaf() throws Exception {
         GafHeaderCreator gafHeaderCreator = new GafHeaderCreator(mockOntology);
 
         gafHeaderCreator.write(mockEmitter, mockContent);
@@ -37,7 +37,7 @@ public class GafHeaderCreatorTest {
     }
 
     @Test
-    public void gafGeneratedByUniprot() throws Exception {
+    void gafGeneratedByUniprot() throws Exception {
         GafHeaderCreator gafHeaderCreator = new GafHeaderCreator(mockOntology);
 
         gafHeaderCreator.write(mockEmitter, mockContent);
@@ -46,7 +46,7 @@ public class GafHeaderCreatorTest {
     }
 
     @Test
-    public void gafGeneratedDateIsTodate() throws Exception {
+    void gafGeneratedDateIsTodate() throws Exception {
         GafHeaderCreator gafHeaderCreator = new GafHeaderCreator(mockOntology);
 
         when(mockContent.getDate()).thenReturn("2021-02-03");

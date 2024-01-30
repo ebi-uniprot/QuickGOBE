@@ -1,13 +1,11 @@
 package uk.ac.ebi.quickgo.annotation.common;
 
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -21,24 +19,21 @@ import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.c
  * @author Edd
  */
 
-@RunWith(SpringJUnit4ClassRunner.class)
+// temporary data store for solr's data, which is automatically cleaned on exit
+@ExtendWith(TemporarySolrDataStore.class)
 @SpringBootTest(classes = AnnotationRepoConfig.class)
-public class AnnotationRepositoryIT {
-
-    // temporary data store for solr's data, which is automatically cleaned on exit
-    @ClassRule
-    public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
+class AnnotationRepositoryIT {
 
     @Autowired
     private AnnotationRepository annotationRepository;
 
-    @Before
-    public void before() {
+    @BeforeEach
+    void before() {
         annotationRepository.deleteAll();
     }
 
     @Test
-    public void add1DocAndFind1Doc() {
+    void add1DocAndFind1Doc() {
         AnnotationDocument doc1 = createAnnotationDoc("A0A000");
         annotationRepository.save(doc1);
 
@@ -46,7 +41,7 @@ public class AnnotationRepositoryIT {
     }
 
     @Test
-    public void add2DocsAndFind2Docs() {
+    void add2DocsAndFind2Docs() {
         AnnotationDocument doc1 = createAnnotationDoc("A0A000");
         AnnotationDocument doc2 = createAnnotationDoc("A0A001");
 
@@ -57,7 +52,7 @@ public class AnnotationRepositoryIT {
     }
 
     @Test
-    public void add3DocsRemove1AndFind2Docs() {
+    void add3DocsRemove1AndFind2Docs() {
         AnnotationDocument doc1 = createAnnotationDoc("A0A000");
         AnnotationDocument doc2 = createAnnotationDoc("A0A001");
         AnnotationDocument doc3 = createAnnotationDoc("A0A002");
@@ -71,7 +66,7 @@ public class AnnotationRepositoryIT {
     }
 
     @Test
-    public void add2DocsAndCheckDefaultSortOrder() {
+    void add2DocsAndCheckDefaultSortOrder() {
         AnnotationDocument doc1 = createAnnotationDoc("A0A000");
         doc1.defaultSort = "5A0A000";
         AnnotationDocument doc2 = createAnnotationDoc("A0A001");

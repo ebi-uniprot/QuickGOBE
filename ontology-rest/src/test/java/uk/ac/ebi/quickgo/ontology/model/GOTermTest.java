@@ -1,11 +1,12 @@
 package uk.ac.ebi.quickgo.ontology.model;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Test behaviour of {@link GOTerm}.
@@ -13,10 +14,10 @@ import static org.hamcrest.core.Is.is;
  * Created 07/01/16
  * @author Edd
  */
-public class GOTermTest {
+class GOTermTest {
 
     @Test
-    public void stringToUsageFindsSuccessfully() {
+    void stringToUsageFindsSuccessfully() {
         GOTerm.Usage usage = GOTerm.Usage.fromFullName("Unrestricted");
         assertThat(usage, is(not(nullValue())));
 
@@ -27,8 +28,8 @@ public class GOTermTest {
         assertThat(usage, is(not(nullValue())));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void stringToUsageProducesIllegalArgumentException() {
-        GOTerm.Usage.fromFullName("SAUSAGES");
+    @Test
+    void stringToUsageProducesIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> GOTerm.Usage.fromFullName("SAUSAGES"));
     }
 }

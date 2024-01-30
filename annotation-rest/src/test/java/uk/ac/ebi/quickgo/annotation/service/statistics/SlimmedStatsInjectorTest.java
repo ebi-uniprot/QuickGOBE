@@ -1,12 +1,11 @@
 package uk.ac.ebi.quickgo.annotation.service.statistics;
-
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.ac.ebi.quickgo.annotation.model.StatisticsByType;
 import uk.ac.ebi.quickgo.annotation.model.StatisticsGroup;
 import uk.ac.ebi.quickgo.annotation.model.StatisticsValue;
 
 import java.util.*;
-import org.junit.Before;
-import org.junit.Test;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -23,7 +22,7 @@ import static uk.ac.ebi.quickgo.annotation.service.statistics.SlimmedStatsInject
  * Created 21/11/17
  * @author Edd
  */
-public class SlimmedStatsInjectorTest {
+class SlimmedStatsInjectorTest {
     private static final int TOTAL = 10;
     private static final int UNTOUCHED_HITS = 5;
     private static final String GENE_PRODUCT = "geneProduct";
@@ -36,8 +35,8 @@ public class SlimmedStatsInjectorTest {
     private StatisticsValue gpGoValue = new StatisticsValue(go(1), UNTOUCHED_HITS, TOTAL);
     private List<StatisticsGroup> initialStatsGroups;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         slimMap = new HashMap<>();
         slimStatsInjector = new SlimmedStatsInjector();
         stats = new ArrayList<>();
@@ -46,7 +45,7 @@ public class SlimmedStatsInjectorTest {
     }
 
     @Test
-    public void termSlimsToNoTerm() {
+    void termSlimsToNoTerm() {
         slimMap.put(go(1), singletonList(go(2)));
         annotationGoStatsType.addValue(new StatisticsValue(go(4444), 5, TOTAL));
         setUpStats();
@@ -59,7 +58,7 @@ public class SlimmedStatsInjectorTest {
     }
 
     @Test
-    public void termSlimsToOneTerm() {
+    void termSlimsToOneTerm() {
         slimMap.put(go(1), singletonList(go(2)));
 
         annotationGoStatsType.addValue(new StatisticsValue(go(1), 5, TOTAL));
@@ -75,7 +74,7 @@ public class SlimmedStatsInjectorTest {
     }
 
     @Test
-    public void twoTermsSlimToSameTerm() {
+    void twoTermsSlimToSameTerm() {
         slimMap.put(go(1), singletonList(go(2)));
         slimMap.put(go(2), singletonList(go(2)));
         annotationGoStatsType.addValue(new StatisticsValue(go(1), 5, TOTAL));
@@ -92,7 +91,7 @@ public class SlimmedStatsInjectorTest {
     }
 
     @Test
-    public void termSlimsToTwoTerms() {
+    void termSlimsToTwoTerms() {
         slimMap.put(go(1), asList(go(2), go(3)));
         annotationGoStatsType.addValue(new StatisticsValue(go(1), 5, TOTAL));
         setUpStats();

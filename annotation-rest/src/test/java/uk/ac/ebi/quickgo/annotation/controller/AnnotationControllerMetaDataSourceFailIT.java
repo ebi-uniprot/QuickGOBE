@@ -1,12 +1,10 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -26,11 +24,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Time: 13:53
  * Created with IntelliJ IDEA.
  */
-@RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {AnnotationREST.class})
 @WebAppConfiguration
 @TestPropertySource(locations="classpath:metadata-source-fails.properties")
-public class AnnotationControllerMetaDataSourceFailIT {
+class AnnotationControllerMetaDataSourceFailIT {
 
     private static final String RESOURCE_URL = "/annotation";
     private MockMvc mockMvc;
@@ -38,14 +35,14 @@ public class AnnotationControllerMetaDataSourceFailIT {
     @Autowired
     private WebApplicationContext webApplicationContext;
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
     }
 
     // ------------------------------- Check about information -------------------------------
     @Test
-    public void about() throws Exception {
+    void about() throws Exception {
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/about"));
         response.andDo(print())
                 .andExpect(status().isInternalServerError());

@@ -1,25 +1,25 @@
 package uk.ac.ebi.quickgo.rest.search;
-
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.ac.ebi.quickgo.common.SearchableField;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.when;
 
 /**
  * Tests the {@link StringToQuickGOQueryConverter} implementation.
  */
-@RunWith(MockitoJUnitRunner.class)
-public class StringToQuickGOQueryConverterTest {
+@ExtendWith(MockitoExtension.class)
+class StringToQuickGOQueryConverterTest {
     private static final String DEFAULT_FIELD = "text";
 
     private StringToQuickGOQueryConverter converter;
@@ -27,13 +27,13 @@ public class StringToQuickGOQueryConverterTest {
     @Mock
     private SearchableField searchableFieldMock;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp()  {
         converter = new StringToQuickGOQueryConverter(DEFAULT_FIELD, searchableFieldMock);
     }
 
     @Test
-    public void nullDefaultFieldInTwoParamConstructorThrowsException() throws Exception {
+    void nullDefaultFieldInTwoParamConstructorThrowsException()  {
         try {
             new StringToQuickGOQueryConverter(null, searchableFieldMock);
             fail();
@@ -43,7 +43,7 @@ public class StringToQuickGOQueryConverterTest {
     }
 
     @Test
-    public void nullSearchableFieldInTwoParamConstructorThrowsException() throws Exception {
+    void nullSearchableFieldInTwoParamConstructorThrowsException()  {
         try {
             new StringToQuickGOQueryConverter(DEFAULT_FIELD, null);
             fail();
@@ -53,7 +53,7 @@ public class StringToQuickGOQueryConverterTest {
     }
 
     @Test
-    public void nullSearchableFieldInSingleParamConstructorThrowsException() throws Exception {
+    void nullSearchableFieldInSingleParamConstructorThrowsException()  {
         try {
             new StringToQuickGOQueryConverter(null);
             fail();
@@ -63,7 +63,7 @@ public class StringToQuickGOQueryConverterTest {
     }
 
     @Test
-    public void convertFieldAndValueIntoQuery() throws Exception {
+    void convertFieldAndValueIntoQuery()  {
         String field = "field1";
         String value = "value1";
         String queryText = concatFieldValueIntoQuery(field, value);
@@ -78,7 +78,7 @@ public class StringToQuickGOQueryConverterTest {
     }
 
     @Test
-    public void converterWithDefaultFieldConvertsValueIntoFieldAndValueQuery() throws Exception {
+    void converterWithDefaultFieldConvertsValueIntoFieldAndValueQuery()  {
         String value = "value1";
 
         QuickGOQuery query = converter.convert(value);
@@ -89,7 +89,7 @@ public class StringToQuickGOQueryConverterTest {
     }
 
     @Test
-    public void converterWithoutDefaultFieldConvertsValueIntoValueOnlyQuery() throws Exception {
+    void converterWithoutDefaultFieldConvertsValueIntoValueOnlyQuery()  {
         converter = new StringToQuickGOQueryConverter(searchableFieldMock);
 
         String value = "value1";
@@ -102,7 +102,7 @@ public class StringToQuickGOQueryConverterTest {
     }
 
     @Test
-    public void converterWithDefaultFieldConvertsValueContainingFieldDelimiterIntoFieldAndValueQuery() throws
+    void converterWithDefaultFieldConvertsValueContainingFieldDelimiterIntoFieldAndValueQuery() throws
                                                                                                        Exception {
         String value = "va:lue1";
 
@@ -116,7 +116,7 @@ public class StringToQuickGOQueryConverterTest {
     }
 
     @Test
-    public void converterWithoutDefaultFieldConvertsValueContainingFieldDelimiterIntoValueOnlyQuery() throws
+    void converterWithoutDefaultFieldConvertsValueContainingFieldDelimiterIntoValueOnlyQuery() throws
                                                                                                        Exception {
         converter = new StringToQuickGOQueryConverter(searchableFieldMock);
 
@@ -131,16 +131,15 @@ public class StringToQuickGOQueryConverterTest {
         assertThat(query, is(equalTo(expectedQuery)));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void nullValueForQueryThrowsException() throws Exception {
-        converter.convert(null);
+    @Test
+    void nullValueForQueryThrowsException()  {
+        assertThrows(IllegalArgumentException.class, () -> converter.convert(null));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void emptyValueForQueryThrowsException() throws Exception {
+    @Test
+    void emptyValueForQueryThrowsException()  {
         String value = "";
-
-        converter.convert(value);
+        assertThrows(IllegalArgumentException.class, () -> converter.convert(value));
     }
 
     private String concatFieldValueIntoQuery(String field, String value) {

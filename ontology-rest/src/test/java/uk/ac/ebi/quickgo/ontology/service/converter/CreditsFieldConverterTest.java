@@ -1,12 +1,11 @@
 package uk.ac.ebi.quickgo.ontology.service.converter;
-
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.ac.ebi.quickgo.common.converter.FlatFieldBuilder;
 import uk.ac.ebi.quickgo.common.converter.FlatFieldLeaf;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 
 import java.util.Optional;
-import org.junit.Before;
-import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -14,16 +13,16 @@ import static org.hamcrest.Matchers.is;
 /**
  * Tests the behaviour of the {@link CreditsFieldConverter} class.
  */
-public class CreditsFieldConverterTest {
+class CreditsFieldConverterTest {
     private CreditsFieldConverter converter;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() throws Exception {
         converter = new CreditsFieldConverter();
     }
 
     @Test
-    public void convertsValidTextBasedCredit() throws Exception {
+    void convertsValidTextBasedCredit() throws Exception {
         String code = "BHF";
         String url = "http://www.ucl.ac.uk/cardiovasculargeneontology/";
 
@@ -40,7 +39,7 @@ public class CreditsFieldConverterTest {
     }
 
     @Test
-    public void returnsEmptyOptionalWhenTextBasedCreditHasWrongNumberOfFields() throws Exception {
+    void returnsEmptyOptionalWhenTextBasedCreditHasWrongNumberOfFields() throws Exception {
         String wrongTextFormatCredit = "Wrong format";
 
         Optional<OBOTerm.Credit> expectedCreditOpt = converter.apply(wrongTextFormatCredit);

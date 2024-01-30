@@ -1,13 +1,11 @@
 package uk.ac.ebi.quickgo.geneproduct.controller;
 
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -38,14 +36,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @author Tony Wardell
  * Date: 04/04/2016
  */
-@RunWith(SpringJUnit4ClassRunner.class)
+// temporary data store for solr's data, which is automatically cleaned on exit
+@ExtendWith(TemporarySolrDataStore.class)
 @SpringBootTest(classes = {GeneProductREST.class})
 @WebAppConfiguration
-public class GeneProductControllerIT {
-
-    // temporary data store for solr's data, which is automatically cleaned on exit
-    @ClassRule
-    public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
+class GeneProductControllerIT {
     private static final String RESOURCE_URL = "/geneproduct";
 
     protected static final String COMMA = ",";
@@ -67,8 +62,8 @@ public class GeneProductControllerIT {
     private String validIdsCSV;
     private List<String> validIdList;
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         geneProductRepository.deleteAll();
 
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
@@ -84,7 +79,7 @@ public class GeneProductControllerIT {
     }
 
     @Test
-    public void canRetrieveOneGeneProductById() throws Exception {
+    void canRetrieveOneGeneProductById() throws Exception {
         ResultActions response = mockMvc.perform(get(buildGeneProductURL(validId)));
 
         response.andDo(print())
@@ -94,7 +89,7 @@ public class GeneProductControllerIT {
     }
 
     @Test
-    public void canRetrieveOneGeneProductByComplexPortalId() throws Exception {
+    void canRetrieveOneGeneProductByComplexPortalId() throws Exception {
         geneProductRepository.deleteAll();
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
         List<GeneProductDocument> basicDocs = createBasicComplexPortalDocs();
@@ -108,7 +103,7 @@ public class GeneProductControllerIT {
     }
 
     @Test
-    public void canRetrieveMultiGeneProductById() throws Exception {
+    void canRetrieveMultiGeneProductById() throws Exception {
         ResultActions result = mockMvc.perform(get(buildGeneProductURL(validIdsCSV)));
 
         result.andDo(print())
@@ -123,14 +118,14 @@ public class GeneProductControllerIT {
     }
 
     @Test
-    public void finds400IfUrlIsEmpty() throws Exception {
+    void finds400IfUrlIsEmpty() throws Exception {
         mockMvc.perform(get(RESOURCE_URL + "/"))
                 .andDo(print())
                 .andExpect(status().isBadRequest());
     }
 
     @Test
-    public void finds400IfTermsIdIsEmpty() throws Exception {
+    void finds400IfTermsIdIsEmpty() throws Exception {
         mockMvc.perform(get(buildGeneProductURL("")))
                 .andDo(print())
                 .andExpect(status().isBadRequest());
@@ -138,7 +133,7 @@ public class GeneProductControllerIT {
 
 
     @Test
-    public void finds400IfIdIsInvalid() throws Exception {
+    void finds400IfIdIsInvalid() throws Exception {
         mockMvc.perform(get(buildGeneProductURL(INVALID_ID)))
                 .andDo(print())
                 .andExpect(jsonPath("$.messages", hasItem(is("Provided ID: '" + INVALID_ID + "' is invalid"))))
@@ -146,7 +141,7 @@ public class GeneProductControllerIT {
     }
 
     @Test
-    public void finds200IfNoResultsBecauseIdsDoNotExist() throws Exception {
+    void finds200IfNoResultsBecauseIdsDoNotExist() throws Exception {
         mockMvc.perform(get(buildGeneProductURL(NON_EXISTANT_ID)))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -155,7 +150,7 @@ public class GeneProductControllerIT {
     }
 
     @Test
-    public void targetSetLookUpUsingValidValueReturnsMultiGeneProduct() throws Exception {
+    void targetSetLookUpUsingValidValueReturnsMultiGeneProduct() throws Exception {
         ResultActions result = mockMvc.perform(get(buildGeneProductTargetSetURL(VALID_TARGET_SET_NAME)));
 
         result.andDo(print())
@@ -170,7 +165,7 @@ public class GeneProductControllerIT {
     }
 
     @Test
-    public void targetSetLookUpUsingInvalidValueReturnsEmptyResults() throws Exception {
+    void targetSetLookUpUsingInvalidValueReturnsEmptyResults() throws Exception {
         ResultActions result = mockMvc.perform(get(buildGeneProductTargetSetURL(NON_EXISTENT_TARGET_SET_NAME)));
         result.andDo(print())
                 .andExpect(status().isOk())
@@ -179,7 +174,7 @@ public class GeneProductControllerIT {
     }
 
     @Test
-    public void targetSetLookUpUsingEmptyStringReturnsBadRequest() throws Exception {
+    void targetSetLookUpUsingEmptyStringReturnsBadRequest() throws Exception {
         ResultActions result = mockMvc.perform(get(buildGeneProductTargetSetURL("")));
         result.andDo(print())
                 .andExpect(jsonPath("$.messages", hasItem(is("Provided ID: 'targetset' is invalid"))))

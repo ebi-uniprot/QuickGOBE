@@ -1,12 +1,11 @@
 package uk.ac.ebi.quickgo.rest.search.results.transformer;
-
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.ac.ebi.quickgo.rest.comm.FilterContext;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -17,8 +16,8 @@ import static org.mockito.Mockito.when;
  * Created 12/08/16
  * @author Edd
  */
-@RunWith(MockitoJUnitRunner.class)
-public class ResultTransformerChainTest {
+@ExtendWith(MockitoExtension.class)
+class ResultTransformerChainTest {
 
     @Mock
     private ResultTransformer<FakeResult> transformer1;
@@ -32,13 +31,13 @@ public class ResultTransformerChainTest {
     private ResultTransformerChain<FakeResult> transformerChain;
     private FakeResult originalResult;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         transformerChain = new ResultTransformerChain<>();
     }
 
     @Test
-    public void transformationOfEmptyResultChainReturnsOriginal() {
+    void transformationOfEmptyResultChainReturnsOriginal() {
         originalResult = new FakeResult("hello");
 
         FakeResult transformedResult = transformerChain.applyTransformations(originalResult, context);
@@ -47,7 +46,7 @@ public class ResultTransformerChainTest {
     }
 
     @Test
-    public void transformationWithOneTransformerReturnsTransformedResult() {
+    void transformationWithOneTransformerReturnsTransformedResult() {
         originalResult = new FakeResult("hello");
 
         FakeResult transformationResult1 = new FakeResult("transformationResult1");
@@ -60,7 +59,7 @@ public class ResultTransformerChainTest {
     }
 
     @Test
-    public void transformationWithTwoTransformersReturnsTransformedResult() {
+    void transformationWithTwoTransformersReturnsTransformedResult() {
         originalResult = new FakeResult("hello");
 
         FakeResult transformationResult1 = new FakeResult("transformationResult1");

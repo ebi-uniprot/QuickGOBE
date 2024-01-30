@@ -2,15 +2,13 @@ package uk.ac.ebi.quickgo.annotation.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.servlet.MockMvc;
@@ -63,14 +61,10 @@ import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.SELECT_ALL_WHERE_
  * Time: 14:21
  * Created with IntelliJ IDEA.
  */
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(TemporarySolrDataStore.class)
 @SpringBootTest(classes = {AnnotationREST.class})
 @WebAppConfiguration
-public class AnnotationControllerIT {
-
-    // temporary data store for solr's data, which is automatically cleaned on exit
-    @ClassRule
-    public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
+class AnnotationControllerIT {
     public static final String DATE_STRING_FORMAT = "%04d%02d%02d";
     public static final String EXACT = "exact";
     public static final String DESCENDANTS = "descendants";
@@ -96,8 +90,8 @@ public class AnnotationControllerIT {
     @Autowired
     private AnnotationRepository repository;
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         repository.deleteAll();
 
         mockMvc = MockMvcBuilders.
@@ -109,7 +103,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void annotationsReturnedInDefaultSortingOrder() throws Exception {
+    void annotationsReturnedInDefaultSortingOrder() throws Exception {
         repository.deleteAll();
         String geneProductId1 = "A0A000";
         String geneProductId2 = "CPX-102";
@@ -136,7 +130,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void whenDefaultSortFieldIsSame_annotationsReturnedInDefaultOrderWrittenToRepository() throws Exception {
+    void whenDefaultSortFieldIsSame_annotationsReturnedInDefaultOrderWrittenToRepository() throws Exception {
         repository.deleteAll();
         String geneProductId1 = "A0A000";
         String geneProductId2 = "CPX-102";
@@ -168,7 +162,7 @@ public class AnnotationControllerIT {
 
     // ASSIGNED BY
     @Test
-    public void lookupAnnotationFilterByAssignedBySuccessfully() throws Exception {
+    void lookupAnnotationFilterByAssignedBySuccessfully() throws Exception {
         String geneProductId = "P99999";
         String assignedBy = "ASPGD";
 
@@ -187,7 +181,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void lookupAnnotationFilterByMultipleAssignedBySuccessfully() throws Exception {
+    void lookupAnnotationFilterByMultipleAssignedBySuccessfully() throws Exception {
         String geneProductId1 = "P99999";
         String assignedBy1 = "ASPGD";
 
@@ -211,7 +205,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void lookupAnnotationFilterByRepetitionOfParmsSuccessfully() throws Exception {
+    void lookupAnnotationFilterByRepetitionOfParmsSuccessfully() throws Exception {
         String geneProductId1 = "P99999";
         String assignedBy1 = "ASPGD";
 
@@ -238,7 +232,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void lookupAnnotationFilterByInvalidAssignedBy() throws Exception {
+    void lookupAnnotationFilterByInvalidAssignedBy() throws Exception {
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(ASSIGNED_BY_PARAM.getName(), MISSING_ASSIGNED_BY));
 
@@ -248,7 +242,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void lookupAnnotationFilterByMultipleAssignedByOneCorrectAndOneUnavailable() throws Exception {
+    void lookupAnnotationFilterByMultipleAssignedByOneCorrectAndOneUnavailable() throws Exception {
         String geneProductId = "P99999";
         String assignedBy = "ASPGD";
 
@@ -268,7 +262,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void invalidAssignedByThrowsAnError() throws Exception {
+    void invalidAssignedByThrowsAnError() throws Exception {
         String invalidAssignedBy = "_ASPGD";
 
         ResultActions response = mockMvc.perform(
@@ -280,7 +274,7 @@ public class AnnotationControllerIT {
 
     // TAXON ID
     @Test
-    public void lookupAnnotationFilterByTaxonIdSuccessfully() throws Exception {
+    void lookupAnnotationFilterByTaxonIdSuccessfully() throws Exception {
         String geneProductId = "P99999";
         int taxonId = 2;
 
@@ -302,7 +296,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void lookupAnnotationFilterByMultipleTaxonIdsSuccessfully() throws Exception {
+    void lookupAnnotationFilterByMultipleTaxonIdsSuccessfully() throws Exception {
         String geneProductId1 = "P99999";
         int taxonId1 = 2;
 
@@ -331,7 +325,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void lookupWhereTaxonIdIsZeroWillNotShowTaxonIdBecauseThisMeansInvalid() throws Exception {
+    void lookupWhereTaxonIdIsZeroWillNotShowTaxonIdBecauseThisMeansInvalid() throws Exception {
         String geneProductId = "P99999";
         int taxonId = 0;
 
@@ -351,7 +345,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterByMissingTaxonIdFindsNothingSuccessfully() throws Exception {
+    void filterByMissingTaxonIdFindsNothingSuccessfully() throws Exception {
         int desiredTaxonId = 999999;
 
         String geneProductId = "P99999";
@@ -371,7 +365,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void invalidTaxIdThrowsError() throws Exception {
+    void invalidTaxIdThrowsError() throws Exception {
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search")
                         .param(TAXON_ID_PARAM.getName(), "-2")
@@ -383,7 +377,7 @@ public class AnnotationControllerIT {
 
     // -- taxon descendant filtering
     @Test
-    public void filterByTaxonAncestorSuccessfully() throws Exception {
+    void filterByTaxonAncestorSuccessfully() throws Exception {
         int taxonId = 3;
         int parentTaxonId = 4;
         int grandParentTaxonId = 5;
@@ -409,7 +403,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterByTaxonAncestorsSuccessfully() throws Exception {
+    void filterByTaxonAncestorsSuccessfully() throws Exception {
         int taxonId1 = 3;
         int parentTaxonId1 = 4;
         int grandParentTaxonId1 = 5;
@@ -454,7 +448,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterByMissingTaxonAncestorFindsNothingSuccessfully() throws Exception {
+    void filterByMissingTaxonAncestorFindsNothingSuccessfully() throws Exception {
         int desiredTaxonId = 99999999;
         int taxonId = 3;
         int parentTaxonId = 4;
@@ -476,7 +470,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void invalidTaxIdWithDescendantsThrowsError() throws Exception {
+    void invalidTaxIdWithDescendantsThrowsError() throws Exception {
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search")
                         .param(TAXON_ID_PARAM.getName(), "-2")
@@ -488,7 +482,7 @@ public class AnnotationControllerIT {
 
     //---------- GoEvidence related tests.
     @Test
-    public void filterAnnotationsByGoEvidenceCodeSuccessfully() throws Exception {
+    void filterAnnotationsByGoEvidenceCodeSuccessfully() throws Exception {
         String goEvidenceCode = "IEA";
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(GO_EVIDENCE_PARAM.getName(), goEvidenceCode));
@@ -501,7 +495,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterAnnotationsByLowercaseGoEvidenceCodeSuccessfully() throws Exception {
+    void filterAnnotationsByLowercaseGoEvidenceCodeSuccessfully() throws Exception {
         String goEvidenceCode = "iea";
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(GO_EVIDENCE_PARAM.getName(), goEvidenceCode));
@@ -514,7 +508,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterAnnotationsByNonExistentGoEvidenceCodeReturnsNothing() throws Exception {
+    void filterAnnotationsByNonExistentGoEvidenceCodeReturnsNothing() throws Exception {
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(GO_EVIDENCE_PARAM.getName(), "ZZZ"));
 
@@ -524,7 +518,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterAnnotationsUsingMultipleGoEvidenceCodesSuccessfully() throws Exception {
+    void filterAnnotationsUsingMultipleGoEvidenceCodesSuccessfully() throws Exception {
         String goEvidenceCode = "IEA";
 
         String goEvidenceCode1 = "BSS";
@@ -550,7 +544,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void invalidGoEvidenceThrowsException() throws Exception {
+    void invalidGoEvidenceThrowsException() throws Exception {
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(GO_EVIDENCE_PARAM.getName(), "BlahBlah"));
 
@@ -561,7 +555,7 @@ public class AnnotationControllerIT {
 
     //---------- Qualifier related tests.
     @Test
-    public void successfullyLookupAnnotationsByQualifier() throws Exception {
+    void successfullyLookupAnnotationsByQualifier() throws Exception {
         String qualifier = "enables";
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(QUALIFIER_PARAM.getName(), qualifier));
@@ -576,7 +570,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void successfullyLookupAnnotationsByNegatedQualifier() throws Exception {
+    void successfullyLookupAnnotationsByNegatedQualifier() throws Exception {
         String qualifier = "not|enables";
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A123");
         doc.qualifier = qualifier;
@@ -595,7 +589,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void failToFindAnnotationsWhenQualifierDoesntExist() throws Exception {
+    void failToFindAnnotationsWhenQualifierDoesntExist() throws Exception {
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(QUALIFIER_PARAM.getName(), "peeled"));
 
@@ -608,7 +602,7 @@ public class AnnotationControllerIT {
 
     //---------- Search by Gene Product ID tests.
     @Test
-    public void filterByGeneProductIDSuccessfully() throws Exception {
+    void filterByGeneProductIDSuccessfully() throws Exception {
         String geneProductId = "A1E959";
         String fullGeneProductId = "UniProtKB:" + geneProductId;
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc(fullGeneProductId);
@@ -626,7 +620,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterByFullyQualifiedUniProtGeneProductIDSuccessfully() throws Exception {
+    void filterByFullyQualifiedUniProtGeneProductIDSuccessfully() throws Exception {
         String geneProductId = "UniProtKB:A1E959";
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc(geneProductId);
         repository.save(doc);
@@ -643,7 +637,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterByPartiallyQualifiedGeneProductIDSuccessfully() throws Exception {
+    void filterByPartiallyQualifiedGeneProductIDSuccessfully() throws Exception {
         String db = "UniProtKB";
         String id = "A1E959";
         String geneProductId = db + ":" + id;
@@ -663,7 +657,7 @@ public class AnnotationControllerIT {
 
     // -- filter gene product ids of the form UniProtKB:P12345-VAR_12345 or UniProtKB:P12345-PRO_12345, etc
     @Test
-    public void findGeneProductVarById() throws Exception {
+    void findGeneProductVarById() throws Exception {
         String db = "UniProtKB";
         String id = "P05067";
         String var = "VAR_000023";
@@ -683,7 +677,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void findTwoGeneProductsIncludingOneWithVarById() throws Exception {
+    void findTwoGeneProductsIncludingOneWithVarById() throws Exception {
         String db = "UniProtKB";
         String id = "P05067";
         String var = "VAR_000023";
@@ -706,7 +700,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void findGeneProductVarByDbAndId() throws Exception {
+    void findGeneProductVarByDbAndId() throws Exception {
         String db = "UniProtKB";
         String id = "P05067";
         String var = "VAR_000023";
@@ -726,7 +720,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void findGeneProductVarByDbIdAndVar() throws Exception {
+    void findGeneProductVarByDbIdAndVar() throws Exception {
         String db = "UniProtKB";
         String id = "P05068";
         String var = "VAR_000023";
@@ -746,7 +740,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void findGeneProductVarByIdAndVar() throws Exception {
+    void findGeneProductVarByIdAndVar() throws Exception {
         String db = "UniProtKB";
         String id = "P05067";
         String var = "VAR_000023";
@@ -770,7 +764,7 @@ public class AnnotationControllerIT {
 
     // -- filter gene product ids of the form UniProtKB:P12345-2
     @Test
-    public void findGeneProductIsoformById() throws Exception {
+    void findGeneProductIsoformById() throws Exception {
         String db = "UniProtKB";
         String id = "P05067";
         String iso = "-2";
@@ -790,7 +784,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void findGeneProductIsoformByDbAndId() throws Exception {
+    void findGeneProductIsoformByDbAndId() throws Exception {
         String db = "UniProtKB";
         String id = "P05067";
         String iso = "-2";
@@ -811,7 +805,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void findGeneProductIsoformByIdAndIsoform() throws Exception {
+    void findGeneProductIsoformByIdAndIsoform() throws Exception {
         String db = "UniProtKB";
         String id = "P05067";
         String iso = "-2";
@@ -834,7 +828,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void findGeneProductIsoformByDbIdAndIsoform() throws Exception {
+    void findGeneProductIsoformByDbIdAndIsoform() throws Exception {
         String db = "UniProtKB";
         String id = "P05068";
         String iso = "-2";
@@ -855,7 +849,7 @@ public class AnnotationControllerIT {
 
     // -- filter gene product ids of the form UniProtKB:P12345-2:VAR_12345 -- not a valid UniProt identifier
     @Test
-    public void filteringUsingInvalidGeneProductIdCausesBadRequest() throws Exception {
+    void filteringUsingInvalidGeneProductIdCausesBadRequest() throws Exception {
         String geneProductId = "UniProtKB:P05068-2:VAR_000023";
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc(geneProductId);
         repository.save(doc);
@@ -868,7 +862,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void findIsoformEntryAndNonIsoformEntryById() throws Exception {
+    void findIsoformEntryAndNonIsoformEntryById() throws Exception {
         String id = "P05067";
         String geneProductIdWithIso = "UniProtKB:P05067-2";
         String geneProductIdWithVar = "UniProtKB:P05067-PRO_0000005211";
@@ -890,7 +884,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterByUniProtKBAndIntactAndRNACentralAndComplexPortalWithCaseInsensitivity() throws
+    void filterByUniProtKBAndIntactAndRNACentralAndComplexPortalWithCaseInsensitivity() throws
                                                                                                Exception {
         repository.deleteAll();
         String uniprotGp = "A0A000";
@@ -913,7 +907,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterByGeneProductUsingInvalidIDFailsValidation() throws Exception {
+    void filterByGeneProductUsingInvalidIDFailsValidation() throws Exception {
         String invalidGeneProductID = "99999";
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc(invalidGeneProductID);
         repository.save(doc);
@@ -925,7 +919,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterByValidIdThatDoesNotExistExpectZeroResultsButNoError() throws Exception {
+    void filterByValidIdThatDoesNotExistExpectZeroResultsButNoError() throws Exception {
         String geneProductId = "Z0Z000";
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(GENE_PRODUCT_ID_PARAM.getName(), geneProductId));
@@ -937,7 +931,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterByThreeGeneProductIdsTwoOfWhichExistToEnsureTheyAreReturned() throws Exception {
+    void filterByThreeGeneProductIdsTwoOfWhichExistToEnsureTheyAreReturned() throws Exception {
         String geneProductId = "Z0Z000";
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(GENE_PRODUCT_ID_PARAM.getName(), geneProductId)
@@ -954,7 +948,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterByGeneProductIDAndAssignedBySuccessfully() throws Exception {
+    void filterByGeneProductIDAndAssignedBySuccessfully() throws Exception {
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search")
                         .param(GENE_PRODUCT_ID_PARAM.getName(), genericDocs.get(0).geneProductId)
@@ -970,7 +964,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void idValidationTestWorksCorrectlyForGeneProductIDWithFeature() throws Exception {
+    void idValidationTestWorksCorrectlyForGeneProductIDWithFeature() throws Exception {
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search")
                         .param(GENE_PRODUCT_ID_PARAM.getName(), "P19712-PRO_0000038050"));
@@ -982,7 +976,7 @@ public class AnnotationControllerIT {
 
     //---------- Gene Ontology Id
     @Test
-    public void successfullyLookupAnnotationsByGoId() throws Exception {
+    void successfullyLookupAnnotationsByGoId() throws Exception {
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search")
                         .param(GO_ID_PARAM.getName(), AnnotationDocMocker.GO_ID)
@@ -997,7 +991,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void successfullyLookupAnnotationsByGoIdCaseInsensitive() throws Exception {
+    void successfullyLookupAnnotationsByGoIdCaseInsensitive() throws Exception {
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search")
                         .param(GO_ID_PARAM.getName(), AnnotationDocMocker.GO_ID.toLowerCase())
@@ -1012,7 +1006,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void failToFindAnnotationsWhenGoIdDoesntExist() throws Exception {
+    void failToFindAnnotationsWhenGoIdDoesntExist() throws Exception {
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search")
                         .param(GO_ID_PARAM.getName(), MISSING_GO_ID)
@@ -1025,7 +1019,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void incorrectFormattedGoIdCausesError() throws Exception {
+    void incorrectFormattedGoIdCausesError() throws Exception {
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(GO_ID_PARAM.getName(), INVALID_GO_ID));
 
@@ -1034,7 +1028,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterAnnotationsUsingSingleEvidenceCodeReturnsResults() throws Exception {
+    void filterAnnotationsUsingSingleEvidenceCodeReturnsResults() throws Exception {
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search")
                         .param(EVIDENCE_CODE_PARAM.getName(), AnnotationDocMocker.ECO_ID)
@@ -1048,7 +1042,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterAnnotationsUsingMultipleEvidenceCodesInSingleParameterProducesMixedResults() throws Exception {
+    void filterAnnotationsUsingMultipleEvidenceCodesInSingleParameterProducesMixedResults() throws Exception {
 
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("B0A000");
         doc.evidenceCode = ECO_ID2;
@@ -1073,7 +1067,7 @@ public class AnnotationControllerIT {
     //---------- EVIDENCE CODE
 
     @Test
-    public void filterAnnotationsUsingMultipleEvidenceCodesAsIndependentParametersProducesMixedResults()
+    void filterAnnotationsUsingMultipleEvidenceCodesAsIndependentParametersProducesMixedResults()
             throws Exception {
 
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("B0A000");
@@ -1097,7 +1091,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterByNonExistentEvidenceCodeReturnsZeroResults() throws Exception {
+    void filterByNonExistentEvidenceCodeReturnsZeroResults() throws Exception {
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search")
                         .param(EVIDENCE_CODE_PARAM.getName(), MISSING_ECO_ID)
@@ -1110,7 +1104,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void retrievesSecondPageOfAllEntriesRequest() throws Exception {
+    void retrievesSecondPageOfAllEntriesRequest() throws Exception {
         int totalEntries = 60;
 
         repository.deleteAll();
@@ -1133,7 +1127,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void pageRequestEqualToAvailablePagesReturns200() throws Exception {
+    void pageRequestEqualToAvailablePagesReturns200() throws Exception {
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(PAGE_PARAM.getName(), "1"));
 
@@ -1151,7 +1145,7 @@ public class AnnotationControllerIT {
     //---------- Page related tests.
 
     @Test
-    public void pageRequestOfZeroAndResultsAvailableReturns400() throws Exception {
+    void pageRequestOfZeroAndResultsAvailableReturns400() throws Exception {
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(PAGE_PARAM.getName(), "0"));
 
@@ -1160,7 +1154,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void pageRequestHigherThanAvailablePagesReturns400() throws Exception {
+    void pageRequestHigherThanAvailablePagesReturns400() throws Exception {
         repository.deleteAll();
 
         int existingPages = 4;
@@ -1177,7 +1171,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void requestingMoreResultsPerPageThanPermittedReturns400() throws Exception {
+    void requestingMoreResultsPerPageThanPermittedReturns400() throws Exception {
         repository.deleteAll();
 
         int docsNecessaryToForcePagination = MAX_ANNOTATION_PER_PAGE_RESULT + 1;
@@ -1193,7 +1187,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void pageRequestHigherThanPaginationLimitReturns400() throws Exception {
+    void pageRequestHigherThanPaginationLimitReturns400() throws Exception {
         int totalEntries = MAX_ANNOTATION_PAGE + 1;
         int pageSize = 1;
         int pageNumWhichIsTooHigh = totalEntries;
@@ -1212,7 +1206,7 @@ public class AnnotationControllerIT {
 
     //---------- withFrom related tests.
     @Test
-    public void successfulLookupWithFromForSingleId() throws Exception {
+    void successfulLookupWithFromForSingleId() throws Exception {
         ResultActions response =
                 mockMvc.perform(get(RESOURCE_URL + "/search").param(WITHFROM_PARAM.getName(), "InterPro:IPR015421"));
 
@@ -1227,7 +1221,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void successfulLookupWithFromForMultipleValues() throws Exception {
+    void successfulLookupWithFromForMultipleValues() throws Exception {
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(WITHFROM_PARAM.getName(),
                 "InterPro:IPR015421,InterPro:IPR015422"));
 
@@ -1244,7 +1238,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void searchingForUnknownWithFromCreatesError() throws Exception {
+    void searchingForUnknownWithFromCreatesError() throws Exception {
         ResultActions response =
                 mockMvc.perform(get(RESOURCE_URL + "/search").param(WITHFROM_PARAM.getName(), "XXX:54321"));
 
@@ -1253,7 +1247,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void successfulLookupWithFromUsingDatabaseNameOnly() throws Exception {
+    void successfulLookupWithFromUsingDatabaseNameOnly() throws Exception {
         ResultActions response =
                 mockMvc.perform(get(RESOURCE_URL + "/search").param(WITHFROM_PARAM.getName(), "InterPro"));
 
@@ -1270,7 +1264,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void successfulLookupWithFromUsingDatabaseIdOnly() throws Exception {
+    void successfulLookupWithFromUsingDatabaseIdOnly() throws Exception {
         ResultActions response =
                 mockMvc.perform(get(RESOURCE_URL + "/search").param(WITHFROM_PARAM.getName(), "IPR015421"));
 
@@ -1286,7 +1280,7 @@ public class AnnotationControllerIT {
     //---------- Limit related tests.
 
     @Test
-    public void limitForPageExceedsMaximumAllowed() throws Exception {
+    void limitForPageExceedsMaximumAllowed() throws Exception {
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search")
                         .param(LIMIT_PARAM.getName(), Integer.toString(MAX_ANNOTATION_PER_PAGE_RESULT+1)));
@@ -1296,7 +1290,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void limitForPageWithinMaximumAllowed() throws Exception {
+    void limitForPageWithinMaximumAllowed() throws Exception {
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(LIMIT_PARAM.getName(), Integer.toString(MAX_ANNOTATION_PER_PAGE_RESULT)));
 
@@ -1306,7 +1300,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void limitForPageThrowsErrorWhenNegative() throws Exception {
+    void limitForPageThrowsErrorWhenNegative() throws Exception {
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
                 .param(LIMIT_PARAM.getName(), "-20"));
 
@@ -1315,7 +1309,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterBySingleReferenceReturnsDocumentsThatContainTheReference() throws Exception {
+    void filterBySingleReferenceReturnsDocumentsThatContainTheReference() throws Exception {
 
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(REF_PARAM.getName(),
                 AnnotationDocMocker.REFERENCE));
@@ -1330,7 +1324,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterBySingleReferenceReturnsOnlyDocumentsThatContainTheReferenceWhenOthersExists() throws Exception {
+    void filterBySingleReferenceReturnsOnlyDocumentsThatContainTheReferenceWhenOthersExists() throws Exception {
 
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A123");
         doc.reference = "PMID:0000002";
@@ -1349,7 +1343,7 @@ public class AnnotationControllerIT {
     //----- Tests for reference ---------------------//
 
     @Test
-    public void filterByThreeReferencesReturnsDocumentsThatContainThoseReferences() throws Exception {
+    void filterByThreeReferencesReturnsDocumentsThatContainThoseReferences() throws Exception {
 
         AnnotationDocument docA = AnnotationDocMocker.createAnnotationDoc("A0A123");
         docA.reference = "PMID:0000002";
@@ -1373,7 +1367,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterByThreeIndependentReferencesReturnsDocumentsThatContainThoseReferences() throws Exception {
+    void filterByThreeIndependentReferencesReturnsDocumentsThatContainThoseReferences() throws Exception {
 
         AnnotationDocument docA = AnnotationDocMocker.createAnnotationDoc("A0A123");
         docA.reference = "PMID:0000002";
@@ -1398,7 +1392,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterByReferenceDbOnlyReturnsDocumentsWithReferencesThatStartWithThatDb() throws Exception {
+    void filterByReferenceDbOnlyReturnsDocumentsWithReferencesThatStartWithThatDb() throws Exception {
 
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(REF_PARAM.getName(), "GO_REF"));
 
@@ -1412,7 +1406,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterByReferenceDbNotAvailableInDocumentsReturnsZeroResults() throws Exception {
+    void filterByReferenceDbNotAvailableInDocumentsReturnsZeroResults() throws Exception {
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(REF_PARAM.getName(), "GO_LEFT"));
         response.andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
@@ -1420,7 +1414,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterBySingleReferenceIdReturnsDocumentsThatContainTheReferenceId() throws Exception {
+    void filterBySingleReferenceIdReturnsDocumentsThatContainTheReferenceId() throws Exception {
         AnnotationDocument docA = AnnotationDocMocker.createAnnotationDoc("A0A123");
         docA.reference = "PMID:0000002";
         repository.save(docA);
@@ -1436,7 +1430,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterByMultipleReferenceIdReturnsDocumentsThatContainTheReferenceId() throws Exception {
+    void filterByMultipleReferenceIdReturnsDocumentsThatContainTheReferenceId() throws Exception {
         AnnotationDocument docA = AnnotationDocMocker.createAnnotationDoc("A0A123");
         docA.reference = "PMID:0000002";
         repository.save(docA);
@@ -1459,7 +1453,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterByUnknownReferenceIdIsUnsuccessful() throws Exception {
+    void filterByUnknownReferenceIdIsUnsuccessful() throws Exception {
 
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(REF_PARAM.getName(), "999999"));
 
@@ -1469,7 +1463,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterByGeneProductTypeReturnsMatchingDocuments() throws Exception {
+    void filterByGeneProductTypeReturnsMatchingDocuments() throws Exception {
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(GENE_PRODUCT_TYPE_PARAM.getName(),
                 "protein"));
 
@@ -1481,7 +1475,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterBySingleGeneProductTypeOfRnaReturnsMatchingDocument() throws Exception {
+    void filterBySingleGeneProductTypeOfRnaReturnsMatchingDocument() throws Exception {
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A123");
         doc.geneProductType = "miRNA";
         repository.save(doc);
@@ -1499,7 +1493,7 @@ public class AnnotationControllerIT {
     //----- Tests for GeneProductType ---------------------//
 
     @Test
-    public void filterAnnotationsByTwoGeneProductTypesAsOneParameterReturnsMatchingDocuments() throws Exception {
+    void filterAnnotationsByTwoGeneProductTypesAsOneParameterReturnsMatchingDocuments() throws Exception {
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A123");
         doc.geneProductType = "complex";
         repository.save(doc);
@@ -1515,7 +1509,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterAnnotationsByTwoGeneProductTypesAsTwoParametersReturnsMatchingDocuments() throws Exception {
+    void filterAnnotationsByTwoGeneProductTypesAsTwoParametersReturnsMatchingDocuments() throws Exception {
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A123");
         doc.geneProductType = "complex";
         repository.save(doc);
@@ -1531,7 +1525,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterByNonExistentGeneProductTypeReturnsNothing() throws Exception {
+    void filterByNonExistentGeneProductTypeReturnsNothing() throws Exception {
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A123");
         doc.geneProductType = "complex";
         repository.save(doc);
@@ -1546,7 +1540,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterByTargetSetReturnsMatchingDocuments() throws Exception {
+    void filterByTargetSetReturnsMatchingDocuments() throws Exception {
         ResultActions response =
                 mockMvc.perform(get(RESOURCE_URL + "/search").param(TARGET_SET_PARAM.getName(), "KRUK"));
 
@@ -1558,7 +1552,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterByTwoTargetSetValuesReturnsMatchingDocuments() throws Exception {
+    void filterByTwoTargetSetValuesReturnsMatchingDocuments() throws Exception {
         ResultActions response =
                 mockMvc.perform(get(RESOURCE_URL + "/search").param(TARGET_SET_PARAM.getName(), "KRUK,BHF-UCL"));
 
@@ -1572,7 +1566,7 @@ public class AnnotationControllerIT {
     //----- Target Sets
 
     @Test
-    public void filterByNewTargetSetValueReturnsMatchingDocuments() throws Exception {
+    void filterByNewTargetSetValueReturnsMatchingDocuments() throws Exception {
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A123");
         doc.targetSets = Collections.singletonList("Parkinsons");
         repository.save(doc);
@@ -1588,7 +1582,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterByTargetSetCaseInsensitiveReturnsMatchingDocuments() throws Exception {
+    void filterByTargetSetCaseInsensitiveReturnsMatchingDocuments() throws Exception {
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A123");
         doc.targetSets = Collections.singletonList("parkinsons");
         repository.save(doc);
@@ -1604,7 +1598,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterByNonExistentTargetSetReturnsNoDocuments() throws Exception {
+    void filterByNonExistentTargetSetReturnsNoDocuments() throws Exception {
         ResultActions response =
                 mockMvc.perform(get(RESOURCE_URL + "/search").param(TARGET_SET_PARAM.getName(), "CLAP"));
 
@@ -1615,7 +1609,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterAnnotationsByGoAspectSuccessfully() throws Exception {
+    void filterAnnotationsByGoAspectSuccessfully() throws Exception {
         String goAspect = AnnotationDocMocker.GO_ASPECT;
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(GO_ASPECT_PARAM.getName(), goAspect));
@@ -1628,7 +1622,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterAnnotationsByInvertedCaseGoAspectSuccessfully() throws Exception {
+    void filterAnnotationsByInvertedCaseGoAspectSuccessfully() throws Exception {
         String goAspect = AnnotationDocMocker.GO_ASPECT.toUpperCase();
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(GO_ASPECT_PARAM.getName(), goAspect));
@@ -1642,7 +1636,7 @@ public class AnnotationControllerIT {
     //---------- GO Aspect related tests.
 
     @Test
-    public void filterAnnotationsByInvalidGoAspectReturnsError() throws Exception {
+    void filterAnnotationsByInvalidGoAspectReturnsError() throws Exception {
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(GO_ASPECT_PARAM.getName(), "ZZZ"));
 
@@ -1650,7 +1644,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterWithAspectMolecularFunctionReturnsAnnotationsWithMolecularFunction() throws Exception {
+    void filterWithAspectMolecularFunctionReturnsAnnotationsWithMolecularFunction() throws Exception {
         String goAspect = "molecular_function";
 
         AnnotationDocument annoDoc1 = AnnotationDocMocker.createAnnotationDoc(createGPId(999));
@@ -1669,7 +1663,7 @@ public class AnnotationControllerIT {
     //----- Tests for Annotation Extension ---------------------//
 
     @Test
-    public void filterByExtensionFull() throws Exception {
+    void filterByExtensionFull() throws Exception {
         ResultActions response =
                 mockMvc.perform(get(RESOURCE_URL + "/search").param(EXTENSION_PARAM.getName(), EXTENSIONS));
 
@@ -1681,7 +1675,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterByUniqueExtensionTarget() throws Exception {
+    void filterByUniqueExtensionTarget() throws Exception {
         String extension = "results_in_development_of(UBERON:1234567)";
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A123");
         doc.extensions = extension;
@@ -1699,7 +1693,7 @@ public class AnnotationControllerIT {
 
     //GOA-3246
     @Test
-    public void filterBySingleAndExtension() throws Exception {
+    void filterBySingleAndExtension() throws Exception {
         String extension = "results_in_development_of(UBERON:1234567)";
         String extensionQuery= extension + " and happy_about(P01234:QWE_90hy)" ;
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A123");
@@ -1716,7 +1710,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterBySingleOrExtension() throws Exception {
+    void filterBySingleOrExtension() throws Exception {
         String extension = "results_in_development_of(UBERON:1234567)";
         String extensionQuery= extension + " or happy_about(PO1234:QWE_90hy)" ;
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A123");
@@ -1734,7 +1728,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterByMultipleOrExtension() throws Exception {
+    void filterByMultipleOrExtension() throws Exception {
         String extensionQuery= Stream.of(EXTENSIONS.split(",|\\|")).collect(Collectors.joining(" or "));
 
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
@@ -1748,7 +1742,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterByMultipleAndExtension() throws Exception {
+    void filterByMultipleAndExtension() throws Exception {
         String extensionQuery= Stream.of(EXTENSIONS.split(",|\\|")).collect(Collectors.joining(" and "));
 
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search")
@@ -1762,7 +1756,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterByAndOrExtension() throws Exception {
+    void filterByAndOrExtension() throws Exception {
         String[] extensions = EXTENSIONS.split(",|\\|");
         String extensionQuery=  extensions[0] + " And " + extensions[1] + " oR " + extensions[2] + " AND "+ extensions[3];
 
@@ -1779,7 +1773,7 @@ public class AnnotationControllerIT {
     // ------------------------------- Wildcard searches  -------------------------------
 
     @Test
-    public void retrieveWhereAnnotationExtensionIsNotEmpty() throws Exception {
+    void retrieveWhereAnnotationExtensionIsNotEmpty() throws Exception {
         int numberOfDocsWithExtensions = 3;
         int numberOfDocsWithoutExtensions = 2;
         repository.deleteAll();
@@ -1805,7 +1799,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void usingInvalidWildCardFieldResultsInError() throws Exception {
+    void usingInvalidWildCardFieldResultsInError() throws Exception {
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/search").param(GENE_PRODUCT_ID_PARAM.getName(),
                                                                                      SELECT_ALL_WHERE_FIELD_IS_NOT_EMPTY));
 
@@ -1816,7 +1810,7 @@ public class AnnotationControllerIT {
     // ------------------------------- Filter by geneProductSubset -------------------------------
     // Holds values TrEMBL, Swiss-Prot and maybe more
     @Test
-    public void filterByGeneProductSubsetWillNotWorkWhenGeneProductTypeIsNotProteinPartOfRequest() throws Exception {
+    void filterByGeneProductSubsetWillNotWorkWhenGeneProductTypeIsNotProteinPartOfRequest() throws Exception {
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A842");
         String geneProductSubset = "Swiss-Prot";
         doc.geneProductSubset = geneProductSubset;
@@ -1831,7 +1825,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterByGeneProductSubset() throws Exception {
+    void filterByGeneProductSubset() throws Exception {
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A842");
         String geneProductSubset = "Swiss-Prot";
         doc.geneProductSubset = geneProductSubset;
@@ -1849,7 +1843,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterByGeneProductSubsetMixedCaseSearchValue() throws Exception {
+    void filterByGeneProductSubsetMixedCaseSearchValue() throws Exception {
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A849");
         doc.geneProductSubset = "Swiss-Prot";
         repository.save(doc);
@@ -1869,7 +1863,7 @@ public class AnnotationControllerIT {
     // ------------------------------- Filter by proteome -------------------------------
 
     @Test
-    public void filterByProteomeWillNotWorkWhenGeneProductTypeIsNotProteinPartOfRequest() throws Exception {
+    void filterByProteomeWillNotWorkWhenGeneProductTypeIsNotProteinPartOfRequest() throws Exception {
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A123");
         doc.proteome = "gcrpCan";
         repository.save(doc);
@@ -1883,7 +1877,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterByProteome() throws Exception {
+    void filterByProteome() throws Exception {
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A123");
         doc.proteome = "gcrpCan";
         repository.save(doc);
@@ -1900,7 +1894,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterByProteomeMixedCaseSearchValue() throws Exception {
+    void filterByProteomeMixedCaseSearchValue() throws Exception {
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A772");
         doc.proteome = "gcrpCan";
         repository.save(doc);
@@ -1917,7 +1911,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void filterByMultipleProteomeParameters() throws Exception {
+    void filterByMultipleProteomeParameters() throws Exception {
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A123");
         doc.proteome = "gcrpCan";
         repository.save(doc);
@@ -1935,7 +1929,7 @@ public class AnnotationControllerIT {
 
 
     @Test
-    public void filterByInvalidProteomeValueProducesNoResults() throws Exception {
+    void filterByInvalidProteomeValueProducesNoResults() throws Exception {
         ResultActions response =
                 mockMvc.perform(get(RESOURCE_URL + "/search").param(PROTEOME_PARAM.getName(), "pancake").param
                         (GENE_PRODUCT_TYPE_PARAM.getName(), "protein"));
@@ -1948,7 +1942,7 @@ public class AnnotationControllerIT {
 
     // GOA-3266
     @Test
-    public void filterByMultipleGeneProductAndProteinSpecificProperties() throws Exception {
+    void filterByMultipleGeneProductAndProteinSpecificProperties() throws Exception {
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A842");
         AnnotationDocument doc2 = AnnotationDocMocker.createAnnotationDoc("A0A843");
 
@@ -1975,7 +1969,7 @@ public class AnnotationControllerIT {
 
     // ------------------------------- Check date format -------------------------------
     @Test
-    public void checkDateFormatIsCorrect() throws Exception {
+    void checkDateFormatIsCorrect() throws Exception {
         String geneProductId = "P99999";
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc(geneProductId);
         int year = 1900;
@@ -2002,7 +1996,7 @@ public class AnnotationControllerIT {
     // ------------------------------- Check about information -------------------------------
 
     @Test
-    public void about() throws Exception {
+    void about() throws Exception {
         ResultActions response = mockMvc.perform(get(RESOURCE_URL + "/about"));
 
         response.andDo(print())
@@ -2010,18 +2004,18 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void advanceFilterNotGoId_descendents_defaultRelations() throws Exception {
+    void advanceFilterNotGoId_descendents_defaultRelations() throws Exception {
         mockRestToOntologyForDescendants();
         advanceFilterTest(20, false, false);
     }
 
     @Test
-    public void advanceFilterNotGoId_exact() throws Exception {
+    void advanceFilterNotGoId_exact() throws Exception {
         advanceFilterTest(20, false, true);
     }
 
     @Test
-    public void advanceFilterAndGoId_descendents_defaultRelations() throws Exception {
+    void advanceFilterAndGoId_descendents_defaultRelations() throws Exception {
         mockRestToOntologyForDescendants();
         advanceFilterTest(5, true, false);
     }
@@ -2037,7 +2031,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void advanceFilterAndGoId_exact() throws Exception {
+    void advanceFilterAndGoId_exact() throws Exception {
         advanceFilterTest(5, true, true);
     }
 
@@ -2063,7 +2057,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void advanceFilter_invalidGoId() throws Exception {
+    void advanceFilter_invalidGoId() throws Exception {
         AnnotationRequestBody.GoDescription and = new AnnotationRequestBody.GoDescription(new String[]{"invalid-go-id"},null,"exact");
         AnnotationRequestBody body = new AnnotationRequestBody(and);
 
@@ -2076,7 +2070,7 @@ public class AnnotationControllerIT {
     }
 
     @Test
-    public void advanceFilter_invalidUsage() throws Exception {
+    void advanceFilter_invalidUsage() throws Exception {
         AnnotationRequestBody.GoDescription and = new AnnotationRequestBody.GoDescription(new String[]{createGoId(1)}, null, "invalid");
         AnnotationRequestBody body = new AnnotationRequestBody(and);
 

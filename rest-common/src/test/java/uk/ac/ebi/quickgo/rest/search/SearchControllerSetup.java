@@ -1,10 +1,9 @@
 package uk.ac.ebi.quickgo.rest.search;
 
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -28,12 +27,9 @@ import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.D
  * is capable of providing the client with a workable response.
  *
  */
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith({SpringExtension.class, TemporarySolrDataStore.class})
 @WebAppConfiguration
 public abstract class SearchControllerSetup {
-    @ClassRule
-    public static final TemporarySolrDataStore solrDataStore = new TemporarySolrDataStore();
-
     private static final String QUERY_PARAM = "query";
     private static final String FACET_PARAM = "facet";
     private static final String PAGE_PARAM = "page";
@@ -47,8 +43,8 @@ public abstract class SearchControllerSetup {
 
     private MockMvc mockMvc;
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
                 .build();
     }
@@ -60,7 +56,7 @@ public abstract class SearchControllerSetup {
      * @param pageNum the page to return
      * @param limit the maximum number of entries that response holds
      * @param errorStatus the expectedErrorStatus code returned from the server
-     * @throws Exception
+     * @
      */
     protected void checkInvalidPageInfoInResponse(String query,
             int pageNum,
@@ -86,7 +82,7 @@ public abstract class SearchControllerSetup {
      * @param query a query in order to get a valid response
      * @param pageNum the page to return
      * @param limit the maximum number of entries that response holds
-     * @throws Exception
+     * @
      */
     protected void checkValidPageInfoInResponse(String query,
             int pageNum,
@@ -114,7 +110,7 @@ public abstract class SearchControllerSetup {
      * </ul>
      *
      * @param query the query that should return a response that contains no results.
-     * @throws Exception
+     * @
      */
     protected void checkValidEmptyResultsResponse(String query) throws Exception {
         MockHttpServletRequestBuilder clientRequest = createRequest(query);

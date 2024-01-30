@@ -1,12 +1,12 @@
 package uk.ac.ebi.quickgo.client.service.loader.presets.evidence;
 
+import org.junit.jupiter.api.Test;
 import uk.ac.ebi.quickgo.client.service.loader.presets.evidence.RawEvidenceNamedPresetColumnsBuilder
         .RawEvidenceNamedPresetColumnsImpl;
 
-import org.junit.Test;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Tony Wardell
@@ -14,40 +14,36 @@ import static org.hamcrest.core.Is.is;
  * Time: 09:56
  * Created with IntelliJ IDEA.
  */
-public class RawEvidenceNamedPresetColumnsBuilderTest {
+class RawEvidenceNamedPresetColumnsBuilderTest {
 
     @Test
-            (expected = IllegalArgumentException.class)
-    public void creatingWithNegativeNamePositionCausesException() {
-        RawEvidenceNamedPresetColumnsBuilder.createWithNamePosition(-1);
+    void creatingWithNegativeNamePositionCausesException() {
+        assertThrows(IllegalArgumentException.class, () -> RawEvidenceNamedPresetColumnsBuilder.createWithNamePosition(-1));
     }
 
     @Test
-            (expected = IllegalArgumentException.class)
-    public void creatingWithNegativeRelevancyPositionCausesException() {
-        RawEvidenceNamedPresetColumnsBuilder
+    void creatingWithNegativeRelevancyPositionCausesException() {
+        assertThrows(IllegalArgumentException.class, () -> RawEvidenceNamedPresetColumnsBuilder
                 .createWithNamePosition(0)
-                .withRelevancyPosition(-1);
+                .withRelevancyPosition(-1));
     }
 
     @Test
-            (expected = IllegalArgumentException.class)
-    public void creatingWithNegativeGoEvidencePositionCausesException() {
-        RawEvidenceNamedPresetColumnsBuilder
+    void creatingWithNegativeGoEvidencePositionCausesException() {
+        assertThrows(IllegalArgumentException.class, () -> RawEvidenceNamedPresetColumnsBuilder
                 .createWithNamePosition(0)
-                .withGoEvidence(-1);
+                .withGoEvidence(-1));
     }
 
     @Test
-            (expected = IllegalArgumentException.class)
-    public void creatingWithNegativeIdPositionCausesException() {
-        RawEvidenceNamedPresetColumnsBuilder
+    void creatingWithNegativeIdPositionCausesException() {
+        assertThrows(IllegalArgumentException.class, () -> RawEvidenceNamedPresetColumnsBuilder
                 .createWithNamePosition(0)
-                .withIdPosition(-1);
+                .withIdPosition(-1));
     }
 
     @Test
-    public void canCreateWithValidNamePosition() {
+    void canCreateWithValidNamePosition() {
         int position = 0;
         RawEvidenceNamedPresetColumnsImpl presetColumns =
                 RawEvidenceNamedPresetColumnsBuilder.createWithNamePosition(position).build();
@@ -55,7 +51,7 @@ public class RawEvidenceNamedPresetColumnsBuilderTest {
     }
 
     @Test
-    public void canCreateWithValidRelevancyPosition() {
+    void canCreateWithValidRelevancyPosition() {
         int position = 1;
         RawEvidenceNamedPresetColumnsImpl presetColumns = RawEvidenceNamedPresetColumnsBuilder.createWithNamePosition(0)
                 .withRelevancyPosition(position)
@@ -64,7 +60,7 @@ public class RawEvidenceNamedPresetColumnsBuilderTest {
     }
 
     @Test
-    public void canCreateWithValidIdPosition() {
+    void canCreateWithValidIdPosition() {
         int position = 1;
         RawEvidenceNamedPresetColumnsImpl presetColumns = RawEvidenceNamedPresetColumnsBuilder.createWithNamePosition(0)
                 .withIdPosition(position)
@@ -73,7 +69,7 @@ public class RawEvidenceNamedPresetColumnsBuilderTest {
     }
 
     @Test
-    public void canCreateWithGoEvidenceIdPosition() {
+    void canCreateWithGoEvidenceIdPosition() {
         int position = 1;
         RawEvidenceNamedPresetColumnsImpl presetColumns = RawEvidenceNamedPresetColumnsBuilder.createWithNamePosition(0)
                 .withGoEvidence(position)
