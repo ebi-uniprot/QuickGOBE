@@ -91,20 +91,20 @@ class OntologyRelationshipValidatorTest {
     }
 
     @Test
-    void fullRelationshipIsInvalidBecauseRelationshipDoesNotExist() throws Exception {
+    void fullRelationshipIsInvalidBecauseRelationshipDoesNotExist() {
         relationship.relationship = "THIS_DOES_NOT_EXIST";
         assertThrows(ValidationException.class, () -> validator.process(relationship));
     }
 
     @Test
-    void fullRelationshipIsInvalidBecauseNameSpacesDoNotMatch() throws Exception {
+    void fullRelationshipIsInvalidBecauseNameSpacesDoNotMatch() {
         relationship.child = "GO:000001";
         relationship.parent = "ECO:000001";
         assertThrows(ValidationException.class, () -> validator.process(relationship));
     }
 
     @Test
-    void fullRelationshipIsInvalidBecauseNameSpacesDoNotExist() throws Exception {
+    void fullRelationshipIsInvalidBecauseNameSpacesDoNotExist() {
         relationship.child = "DOESNT_EXIST:000001";
         relationship.parent = "DOESNT_EXIST:000002";
         assertThrows(ValidationException.class, () -> validator.process(relationship));

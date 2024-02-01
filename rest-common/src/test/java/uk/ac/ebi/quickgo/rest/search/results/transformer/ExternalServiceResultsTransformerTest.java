@@ -1,7 +1,6 @@
 package uk.ac.ebi.quickgo.rest.search.results.transformer;
 
 import uk.ac.ebi.quickgo.rest.comm.FilterContext;
-import uk.ac.ebi.quickgo.rest.search.RetrievalException;
 import uk.ac.ebi.quickgo.rest.search.request.converter.RESTFilterConverterFactory;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 

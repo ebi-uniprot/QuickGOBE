@@ -13,22 +13,22 @@ class GoSimilarityTest {
     private GoSimilarity similarity;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         similarity = new GoSimilarity();
     }
 
     @Test
-    void termsWithNoFrequencyGet0TermFrequencyScore() throws Exception {
+    void termsWithNoFrequencyGet0TermFrequencyScore() {
         assertThat(similarity.tf(0), is(0F));
     }
 
     @Test
-    void termsWithFrequencyOf1Get1TermFrequencyScore() throws Exception {
+    void termsWithFrequencyOf1Get1TermFrequencyScore() {
         assertThat(similarity.tf(1), is(1F));
     }
 
     @Test
-    void termsWithMultipleFrequencyGet1TermFrequencyScore() throws Exception {
+    void termsWithMultipleFrequencyGet1TermFrequencyScore() {
         assertThat(similarity.tf(3), is(1F));
         assertThat(similarity.tf(7), is(1F));
         assertThat(similarity.tf(11), is(1F));

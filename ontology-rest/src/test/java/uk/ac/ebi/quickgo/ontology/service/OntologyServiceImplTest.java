@@ -109,7 +109,7 @@ class OntologyServiceImplTest {
     class GOServiceTests {
 
         @Test
-        void findsGoTermByIdentifier() throws Exception {
+        void findsGoTermByIdentifier() {
             String goId = "GO:0000001";
 
             OntologyDocument doc = createGODoc(goId, "name1");

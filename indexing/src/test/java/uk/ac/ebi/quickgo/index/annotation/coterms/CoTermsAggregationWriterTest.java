@@ -67,7 +67,7 @@ class CoTermsAggregationWriterTest {
     }
 
     @Test
-    void exceptionThrownIfNullAnnotationPassedToAddRowToMatrix() throws Exception {
+    void exceptionThrownIfNullAnnotationPassedToAddRowToMatrix() {
         assertThrows(IllegalArgumentException.class, () -> {
             aggregator.write(null);
         });

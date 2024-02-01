@@ -56,7 +56,7 @@ class AnnotationIndexingBatchIT {
     private AnnotationRepository annotationRepository;
 
     @BeforeEach
-    void setUp() throws IOException {
+    void setUp() {
         annotationRepository.deleteAll();
     }
 

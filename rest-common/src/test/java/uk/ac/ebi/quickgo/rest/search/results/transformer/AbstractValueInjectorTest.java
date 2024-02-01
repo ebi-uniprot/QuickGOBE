@@ -106,7 +106,7 @@ class AbstractValueInjectorTest {
             this.idFromResponse = idFromResponse;
         }
 
-        String idFromResponse;
+        final String idFromResponse;
     }
 
     private static class ConcreteModel {

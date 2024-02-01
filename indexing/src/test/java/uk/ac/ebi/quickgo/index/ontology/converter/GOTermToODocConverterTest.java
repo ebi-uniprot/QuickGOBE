@@ -37,7 +37,7 @@ class GOTermToODocConverterTest {
     @Mock
     public GOTerm term;
 
-    private GOTermToODocConverter converter = new GOTermToODocConverter();
+    private final GOTermToODocConverter converter = new GOTermToODocConverter();
 
     @BeforeEach
     void setup() {

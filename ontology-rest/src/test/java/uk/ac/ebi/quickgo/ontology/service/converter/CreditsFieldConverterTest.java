@@ -17,12 +17,12 @@ class CreditsFieldConverterTest {
     private CreditsFieldConverter converter;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         converter = new CreditsFieldConverter();
     }
 
     @Test
-    void convertsValidTextBasedCredit() throws Exception {
+    void convertsValidTextBasedCredit() {
         String code = "BHF";
         String url = "http://www.ucl.ac.uk/cardiovasculargeneontology/";
 
@@ -39,7 +39,7 @@ class CreditsFieldConverterTest {
     }
 
     @Test
-    void returnsEmptyOptionalWhenTextBasedCreditHasWrongNumberOfFields() throws Exception {
+    void returnsEmptyOptionalWhenTextBasedCreditHasWrongNumberOfFields() {
         String wrongTextFormatCredit = "Wrong format";
 
         Optional<OBOTerm.Credit> expectedCreditOpt = converter.apply(wrongTextFormatCredit);

@@ -51,7 +51,7 @@ class AnnotationRequestValidationIT {
     private AnnotationRequest annotationRequest;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         annotationRequest = new AnnotationRequest();
     }
 

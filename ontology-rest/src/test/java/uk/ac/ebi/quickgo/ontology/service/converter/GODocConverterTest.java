@@ -62,7 +62,7 @@ class GODocConverterTest {
     }
 
     @Test
-    void convertsGoDiscussionsWithoutError() throws Exception {
+    void convertsGoDiscussionsWithoutError() {
         assertThat(goTerm.goDiscussions, hasSize(2));
     }
 }

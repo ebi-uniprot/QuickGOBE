@@ -21,7 +21,7 @@ import static org.hamcrest.Matchers.equalTo;
  */
 class PeriodParserMonthTimeTest {
 
-    private PeriodParserMonthTime periodParserMonthTime = new PeriodParserMonthTime();
+    private final PeriodParserMonthTime periodParserMonthTime = new PeriodParserMonthTime();
 
     @Test
     void validInputStringWithDoubleAndSingleDigitDaysOfMonth(){

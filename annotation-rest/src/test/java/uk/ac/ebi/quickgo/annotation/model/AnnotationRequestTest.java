@@ -1,6 +1,5 @@
 package uk.ac.ebi.quickgo.annotation.model;
 
-import org.springframework.http.MediaType;
 import uk.ac.ebi.quickgo.annotation.AnnotationParameters;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationFields;
 import uk.ac.ebi.quickgo.rest.ParameterException;

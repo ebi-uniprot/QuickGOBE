@@ -8,7 +8,7 @@ import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
  * classes that require a composite builder.
  */
 final class FakeCompositeBuilder implements SearchQueryRequestBuilder {
-    private QuickGOQuery query;
+    private final QuickGOQuery query;
 
     FakeCompositeBuilder() {
         query = QuickGOQuery.createAllQuery();

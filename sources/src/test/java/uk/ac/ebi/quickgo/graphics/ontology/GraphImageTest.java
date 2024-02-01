@@ -16,13 +16,13 @@ import static uk.ac.ebi.quickgo.graphics.ontology.GraphPresentation.defaultHeigh
 import static uk.ac.ebi.quickgo.graphics.ontology.TermNode.*;
 
 class GraphImageTest {
-  private GraphPresentation defaultStyle = new GraphPresentation.Builder().build();
+  private final GraphPresentation defaultStyle = new GraphPresentation.Builder().build();
 
   @Nested
   class render{
     private GraphImage gi = spy(graphImage(defaultStyle));
-    private Graphics2D g2 = mock(Graphics2D.class);
-    private FontMetrics fontMetrics = mock(FontMetrics.class);
+    private final Graphics2D g2 = mock(Graphics2D.class);
+    private final FontMetrics fontMetrics = mock(FontMetrics.class);
 
     @Test
     void infoMessageShouldTakeFontFromStyle() {
@@ -44,8 +44,8 @@ class GraphImageTest {
 
   @Nested
   class DrawCompleteGoNodeHeaderColorInformation {
-    private int height300 = 300;
-    private GraphPresentation style300 = new GraphPresentation.Builder().termBoxHeight(height300).build();
+    private final int height300 = 300;
+    private final GraphPresentation style300 = new GraphPresentation.Builder().termBoxHeight(height300).build();
 
     @Nested
     class getGoNodeHeaderColorInformationHeight {
@@ -117,7 +117,7 @@ class GraphImageTest {
 
     @Nested
     class isDisplayGoNodeHeaderColorInformation {
-      private GraphPresentation styleKeyFalse = new GraphPresentation.Builder().showKey(false).build();
+      private final GraphPresentation styleKeyFalse = new GraphPresentation.Builder().showKey(false).build();
 
       @Test
       void showIdsFalse_willNotShow_informationGraph() {

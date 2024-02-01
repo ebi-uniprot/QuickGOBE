@@ -19,10 +19,10 @@ import static uk.ac.ebi.quickgo.graphics.ontology.GraphPresentation.*;
  * Created with IntelliJ IDEA.
  */
 class GraphPresentationTest {
-    private GraphPresentation style = new GraphPresentation.Builder().build();
-    private GraphPresentation style22 = new GraphPresentation.Builder().fontSize(22).build();
-    private GraphPresentation style33 = new GraphPresentation.Builder().fontSize(33).build();
-    private GraphPresentation style40 = new GraphPresentation.Builder().fontSize(40).build();
+    private final GraphPresentation style = new GraphPresentation.Builder().build();
+    private final GraphPresentation style22 = new GraphPresentation.Builder().fontSize(22).build();
+    private final GraphPresentation style33 = new GraphPresentation.Builder().fontSize(33).build();
+    private final GraphPresentation style40 = new GraphPresentation.Builder().fontSize(40).build();
 
     @Test
     void usingBuilderWithNoArgumentsUsesDefaults() {

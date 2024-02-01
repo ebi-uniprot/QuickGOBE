@@ -207,7 +207,7 @@ class RESTRequesterImplTest {
     }
 
     static class FakeDTO {
-        String value;
+        final String value;
 
         FakeDTO(String value) {
             this.value = value;

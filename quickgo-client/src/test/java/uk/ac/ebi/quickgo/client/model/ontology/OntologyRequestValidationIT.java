@@ -57,7 +57,7 @@ class OntologyRequestValidationIT {
     private OntologyRequest ontologyRequest;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         ontologyRequest = new OntologyRequest();
         ontologyRequest.setQuery("query");
     }
@@ -176,7 +176,7 @@ class OntologyRequestValidationIT {
     }
 
     @Test
-    void providedFilterByAspectValuesAreAllValid() throws Exception {
+    void providedFilterByAspectValuesAreAllValid() {
         Arrays.asList("Process", "PRoceSs", "Function", "funCtioN", "Component", "compONent")
                 .forEach(aspect -> {
                             ontologyRequest.setAspect(aspect);
@@ -187,7 +187,7 @@ class OntologyRequestValidationIT {
     }
 
     @Test
-    void providedFilterByAspectValuesAreAllInvalid() throws Exception {
+    void providedFilterByAspectValuesAreAllInvalid() {
         Arrays.asList("biological_process", "molecular_function", "cellular_component")
                 .forEach(aspect -> {
                             ontologyRequest.setAspect(aspect);
@@ -219,7 +219,7 @@ class OntologyRequestValidationIT {
     }
 
     @Test
-    void providedFilterByTypeValuesAreAllValid() throws Exception {
+    void providedFilterByTypeValuesAreAllValid() {
         Arrays.asList("go", "eco")
                 .forEach(type -> {
                             ontologyRequest.setOntologyType(type);
@@ -255,7 +255,7 @@ class OntologyRequestValidationIT {
     }
 
     @Test
-    void providedFilterByObsoleteValuesAreAllValid() throws Exception {
+    void providedFilterByObsoleteValuesAreAllValid() {
         Arrays.asList("true", "false")
           .forEach(type -> {
                 ontologyRequest.setIsObsolete(type);
@@ -266,7 +266,7 @@ class OntologyRequestValidationIT {
     }
 
     @Test
-    void unrecognizedFacetIsInvalid() throws Exception {
+    void unrecognizedFacetIsInvalid() {
         ontologyRequest.setFacet(new String[]{"invalidFacet"});
 
         Set<ConstraintViolation<OntologyRequest>> violations = validator.validate(ontologyRequest);
@@ -277,7 +277,7 @@ class OntologyRequestValidationIT {
     }
 
     @Test
-    void recognizedFacetIsValid() throws Exception {
+    void recognizedFacetIsValid() {
         ontologyRequest.setFacet(new String[]{VALID_FACET});
 
         Set<ConstraintViolation<OntologyRequest>> violations = validator.validate(ontologyRequest);

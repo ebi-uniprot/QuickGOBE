@@ -62,7 +62,7 @@ class TermNodeTest {
 
   @Nested
   class TermIdBackGroundColor {
-    private Color defaultColor = defaultBoxHeaderBackgroundColor;
+    private final Color defaultColor = defaultBoxHeaderBackgroundColor;
 
     @Test
     void defaultColor_whenTermIsNotProvided() {

@@ -24,7 +24,7 @@ class ValidationEntityCheckerTest {
     private ValidationEntityChecker checker;
 
     @BeforeEach
-    void setup() throws Exception {
+    void setup() {
         ValidationEntity validationEntity1 = mock(ValidationEntity.class);
         ValidationEntity validationEntity2 = mock(ValidationEntity.class);
         ValidationEntity validationEntity3 = mock(ValidationEntity.class);

@@ -9,8 +9,6 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 /**
@@ -27,9 +25,9 @@ class GeneTypeHeaderCreatorTest {
                     "=UniProtKB:A0A000&includeFields=goName,taxonName";
     private final String FORMAT_VERSION_1 = "test-version_1";
     private final String FORMAT_VERSION_2 = "test-version_2";
-    private OntologyHeaderInfo mockOntology = mock(OntologyHeaderInfo.class);
-    private ResponseBodyEmitter mockEmitter = mock(ResponseBodyEmitter.class);
-    private HeaderContent mockContent = mock(HeaderContent.class);
+    private final OntologyHeaderInfo mockOntology = mock(OntologyHeaderInfo.class);
+    private final ResponseBodyEmitter mockEmitter = mock(ResponseBodyEmitter.class);
+    private final HeaderContent mockContent = mock(HeaderContent.class);
     private GeneTypeHeaderCreator gTypeHeaderCreator;
 
     @BeforeEach

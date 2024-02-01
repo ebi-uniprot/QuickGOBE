@@ -18,12 +18,12 @@ class ReplacesConverterTest {
     private ReplaceConverter converter;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         converter = new ReplaceConverter();
     }
 
     @Test
-    void emptyReplaceStringIsConvertedToEmptyOptional() throws Exception {
+    void emptyReplaceStringIsConvertedToEmptyOptional() {
         String toConvert = "";
 
         Optional<OBOTerm.Replace> convertedOptional = converter.apply(toConvert);
@@ -32,7 +32,7 @@ class ReplacesConverterTest {
     }
 
     @Test
-    void replaceStringWithJustIdIsConvertedIntoEmptyOptional() throws Exception {
+    void replaceStringWithJustIdIsConvertedIntoEmptyOptional() {
         String toConvert = "id1";
 
         Optional<OBOTerm.Replace> convertedOptional = converter.apply(toConvert);
@@ -41,7 +41,7 @@ class ReplacesConverterTest {
     }
 
     @Test
-    void replaceStringWithIdAndTypeIsConvertedIntoPopulatedReplaceOptional() throws Exception {
+    void replaceStringWithIdAndTypeIsConvertedIntoPopulatedReplaceOptional() {
         String goTermId = "id1";
         String relationType = "replacedBy";
 

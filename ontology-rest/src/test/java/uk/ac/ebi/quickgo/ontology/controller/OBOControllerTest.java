@@ -64,7 +64,7 @@ class OBOControllerTest {
     private HttpHeadersProvider headersProvider;
     private OBOController<FakeOBOTerm> controller;
     private List<OntologyRelationType> validRelations = new ArrayList<>();
-    private static OntologySpecifier ontologySpecifier = new OntologySpecifier(OntologyType.GO, new ArrayList<>());
+    private static final OntologySpecifier ontologySpecifier = new OntologySpecifier(OntologyType.GO, new ArrayList<>());
 
     private static OBOController<FakeOBOTerm> createOBOController(
             final OntologyService<FakeOBOTerm> ontologyService, final SearchService<OBOTerm> searchService,

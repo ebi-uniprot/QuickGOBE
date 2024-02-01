@@ -26,7 +26,7 @@ class GOADataFileParsingHelperTest {
     public static final String INTRA_VALUE_DELIMITER = "=";
 
     @Test
-    void nullInterValueDelimiterThrowsException() throws Exception {
+    void nullInterValueDelimiterThrowsException() {
         Throwable exception = assertThrows(AssertionError.class, () -> {
             String propsText = "";
 
@@ -36,7 +36,7 @@ class GOADataFileParsingHelperTest {
     }
 
     @Test
-    void nullIntraValueDelimiterThrowsException() throws Exception {
+    void nullIntraValueDelimiterThrowsException() {
         Throwable exception = assertThrows(AssertionError.class, () -> {
             String propsText = "";
 
@@ -46,7 +46,7 @@ class GOADataFileParsingHelperTest {
     }
 
     @Test
-    void nullPropertiesTextReturnsEmptyMap() throws Exception {
+    void nullPropertiesTextReturnsEmptyMap() {
         Map<String, String>
                 propsMap = convertLinePropertiesToMap(null, INTER_VALUE_DELIMITER_REGEX, INTRA_VALUE_DELIMITER);
 
@@ -54,7 +54,7 @@ class GOADataFileParsingHelperTest {
     }
 
     @Test
-    void emptyPropertiesTextReturnsEmptyMap() throws Exception {
+    void emptyPropertiesTextReturnsEmptyMap() {
         String propsText = "";
 
         Map<String, String> propsMap = convertLinePropertiesToMap(propsText, INTER_VALUE_DELIMITER_REGEX, INTRA_VALUE_DELIMITER);
@@ -63,7 +63,7 @@ class GOADataFileParsingHelperTest {
     }
 
     @Test
-    void singlePropertyWithNoValueReturnsMapWithSingleEntryWithKeyAndNoValue() throws Exception {
+    void singlePropertyWithNoValueReturnsMapWithSingleEntryWithKeyAndNoValue() {
         String propKey = "key";
         String propsText = propKey;
 
@@ -71,11 +71,11 @@ class GOADataFileParsingHelperTest {
 
         assertThat(propsMap.size(), is(1));
         assertThat(propsMap, hasKey(propKey));
-        assertThat(propsMap.get(propKey), isEmptyString());
+        assertThat(propsMap.get(propKey), emptyString());
     }
 
     @Test
-    void singlePropertyWithValueReturnsMapWithSingleEntry() throws Exception {
+    void singlePropertyWithValueReturnsMapWithSingleEntry() {
         String propKey = "key";
         String propValue = "value";
 
@@ -88,7 +88,7 @@ class GOADataFileParsingHelperTest {
     }
 
     @Test
-    void twoPropertiesReturnMapWithTwoEntries() throws Exception {
+    void twoPropertiesReturnMapWithTwoEntries() {
         String propKey1 = "key1";
         String propValue1 = "value1";
         String concatProp1 = concatProperty(propKey1, propValue1, INTRA_VALUE_DELIMITER);

@@ -41,7 +41,7 @@ class GeneProductRepositoryIT {
     }
 
     @Test
-    void addGeneProductToRepository() throws Exception {
+    void addGeneProductToRepository() {
         String id = "geneProduct1";
 
         GeneProductDocument doc = createDocWithId(id);
@@ -52,7 +52,7 @@ class GeneProductRepositoryIT {
     }
 
     @Test
-    void add3GeneProductTosRepository() throws Exception {
+    void add3GeneProductTosRepository() {
         String id1 = "geneProduct1";
         String id2 = "geneProduct2";
         String id3 = "geneProduct3";

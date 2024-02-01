@@ -584,7 +584,7 @@ class RESTFilterConverterTest {
     }
 
     static class FakeResponse implements ResponseType {
-        List<Result> results = new ArrayList<>();
+        final List<Result> results = new ArrayList<>();
 
         static class Result {
             String resultField;

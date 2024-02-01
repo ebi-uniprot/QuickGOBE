@@ -21,7 +21,7 @@ class CoTermRepositorySimpleMapTest {
     private static final int headerLines = 1;
 
     @Test
-    void createFailsIfManualResourceIsNull() throws IOException {
+    void createFailsIfManualResourceIsNull() {
         Resource mockAllResource = mock(Resource.class);
         Throwable exception = assertThrows(IllegalArgumentException.class, () ->
             CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(null, mockAllResource, headerLines)
@@ -30,7 +30,7 @@ class CoTermRepositorySimpleMapTest {
     }
 
     @Test
-    void createFailsIfAllResourceIsNull() throws IOException {
+    void createFailsIfAllResourceIsNull() {
         Resource mockManualResource = mock(Resource.class);
         Throwable exception = assertThrows(IllegalArgumentException.class, () ->
             CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(mockManualResource, null, headerLines)
@@ -39,7 +39,7 @@ class CoTermRepositorySimpleMapTest {
     }
 
     @Test
-    void createFailsIfManualResourceIsNonExistent() throws IOException {
+    void createFailsIfManualResourceIsNonExistent() {
         Resource mockManualResource = mock(Resource.class);
         Resource mockAllResource = mock(Resource.class);
         when(mockManualResource.exists()).thenReturn(false);
@@ -50,7 +50,7 @@ class CoTermRepositorySimpleMapTest {
     }
 
     @Test
-    void createFailsIfAllResourceIsNonExistent() throws Exception {
+    void createFailsIfAllResourceIsNonExistent() {
         Resource mockManualResource = mock(Resource.class);
         Resource mockAllResource = mock(Resource.class);
         when(mockManualResource.exists()).thenReturn(true);
@@ -74,7 +74,7 @@ class CoTermRepositorySimpleMapTest {
     }
 
     @Test
-    void createFailsIfHeaderLinesNegative() throws IOException {
+    void createFailsIfHeaderLinesNegative() {
         Resource mockManualResource = mock(Resource.class);
         Resource mockAllResource = mock(Resource.class);
         when(mockManualResource.exists()).thenReturn(true);

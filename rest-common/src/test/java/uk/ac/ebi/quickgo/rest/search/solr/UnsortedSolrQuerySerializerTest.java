@@ -33,7 +33,7 @@ class UnsortedSolrQuerySerializerTest {
     private static final String TERMS_INCOMPATIBLE_FIELD_2 = "termsIncompatibleField2";
     private static final String TERMS_INCOMPATIBLE_FIELD_3 = "termsIncompatibleField3";
     private UnsortedSolrQuerySerializer serializer;
-    private Set<String> nonEmptyFieldQueryCompatibleFields = new HashSet<>();
+    private final Set<String> nonEmptyFieldQueryCompatibleFields = new HashSet<>();
     private Set<String> termsQueryCompatibleFields;
     @BeforeEach
     void setUp() {

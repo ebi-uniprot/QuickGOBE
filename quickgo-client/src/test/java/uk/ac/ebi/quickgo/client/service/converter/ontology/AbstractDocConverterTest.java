@@ -15,17 +15,17 @@ class AbstractDocConverterTest {
     private AbstractDocConverter<FakeOntologyTerm> converter;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         converter = new FakeDocConverter();
     }
 
     @Test
-    void nullOntologyDocumentThrowsException() throws Exception {
+    void nullOntologyDocumentThrowsException() {
         assertThrows(IllegalArgumentException.class, () -> converter.convert(null));
     }
 
     @Test
-    void ontologyDocumentWithNullFieldsIsConvertedToOntologyTermWithNullFields() throws Exception {
+    void ontologyDocumentWithNullFieldsIsConvertedToOntologyTermWithNullFields() {
         OntologyDocument emptyDoc = new OntologyDocument();
 
         FakeOntologyTerm term = converter.convert(emptyDoc);
@@ -34,7 +34,7 @@ class AbstractDocConverterTest {
     }
 
     @Test
-    void ontologyDocumentWithPopulatedFieldsIsConvertedToOntologyTermWithPopulatedFields() throws Exception {
+    void ontologyDocumentWithPopulatedFieldsIsConvertedToOntologyTermWithPopulatedFields() {
         String id = "id";
         String name = "name";
         boolean isObsolete = true;

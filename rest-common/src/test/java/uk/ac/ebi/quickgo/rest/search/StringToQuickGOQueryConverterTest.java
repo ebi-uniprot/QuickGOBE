@@ -102,8 +102,7 @@ class StringToQuickGOQueryConverterTest {
     }
 
     @Test
-    void converterWithDefaultFieldConvertsValueContainingFieldDelimiterIntoFieldAndValueQuery() throws
-                                                                                                       Exception {
+    void converterWithDefaultFieldConvertsValueContainingFieldDelimiterIntoFieldAndValueQuery() {
         String value = "va:lue1";
 
         when(searchableFieldMock.isSearchable("va")).thenReturn(false);
@@ -116,8 +115,7 @@ class StringToQuickGOQueryConverterTest {
     }
 
     @Test
-    void converterWithoutDefaultFieldConvertsValueContainingFieldDelimiterIntoValueOnlyQuery() throws
-                                                                                                       Exception {
+    void converterWithoutDefaultFieldConvertsValueContainingFieldDelimiterIntoValueOnlyQuery() {
         converter = new StringToQuickGOQueryConverter(searchableFieldMock);
 
         String value = "va:lue1";

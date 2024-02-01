@@ -38,17 +38,17 @@ class GeneProductSolrQueryResultConverterTest {
     private GeneProductDocConverter geneProductConverterMock;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         converter = new GeneProductSolrQueryResultConverter(binderMock, geneProductConverterMock, new HashMap<>());
     }
 
     @Test
-    void nullResultsListThrowsAssertionError() throws Exception {
+    void nullResultsListThrowsAssertionError() {
         assertThrows(AssertionError.class, () -> converter.convertResults(null));
     }
 
     @Test
-    void emptySolrDocListReturnsEmptyResults() throws Exception {
+    void emptySolrDocListReturnsEmptyResults() {
         SolrDocumentList solrDocList = new SolrDocumentList();
         List<GeneProductDocument> docTerms = Collections.emptyList();
 
@@ -60,7 +60,7 @@ class GeneProductSolrQueryResultConverterTest {
     }
 
     @Test
-    void geneProductSolrDocumentIsConvertedIntoGeneProduct() throws Exception {
+    void geneProductSolrDocumentIsConvertedIntoGeneProduct() {
         String termId = "A0A015KZI4";
         GeneProductDocument geneProductDoc = createGeneProductDoc(termId);
 

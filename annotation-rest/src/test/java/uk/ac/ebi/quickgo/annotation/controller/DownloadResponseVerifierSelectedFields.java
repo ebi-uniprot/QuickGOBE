@@ -27,7 +27,7 @@ public class DownloadResponseVerifierSelectedFields {
 
     static class TSVSelectedFieldsMatcher extends TypeSafeMatcher<String> {
         private static final String TYPE = "TSV";
-        private String[] expectedFields;
+        private final String[] expectedFields;
 
         TSVSelectedFieldsMatcher(String[] expectedFields) {
             this.expectedFields = expectedFields;

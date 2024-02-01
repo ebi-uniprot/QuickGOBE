@@ -11,7 +11,6 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import static java.util.Arrays.asList;
 
@@ -23,7 +22,7 @@ import static java.util.Arrays.asList;
  * @author Edd
  */
 public class AnnotationDocMocker {
-    public static AtomicLong rowNumberGenerator = new AtomicLong();
+    public static final AtomicLong rowNumberGenerator = new AtomicLong();
     public static final String GO_ID = "GO:0003824";
     public static final String ECO_ID = "ECO:0000256";
     public static final String REFERENCE = "GO_REF:0000002";

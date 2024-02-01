@@ -66,7 +66,7 @@ class QuickGOIndexMainTest {
         }
 
         @Bean
-        protected Step testStep() throws Exception {
+        protected Step testStep() {
             return this.steps
                     .get("test step")
                     .<String, String>chunk(1)
@@ -97,7 +97,7 @@ class QuickGOIndexMainTest {
             return System.out::println;
         }
 
-        public static void main(String[] args) throws Exception {
+        public static void main(String[] args) {
             System.exit(QuickGOIndexMain.run(SuccessfulTestApp.class, args));
         }
     }
@@ -119,7 +119,7 @@ class QuickGOIndexMainTest {
             };
         }
 
-        public static void main(String[] args) throws Exception {
+        public static void main(String[] args) {
             System.exit(QuickGOIndexMain.run(SuccessfulTestApp.class, args));
         }
     }

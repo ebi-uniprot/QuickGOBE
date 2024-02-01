@@ -18,7 +18,7 @@ class DBXRefEntityTest {
     private DBXRefEntity entity1;
 
     @BeforeEach
-    void setup() throws Exception {
+    void setup() {
 
         entity1 = new DBXRefEntity();
 

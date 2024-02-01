@@ -20,8 +20,8 @@ import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.*;
 class AndDescendantsFilterConverterTest {
   private OntologyRelatives response;
   private AndDescendantsFilterConverter converter;
-  private String field = AnnotationFields.Searchable.GP_RELATED_GO_IDS;
-  private String goField = AnnotationFields.Searchable.GO_ID;
+  private final String field = AnnotationFields.Searchable.GP_RELATED_GO_IDS;
+  private final String goField = AnnotationFields.Searchable.GO_ID;
 
   @BeforeEach
   void setUp() {

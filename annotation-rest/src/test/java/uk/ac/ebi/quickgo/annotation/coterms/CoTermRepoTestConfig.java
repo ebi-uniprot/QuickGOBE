@@ -33,7 +33,7 @@ public class CoTermRepoTestConfig {
 
     @Bean
     @Profile(FAILED_RETRIEVAL)
-    public CoTermRepository failedCoTermLoading() throws IOException {
+    public CoTermRepository failedCoTermLoading() {
         return createEmptyRepository();
     }
 

@@ -22,7 +22,7 @@ import static org.hamcrest.core.IsNull.nullValue;
  * Created with IntelliJ IDEA.
  */
 public class OntologyNameInjectorTestHelper {
-    public static String TEST_GO_ID = "go id in test";
+    public static final String TEST_GO_ID = "go id in test";
     public static final BasicOntology basicOntology = createBasicOntology();
 
     private static BasicOntology createBasicOntology() {

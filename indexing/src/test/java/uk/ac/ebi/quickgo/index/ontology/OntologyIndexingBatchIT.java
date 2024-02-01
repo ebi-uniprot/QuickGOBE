@@ -36,7 +36,6 @@ import java.util.List;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.slf4j.LoggerFactory.getLogger;
 import static uk.ac.ebi.quickgo.index.ontology.OntologyConfig.ONTOLOGY_INDEXING_STEP_NAME;
@@ -221,10 +220,8 @@ class OntologyIndexingBatchIT {
      * configure the mocked {@link OntologyReader} to produce the corresponding results.
      *
      * @param readResults a list of intended results (documents / exceptions)
-     * @throws Exception this exception should never occur because the reading is being done from a mocked
-     *         {@link OntologyReader}.
      */
-    private void mockResponseFromReader(List<OntologyReadResult> readResults) throws Exception {
+    private void mockResponseFromReader(List<OntologyReadResult> readResults) {
         Stubber stubber = null;
 
         int goCount = 0;

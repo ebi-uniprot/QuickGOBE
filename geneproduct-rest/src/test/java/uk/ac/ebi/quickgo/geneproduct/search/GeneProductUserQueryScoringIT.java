@@ -17,8 +17,7 @@ import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepository;
 import java.util.Arrays;
 
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.junit.MatcherAssume.assumeThat;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -1146,7 +1145,7 @@ class GeneProductUserQueryScoringIT {
 
     @Test
     void partialInSameWordReturnsShortestMatchesFirst() throws Exception {
-        assumeThat(FIXED_GOA_2041, is(true));
+        assumeTrue(FIXED_GOA_2041);
 
         GeneProductDocument doc1 =
                 createDoc(VALID_ID_1, "metal 1", "symbol", "tax 1", "a synonym one twothree");
@@ -1170,7 +1169,7 @@ class GeneProductUserQueryScoringIT {
 
     @Test
     void partialInDifferentWordsReturnsShortestMatchesFirst() throws Exception {
-        assumeThat(FIXED_GOA_2041, is(true));
+        assumeTrue(FIXED_GOA_2041);
 
         GeneProductDocument doc1 =
                 createDoc(VALID_ID_1, "metal 1", "symbol", null, "a synon is like, err, awesome");
@@ -1194,7 +1193,7 @@ class GeneProductUserQueryScoringIT {
 
     @Test
     void suiteOfTripletWordTests() {
-        assumeThat(FIXED_GOA_2041, is(true));
+        assumeTrue(FIXED_GOA_2041);
 
         StringBuilder report = new StringBuilder("\n\n========== Start of test report ==========").append
                 ("\n");

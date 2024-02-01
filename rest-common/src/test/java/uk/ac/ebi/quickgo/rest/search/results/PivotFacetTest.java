@@ -12,10 +12,10 @@ import static uk.ac.ebi.quickgo.rest.search.results.PivotFacet.*;
  * Tests the behaviour of the {@link PivotFacet} class.
  */
 class PivotFacetTest {
-    private String[] pivotFields = {"field1", "field2"};
-    private String field = "field";
-    private String value = "value";
-    private Long count = 1L;
+    private final String[] pivotFields = {"field1", "field2"};
+    private final String field = "field";
+    private final String value = "value";
+    private final Long count = 1L;
 
     @Test
     void nullFieldsInPivotFacetCreationThrowsException()  {

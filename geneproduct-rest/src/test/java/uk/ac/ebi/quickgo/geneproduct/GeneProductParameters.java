@@ -9,7 +9,7 @@ public enum GeneProductParameters {
     DB_SUBSET_PARAM("dbSubset"),
     PROTEOME_PARAM("proteome");
 
-    private String name;
+    private final String name;
 
     GeneProductParameters(String name) {
         this.name = name;

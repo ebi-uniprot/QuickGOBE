@@ -47,17 +47,17 @@ class OntologySolrQueryResultConverterTest {
     private Map<String, String> fieldNameMap;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         converter = new OntologySolrQueryResultConverter(binderMock, goConverterMock, ecoConverterMock, fieldNameMap);
     }
 
     @Test
-    void nullResultsListThrowsAssertionError() throws Exception {
+    void nullResultsListThrowsAssertionError() {
         assertThrows(AssertionError.class, () -> converter.convertResults(null));
     }
 
     @Test
-    void emptySolrDocListReturnsEmptyResults() throws Exception {
+    void emptySolrDocListReturnsEmptyResults() {
         SolrDocumentList solrDocList = new SolrDocumentList();
         List<OntologyDocument> docTerms = Collections.emptyList();
 
@@ -69,7 +69,7 @@ class OntologySolrQueryResultConverterTest {
     }
 
     @Test
-    void goSolrDocumentIsConvertedIntoGoTerm() throws Exception {
+    void goSolrDocumentIsConvertedIntoGoTerm() {
         String termId = "GO:0006915";
         String termOntologyType = "GO";
         OntologyDocument ontologyDoc = createOntologyDoc(termId, termOntologyType);
@@ -90,7 +90,7 @@ class OntologySolrQueryResultConverterTest {
     }
 
     @Test
-    void ecoSolrDocumentIsConvertedIntoGoTerm() throws Exception {
+    void ecoSolrDocumentIsConvertedIntoGoTerm() {
         String termId = "ECO:0000200";
         String termOntologyType = "ECO";
         OntologyDocument ontologyDoc = createOntologyDoc(termId, termOntologyType);

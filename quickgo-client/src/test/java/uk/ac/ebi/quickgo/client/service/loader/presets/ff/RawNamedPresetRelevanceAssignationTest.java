@@ -26,12 +26,12 @@ class RawNamedPresetRelevanceAssignationTest {
     }
 
     @Test
-    void invalidItemIsFiltered() throws Exception {
+    void invalidItemIsFiltered() {
         assertThat(relevanceChecker.process(createAssignedBy("invalid")), is(nullValue()));
     }
 
     @Test
-    void validItemIsNotFiltered() throws Exception {
+    void validItemIsNotFiltered() {
         assertThat(relevanceChecker.process(createAssignedBy(UNIPROT)), is(not(nullValue())));
         assertThat(relevanceChecker.process(createAssignedBy(UNIPROT)).name, is(UNIPROT));
     }

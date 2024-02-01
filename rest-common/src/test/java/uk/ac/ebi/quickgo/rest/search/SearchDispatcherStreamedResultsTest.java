@@ -28,7 +28,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.*;
 import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.createFirstCursorPage;
@@ -53,7 +52,7 @@ class SearchDispatcherStreamedResultsTest {
     @Mock
     private FilterContext context;
 
-    private DefaultSearchQueryTemplate queryTemplate = new DefaultSearchQueryTemplate();
+    private final DefaultSearchQueryTemplate queryTemplate = new DefaultSearchQueryTemplate();
 
     private ResultTransformerChain<QueryResult<String>> transformer;
 

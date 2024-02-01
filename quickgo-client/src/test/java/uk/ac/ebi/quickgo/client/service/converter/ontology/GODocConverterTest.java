@@ -17,12 +17,12 @@ class GODocConverterTest {
     private GODocConverter converter;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         converter = new GODocConverter();
     }
 
     @Test
-        void ontologyDocumentWithPopulatedAspectIsConvertedIntoGoTermWithPopulatedAspect() throws Exception {
+        void ontologyDocumentWithPopulatedAspectIsConvertedIntoGoTermWithPopulatedAspect() {
         String aspect = Aspect.BIOLOGICAL_PROCESS.getScientificName();
 
         OntologyDocument doc = new OntologyDocument();
@@ -34,7 +34,7 @@ class GODocConverterTest {
     }
 
     @Test
-    void ontologyDocumentWithNullAspectIsConvertedIntoGoTermWithNullAspect() throws Exception {
+    void ontologyDocumentWithNullAspectIsConvertedIntoGoTermWithNullAspect() {
         OntologyDocument doc = new OntologyDocument();
         assertThat(doc.aspect, nullValue());
 
@@ -44,7 +44,7 @@ class GODocConverterTest {
     }
 
     @Test
-    void ontologyDocumentWithUnknownAspectIsConvertedRegardless() throws Exception {
+    void ontologyDocumentWithUnknownAspectIsConvertedRegardless() {
         OntologyDocument doc = new OntologyDocument();
         doc.aspect = "Dish_Washing";
 

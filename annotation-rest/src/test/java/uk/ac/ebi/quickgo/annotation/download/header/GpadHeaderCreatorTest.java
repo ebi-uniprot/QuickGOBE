@@ -18,9 +18,9 @@ import static org.mockito.Mockito.when;
  */
 class GpadHeaderCreatorTest {
 
-    private OntologyHeaderInfo mockOntology = mock(OntologyHeaderInfo.class);
-    private ResponseBodyEmitter mockEmitter = mock(ResponseBodyEmitter.class);
-    private HeaderContent mockContent = mock(HeaderContent.class);
+    private final OntologyHeaderInfo mockOntology = mock(OntologyHeaderInfo.class);
+    private final ResponseBodyEmitter mockEmitter = mock(ResponseBodyEmitter.class);
+    private final HeaderContent mockContent = mock(HeaderContent.class);
 
     @BeforeEach
     void setup() {

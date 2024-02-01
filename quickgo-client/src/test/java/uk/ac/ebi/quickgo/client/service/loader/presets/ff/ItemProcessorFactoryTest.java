@@ -66,19 +66,19 @@ class ItemProcessorFactoryTest {
         }
 
         @Test
-        void nullRawPresetIsInvalid() throws Exception {
+        void nullRawPresetIsInvalid() {
             assertThrows(ValidationException.class, () -> validator.process(null));
         }
 
         @Test
-        void nullNameIsInvalid() throws Exception {
+        void nullNameIsInvalid() {
             RawNamedPreset value = new RawNamedPreset();
             value.name = null;
             assertThrows(ValidationException.class, () -> validator.process(value));
         }
 
         @Test
-        void emptyNameIsInvalid() throws Exception {
+        void emptyNameIsInvalid() {
             RawNamedPreset value = new RawNamedPreset();
             value.name = "";
             assertThrows(ValidationException.class, () -> validator.process(value));

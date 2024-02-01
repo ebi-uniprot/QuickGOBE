@@ -21,7 +21,7 @@ class HeaderUriTest {
 
     private static final String URI = "/QuickGO/services/annotation/downloadSearch?downloadLimit=7&geneProductId" +
             "=UniProtKB:A0A000&includeFields=goName,taxonName";
-    private HttpServletRequest servletRequest = mock(HttpServletRequest.class);
+    private final HttpServletRequest servletRequest = mock(HttpServletRequest.class);
     private static final Map<String,String[]> parameterMap = new HashMap<>();
     static {
         parameterMap.put("downloadLimit",new String[] {"7"});

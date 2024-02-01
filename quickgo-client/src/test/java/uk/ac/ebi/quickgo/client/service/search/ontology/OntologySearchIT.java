@@ -38,7 +38,7 @@ class OntologySearchIT extends SearchControllerSetup {
     private OntologyRepository repository;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         repository.deleteAll();
         resourceUrl = ONTOLOGY_RESOURCE_URL;
     }

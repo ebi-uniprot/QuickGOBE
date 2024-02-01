@@ -664,38 +664,38 @@ class OntologyGraphTest {
         }
 
         @Test
-        void findingChildrenWithANullVertexThrowsException() throws Exception {
+        void findingChildrenWithANullVertexThrowsException() {
             assertThrows(IllegalArgumentException.class, () -> ontologyGraph.children(null));
         }
 
         @Test
-        void findingChildrenWithAEmptyVertexThrowsException() throws Exception {
+        void findingChildrenWithAEmptyVertexThrowsException() {
             assertThrows(IllegalArgumentException.class, () -> ontologyGraph.children(""));
         }
 
         @Test
-        void finds1IsAChildOfParent1() throws Exception {
+        void finds1IsAChildOfParent1() {
             Set<OntologyRelationship> expectedChildren = ontologyGraph.children(parentId, IS_A);
 
             assertThat(expectedChildren, contains(childIsA));
         }
 
         @Test
-        void finds2HasPartChildrenOfParent1() throws Exception {
+        void finds2HasPartChildrenOfParent1() {
             Set<OntologyRelationship> expectedChildren = ontologyGraph.children(parentId, HAS_PART);
 
             assertThat(expectedChildren, containsInAnyOrder(childHasPart1, childHasPart2));
         }
 
         @Test
-        void findsAllChildrenOfParent1WithoutAnyRelationshipsSetAsArguments() throws Exception {
+        void findsAllChildrenOfParent1WithoutAnyRelationshipsSetAsArguments() {
             Set<OntologyRelationship> expectedChildren = ontologyGraph.children(parentId);
 
             assertThat(expectedChildren, containsInAnyOrder(childHasPart1, childHasPart2, childIsA, childRegulates));
         }
 
         @Test
-        void doesNotFindGrandParentOfParentWhenSearchingForChildren() throws Exception {
+        void doesNotFindGrandParentOfParentWhenSearchingForChildren() {
             Set<OntologyRelationship> expectedChildren = ontologyGraph.children(parentId);
 
             assertThat(expectedChildren, hasSize(4));
@@ -703,7 +703,7 @@ class OntologyGraphTest {
         }
 
         @Test
-        void doesNotFindGrandChildOfParentWhenSearchingForChildren() throws Exception {
+        void doesNotFindGrandChildOfParentWhenSearchingForChildren() {
             Set<OntologyRelationship> expectedChildren = ontologyGraph.children(parentId);
 
             assertThat(expectedChildren, hasSize(4));
@@ -735,38 +735,38 @@ class OntologyGraphTest {
         }
 
         @Test
-        void findingParentsWithANullVertexThrowsException() throws Exception {
+        void findingParentsWithANullVertexThrowsException() {
             assertThrows(IllegalArgumentException.class, () -> ontologyGraph.parents(null));
         }
 
         @Test
-        void findingParentsWithAnEmptyVertexThrowsException() throws Exception {
+        void findingParentsWithAnEmptyVertexThrowsException() {
             assertThrows(IllegalArgumentException.class, () -> ontologyGraph.parents(""));
         }
 
         @Test
-        void finds1IsAParentOfChild1() throws Exception {
+        void finds1IsAParentOfChild1() {
             Set<OntologyRelationship> expectedParents = ontologyGraph.parents(childId, IS_A);
 
             assertThat(expectedParents, contains(parentIsA));
         }
 
         @Test
-        void finds2HasPartParentsOfChild1() throws Exception {
+        void finds2HasPartParentsOfChild1() {
             Set<OntologyRelationship> expectedParents = ontologyGraph.parents(childId, HAS_PART);
 
             assertThat(expectedParents, containsInAnyOrder(parentHasPart1, parentHasPart2));
         }
 
         @Test
-        void findsAllParentsOfChild1WithoutAnyRelationshipsSetAsArguments() throws Exception {
+        void findsAllParentsOfChild1WithoutAnyRelationshipsSetAsArguments() {
             Set<OntologyRelationship> expectedParents = ontologyGraph.parents(childId);
 
             assertThat(expectedParents, containsInAnyOrder(parentIsA, parentHasPart1, parentHasPart2, parentRegulates));
         }
 
         @Test
-        void doesNotFindChildOfChild1WhenSearchingForParents() throws Exception {
+        void doesNotFindChildOfChild1WhenSearchingForParents() {
             Set<OntologyRelationship> expectedParents = ontologyGraph.parents(childId);
 
             assertThat(expectedParents, hasSize(4));
@@ -774,7 +774,7 @@ class OntologyGraphTest {
         }
 
         @Test
-        void doesNotFinGrandParentOfChildWhenSearchingForParents() throws Exception {
+        void doesNotFinGrandParentOfChildWhenSearchingForParents() {
             Set<OntologyRelationship> expectedParents = ontologyGraph.parents(childId);
 
             assertThat(expectedParents, hasSize(4));

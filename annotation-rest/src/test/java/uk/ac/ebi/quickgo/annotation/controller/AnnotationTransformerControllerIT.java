@@ -80,7 +80,7 @@ class AnnotationTransformerControllerIT {
     private ObjectMapper dtoMapper;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         mockMvc = MockMvcBuilders.
                 webAppContextSetup(webApplicationContext)
                 .build();

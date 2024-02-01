@@ -27,12 +27,12 @@ class StringToOntologyRelationshipMapperTest {
     }
 
     @Test
-    void nullFieldSetThrowsException() throws Exception {
+    void nullFieldSetThrowsException() {
         assertThrows(IllegalArgumentException.class, () -> mapper.mapFieldSet(null));
     }
 
     @Test
-    void fieldSetWithInsufficientValuesThrowsException() throws Exception {
+    void fieldSetWithInsufficientValuesThrowsException() {
         String[] tokens = new String[numColumns() - 1];
         FieldSet fieldSet = new DefaultFieldSet(tokens);
         assertThrows(IncorrectTokenCountException.class, () -> mapper.mapFieldSet(fieldSet));

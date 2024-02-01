@@ -29,7 +29,7 @@ class GenericTermToODocConverterTest {
 
     @Mock public GenericTerm term;
 
-    private GenericTermToODocConverter converter = new GenericTermToODocConverter();
+    private final GenericTermToODocConverter converter = new GenericTermToODocConverter();
 
     @BeforeEach
     void setup() {

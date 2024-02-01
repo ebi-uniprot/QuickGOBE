@@ -71,7 +71,7 @@ class QualifierPresetsConfigTest {
     }
 
     @Test
-    void avoidsNullPointerExceptionIfNameIsNull() throws Exception {
+    void avoidsNullPointerExceptionIfNameIsNull() {
         QualifierPresetsConfig config = new QualifierPresetsConfig();
 
         List<RawNamedPreset> rawNamedPresets = new ArrayList<>();

@@ -22,7 +22,7 @@ class AbstractHeaderCreatorTest {
 
     private final ResponseBodyEmitter mockEmitter = mock(ResponseBodyEmitter.class);
     private final HeaderContent mockContent = mock(HeaderContent.class);
-    private AbstractHeaderCreator abstractHeaderCreator = new AbstractHeaderCreator() {
+    private final AbstractHeaderCreator abstractHeaderCreator = new AbstractHeaderCreator() {
         @Override protected void output(ResponseBodyEmitter emitter, HeaderContent content) throws IOException {
             emitter.send(content);
         }

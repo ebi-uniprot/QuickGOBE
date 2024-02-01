@@ -33,7 +33,7 @@ class ItemRateWriterListenerTest {
     }
 
     @Test
-    void computesRateAfterOneWrite() throws Exception {
+    void computesRateAfterOneWrite() {
         int numDocs = 40;
         Instant fiveSecsAfterStart = start.plusSeconds(5);
 
@@ -48,7 +48,7 @@ class ItemRateWriterListenerTest {
     }
 
     @Test
-    void computesRateAfterMultipleWrites() throws Exception {
+    void computesRateAfterMultipleWrites() {
         int tenDocs = 10;
         long twoSeconds = 2L;
         Instant twoSecsAfterStart = start.plusSeconds(twoSeconds);

@@ -18,19 +18,19 @@ class StringToGeneProductMapperTest {
     private StringToGeneProductMapper mapper;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         mapper = new StringToGeneProductMapper();
     }
 
     @Test
-    void nullFieldSetThrowsException() throws Exception {
+    void nullFieldSetThrowsException() {
         assertThrows(IllegalArgumentException.class, () -> {
             mapper.mapFieldSet(null);
         });
     }
 
     @Test
-    void fieldSetWithInsufficientValuesThrowsException() throws Exception {
+    void fieldSetWithInsufficientValuesThrowsException() {
         assertThrows(IncorrectTokenCountException.class, () -> {
             String[] tokens = new String[numColumns() - 1];
             FieldSet fieldSet = new DefaultFieldSet(tokens);

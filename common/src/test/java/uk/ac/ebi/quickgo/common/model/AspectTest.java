@@ -1,6 +1,5 @@
 package uk.ac.ebi.quickgo.common.model;
 
-import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 import static java.util.Optional.*;

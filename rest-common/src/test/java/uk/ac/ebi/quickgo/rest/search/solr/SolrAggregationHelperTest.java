@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.isEmptyString;
+import static org.hamcrest.Matchers.emptyString;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.ac.ebi.quickgo.rest.search.solr.AggregateToStringConverter.NUM_BUCKETS;
@@ -74,7 +74,7 @@ class SolrAggregationHelperTest {
     void fieldWithNoPrefixReturnsAnEmptyPrefixWhenExtractingPrefix()  {
         String prefix = fieldPrefixExtractor(GP_ID_FIELD);
 
-        assertThat(prefix, isEmptyString());
+        assertThat(prefix, emptyString());
     }
 
     @Test
@@ -94,7 +94,7 @@ class SolrAggregationHelperTest {
     void emptyPrefixedFieldThrowsExceptionWhenExtractingField()  {
         String fieldName = fieldNameExtractor("");
 
-        assertThat(fieldName, isEmptyString());
+        assertThat(fieldName, emptyString());
     }
 
     @Test

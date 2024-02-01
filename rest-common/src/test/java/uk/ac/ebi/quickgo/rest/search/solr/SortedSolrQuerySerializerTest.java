@@ -23,7 +23,7 @@ import static uk.ac.ebi.quickgo.rest.search.solr.SortedSolrQuerySerializer.RETRI
 class SortedSolrQuerySerializerTest {
     private static final String FIELD_WILDCARD = "fieldWC";
     private SortedSolrQuerySerializer serializer;
-    private static Set<String> wildCardCompatibleFields = new HashSet<>();
+    private static final Set<String> wildCardCompatibleFields = new HashSet<>();
 
     static {
         wildCardCompatibleFields.add(FIELD_WILDCARD);

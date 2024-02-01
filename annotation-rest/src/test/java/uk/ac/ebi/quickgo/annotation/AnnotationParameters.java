@@ -29,7 +29,7 @@ public enum AnnotationParameters {
     SELECTED_FIELD_PARAM("selectedFields"),
     PROTEOME_PARAM("proteome");
 
-    private String name;
+    private final String name;
 
     AnnotationParameters(String name) {
         this.name = name;

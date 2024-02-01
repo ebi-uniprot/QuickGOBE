@@ -51,7 +51,7 @@ class OntologyRepositoryIT {
     }
 
     @Test
-    void add1DocumentThenFind1Documents() throws IOException, SolrServerException {
+    void add1DocumentThenFind1Documents() {
         ontologyRepository.save(OntologyDocMocker.createGODoc("A", "Alice Cooper"));
 
         assertThat(ontologyRepository.findAll(PageRequest.of(0, 10)).getTotalElements(), is(1L));

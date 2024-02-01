@@ -31,8 +31,8 @@ class SlimmedStatsInjectorTest {
     private List<StatisticsGroup> stats;
     private StatisticsGroup annotationGroup;
     private StatisticsByType annotationGoStatsType;
-    private StatisticsByType gpGoStatsType = new StatisticsByType(GO_ID_TYPE_NAME);
-    private StatisticsValue gpGoValue = new StatisticsValue(go(1), UNTOUCHED_HITS, TOTAL);
+    private final StatisticsByType gpGoStatsType = new StatisticsByType(GO_ID_TYPE_NAME);
+    private final StatisticsValue gpGoValue = new StatisticsValue(go(1), UNTOUCHED_HITS, TOTAL);
     private List<StatisticsGroup> initialStatsGroups;
 
     @BeforeEach

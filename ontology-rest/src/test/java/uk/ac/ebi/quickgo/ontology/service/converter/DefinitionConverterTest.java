@@ -25,13 +25,13 @@ class DefinitionConverterTest {
     private OntologyDocument doc;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         converter = new DefinitionConverter();
         doc = createOBODoc("id", "name");
     }
 
     @Test
-    void convertsDocWithDefinitionTextAndNoTextXrefsIntoADefinitionObjectWithJustTheText() throws Exception {
+    void convertsDocWithDefinitionTextAndNoTextXrefsIntoADefinitionObjectWithJustTheText() {
         String text = "This is the definition of the ontology term";
 
         doc.definition = text;
@@ -44,7 +44,7 @@ class DefinitionConverterTest {
     }
 
     @Test
-    void convertsDocWithNullDefinitionXrefListIntoDefinitionObjectWithEmptyXrefs() throws Exception {
+    void convertsDocWithNullDefinitionXrefListIntoDefinitionObjectWithEmptyXrefs() {
         String text = "This is the definition of the ontology term";
 
         doc.definition = text;
@@ -57,8 +57,7 @@ class DefinitionConverterTest {
     }
 
     @Test
-    void convertsDocWithNoDefinitionTextAndWithASingleTextXrefIntoADefinitionObjectWithJustTheXref()
-            throws Exception {
+    void convertsDocWithNoDefinitionTextAndWithASingleTextXrefIntoADefinitionObjectWithJustTheXref() {
         String text = null;
 
         String xrefId = "id";
@@ -81,8 +80,7 @@ class DefinitionConverterTest {
     }
 
     @Test
-    void convertsDocWithADefinitionTextAndWithMultipleTextXrefsIntoADefinitionObjectWithADefinitionAndXrefs()
-            throws Exception {
+    void convertsDocWithADefinitionTextAndWithMultipleTextXrefsIntoADefinitionObjectWithADefinitionAndXrefs() {
         String text = "This is the definition of the ontology term";
 
         String xrefId1 = "id1";

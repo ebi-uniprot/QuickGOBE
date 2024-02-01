@@ -20,7 +20,7 @@ class GeneProductParsingHelperTest {
 
 
     @Test
-    void nullDelimiterThrowsException() throws Exception {
+    void nullDelimiterThrowsException() {
         assertThrows(IllegalArgumentException.class, () -> {
             String value = "";
 
@@ -29,7 +29,7 @@ class GeneProductParsingHelperTest {
     }
 
     @Test
-    void nullPropertyReturnsEmptyArray() throws Exception {
+    void nullPropertyReturnsEmptyArray() {
         String prop = null;
 
         String[] splitArray = splitValue(prop, INTRA_VALUE_DELIMITER);
@@ -38,7 +38,7 @@ class GeneProductParsingHelperTest {
     }
 
     @Test
-    void emptyPropertyReturnsEmptyArray() throws Exception {
+    void emptyPropertyReturnsEmptyArray() {
         String prop = "";
 
         String[] splitArray = splitValue(prop, INTRA_VALUE_DELIMITER);
@@ -47,7 +47,7 @@ class GeneProductParsingHelperTest {
     }
 
     @Test
-    void propWithNoDelimiterReturnsArrayWithOneElement() throws Exception {
+    void propWithNoDelimiterReturnsArrayWithOneElement() {
         String key = "key";
         String prop = key;
 
@@ -58,7 +58,7 @@ class GeneProductParsingHelperTest {
     }
 
     @Test
-    void propWithDelimiterReturnsArrayWithTwoElements() throws Exception {
+    void propWithDelimiterReturnsArrayWithTwoElements() {
         String key = "key";
         String value = "value";
         String prop = concatProperty(key, value, INTRA_VALUE_DELIMITER);
@@ -70,28 +70,28 @@ class GeneProductParsingHelperTest {
     }
 
     @Test
-    void nullTaxonValueReturnsDefaultTaxonId() throws Exception {
+    void nullTaxonValueReturnsDefaultTaxonId() {
         int taxonId = extractTaxonIdFromValue(null);
 
         assertThat(taxonId, is(GeneProductParsingHelper.DEFAULT_TAXON_ID));
     }
 
     @Test
-    void emptyTaxonValueReturnsDefaultTaxonId() throws Exception {
+    void emptyTaxonValueReturnsDefaultTaxonId() {
         int taxonId = extractTaxonIdFromValue("");
 
         assertThat(taxonId, is(GeneProductParsingHelper.DEFAULT_TAXON_ID));
     }
 
     @Test
-    void nonMatchingTaxonValueReturnsDefaultTaxonId() throws Exception {
+    void nonMatchingTaxonValueReturnsDefaultTaxonId() {
         int taxonId = extractTaxonIdFromValue("undefined");
 
         assertThat(taxonId, is(GeneProductParsingHelper.DEFAULT_TAXON_ID));
     }
 
     @Test
-    void validTaxonValueReturnsCorrespondingTaxonId() throws Exception {
+    void validTaxonValueReturnsCorrespondingTaxonId() {
         int expectedTaxonId = 33;
 
         int taxonId = extractTaxonIdFromValue(createUnconvertedTaxonId(expectedTaxonId));
@@ -100,7 +100,7 @@ class GeneProductParsingHelperTest {
     }
 
     @Test
-    void nullTaxonValueDoesNotMatchRegex() throws Exception {
+    void nullTaxonValueDoesNotMatchRegex() {
         String taxonValue = null;
 
         boolean matches = taxonIdMatchesRegex(taxonValue);
@@ -109,7 +109,7 @@ class GeneProductParsingHelperTest {
     }
 
     @Test
-    void emptyTaxonValueDoesNotMatchRegex() throws Exception {
+    void emptyTaxonValueDoesNotMatchRegex() {
         String taxonValue = "";
 
         boolean matches = taxonIdMatchesRegex(taxonValue);
@@ -118,7 +118,7 @@ class GeneProductParsingHelperTest {
     }
 
     @Test
-    void incorrectTaxonValueDoesNotMatchRegex() throws Exception {
+    void incorrectTaxonValueDoesNotMatchRegex() {
         String taxonValue = "undefined";
 
         boolean matches = taxonIdMatchesRegex(taxonValue);
@@ -127,7 +127,7 @@ class GeneProductParsingHelperTest {
     }
 
     @Test
-    void taxonValueWithNoTaxonIdDoesNotMatchRegex() throws Exception {
+    void taxonValueWithNoTaxonIdDoesNotMatchRegex() {
         String taxonValue = "taxon:";
 
         boolean matches = taxonIdMatchesRegex(taxonValue);
@@ -136,7 +136,7 @@ class GeneProductParsingHelperTest {
     }
 
     @Test
-    void taxonValueWithNegativeTaxonIdDoesNotMatchRegex() throws Exception {
+    void taxonValueWithNegativeTaxonIdDoesNotMatchRegex() {
         String taxonValue = createUnconvertedTaxonId(-1);
 
         boolean matches = taxonIdMatchesRegex(taxonValue);
@@ -145,7 +145,7 @@ class GeneProductParsingHelperTest {
     }
 
     @Test
-    void taxonValueWithPositiveTaxonIdDoesMatchRegex() throws Exception {
+    void taxonValueWithPositiveTaxonIdDoesMatchRegex() {
         String taxonValue = createUnconvertedTaxonId(1);
 
         boolean matches = taxonIdMatchesRegex(taxonValue);

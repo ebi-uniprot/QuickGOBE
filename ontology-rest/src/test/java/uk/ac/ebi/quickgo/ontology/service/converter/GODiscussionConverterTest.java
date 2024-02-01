@@ -17,12 +17,12 @@ class GODiscussionConverterTest {
     private GODiscussionConverter converter;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         converter = new GODiscussionConverter();
     }
 
     @Test
-    void convertsValidTextBasedGoDiscussion() throws Exception {
+    void convertsValidTextBasedGoDiscussion() {
         String title = "Viral Processes";
         String url = "http://wiki.geneontology.org/index.php/Virus_terms";
 
@@ -39,7 +39,7 @@ class GODiscussionConverterTest {
     }
 
     @Test
-    void returnsEmptyOptionalWhenTextBasedGoDiscussionHasWrongNumberOfFields() throws Exception {
+    void returnsEmptyOptionalWhenTextBasedGoDiscussionHasWrongNumberOfFields() {
         String wrongTextFormatGoDiscussion = "Wrong format";
 
         Optional<GOTerm.GODiscussion> expectedGoDiscussionOpt = converter.apply(wrongTextFormatGoDiscussion);

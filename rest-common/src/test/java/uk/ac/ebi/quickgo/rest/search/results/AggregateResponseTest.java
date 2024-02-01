@@ -135,14 +135,12 @@ class AggregateResponseTest {
     }
 
     @Test
-    void aggregationWithNoResultsOrNestedResultsOrBucketsReturnsFalseWhenQueriedIfItsPopulated() throws
-                                                                                                        Exception {
+    void aggregationWithNoResultsOrNestedResultsOrBucketsReturnsFalseWhenQueriedIfItsPopulated() {
         assertThat(aggregation.isPopulated(), is(false));
     }
 
     @Test
-    void aggregationWithAResultAndNoNestedResultsAndNoBucketsReturnsTrueWhenQueriedIfItsPopulated() throws
-                                                                                                           Exception {
+    void aggregationWithAResultAndNoNestedResultsAndNoBucketsReturnsTrueWhenQueriedIfItsPopulated() {
         aggregationResultsManager.addAggregateResult(AggregateFunction.COUNT, "field", 0);
 
         assertThat(aggregation.isPopulated(), is(true));

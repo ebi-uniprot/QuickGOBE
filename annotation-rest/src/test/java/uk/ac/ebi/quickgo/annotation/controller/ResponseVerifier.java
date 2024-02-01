@@ -157,7 +157,7 @@ final class ResponseVerifier {
     private static class CompositeResultMatcher implements ResultMatcher {
         private final List<ResultMatcher> matchers = new ArrayList<>();
 
-        @Override public void match(MvcResult result) throws Exception {
+        @Override public void match(MvcResult result) {
             matchers.forEach(matcher -> {
                 try {
                     matcher.match(result);
