@@ -75,15 +75,15 @@ class OBOControllerTest {
             OntologyRestConfig.OntologyPagingConfig ontologyPagingConfig,
             OntologySpecifier ontologySpecifier,
             HttpHeadersProvider headersProvider) {
-        return new OBOController<FakeOBOTerm>(ontologyService,
-                                              searchService,
-                                              searchableField,
-                                              retrievalConfig,
-                                              graphImageService,
-                                              oboControllerValidationHelper,
-                                              ontologyPagingConfig,
-                                              ontologySpecifier,
-                                              headersProvider) {
+        return new OBOController<>(ontologyService,
+          searchService,
+          searchableField,
+          retrievalConfig,
+          graphImageService,
+          oboControllerValidationHelper,
+          ontologyPagingConfig,
+          ontologySpecifier,
+          headersProvider) {
         };
     }
 

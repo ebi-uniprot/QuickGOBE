@@ -37,9 +37,7 @@ class AnnotationDocumentConverterTest {
 
     @Test
     void nullAnnotationThrowsException() {
-        Assertions.assertThrows(DocumentReaderException.class, () -> {
-            converter.process(null);
-        });
+        Assertions.assertThrows(DocumentReaderException.class, () -> converter.process(null));
     }
 
     @Test

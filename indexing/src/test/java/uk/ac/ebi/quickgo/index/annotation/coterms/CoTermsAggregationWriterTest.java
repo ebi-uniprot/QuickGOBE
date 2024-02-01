@@ -68,16 +68,12 @@ class CoTermsAggregationWriterTest {
 
     @Test
     void exceptionThrownIfNullAnnotationPassedToAddRowToMatrix() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            aggregator.write(null);
-        });
+        assertThrows(IllegalArgumentException.class, () -> aggregator.write(null));
     }
 
     @Test
     void exceptionThrownIfNullPredicatePassedToConstructor() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            new CoTermsAggregationWriter(null);
-        });
+        assertThrows(IllegalArgumentException.class, () -> new CoTermsAggregationWriter(null));
     }
 
     private List<AnnotationDocument> createDocs(String... geneProductIds) {

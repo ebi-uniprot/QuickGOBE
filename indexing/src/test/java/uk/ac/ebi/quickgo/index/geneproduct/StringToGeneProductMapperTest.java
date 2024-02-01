@@ -24,9 +24,7 @@ class StringToGeneProductMapperTest {
 
     @Test
     void nullFieldSetThrowsException() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            mapper.mapFieldSet(null);
-        });
+        assertThrows(IllegalArgumentException.class, () -> mapper.mapFieldSet(null));
     }
 
     @Test

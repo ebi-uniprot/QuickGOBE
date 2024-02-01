@@ -62,7 +62,7 @@ class AnnotationControllerStatisticsDownloadIT {
     private static final String GO_ID_STATS_FIELD = "goId";
     private static final String TAXON_NAME = "taxon name: " + 12345;
     private static final String TAXON_ID = "12345";
-    private static final Function<Integer, String> toId = i -> IdGeneratorUtil.createGoId(i);
+    private static final Function<Integer, String> toId = IdGeneratorUtil::createGoId;
     private static final Function<Integer, String> toName = i -> IdGeneratorUtil.createGoId(i) + " name";
     private static final String TAXON_ID_PARAMETER_NAME = "taxonId";
 

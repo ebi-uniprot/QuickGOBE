@@ -60,7 +60,7 @@ class JoinFilterConverterTest {
         addConfigProperty(FROM_ATTRIBUTE_NAME, FROM_ATTRIBUTE_VALUE);
         addConfigProperty(TO_TABLE_NAME, TO_TABLE_VALUE);
         addConfigProperty(TO_ATTRIBUTE_NAME, TO_ATTRIBUTE_VALUE);
-        assertThrows(IllegalArgumentException.class, () -> initialiseConverter());
+        assertThrows(IllegalArgumentException.class, this::initialiseConverter);
     }
 
     @Test
@@ -68,7 +68,7 @@ class JoinFilterConverterTest {
         addConfigProperty(FROM_TABLE_NAME, FROM_TABLE_VALUE);
         addConfigProperty(TO_TABLE_NAME, TO_TABLE_VALUE);
         addConfigProperty(TO_ATTRIBUTE_NAME, TO_ATTRIBUTE_VALUE);
-        assertThrows(IllegalArgumentException.class, () -> initialiseConverter());
+        assertThrows(IllegalArgumentException.class, this::initialiseConverter);
     }
 
     @Test
@@ -76,7 +76,7 @@ class JoinFilterConverterTest {
         addConfigProperty(FROM_TABLE_NAME, FROM_TABLE_VALUE);
         addConfigProperty(FROM_ATTRIBUTE_NAME, FROM_ATTRIBUTE_VALUE);
         addConfigProperty(TO_ATTRIBUTE_NAME, TO_ATTRIBUTE_VALUE);
-        assertThrows(IllegalArgumentException.class, () -> initialiseConverter());
+        assertThrows(IllegalArgumentException.class, this::initialiseConverter);
     }
 
     @Test
@@ -84,7 +84,7 @@ class JoinFilterConverterTest {
         addConfigProperty(FROM_TABLE_NAME, FROM_TABLE_VALUE);
         addConfigProperty(FROM_ATTRIBUTE_NAME, FROM_ATTRIBUTE_VALUE);
         addConfigProperty(TO_TABLE_NAME, TO_TABLE_VALUE);
-        assertThrows(IllegalArgumentException.class, () -> initialiseConverter());
+        assertThrows(IllegalArgumentException.class, this::initialiseConverter);
     }
 
     @Test

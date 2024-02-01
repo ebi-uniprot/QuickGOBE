@@ -423,14 +423,11 @@ class AnnotationControllerDownloadIT {
     }
 
     private String getFileNameEndingFor(MediaType mediaType) {
-        switch (mediaType.getSubtype()) {
-            case MediaTypeFactory.GAF_SUB_TYPE:
-            case MediaTypeFactory.GPAD_SUB_TYPE:
-            case MediaTypeFactory.TSV_SUB_TYPE:
-                return "." + mediaType.getSubtype() + "\"";
-            default:
-                throw new IllegalArgumentException("Unknown media type: " + mediaType);
-        }
+      return switch (mediaType.getSubtype()) {
+        case MediaTypeFactory.GAF_SUB_TYPE, MediaTypeFactory.GPAD_SUB_TYPE, MediaTypeFactory.TSV_SUB_TYPE ->
+          "." + mediaType.getSubtype() + "\"";
+        default -> throw new IllegalArgumentException("Unknown media type: " + mediaType);
+      };
     }
 
     private void canDownloadWithFilterAllAvailableItems(MediaType mediaType) throws Exception {

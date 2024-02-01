@@ -89,9 +89,7 @@ class CoTermsForSelectedTermTest {
 
     @Test
     void passingNullToAddAndCalculateCausesException(){
-        assertThrows(IllegalArgumentException.class, () -> {
-            new CoTermsForSelectedTerm.Builder().addCoTerm(null);
-        });
+        assertThrows(IllegalArgumentException.class, () -> new CoTermsForSelectedTerm.Builder().addCoTerm(null));
     }
 
 

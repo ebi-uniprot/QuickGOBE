@@ -98,16 +98,12 @@ class OntologyReaderTest {
 
         @Test
         void openingEmptyGOWillCauseDocumentReaderException() {
-            assertThrows(IllegalArgumentException.class, () -> {
-                ontologyReader = new OntologyReader(validGO, null);
-            });
+            assertThrows(IllegalArgumentException.class, () -> ontologyReader = new OntologyReader(validGO, null));
         }
 
         @Test
         void openingEmptyECOWillCauseDocumentReaderException() {
-            assertThrows(IllegalArgumentException.class, () -> {
-                ontologyReader = new OntologyReader(null, validECO);
-            });
+            assertThrows(IllegalArgumentException.class, () -> ontologyReader = new OntologyReader(null, validECO));
         }
 
         @Test

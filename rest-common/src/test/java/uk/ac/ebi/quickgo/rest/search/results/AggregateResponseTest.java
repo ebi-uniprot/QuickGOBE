@@ -94,7 +94,7 @@ class AggregateResponseTest {
     void nestedAggregateGetsAddedToStoredAggregates() {
         AggregateResponse nestedAggregation =
                 new AggregateResponse("nestedAggregation", new AggregationResultsManager(),
-                        new LinkedHashSet(), new LinkedHashSet(), 5);
+                        new LinkedHashSet<>(), new LinkedHashSet<>(), 5);
         nestedAggregations.add(nestedAggregation);
 
         Set<AggregateResponse> retrievedAggregates = aggregation.getNestedAggregations();
@@ -114,7 +114,7 @@ class AggregateResponseTest {
             {
         AggregateResponse nestedAggregation =
                 new AggregateResponse("nestedAggregation", new AggregationResultsManager(),
-                        new LinkedHashSet(), new LinkedHashSet(), 5);
+                        new LinkedHashSet<>(), new LinkedHashSet<>(), 5);
         nestedAggregations.add(nestedAggregation);
 
         assertThat(aggregation.hasNestedAggregations(), is(true));
@@ -151,7 +151,7 @@ class AggregateResponseTest {
             {
         AggregateResponse nestedAggregation =
                 new AggregateResponse("nestedAggregation", new AggregationResultsManager(),
-                        new LinkedHashSet(), new LinkedHashSet(), 5);
+                        new LinkedHashSet<>(), new LinkedHashSet<>(), 5);
         nestedAggregations.add(nestedAggregation);
 
         assertThat(aggregation.isPopulated(), is(true));

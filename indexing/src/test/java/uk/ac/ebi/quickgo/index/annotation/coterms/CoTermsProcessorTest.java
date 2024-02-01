@@ -60,9 +60,7 @@ class CoTermsProcessorTest {
 
     @Test
     void aggregatorIsNullCausesException() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            new CoTermsProcessor(null);
-        });
+        assertThrows(IllegalArgumentException.class, () -> new CoTermsProcessor(null));
     }
 
 }

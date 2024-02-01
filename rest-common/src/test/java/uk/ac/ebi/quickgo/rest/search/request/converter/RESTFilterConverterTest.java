@@ -285,11 +285,11 @@ class RESTFilterConverterTest {
         }
 
         private RESTFilterConverter<QuickGOQuery> createConverter(FilterConfig config) {
-            return new RESTFilterConverter<QuickGOQuery>(config, mock(RestTemplate.class)) {
-                @Override
-                RESTRequesterImpl.Builder createRestRequesterBuilder() {
-                    return restRequestBuilderMock;
-                }
+            return new RESTFilterConverter<>(config, mock(RestTemplate.class)) {
+              @Override
+              RESTRequesterImpl.Builder createRestRequesterBuilder() {
+                return restRequestBuilderMock;
+              }
             };
         }
     }

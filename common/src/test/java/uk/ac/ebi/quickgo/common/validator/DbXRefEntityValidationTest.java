@@ -94,8 +94,6 @@ class DbXRefEntityValidationTest {
 
 	@Test
 	void throwsErrorIfEntitiesIsNull(){
-        assertThrows(IllegalArgumentException.class, () -> {
-            dbXrefEntities = DbXRefEntityValidation.createWithData(null);
-        });
+        assertThrows(IllegalArgumentException.class, () -> dbXrefEntities = DbXRefEntityValidation.createWithData(null));
     }
 }

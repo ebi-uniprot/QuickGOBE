@@ -215,12 +215,7 @@ class GraphPresentationTest {
     class arrowLineRelativeFont{
         @Test
         void onlyAcceptsBasicStroke() {
-            Stroke stroke = new Stroke() {
-                @Override
-                public Shape createStrokedShape(Shape p) {
-                  return null;
-                }
-            };
+            Stroke stroke = p -> null;
 
             assertThrows(ClassCastException.class, ()->style.arrowLineRelativeFont(stroke));
         }

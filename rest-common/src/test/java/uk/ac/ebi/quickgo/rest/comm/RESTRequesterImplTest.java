@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.rest.comm;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import org.junit.jupiter.api.BeforeEach;
@@ -206,31 +207,23 @@ class RESTRequesterImplTest {
         requesterBuilder.addRequestParameter(param, value);
     }
 
-    static class FakeDTO {
-        final String value;
+    record FakeDTO(String value) {
 
-        FakeDTO(String value) {
-            this.value = value;
-        }
+        @Override
+        public boolean equals(Object o) {
+                if (this == o) {
+                    return true;
+                }
+                if (o == null || getClass() != o.getClass()) {
+                    return false;
+                }
 
-        @Override public int hashCode() {
-            return value != null ? value.hashCode() : 0;
-        }
+                FakeDTO fakeDTO = (FakeDTO) o;
 
-        @Override public boolean equals(Object o) {
-            if (this == o) {
-                return true;
+                return Objects.equals(value, fakeDTO.value);
+
             }
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-
-            FakeDTO fakeDTO = (FakeDTO) o;
-
-            return value != null ? value.equals(fakeDTO.value) : fakeDTO.value == null;
-
         }
-    }
 
     static class ReturnWithDelay extends Returns {
 

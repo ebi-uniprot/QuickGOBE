@@ -63,9 +63,7 @@ class GeneProductDocumentConverterTest {
 
     @Test
     void nullGeneProductThrowsException() {
-        assertThrows(DocumentReaderException.class, () -> {
-            converter.process(null);
-        });
+        assertThrows(DocumentReaderException.class, () -> converter.process(null));
     }
 
     @Test

@@ -629,16 +629,6 @@ class AnnotationRequestTest {
     }
     //----------------- helpers
     private String getDefaultTaxonSearchField() {
-        String field;
-        switch (AnnotationRequest.DEFAULT_TAXON_USAGE) {
-            case "descendants":
-                field = AnnotationFields.Searchable.TAXON_ANCESTORS;
-                break;
-            case "exact":
-            default:
-                field = AnnotationFields.Searchable.TAXON_ID;
-                break;
-        }
-        return field;
+      return AnnotationFields.Searchable.TAXON_ANCESTORS;
     }
 }

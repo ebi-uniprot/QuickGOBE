@@ -446,9 +446,7 @@ class GenericTermToODocConverterTest {
 
     @Test
     void cannotConvertNullGenericTerm() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            converter.apply(null);
-        });
+        assertThrows(IllegalArgumentException.class, () -> converter.apply(null));
     }
 
     private boolean creditExists(TermCredit credit, Collection<String> extractedCredits) {

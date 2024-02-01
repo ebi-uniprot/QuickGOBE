@@ -101,12 +101,7 @@ class AbstractValueInjectorTest {
 
     }
 
-    private static class ConcreteResponse implements ResponseType {
-        ConcreteResponse(String idFromResponse) {
-            this.idFromResponse = idFromResponse;
-        }
-
-        final String idFromResponse;
+    private record ConcreteResponse(String idFromResponse) implements ResponseType {
     }
 
     private static class ConcreteModel {

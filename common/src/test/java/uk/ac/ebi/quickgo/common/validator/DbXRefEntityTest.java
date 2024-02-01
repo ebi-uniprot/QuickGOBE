@@ -70,23 +70,17 @@ class DbXRefEntityTest {
 
 	@Test
 	void exceptionThrownIfDatabaseIsNull(){
-        assertThrows(IllegalArgumentException.class, () -> {
-            new DbXRefEntity(null, entityType, entityTypeName, idValidationPattern, dbURL, CASE_SENSITIVE_MATCHING);
-        });
+        assertThrows(IllegalArgumentException.class, () -> new DbXRefEntity(null, entityType, entityTypeName, idValidationPattern, dbURL, CASE_SENSITIVE_MATCHING));
     }
 
 	@Test
 	void exceptionThrownIfEntityTypeIsNull(){
-        assertThrows(IllegalArgumentException.class, () -> {
-            new DbXRefEntity(database, null, entityTypeName, idValidationPattern, dbURL, CASE_SENSITIVE_MATCHING);
-        });
+        assertThrows(IllegalArgumentException.class, () -> new DbXRefEntity(database, null, entityTypeName, idValidationPattern, dbURL, CASE_SENSITIVE_MATCHING));
     }
 
 	@Test
 	void exceptionThrownIfIdValidationPatternIsNull(){
-        assertThrows(IllegalArgumentException.class, () -> {
-            new DbXRefEntity(database, entityType, entityTypeName, null, dbURL, CASE_SENSITIVE_MATCHING);
-        });
+        assertThrows(IllegalArgumentException.class, () -> new DbXRefEntity(database, entityType, entityTypeName, null, dbURL, CASE_SENSITIVE_MATCHING));
     }
 
 	@Test

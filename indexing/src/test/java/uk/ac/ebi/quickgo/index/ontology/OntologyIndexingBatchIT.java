@@ -227,25 +227,19 @@ class OntologyIndexingBatchIT {
         int goCount = 0;
         int ecoCount = 0;
         for (OntologyReadResult readResult : readResults) {
-            switch (readResult) {
-                case GO_DOC:
-                    OntologyDocument goDoc = createGODoc(GO + goCount, GO + goCount++ + "name");
-                    stubber = (stubber == null) ? doReturn(goDoc) : stubber.doReturn(goDoc);
-                    break;
-                case ECO_DOC:
-                    OntologyDocument ecoDoc = createECODoc(ECO + ecoCount, ECO + ecoCount++ + "name");
-                    stubber = (stubber == null) ? doReturn(ecoDoc) : stubber.doReturn(ecoDoc);
-                    break;
-                case NULL:
-                    stubber = (stubber == null) ? doReturn(null) : stubber.doReturn(null);
-                    break;
-                case DOC_READER_EXCEPTION:
-                    stubber = (stubber == null) ? doThrow(new DocumentReaderException("Error!"))
-                            : stubber.doThrow(new DocumentReaderException("Error!"));
-                    break;
-                default:
-                    throw new IllegalStateException("Read result not handled: " + readResult);
+          stubber = switch (readResult) {
+            case GO_DOC -> {
+              OntologyDocument goDoc = createGODoc(GO + goCount, GO + goCount++ + "name");
+              yield (stubber == null) ? doReturn(goDoc) : stubber.doReturn(goDoc);
             }
+            case ECO_DOC -> {
+              OntologyDocument ecoDoc = createECODoc(ECO + ecoCount, ECO + ecoCount++ + "name");
+              yield (stubber == null) ? doReturn(ecoDoc) : stubber.doReturn(ecoDoc);
+            }
+            case NULL -> (stubber == null) ? doReturn(null) : stubber.doReturn(null);
+            case DOC_READER_EXCEPTION -> (stubber == null) ? doThrow(new DocumentReaderException("Error!"))
+              : stubber.doThrow(new DocumentReaderException("Error!"));
+          };
         }
 
         if (stubber != null) {

@@ -39,12 +39,12 @@ class QuickGOQueryTest {
 
     @Test
     void generalisedOrWithNoQueriesCausesException() {
-        assertThrows(IllegalArgumentException.class, () -> or());
+        assertThrows(IllegalArgumentException.class, QuickGOQuery::or);
     }
 
     @Test
     void generalisedAndWithNoQueriesCausesException() {
-        assertThrows(IllegalArgumentException.class, () -> QuickGOQuery.and());
+        assertThrows(IllegalArgumentException.class, QuickGOQuery::and);
     }
 
     @Test

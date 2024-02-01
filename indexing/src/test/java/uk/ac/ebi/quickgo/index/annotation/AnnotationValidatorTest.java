@@ -28,9 +28,7 @@ class AnnotationValidatorTest {
     // check required fields -------------------------------------------------
     @Test
     void nullAnnotationThrowsException() {
-        assertThrows(DocumentReaderException.class, () -> {
-            validator.validate(null);
-        });
+        assertThrows(DocumentReaderException.class, () -> validator.validate(null));
     }
 
     @Test

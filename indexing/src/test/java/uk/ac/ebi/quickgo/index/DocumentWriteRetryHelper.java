@@ -40,18 +40,14 @@ public class DocumentWriteRetryHelper {
     public static Stubber stubSolrWriteResponses(List<SolrResponse> responses) {
         Stubber stubber = null;
         for (SolrResponse response : responses) {
-            switch (response) {
-                case OK:
-                    stubber = (stubber == null) ? doNothing() : stubber.doNothing();
-                    break;
-                case REMOTE_EXCEPTION:
-                    String msg = "Host: " + HOST + ", Code: " + CODE + ", Message: " + MESSAGE;
-                    stubber = (stubber == null) ? doThrow(new SolrServerException(msg))
-                            : stubber.doThrow(new SolrServerException(msg));
-                    break;
-                default:
-                    throw new IllegalStateException("Unknown SolrResponse");
+          stubber = switch (response) {
+            case OK -> (stubber == null) ? doNothing() : stubber.doNothing();
+            case REMOTE_EXCEPTION -> {
+              String msg = "Host: " + HOST + ", Code: " + CODE + ", Message: " + MESSAGE;
+              yield (stubber == null) ? doThrow(new SolrServerException(msg))
+                : stubber.doThrow(new SolrServerException(msg));
             }
+          };
         }
         return stubber;
     }

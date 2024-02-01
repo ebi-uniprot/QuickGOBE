@@ -38,9 +38,7 @@ class SiteMapStepListenerTest {
 
     @Test
     void nullSiteMapGeneratorCausesException() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            new SiteMapStepListener(null);
-        });
+        assertThrows(IllegalArgumentException.class, () -> new SiteMapStepListener(null));
     }
 
     @Test

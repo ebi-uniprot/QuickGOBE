@@ -48,14 +48,14 @@ class AbstractSolrQueryResultConverterTest {
 
     @BeforeEach
     void setUp()  {
-        converter = new AbstractSolrQueryResultConverter<String>() {
+        converter = new AbstractSolrQueryResultConverter<>() {
 
-            @Override
-            protected List<String> convertResults(SolrDocumentList results) {
-                return results.stream()
-                        .map(SolrDocument::toString)
-                        .collect(Collectors.toList());
-            }
+          @Override
+          protected List<String> convertResults(SolrDocumentList results) {
+            return results.stream()
+              .map(SolrDocument::toString)
+              .collect(Collectors.toList());
+          }
         };
 
         converter.setQueryResultHighlightingConverter(new SolrQueryResultHighlightingConverter(
@@ -91,7 +91,7 @@ class AbstractSolrQueryResultConverterTest {
     void responseWithNoResults()  {
         QueryRequest request = createDefaultRequest(DEFAULT_QUERY);
 
-        QueryResult result = converter.convert(responseMock, request);
+        QueryResult<String> result = converter.convert(responseMock, request);
 
         assertThat(result.getNumberOfHits(), is(0L));
         assertThat(result.getResults().isEmpty(), is(true));
@@ -103,7 +103,7 @@ class AbstractSolrQueryResultConverterTest {
     void requestWithRegularPagingRendersResponseWithNoResults()  {
         QueryRequest request = createRequestWithPaging(DEFAULT_QUERY, new RegularPage(1, 1));
 
-        QueryResult result = converter.convert(responseMock, request);
+        QueryResult<String> result = converter.convert(responseMock, request);
 
         assertThat(result.getNumberOfHits(), is(0L));
         assertThat(result.getResults().isEmpty(), is(true));
@@ -123,7 +123,7 @@ class AbstractSolrQueryResultConverterTest {
         String expectedNextCursor = "fakeCursor";
 
         when(responseMock.getNextCursorMark()).thenReturn(expectedNextCursor);
-        QueryResult result = converter.convert(responseMock, request);
+        QueryResult<String> result = converter.convert(responseMock, request);
 
         assertThat(result.getNumberOfHits(), is(0L));
         assertThat(result.getResults().isEmpty(), is(true));
@@ -141,7 +141,7 @@ class AbstractSolrQueryResultConverterTest {
         String expectedNextCursor = "fakeCursor";
 
         when(responseMock.getNextCursorMark()).thenReturn(expectedNextCursor);
-        QueryResult result = converter.convert(responseMock, request);
+        QueryResult<String> result = converter.convert(responseMock, request);
 
         assertThat(result.getNumberOfHits(), is(0L));
         assertThat(result.getResults().isEmpty(), is(true));
@@ -162,7 +162,7 @@ class AbstractSolrQueryResultConverterTest {
 
         QueryResponse response = new QueryResponse();
 
-        QueryResult result = converter.convert(response, request);
+        QueryResult<String> result = converter.convert(response, request);
 
         assertThat(result.getNumberOfHits(), is(0L));
         assertThat(result.getResults().isEmpty(), is(true));
@@ -181,7 +181,7 @@ class AbstractSolrQueryResultConverterTest {
 
         when(responseMock.getResults()).thenReturn(docList);
 
-        QueryResult result = converter.convert(responseMock, request);
+        QueryResult<String> result = converter.convert(responseMock, request);
 
         assertThat(result.getNumberOfHits(), is(2L));
         assertThat(result.getResults().size(), is(2));
@@ -198,7 +198,7 @@ class AbstractSolrQueryResultConverterTest {
 
         when(responseMock.getResults()).thenReturn(docList);
 
-        QueryResult result = converter.convert(responseMock, request);
+        QueryResult<String> result = converter.convert(responseMock, request);
 
         checkPageInfo(result.getPageInfo(), 2, 1, 1);
     }
@@ -216,7 +216,7 @@ class AbstractSolrQueryResultConverterTest {
         when(responseMock.getResults()).thenReturn(docList);
         when(responseMock.getNextCursorMark()).thenReturn(expectedNextCursor);
 
-        QueryResult result = converter.convert(responseMock, request);
+        QueryResult<String> result = converter.convert(responseMock, request);
 
         checkPageInfo(result.getPageInfo(), 2, PageInfo.CURSOR_PAGE_NUMBER, expectedNextCursor, 1);
     }
@@ -229,7 +229,7 @@ class AbstractSolrQueryResultConverterTest {
         List<FacetField> solrFacetResponse = Collections.singletonList(setupSolrFacetResponse(facetFieldField));
         when(responseMock.getFacetFields()).thenReturn(solrFacetResponse);
 
-        QueryResult result = converter.convert(responseMock, request);
+        QueryResult<String> result = converter.convert(responseMock, request);
 
         Facet facet = result.getFacet();
         assertThat(facet, is(not(nullValue())));
@@ -260,7 +260,7 @@ class AbstractSolrQueryResultConverterTest {
 
         when(responseMock.getHighlighting()).thenReturn(solrHighlightingResponse);
 
-        QueryResult result = converter.convert(responseMock, request);
+        QueryResult<String> result = converter.convert(responseMock, request);
 
         assertThat(result.getHighlighting(), is(Collections.emptyList()));
     }
@@ -284,7 +284,7 @@ class AbstractSolrQueryResultConverterTest {
 
         when(responseMock.getHighlighting()).thenReturn(solrHighlightingResponse);
 
-        QueryResult result = converter.convert(responseMock, request);
+        QueryResult<String> result = converter.convert(responseMock, request);
 
         assertThat(result.getHighlighting().size(), is(1));
     }

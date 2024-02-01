@@ -108,16 +108,12 @@ class GOADataFileParsingHelperTest {
 
     @Test
     void splittingOnNullDelimiterCausesException() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            splitValue("some value", null);
-        });
+        assertThrows(IllegalArgumentException.class, () -> splitValue("some value", null));
     }
 
     @Test
     void splittingIntegerListOnNullDelimiterCausesException() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            splitValueToIntegerList("1,3", null);
-        });
+        assertThrows(IllegalArgumentException.class, () -> splitValueToIntegerList("1,3", null));
     }
 
     @Test

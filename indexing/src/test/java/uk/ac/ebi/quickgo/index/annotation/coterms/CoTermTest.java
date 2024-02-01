@@ -47,51 +47,37 @@ class CoTermTest {
 
     @Test
     void calculateSimilarityRatioSelectEqualToZeroThrowsException() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            CoTerm.calculateSimilarityRatio(0, TOGETHER, COMPARED);
-        });
+        assertThrows(IllegalArgumentException.class, () -> CoTerm.calculateSimilarityRatio(0, TOGETHER, COMPARED));
     }
 
     @Test
     void calculateProbabilityRatioSelectEqualToZeroThrowsException() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            CoTerm.calculateProbabilityRatio(0L, TOGETHER, ALL, COMPARED);
-        });
+        assertThrows(IllegalArgumentException.class, () -> CoTerm.calculateProbabilityRatio(0L, TOGETHER, ALL, COMPARED));
     }
 
     @Test
     void calculateProbabilityRatioAllEqualToZeroThrowsException() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            CoTerm.calculateProbabilityRatio(SELECTED, TOGETHER, 0L, COMPARED);
-        });
+        assertThrows(IllegalArgumentException.class, () -> CoTerm.calculateProbabilityRatio(SELECTED, TOGETHER, 0L, COMPARED));
     }
 
     @Test
     void ifSetTargetIsPassedNullAnExceptionIsThrown() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            new CoTerm.Builder().setTarget(null);
-        });
+        assertThrows(IllegalArgumentException.class, () -> new CoTerm.Builder().setTarget(null));
     }
 
     @Test
     void ifSetTargetIsPassedEmptyStringAnExceptionIsThrown() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            new CoTerm.Builder().setTarget("   ");
-        });
+        assertThrows(IllegalArgumentException.class, () -> new CoTerm.Builder().setTarget("   "));
     }
 
     @Test
     void ifSetComparedTermIsPassedNullAnExceptionIsThrown() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            new CoTerm.Builder().setComparedTerm(null);
-        });
+        assertThrows(IllegalArgumentException.class, () -> new CoTerm.Builder().setComparedTerm(null));
     }
 
     @Test
     void ifSetComparedTermIsPassedEmptyStringAnExceptionIsThrown() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            new CoTerm.Builder().setComparedTerm("   ");
-        });
+        assertThrows(IllegalArgumentException.class, () -> new CoTerm.Builder().setComparedTerm("   "));
     }
 
     @Test

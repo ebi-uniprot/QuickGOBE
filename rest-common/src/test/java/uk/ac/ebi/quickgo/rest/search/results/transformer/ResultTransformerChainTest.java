@@ -75,12 +75,8 @@ class ResultTransformerChainTest {
         assertThat(transformedResult.value, is(transformationResult2.value));
     }
 
-    private static class FakeResult {
-        FakeResult(String value) {
-            this.value = value;
-        }
+    private record FakeResult(String value) {
 
-        private final String value;
     }
 
 }
