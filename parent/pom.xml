@@ -45,7 +45,7 @@
         <springfox-swagger2.version>2.7.0</springfox-swagger2.version>
 
         <!-- plugin version numbers -->
-        <jacoco.version>0.7.8</jacoco.version>
+        <jacoco.version>0.8.8</jacoco.version>
 
         <!-- jmeter default properties -->
         <jmeter-maven-plugin.version>1.10.1</jmeter-maven-plugin.version>
