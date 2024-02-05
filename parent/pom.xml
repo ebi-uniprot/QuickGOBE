@@ -38,7 +38,7 @@
         <jacoco.itReportPath>${jacoco.outputDir}/${jacoco.out.it.file}</jacoco.itReportPath>
 
         <!-- dependency version numbers -->
-        <guava.version>29.0-jre</guava.version>
+        <guava.version>32.0.0-jre</guava.version>
 
         <solr.version>8.4.0</solr.version>
         <core-dropwizard-metrics.version>3.2.6</core-dropwizard-metrics.version>
