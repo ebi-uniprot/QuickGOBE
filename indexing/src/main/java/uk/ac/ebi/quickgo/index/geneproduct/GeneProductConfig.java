@@ -4,8 +4,9 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
@@ -61,9 +62,6 @@ public class GeneProductConfig {
     private static final String SPECIFIC_VALUE_DELIMITER = ",";
 
     @Autowired
-    private JobBuilderFactory jobBuilders;
-
-    @Autowired
     private StepBuilderFactory stepBuilders;
 
     @Value("${indexing.geneproduct.source}")
@@ -91,8 +89,8 @@ public class GeneProductConfig {
     private SolrTemplate geneProductTemplate;
 
     @Bean
-    public Job geneProductJob() {
-        return jobBuilders.get(GENE_PRODUCT_INDEXING_JOB_NAME)
+    public Job geneProductJob(JobRepository jobRepository) {
+        return new JobBuilder(GENE_PRODUCT_INDEXING_JOB_NAME, jobRepository)
                 .start(geneProductIndexingStep())
                 .listener(logJobListener())
                 // commit the documents to the solr server

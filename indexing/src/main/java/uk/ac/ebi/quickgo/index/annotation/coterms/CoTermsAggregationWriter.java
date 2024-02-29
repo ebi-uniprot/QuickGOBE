@@ -3,6 +3,8 @@ package uk.ac.ebi.quickgo.index.annotation.coterms;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 
 import com.google.common.base.Preconditions;
+import org.springframework.batch.item.Chunk;
+
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Predicate;
@@ -56,7 +58,7 @@ public class CoTermsAggregationWriter extends AbstractItemStreamItemWriter<Annot
      * rethrow it as appropriate.
      */
     @Override
-    public void write(List<? extends AnnotationDocument> items) throws Exception {
+    public void write(Chunk<? extends AnnotationDocument> items) throws Exception {
         Preconditions.checkArgument(items != null, "Null annotation passed to process");
         items.stream()
                 .filter(this.toBeProcessed::test)

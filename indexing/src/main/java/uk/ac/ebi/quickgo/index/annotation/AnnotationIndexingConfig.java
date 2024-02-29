@@ -18,8 +18,9 @@ import java.util.List;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileParseException;
@@ -72,8 +73,6 @@ public class AnnotationIndexingConfig {
     @Autowired
     private SolrTemplate annotationTemplate;
     @Autowired
-    private JobBuilderFactory jobBuilders;
-    @Autowired
     private StepBuilderFactory stepBuilders;
     @Autowired
     private Step coTermManualSummarizationStep;
@@ -95,8 +94,8 @@ public class AnnotationIndexingConfig {
     private ItemProcessor<AnnotationDocument, AnnotationDocument> annotationShardGenerator;
 
     @Bean
-    public Job annotationJob() {
-        return jobBuilders.get(ANNOTATION_INDEXING_JOB_NAME)
+    public Job annotationJob(JobRepository jobRepository) {
+        return new JobBuilder(ANNOTATION_INDEXING_JOB_NAME, jobRepository)
                           .start(annotationIndexingStep())
                           .next(coTermManualSummarizationStep)
                           .next(coTermAllSummarizationStep)

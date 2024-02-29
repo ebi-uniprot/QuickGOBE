@@ -3,8 +3,8 @@ package uk.ac.ebi.quickgo.ontology.traversal.read;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
 import uk.ac.ebi.quickgo.ontology.traversal.OntologyGraph;
 
-import java.util.List;
 import org.slf4j.Logger;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -24,8 +24,9 @@ public class OntologyGraphPopulator implements ItemWriter<OntologyRelationship> 
         this.ontologyGraph = ontologyGraph;
     }
 
-    @Override public void write(List<? extends OntologyRelationship> list) throws Exception {
-        LOGGER.debug("Adding {} ontology graph tuples.", list.size());
-        ontologyGraph.addRelationships(list);
+    @Override
+    public void write(Chunk<? extends OntologyRelationship> list) throws Exception {
+        LOGGER.debug("Adding {} ontology graph tuples.", list.getItems().size());
+        ontologyGraph.addRelationships(list.getItems());
     }
 }

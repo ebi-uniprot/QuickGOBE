@@ -7,8 +7,9 @@ import uk.ac.ebi.quickgo.index.common.listener.LogJobListener;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,15 +52,11 @@ class QuickGOIndexMainTest {
         int itemCount = 0;
 
         @Autowired
-        private JobBuilderFactory jobBuilderFactory;
-
-        @Autowired
         private StepBuilderFactory steps;
 
         @Bean
-        public Job testJob() throws Exception {
-            return this.jobBuilderFactory
-                    .get("test job")
+        public Job testJob(JobRepository jobRepository) throws Exception {
+            return new JobBuilder("test job", jobRepository)
                     .start(testStep())
                     .listener(new LogJobListener())
                     .build();

@@ -14,8 +14,9 @@ import java.util.List;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.CompositeItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,9 +35,6 @@ import org.springframework.context.annotation.Import;
 public class OntologyConfig {
     static final String ONTOLOGY_INDEXING_JOB_NAME = "ontologyIndexingJob";
     static final String ONTOLOGY_INDEXING_STEP_NAME = "ontologyIndexStep";
-
-    @Autowired
-    private JobBuilderFactory jobBuilders;
 
     @Autowired
     private StepBuilderFactory stepBuilders;
@@ -60,8 +58,8 @@ public class OntologyConfig {
     private String sourceFile;
 
     @Bean
-    public Job ontologyJob(Step ontologyStep) {
-        return jobBuilders.get(ONTOLOGY_INDEXING_JOB_NAME)
+    public Job ontologyJob(Step ontologyStep, JobRepository jobRepository) {
+        return new JobBuilder(ONTOLOGY_INDEXING_JOB_NAME, jobRepository)
                 .start(ontologyStep)
                 .listener(logJobListener())
                 .build();

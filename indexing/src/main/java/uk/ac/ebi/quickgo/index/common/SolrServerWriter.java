@@ -2,8 +2,8 @@ package uk.ac.ebi.quickgo.index.common;
 
 import uk.ac.ebi.quickgo.common.QuickGODocument;
 
-import java.util.List;
 import org.apache.solr.client.solrj.SolrClient;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 
 /**
@@ -23,7 +23,8 @@ public class SolrServerWriter<D extends QuickGODocument> implements
         this.collection = collectionName;
     }
 
-    @Override public void write(List<? extends D> list) throws Exception {
-        server.addBeans(collection, list);
+    @Override
+    public void write(Chunk<? extends D> list) throws Exception {
+        server.addBeans(collection, list.getItems());
     }
 }

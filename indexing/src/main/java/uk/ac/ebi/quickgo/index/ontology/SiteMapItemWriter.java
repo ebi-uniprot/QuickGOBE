@@ -5,8 +5,9 @@ import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
 import com.redfin.sitemapgenerator.ChangeFreq;
 import com.redfin.sitemapgenerator.WebSitemapGenerator;
 import com.redfin.sitemapgenerator.WebSitemapUrl;
+import org.springframework.batch.item.Chunk;
+
 import java.util.Date;
-import java.util.List;
 import org.springframework.batch.item.ItemWriter;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -30,7 +31,8 @@ public class SiteMapItemWriter implements ItemWriter<OntologyDocument> {
         this.urlPrefix = urlPrefix;
     }
 
-    @Override public void write(List<? extends OntologyDocument> list) throws Exception {
+    @Override
+    public void write(Chunk<? extends OntologyDocument> list) throws Exception {
         for (OntologyDocument ontologyDocument : list) {
             WebSitemapUrl url = new WebSitemapUrl
                     .Options(buildTermURL(ontologyDocument))

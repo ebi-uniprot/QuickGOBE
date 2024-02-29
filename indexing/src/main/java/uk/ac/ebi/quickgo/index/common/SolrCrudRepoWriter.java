@@ -2,6 +2,7 @@ package uk.ac.ebi.quickgo.index.common;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.data.solr.repository.SolrCrudRepository;
 
@@ -32,7 +33,8 @@ public class SolrCrudRepoWriter<D extends QuickGODocument, R extends SolrCrudRep
         this.repository = repository;
     }
 
-    @Override public void write(List<? extends D> list) throws Exception {
+    @Override
+    public void write(Chunk<? extends D> list) throws Exception {
         LOGGER.info("Writing batch to the repository.");
         repository.saveAll(list);
     }

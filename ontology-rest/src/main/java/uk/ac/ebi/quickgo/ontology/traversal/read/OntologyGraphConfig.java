@@ -5,8 +5,9 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
@@ -48,9 +49,6 @@ public class OntologyGraphConfig {
     private static final String ONTOLOGY_TRAVERSAL_LOADING_JOB_NAME = "OntologyTraversalReadingJob";
     private static final String ONTOLOGY_TRAVERSAL_LOADING_STEP_NAME = "OntologyTraversalReadingStep";
     private static final String TAB = "\t";
-
-    @Autowired
-    private JobBuilderFactory jobBuilders;
     @Autowired
     private StepBuilderFactory stepBuilders;
     @Value("#{'${ontology.traversal.source:}'.split(',')}")
@@ -73,8 +71,8 @@ public class OntologyGraphConfig {
     }
 
     @Bean
-    public Job ontologyGraphBuildJob(OntologyGraph ontologyGraph) {
-        return jobBuilders.get(ONTOLOGY_TRAVERSAL_LOADING_JOB_NAME)
+    public Job ontologyGraphBuildJob(OntologyGraph ontologyGraph, JobRepository jobRepository) {
+        return new JobBuilder(ONTOLOGY_TRAVERSAL_LOADING_JOB_NAME, jobRepository)
                     .start(ontologyGraphBuildStep(ontologyGraph))
                     .listener(logJobListener())
                     .build();
