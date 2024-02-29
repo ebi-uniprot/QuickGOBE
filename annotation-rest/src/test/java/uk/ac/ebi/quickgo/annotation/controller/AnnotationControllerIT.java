@@ -2024,7 +2024,7 @@ class AnnotationControllerIT {
         mockRestServiceServer = MockRestServiceServer.createServer((RestTemplate) restOperations);
 
         String term = createGoId(1);
-        String url = String.format("https://localhost/QuickGO/services/ontology/go/terms/%s/descendants?relations=is_a,part_of,occurs_in",term);
+        String url = "https://localhost/QuickGO/services/ontology/go/terms/%s/descendants?relations=is_a,part_of,occurs_in".formatted(term);
 
         mockRestServiceServer.expect(requestTo(url)).andExpect(method(HttpMethod.GET))
           .andRespond(withSuccess("{\"results\": [{\"descendants\": [\"GO:0000001\"]}]}", MediaType.APPLICATION_JSON));
@@ -2143,7 +2143,7 @@ class AnnotationControllerIT {
     }
 
     private String getRequiredDateString(int year, int month, int date) {
-        return String.format(DATE_STRING_FORMAT, year, month, date);
+        return DATE_STRING_FORMAT.formatted(year, month, date);
     }
 
     //----- Setup data ---------------------//

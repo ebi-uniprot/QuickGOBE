@@ -1,8 +1,8 @@
 package uk.ac.ebi.quickgo.common.validator;
 
 import java.lang.annotation.*;
-import javax.validation.Constraint;
-import javax.validation.Payload;
+import jakarta.validation.Constraint;
+import jakarta.validation.Payload;
 
 /**
  * Annotation that allows a list of strings, separated by commas to be validated as Gene Product IDs

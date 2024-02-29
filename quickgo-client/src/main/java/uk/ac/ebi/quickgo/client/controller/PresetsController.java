@@ -8,11 +8,10 @@ import io.swagger.annotations.ApiOperation;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJacksonValue;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,7 +29,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 public class PresetsController {
     private final CompositePreset presets;
 
-    @Autowired
     public PresetsController(CompositePreset presets) {
         checkArgument(presets != null, "Preset information cannot be null");
 
@@ -46,8 +44,8 @@ public class PresetsController {
      */
     @ApiOperation(value = "Provides preset filtering information indicating valid terms and a corresponding " +
             "description; all of which are ordered by relevancy.")
-    @RequestMapping(method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public FilteredCompositePreset compositePreset(@RequestParam(name = "fields", required = false) String... fields) {
+    @GetMapping( produces = {MediaType.APPLICATION_JSON_VALUE})
+    public FilteredCompositePreset compositePreset(@RequestParam(required = false) String... fields) {
         return createFilteredPreset(fields);
     }
 

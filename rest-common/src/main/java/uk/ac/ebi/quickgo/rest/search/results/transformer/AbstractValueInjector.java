@@ -78,7 +78,7 @@ public abstract class AbstractValueInjector<T, M> implements ResponseValueInject
     }
 
     private static boolean causedByHttpStatus404(Throwable parentCause) {
-        return parentCause instanceof HttpClientErrorException
-                && ((HttpClientErrorException) parentCause).getStatusCode() == HttpStatus.NOT_FOUND;
+        return parentCause instanceof HttpClientErrorException hcee
+                && hcee.getStatusCode() == HttpStatus.NOT_FOUND;
     }
 }

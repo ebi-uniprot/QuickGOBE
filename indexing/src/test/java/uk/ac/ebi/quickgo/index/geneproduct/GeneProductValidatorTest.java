@@ -75,14 +75,14 @@ class GeneProductValidatorTest {
     void nullDatabaseThrowsException() {
         geneProduct.database = null;
 
-        assertActualCauseUponValidation(createValidationException(String.format(NULL_FIELD_MESSAGE, COLUMN_DB.getName())));
+        assertActualCauseUponValidation(createValidationException(NULL_FIELD_MESSAGE.formatted(COLUMN_DB.getName())));
     }
 
     @Test
     void emptyDatabaseThrowsException() {
         geneProduct.database = "";
 
-        assertActualCauseUponValidation(createValidationException(String.format(EMPTY_FIELD_MESSAGE, COLUMN_DB.getName())));
+        assertActualCauseUponValidation(createValidationException(EMPTY_FIELD_MESSAGE.formatted(COLUMN_DB.getName())));
     }
 
     @Test
@@ -96,14 +96,14 @@ class GeneProductValidatorTest {
     void nullIdThrowsException() {
         geneProduct.id = null;
 
-        assertActualCauseUponValidation(createValidationException(String.format(NULL_FIELD_MESSAGE, COLUMN_ID.getName())));
+        assertActualCauseUponValidation(createValidationException(NULL_FIELD_MESSAGE.formatted(COLUMN_ID.getName())));
     }
 
     @Test
     void emptyIdThrowsException() {
         geneProduct.id = "";
 
-        assertActualCauseUponValidation(createValidationException(String.format(EMPTY_FIELD_MESSAGE, COLUMN_ID.getName())));
+        assertActualCauseUponValidation(createValidationException(EMPTY_FIELD_MESSAGE.formatted(COLUMN_ID.getName())));
     }
 
     @Test
@@ -117,14 +117,14 @@ class GeneProductValidatorTest {
     void nullSymbolThrowsException() {
         geneProduct.symbol = null;
 
-        assertActualCauseUponValidation(createValidationException(String.format(NULL_FIELD_MESSAGE, COLUMN_SYMBOL.getName())));
+        assertActualCauseUponValidation(createValidationException(NULL_FIELD_MESSAGE.formatted(COLUMN_SYMBOL.getName())));
     }
 
     @Test
     void emptySymbolThrowsException() {
         geneProduct.symbol = "";
 
-        assertActualCauseUponValidation(createValidationException(String.format(EMPTY_FIELD_MESSAGE, COLUMN_SYMBOL.getName())));
+        assertActualCauseUponValidation(createValidationException(EMPTY_FIELD_MESSAGE.formatted(COLUMN_SYMBOL.getName())));
     }
 
     @Test
@@ -138,14 +138,14 @@ class GeneProductValidatorTest {
     void nullTypeThrowsException() {
         geneProduct.type = null;
 
-        assertActualCauseUponValidation(createValidationException(String.format(NULL_FIELD_MESSAGE, COLUMN_TYPE.getName())));
+        assertActualCauseUponValidation(createValidationException(NULL_FIELD_MESSAGE.formatted(COLUMN_TYPE.getName())));
     }
 
     @Test
     void emptyTypeThrowsException() {
         geneProduct.type = "";
 
-        assertActualCauseUponValidation(createValidationException(String.format(EMPTY_FIELD_MESSAGE, COLUMN_TYPE.getName())));
+        assertActualCauseUponValidation(createValidationException(EMPTY_FIELD_MESSAGE.formatted(COLUMN_TYPE.getName())));
     }
 
     @Test
@@ -199,14 +199,14 @@ class GeneProductValidatorTest {
     void nullTaxonIdThrowsException() {
         geneProduct.taxonId = null;
 
-        assertActualCauseUponValidation(createValidationException(String.format(NULL_FIELD_MESSAGE, COLUMN_TAXON_ID.getName())));
+        assertActualCauseUponValidation(createValidationException(NULL_FIELD_MESSAGE.formatted(COLUMN_TAXON_ID.getName())));
     }
 
     @Test
     void emptyTaxonIdThrowsException() {
         geneProduct.taxonId = "";
 
-        assertActualCauseUponValidation(createValidationException(String.format(EMPTY_FIELD_MESSAGE, COLUMN_TAXON_ID.getName())));
+        assertActualCauseUponValidation(createValidationException(EMPTY_FIELD_MESSAGE.formatted(COLUMN_TAXON_ID.getName())));
     }
 
     @Test

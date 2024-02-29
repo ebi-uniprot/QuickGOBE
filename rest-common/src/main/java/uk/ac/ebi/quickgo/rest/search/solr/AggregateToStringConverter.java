@@ -49,7 +49,7 @@ public class AggregateToStringConverter implements AggregateConverter<String> {
         Preconditions.checkArgument(field != null && !field.trim().isEmpty(), "Cannot merge null or empty field");
         Preconditions.checkArgument(function != null, "Cannot merge null aggregation function");
 
-        return String.format(AGG_FUNCTION_FORMAT, function.getName(), field);
+        return AGG_FUNCTION_FORMAT.formatted(function.getName(), field);
     }
 
     static String createFacetType(String type) {
@@ -57,7 +57,7 @@ public class AggregateToStringConverter implements AggregateConverter<String> {
                 "Cannot create facet type declaration with null or empty input parameter");
         switch (type) {
             case FACET_TYPE_TERM:
-                return String.format(FACET_TYPE_FORMAT, FACET_TYPE_TERM);
+                return FACET_TYPE_FORMAT.formatted(FACET_TYPE_TERM);
             default:
                 throw new IllegalArgumentException("Provided facet type is not valid: " + type);
         }
@@ -66,13 +66,13 @@ public class AggregateToStringConverter implements AggregateConverter<String> {
     static String createFacetField(String field) {
         Preconditions.checkArgument(field != null && !field.trim().isEmpty(),
                 "Cannot create facet field declaration with null or empty input parameter");
-        return String.format(FACET_FIELD_FORMAT, field);
+        return FACET_FIELD_FORMAT.formatted(field);
     }
 
     static String createLimitField(int limit) {
         Preconditions.checkArgument(limit > 0,
                 "Cannot create limit field declaration with input parameter <= 0");
-        return String.format(LIMIT_FIELD_FORMAT, limit);
+        return LIMIT_FIELD_FORMAT.formatted(limit);
     }
 
     /**
@@ -191,6 +191,6 @@ public class AggregateToStringConverter implements AggregateConverter<String> {
     }
 
     private static String encloseBlock(String blockContent) {
-        return String.format(AGG_BLOCK_FORMAT, blockContent);
+        return AGG_BLOCK_FORMAT.formatted(blockContent);
     }
 }

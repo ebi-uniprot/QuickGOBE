@@ -1347,7 +1347,7 @@ public abstract class OBOControllerIT {
         String graphParmsString =
                 "?showKey=%s&showIds=%s&termBoxWidth=%s&termBoxHeight=%s&showSlimColours=%s&showChildren" +
                         "=%s&fontSize=%s";
-        return String.format(graphParmsString,
+        return graphParmsString.formatted(
                 !GraphPresentation.defaultShowKey,
                 !GraphPresentation.defaultShowTermIds,
                 GraphPresentation.defaultWidth + 200,

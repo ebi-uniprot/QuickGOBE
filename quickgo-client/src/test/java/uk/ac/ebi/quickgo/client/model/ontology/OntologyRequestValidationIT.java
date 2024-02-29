@@ -9,8 +9,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import uk.ac.ebi.quickgo.common.FacetableField;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -172,7 +172,7 @@ class OntologyRequestValidationIT {
 
         assertThat(violations, hasSize(1));
         assertThat(violations.iterator().next().getMessage(),
-                is(String.format(DEFAULT_ERROR_MSG, "aspect", incorrectAspect)));
+                is(DEFAULT_ERROR_MSG.formatted("aspect", incorrectAspect)));
     }
 
     @Test

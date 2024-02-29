@@ -11,14 +11,12 @@ import io.swagger.annotations.*;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static java.lang.String.format;
 import static uk.ac.ebi.quickgo.common.validator.OntologyIdPredicate.isValidGOTermId;
 
 /**
@@ -42,7 +40,6 @@ public class CoTermController {
     /**
      * Create the endpoint for Co Terms.
      */
-    @Autowired
     public CoTermController(CoTermRepository coTermRepository) {
         this.coTermRepository = coTermRepository;
     }
@@ -70,19 +67,19 @@ public class CoTermController {
             @ApiResponse(code = 400, message = "Bad request due to a validation issue with one of the request values.",
                     response = ResponseExceptionHandler.ErrorInfo.class)})
     @ApiOperation(value = "Get co-occurring term information for a single GO Term id.")
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET,
+    @GetMapping(value = "/{id}",
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<CoTerm>> findCoTerms(
-            @ApiParam(value = "The GO term id", required = true) @PathVariable(value = "id") String id,
+            @ApiParam(value = "The GO term id", required = true) @PathVariable String id,
             @ApiParam(value = "The source from which the co-occurring terms originated. Possible " +
                     "values: ALL / MANUAL. ALL => manual + electronic/automatically generated annotations; " +
                     "MANUAL => only manually generated annotations", defaultValue = "ALL")
-            @RequestParam(value = "source", defaultValue = "ALL") String source,
+            @RequestParam(defaultValue = "ALL") String source,
             @ApiParam(name = "limit", value = "The number of terms returned", required = false)
-            @RequestParam(value = "limit", required = false) String limit,
+            @RequestParam(required = false) String limit,
             @ApiParam(name = "similarityThreshold", value = "The similarity threshold used when finding co-occurring " +
                     "terms", defaultValue = "0.0")
-            @RequestParam(value = "similarityThreshold", defaultValue = "0.0") float similarityThreshold) {
+            @RequestParam(defaultValue = "0.0") float similarityThreshold) {
 
         validateGoTerm(id);
         final List<CoTerm> coTerms = coTermRepository.findCoTerms(id, toCoTermSource(source));
@@ -134,7 +131,7 @@ public class CoTermController {
     private CoTermSource toCoTermSource(String source) {
         final String asUpperCase = source.toUpperCase();
         if (!CoTermSource.isValidValue(asUpperCase)) {
-            throw new ParameterException(format(INVALID_CO_TERM_SOURCE, CoTermSource.valuesAsCSV(), source));
+            throw new ParameterException(INVALID_CO_TERM_SOURCE.formatted(CoTermSource.valuesAsCSV(), source));
 
         }
         return CoTermSource.valueOf(asUpperCase);

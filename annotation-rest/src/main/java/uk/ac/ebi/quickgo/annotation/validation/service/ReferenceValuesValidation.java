@@ -5,9 +5,8 @@ import uk.ac.ebi.quickgo.annotation.validation.model.ValidationProperties;
 import com.google.common.base.Preconditions;
 import java.util.Objects;
 import java.util.stream.Stream;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
 import static uk.ac.ebi.quickgo.annotation.validation.service.DbCrossReferenceId.db;
@@ -28,7 +27,6 @@ public class ReferenceValuesValidation implements ConstraintValidator<ReferenceV
     private final ValidationEntityChecker validator;
     private final ValidationProperties validationLoadProperties;
 
-    @Autowired
     public ReferenceValuesValidation(ValidationEntityChecker validator, ValidationProperties validationLoadProperties) {
         Preconditions.checkArgument(Objects.nonNull(validator), "The ValidationEntityChecker instance cannot be null" +
                 ".");

@@ -48,16 +48,16 @@ class AnnotationParsingHelper {
     static final Pattern PROPS_GO_EVIDENCE_REGEX = Pattern.compile(GO_EVIDENCE + "=");
 
     // regex patterns
-    static final Pattern WITH_REGEX = Pattern.compile(String.format(
-            "(" + PIPE_SEPARATED_CSVs_FORMAT + ")|(With:Not_Supplied)",
+    static final Pattern WITH_REGEX = Pattern.compile((
+            "(" + PIPE_SEPARATED_CSVs_FORMAT + ")|(With:Not_Supplied)").formatted(
             DB_COLON_REF_FORMAT, DB_COLON_REF_FORMAT, DB_COLON_REF_FORMAT, DB_COLON_REF_FORMAT));
     static final Pattern QUALIFIER_REGEX = Pattern.compile(QUALIFIERS_FORMAT);
-    static final Pattern ANNOTATION_EXTENSION_REGEX = Pattern.compile(String.format(
-            PIPE_SEPARATED_CSVs_FORMAT,
+    static final Pattern ANNOTATION_EXTENSION_REGEX = Pattern.compile(
+            PIPE_SEPARATED_CSVs_FORMAT.formatted(
             WORD_LBRACE_WORD_RBRACE_FORMAT, WORD_LBRACE_WORD_RBRACE_FORMAT,
             WORD_LBRACE_WORD_RBRACE_FORMAT, WORD_LBRACE_WORD_RBRACE_FORMAT));
-    static final Pattern ANNOTATION_PROPERTIES_REGEX = Pattern.compile(String.format(
-            PIPE_SEPARATED_CSVs_FORMAT,
+    static final Pattern ANNOTATION_PROPERTIES_REGEX = Pattern.compile(
+            PIPE_SEPARATED_CSVs_FORMAT.formatted(
             KEY_EQUALS_VALUE_FORMAT, KEY_EQUALS_VALUE_FORMAT, KEY_EQUALS_VALUE_FORMAT, KEY_EQUALS_VALUE_FORMAT));
     static final Pattern INTERACTING_TAXON_REGEX = Pattern.compile(INTERACTING_TAXON_FORMAT);
     static final Pattern RAW_TAXON_REGEX = Pattern.compile(RAW_TAXON_FORMAT);

@@ -42,8 +42,8 @@ public class PeriodParserMonthTime extends PeriodParser {
         if (fromTo.length == REQUIRED_DATE_MODIFYING_INSTANCES) {
             List<MonthTime> durationList = Arrays.stream(fromTo)
                                                  .map(this::mapToMonthTime)
-                                                 .filter(Optional::isPresent)   //replace these two lines with
-                                                 .map(Optional::get)            //.map(Optional::stream) in Java 9
+                                                 //replace these two lines with
+                                                 .flatMap(Optional::stream)            //.map(Optional::stream) in Java 9
                                                  .collect(toList());
             LOGGER.debug("Created durationList " + durationList);
             if (durationList.size() == REQUIRED_DATE_MODIFYING_INSTANCES) {

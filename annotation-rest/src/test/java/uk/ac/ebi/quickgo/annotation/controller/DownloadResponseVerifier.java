@@ -57,7 +57,7 @@ class DownloadResponseVerifier {
                 if (!line.startsWith("!")) {
                     String[] components = line.split("\t");
                     if (components.length != NO_OF_FIELDS) {
-                        LOGGER.error(String.format("GAF line should contain %d fields, but found: %d", NO_OF_FIELDS,
+                        LOGGER.error("GAF line should contain %d fields, but found: %d".formatted(NO_OF_FIELDS,
                                 components.length));
                         return false;
                     }

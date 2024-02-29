@@ -3,8 +3,8 @@ package uk.ac.ebi.quickgo.common.validator;
 import java.util.Arrays;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -40,7 +40,7 @@ public class GeneProductIDValidator implements ConstraintValidator<GeneProductID
 
             if (!invalidGpIds.isEmpty()) {
                 context.disableDefaultConstraintViolation();
-                context.buildConstraintViolationWithTemplate(String.format(DEFAULT_ERROR_MESSAGE, invalidGpIds))
+                context.buildConstraintViolationWithTemplate(DEFAULT_ERROR_MESSAGE.formatted(invalidGpIds))
                         .addConstraintViolation();
             }
         }

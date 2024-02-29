@@ -136,7 +136,7 @@ class StatsConfigsAreAppliedIT {
     }
 
     private String statsValuesJSONPath(String statType, String subType) {
-        return String.format(STATS_VALUES_JSON_PATH_FORMAT, statType, subType);
+        return STATS_VALUES_JSON_PATH_FORMAT.formatted(statType, subType);
     }
 
     /**
@@ -159,7 +159,7 @@ class StatsConfigsAreAppliedIT {
     }
 
     private String createGOId(int idNum) {
-        return String.format("GO:000%03d", idNum);
+        return "GO:000%03d".formatted(idNum);
     }
 
     /**

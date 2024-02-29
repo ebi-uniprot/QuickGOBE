@@ -28,7 +28,7 @@ class LogJobListener implements JobExecutionListener {
         // compute duration
         Duration.between(jobExecution.getEndTime().toInstant(), jobExecution.getStartTime().toInstant());
         long durationMillis = jobExecution.getEndTime().getTime() - jobExecution.getStartTime().getTime();
-        String duration = String.format("%d hrs, %d min, %d sec",
+        String duration = "%d hrs, %d min, %d sec".formatted(
                 TimeUnit.MILLISECONDS.toHours(durationMillis),
                 TimeUnit.MILLISECONDS.toMinutes(durationMillis) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS
                         .toHours(durationMillis)),

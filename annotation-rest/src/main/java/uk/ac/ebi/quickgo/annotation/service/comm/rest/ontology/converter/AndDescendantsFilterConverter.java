@@ -89,7 +89,7 @@ public class AndDescendantsFilterConverter extends AbstractOntologyFilterConvert
     if (isValidGOTermId().test(goId)) {
       return QuickGOQuery.createQuery(fieldName, goId);
     } else {
-      throw new RetrievalException(String.format(UNKNOWN_ID_FORMAT, goId));
+      throw new RetrievalException(UNKNOWN_ID_FORMAT.formatted(goId));
     }
   }
 }

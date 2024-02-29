@@ -112,7 +112,7 @@ class SortedSolrQuerySerializerTest {
 
         String solrJoinString = serializer.visit(query);
 
-        assertThat(solrJoinString, is(String.format(CROSS_CORE_JOIN_SYNTAX, joinFromAttribute, joinToAttribute,
+        assertThat(solrJoinString, is(CROSS_CORE_JOIN_SYNTAX.formatted(joinFromAttribute, joinToAttribute,
                 joinFromTable, fromFilterString)));
     }
 
@@ -134,7 +134,7 @@ class SortedSolrQuerySerializerTest {
 
         String solrJoinString = serializer.visit(query);
 
-        assertThat(solrJoinString, is(String.format(CROSS_CORE_JOIN_SYNTAX, joinFromAttribute, joinToAttribute,
+        assertThat(solrJoinString, is(CROSS_CORE_JOIN_SYNTAX.formatted(joinFromAttribute, joinToAttribute,
                 joinFromTable, fromFilterString)));
     }
 
@@ -150,7 +150,7 @@ class SortedSolrQuerySerializerTest {
         System.out.println(queryString);
 
         assertThat(queryString, is(
-                String.format("((%s:%s) OR (%s:%s) OR (%s:%s))",
+                "((%s:%s) OR (%s:%s) OR (%s:%s))".formatted(
                         query1.field(), query1.value(),
                         query2.field(), query2.value(),
                         query3.field(), query3.value())
@@ -169,7 +169,7 @@ class SortedSolrQuerySerializerTest {
         System.out.println(queryString);
 
         assertThat(queryString, is(
-                String.format("((%s:%s) AND (%s:%s) AND (%s:%s))",
+                "((%s:%s) AND (%s:%s) AND (%s:%s))".formatted(
                         query1.field(), query1.value(),
                         query2.field(), query2.value(),
                         query3.field(), query3.value())
@@ -183,7 +183,7 @@ class SortedSolrQuerySerializerTest {
 
         String queryString = serializerWithWildCard.visit(allNonEmptyFieldQuery);
 
-        assertThat(queryString, is(String.format("(%s:%s)", allNonEmptyFieldQuery.field(), RETRIEVE_ALL_NON_EMPTY )));
+        assertThat(queryString, is("(%s:%s)".formatted(allNonEmptyFieldQuery.field(), RETRIEVE_ALL_NON_EMPTY)));
     }
 
     @Test

@@ -4,13 +4,12 @@ import com.google.common.base.Preconditions;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import uk.ac.ebi.quickgo.client.model.ontology.OntologyRequest;
 import uk.ac.ebi.quickgo.client.model.ontology.OntologyTerm;
@@ -26,7 +25,7 @@ import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
 import uk.ac.ebi.quickgo.rest.search.request.converter.FilterConverterFactory;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;
@@ -50,7 +49,6 @@ public class SearchController {
     private final DefaultSearchQueryTemplate requestTemplate;
     private final FilterConverterFactory converterFactory;
 
-    @Autowired
     public SearchController(
             SearchService<OntologyTerm> ontologySearchService,
             SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig,
@@ -78,7 +76,7 @@ public class SearchController {
      */
     @ApiOperation(value = "Searches a user defined query, e.g., query=apopto",
             notes = "Response fields include: id and name (and aspect for GO terms)")
-    @RequestMapping(value = "/ontology", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @GetMapping(value = "/ontology", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<OntologyTerm>> ontologySearch(@Valid @ModelAttribute OntologyRequest request,
             BindingResult bindingResult) {
 
