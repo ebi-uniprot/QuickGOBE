@@ -34,3 +34,7 @@ search:
           responseClass: "uk.ac.ebi.quickgo.client.service.loader.presets.RelevancyResponseType",
           responseConverter: "uk.ac.ebi.quickgo.client.service.loader.presets.RelevancyResponseConverter"
         }
+spring:
+  threads:
+    virtual:
+      enabled: true

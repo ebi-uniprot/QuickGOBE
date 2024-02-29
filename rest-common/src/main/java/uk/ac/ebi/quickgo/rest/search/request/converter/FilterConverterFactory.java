@@ -8,7 +8,6 @@ import uk.ac.ebi.quickgo.rest.search.request.config.FilterConfigRetrieval;
 
 import com.google.common.base.Preconditions;
 import java.util.Optional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestOperations;
@@ -25,7 +24,6 @@ public class FilterConverterFactory {
     private final FilterConfigRetrieval filterConfigRetrieval;
     private final RestOperations restOperations;
 
-    @Autowired
     public FilterConverterFactory(FilterConfigRetrieval globalFilterConfigRetrieval, RestOperations restOperations) {
         Preconditions.checkArgument(globalFilterConfigRetrieval != null, "RequestConfigRetrieval cannot be null");
         Preconditions.checkArgument(restOperations != null, "RestOperations cannot be null");

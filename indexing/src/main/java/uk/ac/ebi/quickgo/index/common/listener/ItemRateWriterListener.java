@@ -93,17 +93,17 @@ public class ItemRateWriterListener<O> implements ItemWriteListener<O> {
             return
                             "\n\tWrite statistics {\n" +
                             "\t\tLatest delta:\n" +
-                            String.format("\t\t\t# docs\t\t:\t%d\n", deltaWriteCount) +
-                            String.format("\t\t\ttime (sec)\t:\t%d\n", deltaSeconds) +
-                            String.format("\t\t\tdocs/sec\t:\t%.2f\n", deltaDocsPerSecond) +
-                            String.format("\t\t\tdocs/hour\t:\t%.0f\t(projected from docs/sec)\n", deltaDocsPerSecond
-                                    * SECONDS_IN_AN_HOUR) +
+                                    "\t\t\t# docs\t\t:\t%d\n".formatted(deltaWriteCount) +
+                                    "\t\t\ttime (sec)\t:\t%d\n".formatted(deltaSeconds) +
+                                    "\t\t\tdocs/sec\t:\t%.2f\n".formatted(deltaDocsPerSecond) +
+                                    "\t\t\tdocs/hour\t:\t%.0f\t(projected from docs/sec)\n".formatted(deltaDocsPerSecond
+                                            * SECONDS_IN_AN_HOUR) +
                             "\t\tOverall:\n" +
-                            String.format("\t\t\t# docs\t\t:\t%d\n", totalWriteCount) +
-                            String.format("\t\t\ttime (sec)\t:\t%d\n", totalSeconds) +
-                            String.format("\t\t\tdocs/sec\t:\t%.2f\n", totalDocsPerSecond) +
-                            String.format("\t\t\tdocs/hour\t:\t%.0f\t(projected from docs/sec)\n", totalDocsPerSecond *
-                            SECONDS_IN_AN_HOUR) +
+                                    "\t\t\t# docs\t\t:\t%d\n".formatted(totalWriteCount) +
+                                    "\t\t\ttime (sec)\t:\t%d\n".formatted(totalSeconds) +
+                                    "\t\t\tdocs/sec\t:\t%.2f\n".formatted(totalDocsPerSecond) +
+                                    "\t\t\tdocs/hour\t:\t%.0f\t(projected from docs/sec)\n".formatted(totalDocsPerSecond *
+                                            SECONDS_IN_AN_HOUR) +
                             "\t}\n";
         }
     }

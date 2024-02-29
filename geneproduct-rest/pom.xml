@@ -18,28 +18,28 @@
         <json-path.version>2.4.0</json-path.version>
     </properties>
 
-    <dependencies>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>common</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>geneproduct-common</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>rest-common</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+ <dependencies>
+  <dependency>
+   <groupId>${project.groupId}</groupId>
+   <artifactId>common</artifactId>
+   <version>${project.version}</version>
+  </dependency>
+  <dependency>
+   <groupId>${project.groupId}</groupId>
+   <artifactId>geneproduct-common</artifactId>
+   <version>${project.version}</version>
+  </dependency>
+  <dependency>
+   <groupId>${project.groupId}</groupId>
+   <artifactId>rest-common</artifactId>
+   <version>${project.version}</version>
+  </dependency>
 
-        <!-- REST API documentation -->
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger-ui</artifactId>
-        </dependency>
+  <!-- REST API documentation -->
+  <dependency>
+   <groupId>io.springfox</groupId>
+   <artifactId>springfox-swagger-ui</artifactId>
+  </dependency>
 
         <!--Test dependencies-->
         <dependency>

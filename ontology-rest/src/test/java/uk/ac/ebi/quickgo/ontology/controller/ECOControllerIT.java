@@ -43,7 +43,7 @@ class ECOControllerIT extends OBOControllerIT {
 
     @Override
     protected String createId(int idNum) {
-        return String.format("ECO:%07d", idNum);
+        return "ECO:%07d".formatted(idNum);
     }
 
     @Override protected String getValidRelations() {

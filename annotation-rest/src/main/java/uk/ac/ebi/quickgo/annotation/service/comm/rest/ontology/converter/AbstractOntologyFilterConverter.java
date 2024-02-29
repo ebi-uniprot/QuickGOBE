@@ -108,7 +108,7 @@ abstract class AbstractOntologyFilterConverter
             field = Searchable.EVIDENCE_CODE;
             return QuickGOQuery.createQuery(field, id);
         } else {
-            throw new RetrievalException(String.format(UNKNOWN_ID_FORMAT, id));
+            throw new RetrievalException(UNKNOWN_ID_FORMAT.formatted(id));
         }
     }
 
@@ -119,7 +119,7 @@ abstract class AbstractOntologyFilterConverter
     protected void handleInvalidIds() {
         if (idsWithNoRelatives.length() > 0) {
             throw new RetrievalException(
-                    String.format(ERROR_MESSAGE_ON_INVALID_IDS, idsWithNoRelatives.toString()));
+                    ERROR_MESSAGE_ON_INVALID_IDS.formatted(idsWithNoRelatives.toString()));
         }
     }
     

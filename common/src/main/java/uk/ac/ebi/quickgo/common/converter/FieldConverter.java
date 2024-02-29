@@ -34,8 +34,7 @@ public interface FieldConverter<T extends FieldType> extends Function<String, Op
         if (list != null) {
             return list.stream()
                     .map(this::apply)
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
+                    .flatMap(Optional::stream)
                     .collect(Collectors.toList());
         }
         return new ArrayList<>();

@@ -241,12 +241,12 @@ public class SolrResponseAggregationConverter implements AggregationConverter<So
     private double convertToDouble(Object number) {
         double convertedValue;
 
-        if (number instanceof Double) {
-            convertedValue = (double) number;
-        } else if (number instanceof Long) {
-            convertedValue = (long) number;
-        } else if (number instanceof Integer) {
-            convertedValue = ((Integer) number).doubleValue();
+        if (number instanceof Double double1) {
+            convertedValue = double1;
+        } else if (number instanceof Long long1) {
+            convertedValue = long1;
+        } else if (number instanceof Integer integer) {
+            convertedValue = integer.doubleValue();
         } else {
             throw new IllegalArgumentException("Unable to convert number: " + number);
         }

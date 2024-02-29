@@ -16,11 +16,18 @@ model:
       field1: transformedField1,
       field2: transformedField2
     }
+spring:
+  threads:
+    virtual:
+      enabled: true
 
 ---
 ## ================= CORS =================
 spring:
-   profiles: cors-config-integration-test
+   config.activate.on-profile: cors-config-integration-test
+  threads:
+    virtual:
+      enabled: true
 cors:
   filters:
     - allow-origins: "http://www.ebi.ac.uk, http://localhost:9090"
@@ -35,7 +42,10 @@ cors:
 ---
 ## ==========
 spring:
-   profiles: cors-config-filtering-test
+   config.activate.on-profile: cors-config-filtering-test
+  threads:
+    virtual:
+      enabled: true
 cors:
   filters:
     - allow-origins: "http://any-host"

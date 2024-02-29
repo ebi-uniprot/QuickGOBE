@@ -124,7 +124,7 @@ public class StatsSetupHelper {
                 args.add("");
             }
         }
-        return String.format(format, args.toArray());
+        return format.formatted(args.toArray());
     }
 
     private <T> String getResponseAsString(T response) {

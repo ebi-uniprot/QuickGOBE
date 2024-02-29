@@ -20,7 +20,6 @@ import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -51,7 +50,6 @@ public class AnnotationStatisticsService implements StatisticsService {
     private final DefaultSearchQueryTemplate queryTemplate;
     private final SlimmedStatsInjector slimmedStatsInjector;
 
-    @Autowired
     public AnnotationStatisticsService(FilterConverterFactory converterFactory,
             SearchService<Annotation> searchService,
             StatsConverter converter,

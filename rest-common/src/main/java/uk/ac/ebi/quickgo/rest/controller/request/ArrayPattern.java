@@ -7,10 +7,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
-import javax.validation.Constraint;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-import javax.validation.Payload;
+import jakarta.validation.Constraint;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
+import jakarta.validation.Payload;
 
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
@@ -160,7 +160,7 @@ public @interface ArrayPattern {
                     String invalidItemsText = invalidItems.stream().collect(Collectors.joining(", "));
 
                     context.buildConstraintViolationWithTemplate(
-                            String.format(DEFAULT_ERROR_MSG, paramName, invalidItemsText)).addConstraintViolation();
+                            DEFAULT_ERROR_MSG.formatted(paramName, invalidItemsText)).addConstraintViolation();
                 }
             }
 

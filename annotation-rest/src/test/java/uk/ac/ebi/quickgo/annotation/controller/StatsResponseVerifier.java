@@ -2,7 +2,6 @@ package uk.ac.ebi.quickgo.annotation.controller;
 
 import org.springframework.test.web.servlet.ResultMatcher;
 
-import static java.lang.String.format;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -25,7 +24,7 @@ final class StatsResponseVerifier {
         String hitsInGroupText = "%s[?(@.%s=='%s')].%s";
 
         return jsonPath(
-                format(hitsInGroupText, ResponseVerifier.RESULTS, GROUP_NAME_TAG, groupName, TOTAL_GROUP_HITS_TAG)
+                hitsInGroupText.formatted(ResponseVerifier.RESULTS, GROUP_NAME_TAG, groupName, TOTAL_GROUP_HITS_TAG)
         ).value(hits);
     }
 
@@ -41,7 +40,7 @@ final class StatsResponseVerifier {
     static ResultMatcher numericValueForGroup(String group, String type, String field, int value) {
         String valuesInTypeForGroup = "%s[?(@.%s=='%s')]..[?(@.%s=='%s')]..%s";
         return jsonPath(
-                format(valuesInTypeForGroup,
+                valuesInTypeForGroup.formatted(
                         ResponseVerifier.RESULTS,
                         GROUP_NAME_TAG, group,
                         TYPE_NAME_TAG, type,
@@ -79,7 +78,7 @@ final class StatsResponseVerifier {
     private static ResultMatcher targetInTypeWithinGroup(String group, String type, String[] expected, String target) {
         String valuesInTypeForGroup = "%s[?(@.%s=='%s')]..[?(@.%s=='%s')]..%s";
         return jsonPath(
-                format(valuesInTypeForGroup,
+                valuesInTypeForGroup.formatted(
                         ResponseVerifier.RESULTS,
                         GROUP_NAME_TAG, group,
                         TYPE_NAME_TAG, type,
@@ -90,7 +89,7 @@ final class StatsResponseVerifier {
     static ResultMatcher numberOfTypes(String group, int expectedSize) {
         String valuesInTypeForGroup = "%s[?(@.%s=='%s')].types[*].length()";
         return jsonPath(
-                format(valuesInTypeForGroup,
+                valuesInTypeForGroup.formatted(
                         ResponseVerifier.RESULTS,
                         GROUP_NAME_TAG, group),
                 hasSize(expectedSize));

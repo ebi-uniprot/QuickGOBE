@@ -119,11 +119,18 @@ coterm:
    all: classpath:/coterms/CoTermsAll
    headerLines: 1
    limit: 30
+spring:
+  threads:
+    virtual:
+      enabled: true
 
 ---
 ## ==========
 spring:
-   profiles: download-task-executor-test
+   config.activate.on-profile: download-task-executor-test
+  threads:
+    virtual:
+      enabled: true
 annotation:
   download:
     taskExecutor:
@@ -137,7 +144,10 @@ annotation:
 ---
 ## ==========
 spring:
-   profiles: stats-type-limit-properties-test
+   config.activate.on-profile: stats-type-limit-properties-test
+  threads:
+    virtual:
+      enabled: true
 annotation:
   stats:
     typeLimitsForStandardUsage:

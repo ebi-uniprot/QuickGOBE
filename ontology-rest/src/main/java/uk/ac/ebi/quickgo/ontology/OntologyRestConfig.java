@@ -77,8 +77,7 @@ public class OntologyRestConfig {
             try {
                 cachingAllowingAlarmClocks = Arrays.stream(periods)
                                                   .map(parser::parse)
-                                                  .filter(Optional::isPresent)
-                                                  .map(Optional::get)
+                                                  .flatMap(Optional::stream)
                                                   .collect(toList());
             } catch (Exception e) {
                 LOGGER.error("Failed to load caching allowed periods for ontology using " + cachingAllowedPeriodValue,

@@ -6,7 +6,6 @@ import uk.ac.ebi.quickgo.annotation.validation.service.ValidationEntityChecker;
 import com.google.common.base.Preconditions;
 import java.util.List;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Aggregate ValidationEntity instances.
@@ -20,7 +19,6 @@ class ValidationEntitiesAggregator implements ItemWriter<ValidationEntity> {
 
     private final ValidationEntityChecker validationEntityChecker;
 
-    @Autowired
     public ValidationEntitiesAggregator(ValidationEntityChecker validationEntityChecker) {
         this.validationEntityChecker = validationEntityChecker;
     }

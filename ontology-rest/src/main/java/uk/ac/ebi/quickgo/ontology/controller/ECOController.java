@@ -14,7 +14,6 @@ import uk.ac.ebi.quickgo.rest.headers.HttpHeadersProvider;
 import uk.ac.ebi.quickgo.rest.search.SearchService;
 
 import io.swagger.annotations.Api;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.ECO_GRAPH_TRAVERSAL_TYPES;
@@ -36,8 +35,7 @@ public class ECOController extends OBOController<ECOTerm> {
     private static final OntologySpecifier ECO_SPECIFIER = new OntologySpecifier(OntologyType.ECO,
                                                                                  ECO_GRAPH_TRAVERSAL_TYPES);
 
-   @Autowired
-    public ECOController(OntologyService<ECOTerm> ecoOntologyService,
+   public ECOController(OntologyService<ECOTerm> ecoOntologyService,
                          SearchService<OBOTerm> ontologySearchService,
                          SearchableField searchableField,
                          SearchServiceConfig.OntologyCompositeRetrievalConfig ontologyRetrievalConfig,

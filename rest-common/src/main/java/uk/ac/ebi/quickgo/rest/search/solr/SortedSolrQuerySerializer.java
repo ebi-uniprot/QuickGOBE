@@ -77,7 +77,7 @@ public class SortedSolrQuerySerializer implements QueryVisitor<String> {
             fromFilterString = "";
         }
 
-        return String.format(CROSS_CORE_JOIN_SYNTAX, query.getJoinFromAttribute(), query.getJoinToAttribute(),
+        return CROSS_CORE_JOIN_SYNTAX.formatted(query.getJoinFromAttribute(), query.getJoinToAttribute(),
                 query.getJoinFromTable(), fromFilterString);
     }
 

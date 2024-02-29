@@ -9,7 +9,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -21,7 +20,6 @@ import org.springframework.stereotype.Component;
 @Component class InternalFilterConfigRetrieval implements FilterConfigRetrieval {
     private final Map<Set<String>, FilterConfig> executionConfigs;
 
-    @Autowired
     public InternalFilterConfigRetrieval(SearchableField searchableField) {
         Preconditions
                 .checkArgument(searchableField != null, "SearchableField instance cannot be null.");

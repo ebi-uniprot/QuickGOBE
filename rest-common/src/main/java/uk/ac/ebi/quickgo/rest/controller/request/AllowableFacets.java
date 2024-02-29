@@ -1,8 +1,8 @@
 package uk.ac.ebi.quickgo.rest.controller.request;
 
 import java.lang.annotation.*;
-import javax.validation.Constraint;
-import javax.validation.Payload;
+import jakarta.validation.Constraint;
+import jakarta.validation.Payload;
 
 @Target({ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)

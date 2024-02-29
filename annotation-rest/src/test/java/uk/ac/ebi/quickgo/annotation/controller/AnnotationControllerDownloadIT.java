@@ -302,8 +302,8 @@ class AnnotationControllerDownloadIT {
                 .header(ACCEPT, "text/text")
         );
 
-        var err = String.format("Provide at least one from '%s', '%s' or '%s' as 'accept' header",
-            GPAD_MEDIA_TYPE_STRING, GAF_MEDIA_TYPE_STRING, TSV_MEDIA_TYPE_STRING);
+        var err = "Provide at least one from '%s', '%s' or '%s' as 'accept' header".formatted(
+                GPAD_MEDIA_TYPE_STRING, GAF_MEDIA_TYPE_STRING, TSV_MEDIA_TYPE_STRING);
         assertBadRequestError(response, err);
     }
 
@@ -522,7 +522,7 @@ class AnnotationControllerDownloadIT {
                 args.add("");
             }
         }
-        return String.format(AnnotationControllerDownloadIT.GO_TERM_RESOURCE_FORMAT, args.toArray());
+        return AnnotationControllerDownloadIT.GO_TERM_RESOURCE_FORMAT.formatted(args.toArray());
     }
 
     private String buildGeneProductResource(String... arguments) {
@@ -538,7 +538,7 @@ class AnnotationControllerDownloadIT {
                 args.add("");
             }
         }
-        return String.format(AnnotationControllerDownloadIT.GENE_PRODUCT_RESOURCE_FORMAT, args.toArray());
+        return AnnotationControllerDownloadIT.GENE_PRODUCT_RESOURCE_FORMAT.formatted(args.toArray());
     }
 
 

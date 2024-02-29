@@ -4,6 +4,9 @@ spring:
     include: httpServer
   lifecycle:
     timeout-per-shutdown-phase: 5m
+  threads:
+    virtual:
+      enabled: true
 
 logging:
   level:
@@ -15,7 +18,7 @@ server:
   tomcat:
     threads:
       max: 0
-  max-http-header-size: 64000
+  max-http-request-header-size: 64000
   shutdown: graceful
 
 ## ================= Solr =================

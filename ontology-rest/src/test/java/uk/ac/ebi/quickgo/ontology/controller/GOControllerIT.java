@@ -379,7 +379,7 @@ class GOControllerIT extends OBOControllerIT {
 
     @Override
     protected String createId(int idNum) {
-        return String.format("GO:%07d", idNum);
+        return "GO:%07d".formatted(idNum);
     }
 
     /*

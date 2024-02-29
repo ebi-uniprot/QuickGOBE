@@ -14,28 +14,32 @@
     <name>Common RESTful classes</name>
     <description>Contains a set of classes shared amongst the web-services</description>
 
-    <dependencies>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>common</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+ <dependencies>
+  <dependency>
+   <groupId>${project.groupId}</groupId>
+   <artifactId>common</artifactId>
+   <version>${project.version}</version>
+  </dependency>
 
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-        </dependency>
+  <dependency>
+   <groupId>com.fasterxml.jackson.core</groupId>
+   <artifactId>jackson-core</artifactId>
+  </dependency>
 
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-        </dependency>
+  <dependency>
+   <groupId>com.fasterxml.jackson.core</groupId>
+   <artifactId>jackson-databind</artifactId>
+  </dependency>
 
-        <!-- REST API documentation -->
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger2</artifactId>
-        </dependency>
+  <!-- REST API documentation -->
+  <dependency>
+   <groupId>io.springfox</groupId>
+   <artifactId>springfox-swagger2</artifactId>
+  </dependency>
+  <dependency>
+   <groupId>jakarta.servlet</groupId>
+   <artifactId>jakarta.servlet-api</artifactId>
+  </dependency>
 
         <!-- Test dependencies -->
         <dependency>

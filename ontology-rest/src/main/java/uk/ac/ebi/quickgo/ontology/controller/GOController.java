@@ -20,13 +20,12 @@ import com.google.common.base.Preconditions;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -56,7 +55,6 @@ public class GOController extends OBOController<GOTerm> {
     private static final OntologySpecifier GO_SPECIFIER = new OntologySpecifier(OntologyType.GO,
                                                                                 GO_GRAPH_TRAVERSAL_TYPES);
 
-    @Autowired
     public GOController(OntologyService<GOTerm> goOntologyService,
             SearchService<OBOTerm> ontologySearchService,
             SearchableField searchableField,
@@ -80,7 +78,7 @@ public class GOController extends OBOController<GOTerm> {
     @ApiOperation(value = "Get meta-data information about the gene ontology service",
             response = About.class,
             notes = "Gene ontology version number and creation date.")
-    @RequestMapping(value = "/about", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @GetMapping(value = "/about", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<MetaData> provideMetaData() {
         return new ResponseEntity<>(this.metaDataProvider.lookupMetaData(), HttpStatus.OK);
     }
@@ -95,15 +93,15 @@ public class GOController extends OBOController<GOTerm> {
      */
     @ApiOperation(value = "Gets slimming information for the provided slim-set, where the slims can be reached only " +
             "via the provided relationships")
-    @RequestMapping(value = "slim", method = RequestMethod.GET, produces = {MediaType
+    @GetMapping(value = "slim", produces = {MediaType
             .APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<SlimTerm>> findSlims(
             @ApiParam(value = "Comma-separated term IDs forming the 'slim-set'", required = true)
-            @RequestParam(value = "slimsToIds", required = false) String slimsToIds,
+            @RequestParam(required = false) String slimsToIds,
             @ApiParam(value = "Comma-separated term IDs from which slimming information is applied.")
-            @RequestParam(value = "slimsFromIds", required = false) String slimsFromIds,
+            @RequestParam(required = false) String slimsFromIds,
             @ApiParam(value = "The relationships over which the slimming information is computed")
-            @RequestParam(value = "relations", defaultValue = DEFAULT_SLIM_TRAVERSAL_TYPES_CSV) String relations) {
+            @RequestParam(defaultValue = DEFAULT_SLIM_TRAVERSAL_TYPES_CSV) String relations) {
 
         checkSlimSetIsSet(slimsToIds);
         return getResultsResponse(ontologyService.findSlimmedInfoForSlimmedTerms(

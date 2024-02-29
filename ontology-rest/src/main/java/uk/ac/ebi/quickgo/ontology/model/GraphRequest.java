@@ -3,7 +3,7 @@ package uk.ac.ebi.quickgo.ontology.model;
 import uk.ac.ebi.quickgo.graphics.ontology.GraphPresentation;
 
 import io.swagger.annotations.ApiModelProperty;
-import javax.validation.constraints.Min;
+import jakarta.validation.constraints.Min;
 
 /**
  * The client can provide parameters to change the rendering of a terms chart. This class binds the parameters.

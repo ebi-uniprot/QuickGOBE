@@ -82,7 +82,7 @@ final class ResponseVerifier {
     }
 
     private static ResultMatcher fieldsInResultExist(int resultIndex) {
-        String path = String.format(RESULTS_CONTENT_BY_INDEX, resultIndex);
+        String path = RESULTS_CONTENT_BY_INDEX.formatted(resultIndex);
 
         return new CompositeResultMatcher().addMatcher(jsonPath(path + "id").exists())
                                            .addMatcher(jsonPath(path + "geneProductId").exists())
@@ -111,7 +111,7 @@ final class ResponseVerifier {
     }
 
     static ResultMatcher fieldInRowHasValue(String fieldName, int index, String value) {
-        String path = String.format(RESULTS_CONTENT_BY_INDEX, index);
+        String path = RESULTS_CONTENT_BY_INDEX.formatted(index);
         return new CompositeResultMatcher().addMatcher(jsonPath(path + fieldName, is(value)));
 
     }

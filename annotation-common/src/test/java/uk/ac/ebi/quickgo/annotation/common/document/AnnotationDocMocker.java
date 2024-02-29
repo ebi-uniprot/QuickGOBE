@@ -107,7 +107,7 @@ public class AnnotationDocMocker {
     }
 
     private static String asExtension(String relationship, String db, String id) {
-        return String.format("%s(%s:%s)", relationship, db, id);
+        return "%s(%s:%s)".formatted(relationship, db, id);
     }
 
     //----- Setup data ---------------------//
@@ -163,11 +163,11 @@ public class AnnotationDocMocker {
 
 
     private static String createGPId(int idNum) {
-        return String.format("A0A%03d", idNum);
+        return "A0A%03d".formatted(idNum);
     }
 
     public static String createUniProtGPID(int idNum) {
-        return String.format("UniProtKB:A0A%03d", idNum);
+        return "UniProtKB:A0A%03d".formatted(idNum);
     }
 
     /**
@@ -176,6 +176,6 @@ public class AnnotationDocMocker {
      * @return GO id
      */
     private static String createGOID(int idNum) {
-        return String.format("GO:%07d", idNum);
+        return "GO:%07d".formatted(idNum);
     }
 }

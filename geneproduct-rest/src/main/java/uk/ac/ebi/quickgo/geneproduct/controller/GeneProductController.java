@@ -25,10 +25,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -60,7 +59,6 @@ public class GeneProductController {
     private final DefaultSearchQueryTemplate requestTemplate;
     private final FilterConverterFactory converterFactory;
 
-    @Autowired
     public GeneProductController(
             GeneProductService geneProductService,
             SearchService<GeneProduct> geneProductSearchService,
@@ -93,7 +91,7 @@ public class GeneProductController {
      * @return a 400 response
      */
     @ApiOperation(value = "Catches any bad requests and returns an error response with a 400 status", hidden = true)
-    @RequestMapping(value = "/*", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @GetMapping(value = "/*", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<ResponseExceptionHandler.ErrorInfo> emptyId() {
         throw new ParameterException("The requested end-point does not exist.");
     }
@@ -110,7 +108,7 @@ public class GeneProductController {
      * </ul>
      */
     @ApiOperation(value = "Retrieves details about a list of gene product IDs specified in CSV format")
-    @RequestMapping(value = "/{ids}", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @GetMapping(value = "/{ids}", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<GeneProduct>> findById(@PathVariable String ids) {
         return getGeneProductResponse(geneProductService.findById(controllerValidationHelper.validateCSVIds(ids)));
     }
@@ -122,7 +120,7 @@ public class GeneProductController {
      * @return the search results
      */
     @ApiOperation(value = "Searches the gene product data-set for a specified value")
-    @RequestMapping(value = "/search", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @GetMapping(value = "/search", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<GeneProduct>> geneProductSearch(
             @Valid @ModelAttribute GeneProductRequest request,
             BindingResult bindingResult) {
@@ -156,7 +154,7 @@ public class GeneProductController {
      * @return lookup results
      */
     @ApiOperation(value = "Retrieves gene products associated with a specified target set")
-    @RequestMapping(value = "/targetset/{name}", method = {RequestMethod.GET}, produces = {MediaType
+    @GetMapping(value = "/targetset/{name}", produces = {MediaType
             .APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<GeneProduct>> findByTargetSet(@PathVariable String name) {
         return getGeneProductResponse(geneProductService.findByTargetSet(name));

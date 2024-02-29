@@ -17,8 +17,8 @@ import uk.ac.ebi.quickgo.annotation.validation.service.JobTestRunnerConfig;
 import uk.ac.ebi.quickgo.rest.ParameterException;
 import uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -886,7 +886,7 @@ class AnnotationRequestValidationIT {
     // Helpers
     private String createRegexErrorMessage(String paramName, String... invalidItems) {
         String csvInvalidItems = Stream.of(invalidItems).collect(Collectors.joining(", "));
-        return String.format(ArrayPattern.DEFAULT_ERROR_MSG, paramName, csvInvalidItems);
+        return ArrayPattern.DEFAULT_ERROR_MSG.formatted(paramName, csvInvalidItems);
     }
 
     private String createMaxSizeErrorMessage(String paramName, int maxSize) {

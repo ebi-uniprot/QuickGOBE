@@ -7,9 +7,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 import static uk.ac.ebi.quickgo.rest.controller.request.AllowableFacets.DEFAULT_ERROR_MESSAGE;
 
@@ -22,7 +21,6 @@ import static uk.ac.ebi.quickgo.rest.controller.request.AllowableFacets.DEFAULT_
 public class AllowableFacetsImpl implements ConstraintValidator<AllowableFacets, String[]> {
     private final FacetableField facetableField;
 
-    @Autowired
     public AllowableFacetsImpl(FacetableField facetableField) {
         Preconditions.checkArgument(facetableField != null, "Facetable fields cannot be null");
 

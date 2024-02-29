@@ -9,9 +9,9 @@ import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.*;
 import java.util.stream.Stream;
-import javax.validation.constraints.*;
+import jakarta.validation.constraints.*;
 
-import static javax.validation.constraints.Pattern.Flag.CASE_INSENSITIVE;
+import static jakarta.validation.constraints.Pattern.Flag.CASE_INSENSITIVE;
 import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.DEFAULT_ENTRIES_PER_PAGE;
 import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.MAX_ENTRIES_PER_PAGE;
 import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.MAX_PAGE_NUMBER;
@@ -187,8 +187,7 @@ public class GeneProductRequest {
 
         Stream.of(TARGET_FIELDS)
                 .map(this::createFilter)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
+                .flatMap(Optional::stream)
                 .forEach(filterRequests::add);
 
         return filterRequests;

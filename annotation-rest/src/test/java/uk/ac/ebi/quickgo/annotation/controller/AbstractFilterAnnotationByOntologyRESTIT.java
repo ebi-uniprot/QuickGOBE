@@ -442,7 +442,7 @@ public abstract class AbstractFilterAnnotationByOntologyRESTIT {
                 args.add("");
             }
         }
-        return String.format(format, args.toArray());
+        return format.formatted(args.toArray());
     }
 
     void expectRestCallResponse(HttpMethod method, String url, ResponseCreator response) {

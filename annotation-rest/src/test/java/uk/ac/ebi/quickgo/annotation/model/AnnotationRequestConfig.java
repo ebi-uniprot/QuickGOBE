@@ -6,7 +6,7 @@ import uk.ac.ebi.quickgo.common.validator.DbXRefEntityValidation;
 import java.util.Arrays;
 import org.springframework.context.annotation.Bean;
 
-import javax.validation.Validator;
+import jakarta.validation.Validator;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 /**

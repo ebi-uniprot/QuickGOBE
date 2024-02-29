@@ -73,8 +73,8 @@ public class ValidationHelper {
      */
     public static void handleFieldPatternMismatchError(String fieldName, Object fieldValue, String pattern, Object
             rawObject) {
-        String errorMessage = String.format(
-                "%s field, <%s> does not match: <%s>. See, %s",
+        String errorMessage = 
+                "%s field, <%s> does not match: <%s>. See, %s".formatted(
                 fieldName, fieldValue, pattern, rawObject.toString());
         LOGGER.error(errorMessage);
         throw new ValidationException(errorMessage);
