@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.ontology.traversal.read;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.batch.item.Chunk;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationType;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
 import uk.ac.ebi.quickgo.ontology.traversal.OntologyGraph;
@@ -32,7 +33,7 @@ class OntologyGraphPopulatorTest {
     void graphIsPopulated() throws Exception {
         int max = 10;
         List<OntologyRelationship> tuples = createOntologyTuples(max);
-        ontologyGraphPopulator.write(tuples);
+        ontologyGraphPopulator.write(new Chunk<>(tuples));
         assertThat(ontologyGraph.getVertices().size(), is(equalTo(max * 2)));
     }
 

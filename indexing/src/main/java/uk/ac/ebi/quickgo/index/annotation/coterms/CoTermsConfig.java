@@ -21,7 +21,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
+import org.springframework.core.io.WritableResource;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.common.QuickGODocument;
 import uk.ac.ebi.quickgo.index.common.listener.ItemRateWriterListener;
@@ -137,25 +137,25 @@ public class CoTermsConfig {
         return new CoTermItemReader(coTermsAllAggregationWriter);
     }
 
-    private ItemWriter<List<CoTerm>> coTermsManualStatsWriter(Resource outputPath) {
+    private ItemWriter<List<CoTerm>> coTermsManualStatsWriter(WritableResource outputPath) {
         checkArgument(Objects.nonNull(outputPath), "The output path for the 'manual' coterms" +
                 " file cannot be null");
         return listItemFlatFileWriter(outputPath);
     }
 
-    private ItemWriter<List<CoTerm>> coTermsAllStatsWriter(Resource outputPath) {
+    private ItemWriter<List<CoTerm>> coTermsAllStatsWriter(WritableResource outputPath) {
         checkArgument(Objects.nonNull(outputPath), "The output path for the 'all' coterms" +
                 " file cannot be null");
         return listItemFlatFileWriter(outputPath);
     }
 
-    private ListItemWriter<CoTerm> listItemFlatFileWriter(Resource outputFile) {
+    private ListItemWriter<CoTerm> listItemFlatFileWriter(WritableResource outputFile) {
         ListItemWriter<CoTerm> listWriter = new ListItemWriter<>(flatFileWriter(outputFile));
         listWriter.setLineAggregator(new PassThroughLineAggregator<>());
         return listWriter;
     }
 
-    private FlatFileItemWriter<CoTerm> flatFileWriter(Resource outputFile) {
+    private FlatFileItemWriter<CoTerm> flatFileWriter(WritableResource outputFile) {
         FlatFileItemWriter<CoTerm> ffw = new FlatFileItemWriter<>();
         ffw.setLineAggregator(lineAggregator());
         LOGGER.info("Write out co-occurring terms to {}", outputFile.toString());

@@ -8,6 +8,8 @@ import org.springframework.batch.item.Chunk;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Predicate;
+import java.util.stream.StreamSupport;
+
 import org.springframework.batch.item.support.AbstractItemStreamItemWriter;
 
 import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTerm.calculateProbabilityRatio;
@@ -60,8 +62,8 @@ public class CoTermsAggregationWriter extends AbstractItemStreamItemWriter<Annot
     @Override
     public void write(Chunk<? extends AnnotationDocument> items) throws Exception {
         Preconditions.checkArgument(items != null, "Null annotation passed to process");
-        items.stream()
-                .filter(this.toBeProcessed::test)
+        StreamSupport.stream(items.spliterator(), false)
+                .filter(this.toBeProcessed)
                 .forEach(this::addGOTermToAggregationForGeneProduct);
     }
 

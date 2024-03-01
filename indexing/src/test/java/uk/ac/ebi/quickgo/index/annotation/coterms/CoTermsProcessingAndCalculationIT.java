@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.index.annotation.coterms;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -193,12 +194,12 @@ class CoTermsProcessingAndCalculationIT {
     }
 
     private void writeDocsToAllAggregationInstance(List<AnnotationDocument> docsToWrite) throws Exception {
-        coTermsAllAggregationWriter.write(docsToWrite);
+        coTermsAllAggregationWriter.write(new Chunk<>(docsToWrite));
         coTermsAllAggregationWriter.close();
     }
 
     private void writeDocsToManualAggregationInstance(List<AnnotationDocument> docsToWrite) throws Exception {
-        coTermsManualAggregationWriter.write(docsToWrite);
+        coTermsManualAggregationWriter.write(new Chunk<>(docsToWrite));
         coTermsManualAggregationWriter.close();
     }
 

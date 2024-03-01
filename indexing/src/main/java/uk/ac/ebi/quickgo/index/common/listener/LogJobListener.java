@@ -26,8 +26,7 @@ public class LogJobListener implements JobExecutionListener {
         LOGGER.info("Completed QuickGO job '{}'.\n", jobExecution.getJobInstance().getJobName());
 
         // compute duration
-        Duration.between(jobExecution.getEndTime().toInstant(), jobExecution.getStartTime().toInstant());
-        long durationMillis = jobExecution.getEndTime().getTime() - jobExecution.getStartTime().getTime();
+        long durationMillis = Duration.between(jobExecution.getEndTime(), jobExecution.getStartTime()).toMillis();
         String duration = "%d hrs, %d min, %d sec".formatted(
                 TimeUnit.MILLISECONDS.toHours(durationMillis),
                 TimeUnit.MILLISECONDS.toMinutes(durationMillis) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS

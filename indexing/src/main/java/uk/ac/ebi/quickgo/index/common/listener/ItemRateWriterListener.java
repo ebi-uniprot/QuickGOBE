@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.index.common.listener;
 
+import org.springframework.batch.item.Chunk;
 import uk.ac.ebi.quickgo.index.common.SolrServerWriter;
 
 import java.time.Duration;
@@ -37,21 +38,13 @@ public class ItemRateWriterListener<O> implements ItemWriteListener<O> {
         writeRateDocumentInterval = writeInterval;
     }
 
-    @Override public void beforeWrite(List<? extends O> list) {
-
-    }
-
-    @Override public void afterWrite(List<? extends O> list) {
+    @Override public void afterWrite(Chunk<? extends O> list) {
         deltaWriteCount.addAndGet(list.size());
 
         if (deltaWriteCount.get() >= writeRateDocumentInterval) {
             LOGGER.info(computeWriteRateStats(Instant.now()).toString());
             resetDelta();
         }
-    }
-
-    @Override public void onWriteError(Exception e, List<? extends O> list) {
-
     }
 
     /**

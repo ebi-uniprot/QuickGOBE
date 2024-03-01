@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.index.annotation.coterms;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.batch.item.Chunk;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker;
 
@@ -86,7 +87,7 @@ class CoTermsAggregationWriterTest {
     }
 
     private void completeAggregation(List<AnnotationDocument> docs) throws Exception {
-        aggregator.write(docs);
+        aggregator.write(new Chunk<>(docs));
         aggregator.close();
     }
 

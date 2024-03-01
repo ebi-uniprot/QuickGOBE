@@ -2,12 +2,13 @@ package uk.ac.ebi.quickgo.index;
 
 import org.apache.solr.client.solrj.SolrServerException;
 import org.junit.jupiter.api.Test;
+import org.springframework.batch.core.step.builder.StepBuilder;
+import org.springframework.transaction.PlatformTransactionManager;
 import uk.ac.ebi.quickgo.index.common.listener.LogJobListener;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.item.ItemReader;
@@ -52,10 +53,13 @@ class QuickGOIndexMainTest {
         int itemCount = 0;
 
         @Autowired
-        private StepBuilderFactory steps;
+        private JobRepository jobRepository;
+
+        @Autowired
+        private PlatformTransactionManager transactionManager;
 
         @Bean
-        public Job testJob(JobRepository jobRepository) throws Exception {
+        public Job testJob() {
             return new JobBuilder("test job", jobRepository)
                     .start(testStep())
                     .listener(new LogJobListener())
@@ -64,9 +68,8 @@ class QuickGOIndexMainTest {
 
         @Bean
         protected Step testStep() {
-            return this.steps
-                    .get("test step")
-                    .<String, String>chunk(1)
+            return new StepBuilder("test step", jobRepository)
+                    .<String, String>chunk(1, transactionManager)
                     .reader(getStringItemReader())
                     .writer(createWriter())
                     .build();
@@ -117,7 +120,7 @@ class QuickGOIndexMainTest {
         }
 
         public static void main(String[] args) {
-            System.exit(QuickGOIndexMain.run(SuccessfulTestApp.class, args));
+            System.exit(QuickGOIndexMain.run(FailingTestApp.class, args));
         }
     }
 }

@@ -1,12 +1,12 @@
 package uk.ac.ebi.quickgo.index.common.listener;
 
 import java.time.Instant;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.batch.item.Chunk;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -24,7 +24,7 @@ class ItemRateWriterListenerTest {
     private ItemRateWriterListener<Object> itemRateWriterListener;
 
     @Mock
-    private List<Object> mockedWrittenDocList;
+    private Chunk<Object> mockedWrittenDocList;
 
     @BeforeEach
     void setUp() {

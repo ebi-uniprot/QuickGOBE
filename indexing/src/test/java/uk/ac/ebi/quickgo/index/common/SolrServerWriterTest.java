@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.index.common;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.batch.item.Chunk;
 import uk.ac.ebi.quickgo.common.QuickGODocument;
 
 import java.util.ArrayList;
@@ -32,7 +33,7 @@ class SolrServerWriterTest {
     @Test
     void writerWillSubmitDocumentsForIndexingToSolrServer() throws Exception {
         List<FakeDocument> fakeDocuments = new ArrayList<>();
-        solrServerWriter.write(fakeDocuments);
+        solrServerWriter.write(new Chunk<>(fakeDocuments));
 
         // ensure solr server has sent the documents off for indexing
         verify(solrServer).addBeans(COLLECTION, fakeDocuments);

@@ -29,7 +29,7 @@ public class ListItemWriter<T> extends FlatFileItemWriter<List<T>> {
     @Override
     public void write(Chunk<? extends List<T>> list) throws Exception {
         for (List<T> subList : list) {
-            wrapped.write(subList);
+            wrapped.write(new Chunk<>(subList));
         }
     }
 

@@ -10,6 +10,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.batch.item.Chunk;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -65,7 +66,7 @@ class SiteMapItemWriterTest {
 
         String goId = "GO:0000001";
         String ecoId = "ECO:0000001";
-        itemWriter.write(asList(createGODoc(goId, "go name"), createECODoc(ecoId, "eco name")));
+        itemWriter.write(new Chunk<>(createGODoc(goId, "go name"), createECODoc(ecoId, "eco name")));
 
         verify(webSitemapGenerator, times(2)).addUrl(argumentCaptor.capture());
         List<WebSitemapUrl> urlsToWrite = argumentCaptor.getAllValues();

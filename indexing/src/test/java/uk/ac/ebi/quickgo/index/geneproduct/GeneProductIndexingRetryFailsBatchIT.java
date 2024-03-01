@@ -9,6 +9,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,7 +70,7 @@ class GeneProductIndexingRetryFailsBatchIT {
         assertThat(indexingStep.getProcessSkipCount(), is(0));
         assertThat(indexingStep.getWriteCount(), is(0));
 
-        verify(geneProductRepositoryWriter, times(2)).write(argumentCaptor.capture());
+        verify(geneProductRepositoryWriter, times(2)).write(new Chunk<>(argumentCaptor.capture()));
         List<List<GeneProductDocument>> docsSentToBeWritten = argumentCaptor.getAllValues();
         validateWriteAttempts(SOLR_RESPONSES, docsSentToBeWritten, d -> d.id);
 
