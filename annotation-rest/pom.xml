@@ -19,96 +19,96 @@
     <name>Annotation RESTful service</name>
     <packaging>jar</packaging>
 
- <dependencies>
-  <dependency>
-   <groupId>${project.groupId}</groupId>
-   <artifactId>common</artifactId>
-   <version>${project.version}</version>
-  </dependency>
-  <dependency>
-   <groupId>${project.groupId}</groupId>
-   <artifactId>annotation-common</artifactId>
-   <version>${project.version}</version>
-  </dependency>
-  <dependency>
-   <groupId>${project.groupId}</groupId>
-   <artifactId>rest-common</artifactId>
-   <version>${project.version}</version>
-  </dependency>
-  <dependency>
-   <groupId>org.springframework.boot</groupId>
-   <artifactId>spring-boot-starter-batch</artifactId>
-  </dependency>
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>annotation-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>rest-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-batch</artifactId>
+        </dependency>
 
-  <!-- REST API documentation -->
-  <dependency>
-   <groupId>io.springfox</groupId>
-   <artifactId>springfox-swagger-ui</artifactId>
-  </dependency>
+        <!-- REST API documentation -->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+        </dependency>
 
-  <!-- Conversion into Microsoft Office formats -->
-  <dependency>
-   <groupId>org.apache.poi</groupId>
-   <artifactId>poi</artifactId>
-   <version>${apache.poi.version}</version>
-  </dependency>
+        <!-- Conversion into Microsoft Office formats -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>${apache.poi.version}</version>
+        </dependency>
 
-  <!--Test dependencies-->
-  <dependency>
-   <groupId>uk.ac.ebi.quickgo</groupId>
-   <artifactId>common</artifactId>
-   <version>${project.version}</version>
-   <type>test-jar</type>
-   <scope>test</scope>
-  </dependency>
-  <dependency>
-   <groupId>${project.groupId}</groupId>
-   <artifactId>annotation-common</artifactId>
-   <version>${project.version}</version>
-   <type>test-jar</type>
-   <scope>test</scope>
-  </dependency>
-  <dependency>
-   <groupId>${project.groupId}</groupId>
-   <artifactId>ontology-common</artifactId>
-   <version>${project.version}</version>
-   <!--Warning: Do not change the scope from test. The module is meant for testing purposes only.
+        <!--Test dependencies-->
+        <dependency>
+            <groupId>uk.ac.ebi.quickgo</groupId>
+            <artifactId>common</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>annotation-common</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ontology-common</artifactId>
+            <version>${project.version}</version>
+            <!--Warning: Do not change the scope from test. The module is meant for testing purposes only.
             We do not want to pollute the annotation REST module with ontology concerns-->
-   <scope>test</scope>
-  </dependency>
-  <dependency>
-   <groupId>${project.groupId}</groupId>
-   <artifactId>ontology-common</artifactId>
-   <version>${project.version}</version>
-   <type>test-jar</type>
-   <!--Warning: Do not change the scope from test. The module is meant for testing purposes only.
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ontology-common</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <!--Warning: Do not change the scope from test. The module is meant for testing purposes only.
             We do not want to pollute the annotation REST module with ontology concerns-->
-   <scope>test</scope>
-  </dependency>
-  <dependency>
-   <groupId>org.springframework.batch</groupId>
-   <artifactId>spring-batch-test</artifactId>
-   <scope>test</scope>
-   <exclusions>
-    <exclusion>
-     <groupId>junit</groupId>
-     <artifactId>junit</artifactId>
-    </exclusion>
-   </exclusions>
-  </dependency>
-  <dependency>
-   <groupId>org.springframework.boot</groupId>
-   <artifactId>spring-boot-starter-cache</artifactId>
-  </dependency>
-  <dependency>
-   <groupId>javax.cache</groupId>
-   <artifactId>cache-api</artifactId>
-  </dependency>
-  <dependency>
-   <groupId>org.ehcache</groupId>
-   <artifactId>ehcache</artifactId>
-   <version>${ehcache.version}</version>
-   <classifier>jakarta</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.batch</groupId>
+            <artifactId>spring-batch-test</artifactId>
+            <scope>test</scope>
+            <exclusions>
+             <exclusion>
+              <groupId>junit</groupId>
+              <artifactId>junit</artifactId>
+             </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.cache</groupId>
+            <artifactId>cache-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.ehcache</groupId>
+            <artifactId>ehcache</artifactId>
+            <version>${ehcache.version}</version>
+            <classifier>jakarta</classifier>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>

@@ -20,36 +20,36 @@
         <json-path.version>2.4.0</json-path.version>
     </properties>
 
- <dependencies>
-  <dependency>
-   <groupId>${project.groupId}</groupId>
-   <artifactId>common</artifactId>
-   <version>${project.version}</version>
-  </dependency>
-  <dependency>
-   <groupId>${project.groupId}</groupId>
-   <artifactId>ontology-common</artifactId>
-   <version>${project.version}</version>
-  </dependency>
-  <dependency>
-   <groupId>${project.groupId}</groupId>
-   <artifactId>rest-common</artifactId>
-   <version>${project.version}</version>
-  </dependency>
-  <dependency>
-   <groupId>org.springframework.boot</groupId>
-   <artifactId>spring-boot-starter-batch</artifactId>
-  </dependency>
-  <dependency>
-   <groupId>com.h2database</groupId>
-   <artifactId>h2</artifactId>
-  </dependency>
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ontology-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>rest-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-batch</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+        </dependency>
 
-  <!-- REST API documentation -->
-  <dependency>
-   <groupId>io.springfox</groupId>
-   <artifactId>springfox-swagger-ui</artifactId>
-  </dependency>
+        <!-- REST API documentation -->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+        </dependency>
 
         <!--Test dependencies-->
         <dependency>
