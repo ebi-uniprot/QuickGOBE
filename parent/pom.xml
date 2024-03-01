@@ -44,7 +44,7 @@
         <springfox-swagger2.version>2.7.0</springfox-swagger2.version>
 
         <!-- plugin version numbers -->
-        <jacoco.version>0.8.8</jacoco.version>
+        <jacoco.version>0.8.11</jacoco.version>
 
         <!-- jmeter default properties -->
         <jmeter-maven-plugin.version>1.10.1</jmeter-maven-plugin.version>
@@ -246,7 +246,6 @@
                             <exclude>**/IT*.java</exclude>
                         </excludes>
                         <argLine>${jacoco.agent.ut.arg}</argLine>
-                        <argLine>--illegal-access=permit</argLine>
                     </configuration>
                 </plugin>
 
@@ -256,7 +255,6 @@
                     <configuration>
                         <skipITs>${skipITs}</skipITs>
                         <argLine>${jacoco.agent.it.arg}</argLine>
-                        <argLine>--illegal-access=permit</argLine>
                     </configuration>
                     <executions>
                         <execution>
