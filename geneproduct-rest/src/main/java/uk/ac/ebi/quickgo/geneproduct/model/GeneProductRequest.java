@@ -59,7 +59,7 @@ public class GeneProductRequest {
     private String[] taxonId;
 
     @ApiModelProperty(value = "Filters the results of the main query based on a value chosen from " +
-            "the type field", allowableValues = "protein,miRNA,complexes", example = "protein")
+            "the type field", allowableValues = "protein,RNA,complexes", example = "protein")
     private String type;
 
     @ApiModelProperty(value = "Filters the results of the main query based on a value chosen from " +
@@ -139,7 +139,7 @@ public class GeneProductRequest {
         }
     }
 
-    @Pattern(regexp = "protein|miRNA|complexes", flags = CASE_INSENSITIVE,
+    @Pattern(regexp = "protein|RNA|complexes", flags = CASE_INSENSITIVE,
             message = "Provided type is invalid: ${validatedValue}")
     public String getType() {
         return filterMap.get(GeneProductFields.Searchable.TYPE) == null ? null :

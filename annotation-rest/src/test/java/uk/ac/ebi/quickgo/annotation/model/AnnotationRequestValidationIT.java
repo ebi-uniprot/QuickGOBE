@@ -440,7 +440,7 @@ class AnnotationRequestValidationIT {
     // GENE PRODUCT TYPE PARAMETER
     @Test
     void validGeneProductTypeValuesDontCauseAnError() {
-        String[] gpTypes = {"complex", "miRNA", "protein"};
+        String[] gpTypes = {"complex", "RNA", "protein"};
 
         annotationRequest.setGeneProductType(gpTypes);
 
@@ -449,7 +449,7 @@ class AnnotationRequestValidationIT {
 
     @Test
     void setGpTypeNotCaseSensitive() {
-        String[] gpTypes = {"comPlex", "mirna", "pRotein"};
+        String[] gpTypes = {"comPlex", "rna", "pRotein"};
 
         annotationRequest.setGeneProductType(gpTypes);
 

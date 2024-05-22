@@ -96,7 +96,7 @@ public class AnnotationRequest {
     private String geneProductId;
 
     @ApiModelProperty(value = "The type of gene product. Accepts comma separated values. Allowed values are" +
-      " miRNA,complex,protein", position = 2)
+      " RNA,complex,protein", position = 2)
     private String geneProductType;
 
     @ApiModelProperty(
@@ -438,7 +438,7 @@ public class AnnotationRequest {
         filterMap.put(GENE_PRODUCT_TYPE, geneProductType);
     }
 
-    @ArrayPattern(regexp = "^complex|miRNA|protein$", flags = CASE_INSENSITIVE, paramName = GENE_PRODUCT_TYPE_PARAM)
+    @ArrayPattern(regexp = "^complex|RNA|protein$", flags = CASE_INSENSITIVE, paramName = GENE_PRODUCT_TYPE_PARAM)
     public String[] getGeneProductType() {
         return filterMap.get(GENE_PRODUCT_TYPE);
     }

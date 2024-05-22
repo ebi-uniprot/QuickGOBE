@@ -599,7 +599,7 @@ class AnnotationRequestTest {
     void cannotCreateFilterWithProteomeAndGeneProductSubsetAndGeneProductTypeValueOtherThanProtein() {
         annotationRequest.setGeneProductSubset("TrEMBL");
         annotationRequest.setProteome("complete");
-        annotationRequest.setGeneProductType("miRNA");
+        annotationRequest.setGeneProductType("RNA");
         assertThrows(ParameterException.class, () -> annotationRequest.createFilterRequests());
     }
 

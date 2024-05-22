@@ -42,7 +42,7 @@ class GeneProductTest {
         assertThat(uniprot.db(), is("RNAcentral"));
         assertThat(uniprot.canonicalId(), is("URS00000064B1_559292"));
         assertThat(uniprot.fullId(), equalTo(fullId));
-        assertThat(uniprot.type(), is("miRNA"));
+        assertThat(uniprot.type(), is("RNA"));
     }
 
     @Test

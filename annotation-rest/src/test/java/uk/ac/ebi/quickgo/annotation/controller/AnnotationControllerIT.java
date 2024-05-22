@@ -1477,11 +1477,11 @@ class AnnotationControllerIT {
     @Test
     void filterBySingleGeneProductTypeOfRnaReturnsMatchingDocument() throws Exception {
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc("A0A123");
-        doc.geneProductType = "miRNA";
+        doc.geneProductType = "RNA";
         repository.save(doc);
 
         ResultActions response =
-                mockMvc.perform(get(RESOURCE_URL + "/search").param(GENE_PRODUCT_TYPE_PARAM.getName(), "miRNA"));
+                mockMvc.perform(get(RESOURCE_URL + "/search").param(GENE_PRODUCT_TYPE_PARAM.getName(), "RNA"));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -1531,7 +1531,7 @@ class AnnotationControllerIT {
         repository.save(doc);
 
         ResultActions response =
-                mockMvc.perform(get(RESOURCE_URL + "/search").param(GENE_PRODUCT_TYPE_PARAM.getName(), "miRNA"));
+                mockMvc.perform(get(RESOURCE_URL + "/search").param(GENE_PRODUCT_TYPE_PARAM.getName(), "RNA"));
 
         response.andDo(print())
                 .andExpect(status().isOk())
@@ -1950,13 +1950,13 @@ class AnnotationControllerIT {
         doc.geneProductSubset = "swiss-prot";
         doc2.proteome= "";
         doc2.geneProductSubset="";
-        doc2.geneProductType="miRNA";
+        doc2.geneProductType="RNA";
         repository.save(doc);
         repository.save(doc2);
 
         ResultActions response =
                 mockMvc.perform(get(RESOURCE_URL + "/search").param(GP_SUBSET_PARAM.getName(), "swiss-prot")
-                        .param(GENE_PRODUCT_TYPE_PARAM.getName(), "protein,miRNA")
+                        .param(GENE_PRODUCT_TYPE_PARAM.getName(), "protein,RNA")
                         .param(PROTEOME_PARAM.getName(), "gcrpCan")
                 );
 

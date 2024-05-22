@@ -8,7 +8,7 @@ package uk.ac.ebi.quickgo.geneproduct.common;
 public enum GeneProductType {
     COMPLEX("complex"),
     PROTEIN("protein"),
-    miRNA("miRNA");
+    RNA("RNA");
 
     private String name;
 

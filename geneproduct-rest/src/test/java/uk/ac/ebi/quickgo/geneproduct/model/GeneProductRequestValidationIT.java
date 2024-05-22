@@ -90,8 +90,8 @@ class GeneProductRequestValidationIT {
     }
 
     @Test
-    void miRNATypeIsValid() {
-        String type = "miRNA";
+    void RNATypeIsValid() {
+        String type = "RNA";
         geneProductRequest.setType(type);
 
         assertThat(validator.validate(geneProductRequest), hasSize(0));
@@ -99,7 +99,7 @@ class GeneProductRequestValidationIT {
 
     @Test
     void caseInsensitiveTypeIsValid() {
-        String type = "mirna";
+        String type = "rna";
         geneProductRequest.setType(type);
 
         assertThat(validator.validate(geneProductRequest), hasSize(0));

@@ -146,7 +146,7 @@ class AnnotationToGAFTest {
         assertThat(elements[COL_ASPECT], is("C"));
         assertThat(elements[COL_DB_OBJECT_NAME], is(NAME));
         assertThat(elements[COL_DB_OBJECT_SYNONYM], is(SYNONYMS));
-        assertThat(elements[COL_DB_OBJECT_TYPE], is(GeneProduct.GeneProductType.MI_RNA.getName()));
+        assertThat(elements[COL_DB_OBJECT_TYPE], is(GeneProduct.GeneProductType.RNA.getName()));
         assertThat(elements[COL_TAXON], is("taxon:" + TAXON_ID));
         assertThat(elements[COL_DATE], equalTo(DATE_AS_STRING));
         assertThat(elements[COL_ASSIGNED_BY], equalTo(ASSIGNED_BY));

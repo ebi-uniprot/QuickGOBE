@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 
 import static java.util.Objects.nonNull;
 import static uk.ac.ebi.quickgo.annotation.model.GeneProduct.GeneProductType.COMPLEX;
-import static uk.ac.ebi.quickgo.annotation.model.GeneProduct.GeneProductType.MI_RNA;
+import static uk.ac.ebi.quickgo.annotation.model.GeneProduct.GeneProductType.RNA;
 import static uk.ac.ebi.quickgo.annotation.model.GeneProduct.GeneProductType.PROTEIN;
 
 /**
@@ -66,7 +66,7 @@ public class GeneProduct {
         if (rnaMatcher.matches()) {
             String db = "RNAcentral";
             String id = rnaMatcher.group(RNA_ID_GROUP);
-            return new GeneProduct(new GeneProductId(db, id, curieId, null), MI_RNA);
+            return new GeneProduct(new GeneProductId(db, id, curieId, null), RNA);
         }
 
         Matcher complexPortalMatcher = COMPLEX_PORTAL_CANONICAL_PATTERN.matcher(curieId);
@@ -137,7 +137,7 @@ public class GeneProduct {
     public enum GeneProductType {
         COMPLEX("complex"),
         PROTEIN("protein"),
-        MI_RNA("miRNA");
+        RNA("RNA");
 
         private String name;
 

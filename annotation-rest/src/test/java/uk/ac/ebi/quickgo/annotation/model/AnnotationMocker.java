@@ -79,7 +79,7 @@ public class AnnotationMocker {
     //RNACentral
     public static final String DB_RNA_CENTRAL = "RNAcentral";
     public static final String ID_RNA_CENTRAL = "URS00000064B1_559292";
-    //    String gpType = "miRNA";
+    //    String gpType = "RNA";
     //    annotation.id = String.format("%s:%s", db, gpId);
     //        annotation.setGeneProduct(GeneProduct.fromCurieId(annotation.id));
     //    annotation.geneProductId = String.format("%s:%s", db, gpId);
