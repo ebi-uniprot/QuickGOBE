@@ -304,7 +304,7 @@ public class GOTerm extends GenericTerm {
     @Override
     public void addQCCheck(String s) {
         switch (s) {
-            case "gocheck_do_not_annotate":
+            case "gocheck_do_not_annotate", "gocheck_obsoletion_candidate":
                 this.usage = ETermUsage.X;
                 break;
 
