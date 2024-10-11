@@ -18,6 +18,7 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Publishes the configuration beans of the ontology repository.
@@ -35,7 +36,7 @@ public class OntologyRepoConfig {
     @Bean
     @Profile("httpServer")
     public SolrClientFactory httpSolrServerFactory(@Value("${zookeeper.hosts}") List<String> zkHosts) {
-        return new HttpSolrClientFactory(new CloudHttp2SolrClient.Builder(zkHosts).build());
+        return new HttpSolrClientFactory(new CloudHttp2SolrClient.Builder(zkHosts, Optional.empty()).build());
     }
 
     @Bean

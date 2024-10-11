@@ -27,8 +27,7 @@ server:
 
 ## ================= zookeeper =================
 zookeeper:
-  hosts:
-    - wp-p2m-c8.ebi.ac.uk:2181
+  hosts: wp-p2m-c8.ebi.ac.uk:2181
 
 ## =============== Validation =================
 geneproduct:
