@@ -20,10 +20,15 @@ server:
 
 ## ================= Solr =================
 ## DEV solr server
-solr:
+#solr:
   #host: http://ves-hx-ac.ebi.ac.uk:8090/solr
-  host: http://wp-p2m-c5.ebi.ac.uk:8090/solr/
-  timeoutMilliSeconds: 120000
+  #host: http://wp-p2m-c5.ebi.ac.uk:8090/solr/
+  #timeoutMilliSeconds: 120000
+
+## ================= zookeeper =================
+zookeeper:
+  hosts:
+    - wp-p2m-c8.ebi.ac.uk:2181
 
 ## =============== Validation =================
 geneproduct:

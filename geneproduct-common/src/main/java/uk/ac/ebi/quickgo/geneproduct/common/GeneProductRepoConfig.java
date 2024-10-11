@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.geneproduct.common;
 
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.impl.CloudHttp2SolrClient;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -16,6 +16,7 @@ import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Publishes the configuration beans of the Gene Product repository.
@@ -30,8 +31,8 @@ public class GeneProductRepoConfig {
 
     @Bean
     @Profile("httpServer")
-    public SolrClientFactory httpSolrServerFactory(@Value("${solr.host}") String solrUrl) {
-        return new HttpSolrClientFactory(new HttpSolrClient.Builder().withBaseSolrUrl(solrUrl).build());
+    public SolrClientFactory httpSolrServerFactory(@Value("${zookeeper.hosts}") List<String> zkHosts) {
+        return new HttpSolrClientFactory(new CloudHttp2SolrClient.Builder(zkHosts).build());
     }
 
     @Bean

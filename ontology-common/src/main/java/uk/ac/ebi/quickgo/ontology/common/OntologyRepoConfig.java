@@ -1,8 +1,7 @@
 package uk.ac.ebi.quickgo.ontology.common;
 
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
-import org.apache.solr.core.CoreContainer;
+import org.apache.solr.client.solrj.impl.CloudHttp2SolrClient;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,8 +16,8 @@ import org.springframework.data.solr.server.support.HttpSolrClientFactory;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Publishes the configuration beans of the ontology repository.
@@ -35,8 +34,8 @@ public class OntologyRepoConfig {
 
     @Bean
     @Profile("httpServer")
-    public SolrClientFactory httpSolrServerFactory(@Value("${solr.host}") String solrUrl) {
-        return new HttpSolrClientFactory(new HttpSolrClient.Builder().withBaseSolrUrl(solrUrl).build());
+    public SolrClientFactory httpSolrServerFactory(@Value("${zookeeper.hosts}") List<String> zkHosts) {
+        return new HttpSolrClientFactory(new CloudHttp2SolrClient.Builder(zkHosts).build());
     }
 
     @Bean
