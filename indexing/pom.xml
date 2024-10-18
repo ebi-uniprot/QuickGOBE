@@ -58,10 +58,6 @@
             <version>${commons-collections.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.solr</groupId>
-            <artifactId>solr-core</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.github.dfabulich</groupId>
             <artifactId>sitemapgen4j</artifactId>
             <version>${sitemapgen4j.version}</version>

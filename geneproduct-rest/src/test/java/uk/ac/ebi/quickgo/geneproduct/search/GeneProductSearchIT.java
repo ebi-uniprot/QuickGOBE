@@ -376,7 +376,7 @@ class GeneProductSearchIT extends SearchControllerSetup {
         checkValidHighlightOnQueryResponse("Slider", "A0A0F8CSS2", "A0A0F8CSS3")
                 .andExpect(jsonPath("$.results.*.id", containsInAnyOrder("A0A0F8CSS2", "A0A0F8CSS3")))
                 .andExpect(jsonPath("$.highlighting.*.id", containsInAnyOrder("A0A0F8CSS2", "A0A0F8CSS3")))
-                .andExpect(jsonPath("$.highlighting.*.matches.*.field", containsInAnyOrder("name", "name")))
+                .andExpect(jsonPath("$.highlighting.*.matches.*.field", containsInAnyOrder("name", "name", "name", "name")))
                 .andExpect(jsonPath("$.highlighting[0].matches[0].values[0]", containsString("Slider")))
                 .andExpect(jsonPath("$.highlighting[1].matches[0].values[0]", containsString("Slider")));
     }
