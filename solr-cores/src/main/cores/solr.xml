@@ -28,6 +28,7 @@
 
 <solr>
     <int name="maxBooleanClauses">${solr.max.booleanClauses:3024}</int>
+    <str name="allowPaths">*</str>
     <solrcloud>
         <str name="host">${host:}</str>
         <int name="hostPort">${jetty.port:8983}</int>
