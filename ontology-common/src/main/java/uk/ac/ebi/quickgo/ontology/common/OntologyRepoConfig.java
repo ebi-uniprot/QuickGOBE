@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.ontology.common;
 
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.impl.CloudHttp2SolrClient;
+import org.apache.solr.client.solrj.impl.CloudSolrClient;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,7 +36,7 @@ public class OntologyRepoConfig {
     @Bean
     @Profile("httpServer")
     public SolrClientFactory httpSolrServerFactory(@Value("${zookeeper.hosts}") List<String> zkHosts) {
-        return new HttpSolrClientFactory(new CloudHttp2SolrClient.Builder(zkHosts, Optional.empty()).build());
+        return new HttpSolrClientFactory(new CloudSolrClient.Builder(zkHosts, Optional.empty()).build());
     }
 
     @Bean

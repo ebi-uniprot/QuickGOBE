@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.annotation.common;
 
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.impl.CloudHttp2SolrClient;
+import org.apache.solr.client.solrj.impl.CloudSolrClient;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -36,7 +36,7 @@ public class AnnotationRepoConfig {
     @Bean
     @Profile("httpServer")
     public SolrClientFactory httpSolrServerFactory(@Value("${zookeeper.hosts}") List<String> zkHosts) {
-        return new HttpSolrClientFactory(new CloudHttp2SolrClient.Builder(zkHosts, Optional.empty()).build());
+        return new HttpSolrClientFactory(new CloudSolrClient.Builder(zkHosts, Optional.empty()).build());
     }
 
     @Bean
