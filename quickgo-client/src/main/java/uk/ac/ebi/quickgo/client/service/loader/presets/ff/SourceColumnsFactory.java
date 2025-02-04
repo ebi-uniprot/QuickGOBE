@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.client.service.loader.presets.ff;
 
 import uk.ac.ebi.quickgo.client.service.loader.presets.evidence.RawEvidenceNamedPresetColumnsBuilder;
+import uk.ac.ebi.quickgo.client.service.loader.presets.slimsets.RawSlimSetNamedPresetColumnsBuilder;
 
 /**
  * Factory for creating {@link RawNamedPresetColumns} instances based on a specified {@link Source}.
@@ -26,12 +27,6 @@ public class SourceColumnsFactory {
                 return RawNamedPresetColumnsBuilder.createWithNamePosition(0)
                         .withDescriptionPosition(1)
                         .withURLPosition(3)
-                        .build();
-            case GO_SLIM_SET_COLUMNS:
-                return RawNamedPresetColumnsBuilder.createWithNamePosition(0)
-                        .withIdPosition(1)
-                        .withDescriptionPosition(2)
-                        .withAssociationPosition(3)
                         .build();
             case EXT_RELATION_COLUMNS:
                 return RawNamedPresetColumnsBuilder
@@ -60,10 +55,21 @@ public class SourceColumnsFactory {
                 .build();
     }
 
+    public static RawSlimSetNamedPresetColumnsBuilder.RawSlimSetNamedPresetColumnsImpl createSlimSetColumns() {
+        return RawSlimSetNamedPresetColumnsBuilder
+              .createWithNamePosition(0)
+              .withIdPosition(1)
+              .withDescriptionPosition(2)
+              .withAssociationPosition(3)
+              .withRolePosition(4)
+              .withTaxIdsPosition(5)
+              .withShortLabelPosition(6)
+              .build();
+    }
+
     public enum Source {
         DB_COLUMNS,
         GENE_PRODUCT_COLUMNS,
-        GO_SLIM_SET_COLUMNS,
         REF_COLUMNS,
         EXT_RELATION_COLUMNS,
         TAXON_COLUMNS,

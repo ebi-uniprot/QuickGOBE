@@ -10,6 +10,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.stream.Collectors.mapping;
@@ -216,12 +217,25 @@ public class CompositePresetImpl implements CompositePreset {
      */
     private static Function<Map.Entry<String, List<PresetItem>>, PresetItem> goSlimsGrouping() {
         return groupedEntry -> {
-            PresetItem.Builder presetBuilder = PresetItem.createWithName(groupedEntry.getKey());
+            PresetItem.Builder presetBuilder = builderWithGoSlimsGroupProperties(groupedEntry);
             return presetBuilder.withAssociations(groupedEntry.getValue().stream()
                     .map(CompositePresetImpl::transformGOSlimPreset)
-                    .collect(Collectors.toList()))
+                    .toList())
                     .build();
         };
+    }
+
+    private static PresetItem.Builder builderWithGoSlimsGroupProperties(Map.Entry<String, List<PresetItem>> groupedEntry){
+        PresetItem.Builder presetBuilder = PresetItem.createWithName(groupedEntry.getKey());
+        if(groupedEntry.getValue().isEmpty()){
+            return presetBuilder;
+        }
+        PresetItem firstGroupItem = groupedEntry.getValue().getFirst();
+        Stream.of(SlimAdditionalProperty.ROLE, SlimAdditionalProperty.TAX_IDS, SlimAdditionalProperty.SHORT_LABEL)
+                .map(SlimAdditionalProperty::getKey)
+                .filter(prop -> firstGroupItem.getProperty(prop) != null)
+                .forEach(prop -> presetBuilder.withProperty(prop, firstGroupItem.getProperty(prop)));
+        return presetBuilder;
     }
 
     private static PresetItem transformGOSlimPreset(PresetItem presetItem) {

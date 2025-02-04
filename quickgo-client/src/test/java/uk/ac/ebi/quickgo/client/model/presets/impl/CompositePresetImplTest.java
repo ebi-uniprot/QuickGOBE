@@ -1,5 +1,7 @@
 package uk.ac.ebi.quickgo.client.model.presets.impl;
 
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
 
 import java.util.*;
@@ -10,8 +12,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -155,6 +156,42 @@ class CompositePresetImplTest {
         @Test
         void cannotAddNullPreset() {
             assertThrows(IllegalArgumentException.class, () -> presetBuilder.addPreset(GO_SLIMS_SETS, null));
+        }
+
+        @Nested
+        class GoSlims {
+            @ParameterizedTest
+            @ValueSource(strings = {"role", "taxIds", "shortLabel"})
+            void groupLevelPropertyShouldPresent(String propertyKey) {
+                presetBuilder.addPreset(GO_SLIMS_SETS, createWithName(name(1)).withProperty(propertyKey, "val").build());
+                var presetItem = presetBuilder.getGoSlimSets().getFirst();
+
+                assertThat(presetItem.getProperty(propertyKey), is("val"));
+                var association = presetItem.getAssociations().getFirst();
+                assertThat(association.getProperty(propertyKey), emptyOrNullString());
+            }
+
+            @Test
+            void aspectWillNotAddGroupLevel() {
+                presetBuilder.addPreset(GO_SLIMS_SETS, createWithName(name(1)).withProperty("description", "C").build());
+                var presetItem = presetBuilder.getGoSlimSets().getFirst();
+
+                assertThat(presetItem.getProperty("aspect"), emptyOrNullString());
+                System.out.println(presetItem);
+                var association = presetItem.getAssociations().getFirst();
+                assertThat(association.getProperty("aspect"), is("cellular_component"));
+            }
+
+            @ParameterizedTest
+            @ValueSource(strings = {"not exist", "abc", "not_property"})
+            void otherPropertiesWillNotAddGroupLevel(String propertyKey) {
+                presetBuilder.addPreset(GO_SLIMS_SETS, createWithName(name(1)).withProperty(propertyKey, "val").build());
+                var presetItem = presetBuilder.getGoSlimSets().getFirst();
+
+                assertThat(presetItem.getProperty(propertyKey), emptyOrNullString());
+                var association = presetItem.getAssociations().getFirst();
+                assertThat(association.getProperty("aspect"), emptyOrNullString());
+            }
         }
 
     }

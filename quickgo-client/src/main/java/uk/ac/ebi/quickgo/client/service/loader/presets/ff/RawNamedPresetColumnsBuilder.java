@@ -47,7 +47,7 @@ public class RawNamedPresetColumnsBuilder {
         return this;
     }
 
-    RawNamedPresetColumnsBuilder withDescriptionPosition(int descriptionPosition) {
+    public RawNamedPresetColumnsBuilder withDescriptionPosition(int descriptionPosition) {
         checkColumnPosition(descriptionPosition);
         this.descriptionPosition = descriptionPosition;
         return this;
@@ -65,7 +65,7 @@ public class RawNamedPresetColumnsBuilder {
         return this;
     }
 
-    RawNamedPresetColumnsBuilder withAssociationPosition(int associationPosition) {
+    public RawNamedPresetColumnsBuilder withAssociationPosition(int associationPosition) {
         checkColumnPosition(associationPosition);
         this.associationPosition = associationPosition;
         return this;

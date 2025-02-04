@@ -9,7 +9,7 @@ import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
  * @author Edd
  */
 enum SlimAdditionalProperty {
-    NAME("name"), ASPECT("aspect");
+    NAME("name"), ASPECT("aspect"), ROLE("role"), TAX_IDS("taxIds"), SHORT_LABEL("shortLabel");
 
     private final String key;
 
