@@ -41,7 +41,7 @@
 
         <solr.version>8.11.4</solr.version>
         <core-dropwizard-metrics.version>3.2.6</core-dropwizard-metrics.version>
-        <springfox-swagger2.version>2.7.0</springfox-swagger2.version>
+        <springfox-swagger2.version>2.10.0</springfox-swagger2.version>
 
         <!-- plugin version numbers -->
         <jacoco.version>0.8.11</jacoco.version>
