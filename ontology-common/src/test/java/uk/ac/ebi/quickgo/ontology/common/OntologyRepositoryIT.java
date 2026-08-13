@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.solr.core.SolrTemplate;
 import uk.ac.ebi.quickgo.common.QueryUtils;
 import uk.ac.ebi.quickgo.common.SolrCollectionName;
 import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
@@ -41,9 +40,6 @@ class OntologyRepositoryIT {
 
     @Autowired
     private OntologyRepository ontologyRepository;
-
-    @Autowired
-    private SolrTemplate ontologyTemplate;
 
     @BeforeEach
     void before() {
@@ -278,17 +274,14 @@ class OntologyRepositoryIT {
      */
     @Test
     void saveDirectlyToSolrServer() throws IOException, SolrServerException {
-        ontologyTemplate.getSolrClient().addBean(COLLECTION,OntologyDocMocker.createGODoc("A", "Alice Cooper"));
-        ontologyTemplate.getSolrClient().addBean(COLLECTION,OntologyDocMocker.createGODoc("B", "Alice Cooper"));
-        ontologyTemplate.getSolrClient().addBean(COLLECTION,OntologyDocMocker.createGODoc("C", "Alice Cooper"));
-        ontologyTemplate.getSolrClient().addBeans(COLLECTION,
-                Arrays.asList(
-                        OntologyDocMocker.createGODoc("D", "Alice Cooper"),
-                        OntologyDocMocker.createGODoc("E", "Alice Cooper")));
-
         assertThat(ontologyRepository.findAll(PageRequest.of(0, 10)).getTotalElements(), is(0L));
-
-        ontologyTemplate.getSolrClient().commit(COLLECTION);
+        ontologyRepository.save(OntologyDocMocker.createGODoc("A", "Alice Cooper"));
+        ontologyRepository.save(OntologyDocMocker.createGODoc("B", "Alice Cooper"));
+        ontologyRepository.save(OntologyDocMocker.createGODoc("C", "Alice Cooper"));
+        ontologyRepository.saveAll(
+          Arrays.asList(
+            OntologyDocMocker.createGODoc("D", "Alice Cooper"),
+            OntologyDocMocker.createGODoc("E", "Alice Cooper")));
 
         assertThat(ontologyRepository.findAll(PageRequest.of(0, 10)).getTotalElements(), is(5L));
     }

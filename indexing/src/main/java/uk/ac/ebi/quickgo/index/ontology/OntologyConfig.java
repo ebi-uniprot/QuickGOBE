@@ -1,7 +1,6 @@
 package uk.ac.ebi.quickgo.index.ontology;
 
 import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
-import uk.ac.ebi.quickgo.index.common.SolrCrudRepoWriter;
 import uk.ac.ebi.quickgo.index.common.listener.LogJobListener;
 import uk.ac.ebi.quickgo.index.common.listener.LogStepListener;
 import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
@@ -94,7 +93,7 @@ public class OntologyConfig {
 
     private ItemWriter<OntologyDocument> compositeOntologyWriter() {
         List<ItemWriter<? super OntologyDocument>> writers = new ArrayList<>();
-        writers.add(new SolrCrudRepoWriter<>(ontologyRepository));
+        writers.add(entity -> ontologyRepository.saveAll(entity));
         writers.add(siteMapOntologyWriter);
 
         CompositeItemWriter<OntologyDocument> compositeItemWriter = new CompositeItemWriter<>();

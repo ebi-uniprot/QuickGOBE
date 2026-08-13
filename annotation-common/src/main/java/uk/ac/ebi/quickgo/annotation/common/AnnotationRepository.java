@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.common;
 
-import org.springframework.data.solr.repository.SolrCrudRepository;
+import uk.ac.ebi.quickgo.common.repository.SolrCrudRepository;
 
 /**
  * Annotation repository interface used to perform searches over its contents.

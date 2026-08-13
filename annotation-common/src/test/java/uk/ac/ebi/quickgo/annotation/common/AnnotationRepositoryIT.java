@@ -60,7 +60,7 @@ class AnnotationRepositoryIT {
         annotationRepository.save(doc1);
         annotationRepository.save(doc2);
         annotationRepository.save(doc3);
-        annotationRepository.delete(doc3);
+        annotationRepository.deleteById(doc3.id);
 
         assertThat(annotationRepository.findAll(PageRequest.of(0, 10)).getTotalElements(), is(2L));
     }

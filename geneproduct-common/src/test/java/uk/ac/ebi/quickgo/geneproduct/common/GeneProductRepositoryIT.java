@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.solr.core.SolrTemplate;
 import uk.ac.ebi.quickgo.common.SolrCollectionName;
 import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 
@@ -31,9 +30,6 @@ class GeneProductRepositoryIT {
 
     @Autowired
     private GeneProductRepository geneProductRepository;
-
-    @Autowired
-    private SolrTemplate geneProductTemplate;
 
     @BeforeEach
     void before() {
@@ -111,7 +107,7 @@ class GeneProductRepositoryIT {
     /**
      * Deleting from a repository is a special case when the schema.xml defines a non-"string"
      * analyzer on the field used to identify the documents to delete. We use a lower-casing analyser
-     * for IDs, which means the geneProductTemplate.deleteById fails.
+     * for IDs, which means direct deletion fails.
      * <p>
      * To get the desired behaviour, delete by accessing the solr server instance directly, so that
      * the request goes through a query, which is subject to the same analyser used for indexing.
@@ -120,10 +116,9 @@ class GeneProductRepositoryIT {
      * @throws SolrServerException
      * @throws IOException
      */
-    private void deleteFromRepositoryByIds(GeneProductDocument... docs) throws SolrServerException, IOException {
+    private void deleteFromRepositoryByIds(GeneProductDocument... docs) {
         for (GeneProductDocument doc : docs) {
-            geneProductTemplate.getSolrClient().deleteByQuery(COLLECTION,GeneProductFields.Searchable.ID + ":" + doc.id);
+            geneProductRepository.deleteById(doc.id);
         }
-        geneProductTemplate.getSolrClient().commit(COLLECTION);
     }
 }

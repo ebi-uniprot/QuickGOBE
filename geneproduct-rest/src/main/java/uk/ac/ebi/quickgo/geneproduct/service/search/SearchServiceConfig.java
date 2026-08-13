@@ -1,10 +1,10 @@
 package uk.ac.ebi.quickgo.geneproduct.service.search;
 
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
-import org.springframework.data.solr.core.SolrTemplate;
 import uk.ac.ebi.quickgo.common.FacetableField;
 import uk.ac.ebi.quickgo.common.SearchableField;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductFields;
@@ -78,7 +78,7 @@ public class SearchServiceConfig {
 
     @Bean
     public RequestRetrieval<GeneProduct> geneProductSolrRequestRetrieval(
-            SolrTemplate geneProductTemplate,
+            SolrClient solrClient,
             QueryRequestConverter<SolrQuery> solrSelectQueryRequestConverter,
             GeneProductCompositeRetrievalConfig geneProductRetrievalConfig) {
 
@@ -89,7 +89,7 @@ public class SearchServiceConfig {
         );
 
         return new SolrRequestRetrieval<>(
-                geneProductTemplate.getSolrClient(),
+                solrClient,
                 solrSelectQueryRequestConverter,
                 resultConverter,
                 geneProductRetrievalConfig);

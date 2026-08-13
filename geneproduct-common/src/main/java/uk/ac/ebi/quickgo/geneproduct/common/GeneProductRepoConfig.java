@@ -1,21 +1,16 @@
 package uk.ac.ebi.quickgo.geneproduct.common;
 
 import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.client.solrj.impl.CloudSolrClient;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.apache.solr.core.CoreContainer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.data.solr.core.SolrTemplate;
-import org.springframework.data.solr.repository.support.SolrRepositoryFactory;
-import org.springframework.data.solr.server.SolrClientFactory;
-import org.springframework.data.solr.server.support.EmbeddedSolrServerFactory;
-import org.springframework.data.solr.server.support.HttpSolrClientFactory;
-import org.xml.sax.SAXException;
+import uk.ac.ebi.quickgo.common.SolrCollectionName;
 
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
+import java.nio.file.FileSystems;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,34 +21,25 @@ import java.util.Optional;
 public class GeneProductRepoConfig {
 
     @Bean
-    public SolrClient solrServer(SolrClientFactory solrClientFactory) {
-        return solrClientFactory.getSolrClient();
+    @Profile("httpServer")
+    public SolrClient httpSolrServer(@Value("${zookeeper.hosts}") List<String> zkHosts) {
+        return new CloudSolrClient.Builder(zkHosts, Optional.empty()).build();
     }
 
-    @Bean
-    @Profile("httpServer")
-    public SolrClientFactory httpSolrServerFactory(@Value("${zookeeper.hosts}") List<String> zkHosts) {
-        return new HttpSolrClientFactory(new CloudSolrClient.Builder(zkHosts, Optional.empty()).build());
+    @Bean(destroyMethod = "shutdown")
+    @Profile("embeddedServer")
+    public CoreContainer coreContainer(@Value("${solr.solr.home}") String solrHome) {
+        return CoreContainer.createAndLoad(FileSystems.getDefault().getPath(solrHome));
     }
 
     @Bean
     @Profile("embeddedServer")
-    public SolrClientFactory embeddedSolrServerFactory(@Value("${solr.solr.home}") String solrHome)
-            throws IOException, SAXException, ParserConfigurationException {
-        return new EmbeddedSolrServerFactory(solrHome);
+    public SolrClient embeddedSolrServer(CoreContainer coreContainer) {
+        return new EmbeddedSolrServer(coreContainer, SolrCollectionName.GENE_PRODUCT);
     }
 
     @Bean
-    public SolrTemplate geneProductTemplate(SolrClientFactory solrClientFactory) {
-        SolrTemplate template = new SolrTemplate(solrClientFactory);
-
-        return template;
-    }
-
-    @Bean
-    public GeneProductRepository geneProductRepository(
-            @Qualifier("geneProductTemplate") SolrTemplate geneProductTemplate) {
-        return new SolrRepositoryFactory(geneProductTemplate)
-                .getRepository(GeneProductRepository.class);
+    public GeneProductRepository geneProductRepository(SolrClient solrClient) {
+        return new GeneProductRepositoryImpl(solrClient);
     }
 }

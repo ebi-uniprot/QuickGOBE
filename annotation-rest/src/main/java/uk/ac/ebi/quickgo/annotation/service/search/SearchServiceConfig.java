@@ -1,13 +1,13 @@
 package uk.ac.ebi.quickgo.annotation.service.search;
 
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.*;
-import org.springframework.data.solr.core.SolrTemplate;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationFields;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepoConfig;
 import uk.ac.ebi.quickgo.annotation.model.Annotation;
@@ -103,7 +103,7 @@ public class SearchServiceConfig {
 
     @Bean
     public RequestRetrieval<Annotation> annotationSolrRequestRetrieval(
-            SolrTemplate annotationTemplate,
+            SolrClient annotationSolrClient,
             QueryRequestConverter<SolrQuery> queryRequestConverter,
             AnnotationCompositeRetrievalConfig annotationRetrievalConfig) {
 
@@ -113,7 +113,7 @@ public class SearchServiceConfig {
                 annotationRetrievalConfig);
 
         return new SolrRequestRetrieval<>(
-                annotationTemplate.getSolrClient(),
+                annotationSolrClient,
                 queryRequestConverter,
                 resultConverter,
                 annotationRetrievalConfig);

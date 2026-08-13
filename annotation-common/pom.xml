@@ -26,6 +26,12 @@
             <version>${project.version}</version>
         </dependency>
 
+        <!-- Spring Data types for pagination and sorting support -->
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-commons</artifactId>
+        </dependency>
+
         <!-- Test dependencies -->
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -48,7 +54,7 @@
                             <goal>test-jar</goal>
                         </goals>
                         <configuration>
-                            <finalName>ontology-common-test</finalName>
+                            <finalName>annotation-common-test</finalName>
                         </configuration>
                     </execution>
                 </executions>

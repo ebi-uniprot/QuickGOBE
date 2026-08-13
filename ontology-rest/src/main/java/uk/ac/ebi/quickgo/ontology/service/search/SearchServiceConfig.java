@@ -1,10 +1,10 @@
 package uk.ac.ebi.quickgo.ontology.service.search;
 
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
-import org.springframework.data.solr.core.SolrTemplate;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepoConfig;
 import uk.ac.ebi.quickgo.ontology.model.OBOTerm;
 import uk.ac.ebi.quickgo.ontology.service.converter.ECODocConverter;
@@ -41,7 +41,7 @@ public class SearchServiceConfig {
 
     @Bean
     public RequestRetrieval<OBOTerm> ontologySolrRequestRetrieval(
-            SolrTemplate ontologyTemplate,
+            SolrClient solrClient,
             QueryRequestConverter<SolrQuery> solrSelectQueryRequestConverter,
             OntologyCompositeRetrievalConfig ontologyRetrievalConfig) {
 
@@ -53,7 +53,7 @@ public class SearchServiceConfig {
         );
 
         return new SolrRequestRetrieval<>(
-                ontologyTemplate.getSolrClient(),
+                solrClient,
                 solrSelectQueryRequestConverter,
                 resultConverter,
                 ontologyRetrievalConfig);

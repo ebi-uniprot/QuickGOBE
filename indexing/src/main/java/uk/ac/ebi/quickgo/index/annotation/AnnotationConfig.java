@@ -25,7 +25,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.Resource;
-import org.springframework.data.solr.core.SolrTemplate;
+import org.apache.solr.client.solrj.SolrClient;
 
 import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.TAB;
 
@@ -49,7 +49,7 @@ public class AnnotationConfig {
     private int headerLines;
 
     @Autowired
-    private SolrTemplate annotationTemplate;
+    private SolrClient annotationSolrClient;
 
     @Bean
     MultiResourceItemReader<Annotation> annotationMultiFileReader() {
@@ -110,6 +110,6 @@ public class AnnotationConfig {
 
     @Bean
     ItemWriter<AnnotationDocument> annotationSolrServerWriter() {
-        return new SolrServerWriter<>(annotationTemplate.getSolrClient(), COLLECTION);
+        return new SolrServerWriter<>(annotationSolrClient, COLLECTION);
     }
 }

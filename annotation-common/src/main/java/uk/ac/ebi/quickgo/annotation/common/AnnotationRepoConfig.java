@@ -1,23 +1,19 @@
 package uk.ac.ebi.quickgo.annotation.common;
 
+import java.nio.file.FileSystems;
+import java.util.List;
+import java.util.Optional;
+
 import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.client.solrj.impl.CloudSolrClient;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.apache.solr.core.CoreContainer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.data.solr.core.SolrTemplate;
-import org.springframework.data.solr.repository.support.SolrRepositoryFactory;
-import org.springframework.data.solr.server.SolrClientFactory;
-import org.springframework.data.solr.server.support.EmbeddedSolrServerFactory;
-import org.springframework.data.solr.server.support.HttpSolrClientFactory;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
+import uk.ac.ebi.quickgo.common.SolrCollectionName;
 
 /**
  * Publishes the configuration beans of the annotation repository.
@@ -29,31 +25,25 @@ import java.util.Optional;
 public class AnnotationRepoConfig {
 
     @Bean
-    public SolrClient solrServer(SolrClientFactory solrClientFactory) {
-        return solrClientFactory.getSolrClient();
+    @Profile("httpServer")
+    public SolrClient httpSolrServer(@Value("${zookeeper.hosts}") List<String> zkHosts) {
+        return new CloudSolrClient.Builder(zkHosts, Optional.empty()).build();
     }
 
-    @Bean
-    @Profile("httpServer")
-    public SolrClientFactory httpSolrServerFactory(@Value("${zookeeper.hosts}") List<String> zkHosts) {
-        return new HttpSolrClientFactory(new CloudSolrClient.Builder(zkHosts, Optional.empty()).build());
+    @Bean(destroyMethod = "shutdown")
+    @Profile("embeddedServer")
+    public CoreContainer coreContainer(@Value("${solr.solr.home}") String solrHome) {
+        return CoreContainer.createAndLoad(FileSystems.getDefault().getPath(solrHome));
     }
 
     @Bean
     @Profile("embeddedServer")
-    public SolrClientFactory embeddedSolrServerFactory(@Value("${solr.solr.home}") String solrHome)
-            throws IOException, SAXException, ParserConfigurationException {
-        return new EmbeddedSolrServerFactory(solrHome);
+    public SolrClient embeddedSolrServer(CoreContainer coreContainer) {
+        return new EmbeddedSolrServer(coreContainer, SolrCollectionName.ANNOTATION);
     }
 
     @Bean
-    public SolrTemplate annotationTemplate(SolrClientFactory solrClientFactory) {
-        return new SolrTemplate(solrClientFactory);
-    }
-
-    @Bean
-    public AnnotationRepository annotationRepository(
-            @Qualifier("annotationTemplate") SolrTemplate annotationTemplate) {
-        return new SolrRepositoryFactory(annotationTemplate).getRepository(AnnotationRepository.class);
+    public AnnotationRepository annotationRepository(SolrClient solrClient) {
+        return new AnnotationRepositoryImpl(solrClient);
     }
 }

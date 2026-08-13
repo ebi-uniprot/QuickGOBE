@@ -42,6 +42,7 @@
         <solr.version>8.11.4</solr.version>
         <core-dropwizard-metrics.version>3.2.6</core-dropwizard-metrics.version>
         <springfox-swagger2.version>2.7.0</springfox-swagger2.version>
+        <spring-data-commons.version>2.7.12</spring-data-commons.version>
 
         <!-- plugin version numbers -->
         <jacoco.version>0.8.11</jacoco.version>
@@ -56,7 +57,11 @@
 
     <dependencyManagement>
         <dependencies>
-
+            <dependency>
+                <groupId>org.springframework.data</groupId>
+                <artifactId>spring-data-commons</artifactId>
+                <version>${spring-data-commons.version}</version>
+            </dependency>
             <dependency>
                 <groupId>io.dropwizard.metrics</groupId>
                 <artifactId>metrics-core</artifactId>
@@ -185,14 +190,8 @@
                 <artifactId>log4j-api</artifactId>
                 <version>${log4j.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.apache.logging.log4j</groupId>
-                <artifactId>log4j-web</artifactId>
-                <version>${log4j.version}</version>
-            </dependency>
         </dependencies>
     </dependencyManagement>
-
 
     <dependencies>
         <dependency>

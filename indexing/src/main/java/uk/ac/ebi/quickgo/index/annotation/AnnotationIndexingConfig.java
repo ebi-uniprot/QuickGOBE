@@ -12,6 +12,7 @@ import uk.ac.ebi.quickgo.index.common.listener.LogJobListener;
 import uk.ac.ebi.quickgo.index.common.listener.LogStepListener;
 import uk.ac.ebi.quickgo.index.common.listener.SkipLoggerListener;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +34,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.Resource;
-import org.springframework.data.solr.core.SolrTemplate;
+import org.apache.solr.client.solrj.SolrClient;
 import org.springframework.retry.backoff.BackOffPolicy;
 import org.springframework.retry.backoff.ExponentialBackOffPolicy;
 
@@ -70,7 +71,7 @@ public class AnnotationIndexingConfig {
     private int retryLimit;
 
     @Autowired
-    private SolrTemplate annotationTemplate;
+    private SolrClient annotationSolrClient;
     @Autowired
     private JobBuilderFactory jobBuilders;
     @Autowired
@@ -106,7 +107,11 @@ public class AnnotationIndexingConfig {
                               @Override public void beforeJob(JobExecution jobExecution) {}
 
                               @Override public void afterJob(JobExecution jobExecution) {
-                                  annotationTemplate.commit(SolrCollectionName.ANNOTATION);
+                                  try {
+                                      annotationSolrClient.commit(SolrCollectionName.ANNOTATION);
+                                  } catch (SolrServerException | IOException e) {
+                                      throw new RuntimeException("Failed to commit annotation Solr index", e);
+                                  }
                               }
                           })
                           .build();

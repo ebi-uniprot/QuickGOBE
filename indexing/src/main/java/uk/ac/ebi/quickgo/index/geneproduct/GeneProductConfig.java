@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.index.geneproduct;
 
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.springframework.batch.core.*;
@@ -26,7 +27,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.Resource;
-import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.retry.backoff.BackOffPolicy;
 import org.springframework.retry.backoff.ExponentialBackOffPolicy;
 import uk.ac.ebi.quickgo.common.QuickGODocument;
@@ -40,6 +40,7 @@ import uk.ac.ebi.quickgo.index.common.listener.LogJobListener;
 import uk.ac.ebi.quickgo.index.common.listener.LogStepListener;
 import uk.ac.ebi.quickgo.index.common.listener.SkipLoggerListener;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -88,7 +89,7 @@ public class GeneProductConfig {
     private int retryLimit;
 
     @Autowired
-    private SolrTemplate geneProductTemplate;
+    private SolrClient solrClient;
 
     @Bean
     public Job geneProductJob() {
@@ -100,7 +101,11 @@ public class GeneProductConfig {
                     @Override public void beforeJob(JobExecution jobExecution) {}
 
                     @Override public void afterJob(JobExecution jobExecution) {
-                        geneProductTemplate.commit(SolrCollectionName.GENE_PRODUCT);
+                        try {
+                            solrClient.commit(SolrCollectionName.GENE_PRODUCT);
+                        } catch (SolrServerException | IOException e) {
+                            throw new RuntimeException("Failed to commit geneproduct Solr index", e);
+                        }
                     }
                 })
                 .build();
@@ -201,7 +206,7 @@ public class GeneProductConfig {
 
     @Bean
     ItemWriter<GeneProductDocument> geneProductRepositoryWriter() {
-        return new SolrServerWriter<>(geneProductTemplate.getSolrClient(), COLLECTION);
+        return new SolrServerWriter<>(solrClient, COLLECTION);
     }
 
     private JobExecutionListener logJobListener() {

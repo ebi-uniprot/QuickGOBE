@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.index.annotation;
 
+import org.apache.solr.client.solrj.SolrServerException;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepoConfig;
 import uk.ac.ebi.quickgo.common.QuickGODocument;
@@ -11,6 +12,7 @@ import uk.ac.ebi.quickgo.index.common.listener.LogJobListener;
 import uk.ac.ebi.quickgo.index.common.listener.LogStepListener;
 import uk.ac.ebi.quickgo.index.common.listener.SkipLoggerListener;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +33,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.Resource;
-import org.springframework.data.solr.core.SolrTemplate;
+import org.apache.solr.client.solrj.SolrClient;
 
 /**
  * Sets up batch jobs for annotation indexing.
@@ -56,7 +58,7 @@ public class CoTermIndexingConfig {
     private int headerLines;
 
     @Autowired
-    private SolrTemplate annotationTemplate;
+    private SolrClient annotationSolrClient;
     @Autowired
     private JobBuilderFactory jobBuilders;
     @Autowired
@@ -88,7 +90,11 @@ public class CoTermIndexingConfig {
                               @Override public void beforeJob(JobExecution jobExecution) {}
 
                               @Override public void afterJob(JobExecution jobExecution) {
-                                  annotationTemplate.commit(SolrCollectionName.ANNOTATION);
+                                  try {
+                                      annotationSolrClient.commit(SolrCollectionName.ANNOTATION);
+                                  } catch (SolrServerException | IOException e) {
+                                      throw new RuntimeException("Failed to commit annotation Solr index", e);
+                                  }
                               }
                           })
                           .build();
