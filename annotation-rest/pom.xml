@@ -5,6 +5,7 @@
      <properties>
          <apache.poi.version>4.1.1</apache.poi.version>
          <ehcache.version>3.10.8</ehcache.version>
+         <lombok.version>1.18.46</lombok.version>
     </properties>
 
     <parent>
@@ -112,7 +113,6 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.30</version>
         </dependency>
         <dependency>
             <groupId>com.h2database</groupId>
@@ -122,6 +122,20 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
