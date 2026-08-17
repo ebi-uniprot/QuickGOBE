@@ -53,6 +53,7 @@
         <jmeter.min.jvm.mem>1024</jmeter.min.jvm.mem>
         <jmeter.max.jvm.mem>2048</jmeter.max.jvm.mem>
         <log4j.version>2.17.1</log4j.version>
+        <maven.resources.version>3.3.0</maven.resources.version>
     </properties>
 
     <dependencyManagement>
@@ -386,6 +387,11 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>${maven.resources.version}</version>
             </plugin>
         </plugins>
     </build>
