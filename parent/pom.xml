@@ -53,7 +53,7 @@
         <jmeter.min.jvm.mem>1024</jmeter.min.jvm.mem>
         <jmeter.max.jvm.mem>2048</jmeter.max.jvm.mem>
         <log4j.version>2.17.1</log4j.version>
-        <maven.resources.version>3.0.1</maven.resources.version>
+        <maven.resources.version>3.0.2</maven.resources.version>
     </properties>
 
     <dependencyManagement>
