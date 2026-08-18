@@ -1,104 +1,448 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>build</artifactId>
     <groupId>uk.ac.ebi.quickgo</groupId>
+    <artifactId>quickgo-parent</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>Builds the QuickGO project</name>
-    <description>Aggregator pom configured to build certain parts, or all of the QuickGO project</description>
+    <name>QuickGO Parent Project</name>
+    <description>QuickGO parent project</description>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.7.12</version>
+        <relativePath/>
+    </parent>
 
     <properties>
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <maven.compiler.source>1.8</maven.compiler.source>
+        <java.version>21</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!--Unit and Integration testing settings-->
+        <skipITs>false</skipITs>
+        <skipUTs>false</skipUTs>
+
+        <!-- Test coverage -->
+        <jacoco.outputDir>${project.build.directory}/coverage-reports</jacoco.outputDir>
+
+        <!-- Unit test report path -->
+        <jacoco.out.ut.file>jacoco-ut.exec</jacoco.out.ut.file>
+        <jacoco.reportPath>${jacoco.outputDir}/${jacoco.out.ut.file}</jacoco.reportPath>
+
+        <!-- Integration test report path-->
+        <jacoco.out.it.file>jacoco-it.exec</jacoco.out.it.file>
+        <jacoco.itReportPath>${jacoco.outputDir}/${jacoco.out.it.file}</jacoco.itReportPath>
+
+        <!-- dependency version numbers -->
+        <guava.version>32.0.0-jre</guava.version>
+
+        <solr.version>8.11.4</solr.version>
+        <core-dropwizard-metrics.version>3.2.6</core-dropwizard-metrics.version>
+        <springfox-swagger2.version>2.7.0</springfox-swagger2.version>
+        <spring-data-commons.version>2.7.12</spring-data-commons.version>
+
+        <!-- plugin version numbers -->
+        <jacoco.version>0.8.15</jacoco.version>
+
+        <!-- jmeter default properties -->
+        <jmeter-maven-plugin.version>1.10.1</jmeter-maven-plugin.version>
+        <jmeter-analysis-maven-plugin.version>1.0.6</jmeter-analysis-maven-plugin.version>
+        <jmeter.min.jvm.mem>1024</jmeter.min.jvm.mem>
+        <jmeter.max.jvm.mem>2048</jmeter.max.jvm.mem>
+        <log4j.version>2.17.1</log4j.version>
+        <maven.resources.version>3.0.2</maven.resources.version>
     </properties>
 
-    <profiles>
-        <profile>
-            <id>solr-plugins</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <modules>
-                <module>solr-plugin</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>all</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <modules>
-                <module>common</module>
-                <module>ontology-common</module>
-                <module>ontology-rest</module>
-                <module>geneproduct-common</module>
-                <module>geneproduct-rest</module>
-                <module>annotation-common</module>
-                <module>annotation-rest</module>
-                <module>quickgo-client</module>
-                <module>indexing</module>
-                <module>sources</module>
-                <module>rest-common</module>
-                <module>solr-plugin</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>indexing</id>
-            <modules>
-                <module>sources</module>
-                <module>common</module>
-                <module>ontology-common</module>
-                <module>geneproduct-common</module>
-                <module>annotation-common</module>
-                <module>indexing</module>
-                <module>solr-plugin</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>ontology_web_service</id>
-            <modules>
-                <module>common</module>
-                <module>ontology-common</module>
-                <module>rest-common</module>
-                <module>ontology-rest</module>
-                <module>solr-plugin</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>gene_product_web_service</id>
-            <modules>
-                <module>common</module>
-                <module>geneproduct-common</module>
-                <module>rest-common</module>
-                <module>geneproduct-rest</module>
-                <module>solr-plugin</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>annotation_web_service</id>
-            <modules>
-                <module>common</module>
-                <module>annotation-common</module>
-                <module>ontology-common</module>
-                <module>rest-common</module>
-                <module>annotation-rest</module>
-                <module>solr-plugin</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>client_web_service</id>
-            <modules>
-                <module>common</module>
-                <module>ontology-common</module>
-                <module>rest-common</module>
-                <module>quickgo-client</module>
-                <module>solr-plugin</module>
-            </modules>
-        </profile>
-    </profiles>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.data</groupId>
+                <artifactId>spring-data-commons</artifactId>
+                <version>${spring-data-commons.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.dropwizard.metrics</groupId>
+                <artifactId>metrics-core</artifactId>
+                <version>${core-dropwizard-metrics.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.solr</groupId>
+                <artifactId>solr-core</artifactId>
+                <version>${solr.version}</version>
+                <!-- exclude jetty dependencies at this level
+                     so they do not override what spring-boot uses -->
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.eclipse.jetty</groupId>
+                        <artifactId>jetty-server</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.eclipse.jetty</groupId>
+                        <artifactId>jetty-webapp</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.eclipse.jetty</groupId>
+                        <artifactId>jetty-servlet</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.eclipse.jetty</groupId>
+                        <artifactId>jetty-continuation</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.eclipse.jetty</groupId>
+                        <artifactId>jetty-deploy</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.eclipse.jetty</groupId>
+                        <artifactId>jetty-http</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.eclipse.jetty</groupId>
+                        <artifactId>jetty-io</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.eclipse.jetty</groupId>
+                        <artifactId>jetty-jmx</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.eclipse.jetty</groupId>
+                        <artifactId>jetty-security</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.eclipse.jetty</groupId>
+                        <artifactId>jetty-util</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.eclipse.jetty</groupId>
+                        <artifactId>jetty-xml</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.eclipse.jetty</groupId>
+                        <artifactId>jetty-servlet</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.restlet.jee</groupId>
+                        <artifactId>org.restlet.ext.servlet</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.eclipse.jetty.orbit</groupId>
+                        <artifactId>javax.servlet</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.logging.log4j</groupId>
+                        <artifactId>log4j-api</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.logging.log4j</groupId>
+                        <artifactId>log4j-core</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.logging.log4j</groupId>
+                        <artifactId>log4j-slf4j-impl</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.logging.log4j</groupId>
+                        <artifactId>log4j-1.2-api</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.hadoop</groupId>
+                        <artifactId>hadoop-annotations</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.jayway.jsonpath</groupId>
+                        <artifactId>json-path</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
+            </dependency>
+
+            <!-- REST API documentation -->
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-swagger2</artifactId>
+                <version>${springfox-swagger2.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-swagger-ui</artifactId>
+                <version>${springfox-swagger2.version}</version>
+            </dependency>
+            <!--https://www.ebi.ac.uk/panda/jira/browse/GOA-3568-->
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-core</artifactId>
+                <version>${log4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-to-slf4j</artifactId>
+                <version>${log4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-api</artifactId>
+                <version>${log4j.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.vintage</groupId>
+            <artifactId>junit-vintage-engine</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-launcher</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-runner</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <configuration>
+                        <!-- Exclude integration tests from unit test run-->
+                        <excludes>
+                            <skipITs>${skipUTs}</skipITs>
+                            <exclude>**/*IT.java</exclude>
+                            <exclude>**/IT*.java</exclude>
+                        </excludes>
+                        <argLine>${jacoco.agent.ut.arg}</argLine>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <configuration>
+                        <skipITs>${skipITs}</skipITs>
+                        <argLine>${jacoco.agent.it.arg}</argLine>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <phase>integration-test</phase>
+                            <goals>
+                                <goal>integration-test</goal>
+                                <goal>verify</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>${jacoco.version}</version>
+                    <executions>
+                        <!-- Sets up jacaco for unit test coverage analysis (jacoco.agent.ut.arg) -->
+                        <execution>
+                            <id>prepare-ut-agent</id>
+                            <phase>process-test-classes</phase>
+                            <goals>
+                                <goal>prepare-agent</goal>
+                            </goals>
+                            <configuration>
+                                <destFile>${jacoco.reportPath}</destFile>
+                                <propertyName>jacoco.agent.ut.arg</propertyName>
+                                <append>true</append>
+                            </configuration>
+                        </execution>
+                        <!-- Sets up jacaco for integration test coverage analysis (jacoco.agent.it.arg) -->
+                        <execution>
+                            <id>prepare-it-agent</id>
+                            <phase>pre-integration-test</phase>
+                            <goals>
+                                <goal>prepare-agent</goal>
+                            </goals>
+                            <configuration>
+                                <destFile>${jacoco.itReportPath}</destFile>
+                                <propertyName>jacoco.agent.it.arg</propertyName>
+                                <append>true</append>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-clean-plugin</artifactId>
+                    <configuration>
+                        <filesets>
+                            <fileset>
+                                <directory>${jacoco.outputDir}</directory>
+                                <includes>
+                                    <include>**/*</include>
+                                </includes>
+                            </fileset>
+                        </filesets>
+                    </configuration>
+                </plugin>
+
+                <!-- jmeter REST performance analysis plugins -->
+                <plugin>
+                    <groupId>com.lazerycode.jmeter</groupId>
+                    <artifactId>jmeter-maven-plugin</artifactId>
+                    <version>${jmeter-maven-plugin.version}</version>
+
+                    <configuration>
+                        <testResultsTimestamp>false</testResultsTimestamp>
+                        <overrideRootLogLevel>DEBUG</overrideRootLogLevel>
+                        <suppressJMeterOutput>false</suppressJMeterOutput>
+                        <ignoreResultFailures>true</ignoreResultFailures>
+
+                        <jMeterProcessJVMSettings>
+                            <xms>${jmeter.min.jvm.mem}</xms>
+                            <xmx>${jmeter.max.jvm.mem}</xmx>
+                            <arguments>
+                                <argument>-Xprof</argument>
+                                <argument>-Xfuture</argument>
+                            </arguments>
+                        </jMeterProcessJVMSettings>
+                    </configuration>
+
+                    <executions>
+                        <execution>
+                            <id>jmeter-tests</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>jmeter</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <plugin>
+                    <groupId>com.lazerycode.jmeter</groupId>
+                    <artifactId>jmeter-analysis-maven-plugin</artifactId>
+                    <version>${jmeter-analysis-maven-plugin.version}</version>
+                    <configuration>
+                        <source>${project.build.directory}/jmeter/results/*.jtl</source>
+                        <targetDirectory>${project.build.directory}/jmeter/analysis</targetDirectory>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>create-html-report</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>analyze</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>${maven.resources.version}</version>
+                <executions>
+                    <!-- Disable default main resources copying -->
+                    <execution>
+                        <id>default-resources</id>
+                        <phase>none</phase>
+                    </execution>
+                    <!-- Disable default test resources copying (Fixes your GPFS error) -->
+                    <execution>
+                        <id>default-testResources</id>
+                        <phase>none</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>3.1.0</version>
+            <executions>
+            <!-- Copy Main Resources -->
+            <execution>
+                <id>copy-main-resources</id>
+                <phase>process-resources</phase>
+                <configuration>
+                    <target>
+                        <!-- Only attempt copy if directory exists, or silently skip if failonerror is false -->
+                        <copy todir="${project.build.outputDirectory}" preservelastmodified="false" failonerror="false">
+                            <fileset dir="${project.basedir}/src/main/resources" erroronmissingdir="false"/>
+                        </copy>
+                    </target>
+                </configuration>
+                <goals>
+                    <goal>run</goal>
+                </goals>
+            </execution>
+                <!-- Copy Test Resources (Replaces the failing GPFS operation) -->
+                <execution>
+                    <id>copy-test-resources</id>
+                    <phase>process-test-resources</phase>
+                    <configuration>
+                        <target>
+                            <copy todir="${project.build.testOutputDirectory}" preservelastmodified="false" failonerror="false">
+                                <fileset dir="${project.basedir}/src/test/resources" erroronmissingdir="false"/>
+                            </copy>
+                        </target>
+                    </configuration>
+                    <goals>
+                        <goal>run</goal>
+                    </goals>
+                </execution>
+            </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>
