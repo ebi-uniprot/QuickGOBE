@@ -8,3 +8,4 @@ solr-cores/src/main/cores/*/data
 # AI tools ignore
 .opencode
 /opencode.json
+.moderne
