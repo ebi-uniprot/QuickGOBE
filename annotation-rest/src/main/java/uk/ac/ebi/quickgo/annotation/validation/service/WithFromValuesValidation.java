@@ -3,8 +3,8 @@ package uk.ac.ebi.quickgo.annotation.validation.service;
 import com.google.common.base.Preconditions;
 import java.util.Objects;
 import java.util.stream.Stream;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**

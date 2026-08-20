@@ -1,5 +1,7 @@
 package uk.ac.ebi.quickgo.index.common;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.springframework.batch.item.Chunk;
 import uk.ac.ebi.quickgo.common.QuickGODocument;
 
 import java.util.List;
@@ -23,7 +25,12 @@ public class SolrServerWriter<D extends QuickGODocument> implements
         this.collection = collectionName;
     }
 
-    @Override public void write(List<? extends D> list) throws Exception {
+    void write(List<? extends D> list) throws Exception {
         server.addBeans(collection, list);
+    }
+
+    @Override
+    public void write(@NonNull Chunk<? extends D> chunk) throws Exception {
+        write(chunk.getItems());
     }
 }

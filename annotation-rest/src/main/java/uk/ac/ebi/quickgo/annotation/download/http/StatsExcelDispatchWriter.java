@@ -38,8 +38,8 @@ public class StatsExcelDispatchWriter implements OutputStreamWriter {
 
     @SuppressWarnings("unchecked")
    public void write(Object object, OutputStream out) throws IOException {
-        if (object instanceof ResponseExceptionHandler.ErrorInfo) {
-            writeError(out, (ResponseExceptionHandler.ErrorInfo) object);
+        if (object instanceof ResponseExceptionHandler.ErrorInfo info) {
+            writeError(out, info);
         } else {
             if (object instanceof QueryResult) {
                 writeDetail(out, (QueryResult<StatisticsGroup>) object);

@@ -1,5 +1,7 @@
 package uk.ac.ebi.quickgo.index.annotation.coterms;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.springframework.batch.item.Chunk;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 
 import com.google.common.base.Preconditions;
@@ -55,8 +57,7 @@ public class CoTermsAggregationWriter extends AbstractItemStreamItemWriter<Annot
      * @throws java.lang.Exception - if there are errors. The framework will catch the exception and convert or
      * rethrow it as appropriate.
      */
-    @Override
-    public void write(List<? extends AnnotationDocument> items) throws Exception {
+    void write(List<? extends AnnotationDocument> items) throws Exception {
         Preconditions.checkArgument(items != null, "Null annotation passed to process");
         items.stream()
                 .filter(this.toBeProcessed::test)
@@ -186,6 +187,11 @@ public class CoTermsAggregationWriter extends AbstractItemStreamItemWriter<Annot
             coTerms.incrementCoTerms(termId, geneProductBatch.terms);
             geneProductCountForTerms.incrementGeneProductCountForTerm(termId);
         }
+    }
+
+    @Override
+    public void write(@NonNull Chunk<? extends AnnotationDocument> chunk) throws Exception {
+        write(chunk.getItems());
     }
 }
 

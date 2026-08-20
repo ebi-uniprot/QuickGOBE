@@ -1,20 +1,25 @@
 package uk.ac.ebi.quickgo.ontology.controller;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import uk.ac.ebi.quickgo.ontology.service.AnnotationExtensionService;
 
+import java.io.File;
 import java.util.Map;
 
-@Api(tags = {"Annotation extension relations & validation"},
-        value = "Web services is used to check whether annotation extensions are valid, and which annotation" +
+@Tag(name = "Annotation extension relations & validation",
+        description = "Web services is used to check whether annotation extensions are valid, and which annotation" +
                 " extension relations are valid for use with a particular GO term. https://youtu.be/VtmfhIAuhFo")
 @RestController
 @RequestMapping(value = "/ontology/ae")
@@ -27,22 +32,25 @@ public class AnnotationExtensionController {
         this.annotationExtensionService = annotationExtensionService;
     }
 
-    @ApiOperation(value = Docs.Relations.des, response = Map.class, notes = Docs.Relations.note)
-    @RequestMapping(path = "/relations", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
+    @Operation(summary = Docs.Relations.des, description = Docs.Relations.note)
+    @ApiResponse(content = @Content(mediaType = "application/json", schema = @Schema(implementation = Map.class)))
+    @GetMapping(path = "/relations", produces = APPLICATION_JSON_VALUE)
     Map<String, Object> displayAbleAnnotationExtensionRelationsHierarchy() {
         return annotationExtensionService.getDisplayAbleAnnotationExtensionRelationsHierarchy();
     }
 
-    @ApiOperation(value = Docs.Domain.des, response = Map.class, notes = Docs.Domain.note)
-    @RequestMapping(path = "/relations/{domain}", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
-    Map<String, Object> allPossibleRelationsForDomain(@ApiParam(Docs.Domain.dDomain) @PathVariable String domain) {
+    @Operation(summary = Docs.Domain.des, description = Docs.Domain.note)
+    @ApiResponse(content = @Content(mediaType = "application/json", schema = @Schema(implementation = Map.class)))
+    @GetMapping(path = "/relations/{domain}", produces = APPLICATION_JSON_VALUE)
+    Map<String, Object> allPossibleRelationsForDomain(@Parameter(description = Docs.Domain.dDomain) @PathVariable String domain) {
         return annotationExtensionService.getAllPossibleRelationsForDomain(domain);
     }
 
-    @ApiOperation(value = Docs.Validate.des, response = Map.class, notes = Docs.Validate.note)
-    @RequestMapping(path = "/{goTermId}/validate/{candidate:.+}", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
-    Map<String, Object> isValidRelation(@ApiParam(Docs.Validate.dGoTermId) @PathVariable String goTermId,
-                                        @ApiParam(Docs.Validate.dCandidate) @PathVariable String candidate) {
+    @Operation(summary = Docs.Validate.des, description = Docs.Validate.note)
+    @ApiResponse(content = @Content(mediaType = "application/json", schema = @Schema(implementation = Map.class)))
+    @GetMapping(path = "/{goTermId}/validate/{candidate:.+}", produces = APPLICATION_JSON_VALUE)
+    Map<String, Object> isValidRelation(@Parameter(description = Docs.Validate.dGoTermId) @PathVariable String goTermId,
+                                        @Parameter(description = Docs.Validate.dCandidate) @PathVariable String candidate) {
         return annotationExtensionService.isAnnotationExtensionValidForGoTerm(candidate, goTermId);
     }
 

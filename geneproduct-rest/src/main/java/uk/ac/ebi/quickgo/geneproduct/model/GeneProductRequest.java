@@ -1,17 +1,17 @@
 package uk.ac.ebi.quickgo.geneproduct.model;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductFields;
 import uk.ac.ebi.quickgo.rest.controller.request.AllowableFacets;
 import uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 
-import io.swagger.annotations.ApiModelProperty;
 import java.util.*;
 import java.util.stream.Stream;
-import javax.validation.constraints.*;
+import jakarta.validation.constraints.*;
 
-import static javax.validation.constraints.Pattern.Flag.CASE_INSENSITIVE;
+import static jakarta.validation.constraints.Pattern.Flag.CASE_INSENSITIVE;
 import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.DEFAULT_ENTRIES_PER_PAGE;
 import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.MAX_ENTRIES_PER_PAGE;
 import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.MAX_PAGE_NUMBER;
@@ -33,40 +33,40 @@ public class GeneProductRequest {
             GeneProductFields.Searchable.DATABASE_SUBSET,
             GeneProductFields.Searchable.PROTEOME};
 
-    @ApiModelProperty(value = "Indicates whether the result set should be highlighted", hidden = true)
+    @Schema(description = "Indicates whether the result set should be highlighted", hidden = true)
     private boolean highlighting = false;
 
-    @ApiModelProperty(value = "Page number of the result set to display.",
+    @Schema(description = "Page number of the result set to display.",
             allowableValues = "range[" + MIN_PAGE_NUMBER + ",  max_result_page_size]")
     private int page = DEFAULT_PAGE_NUMBER;
 
-    @ApiModelProperty(value = "Number of results per page.",
+    @Schema(description = "Number of results per page.",
             allowableValues = "range[" + MIN_ENTRIES_PER_PAGE + "," + MAX_ENTRIES_PER_PAGE + "]")
     private int limit = DEFAULT_ENTRIES_PER_PAGE;
 
-    @ApiModelProperty(value = "Fields to generate facet from", example = "taxonId, type", hidden = true)
+    @Schema(description = "Fields to generate facet from", example = "taxonId, type", hidden = true)
     private String[] facet;
 
-    @ApiModelProperty(value = "The query used to filter the gene products", example = "kinase", required = true)
+    @Schema(description = "The query used to filter the gene products", example = "kinase", required = true)
     private String query;
 
     /*
         The filter fields are only declared here, because there is a bug in springfox that doesn't read annotations on
         setters
      */
-    @ApiModelProperty(value = "Filters the results of the main query based on values chosen from " +
+    @Schema(description = "Filters the results of the main query based on values chosen from " +
             "the taxonomy identifier field", example = "9606")
     private String[] taxonId;
 
-    @ApiModelProperty(value = "Filters the results of the main query based on a value chosen from " +
+    @Schema(description = "Filters the results of the main query based on a value chosen from " +
             "the type field", allowableValues = "protein,RNA,complexes", example = "protein")
     private String type;
 
-    @ApiModelProperty(value = "Filters the results of the main query based on a value chosen from " +
+    @Schema(description = "Filters the results of the main query based on a value chosen from " +
             "the dbSubset field", allowableValues = "TrEMBL,Swiss-Prot", example = "TrEMBL")
     private String dbSubset;
 
-    @ApiModelProperty(value = "Filters the results of the main query based on a value chosen from the proteome field." +
+    @Schema(description = "Filters the results of the main query based on a value chosen from the proteome field." +
             " Proteins with a proteome 'gcrpCan' (Gene Centric Reference Proteome Canonical) are part of a subset of " +
             "proteomes that have been selected either manually or algorithmically according to a number of criteria " +
             "to provide a broad UniProtKB, as well as the proteomes of well-studied model organisms and other species" +

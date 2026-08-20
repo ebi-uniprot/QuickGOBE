@@ -38,11 +38,11 @@ public class AnnotationDispatchWriter implements OutputStreamWriter {
 
     @Override
     @SuppressWarnings("unchecked") public void write(Object object, OutputStream out) throws IOException {
-        if (object instanceof ResponseExceptionHandler.ErrorInfo) {
-            writeError(out, (ResponseExceptionHandler.ErrorInfo) object);
+        if (object instanceof ResponseExceptionHandler.ErrorInfo info) {
+            writeError(out, info);
         } else {
-            if (object instanceof DownloadContent) {
-                writeAnnotations(out, (DownloadContent) object);
+            if (object instanceof DownloadContent content) {
+                writeAnnotations(out, content);
             } else {
                 LOGGER.warn("DispatchWriter write must handle: " + object.getClass());
             }

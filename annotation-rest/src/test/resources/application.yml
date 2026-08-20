@@ -123,7 +123,9 @@ coterm:
 ---
 ## ==========
 spring:
-   profiles: download-task-executor-test
+   config:
+     activate:
+       on-profile: download-task-executor-test
 annotation:
   download:
     taskExecutor:
@@ -137,7 +139,9 @@ annotation:
 ---
 ## ==========
 spring:
-   profiles: stats-type-limit-properties-test
+   config:
+     activate:
+       on-profile: stats-type-limit-properties-test
 annotation:
   stats:
     typeLimitsForStandardUsage:

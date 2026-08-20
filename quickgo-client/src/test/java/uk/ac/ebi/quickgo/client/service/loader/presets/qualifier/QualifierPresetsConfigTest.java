@@ -1,5 +1,6 @@
 package uk.ac.ebi.quickgo.client.service.loader.presets.qualifier;
 
+import org.springframework.batch.item.Chunk;
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
 import uk.ac.ebi.quickgo.client.model.presets.impl.CompositePresetImpl;
 import uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPreset;
@@ -42,7 +43,7 @@ class QualifierPresetsConfigTest {
         rawNamedPresets.add(raw1);
 
         ItemWriter<RawNamedPreset> writer = config.rawPresetWriter(presetBuilder);
-        writer.write(rawNamedPresets);
+        writer.write(new Chunk<>(rawNamedPresets));
 
         final List<PresetItem> qualifiers = presetBuilder.getQualifiers();
         assertThat(qualifiers, hasSize(1));
@@ -62,7 +63,7 @@ class QualifierPresetsConfigTest {
         rawNamedPresets.add(raw1);
 
         ItemWriter<RawNamedPreset> writer = config.rawPresetWriter(presetBuilder);
-        writer.write(rawNamedPresets);
+        writer.write(new Chunk<>(rawNamedPresets));
 
         final List<PresetItem> qualifiers = presetBuilder.getQualifiers();
         assertThat(qualifiers, hasSize(1));
@@ -82,6 +83,6 @@ class QualifierPresetsConfigTest {
         rawNamedPresets.add(raw1);
 
         ItemWriter<RawNamedPreset> writer = config.rawPresetWriter(presetBuilder);
-        assertThrows(IllegalArgumentException.class, () -> writer.write(rawNamedPresets));
+        assertThrows(IllegalArgumentException.class, () -> writer.write(new Chunk<>(rawNamedPresets)));
     }
 }

@@ -7,8 +7,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.*;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -45,7 +44,7 @@ public class FakeRESTApp {
             return value;
         }
 
-        @RequestMapping(value = RESOURCE_1_URL, method = {RequestMethod.GET},
+        @GetMapping(value = RESOURCE_1_URL,
                 produces = {MediaType.APPLICATION_JSON_VALUE})
         public String getResource1() {
             return "{ resource1Attribute : " + this.value+" }";

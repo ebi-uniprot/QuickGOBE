@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.annotation.download.header;
 
 import java.util.stream.Collectors;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import static java.util.Arrays.stream;
 

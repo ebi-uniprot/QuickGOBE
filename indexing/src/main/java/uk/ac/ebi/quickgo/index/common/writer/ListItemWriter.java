@@ -1,8 +1,7 @@
 package uk.ac.ebi.quickgo.index.common.writer;
 
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
@@ -25,9 +24,9 @@ public class ListItemWriter<T> extends FlatFileItemWriter<List<T>> {
         wrapped = writer;
     }
 
-    @Override public void write(List<? extends List<T>> list) throws Exception {
+    public void write(List<? extends List<T>> list) throws Exception {
         for (List<T> subList : list) {
-            wrapped.write(subList);
+            wrapped.write(new Chunk<>(subList));
         }
     }
 

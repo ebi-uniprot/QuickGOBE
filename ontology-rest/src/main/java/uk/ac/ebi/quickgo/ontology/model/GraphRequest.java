@@ -1,9 +1,9 @@
 package uk.ac.ebi.quickgo.ontology.model;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import uk.ac.ebi.quickgo.graphics.ontology.GraphPresentation;
 
-import io.swagger.annotations.ApiModelProperty;
-import javax.validation.constraints.Min;
+import jakarta.validation.constraints.Min;
 
 /**
  * The client can provide parameters to change the rendering of a terms chart. This class binds the parameters.
@@ -14,23 +14,23 @@ import javax.validation.constraints.Min;
  */
 public class GraphRequest {
 
-    @ApiModelProperty(value = "Comma-separated term IDs")
+    @Schema(description = "Comma-separated term IDs")
     private String ids;
-    @ApiModelProperty(value = "Whether or not to encode the image as base64")
+    @Schema(description = "Whether or not to encode the image as base64")
     private boolean base64 = false;
-    @ApiModelProperty(value = "Whether or not to show the key for the ancestor graph")
+    @Schema(description = "Whether or not to show the key for the ancestor graph")
     private boolean showKey = GraphPresentation.defaultShowKey;
-    @ApiModelProperty(value = "Whether or not to show the GO IDs for the ancestor graph")
+    @Schema(description = "Whether or not to show the GO IDs for the ancestor graph")
     private boolean showIds = GraphPresentation.defaultShowTermIds;
-    @ApiModelProperty(value = "Term box width in pixels")
+    @Schema(description = "Term box width in pixels")
     private Integer termBoxWidth = GraphPresentation.defaultWidth;
-    @ApiModelProperty(value = "Term box height in pixels")
+    @Schema(description = "Term box height in pixels")
     private Integer termBoxHeight = GraphPresentation.defaultHeight;
-    @ApiModelProperty(value = "Whether or not to show the slim set a term appears in")
+    @Schema(description = "Whether or not to show the slim set a term appears in")
     private boolean showSlimColours = GraphPresentation.defaultShowSlimColours;
-    @ApiModelProperty(value = "Whether or not to show the children of terms")
+    @Schema(description = "Whether or not to show the children of terms")
     private boolean showChildren = GraphPresentation.defaultShowChildren;
-    @ApiModelProperty(value = "Text font size in pixels")
+    @Schema(description = "Text font size in pixels")
     private Integer fontSize = GraphPresentation.defaultFontSize;
 
     public GraphRequest() {}

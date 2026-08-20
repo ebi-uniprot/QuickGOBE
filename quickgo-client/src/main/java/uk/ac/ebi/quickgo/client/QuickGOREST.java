@@ -6,7 +6,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 import uk.ac.ebi.quickgo.client.service.loader.presets.PresetsConfig;
 import uk.ac.ebi.quickgo.client.service.search.SearchServiceConfig;
-import uk.ac.ebi.quickgo.rest.controller.SwaggerConfig;
 
 /**
  * Runnable class to start an embedded Jetty server to host the defined RESTful components.
@@ -19,7 +18,7 @@ import uk.ac.ebi.quickgo.rest.controller.SwaggerConfig;
         "uk.ac.ebi.quickgo.client.controller",
         "uk.ac.ebi.quickgo.rest"
 })
-@Import({SearchServiceConfig.class, SwaggerConfig.class, PresetsConfig.class})
+@Import({SearchServiceConfig.class, PresetsConfig.class})
 public class QuickGOREST {
 
     public static void main(String[] args) {

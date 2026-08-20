@@ -4,15 +4,16 @@ import uk.ac.ebi.quickgo.client.model.presets.CompositePreset;
 
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJacksonValue;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -44,9 +45,9 @@ public class PresetsController {
      * @param fields the preset fields wanted. If empty, all fields are returned
      * @return a populated instance that encapsulates the preset information
      */
-    @ApiOperation(value = "Provides preset filtering information indicating valid terms and a corresponding " +
+    @Operation(summary = "Provides preset filtering information indicating valid terms and a corresponding " +
             "description; all of which are ordered by relevancy.")
-    @RequestMapping(method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @GetMapping( produces = {MediaType.APPLICATION_JSON_VALUE})
     public FilteredCompositePreset compositePreset(@RequestParam(name = "fields", required = false) String... fields) {
         return createFilteredPreset(fields);
     }

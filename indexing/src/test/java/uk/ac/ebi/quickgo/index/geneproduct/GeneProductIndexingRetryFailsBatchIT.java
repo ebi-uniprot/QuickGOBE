@@ -9,6 +9,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +47,7 @@ class GeneProductIndexingRetryFailsBatchIT {
     private ItemWriter<GeneProductDocument> geneProductRepositoryWriter;
 
     @Captor
-    private ArgumentCaptor<List<GeneProductDocument>> argumentCaptor;
+    private ArgumentCaptor<Chunk<GeneProductDocument>> argumentCaptor;
 
     private static final List<DocumentWriteRetryHelper.SolrResponse> SOLR_RESPONSES = asList(
             DocumentWriteRetryHelper.SolrResponse.REMOTE_EXCEPTION,// error
@@ -70,7 +71,7 @@ class GeneProductIndexingRetryFailsBatchIT {
         assertThat(indexingStep.getWriteCount(), is(0));
 
         verify(geneProductRepositoryWriter, times(2)).write(argumentCaptor.capture());
-        List<List<GeneProductDocument>> docsSentToBeWritten = argumentCaptor.getAllValues();
+        List<List<GeneProductDocument>> docsSentToBeWritten = argumentCaptor.getAllValues().stream().map(Chunk::getItems).toList();
         validateWriteAttempts(SOLR_RESPONSES, docsSentToBeWritten, d -> d.id);
 
         BatchStatus status = jobExecution.getStatus();

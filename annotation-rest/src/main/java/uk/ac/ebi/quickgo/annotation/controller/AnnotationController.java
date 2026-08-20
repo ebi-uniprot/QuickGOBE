@@ -1,6 +1,12 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
-import io.swagger.annotations.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
@@ -40,8 +46,8 @@ import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformationRequests;
 import uk.ac.ebi.quickgo.rest.search.results.transformer.ResultTransformerChain;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -63,7 +69,6 @@ import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.*;
 import static uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.completablevalue.EvidenceNameInjector.EVIDENCE_CODE;
 import static uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.completablevalue.OntologyNameInjector.GO_ID;
 import static uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.transformer.completablevalue.TaxonomyNameInjector.TAXON_ID;
-import static uk.ac.ebi.quickgo.common.array.ArrayPopulation.ensureArrayContains;
 import static uk.ac.ebi.quickgo.common.array.ArrayPopulation.ensureArrayContainsCommonValue;
 import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.searchAndTransform;
 import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.streamSearchResults;
@@ -119,7 +124,7 @@ import static uk.ac.ebi.quickgo.rest.search.query.CursorPage.createFirstCursorPa
  *         Created with IntelliJ IDEA.
  */
 @RestController
-@Api(tags = {"annotations"})
+@Tag(name = "annotations")
 @RequestMapping(value = "/annotation")
 public class AnnotationController {
     private static final Logger LOGGER = getLogger(AnnotationController.class);
@@ -197,16 +202,16 @@ public class AnnotationController {
      * @return a {@link QueryResult} instance containing the results of the search
      */
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Annotation result set has been filtered according to " +
+            @ApiResponse(responseCode = "200", description = "Annotation result set has been filtered according to " +
                     "the provided attribute values"),
-            @ApiResponse(code = 500, message = "Internal server error occurred whilst searching for " +
-                    "matching annotations", response = ResponseExceptionHandler.ErrorInfo.class),
-            @ApiResponse(code = 400, message = "Bad request due to a validation issue encountered in one of the " +
-                    "filters", response = ResponseExceptionHandler.ErrorInfo.class)})
-    @ApiOperation(value = "Search for all annotations that match the supplied filter criteria.")
+            @ApiResponse(responseCode = "500", description = "Internal server error occurred whilst searching for " +
+                    "matching annotations", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseExceptionHandler.ErrorInfo.class))),
+            @ApiResponse(responseCode = "400", description = "Bad request due to a validation issue encountered in one of the " +
+                    "filters", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseExceptionHandler.ErrorInfo.class)))})
+    @Operation(summary = "Search for all annotations that match the supplied filter criteria.")
     @RequestMapping(value = "/search", method = {GET, POST}, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<Annotation>> annotationLookup(
-        @ApiParam("Optional body for advance filtering. For example show me all annotations to proteins that are annotated to GO:xxx AND GO:yyy " +
+        @Parameter(description = "Optional body for advance filtering. For example show me all annotations to proteins that are annotated to GO:xxx AND GO:yyy " +
           "or show me all annotations to proteins that are annotated to GO:xxx and NOT GO:yyy. Request Body is in beta and subject to change in future")
         @Valid @RequestBody(required = false) AnnotationRequestBody body,
         @Valid @ModelAttribute AnnotationRequest request, BindingResult bindingResult) {
@@ -233,14 +238,14 @@ public class AnnotationController {
      * @return a {@link QueryResult} instance containing the results of the search
      */
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Statistics have been calculated for the annotation result set " +
+            @ApiResponse(responseCode = "200", description = "Statistics have been calculated for the annotation result set " +
                     "obtained from the application of the filter parameters"),
-            @ApiResponse(code = 500, message = "Internal server error occurred whilst producing statistics",
-                    response = ResponseExceptionHandler.ErrorInfo.class),
-            @ApiResponse(code = 400, message = "Bad request due to a validation issue encountered in one of the " +
-                    "filters", response = ResponseExceptionHandler.ErrorInfo.class)})
-    @ApiOperation(value = "Generate statistics for the annotation result set obtained from applying the filters.")
-    @RequestMapping(value = "/stats", method = {GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
+            @ApiResponse(responseCode = "500", description = "Internal server error occurred whilst producing statistics",
+              content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseExceptionHandler.ErrorInfo.class))),
+            @ApiResponse(responseCode = "400", description = "Bad request due to a validation issue encountered in one of the filters",
+              content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseExceptionHandler.ErrorInfo.class)))})
+    @Operation(summary = "Generate statistics for the annotation result set obtained from applying the filters.")
+    @GetMapping(value = "/stats", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<StatisticsGroup>> annotationStats(
             @Valid @ModelAttribute AnnotationRequest request, BindingResult bindingResult) {
         checkBindingErrors(bindingResult);
@@ -250,12 +255,12 @@ public class AnnotationController {
         return new ResponseEntity<>(stats, HttpStatus.OK);
     }
 
-    @ApiOperation(value = "Download all annotations that match the supplied filter criteria.",
-            response = File.class)
+    @Operation(summary = "Download all annotations that match the supplied filter criteria.")
+    @ApiResponse(content = @Content(mediaType = "application/json", schema = @Schema(implementation = File.class)))
     @RequestMapping(value = "/downloadSearch", method = {GET, POST},
             produces = {GPAD_MEDIA_TYPE_STRING, GAF_MEDIA_TYPE_STRING, TSV_MEDIA_TYPE_STRING})
     public ResponseEntity<ResponseBodyEmitter> downloadLookup(
-            @ApiParam("Optional body for advance filtering. For example show me all annotations to proteins that are annotated to GO:xxx AND GO:yyy " +
+            @Parameter(description = "Optional body for advance filtering. For example show me all annotations to proteins that are annotated to GO:xxx AND GO:yyy " +
               "or show me all annotations to proteins that are annotated to GO:xxx and NOT GO:yyy. Request Body is in beta and subject to change in future")
             @Valid @RequestBody(required = false) AnnotationRequestBody body,
             @Valid @ModelAttribute AnnotationRequest request,
@@ -342,18 +347,17 @@ public class AnnotationController {
      *
      * @return response with metadata information.
      */
-    @ApiOperation(value = "Get meta-data information about the annotation service",
-            response = About.class,
-            notes = "Provides the date the annotation information was created.")
-    @RequestMapping(value = "/about", method = GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @Operation(summary = "Get meta-data information about the annotation service",
+            description = "Provides the date the annotation information was created.")
+    @ApiResponse(content = @Content(mediaType = "application/json", schema = @Schema(implementation = About.class)))
+    @GetMapping(value = "/about", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<MetaData> provideMetaData() {
         return new ResponseEntity<>(metaDataProvider.lookupMetaData(), HttpStatus.OK);
     }
 
-    @ApiOperation(value = "Download statistics for all annotations that match the supplied filter criteria.",
-            response = File.class)
-    @RequestMapping(value = "/downloadStats", method = {GET},
-            produces = {EXCEL_MEDIA_TYPE_STRING, JSON_MEDIA_TYPE_STRING})
+    @Operation(summary = "Download statistics for all annotations that match the supplied filter criteria.")
+    @ApiResponse(content = @Content(mediaType = "application/json", schema = @Schema(implementation = File.class)))
+    @GetMapping(value = "/downloadStats", produces = {EXCEL_MEDIA_TYPE_STRING, JSON_MEDIA_TYPE_STRING})
     public ResponseEntity<ResponseBodyEmitter> downloadStats(@Valid @ModelAttribute AnnotationRequest request,
             BindingResult bindingResult, @RequestHeader(ACCEPT) MediaType mediaTypeAcceptHeader) {
         checkBindingErrors(bindingResult);

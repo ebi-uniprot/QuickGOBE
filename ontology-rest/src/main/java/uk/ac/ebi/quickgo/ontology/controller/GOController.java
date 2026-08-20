@@ -1,5 +1,8 @@
 package uk.ac.ebi.quickgo.ontology.controller;
 
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import uk.ac.ebi.quickgo.common.SearchableField;
 import uk.ac.ebi.quickgo.graphics.service.GraphImageService;
 import uk.ac.ebi.quickgo.ontology.OntologyRestConfig;
@@ -17,16 +20,16 @@ import uk.ac.ebi.quickgo.rest.search.SearchService;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
 import com.google.common.base.Preconditions;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -45,7 +48,7 @@ import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.GO_GRAPH_TRA
  * @author Edd
  */
 @RestController
-@Api(tags = {"gene ontology"})
+@Tag(name = "gene ontology")
 @RequestMapping(value = "/ontology/go")
 @EnableConfigurationProperties(OntologyRestProperties.class)
 public class GOController extends OBOController<GOTerm> {
@@ -77,10 +80,10 @@ public class GOController extends OBOController<GOTerm> {
      *
      * @return response with metadata information.
      */
-    @ApiOperation(value = "Get meta-data information about the gene ontology service",
-            response = About.class,
-            notes = "Gene ontology version number and creation date.")
-    @RequestMapping(value = "/about", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @Operation(summary = "Get meta-data information about the gene ontology service",
+            description = "Gene ontology version number and creation date.")
+    @ApiResponse(content = @Content(mediaType = "application/json", schema = @Schema(implementation = About.class)))
+    @GetMapping(value = "/about", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<MetaData> provideMetaData() {
         return new ResponseEntity<>(this.metaDataProvider.lookupMetaData(), HttpStatus.OK);
     }
@@ -93,16 +96,16 @@ public class GOController extends OBOController<GOTerm> {
      * @param relations the relationships over which the slims can be reached
      * @return a response containing the id/slim-id mappings
      */
-    @ApiOperation(value = "Gets slimming information for the provided slim-set, where the slims can be reached only " +
+    @Operation(summary = "Gets slimming information for the provided slim-set, where the slims can be reached only " +
             "via the provided relationships")
-    @RequestMapping(value = "slim", method = RequestMethod.GET, produces = {MediaType
+    @GetMapping(value = "slim", produces = {MediaType
             .APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<SlimTerm>> findSlims(
-            @ApiParam(value = "Comma-separated term IDs forming the 'slim-set'", required = true)
+            @Parameter(description = "Comma-separated term IDs forming the 'slim-set'", required = true)
             @RequestParam(value = "slimsToIds", required = false) String slimsToIds,
-            @ApiParam(value = "Comma-separated term IDs from which slimming information is applied.")
+            @Parameter(description = "Comma-separated term IDs from which slimming information is applied.")
             @RequestParam(value = "slimsFromIds", required = false) String slimsFromIds,
-            @ApiParam(value = "The relationships over which the slimming information is computed")
+            @Parameter(description = "The relationships over which the slimming information is computed")
             @RequestParam(value = "relations", defaultValue = DEFAULT_SLIM_TRAVERSAL_TYPES_CSV) String relations) {
 
         checkSlimSetIsSet(slimsToIds);

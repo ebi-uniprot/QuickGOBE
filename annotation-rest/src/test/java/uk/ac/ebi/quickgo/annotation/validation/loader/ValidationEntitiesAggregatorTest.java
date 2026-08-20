@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.annotation.validation.loader;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.batch.item.Chunk;
 import uk.ac.ebi.quickgo.annotation.validation.model.ValidationEntity;
 import uk.ac.ebi.quickgo.annotation.validation.service.ValidationEntityChecker;
 
@@ -35,13 +36,13 @@ class ValidationEntitiesAggregatorTest {
 
     @Test
     void writeNullEntitiesThrowsException(){
-        assertThrows(IllegalArgumentException.class, () -> aggregator.write(null));
+        assertThrows(IllegalArgumentException.class, () -> aggregator.write((Chunk<? extends ValidationEntity>) null));
     }
 
     @Test
     void writeEntitiesPassedOn(){
         final List<ValidationEntity> items = Arrays.asList(mockEntityInterpro, mockEntityPim);
-        aggregator.write(items);
+        aggregator.write(new Chunk<>(items));
         verify(mockValidationEntityChecker, times(1)).addEntities(items);
     }
 

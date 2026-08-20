@@ -27,15 +27,16 @@ import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.query.RegularPage;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+
 import java.awt.image.RenderedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.*;
 import javax.imageio.ImageIO;
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.InputStreamResource;
@@ -43,10 +44,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static org.apache.http.HttpHeaders.CONTENT_ENCODING;
+import static org.apache.hc.core5.http.HttpHeaders.CONTENT_ENCODING;
 import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.DEFAULT_TRAVERSAL_TYPES;
 import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.DEFAULT_TRAVERSAL_TYPES_CSV;
 import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.and;
@@ -128,8 +132,8 @@ public abstract class OBOController<T extends OBOTerm> {
      *
      * @return a 400 response
      */
-    @ApiOperation(value = "Catches any bad requests and returns an error response with a 400 status", hidden = true)
-    @RequestMapping(value = "/*", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @Operation(summary = "Catches any bad requests and returns an error response with a 400 status", hidden = true)
+    @GetMapping(value = "/*", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<ResponseExceptionHandler.ErrorInfo> emptyId() {
         throw new IllegalArgumentException("The requested end-point does not exist.");
     }
@@ -141,11 +145,11 @@ public abstract class OBOController<T extends OBOTerm> {
      * @return the specified page of results as a {@link QueryResult} instance or a 400 response
      *          if the page number is invalid
      */
-    @ApiOperation(value = "Get information on all terms and page through the results")
-    @RequestMapping(value = "/" + TERMS_RESOURCE, method = {RequestMethod.GET},
+    @Operation(summary = "Get information on all terms and page through the results")
+    @GetMapping(value = "/" + TERMS_RESOURCE,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> baseUrl(
-            @ApiParam(value = "The results page to retrieve")
+            @Parameter(description = "The results page to retrieve")
             @RequestParam(value = "page", defaultValue = DEFAULT_PAGE_NUMBER) int page) {
 
         return new ResponseEntity<>(ontologyService.findAllByOntologyType
@@ -166,13 +170,13 @@ public abstract class OBOController<T extends OBOTerm> {
      *     <li>any id is of the an invalid format: response returns 400</li>
      * </ul>
      */
-    @ApiOperation(value = "Get core information about a (CSV) list of terms based on their ids",
-            notes = "If possible, response fields include: id, isObsolete, name, definition, ancestors, synonyms, " +
+    @Operation(summary = "Get core information about a (CSV) list of terms based on their ids",
+            description = "If possible, response fields include: id, isObsolete, name, definition, ancestors, synonyms, " +
                     "comment, aspect (for GO) and usage.")
-    @RequestMapping(value = TERMS_RESOURCE + "/{ids}", method = RequestMethod.GET,
+    @GetMapping(value = TERMS_RESOURCE + "/{ids}",
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsCoreAttr(
-            @ApiParam(value = "Comma-separated term IDs", required = true) @PathVariable(value = "ids") String ids) {
+            @Parameter(description = "Comma-separated term IDs", required = true) @PathVariable(value = "ids") String ids) {
         return getResultsResponse(ontologyService.findCoreInfoByOntologyId(validationHelper.validateCSVIds(ids)));
     }
 
@@ -187,12 +191,12 @@ public abstract class OBOController<T extends OBOTerm> {
      *     <li>any id is of the an invalid format: response returns 400</li>
      * </ul>
      */
-    @ApiOperation(value = "Get complete information about a (CSV) list of terms based on their ids",
-            notes = "All fields will be populated providing they have a value.")
-    @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + COMPLETE_SUB_RESOURCE, method = RequestMethod.GET,
+    @Operation(summary = "Get complete information about a (CSV) list of terms based on their ids",
+            description = "All fields will be populated providing they have a value.")
+    @GetMapping(value = TERMS_RESOURCE + "/{ids}/" + COMPLETE_SUB_RESOURCE,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsComplete(
-            @ApiParam(value = "Comma-separated term IDs", required = true) @PathVariable(value = "ids") String ids) {
+            @Parameter(description = "Comma-separated term IDs", required = true) @PathVariable(value = "ids") String ids) {
         return getResultsResponse(
                 ontologyService.findCompleteInfoByOntologyId(validationHelper.validateCSVIds(ids)));
     }
@@ -208,12 +212,12 @@ public abstract class OBOController<T extends OBOTerm> {
      *     <li>any id is of the an invalid format: response returns 400</li>
      * </ul>
      */
-    @ApiOperation(value = "Get history information about a (CSV) list of terms based on their ids",
-            notes = "If possible, response fields include: id, isObsolete, name, definition, history.")
-    @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + HISTORY_SUB_RESOURCE, method = RequestMethod.GET,
+    @Operation(summary = "Get history information about a (CSV) list of terms based on their ids",
+            description = "If possible, response fields include: id, isObsolete, name, definition, history.")
+    @GetMapping(value = TERMS_RESOURCE + "/{ids}/" + HISTORY_SUB_RESOURCE,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsHistory(
-            @ApiParam(value = "Comma-separated term IDs", required = true) @PathVariable(value = "ids") String ids) {
+            @Parameter(description = "Comma-separated term IDs", required = true) @PathVariable(value = "ids") String ids) {
 
         return getResultsResponse(
                 ontologyService.findHistoryInfoByOntologyId(validationHelper.validateCSVIds(ids)));
@@ -230,12 +234,12 @@ public abstract class OBOController<T extends OBOTerm> {
      *     <li>any id is of the an invalid format: response returns 400</li>
      * </ul>
      */
-    @ApiOperation(value = "Get cross-reference information about a (CSV) list of terms based on their ids",
-            notes = "If possible, response fields include: id, isObsolete, name, definition, comment, xRefs.")
-    @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + XREFS_SUB_RESOURCE, method = RequestMethod.GET,
+    @Operation(summary = "Get cross-reference information about a (CSV) list of terms based on their ids",
+            description = "If possible, response fields include: id, isObsolete, name, definition, comment, xRefs.")
+    @GetMapping(value = TERMS_RESOURCE + "/{ids}/" + XREFS_SUB_RESOURCE,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsXRefs(
-            @ApiParam(value = "Comma-separated term IDs", required = true) @PathVariable(value = "ids") String ids) {
+            @Parameter(description = "Comma-separated term IDs", required = true) @PathVariable(value = "ids") String ids) {
         return getResultsResponse(
                 ontologyService.findXRefsInfoByOntologyId(validationHelper.validateCSVIds(ids)));
     }
@@ -251,13 +255,13 @@ public abstract class OBOController<T extends OBOTerm> {
      *     <li>any id is of the an invalid format: response returns 400</li>
      * </ul>
      */
-    @ApiOperation(value = "Get taxonomy constraint information about a (CSV) list of terms based on their ids",
-            notes = "If possible, response fields include: id, isObsolete, name, definition, taxonConstraints, " +
+    @Operation(summary = "Get taxonomy constraint information about a (CSV) list of terms based on their ids",
+            description = "If possible, response fields include: id, isObsolete, name, definition, taxonConstraints, " +
                     "blacklist.")
-    @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + CONSTRAINTS_SUB_RESOURCE, method = RequestMethod.GET,
+    @GetMapping(value = TERMS_RESOURCE + "/{ids}/" + CONSTRAINTS_SUB_RESOURCE,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsTaxonConstraints(
-            @ApiParam(value = "Comma-separated term IDs", required = true) @PathVariable(value = "ids") String ids) {
+            @Parameter(description = "Comma-separated term IDs", required = true) @PathVariable(value = "ids") String ids) {
         return getResultsResponse(
                 ontologyService.findTaxonConstraintsInfoByOntologyId(validationHelper.validateCSVIds(ids)));
     }
@@ -273,12 +277,12 @@ public abstract class OBOController<T extends OBOTerm> {
      *     <li>any id is of the an invalid format: response returns 400</li>
      * </ul>
      */
-    @ApiOperation(value = "Get cross ontology relationship information about a (CSV) list of terms based on their ids",
-            notes = "If possible, response fields include: id, isObsolete, name, definition, comment, xRelations.")
-    @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + XRELATIONS_SUB_RESOURCE, method = RequestMethod.GET,
+    @Operation(summary = "Get cross ontology relationship information about a (CSV) list of terms based on their ids",
+            description = "If possible, response fields include: id, isObsolete, name, definition, comment, xRelations.")
+    @GetMapping(value = TERMS_RESOURCE + "/{ids}/" + XRELATIONS_SUB_RESOURCE,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsXOntologyRelations(
-            @ApiParam(value = "Comma-separated term IDs", required = true) @PathVariable(value = "ids") String ids) {
+            @Parameter(description = "Comma-separated term IDs", required = true) @PathVariable(value = "ids") String ids) {
         return getResultsResponse(
                 ontologyService.findXORelationsInfoByOntologyId(validationHelper.validateCSVIds(ids)));
     }
@@ -294,13 +298,13 @@ public abstract class OBOController<T extends OBOTerm> {
      *     <li>any id is of the an invalid format: response returns 400</li>
      * </ul>
      */
-    @ApiOperation(value = "Get annotation guideline information about a (CSV) list of terms based on their ids",
-            notes = "If possible, response fields include: id, isObsolete, name, definition, " +
+    @Operation(summary = "Get annotation guideline information about a (CSV) list of terms based on their ids",
+            description = "If possible, response fields include: id, isObsolete, name, definition, " +
                     "comment, annotationGuidelines.")
-    @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + GUIDELINES_SUB_RESOURCE, method = RequestMethod.GET,
+    @GetMapping(value = TERMS_RESOURCE + "/{ids}/" + GUIDELINES_SUB_RESOURCE,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findTermsAnnotationGuideLines(
-            @ApiParam(value = "Comma-separated term IDs", required = true) @PathVariable(value = "ids") String ids) {
+            @Parameter(description = "Comma-separated term IDs", required = true) @PathVariable(value = "ids") String ids) {
         return getResultsResponse(ontologyService
                 .findAnnotationGuideLinesInfoByOntologyId(validationHelper.validateCSVIds
                         (ids)));
@@ -313,15 +317,15 @@ public abstract class OBOController<T extends OBOTerm> {
      * @param limit the amount of queries to return
      * @return a {@link QueryResult} instance containing the results of the search
      */
-    @ApiOperation(value = "Searches a simple user query, e.g., query=apopto",
-            notes = "If possible, response fields include: id, name, isObsolete, aspect (for GO)")
-    @RequestMapping(value = "/" + SEARCH_RESOUCE, method = {RequestMethod.GET},
+    @Operation(summary = "Searches a simple user query, e.g., query=apopto",
+            description = "If possible, response fields include: id, name, isObsolete, aspect (for GO)")
+    @GetMapping(value = "/" + SEARCH_RESOUCE,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<OBOTerm>> ontologySearch(
-            @ApiParam(value = "Some value to search for in the ontology") @RequestParam(value = "query") String query,
-            @ApiParam(value = "The number of results per page [1-600]")
+            @Parameter(description = "Some value to search for in the ontology") @RequestParam(value = "query") String query,
+            @Parameter(description = "The number of results per page [1-600]")
             @RequestParam(value = "limit", defaultValue = DEFAULT_ENTRIES_PER_PAGE) int limit,
-            @ApiParam(value = "The results page to retrieve")
+            @Parameter(description = "The results page to retrieve")
             @RequestParam(value = "page", defaultValue = DEFAULT_PAGE_NUMBER) int page) {
 
         validationHelper.validateRequestedResults(limit);
@@ -342,12 +346,12 @@ public abstract class OBOController<T extends OBOTerm> {
      * @param relations the ontology relationships over which ancestors will be found
      * @return a result instance containing the ancestors
      */
-    @ApiOperation(value = "Retrieves the ancestors of specified ontology terms")
-    @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + ANCESTORS_SUB_RESOURCE, method = RequestMethod.GET,
+    @Operation(summary = "Retrieves the ancestors of specified ontology terms")
+    @GetMapping(value = TERMS_RESOURCE + "/{ids}/" + ANCESTORS_SUB_RESOURCE,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findAncestors(
-            @ApiParam(value = "Comma-separated term IDs", required = true) @PathVariable(value = "ids") String ids,
-            @ApiParam(value = "Comma-separated ontology relationships")
+            @Parameter(description = "Comma-separated term IDs", required = true) @PathVariable(value = "ids") String ids,
+            @Parameter(description = "Comma-separated ontology relationships")
             @RequestParam(value = "relations", defaultValue = DEFAULT_TRAVERSAL_TYPES_CSV) String relations) {
         return getResultsResponse(
                 ontologyService.findAncestorsInfoByOntologyId(
@@ -362,12 +366,12 @@ public abstract class OBOController<T extends OBOTerm> {
      * @param relations the ontology relationships over which descendants will be found
      * @return a result containing the descendants
      */
-    @ApiOperation(value = "Retrieves the descendants of specified ontology terms")
-    @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + DESCENDANTS_SUB_RESOURCE, method = RequestMethod.GET,
+    @Operation(summary = "Retrieves the descendants of specified ontology terms")
+    @GetMapping(value = TERMS_RESOURCE + "/{ids}/" + DESCENDANTS_SUB_RESOURCE,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findDescendants(
-            @ApiParam(value = "Comma-separated term IDs", required = true) @PathVariable(value = "ids") String ids,
-            @ApiParam(value = "Comma-separated ontology relationships")
+            @Parameter(description = "Comma-separated term IDs", required = true) @PathVariable(value = "ids") String ids,
+            @Parameter(description = "Comma-separated ontology relationships")
             @RequestParam(value = "relations", defaultValue = DEFAULT_TRAVERSAL_TYPES_CSV) String relations) {
         return getResultsResponse(
                 ontologyService.findDescendantsInfoByOntologyId(
@@ -381,11 +385,11 @@ public abstract class OBOController<T extends OBOTerm> {
      * @param ids the term ids in CSV format
      * @return a result containing the children
      */
-    @ApiOperation(value = "Retrieves the children of specified ontology terms")
-    @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + CHILDREN_SUB_RESOURCE, method = RequestMethod.GET,
+    @Operation(summary = "Retrieves the children of specified ontology terms")
+    @GetMapping(value = TERMS_RESOURCE + "/{ids}/" + CHILDREN_SUB_RESOURCE,
       produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<OBOMinimum>> findChildren(
-      @ApiParam(value = "Comma-separated term IDs", required = true) @PathVariable(value = "ids") String ids) {
+      @Parameter(description = "Comma-separated term IDs", required = true) @PathVariable(value = "ids") String ids) {
         return getResultsResponse(ontologyService.findChildrenInfoByOntologyId(validationHelper.validateCSVIds(ids)));
     }
 
@@ -396,14 +400,14 @@ public abstract class OBOController<T extends OBOTerm> {
      * @param relations the ontology relationships over which descendants will be found
      * @return a result containing a list of paths between the {@code ids} terms, and {@code toIds} terms
      */
-    @ApiOperation(value = "Retrieves the paths between two specified sets of ontology terms. Each path is " +
+    @Operation(summary = "Retrieves the paths between two specified sets of ontology terms. Each path is " +
             "formed from a list of (term, relationship, term) triples.")
-    @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + PATHS_SUB_RESOURCE + "/{toIds}", method = RequestMethod.GET,
+    @GetMapping(value = TERMS_RESOURCE + "/{ids}/" + PATHS_SUB_RESOURCE + "/{toIds}",
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<List<OntologyRelationship>>> findPaths(
-            @ApiParam(value = "Comma-separated source term IDs") @PathVariable(value = "ids") String ids,
-            @ApiParam(value = "Comma-separated target term IDs") @PathVariable(value = "toIds") String toIds,
-            @ApiParam(value = "Comma-separated ontology relationships")
+            @Parameter(description = "Comma-separated source term IDs") @PathVariable(value = "ids") String ids,
+            @Parameter(description = "Comma-separated target term IDs") @PathVariable(value = "toIds") String toIds,
+            @Parameter(description = "Comma-separated ontology relationships")
             @RequestParam(value = "relations", defaultValue = DEFAULT_TRAVERSAL_TYPES_CSV) String relations) {
         return getResultsResponse(
                 ontologyService.paths(
@@ -419,8 +423,8 @@ public abstract class OBOController<T extends OBOTerm> {
      *
      * @return the image corresponding to the requested term ids
      */
-    @ApiOperation(value = "Retrieves the PNG image corresponding to the specified ontology terms")
-    @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + CHART_SUB_RESOURCE, method = RequestMethod.GET,
+    @Operation(summary = "Retrieves the PNG image corresponding to the specified ontology terms")
+    @GetMapping(value = TERMS_RESOURCE + "/{ids}/" + CHART_SUB_RESOURCE,
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.IMAGE_PNG_VALUE})
     public ResponseEntity<InputStreamResource> getChart(@Valid @ModelAttribute GraphRequest request, BindingResult
             bindingResult) {
@@ -441,10 +445,9 @@ public abstract class OBOController<T extends OBOTerm> {
      *
      * @return the coordinate information of the terms in the chart
      */
-    @ApiOperation(value = "Retrieves coordinate information about terms within the PNG chart from the " +
+    @Operation(summary = "Retrieves coordinate information about terms within the PNG chart from the " +
             CHART_SUB_RESOURCE + " sub-resource")
-    @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + CHART_COORDINATES_SUB_RESOURCE,
-            method = RequestMethod.GET,
+    @GetMapping(value = TERMS_RESOURCE + "/{ids}/" + CHART_COORDINATES_SUB_RESOURCE,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<GraphImageLayout> getChartCoordinates(@Valid @ModelAttribute GraphRequest request,
             BindingResult bindingResult) {
@@ -471,15 +474,15 @@ public abstract class OBOController<T extends OBOTerm> {
      * @param stopIds the term ids that indicate the ending of the sub-graph
      * @return the specified ontology sub-graph
      */
-    @ApiOperation(value = "Fetches a sub-graph of the ontology")
-    @RequestMapping(value = TERMS_RESOURCE + "/graph", method = RequestMethod.GET, produces = {MediaType
+    @Operation(summary = "Fetches a sub-graph of the ontology")
+    @GetMapping(value = TERMS_RESOURCE + "/graph", produces = {MediaType
             .APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<AncestorGraph>> getGraph(
-            @ApiParam(value = "Comma-separated term IDs specifying the beginning of the sub-graph")
+            @Parameter(description = "Comma-separated term IDs specifying the beginning of the sub-graph")
             @RequestParam(value = "startIds") String startIds,
-            @ApiParam(value = "Comma-separated term IDs specifying the end of the sub-graph")
+            @Parameter(description = "Comma-separated term IDs specifying the end of the sub-graph")
             @RequestParam(value = "stopIds", required = false) String stopIds,
-            @ApiParam(value = "Comma-separated relationships over which the graph will navigate")
+            @Parameter(description = "Comma-separated relationships over which the graph will navigate")
             @RequestParam(value = "relations", required = false) String relations) {
         final AncestorGraph<AncestorVertex> ancestorGraph = ontologyService.findOntologySubGraphById(
                 asSet(validationHelper.validateCSVIds(startIds)),
@@ -493,13 +496,13 @@ public abstract class OBOController<T extends OBOTerm> {
         }
     }
 
-    @ApiOperation(value = "Get secondary ids for given (CSV) list of ids. Response Term list have primary and list" +
+    @Operation(summary = "Get secondary ids for given (CSV) list of ids. Response Term list have primary and list" +
       " of secondary ids (if exists) irrespective of input id (which can be primary or secondary)",
-      notes = "If possible, response fields include: id, isObsolete, name, definition, comments, secondaryIds.")
-    @RequestMapping(value = TERMS_RESOURCE + "/{ids}/" + SECONDARY_IDS_SUB_RESOURCE, method = RequestMethod.GET,
+      description = "If possible, response fields include: id, isObsolete, name, definition, comments, secondaryIds.")
+    @GetMapping(value = TERMS_RESOURCE + "/{ids}/" + SECONDARY_IDS_SUB_RESOURCE,
       produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<T>> findSecondaryIds(
-      @ApiParam(value = "Comma-separated term IDs - can be primary or secondary id. Any id is of the an invalid" +
+      @Parameter(description = "Comma-separated term IDs - can be primary or secondary id. Any id is of the an invalid" +
         " format: response returns 400", required = true) @PathVariable(value = "ids") String ids) {
         return getResultsResponse(ontologyService.findSecondaryIdsByOntologyId(validationHelper.validateCSVIds(ids)));
     }

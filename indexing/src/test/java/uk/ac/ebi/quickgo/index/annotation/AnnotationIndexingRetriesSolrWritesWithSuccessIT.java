@@ -9,6 +9,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,7 +59,7 @@ class AnnotationIndexingRetriesSolrWritesWithSuccessIT {
     private ItemWriter<AnnotationDocument> annotationSolrServerWriter;
 
     @Captor
-    private ArgumentCaptor<List<AnnotationDocument>> argumentCaptor;
+    private ArgumentCaptor<Chunk<AnnotationDocument>> argumentCaptor;
 
     private static final List<SolrResponse> SOLR_RESPONSES = asList(
             SolrResponse.OK,                // simulate writing first chunk (size 2: both valid)
@@ -95,7 +96,7 @@ class AnnotationIndexingRetriesSolrWritesWithSuccessIT {
         assertThat(indexingStep.getWriteCount(), is(6));
 
         verify(annotationSolrServerWriter, times(6)).write(argumentCaptor.capture());
-        List<List<AnnotationDocument>> docsSentToBeWritten = argumentCaptor.getAllValues();
+        List<List<AnnotationDocument>> docsSentToBeWritten = argumentCaptor.getAllValues().stream().map(Chunk::getItems).toList();
         validateWriteAttempts(SOLR_RESPONSES, docsSentToBeWritten, d -> d.geneProductId);
 
         BatchStatus status = jobExecution.getStatus();

@@ -1,21 +1,21 @@
 package uk.ac.ebi.quickgo.client.model.ontology;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import uk.ac.ebi.quickgo.rest.controller.request.AllowableFacets;
 import uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern;
 import uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern.Flag;
 import uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
 
-import io.swagger.annotations.ApiModelProperty;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.validation.constraints.*;
+import jakarta.validation.constraints.*;
 
-import static javax.validation.constraints.Pattern.Flag.CASE_INSENSITIVE;
+import static jakarta.validation.constraints.Pattern.Flag.CASE_INSENSITIVE;
 import static uk.ac.ebi.quickgo.ontology.common.OntologyFields.Searchable;
 import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.DEFAULT_ENTRIES_PER_PAGE;
 import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.MAX_ENTRIES_PER_PAGE;
@@ -33,37 +33,37 @@ import static uk.ac.ebi.quickgo.rest.search.DefaultSearchQueryTemplate.DEFAULT_P
 public class OntologyRequest {
     private static final String[] TARGET_FIELDS = new String[]{Searchable.ASPECT, Searchable.ONTOLOGY_TYPE, Searchable.IS_OBSOLETE};
 
-    @ApiModelProperty(value = "Indicates whether the result set should be highlighted")
+    @Schema(description = "Indicates whether the result set should be highlighted")
     private boolean highlighting = false;
 
-    @ApiModelProperty(value = "Page number of the result set to display.",
+    @Schema(description = "Page number of the result set to display.",
             allowableValues = "range[" + MIN_PAGE_NUMBER + ",  max_result_page_size]")
     private int page = DEFAULT_PAGE_NUMBER;
 
-    @ApiModelProperty(value = "Number of results per page.",
+    @Schema(description = "Number of results per page.",
             allowableValues = "range[" + MIN_ENTRIES_PER_PAGE + "," + MAX_ENTRIES_PER_PAGE + "]")
     private int limit = DEFAULT_ENTRIES_PER_PAGE;
 
-    @ApiModelProperty(value = "Fields to generate facets from", allowableValues = "aspect, ontologyType, isObsolete",
+    @Schema(description = "Fields to generate facets from", allowableValues = "aspect, ontologyType, isObsolete",
             example = "aspect, ontologyType, isObsolete")
     private String[] facet;
 
-    @ApiModelProperty(value = "The query used to filter the gene products", example = "kinase", required = true)
+    @Schema(description = "The query used to filter the gene products", example = "kinase", required = true)
     private String query;
 
     /*
         The filter fields are only declared here, because there is a bug in springfox that doesn't read annotations on
         setters
      */
-    @ApiModelProperty(value = "Further filters the results of the main query based on values chosen from " +
+    @Schema(description = "Further filters the results of the main query based on values chosen from " +
             "the aspect field", allowableValues = "Component,Function,Process", example = "Process")
     private String[] aspect;
 
-    @ApiModelProperty(value = "Further filters the results of the main query based on a value chosen from " +
+    @Schema(description = "Further filters the results of the main query based on a value chosen from " +
             "the type field", allowableValues = "GO,ECO", example = "GO")
     private String type;
 
-    @ApiModelProperty(value = "Further filters the results of the main query based on a value chosen from " +
+    @Schema(description = "Further filters the results of the main query based on a value chosen from " +
       "the isObsolete field", allowableValues = "true,false", example = "false")
     private String isObsolete;
 

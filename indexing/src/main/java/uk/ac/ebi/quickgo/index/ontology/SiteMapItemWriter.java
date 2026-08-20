@@ -1,5 +1,7 @@
 package uk.ac.ebi.quickgo.index.ontology;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.springframework.batch.item.Chunk;
 import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
 
 import com.redfin.sitemapgenerator.ChangeFreq;
@@ -30,7 +32,7 @@ public class SiteMapItemWriter implements ItemWriter<OntologyDocument> {
         this.urlPrefix = urlPrefix;
     }
 
-    @Override public void write(List<? extends OntologyDocument> list) throws Exception {
+    void write(List<? extends OntologyDocument> list) throws Exception {
         for (OntologyDocument ontologyDocument : list) {
             WebSitemapUrl url = new WebSitemapUrl
                     .Options(buildTermURL(ontologyDocument))
@@ -44,5 +46,10 @@ public class SiteMapItemWriter implements ItemWriter<OntologyDocument> {
 
     private String buildTermURL(OntologyDocument ontologyDocument) {
         return urlPrefix + "/" + ontologyDocument.id;
+    }
+
+    @Override
+    public void write(@NonNull Chunk<? extends OntologyDocument> chunk) throws Exception {
+        write(chunk.getItems());
     }
 }

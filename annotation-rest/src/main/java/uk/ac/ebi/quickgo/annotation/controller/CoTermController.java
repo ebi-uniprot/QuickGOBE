@@ -1,5 +1,7 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import uk.ac.ebi.quickgo.annotation.coterms.CoTerm;
 import uk.ac.ebi.quickgo.annotation.coterms.CoTermRepository;
 import uk.ac.ebi.quickgo.annotation.coterms.CoTermSource;
@@ -7,7 +9,12 @@ import uk.ac.ebi.quickgo.rest.ParameterException;
 import uk.ac.ebi.quickgo.rest.ResponseExceptionHandler;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
-import io.swagger.annotations.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,7 +35,7 @@ import static uk.ac.ebi.quickgo.common.validator.OntologyIdPredicate.isValidGOTe
  * @author Tony Wardell
  */
 @RestController
-@Api(tags = {"co-occurring terms"})
+@Tag(name = "co-occurring terms")
 @RequestMapping(value = "/annotation/coterms")
 public class CoTermController {
 
@@ -63,25 +70,25 @@ public class CoTermController {
      * </ul>
      */
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "All request values are valid, and co-occurring terms identified " +
+            @ApiResponse(responseCode = "200", description = "All request values are valid, and co-occurring terms identified " +
                     "for the supplied GO term id are returned if they exist."),
-            @ApiResponse(code = 500, message = "Internal server error occurred whilst searching for co-occurring terms",
-                    response = ResponseExceptionHandler.ErrorInfo.class),
-            @ApiResponse(code = 400, message = "Bad request due to a validation issue with one of the request values.",
-                    response = ResponseExceptionHandler.ErrorInfo.class)})
-    @ApiOperation(value = "Get co-occurring term information for a single GO Term id.")
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET,
+            @ApiResponse(responseCode = "500", description = "Internal server error occurred whilst searching for co-occurring terms",
+              content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseExceptionHandler.ErrorInfo.class))),
+            @ApiResponse(responseCode = "400", description = "Bad request due to a validation issue with one of the request values.",
+              content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseExceptionHandler.ErrorInfo.class)))})
+    @Operation(summary = "Get co-occurring term information for a single GO Term id.")
+    @GetMapping(value = "/{id}",
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<CoTerm>> findCoTerms(
-            @ApiParam(value = "The GO term id", required = true) @PathVariable(value = "id") String id,
-            @ApiParam(value = "The source from which the co-occurring terms originated. Possible " +
+            @Parameter(description = "The GO term id", required = true) @PathVariable(value = "id") String id,
+            @Parameter(description = "The source from which the co-occurring terms originated. Possible " +
                     "values: ALL / MANUAL. ALL => manual + electronic/automatically generated annotations; " +
-                    "MANUAL => only manually generated annotations", defaultValue = "ALL")
+                    "MANUAL => only manually generated annotations", schema = @Schema(type = "string", defaultValue = "ALL"))
             @RequestParam(value = "source", defaultValue = "ALL") String source,
-            @ApiParam(name = "limit", value = "The number of terms returned", required = false)
+            @Parameter(name = "limit", description = "The number of terms returned", required = false)
             @RequestParam(value = "limit", required = false) String limit,
-            @ApiParam(name = "similarityThreshold", value = "The similarity threshold used when finding co-occurring " +
-                    "terms", defaultValue = "0.0")
+            @Parameter(name = "similarityThreshold", description = "The similarity threshold used when finding co-occurring " +
+                    "terms", schema = @Schema(type = "number", defaultValue = "0.0"))
             @RequestParam(value = "similarityThreshold", defaultValue = "0.0") float similarityThreshold) {
 
         validateGoTerm(id);

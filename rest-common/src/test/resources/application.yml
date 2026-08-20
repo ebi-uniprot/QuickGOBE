@@ -20,7 +20,9 @@ model:
 ---
 ## ================= CORS =================
 spring:
-   profiles: cors-config-integration-test
+   config:
+     activate:
+       on-profile: cors-config-integration-test
 cors:
   filters:
     - allow-origins: "http://www.ebi.ac.uk, http://localhost:9090"
@@ -35,7 +37,9 @@ cors:
 ---
 ## ==========
 spring:
-   profiles: cors-config-filtering-test
+   config:
+     activate:
+       on-profile: cors-config-filtering-test
 cors:
   filters:
     - allow-origins: "http://any-host"

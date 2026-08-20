@@ -1,7 +1,6 @@
 package uk.ac.ebi.quickgo.ontology.traversal.read;
 
 import java.time.Duration;
-import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.JobExecution;
@@ -26,15 +25,8 @@ public class LogJobListener implements JobExecutionListener {
         LOGGER.info("Completed QuickGO job '{}'.\n", jobExecution.getJobInstance().getJobName());
 
         // compute duration
-        Duration.between(jobExecution.getEndTime().toInstant(), jobExecution.getStartTime().toInstant());
-        long durationMillis = jobExecution.getEndTime().getTime() - jobExecution.getStartTime().getTime();
-        String duration = String.format("%d hrs, %d min, %d sec",
-                TimeUnit.MILLISECONDS.toHours(durationMillis),
-                TimeUnit.MILLISECONDS.toMinutes(durationMillis) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS
-                        .toHours(durationMillis)),
-                TimeUnit.MILLISECONDS.toSeconds(durationMillis) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS
-                        .toMinutes(durationMillis))
-        );
+        var dur = Duration.between(jobExecution.getEndTime(), jobExecution.getStartTime());
+        String duration = "%d hrs, %d min, %d sec".formatted(dur.toHours(), dur.toMinutesPart(), dur.toSecondsPart());
 
         LOGGER.info("=====================================================");
         LOGGER.info("              QuickGO Job Statistics                 ");

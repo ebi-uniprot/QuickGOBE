@@ -18,14 +18,15 @@ import uk.ac.ebi.quickgo.rest.search.request.converter.ConvertedFilter;
 import uk.ac.ebi.quickgo.rest.search.request.converter.FilterConverterFactory;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +49,7 @@ import static uk.ac.ebi.quickgo.rest.search.SearchDispatcher.search;
  * Created with IntelliJ IDEA.
  */
 @RestController
-@Api(tags = {"gene products"})
+@Tag(name = "gene products")
 @RequestMapping(value = "/geneproduct")
 public class GeneProductController {
     private static final String COLLECTION = SolrCollectionName.GENE_PRODUCT;
@@ -92,8 +93,8 @@ public class GeneProductController {
      *
      * @return a 400 response
      */
-    @ApiOperation(value = "Catches any bad requests and returns an error response with a 400 status", hidden = true)
-    @RequestMapping(value = "/*", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @Operation(summary = "Catches any bad requests and returns an error response with a 400 status", hidden = true)
+    @GetMapping(value = "/*", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<ResponseExceptionHandler.ErrorInfo> emptyId() {
         throw new ParameterException("The requested end-point does not exist.");
     }
@@ -109,8 +110,8 @@ public class GeneProductController {
      *     <li>any id is of the an invalid format: response returns 400</li>
      * </ul>
      */
-    @ApiOperation(value = "Retrieves details about a list of gene product IDs specified in CSV format")
-    @RequestMapping(value = "/{ids}", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @Operation(summary = "Retrieves details about a list of gene product IDs specified in CSV format")
+    @GetMapping(value = "/{ids}", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<GeneProduct>> findById(@PathVariable String ids) {
         return getGeneProductResponse(geneProductService.findById(controllerValidationHelper.validateCSVIds(ids)));
     }
@@ -121,8 +122,8 @@ public class GeneProductController {
      * @param request an object that wraps all possible configurations for this endpoint
      * @return the search results
      */
-    @ApiOperation(value = "Searches the gene product data-set for a specified value")
-    @RequestMapping(value = "/search", method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @Operation(summary = "Searches the gene product data-set for a specified value")
+    @GetMapping(value = "/search", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<GeneProduct>> geneProductSearch(
             @Valid @ModelAttribute GeneProductRequest request,
             BindingResult bindingResult) {
@@ -155,8 +156,8 @@ public class GeneProductController {
      * @param name name of target set
      * @return lookup results
      */
-    @ApiOperation(value = "Retrieves gene products associated with a specified target set")
-    @RequestMapping(value = "/targetset/{name}", method = {RequestMethod.GET}, produces = {MediaType
+    @Operation(summary = "Retrieves gene products associated with a specified target set")
+    @GetMapping(value = "/targetset/{name}", produces = {MediaType
             .APPLICATION_JSON_VALUE})
     public ResponseEntity<QueryResult<GeneProduct>> findByTargetSet(@PathVariable String name) {
         return getGeneProductResponse(geneProductService.findByTargetSet(name));

@@ -14,11 +14,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 import uk.ac.ebi.quickgo.geneproduct.service.ServiceConfig;
-import uk.ac.ebi.quickgo.rest.controller.SwaggerConfig;
 
 @SpringBootApplication
 @ComponentScan({"uk.ac.ebi.quickgo.geneproduct.controller", "uk.ac.ebi.quickgo.rest"})
-@Import({ServiceConfig.class, SwaggerConfig.class})
+@Import({ServiceConfig.class})
 public class GeneProductREST {
 
 	public static void main(String[] args) {

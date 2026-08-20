@@ -3,8 +3,8 @@ package uk.ac.ebi.quickgo.common.validator;
 import java.util.Arrays;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**

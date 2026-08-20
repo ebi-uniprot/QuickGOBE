@@ -17,8 +17,8 @@ import uk.ac.ebi.quickgo.annotation.validation.service.JobTestRunnerConfig;
 import uk.ac.ebi.quickgo.rest.ParameterException;
 import uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;

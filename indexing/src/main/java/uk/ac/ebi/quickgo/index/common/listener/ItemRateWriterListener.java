@@ -37,11 +37,11 @@ public class ItemRateWriterListener<O> implements ItemWriteListener<O> {
         writeRateDocumentInterval = writeInterval;
     }
 
-    @Override public void beforeWrite(List<? extends O> list) {
+    public void beforeWrite(List<? extends O> list) {
 
     }
 
-    @Override public void afterWrite(List<? extends O> list) {
+    public void afterWrite(List<? extends O> list) {
         deltaWriteCount.addAndGet(list.size());
 
         if (deltaWriteCount.get() >= writeRateDocumentInterval) {
@@ -50,7 +50,7 @@ public class ItemRateWriterListener<O> implements ItemWriteListener<O> {
         }
     }
 
-    @Override public void onWriteError(Exception e, List<? extends O> list) {
+    public void onWriteError(Exception e, List<? extends O> list) {
 
     }
 
