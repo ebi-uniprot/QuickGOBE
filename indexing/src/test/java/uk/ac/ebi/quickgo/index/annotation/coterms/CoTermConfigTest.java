@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.index.annotation.coterms;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.batch.core.step.builder.StepBuilderException;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -17,7 +18,7 @@ class CoTermConfigTest {
 
     @Test
     void manualAndAllOutputPathsWhenDifferentWillNotCauseAIllegalStateException(){
-        assertThrows(NullPointerException.class, () -> {
+        assertThrows(StepBuilderException.class, () -> {
             CoTermsConfig coTermsConfig = new CoTermsConfig();
             CoTermsConfigProperties properties = new CoTermsConfigProperties();
             properties.setAll(ALL_PATH);
