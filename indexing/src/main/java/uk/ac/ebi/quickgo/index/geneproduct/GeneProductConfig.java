@@ -2,11 +2,10 @@ package uk.ac.ebi.quickgo.index.geneproduct;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
@@ -21,6 +20,8 @@ import org.springframework.batch.item.support.CompositeItemProcessor;
 import org.springframework.batch.item.validator.ValidatingItemProcessor;
 import org.springframework.batch.item.validator.ValidationException;
 import org.springframework.batch.item.validator.Validator;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -62,10 +63,10 @@ public class GeneProductConfig {
     private static final String SPECIFIC_VALUE_DELIMITER = ",";
 
     @Autowired
-    private JobBuilderFactory jobBuilders;
+    private JobRepository jobRepository;
 
     @Autowired
-    private StepBuilderFactory stepBuilders;
+    private PlatformTransactionManager transactionManager;
 
     @Value("${indexing.geneproduct.source}")
     private Resource[] resources;
@@ -93,7 +94,7 @@ public class GeneProductConfig {
 
     @Bean
     public Job geneProductJob() {
-        return jobBuilders.get(GENE_PRODUCT_INDEXING_JOB_NAME)
+        return new JobBuilder(GENE_PRODUCT_INDEXING_JOB_NAME, jobRepository)
                 .start(geneProductIndexingStep())
                 .listener(logJobListener())
                 // commit the documents to the solr server
@@ -113,15 +114,14 @@ public class GeneProductConfig {
 
     @Bean
     public Step geneProductIndexingStep() {
-        return stepBuilders.get(GENE_PRODUCT_INDEXING_STEP_NAME)
-                .<GeneProduct, GeneProductDocument>chunk(chunkSize)
+        return new StepBuilder(GENE_PRODUCT_INDEXING_STEP_NAME, jobRepository)
+                .<GeneProduct, GeneProductDocument>chunk(chunkSize, transactionManager)
                 .faultTolerant()
                 .skipLimit(skipLimit)
                 .skip(FlatFileParseException.class)
                 .skip(ValidationException.class)
                 .listener(skipLogListener())
                 .retry(SolrServerException.class)
-                .retry(HttpSolrClient.RemoteSolrException.class)
                 .retryLimit(retryLimit)
                 .backOffPolicy(backOffPolicy())
                 .<GeneProduct>reader(geneProductMultiFileReader())

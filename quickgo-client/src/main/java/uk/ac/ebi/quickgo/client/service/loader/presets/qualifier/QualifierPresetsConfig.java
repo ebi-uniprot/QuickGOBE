@@ -9,8 +9,10 @@ import uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPreset;
 import uk.ac.ebi.quickgo.rest.search.request.converter.RESTFilterConverterFactory;
 
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -32,14 +34,13 @@ public class QualifierPresetsConfig {
     public static final String QUALIFIER = "qualifier";
 
     @Bean
-    public Step qualifierStep(
-            StepBuilderFactory stepBuilderFactory,
+    public Step qualifierStep(JobRepository jobRepository, PlatformTransactionManager transactionManager,
             Integer chunkSize,
             CompositePresetImpl presets,
             RESTFilterConverterFactory converterFactory) {
 
-        return stepBuilderFactory.get(QUALIFIER_LOADING_STEP_NAME)
-                .<RawNamedPreset, RawNamedPreset>chunk(chunkSize)
+        return new StepBuilder(QUALIFIER_LOADING_STEP_NAME, jobRepository)
+                .<RawNamedPreset, RawNamedPreset>chunk(chunkSize, transactionManager)
                 .faultTolerant()
                 .skipLimit(SKIP_LIMIT)
                 .reader(topItemsFromRESTReader(converterFactory, QUALIFIER))

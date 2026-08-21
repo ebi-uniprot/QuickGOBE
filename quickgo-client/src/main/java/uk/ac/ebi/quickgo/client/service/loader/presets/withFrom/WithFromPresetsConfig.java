@@ -11,10 +11,12 @@ import uk.ac.ebi.quickgo.client.service.loader.presets.ff.SourceColumnsFactory;
 import uk.ac.ebi.quickgo.client.service.loader.presets.ff.StringToRawNamedPresetMapper;
 
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -50,15 +52,14 @@ public class WithFromPresetsConfig {
     private int headerLines;
 
     @Bean
-    public Step withFromDbStep(
-            StepBuilderFactory stepBuilderFactory,
+    public Step withFromDbStep(JobRepository jobRepository, PlatformTransactionManager transactionManager,
             Integer chunkSize, CompositePresetImpl presets, RestValuesRetriever restValuesRetriever) {
 
         FlatFileItemReader<RawNamedPreset> itemReader = fileReader(rawPresetFieldSetMapper());
         itemReader.setLinesToSkip(headerLines);
 
-        return stepBuilderFactory.get(WITH_FROM_DB_LOADING_STEP_NAME)
-                .<RawNamedPreset, RawNamedPreset>chunk(chunkSize)
+        return new StepBuilder(WITH_FROM_DB_LOADING_STEP_NAME, jobRepository)
+                .<RawNamedPreset, RawNamedPreset>chunk(chunkSize, transactionManager)
                 .faultTolerant()
                 .skipLimit(SKIP_LIMIT).<RawNamedPreset>reader(rawPresetMultiFileReader(resources, itemReader))
                 .processor(compositeItemProcessor(validatingItemProcessor(),

@@ -16,11 +16,11 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.SolrClient;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileParseException;
@@ -28,13 +28,14 @@ import org.springframework.batch.item.file.MultiResourceItemReader;
 import org.springframework.batch.item.support.CompositeItemProcessor;
 import org.springframework.batch.item.support.CompositeItemWriter;
 import org.springframework.batch.item.validator.ValidationException;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.Resource;
-import org.apache.solr.client.solrj.SolrClient;
 import org.springframework.retry.backoff.BackOffPolicy;
 import org.springframework.retry.backoff.ExponentialBackOffPolicy;
 
@@ -73,9 +74,9 @@ public class AnnotationIndexingConfig {
     @Autowired
     private SolrClient annotationSolrClient;
     @Autowired
-    private JobBuilderFactory jobBuilders;
+    private JobRepository jobRepository;
     @Autowired
-    private StepBuilderFactory stepBuilders;
+    private PlatformTransactionManager transactionManager;
     @Autowired
     private Step coTermManualSummarizationStep;
     @Autowired
@@ -97,7 +98,7 @@ public class AnnotationIndexingConfig {
 
     @Bean
     public Job annotationJob() {
-        return jobBuilders.get(ANNOTATION_INDEXING_JOB_NAME)
+        return new JobBuilder(ANNOTATION_INDEXING_JOB_NAME, jobRepository)
                           .start(annotationIndexingStep())
                           .next(coTermManualSummarizationStep)
                           .next(coTermAllSummarizationStep)
@@ -118,14 +119,13 @@ public class AnnotationIndexingConfig {
     }
 
     private Step annotationIndexingStep() {
-        return stepBuilders.get(ANNOTATION_INDEXING_STEP_NAME)
-                .<Annotation, AnnotationDocument>chunk(chunkSize)
+        return new StepBuilder(ANNOTATION_INDEXING_STEP_NAME, jobRepository)
+                .<Annotation, AnnotationDocument>chunk(chunkSize, transactionManager)
                 .faultTolerant()
                 .skipLimit(skipLimit)
                 .skip(FlatFileParseException.class)
                 .skip(ValidationException.class)
                 .retry(SolrServerException.class)
-                .retry(HttpSolrClient.RemoteSolrException.class)
                 .retryLimit(retryLimit)
                 .backOffPolicy(backOffPolicy())
                 .<Annotation>reader(annotationMultiFileReader)

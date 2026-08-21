@@ -250,6 +250,7 @@
                             <exclude>**/IT*.java</exclude>
                         </excludes>
                         <argLine>${jacoco.agent.ut.arg}</argLine>
+                        <useModulePath>false</useModulePath>
                     </configuration>
                 </plugin>
 

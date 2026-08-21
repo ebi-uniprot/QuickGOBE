@@ -6,7 +6,7 @@ import org.springframework.batch.core.ItemWriteListener;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileHeaderCallback;
@@ -15,6 +15,8 @@ import org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor;
 import org.springframework.batch.item.file.transform.DelimitedLineAggregator;
 import org.springframework.batch.item.file.transform.LineAggregator;
 import org.springframework.batch.item.file.transform.PassThroughLineAggregator;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -64,7 +66,9 @@ public class CoTermsConfig {
     private static final String DELIMITER = "\t";
 
     @Autowired
-    private StepBuilderFactory stepBuilders;
+    private JobRepository jobRepository;
+    @Autowired
+    private PlatformTransactionManager transactionManager;
 
     @Bean
     @ConfigurationProperties(prefix = "indexing.coterms")
@@ -77,8 +81,8 @@ public class CoTermsConfig {
        LOGGER.info("Created coTermManualSummarizationStep. Will write CoTerms to " + coTermsConfigProperties
                 .getManual());
 
-        return stepBuilders.get(CO_TERM_MANUAL_SUMMARIZATION_STEP)
-                .<String, List<CoTerm>>chunk(coTermsConfigProperties.getChunkSize())
+        return new StepBuilder(CO_TERM_MANUAL_SUMMARIZATION_STEP, jobRepository)
+                .<String, List<CoTerm>>chunk(coTermsConfigProperties.getChunkSize(), transactionManager)
                 .reader(coTermsManualReader(coTermsManualAggregationWriter()))
                 .processor(coTermsManualCalculator(coTermsManualAggregationWriter()))
                 .writer(coTermsManualStatsWriter(
@@ -95,8 +99,8 @@ public class CoTermsConfig {
                 "Created coTermAllSummarizationStep. Will write CoTerms to " +
                         coTermsConfigProperties.getAll());
 
-        return stepBuilders.get(CO_TERM_ALL_SUMMARIZATION_STEP)
-                .<String, List<CoTerm>>chunk(coTermsConfigProperties.getChunkSize())
+        return new StepBuilder(CO_TERM_ALL_SUMMARIZATION_STEP, jobRepository)
+                .<String, List<CoTerm>>chunk(coTermsConfigProperties.getChunkSize(), transactionManager)
                 .reader(coTermsAllReader(coTermsAllAggregationWriter()))
                 .processor(coTermsAllCalculator(coTermsAllAggregationWriter()))
                 .writer(coTermsAllStatsWriter(new FileSystemResource(coTermsConfigProperties.getAll())))

@@ -10,10 +10,12 @@ import uk.ac.ebi.quickgo.client.service.loader.presets.PresetsCommonConfig;
 import uk.ac.ebi.quickgo.client.service.loader.presets.ff.SourceColumnsFactory;
 
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -42,15 +44,14 @@ public class GOSlimSetPresetsConfig {
     private int headerLines;
 
     @Bean
-    public Step goSlimSetStep(
-            StepBuilderFactory stepBuilderFactory,
+    public Step goSlimSetStep(JobRepository jobRepository, PlatformTransactionManager transactionManager,
             Integer chunkSize,
             CompositePresetImpl presets) {
         FlatFileItemReader<RawSlimSetNamedPreset> itemReader = fileReader(rawPresetFieldSetMapper());
         itemReader.setLinesToSkip(headerLines);
 
-        return stepBuilderFactory.get(GO_SLIM_SET_LOADING_STEP_NAME)
-                .<RawSlimSetNamedPreset, RawSlimSetNamedPreset>chunk(chunkSize)
+        return new StepBuilder(GO_SLIM_SET_LOADING_STEP_NAME, jobRepository)
+                .<RawSlimSetNamedPreset, RawSlimSetNamedPreset>chunk(chunkSize, transactionManager)
                 .faultTolerant()
                 .skipLimit(SKIP_LIMIT)
                 .<RawSlimSetNamedPreset>reader(rawPresetMultiFileReader(resources, itemReader))

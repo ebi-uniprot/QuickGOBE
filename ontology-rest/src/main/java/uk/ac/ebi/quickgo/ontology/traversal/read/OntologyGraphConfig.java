@@ -5,8 +5,8 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
@@ -16,6 +16,8 @@ import org.springframework.batch.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.batch.item.support.CompositeItemProcessor;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -50,9 +52,9 @@ public class OntologyGraphConfig {
     private static final String TAB = "\t";
 
     @Autowired
-    private JobBuilderFactory jobBuilders;
+    private JobRepository jobRepository;
     @Autowired
-    private StepBuilderFactory stepBuilders;
+    private PlatformTransactionManager transactionManager;
     @Value("#{'${ontology.traversal.source:}'.split(',')}")
     private Resource[] resources;
     @Value("${ontology.traversal.chunk.size:500}")
@@ -74,7 +76,7 @@ public class OntologyGraphConfig {
 
     @Bean
     public Job ontologyGraphBuildJob(OntologyGraph ontologyGraph) {
-        return jobBuilders.get(ONTOLOGY_TRAVERSAL_LOADING_JOB_NAME)
+        return new JobBuilder(ONTOLOGY_TRAVERSAL_LOADING_JOB_NAME, jobRepository)
                     .start(ontologyGraphBuildStep(ontologyGraph))
                     .listener(logJobListener())
                     .build();
@@ -82,8 +84,8 @@ public class OntologyGraphConfig {
 
     @Bean
     public Step ontologyGraphBuildStep(OntologyGraph ontologyGraph) {
-        return stepBuilders.get(ONTOLOGY_TRAVERSAL_LOADING_STEP_NAME)
-                .<RawOntologyRelationship, OntologyRelationship>chunk(chunkSize)
+        return new StepBuilder(ONTOLOGY_TRAVERSAL_LOADING_STEP_NAME, jobRepository)
+                .<RawOntologyRelationship, OntologyRelationship>chunk(chunkSize, transactionManager)
                 .faultTolerant()
                 .skipLimit(SKIP_LIMIT)
                 .<RawOntologyRelationship>reader(ontologyTraversalMultiFileReader())

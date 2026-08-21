@@ -11,10 +11,12 @@ import uk.ac.ebi.quickgo.client.service.loader.presets.ff.SourceColumnsFactory;
 import uk.ac.ebi.quickgo.client.service.loader.presets.ff.StringToRawNamedPresetMapper;
 
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -47,15 +49,15 @@ public class AssignedByPresetsConfig {
     @Value("${assignedBy.preset.header.lines:1}") private int assignedByHeaderLines;
 
     @Bean
-    public Step assignedByStep(StepBuilderFactory stepBuilderFactory,
+    public Step assignedByStep(JobRepository jobRepository, PlatformTransactionManager transactionManager,
                                Integer chunkSize,
                                CompositePresetImpl presets,
                                RestValuesRetriever restValuesRetriever) {
 
         FlatFileItemReader<RawNamedPreset> itemReader = fileReader(rawAssignedByPresetFieldSetMapper());
         itemReader.setLinesToSkip(assignedByHeaderLines);
-        return stepBuilderFactory.get(ASSIGNED_BY_LOADING_STEP_NAME)
-                .<RawNamedPreset, RawNamedPreset>chunk(chunkSize).faultTolerant().skipLimit(SKIP_LIMIT)
+        return new StepBuilder(ASSIGNED_BY_LOADING_STEP_NAME, jobRepository)
+                .<RawNamedPreset, RawNamedPreset>chunk(chunkSize, transactionManager).faultTolerant().skipLimit(SKIP_LIMIT)
                 .<RawNamedPreset>reader(rawPresetMultiFileReader(assignedByResources, itemReader)).processor(
                         compositeItemProcessor(validatingItemProcessor(),
                                 checkPresetIsUsedItemProcessor(restValuesRetriever, ASSIGNED_BY),

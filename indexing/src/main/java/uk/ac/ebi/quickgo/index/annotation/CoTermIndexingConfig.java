@@ -18,8 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileParseException;
@@ -27,6 +27,8 @@ import org.springframework.batch.item.file.MultiResourceItemReader;
 import org.springframework.batch.item.support.CompositeItemProcessor;
 import org.springframework.batch.item.support.CompositeItemWriter;
 import org.springframework.batch.item.validator.ValidationException;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -60,9 +62,9 @@ public class CoTermIndexingConfig {
     @Autowired
     private SolrClient annotationSolrClient;
     @Autowired
-    private JobBuilderFactory jobBuilders;
+    private JobRepository jobRepository;
     @Autowired
-    private StepBuilderFactory stepBuilders;
+    private PlatformTransactionManager transactionManager;
     @Autowired
     private Step coTermManualSummarizationStep;
     @Autowired
@@ -80,7 +82,7 @@ public class CoTermIndexingConfig {
 
     @Bean
     public Job coTermsOnlyJob() {
-        return jobBuilders.get(COTERM_INDEXING_JOB_NAME)
+        return new JobBuilder(COTERM_INDEXING_JOB_NAME, jobRepository)
                           .start(annotationReadingStep())
                           .next(coTermManualSummarizationStep)
                           .next(coTermAllSummarizationStep)
@@ -101,8 +103,8 @@ public class CoTermIndexingConfig {
     }
 
     private Step annotationReadingStep() {
-        return stepBuilders.get(ANNOTATION_READING_STEP_NAME)
-                .<Annotation, AnnotationDocument>chunk(chunkSize)
+        return new StepBuilder(ANNOTATION_READING_STEP_NAME, jobRepository)
+                .<Annotation, AnnotationDocument>chunk(chunkSize, transactionManager)
                 .faultTolerant()
                 .skipLimit(skipLimit)
                 .skip(FlatFileParseException.class)

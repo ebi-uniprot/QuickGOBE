@@ -13,10 +13,12 @@ import java.util.List;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.CompositeItemWriter;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -35,10 +37,10 @@ public class OntologyConfig {
     static final String ONTOLOGY_INDEXING_STEP_NAME = "ontologyIndexStep";
 
     @Autowired
-    private JobBuilderFactory jobBuilders;
+    private JobRepository jobRepository;
 
     @Autowired
-    private StepBuilderFactory stepBuilders;
+    private PlatformTransactionManager transactionManager;
 
     @Autowired
     private OntologyRepository ontologyRepository;
@@ -60,7 +62,7 @@ public class OntologyConfig {
 
     @Bean
     public Job ontologyJob(Step ontologyStep) {
-        return jobBuilders.get(ONTOLOGY_INDEXING_JOB_NAME)
+        return new JobBuilder(ONTOLOGY_INDEXING_JOB_NAME, jobRepository)
                 .start(ontologyStep)
                 .listener(logJobListener())
                 .build();
@@ -68,10 +70,9 @@ public class OntologyConfig {
 
     @Bean
     public Step ontologyStep() {
-        return stepBuilders
-                .get(ONTOLOGY_INDEXING_STEP_NAME)
+        return new StepBuilder(ONTOLOGY_INDEXING_STEP_NAME, jobRepository)
                 // read and process items in chunks of the following size
-                .<OntologyDocument, OntologyDocument>chunk(chunkSize)
+                .<OntologyDocument, OntologyDocument>chunk(chunkSize, transactionManager)
                 .reader(ontologyReader())
                 .faultTolerant()
                 .skip(DocumentReaderException.class)

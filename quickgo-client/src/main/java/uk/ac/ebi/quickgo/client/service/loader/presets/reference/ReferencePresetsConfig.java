@@ -12,11 +12,13 @@ import uk.ac.ebi.quickgo.client.service.loader.presets.ff.StringToRawNamedPreset
 import java.util.List;
 import java.util.function.Function;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -59,15 +61,14 @@ public class ReferencePresetsConfig {
     private int specificDBHeaderLines;
 
     @Bean
-    public Step referenceGenericDbStep(
-            StepBuilderFactory stepBuilderFactory,
+    public Step referenceGenericDbStep(JobRepository jobRepository, PlatformTransactionManager transactionManager,
             Integer chunkSize,
             CompositePresetImpl presets) {
         FlatFileItemReader<RawNamedPreset> itemReader = fileReader(fieldSetMapper(DB_COLUMNS));
         itemReader.setLinesToSkip(dbHeaderLines);
 
-        return stepBuilderFactory.get(CORE_REFERENCE_DB_LOADING_STEP_NAME)
-                .<RawNamedPreset, RawNamedPreset>chunk(chunkSize)
+        return new StepBuilder(CORE_REFERENCE_DB_LOADING_STEP_NAME, jobRepository)
+                .<RawNamedPreset, RawNamedPreset>chunk(chunkSize, transactionManager)
                 .faultTolerant()
                 .skipLimit(SKIP_LIMIT)
                 .<RawNamedPreset>reader(
@@ -85,15 +86,14 @@ public class ReferencePresetsConfig {
     }
 
     @Bean
-    public Step referenceSpecificDbStep(
-            StepBuilderFactory stepBuilderFactory,
+    public Step referenceSpecificDbStep(JobRepository jobRepository, PlatformTransactionManager transactionManager,
             Integer chunkSize,
             CompositePresetImpl presets) {
         FlatFileItemReader<RawNamedPreset> itemReader = fileReader(fieldSetMapper(REF_COLUMNS));
         itemReader.setLinesToSkip(dbHeaderLines);
 
-        return stepBuilderFactory.get(SPECIFIC_REFERENCE_LOADING_STEP_NAME)
-                .<RawNamedPreset, RawNamedPreset>chunk(chunkSize)
+        return new StepBuilder(SPECIFIC_REFERENCE_LOADING_STEP_NAME, jobRepository)
+                .<RawNamedPreset, RawNamedPreset>chunk(chunkSize, transactionManager)
                 .faultTolerant()
                 .skipLimit(SKIP_LIMIT)
                 .<RawNamedPreset>reader(rawPresetMultiFileReader(specificResources, itemReader))

@@ -1,9 +1,6 @@
 package uk.ac.ebi.quickgo.client.service.loader.presets;
 
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -23,11 +20,6 @@ import uk.ac.ebi.quickgo.rest.search.request.converter.RESTFilterConverterFactor
 @EnableBatchProcessing
 @ComponentScan({"uk.ac.ebi.quickgo.rest"})
 public class PresetsCommonConfig {
-    @Autowired
-    private JobBuilderFactory jobBuilders;
-    @Autowired
-    private StepBuilderFactory stepBuilders;
-
     @Value("${preset.chunk.size:500}")
     private int chunkSize;
 

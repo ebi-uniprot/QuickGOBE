@@ -6,12 +6,12 @@ import java.util.Iterator;
 import java.util.List;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.job.builder.SimpleJobBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.batch.core.repository.JobRepository;
 
 /**
  * Exposes a Spring Batch {@link Job} that, when run, will read and populate a {@link CompositePresetImpl}
@@ -30,10 +30,8 @@ public class PresetsConfig {
     private static final String PRESET_LOADING_JOB_NAME = "PresetReadingJob";
 
     @Bean
-    public Job presetsBuildJob(
-            JobBuilderFactory jobBuilderFactory,
-            List<Step> presetSteps) {
-        JobBuilder jobBuilder = jobBuilderFactory.get(PRESET_LOADING_JOB_NAME);
+    public Job presetsBuildJob(JobRepository jobRepository, List<Step> presetSteps) {
+        JobBuilder jobBuilder = new JobBuilder(PRESET_LOADING_JOB_NAME, jobRepository);
 
         SimpleJobBuilder simpleJobBuilder = null;
         Iterator<Step> presetsIterator = presetSteps.iterator();

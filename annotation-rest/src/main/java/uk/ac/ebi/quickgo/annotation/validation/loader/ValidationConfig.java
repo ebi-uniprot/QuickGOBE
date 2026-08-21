@@ -14,15 +14,18 @@ import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.LineMapper;
 import org.springframework.batch.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.batch.item.file.transform.LineTokenizer;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -52,15 +55,15 @@ public class ValidationConfig {
     private ValidationProperties validationProperties;
 
     @Autowired
-    private JobBuilderFactory jobBuilders;
+    private JobRepository jobRepository;
 
     @Autowired
-    private StepBuilderFactory stepBuilders;
+    private PlatformTransactionManager transactionManager;
 
     @Bean Job validationJob(Step validationEntitiesStep) {
         Preconditions.checkArgument(Objects.nonNull(validationEntitiesStep), "Cannot run %s as %s is null",
                                     LOAD_ANNOTATION_FILTERING_VALIDATION_VALUES_JOB_NAME, validationEntitiesStep );
-        return jobBuilders.get(LOAD_ANNOTATION_FILTERING_VALIDATION_VALUES_JOB_NAME)
+        return new JobBuilder(LOAD_ANNOTATION_FILTERING_VALIDATION_VALUES_JOB_NAME, jobRepository)
                 .start(validationEntitiesStep)
                 .listener(logJobListener())
                 .build();
@@ -69,9 +72,8 @@ public class ValidationConfig {
     @Bean
     Step validationEntitiesStep(ValidationEntitiesAggregator validationEntitiesAggregator) {
         try {
-            return stepBuilders
-                    .get(LOAD_ANNOTATION_DBX_REF_ENTITIES_STEP_NAME)
-                    .<DBXRefEntity, DBXRefEntity>chunk(validationProperties.getChunk())
+            return new StepBuilder(LOAD_ANNOTATION_DBX_REF_ENTITIES_STEP_NAME, jobRepository)
+                    .<DBXRefEntity, DBXRefEntity>chunk(validationProperties.getChunk(), transactionManager)
                     .reader(dbXrefReader())
                     .writer(validationEntitiesAggregator)
                     .listener(logStepListener())
