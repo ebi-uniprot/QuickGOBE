@@ -60,11 +60,6 @@
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>jakarta.batch</groupId>
-            <artifactId>jakarta.batch-api</artifactId>
-        </dependency>
-
         <!--Test dependencies-->
         <dependency>
             <groupId>uk.ac.ebi.quickgo</groupId>
