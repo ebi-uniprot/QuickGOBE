@@ -40,11 +40,3 @@ The Solr Home directory typically contains the following sub-directories...
         snapshots.  You can override this location in the 
         conf/solrconfig.xml.  Solr will create this directory if it does not 
         already exist.
-
-   lib/
-        This directory is optional.  If it exists, Solr will load any Jars
-        found in this directory and use them to resolve any "plugins"
-        specified in your solrconfig.xml or schema.xml (ie: Analyzers,
-        Request Handlers, etc...).  Alternatively you can use the <lib>
-        syntax in conf/solrconfig.xml to direct Solr to your plugins.  See 
-        the example conf/solrconfig.xml file for details.
