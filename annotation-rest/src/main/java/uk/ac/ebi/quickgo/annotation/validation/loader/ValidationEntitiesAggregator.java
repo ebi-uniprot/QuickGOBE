@@ -33,6 +33,8 @@ class ValidationEntitiesAggregator implements ItemWriter<ValidationEntity> {
     }
 
     @Override public void write(Chunk<? extends ValidationEntity> chunk) {
+        Preconditions.checkArgument(chunk != null, "The chunk of items written to ValidationEntitiesAggregator " +
+          "cannot be null.");
         write(chunk.getItems());
     }
 
