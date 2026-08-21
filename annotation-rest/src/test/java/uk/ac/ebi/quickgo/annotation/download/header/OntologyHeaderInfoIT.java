@@ -9,7 +9,6 @@ import uk.ac.ebi.quickgo.annotation.download.DownloadConfig;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -32,7 +31,7 @@ class OntologyHeaderInfoIT {
 
     @BeforeEach
     void setup() throws IOException {
-        path = Paths.get(ONTOLOGY_RESOURCE.getURI());
+        path = Path.of(ONTOLOGY_RESOURCE.getURI());
     }
 
     @Test

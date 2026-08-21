@@ -4,7 +4,6 @@ import uk.ac.ebi.quickgo.rest.metadata.MetaData;
 import uk.ac.ebi.quickgo.rest.metadata.MetaDataProvider;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.function.Function;
 
 import org.junit.jupiter.api.Test;
@@ -23,7 +22,7 @@ class MetaDataProviderTest {
 
     private static final MetaData METADATA = new MetaData();
     private static final  Function<Path,MetaData> FAKE_MAPPER = (Path p) -> METADATA;
-    private static final Path PATH_TO_NOWHERE = Paths.get("/path/to/nowhere");
+    private static final Path PATH_TO_NOWHERE = Path.of("/path/to/nowhere");
 
     @Test
     void mapperIsNullThrowsIllegalArgumentException(){

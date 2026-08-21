@@ -12,7 +12,6 @@ import uk.ac.ebi.quickgo.annotation.download.header.*;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,7 +28,7 @@ import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.*;
 @ConfigurationProperties(prefix = "annotation.download")
 public class DownloadConfig {
     private static final int DEFAULT_DOWNLOAD_EMITTER_TIMEOUT_MILLIS = 40 * 60 * 1000;
-    private static final Path DEFAULT_ONTOLOGY_PATH = Paths.get("ONTOLOGY_IRI.dat.gz");
+    private static final Path DEFAULT_ONTOLOGY_PATH = Path.of("ONTOLOGY_IRI.dat.gz");
 
     private TaskExecutorProperties taskExecutor = new TaskExecutorProperties();
     private int defaultEmitterTimeout = DEFAULT_DOWNLOAD_EMITTER_TIMEOUT_MILLIS;
@@ -72,7 +71,7 @@ public class DownloadConfig {
 
     @Bean
     OntologyHeaderInfo ontology() throws IOException {
-        Path osPath = ontologySource != null ? Paths.get(ontologySource.getURI()) : DEFAULT_ONTOLOGY_PATH;
+        Path osPath = ontologySource != null ? Path.of(ontologySource.getURI()) : DEFAULT_ONTOLOGY_PATH;
         return new OntologyHeaderInfo(osPath);
     }
 

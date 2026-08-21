@@ -3,7 +3,7 @@ package uk.ac.ebi.quickgo.annotation.coterms;
 import com.google.common.base.Preconditions;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -162,7 +162,7 @@ public class CoTermRepositorySimpleMap implements CoTermRepository {
          */
         private Map<String, List<CoTerm>> loadCoTermsSource(Resource source) throws IOException {
 
-            Stream<String> lines = Files.lines(Paths.get(source.getURI()));
+            Stream<String> lines = Files.lines(Path.of(source.getURI()));
             return lines
                     .skip(headerLines)
                     .map(CoTermRecordParser::createFromText)

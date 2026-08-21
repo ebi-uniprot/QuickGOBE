@@ -8,7 +8,6 @@ import uk.ac.ebi.quickgo.rest.metadata.MetaDataStringOnly;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
@@ -29,7 +28,7 @@ import org.springframework.core.io.Resource;
 @Configuration
 public class MetaDataConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger(MetaDataConfig.class);
-    private static final Path DEFAULT_METADATA_PATH = Paths.get("ONTOLOGY_IRI.dat.gz");
+    private static final Path DEFAULT_METADATA_PATH = Path.of("ONTOLOGY_IRI.dat.gz");
     private static final String SERVICE = "go";
     private static final Function<Path, MetaData> MAPPER = (Path p) -> {
         try (Stream<String> stream = GZIPFiles.lines(p)) {
@@ -57,7 +56,7 @@ public class MetaDataConfig {
         final Resource source = metaDataConfigProperties.getSource();
         if (source != null) {
             try {
-                metaDataPath = Paths.get(source.getURI());
+                metaDataPath = Path.of(source.getURI());
             } catch (IOException e) {
                 LOGGER.error("Failed to get the URI of the metadata source " + source, e);
             }

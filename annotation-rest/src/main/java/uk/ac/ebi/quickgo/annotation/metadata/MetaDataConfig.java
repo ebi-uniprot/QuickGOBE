@@ -5,7 +5,6 @@ import uk.ac.ebi.quickgo.rest.metadata.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -30,7 +29,7 @@ import static java.util.stream.Collectors.toList;
 public class MetaDataConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger(MetaDataConfig.class);
     private static final String SERVICE = "annotation";
-    private static final Path DEFAULT_METADATA_PATH = Paths.get("goa_uniprot.gpa-version");
+    private static final Path DEFAULT_METADATA_PATH = Path.of("goa_uniprot.gpa-version");
     private static final Function<Path, MetaData> MAPPER = (Path p) -> {
         try (Stream<String> stream = Files.lines(p)){
             MetaDataStringOnly metaDataStringOnly = new MetaDataStringOnly();
@@ -59,7 +58,7 @@ public class MetaDataConfig {
         final Resource source = metaDataConfigProperties.getSource();
         if (source != null) {
             try {
-                metaDataPath = Paths.get(source.getURI());
+                metaDataPath = Path.of(source.getURI());
             } catch (IOException e) {
                 LOGGER.error("Failed to get the URI of the metadata source " + source, e);
             }
