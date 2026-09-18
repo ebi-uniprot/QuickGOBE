@@ -1,6 +1,4 @@
 package uk.ac.ebi.quickgo.annotation.validation.service;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
 import uk.ac.ebi.quickgo.annotation.validation.model.ValidationEntity;
 
 import java.util.Arrays;
@@ -19,7 +17,6 @@ import static org.mockito.Mockito.when;
  * Time: 17:27
  * Created with IntelliJ IDEA.
  */
-@MockitoSettings(strictness = Strictness.LENIENT)
 class ValidationEntityCheckerTest {
     private ValidationEntityChecker checker;
 
