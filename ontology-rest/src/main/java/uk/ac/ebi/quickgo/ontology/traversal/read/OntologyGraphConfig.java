@@ -4,11 +4,11 @@ import org.slf4j.Logger;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.file.BufferedReaderFactory;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.LineMapper;
 import org.springframework.batch.item.file.MultiResourceItemReader;
@@ -28,7 +28,10 @@ import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
 import uk.ac.ebi.quickgo.ontology.traversal.OntologyGraph;
 import uk.ac.ebi.quickgo.ontology.traversal.OntologyGraphTraversal;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
@@ -43,7 +46,6 @@ import static org.slf4j.LoggerFactory.getLogger;
  * @author Edd
  */
 @Configuration
-@EnableBatchProcessing
 public class OntologyGraphConfig {
 
     private static final Logger LOGGER = getLogger(OntologyGraphConfig.class);
@@ -115,28 +117,16 @@ public class OntologyGraphConfig {
     @Bean
     MultiResourceItemReader<RawOntologyRelationship> ontologyTraversalMultiFileReader() {
         MultiResourceItemReader<RawOntologyRelationship> reader = new MultiResourceItemReader<>();
-
         setResourceComparator(reader);
-
-        try {
-            GZIPResource[] zippedResources = new GZIPResource[resources.length];
-            for (int i = 0; i < resources.length; i++) {
-                zippedResources[i] = new GZIPResource(resources[i]);
-            }
-
-            reader.setResources(zippedResources);
-            reader.setDelegate(ontologyTraversalSingleFileReader());
-        } catch (IOException e) {
-            LOGGER.error("Failed to populate ontology traversal graph, and therefore there will be " +
-                    "no graph operations supported, e.g., closures and slimming: ", e);
-        }
-
+        reader.setResources(resources);
+        reader.setDelegate(ontologyTraversalSingleFileReader());
         return reader;
     }
 
     @Bean
     FlatFileItemReader<RawOntologyRelationship> ontologyTraversalSingleFileReader() {
         FlatFileItemReader<RawOntologyRelationship> reader = new FlatFileItemReader<>();
+        reader.setBufferedReaderFactory(new GZipBufferedReaderFactory());
         reader.setLineMapper(ontologyRelationshipLineMapper());
         reader.setLinesToSkip(headerLines);
         return reader;
@@ -175,9 +165,9 @@ public class OntologyGraphConfig {
         reader.setComparator((o1, o2) -> 0);
     }
 
-    private static class GZIPResource extends InputStreamResource implements Resource {
-        GZIPResource(Resource delegate) throws IOException {
-            super(new GZIPInputStream(delegate.getInputStream()));
+    private static class GZipBufferedReaderFactory implements BufferedReaderFactory {
+        public BufferedReader create(Resource resource, String encoding) throws IOException {
+            return new BufferedReader(new InputStreamReader(new GZIPInputStream(resource.getInputStream()), encoding));
         }
     }
 }

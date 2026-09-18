@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpMethod;
@@ -29,7 +28,7 @@ import uk.ac.ebi.quickgo.annotation.model.AnnotationMocker;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationRequestBody;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.geneproduct.model.BasicGeneProduct;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.BasicOntology;
-import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
+import uk.ac.ebi.quickgo.common.store.SolrContainerTestSetup;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -66,10 +65,9 @@ import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.*;
  *
  * @author Edd
  */
-@ExtendWith(TemporarySolrDataStore.class)
 @SpringBootTest(classes = {AnnotationREST.class})
 @WebAppConfiguration
-class AnnotationControllerDownloadIT {
+class AnnotationControllerDownloadIT extends SolrContainerTestSetup {
     private static final int NUMBER_OF_GENERIC_DOCS = 200;
     private static final String DOWNLOAD_SEARCH_URL = "/annotation/downloadSearch";
     private static final String DOWNLOAD_LIMIT_PARAM = "downloadLimit";

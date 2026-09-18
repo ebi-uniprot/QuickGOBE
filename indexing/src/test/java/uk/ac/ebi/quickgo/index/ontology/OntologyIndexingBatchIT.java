@@ -3,15 +3,16 @@ package uk.ac.ebi.quickgo.index.ontology;
 import com.redfin.sitemapgenerator.WebSitemapGenerator;
 import org.hamcrest.core.Is;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.stubbing.Stubber;
 import org.slf4j.Logger;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.configuration.support.DefaultBatchConfiguration;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.test.JobLauncherTestUtils;
+import org.springframework.batch.test.context.SpringBatchTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,11 +20,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ActiveProfiles;
-import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
+import uk.ac.ebi.quickgo.common.store.SolrContainerTestSetup;
 import uk.ac.ebi.quickgo.index.QuickGOIndexMain;
+import uk.ac.ebi.quickgo.index.common.BatchConfig;
 import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
-import uk.ac.ebi.quickgo.index.common.JobTestRunnerConfig;
 import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
 
 import java.io.BufferedReader;
@@ -51,11 +51,10 @@ import static uk.ac.ebi.quickgo.ontology.common.document.OntologyDocMocker.creat
  * Created 18/12/15
  * @author Edd
  */
-@ExtendWith(TemporarySolrDataStore.class)
-@ActiveProfiles(profiles = {"embeddedServer"})
-@SpringBootTest(classes = {JobTestRunnerConfig.class, OntologyConfig.class, OntologyIndexingBatchIT.TestConfig.class})
+@SpringBootTest(classes = {OntologyConfig.class, OntologyIndexingBatchIT.TestConfig.class, DefaultBatchConfiguration.class, BatchConfig.class})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-class OntologyIndexingBatchIT {
+@SpringBatchTest
+class OntologyIndexingBatchIT extends SolrContainerTestSetup {
     @TempDir
     static File siteMapTempFolder;
 
@@ -66,7 +65,7 @@ class OntologyIndexingBatchIT {
     private OntologyReader reader;
 
     @Value("${indexing.ontology.skip.limit}")
-    private int skipLimit;
+    private long skipLimit;
 
     private static final String INVALID_TERM = "INVALID_TERM";
     private static final String GO = "go";
@@ -95,7 +94,7 @@ class OntologyIndexingBatchIT {
                 NULL
         );
 
-        int docCount = validDocsReadCount(resultsFromReadingSource);
+        long docCount = validDocsReadCount(resultsFromReadingSource);
         mockResponseFromReader(resultsFromReadingSource);
 
         JobExecution jobExecution = jobLauncherTestUtils.launchStep(ONTOLOGY_INDEXING_STEP_NAME);
@@ -104,7 +103,7 @@ class OntologyIndexingBatchIT {
         StepExecution step = jobExecution.getStepExecutions().iterator().next();
         assertThat(step.getReadCount(), is(docCount));
         assertThat(step.getWriteCount(), is(docCount));
-        assertThat(step.getSkipCount(), is(0));
+        assertThat(step.getSkipCount(), is(0L));
 
         checkSiteMapWasWritten(resultsFromReadingSource);
     }
@@ -118,7 +117,7 @@ class OntologyIndexingBatchIT {
                 NULL
         );
 
-        int docCount = validDocsReadCount(resultsFromReadingSource);
+        long docCount = validDocsReadCount(resultsFromReadingSource);
         mockResponseFromReader(resultsFromReadingSource);
 
         JobExecution jobExecution = jobLauncherTestUtils.launchStep(ONTOLOGY_INDEXING_STEP_NAME);
@@ -127,7 +126,7 @@ class OntologyIndexingBatchIT {
         StepExecution step = jobExecution.getStepExecutions().iterator().next();
         assertThat(step.getReadCount(), is(docCount));
         assertThat(step.getWriteCount(), is(docCount));
-        assertThat(step.getSkipCount(), is(1));
+        assertThat(step.getSkipCount(), is(1L));
 
         checkSiteMapWasWritten(resultsFromReadingSource);
     }
@@ -155,8 +154,8 @@ class OntologyIndexingBatchIT {
         assertThat(jobExecution.getStatus(), is(BatchStatus.FAILED));
 
         StepExecution step = jobExecution.getStepExecutions().iterator().next();
-        assertThat(step.getReadCount(), is(4));
-        assertThat(step.getWriteCount(), is(4));
+        assertThat(step.getReadCount(), is(4L));
+        assertThat(step.getWriteCount(), is(4L));
         assertThat(step.getSkipCount(), is(skipLimit));
 
         checkSiteMapWasWritten(asList(GO_DOC,
@@ -200,8 +199,8 @@ class OntologyIndexingBatchIT {
         assertThat(jobExecution.getStatus(), is(BatchStatus.FAILED));
 
         StepExecution step = jobExecution.getStepExecutions().iterator().next();
-        assertThat(step.getReadCount(), is(10));
-        assertThat(step.getWriteCount(), is(8));
+        assertThat(step.getReadCount(), is(10L));
+        assertThat(step.getWriteCount(), is(8L));
         assertThat(step.getSkipCount(), Is.is(skipLimit));
 
         checkSiteMapWasWritten(asList(
@@ -249,8 +248,8 @@ class OntologyIndexingBatchIT {
         }
     }
 
-    private int validDocsReadCount(List<OntologyReadResult> resultsFromReadingSource) {
-        return (int) resultsFromReadingSource.stream().filter(r -> r == ECO_DOC || r == GO_DOC).count();
+    private long validDocsReadCount(List<OntologyReadResult> resultsFromReadingSource) {
+        return resultsFromReadingSource.stream().filter(r -> r == ECO_DOC || r == GO_DOC).count();
     }
 
     /**
@@ -265,7 +264,7 @@ class OntologyIndexingBatchIT {
         File siteMapXml = new File(siteMapTempFolder, SITEMAP_XML);
         assertThat(siteMapXml.exists(), is(true));
 
-        int urlMatchCount = 0;
+        long urlMatchCount = 0;
         try (BufferedReader reader = Files.newBufferedReader(siteMapXml.toPath())) {
             String line = null;
             while ((line = reader.readLine()) != null) {

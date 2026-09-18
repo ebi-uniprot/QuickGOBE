@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpMethod;
@@ -25,7 +24,7 @@ import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.BasicOntology;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.BasicTaxonomyNode;
-import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
+import uk.ac.ebi.quickgo.common.store.SolrContainerTestSetup;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepoConfig;
 
 import java.util.ArrayList;
@@ -57,10 +56,9 @@ import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.*;
  * Created 07/04/17
  * @author Edd
  */
-@ExtendWith(TemporarySolrDataStore.class)
 @SpringBootTest(classes = {AnnotationREST.class, OntologyRepoConfig.class})
 @WebAppConfiguration
-class AnnotationTransformerControllerIT {
+class AnnotationTransformerControllerIT extends SolrContainerTestSetup {
     private static final String SEARCH_RESOURCE = "/annotation/search";
     private static final String BASE_URL = "https://localhost";
     private static final String GO_NAME_FIELD = "goName";

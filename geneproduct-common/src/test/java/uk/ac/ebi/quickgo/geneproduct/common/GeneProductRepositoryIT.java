@@ -3,11 +3,9 @@ package uk.ac.ebi.quickgo.geneproduct.common;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import uk.ac.ebi.quickgo.common.SolrCollectionName;
-import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
+import uk.ac.ebi.quickgo.common.store.SolrContainerTestSetup;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -23,10 +21,8 @@ import static uk.ac.ebi.quickgo.geneproduct.common.common.GeneProductDocMocker.c
 /**
  * Tests the behaviour of the {@link GeneProductRepository}
  */
-@ExtendWith(TemporarySolrDataStore.class)
 @SpringBootTest(classes = GeneProductRepoConfig.class)
-class GeneProductRepositoryIT {
-    private static final String COLLECTION = SolrCollectionName.GENE_PRODUCT;
+class GeneProductRepositoryIT extends SolrContainerTestSetup {
 
     @Autowired
     private GeneProductRepository geneProductRepository;

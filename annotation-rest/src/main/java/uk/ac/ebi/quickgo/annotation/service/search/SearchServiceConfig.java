@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.service.search;
 
-import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.request.SolrQuery;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
 import org.slf4j.Logger;

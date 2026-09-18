@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpMethod;
@@ -22,7 +21,7 @@ import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker;
 import uk.ac.ebi.quickgo.annotation.model.AnnotationRequestBody;
-import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
+import uk.ac.ebi.quickgo.common.store.SolrContainerTestSetup;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -61,10 +60,9 @@ import static uk.ac.ebi.quickgo.rest.search.query.QuickGOQuery.SELECT_ALL_WHERE_
  * Time: 14:21
  * Created with IntelliJ IDEA.
  */
-@ExtendWith(TemporarySolrDataStore.class)
 @SpringBootTest(classes = {AnnotationREST.class})
 @WebAppConfiguration
-class AnnotationControllerIT {
+class AnnotationControllerIT extends SolrContainerTestSetup {
     public static final String DATE_STRING_FORMAT = "%04d%02d%02d";
     public static final String EXACT = "exact";
     public static final String DESCENDANTS = "descendants";

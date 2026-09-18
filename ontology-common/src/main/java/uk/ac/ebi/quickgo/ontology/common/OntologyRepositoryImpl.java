@@ -1,11 +1,11 @@
 package uk.ac.ebi.quickgo.ontology.common;
 
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.request.SolrQuery;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import uk.ac.ebi.quickgo.common.SolrCollectionName;
-import uk.ac.ebi.quickgo.common.SolrCrudRepositoryImpl;
+import uk.ac.ebi.quickgo.common.repository.SolrCrudRepositoryImpl;
 
 import java.util.List;
 import java.util.stream.Collectors;

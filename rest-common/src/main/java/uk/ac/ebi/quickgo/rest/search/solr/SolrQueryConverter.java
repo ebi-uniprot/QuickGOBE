@@ -6,7 +6,7 @@ import com.google.common.base.Preconditions;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.request.SolrQuery;
 import org.apache.solr.common.params.CursorMarkParams;
 
 /**

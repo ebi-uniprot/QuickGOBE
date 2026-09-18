@@ -1,6 +1,7 @@
 package uk.ac.ebi.quickgo.index;
 
 import uk.ac.ebi.quickgo.index.annotation.AnnotationConfig;
+import uk.ac.ebi.quickgo.index.common.BatchConfig;
 import uk.ac.ebi.quickgo.index.geneproduct.GeneProductConfig;
 import uk.ac.ebi.quickgo.index.ontology.OntologyConfig;
 
@@ -25,7 +26,7 @@ import org.springframework.context.annotation.Import;
  * Created 02/12/15
  * @author Edd
  */
-@Import({OntologyConfig.class, GeneProductConfig.class, AnnotationConfig.class})
+@Import({OntologyConfig.class, GeneProductConfig.class, AnnotationConfig.class, BatchConfig.class})
 @SpringBootApplication
 public class QuickGOIndexMain {
     static <T> int run(Class<T> type, String[] args) {

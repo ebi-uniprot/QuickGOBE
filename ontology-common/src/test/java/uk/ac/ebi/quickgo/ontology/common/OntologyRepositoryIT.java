@@ -3,14 +3,12 @@ package uk.ac.ebi.quickgo.ontology.common;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import uk.ac.ebi.quickgo.common.QueryUtils;
-import uk.ac.ebi.quickgo.common.SolrCollectionName;
-import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
+import uk.ac.ebi.quickgo.common.store.SolrContainerTestSetup;
 import uk.ac.ebi.quickgo.ontology.common.document.OntologyDocMocker;
 
 import java.io.IOException;
@@ -32,11 +30,8 @@ import static org.hamcrest.core.IsNull.notNullValue;
  * @author Edd
  */
 
-// temporary data store for solr's data, which is automatically cleaned on exit
-@ExtendWith(TemporarySolrDataStore.class)
 @SpringBootTest(classes = OntologyRepoConfig.class)
-class OntologyRepositoryIT {
-    private static final String COLLECTION = SolrCollectionName.ONTOLOGY;
+class OntologyRepositoryIT extends SolrContainerTestSetup {
 
     @Autowired
     private OntologyRepository ontologyRepository;

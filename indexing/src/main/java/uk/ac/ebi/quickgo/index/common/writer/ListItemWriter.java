@@ -1,12 +1,10 @@
 package uk.ac.ebi.quickgo.index.common.writer;
 
 import java.util.List;
-import org.springframework.batch.item.Chunk;
-import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.file.FlatFileHeaderCallback;
+
+import org.springframework.batch.item.*;
 import org.springframework.batch.item.file.FlatFileItemWriter;
+import org.springframework.lang.NonNull;
 
 /**
  * Custom Spring Batch writer can process a list produced by an item processor.
@@ -16,7 +14,7 @@ import org.springframework.batch.item.file.FlatFileItemWriter;
  * Time: 16:47
  * Created with IntelliJ IDEA.
  */
-public class ListItemWriter<T> extends FlatFileItemWriter<List<T>> {
+public class ListItemWriter<T> implements ItemStreamWriter<List<T>> {
 
     private final FlatFileItemWriter<T> wrapped;
 
@@ -31,7 +29,7 @@ public class ListItemWriter<T> extends FlatFileItemWriter<List<T>> {
     }
 
     @Override
-    public void close() {
+    public void close() throws ItemStreamException {
         wrapped.close();
     }
 
@@ -52,7 +50,7 @@ public class ListItemWriter<T> extends FlatFileItemWriter<List<T>> {
     }
 
     @Override
-    public void setHeaderCallback(FlatFileHeaderCallback headerCallback) {
-        wrapped.setHeaderCallback(headerCallback);
+    public void write(@NonNull Chunk<? extends List<T>> chunk) throws Exception {
+        write(chunk.getItems());
     }
 }

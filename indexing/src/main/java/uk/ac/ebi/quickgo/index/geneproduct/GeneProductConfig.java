@@ -3,7 +3,6 @@ package uk.ac.ebi.quickgo.index.geneproduct;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.springframework.batch.core.*;
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
@@ -50,7 +49,6 @@ import java.util.List;
  * Sets up batch jobs for gene product indexing.
  */
 @Configuration
-@EnableBatchProcessing
 @Import({GeneProductRepoConfig.class})
 public class GeneProductConfig {
     static final String COLLECTION = SolrCollectionName.GENE_PRODUCT;

@@ -1,10 +1,10 @@
 package uk.ac.ebi.quickgo.geneproduct.common;
 
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.request.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import uk.ac.ebi.quickgo.common.SolrCollectionName;
-import uk.ac.ebi.quickgo.common.SolrCrudRepositoryImpl;
+import uk.ac.ebi.quickgo.common.repository.SolrCrudRepositoryImpl;
 
 import java.util.ArrayList;
 import java.util.List;

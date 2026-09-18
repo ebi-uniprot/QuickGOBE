@@ -2,12 +2,13 @@ package uk.ac.ebi.quickgo.index.annotation;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.configuration.support.DefaultBatchConfiguration;
 import org.springframework.batch.test.JobLauncherTestUtils;
+import org.springframework.batch.test.context.SpringBatchTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
@@ -16,11 +17,10 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.test.context.ActiveProfiles;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
-import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
+import uk.ac.ebi.quickgo.common.store.SolrContainerTestSetup;
 import uk.ac.ebi.quickgo.index.annotation.coterms.CoTermsConfigProperties;
-import uk.ac.ebi.quickgo.index.common.JobTestRunnerConfig;
+import uk.ac.ebi.quickgo.index.common.BatchConfig;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -41,11 +41,11 @@ import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermsConfig.CO_TERM_M
  * Created 22/04/16
  * @author Edd
  */
-@ExtendWith(TemporarySolrDataStore.class)
 @ActiveProfiles(profiles = {"embeddedServer"})
 @SpringBootTest(classes = {AnnotationIndexingBatchIT.TestConfig.class,
-                AnnotationIndexingConfig.class, JobTestRunnerConfig.class})
-class AnnotationIndexingBatchIT {
+                AnnotationIndexingConfig.class,  DefaultBatchConfiguration.class, BatchConfig.class})
+@SpringBatchTest
+class AnnotationIndexingBatchIT extends SolrContainerTestSetup {
     @TempDir
     private static Path basicTemporaryFolder;
 
@@ -73,10 +73,10 @@ class AnnotationIndexingBatchIT {
 
         StepExecution indexingStep = jobsSingleStepAsList.get(0);
 
-        assertThat(indexingStep.getReadCount(), is(8));
-        assertThat(indexingStep.getReadSkipCount(), is(0));
-        assertThat(indexingStep.getProcessSkipCount(), is(2));
-        assertThat(indexingStep.getWriteCount(), is(6));
+        assertThat(indexingStep.getReadCount(), is(8L));
+        assertThat(indexingStep.getReadSkipCount(), is(0L));
+        assertThat(indexingStep.getProcessSkipCount(), is(2L));
+        assertThat(indexingStep.getWriteCount(), is(6L));
 
         List<String> writtenAnnotationDocGeneProductIds =
                 getGeneProductIdsFromAnnotationDocuments(annotationRepository.findAll());
@@ -97,10 +97,10 @@ class AnnotationIndexingBatchIT {
                 .collect(Collectors.toList());
         assertThat(summarizeCoTermManualSteps, hasSize(1));
         StepExecution coTermsManualStep = summarizeCoTermManualSteps.get(0);
-        assertThat(coTermsManualStep.getReadCount(), is(4));
-        assertThat(coTermsManualStep.getReadSkipCount(), is(0));
-        assertThat(coTermsManualStep.getProcessSkipCount(), is(0));
-        assertThat(coTermsManualStep.getWriteCount(), is(4));
+        assertThat(coTermsManualStep.getReadCount(), is(4L));
+        assertThat(coTermsManualStep.getReadSkipCount(), is(0L));
+        assertThat(coTermsManualStep.getProcessSkipCount(), is(0L));
+        assertThat(coTermsManualStep.getWriteCount(), is(4L));
 
         List<StepExecution> summarizeCoTermAllSteps = jobExecution.getStepExecutions()
                 .stream()
@@ -108,10 +108,10 @@ class AnnotationIndexingBatchIT {
                 .collect(Collectors.toList());
         assertThat(summarizeCoTermAllSteps, hasSize(1));
         StepExecution coTermsAllStep = summarizeCoTermAllSteps.get(0);
-        assertThat(coTermsAllStep.getReadCount(), is(5));
-        assertThat(coTermsAllStep.getReadSkipCount(), is(0));
-        assertThat(coTermsAllStep.getProcessSkipCount(), is(0));
-        assertThat(coTermsAllStep.getWriteCount(), is(5));
+        assertThat(coTermsAllStep.getReadCount(), is(5L));
+        assertThat(coTermsAllStep.getReadSkipCount(), is(0L));
+        assertThat(coTermsAllStep.getProcessSkipCount(), is(0L));
+        assertThat(coTermsAllStep.getWriteCount(), is(5L));
         assertThat(coTermsAllStep.getExecutionContext().get("FlatFileItemWriter.written"), is(7L));
 
         //Has finished

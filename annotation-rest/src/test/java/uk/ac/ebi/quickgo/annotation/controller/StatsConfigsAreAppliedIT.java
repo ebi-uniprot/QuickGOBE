@@ -2,7 +2,6 @@ package uk.ac.ebi.quickgo.annotation.controller;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
@@ -20,7 +19,7 @@ import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker;
 import uk.ac.ebi.quickgo.annotation.service.statistics.RequiredStatisticsProvider;
 import uk.ac.ebi.quickgo.annotation.service.statistics.StatisticsTypeConfigurer;
-import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
+import uk.ac.ebi.quickgo.common.store.SolrContainerTestSetup;
 
 import java.util.HashMap;
 import java.util.List;
@@ -46,10 +45,9 @@ import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.totalNumO
  */
 
 // temporary data store for solr's data, which is automatically cleaned on exit
-@ExtendWith(TemporarySolrDataStore.class)
 @SpringBootTest(classes = {AnnotationREST.class, StatsConfigsAreAppliedIT.TestStatsTypeConfig.class})
 @WebAppConfiguration
-class StatsConfigsAreAppliedIT {
+class StatsConfigsAreAppliedIT extends SolrContainerTestSetup {
     private static final String GO_ID = "goId";
     private static final String TAXON_ID = "taxonId";
 

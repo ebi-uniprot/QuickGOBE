@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.ItemWriteListener;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecutionListener;
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
@@ -14,7 +13,6 @@ import org.springframework.batch.item.file.FlatFileItemWriter;
 import org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor;
 import org.springframework.batch.item.file.transform.DelimitedLineAggregator;
 import org.springframework.batch.item.file.transform.LineAggregator;
-import org.springframework.batch.item.file.transform.PassThroughLineAggregator;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +47,6 @@ import static com.google.common.base.Preconditions.checkArgument;
  */
 @Configuration
 @EnableConfigurationProperties
-@EnableBatchProcessing
 public class CoTermsConfig {
 
     private static final String ELECTRONIC = "IEA";
@@ -154,9 +151,7 @@ public class CoTermsConfig {
     }
 
     private ListItemWriter<CoTerm> listItemFlatFileWriter(WritableResource outputFile) {
-        ListItemWriter<CoTerm> listWriter = new ListItemWriter<>(flatFileWriter(outputFile));
-        listWriter.setLineAggregator(new PassThroughLineAggregator<>());
-        return listWriter;
+        return new ListItemWriter<>(flatFileWriter(outputFile));
     }
 
     private FlatFileItemWriter<CoTerm> flatFileWriter(WritableResource outputFile) {

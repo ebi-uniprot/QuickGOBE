@@ -34,7 +34,7 @@ geneproduct:
   db:
     xref:
       valid:
-        regexes: /home/rizwan/tools/quickgo-local/ff/DB_XREFS_ENTITIES.dat.gz
+        regexes: /Users/rishtiaq/tools/quickgo-local/ff/DB_XREFS_ENTITIES.dat.gz
         casesensitive: false
 
 ## =============== Search =================
@@ -47,14 +47,14 @@ annotation:
         fields: ['assignedBy', 'evidenceCode', 'goEvidence', 'goId', 'dbSubset', 'geneProductType', 'qualifier',
                  'targetSet', 'taxonId', 'geneProductId']
   validation:
-    validationResource: file:/home/rizwan/tools/quickgo-local/ff/DB_XREFS_ENTITIES.dat.gz
+    validationResource: file:/Users/rishtiaq/tools/quickgo-local/ff/DB_XREFS_ENTITIES.dat.gz
     chunk: 30
     headerLines: 1
     reference_dbs: ['pmid', 'doi', 'go_ref', 'reactome']
   download:
     sort:
       fields: 'id'
-    ontologySource: file:/home/rizwan/tools/quickgo-local/ff/ONTOLOGY_IRI.dat.gz
+    ontologySource: file:/Users/rishtiaq/tools/quickgo-local/ff/ONTOLOGY_IRI.dat.gz
     taskExecutor:
       corePoolSize: 10
       maxPoolSize: 20
@@ -64,7 +64,7 @@ annotation:
       waitForTasksToCompleteOnShutdown: true
     defaultEmitterTimeout: 18000000
   metadata:
-    source: file:/home/rizwan/tools/quickgo-local/ff/goa_uniprot.gpa-version
+    source: file:/Users/rishtiaq/tools/quickgo-local/ff/goa_uniprot.gpa-version
   stats:
     typeLimits:
       goId: 11

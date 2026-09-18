@@ -2,16 +2,15 @@ package uk.ac.ebi.quickgo.index.annotation;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.MockitoAnnotations;
-import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.*;
+import org.springframework.batch.core.configuration.support.DefaultBatchConfiguration;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.test.JobLauncherTestUtils;
+import org.springframework.batch.test.context.SpringBatchTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
@@ -19,8 +18,8 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.test.context.ActiveProfiles;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
-import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
-import uk.ac.ebi.quickgo.index.common.JobTestRunnerConfig;
+import uk.ac.ebi.quickgo.common.store.SolrContainerTestSetup;
+import uk.ac.ebi.quickgo.index.common.BatchConfig;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -46,11 +45,11 @@ import static uk.ac.ebi.quickgo.index.annotation.AnnotationConfig.ANNOTATION_IND
  * Created 22/04/16
  * @author Edd
  */
-@ExtendWith(TemporarySolrDataStore.class)
 @ActiveProfiles(profiles = {"embeddedServer", "tooManySolrRemoteHostErrors"})
-@SpringBootTest(classes = {AnnotationIndexingConfig.class, JobTestRunnerConfig.class,
+@SpringBootTest(classes = {AnnotationIndexingConfig.class, DefaultBatchConfiguration.class, BatchConfig.class,
                 AnnotationIndexingRetriesSolrWritesWithFailureIT.RetryConfig.class})
-class AnnotationIndexingRetriesSolrWritesWithFailureIT {
+@SpringBatchTest
+class AnnotationIndexingRetriesSolrWritesWithFailureIT extends SolrContainerTestSetup {
 
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
@@ -88,11 +87,11 @@ class AnnotationIndexingRetriesSolrWritesWithFailureIT {
 
         StepExecution indexingStep = jobsSingleStepAsList.get(0);
 
-        assertThat(indexingStep.getReadCount(), is(8));
-        assertThat(indexingStep.getReadSkipCount(), is(0));
-        assertThat(indexingStep.getProcessSkipCount(), is(2));
-        assertThat(indexingStep.getWriteSkipCount(), is(0));
-        assertThat(indexingStep.getWriteCount(), is(5));
+        assertThat(indexingStep.getReadCount(), is(8L));
+        assertThat(indexingStep.getReadSkipCount(), is(0L));
+        assertThat(indexingStep.getProcessSkipCount(), is(2L));
+        assertThat(indexingStep.getWriteSkipCount(), is(0L));
+        assertThat(indexingStep.getWriteCount(), is(5L));
 
         verify(annotationSolrServerWriter, times(6)).write(argumentCaptor.capture());
         List<List<AnnotationDocument>> docsSentToBeWritten = argumentCaptor.getAllValues().stream().map(Chunk::getItems).toList();

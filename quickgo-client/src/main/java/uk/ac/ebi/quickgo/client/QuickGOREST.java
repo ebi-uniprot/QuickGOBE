@@ -18,7 +18,7 @@ import uk.ac.ebi.quickgo.client.service.search.SearchServiceConfig;
         "uk.ac.ebi.quickgo.client.controller",
         "uk.ac.ebi.quickgo.rest"
 })
-@Import({SearchServiceConfig.class, PresetsConfig.class})
+@Import({SearchServiceConfig.class, PresetsConfig.class, BatchConfig.class})
 public class QuickGOREST {
 
     public static void main(String[] args) {

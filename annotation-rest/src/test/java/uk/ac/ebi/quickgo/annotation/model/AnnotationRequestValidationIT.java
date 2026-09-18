@@ -5,15 +5,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import uk.ac.ebi.quickgo.annotation.IdGeneratorUtil;
-import uk.ac.ebi.quickgo.annotation.validation.loader.ValidationConfig;
-import uk.ac.ebi.quickgo.annotation.validation.service.JobTestRunnerConfig;
 import uk.ac.ebi.quickgo.rest.ParameterException;
 import uk.ac.ebi.quickgo.rest.controller.request.ArrayPattern;
 
@@ -31,22 +26,17 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static uk.ac.ebi.quickgo.annotation.IdGeneratorUtil.generateValues;
 import static uk.ac.ebi.quickgo.annotation.model.AnnotationRequest.*;
-import static uk.ac.ebi.quickgo.annotation.validation.loader.ValidationConfig.LOAD_ANNOTATION_DBX_REF_ENTITIES_STEP_NAME;
 import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.*;
 
 /**
  * Tests that the validation added to the {@link AnnotationRequest} class is correct.
  */
-@SpringBootTest(classes = {AnnotationRequestConfig.class, ValidationConfig.class, JobTestRunnerConfig.class})
+@SpringBootTest
 class AnnotationRequestValidationIT {
     private static final String[] VALID_GENE_PRODUCT_ID = {"A0A000", "A0A003"};
-    private static boolean HAS_RUN = false;
 
     @Autowired
     private Validator validator;
-
-    @Autowired
-    private JobLauncherTestUtils jobLauncherTestUtils;
 
     private AnnotationRequest annotationRequest;
 
@@ -685,7 +675,6 @@ class AnnotationRequestValidationIT {
     // WITH/FROM PARAMETER
     @Test
     void withFromIsValid() {
-        setupDbXrefValidationData();
         String[] refs = new String[]{"PMID:123456"};
         annotationRequest.setWithFrom(refs);
         Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
@@ -694,7 +683,6 @@ class AnnotationRequestValidationIT {
 
     @Test
     void withFromIsInvalid() {
-        setupDbXrefValidationData();
         String[] refs = new String[]{"PMID:ZZZZZZZZ"};
         annotationRequest.setWithFrom(refs);
         Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
@@ -704,8 +692,6 @@ class AnnotationRequestValidationIT {
     // REFERENCE PARAMETER
     @Test
     void exceedingMaximumNumberOfReferencesSendsError() {
-        setupDbXrefValidationData();
-
         int numRefs = AnnotationRequest.MAX_REFERENCES + 1;
         List<String> refs = IntStream.range(0, numRefs)
                 .mapToObj(i -> "PMID:123456")
@@ -720,7 +706,6 @@ class AnnotationRequestValidationIT {
 
     @Test
     void referenceIsValid() {
-        setupDbXrefValidationData();
         String[] refs = new String[]{"PMID:123456"};
         annotationRequest.setReference(refs);
         Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
@@ -729,7 +714,6 @@ class AnnotationRequestValidationIT {
 
     @Test
     void referenceIsInvalid() {
-        setupDbXrefValidationData();
         String[] refs = new String[]{"PMID:ZZZZZZZZ"};
         annotationRequest.setReference(refs);
         Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
@@ -893,12 +877,4 @@ class AnnotationRequestValidationIT {
         return "Number of items in '" + paramName + "' is larger than: " + maxSize;
     }
 
-    private void setupDbXrefValidationData() {
-        if (!HAS_RUN) {
-            JobExecution jobExecution = jobLauncherTestUtils.launchStep(LOAD_ANNOTATION_DBX_REF_ENTITIES_STEP_NAME);
-            assertThat(jobExecution.getStatus(), is(BatchStatus.COMPLETED));
-            HAS_RUN = true;
-        }
-
-    }
 }

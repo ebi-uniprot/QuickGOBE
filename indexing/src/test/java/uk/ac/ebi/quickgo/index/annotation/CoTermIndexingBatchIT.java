@@ -5,14 +5,16 @@ import org.junit.jupiter.api.io.TempDir;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.configuration.support.DefaultBatchConfiguration;
 import org.springframework.batch.test.JobLauncherTestUtils;
+import org.springframework.batch.test.context.SpringBatchTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import uk.ac.ebi.quickgo.index.annotation.coterms.CoTermsConfigProperties;
-import uk.ac.ebi.quickgo.index.common.JobTestRunnerConfig;
+import uk.ac.ebi.quickgo.index.common.BatchConfig;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -33,7 +35,8 @@ import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTermsConfig.CO_TERM_M
  * @author Edd
  */
 @SpringBootTest(classes = {CoTermIndexingBatchIT.TestConfig.class, CoTermIndexingConfig.class,
-  JobTestRunnerConfig.class})
+  DefaultBatchConfiguration.class, BatchConfig.class})
+@SpringBatchTest
 class CoTermIndexingBatchIT {
 
     @TempDir
@@ -56,10 +59,10 @@ class CoTermIndexingBatchIT {
 
         StepExecution readingStep = jobsSingleStepAsList.get(0);
 
-        assertThat(readingStep.getReadCount(), is(8));
-        assertThat(readingStep.getReadSkipCount(), is(0));
-        assertThat(readingStep.getProcessSkipCount(), is(2));
-        assertThat(readingStep.getWriteCount(), is(6));
+        assertThat(readingStep.getReadCount(), is(8L));
+        assertThat(readingStep.getReadSkipCount(), is(0L));
+        assertThat(readingStep.getProcessSkipCount(), is(2L));
+        assertThat(readingStep.getWriteCount(), is(6L));
 
         //Manual
         List<StepExecution> summarizeCoTermManualSteps = jobExecution.getStepExecutions()
@@ -69,10 +72,10 @@ class CoTermIndexingBatchIT {
                 .collect(Collectors.toList());
         assertThat(summarizeCoTermManualSteps, hasSize(1));
         StepExecution coTermsManualStep = summarizeCoTermManualSteps.get(0);
-        assertThat(coTermsManualStep.getReadCount(), is(4));
-        assertThat(coTermsManualStep.getReadSkipCount(), is(0));
-        assertThat(coTermsManualStep.getProcessSkipCount(), is(0));
-        assertThat(coTermsManualStep.getWriteCount(), is(4));
+        assertThat(coTermsManualStep.getReadCount(), is(4L));
+        assertThat(coTermsManualStep.getReadSkipCount(), is(0L));
+        assertThat(coTermsManualStep.getProcessSkipCount(), is(0L));
+        assertThat(coTermsManualStep.getWriteCount(), is(4L));
 
         List<StepExecution> summarizeCoTermAllSteps = jobExecution.getStepExecutions()
                 .stream()
@@ -81,10 +84,10 @@ class CoTermIndexingBatchIT {
                 .collect(Collectors.toList());
         assertThat(summarizeCoTermAllSteps, hasSize(1));
         StepExecution coTermsAllStep = summarizeCoTermAllSteps.get(0);
-        assertThat(coTermsAllStep.getReadCount(), is(5));
-        assertThat(coTermsAllStep.getReadSkipCount(), is(0));
-        assertThat(coTermsAllStep.getProcessSkipCount(), is(0));
-        assertThat(coTermsAllStep.getWriteCount(), is(5));
+        assertThat(coTermsAllStep.getReadCount(), is(5L));
+        assertThat(coTermsAllStep.getReadSkipCount(), is(0L));
+        assertThat(coTermsAllStep.getProcessSkipCount(), is(0L));
+        assertThat(coTermsAllStep.getWriteCount(), is(5L));
         assertThat(coTermsAllStep.getExecutionContext().get("FlatFileItemWriter.written"), is(7L));
 
         //Has finished

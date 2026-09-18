@@ -3,11 +3,13 @@ package uk.ac.ebi.quickgo.client.service.loader.presets;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.configuration.support.DefaultBatchConfiguration;
 import org.springframework.batch.test.JobLauncherTestUtils;
+import org.springframework.batch.test.context.SpringBatchTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.web.WebAppConfiguration;
+import uk.ac.ebi.quickgo.client.BatchConfig;
 import uk.ac.ebi.quickgo.client.model.presets.CompositePreset;
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
 import uk.ac.ebi.quickgo.client.service.loader.presets.assignedby.AssignedByPresetsConfig;
@@ -30,8 +32,8 @@ import static org.hamcrest.Matchers.hasSize;
  * Created 31/08/16
  * @author Edd
  */
-@SpringBootTest(classes = {PresetsConfig.class, MockPresetDataConfig.class, JobTestRunnerConfig.class})
-@WebAppConfiguration
+@SpringBootTest(classes = {PresetsConfig.class, MockPresetDataConfig.class, DefaultBatchConfiguration.class, BatchConfig.class})
+@SpringBatchTest
 @ActiveProfiles(profiles = {MockPresetDataConfig.FAILED_FETCHING, MockPresetDataConfig.NO_SEARCH_ATTRIBUTES})
 class PresetsFailedRelevancyFetchingIT {
     @Autowired

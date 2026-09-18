@@ -17,7 +17,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.batch.core.*;
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
@@ -44,7 +43,6 @@ import org.apache.solr.client.solrj.SolrClient;
  * @author Tony Wardell
  */
 @Configuration
-@EnableBatchProcessing
 @Import({AnnotationRepoConfig.class, CoTermsConfig.class, AnnotationConfig.class})
 public class CoTermIndexingConfig {
     static final String COTERM_INDEXING_JOB_NAME = "coTermIndexingJob";

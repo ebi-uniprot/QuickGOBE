@@ -2,7 +2,6 @@ package uk.ac.ebi.quickgo.geneproduct.controller;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -11,7 +10,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
+import uk.ac.ebi.quickgo.common.store.SolrContainerTestSetup;
 import uk.ac.ebi.quickgo.geneproduct.GeneProductREST;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductDocument;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepository;
@@ -36,11 +35,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @author Tony Wardell
  * Date: 04/04/2016
  */
-// temporary data store for solr's data, which is automatically cleaned on exit
-@ExtendWith(TemporarySolrDataStore.class)
 @SpringBootTest(classes = {GeneProductREST.class})
 @WebAppConfiguration
-class GeneProductControllerIT {
+class GeneProductControllerIT extends SolrContainerTestSetup {
     private static final String RESOURCE_URL = "/geneproduct";
 
     protected static final String COMMA = ",";
@@ -174,11 +171,10 @@ class GeneProductControllerIT {
     }
 
     @Test
-    void targetSetLookUpUsingEmptyStringReturnsBadRequest() throws Exception {
+    void targetSetLookUpUsingEmptyStringReturnsNotFound() throws Exception {
         ResultActions result = mockMvc.perform(get(buildGeneProductTargetSetURL("")));
         result.andDo(print())
-                .andExpect(jsonPath("$.messages", hasItem(is("Provided ID: 'targetset' is invalid"))))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isNotFound());
     }
 
     private ResultActions expectFields(ResultActions result, String id, String path) throws Exception {

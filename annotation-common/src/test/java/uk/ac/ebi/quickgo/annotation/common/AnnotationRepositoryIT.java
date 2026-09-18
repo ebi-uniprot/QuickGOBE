@@ -2,11 +2,10 @@ package uk.ac.ebi.quickgo.annotation.common;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
-import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
+import uk.ac.ebi.quickgo.common.store.SolrContainerTestSetup;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -19,10 +18,8 @@ import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.c
  * @author Edd
  */
 
-// temporary data store for solr's data, which is automatically cleaned on exit
-@ExtendWith(TemporarySolrDataStore.class)
 @SpringBootTest(classes = AnnotationRepoConfig.class)
-class AnnotationRepositoryIT {
+class AnnotationRepositoryIT extends SolrContainerTestSetup {
 
     @Autowired
     private AnnotationRepository annotationRepository;

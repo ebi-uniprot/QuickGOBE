@@ -1,11 +1,14 @@
 package uk.ac.ebi.quickgo.index.annotation.coterms;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.batch.core.configuration.support.DefaultBatchConfiguration;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.test.context.SpringBatchTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
+import uk.ac.ebi.quickgo.index.common.BatchConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +28,8 @@ import static uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker.c
  * Time: 14:16
  * Created with IntelliJ IDEA.
  */
-@SpringBootTest(classes = {CoTermsConfig.class})
+@SpringBootTest(classes = {CoTermsConfig.class, DefaultBatchConfiguration.class, BatchConfig.class})
+@SpringBatchTest
 @DirtiesContext(classMode = AFTER_EACH_TEST_METHOD)
 class CoTermsProcessingAndCalculationIT {
 

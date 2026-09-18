@@ -7,7 +7,6 @@ import uk.ac.ebi.quickgo.index.common.GZipBufferedReaderFactory;
 import uk.ac.ebi.quickgo.index.common.SolrServerWriter;
 
 import java.util.function.Function;
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
@@ -36,7 +35,6 @@ import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.T
  * @author Edd
  */
 @Configuration
-@EnableBatchProcessing
 @Import({AnnotationRepoConfig.class})
 public class AnnotationConfig {
     static final String COLLECTION = SolrCollectionName.ANNOTATION;

@@ -1,6 +1,5 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.cache.CacheManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,7 +18,7 @@ import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker;
 import uk.ac.ebi.quickgo.common.QuickGODocument;
-import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
+import uk.ac.ebi.quickgo.common.store.SolrContainerTestSetup;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -47,10 +46,9 @@ import static uk.ac.ebi.quickgo.annotation.controller.StatsResponseVerifier.*;
  * Tests the behaviour of the statistics endpoint of the {@link AnnotationController}.
  */
 // temporary data store for solr's data, which is automatically cleaned on exit
-@ExtendWith(TemporarySolrDataStore.class)
 @SpringBootTest(classes = {AnnotationREST.class})
 @WebAppConfiguration
-class AnnotationControllerStatisticsIT {
+class AnnotationControllerStatisticsIT extends SolrContainerTestSetup {
     private static final String RESOURCE_URL = "/annotation";
     private static final String STATS_ENDPOINT = RESOURCE_URL + "/stats";
     private static final String GO_TERM_NAME = "catalytic activity";

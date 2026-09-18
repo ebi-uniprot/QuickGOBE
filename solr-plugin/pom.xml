@@ -16,9 +16,11 @@
     <packaging>jar</packaging>
 
     <dependencies>
+        <!-- Explicitly add lucene-core which contains ClassicSimilarity -->
         <dependency>
-            <groupId>org.apache.solr</groupId>
-            <artifactId>solr-core</artifactId>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-core</artifactId>
+            <version>10.3.2</version>
         </dependency>
     </dependencies>
 

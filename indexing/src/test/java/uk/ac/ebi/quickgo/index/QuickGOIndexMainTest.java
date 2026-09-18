@@ -6,7 +6,6 @@ import uk.ac.ebi.quickgo.index.common.listener.LogJobListener;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemReader;
@@ -47,7 +46,6 @@ class QuickGOIndexMainTest {
 
     @Configuration
     @EnableAutoConfiguration
-    @EnableBatchProcessing
     abstract static class TestApp {
         static final int ITEM_COUNT = 10;
         int itemCount = 0;
@@ -120,7 +118,7 @@ class QuickGOIndexMainTest {
         }
 
         public static void main(String[] args) {
-            System.exit(QuickGOIndexMain.run(SuccessfulTestApp.class, args));
+            System.exit(QuickGOIndexMain.run(FailingTestApp.class, args));
         }
     }
 }

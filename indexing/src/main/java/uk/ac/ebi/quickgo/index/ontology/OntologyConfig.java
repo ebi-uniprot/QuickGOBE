@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemWriter;
@@ -30,7 +29,6 @@ import org.springframework.context.annotation.Import;
  * @author Edd
  */
 @Configuration
-@EnableBatchProcessing
 @Import({OntologyRepoConfig.class, OntologySiteMapConfig.class})
 public class OntologyConfig {
     static final String ONTOLOGY_INDEXING_JOB_NAME = "ontologyIndexingJob";

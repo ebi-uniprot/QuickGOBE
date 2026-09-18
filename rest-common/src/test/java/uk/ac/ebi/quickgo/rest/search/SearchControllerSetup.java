@@ -12,7 +12,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
+import uk.ac.ebi.quickgo.common.store.SolrContainerTestSetup;
 
 import java.util.stream.Stream;
 
@@ -27,9 +27,9 @@ import static uk.ac.ebi.quickgo.rest.controller.ControllerValidationHelperImpl.D
  * is capable of providing the client with a workable response.
  *
  */
-@ExtendWith({SpringExtension.class, TemporarySolrDataStore.class})
+@ExtendWith({SpringExtension.class})
 @WebAppConfiguration
-public abstract class SearchControllerSetup {
+public abstract class SearchControllerSetup extends SolrContainerTestSetup {
     private static final String QUERY_PARAM = "query";
     private static final String FACET_PARAM = "facet";
     private static final String PAGE_PARAM = "page";

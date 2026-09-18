@@ -6,7 +6,7 @@ import uk.ac.ebi.quickgo.rest.search.query.*;
 
 import java.util.HashSet;
 import java.util.Set;
-import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.request.SolrQuery;
 import org.apache.solr.common.params.CursorMarkParams;
 
 import static org.hamcrest.CoreMatchers.is;

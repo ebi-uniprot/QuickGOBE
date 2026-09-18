@@ -1,6 +1,5 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.cache.CacheManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,7 +20,7 @@ import uk.ac.ebi.quickgo.annotation.IdGeneratorUtil;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
 import uk.ac.ebi.quickgo.annotation.common.document.AnnotationDocMocker;
-import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
+import uk.ac.ebi.quickgo.common.store.SolrContainerTestSetup;
 
 import java.util.List;
 import java.util.function.Function;
@@ -45,10 +44,9 @@ import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.*;
  * Time: 13:41
  * Created with IntelliJ IDEA.
  */
-@ExtendWith(TemporarySolrDataStore.class)
 @SpringBootTest(classes = {AnnotationREST.class})
 @WebAppConfiguration
-class AnnotationControllerStatisticsDownloadIT {
+class AnnotationControllerStatisticsDownloadIT extends SolrContainerTestSetup {
     private static final int NUMBER_OF_GENERIC_DOCS = 5;
     private static final String DOWNLOAD_STATISTICS_SEARCH_URL = "/annotation/downloadStats";
     private static final String NUMBER_OF_GO_ID_RESULTS_FOR_ANNOTATIONS =

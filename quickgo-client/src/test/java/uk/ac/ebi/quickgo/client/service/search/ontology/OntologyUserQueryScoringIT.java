@@ -2,7 +2,6 @@ package uk.ac.ebi.quickgo.client.service.search.ontology;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -10,7 +9,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.ac.ebi.quickgo.client.QuickGOREST;
-import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
+import uk.ac.ebi.quickgo.common.store.SolrContainerTestSetup;
 import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepository;
 import uk.ac.ebi.quickgo.ontology.common.OntologyType;
@@ -35,10 +34,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * <b>Note: This class should be used solely for functional tests on the user query, and no other section of the user
  * request.</b>
  */
-@ExtendWith(TemporarySolrDataStore.class)
 @SpringBootTest(classes = {QuickGOREST.class})
 @WebAppConfiguration
-class OntologyUserQueryScoringIT {
+class OntologyUserQueryScoringIT extends SolrContainerTestSetup {
     private static final String RESOURCE_URL = "/internal/search/ontology";
     private static final String QUERY_PARAM = "query";
 

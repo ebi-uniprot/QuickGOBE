@@ -2,14 +2,13 @@ package uk.ac.ebi.quickgo.geneproduct.search;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
+import uk.ac.ebi.quickgo.common.store.SolrContainerTestSetup;
 import uk.ac.ebi.quickgo.geneproduct.GeneProductREST;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductDocument;
 import uk.ac.ebi.quickgo.geneproduct.common.GeneProductRepository;
@@ -58,11 +57,9 @@ import static uk.ac.ebi.quickgo.geneproduct.common.common.GeneProductDocMocker.c
  * Created 04/04/16
  * @author Edd
  */
-// temporary data store for solr's data, which is automatically cleaned on exit
-@ExtendWith(TemporarySolrDataStore.class)
 @SpringBootTest(classes = {GeneProductREST.class})
 @WebAppConfiguration
-class GeneProductUserQueryScoringIT {
+class GeneProductUserQueryScoringIT extends SolrContainerTestSetup {
     /*
      * TODO: fix behaviour documented in https://www.ebi.ac.uk/panda/jira/browse/GOA-2041
      */

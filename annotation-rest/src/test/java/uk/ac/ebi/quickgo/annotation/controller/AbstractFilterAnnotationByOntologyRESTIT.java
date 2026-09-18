@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpMethod;
@@ -23,7 +22,7 @@ import uk.ac.ebi.quickgo.annotation.AnnotationREST;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationRepository;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.OntologyRelatives;
-import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
+import uk.ac.ebi.quickgo.common.store.SolrContainerTestSetup;
 import uk.ac.ebi.quickgo.ontology.common.OntologyRepoConfig;
 
 import java.util.ArrayList;
@@ -54,11 +53,9 @@ import static uk.ac.ebi.quickgo.annotation.controller.ResponseVerifier.*;
  * Created 02/11/16
  * @author Edd
  */
-// temporary data store for solr's data, which is automatically cleaned on exit
-@ExtendWith(TemporarySolrDataStore.class)
 @SpringBootTest(classes = {AnnotationREST.class, OntologyRepoConfig.class})
 @WebAppConfiguration
-public abstract class AbstractFilterAnnotationByOntologyRESTIT {
+public abstract class AbstractFilterAnnotationByOntologyRESTIT extends SolrContainerTestSetup {
     static final String FAILED_REST_FETCH_PREFIX = "Failed to fetch REST response due to: ";
     static final String IS_A = "is_a";
     static final String SLIM_USAGE = "slim";

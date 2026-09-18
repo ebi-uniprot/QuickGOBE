@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.test.JobLauncherTestUtils;
+import org.springframework.batch.test.context.SpringBatchTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
@@ -23,7 +24,8 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
  * Created 18/05/16
  * @author Edd
  */
-@SpringBootTest(classes = {OntologyGraphConfig.class, JobTestRunnerConfig.class})
+@SpringBootTest
+@SpringBatchTest
 @TestPropertySource(properties = "ontology.traversal.source=classpath:/relations/RELATIONS.dat.gz,classpath:/relations/ECO_RELATIONS.dat.gz")
 class OntologyGraphConfigIT {
 

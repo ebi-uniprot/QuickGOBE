@@ -54,7 +54,7 @@ public class EvidencePresetsConfig {
                 .<RawEvidenceNamedPreset, RawEvidenceNamedPreset>chunk(chunkSize, transactionManager)
                 .faultTolerant()
                 .skipLimit(SKIP_LIMIT)
-                .<RawEvidenceNamedPreset>reader(rawPresetMultiFileReader(resources, itemReader, Optional::of))
+                .<RawEvidenceNamedPreset>reader(rawPresetMultiFileReader(resources, itemReader))
                 .processor(rawPresetValidator())
                 .writer(rawPresetWriter(presets))
                 .listener(new LogStepListener())

@@ -1,6 +1,5 @@
 package uk.ac.ebi.quickgo.client.service.loader.presets;
 
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -17,7 +16,6 @@ import uk.ac.ebi.quickgo.rest.search.request.converter.RESTFilterConverterFactor
  * @author Edd
  */
 @Configuration
-@EnableBatchProcessing
 @ComponentScan({"uk.ac.ebi.quickgo.rest"})
 public class PresetsCommonConfig {
     @Value("${preset.chunk.size:500}")

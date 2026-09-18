@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.common.repository;
 
-import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.request.SolrQuery;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;

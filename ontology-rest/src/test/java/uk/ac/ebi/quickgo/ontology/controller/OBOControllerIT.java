@@ -4,7 +4,6 @@ import org.apache.hc.core5.http.HttpHeaders;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,7 +15,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
+import uk.ac.ebi.quickgo.common.store.SolrContainerTestSetup;
 import uk.ac.ebi.quickgo.graphics.model.GraphImageLayout;
 import uk.ac.ebi.quickgo.graphics.ontology.GraphImage;
 import uk.ac.ebi.quickgo.graphics.ontology.GraphImageResult;
@@ -54,11 +53,9 @@ import static uk.ac.ebi.quickgo.ontology.controller.OBOController.*;
  *
  * Created by edd on 14/01/2016.
  */
-// temporary data store for solr's data, which is automatically cleaned on exit
-@ExtendWith(TemporarySolrDataStore.class)
-@SpringBootTest(classes = {OntologyREST.class})
+@SpringBootTest
 @WebAppConfiguration
-public abstract class OBOControllerIT {
+public abstract class OBOControllerIT extends SolrContainerTestSetup {
     private static final int WAIT_PERIOD = 10;
     private static final String QUERY_PARAM = "query";
     private static final String PAGE_PARAM = "page";
@@ -1249,9 +1246,7 @@ public abstract class OBOControllerIT {
                 .andDo(print())
                 .andExpect(jsonPath("$.url", is(requestUrl(result))))
                 .andExpect(jsonPath("$.messages", hasItem(containsString(
-                        "Failed to convert property value of type 'java.lang.String' to required type" +
-                          " 'boolean' for property 'showKey'; nested exception is java.lang.IllegalArgumentException:" +
-                          " Invalid boolean value [bloom]"))));
+                        "Failed to convert property value of type 'java.lang.String' to required type 'boolean' for property 'showKey'; Invalid boolean value [bloom]"))));
     }
 
     protected ResultActions expectInvalidRelationError(ResultActions result, String relation) throws Exception {

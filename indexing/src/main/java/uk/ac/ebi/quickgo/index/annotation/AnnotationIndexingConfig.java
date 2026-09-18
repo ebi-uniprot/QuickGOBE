@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.solr.client.solrj.SolrClient;
 import org.springframework.batch.core.*;
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
@@ -46,7 +45,6 @@ import org.springframework.retry.backoff.ExponentialBackOffPolicy;
  * @author Edd
  */
 @Configuration
-@EnableBatchProcessing
 @Import({AnnotationRepoConfig.class, CoTermsConfig.class, AnnotationConfig.class})
 public class AnnotationIndexingConfig {
     private static final String ANNOTATION_INDEXING_JOB_NAME = "annotationIndexingJob";
