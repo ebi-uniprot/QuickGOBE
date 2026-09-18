@@ -167,7 +167,7 @@
                             <exclude>**/*IT.java</exclude>
                             <exclude>**/IT*.java</exclude>
                         </excludes>
-                        <argLine>${jacoco.agent.ut.arg}</argLine>
+                        <argLine>${jacoco.agent.ut.arg} -javaagent:${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar</argLine>
                         <useModulePath>false</useModulePath>
                     </configuration>
                 </plugin>
@@ -177,7 +177,7 @@
                     <artifactId>maven-failsafe-plugin</artifactId>
                     <configuration>
                         <skipITs>${skipITs}</skipITs>
-                        <argLine>${jacoco.agent.it.arg}</argLine>
+                        <argLine>${jacoco.agent.it.arg} -javaagent:${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar</argLine>
                     </configuration>
                     <executions>
                         <execution>
