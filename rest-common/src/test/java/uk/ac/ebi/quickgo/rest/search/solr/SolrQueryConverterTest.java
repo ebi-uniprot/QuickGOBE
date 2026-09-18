@@ -272,7 +272,7 @@ class SolrQueryConverterTest {
         SolrQuery query = converter.convert(request);
 
         assertThat(query.getSorts(), hasSize(1));
-        checkSortCriterion(query.getSorts().get(0), sortField, sortOrder);
+        checkSortCriterion(query.getSorts().getFirst(), sortField, sortOrder);
     }
 
     @Test
@@ -296,7 +296,7 @@ class SolrQueryConverterTest {
         SolrQuery query = converter.convert(request);
 
         assertThat(query.getSorts(), hasSize(3));
-        checkSortCriterion(query.getSorts().get(0), sortField0, sortOrder0);
+        checkSortCriterion(query.getSorts().getFirst(), sortField0, sortOrder0);
         checkSortCriterion(query.getSorts().get(1), sortField1, sortOrder1);
         checkSortCriterion(query.getSorts().get(2), sortField2, sortOrder2);
     }

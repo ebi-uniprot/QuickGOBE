@@ -432,7 +432,7 @@ class AnnotationTransformerControllerIT extends SolrContainerTestSetup {
                 args.add("");
             }
         }
-        return String.format(format, args.toArray());
+        return format.formatted(args.toArray());
     }
 
     private String goId(int id) {

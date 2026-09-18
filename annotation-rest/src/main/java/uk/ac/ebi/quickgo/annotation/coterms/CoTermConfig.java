@@ -36,7 +36,7 @@ public class CoTermConfig {
             coTermRepository = CoTermRepositorySimpleMap.createCoTermRepositorySimpleMap(coTermProperties.manual,
                                                                                          coTermProperties.all,
                                                                                          coTermProperties.headerLines);
-        } catch (Exception e) {
+        } catch (Exception _) {
             final String errorMessage = "Failed to load co-occurring terms from 'MANUAL' source " +
                     (coTermProperties
                              .getManual() == null ? "unknown" : coTermProperties

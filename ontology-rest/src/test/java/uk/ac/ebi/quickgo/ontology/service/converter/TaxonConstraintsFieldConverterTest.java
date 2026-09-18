@@ -59,7 +59,7 @@ class TaxonConstraintsFieldConverterTest {
         List<OBOTerm.TaxonConstraint> taxonConstraints = converter.convertFieldList(rawTaxonConstraints);
         assertThat(taxonConstraints.size(), is(1));
 
-        OBOTerm.TaxonConstraint expectedTaxCons = taxonConstraints.get(0);
+        OBOTerm.TaxonConstraint expectedTaxCons = taxonConstraints.getFirst();
         assertThat(expectedTaxCons.ancestorId, is(ANCESTOR_ID));
         assertThat(expectedTaxCons.ancestorName, is(ANCESTOR_NAME));
         assertThat(expectedTaxCons.relationship, is(RELATIONSHIP));
@@ -87,7 +87,7 @@ class TaxonConstraintsFieldConverterTest {
         List<OBOTerm.TaxonConstraint> taxonConstraints = converter.convertFieldList(rawTaxonConstraints);
         assertThat(taxonConstraints.size(), is(1));
 
-        OBOTerm.TaxonConstraint expectedTaxCons = taxonConstraints.get(0);
+        OBOTerm.TaxonConstraint expectedTaxCons = taxonConstraints.getFirst();
         assertThat(expectedTaxCons.ancestorId, is(nullValue()));
         assertThat(expectedTaxCons.ancestorName, is(nullValue()));
         assertThat(expectedTaxCons.relationship, is(nullValue()));
@@ -98,7 +98,7 @@ class TaxonConstraintsFieldConverterTest {
         List<OBOTerm.Literature> expectedCitations = expectedTaxCons.citations;
         assertThat(expectedCitations, hasSize(1));
 
-        OBOTerm.Literature expectedCitation = expectedCitations.get(0);
+        OBOTerm.Literature expectedCitation = expectedCitations.getFirst();
         assertThat(expectedCitation.id, is(CITATION_ID1));
     }
 
@@ -121,7 +121,7 @@ class TaxonConstraintsFieldConverterTest {
         List<OBOTerm.TaxonConstraint> taxonConstraints = converter.convertFieldList(rawTaxonConstraints);
         assertThat(taxonConstraints.size(), is(1));
 
-        OBOTerm.TaxonConstraint expectedTaxCons = taxonConstraints.get(0);
+        OBOTerm.TaxonConstraint expectedTaxCons = taxonConstraints.getFirst();
         assertThat(expectedTaxCons.ancestorId, is(nullValue()));
         assertThat(expectedTaxCons.ancestorName, is(nullValue()));
         assertThat(expectedTaxCons.relationship, is(nullValue()));

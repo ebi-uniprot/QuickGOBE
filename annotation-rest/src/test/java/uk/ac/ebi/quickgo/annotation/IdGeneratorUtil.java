@@ -15,7 +15,7 @@ public class IdGeneratorUtil {
      * @return a gene product identifier
      */
     public static String createGPId(int idNum) {
-        return String.format("A0A%03d", idNum);
+        return "A0A%03d".formatted(idNum);
     }
 
     /**
@@ -25,7 +25,7 @@ public class IdGeneratorUtil {
      * @return an evidence code identifier
      */
     public static String createEvidenceCode(int idNum) {
-        return String.format("ECO:%07d", idNum);
+        return "ECO:%07d".formatted(idNum);
     }
 
     /**
@@ -35,7 +35,7 @@ public class IdGeneratorUtil {
      * @return an GO_REF identifier
      */
     public static String createGoRef(int idNum) {
-        return String.format("GO_REF:%07d", idNum);
+        return "GO_REF:%07d".formatted(idNum);
     }
 
     /**
@@ -45,7 +45,7 @@ public class IdGeneratorUtil {
      * @return a GO identifier
      */
     public static String createGoId(int idNum) {
-        return String.format("GO:%07d", idNum);
+        return "GO:%07d".formatted(idNum);
     }
 
     /**

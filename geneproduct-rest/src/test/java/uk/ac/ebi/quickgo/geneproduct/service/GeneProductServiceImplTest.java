@@ -90,7 +90,7 @@ class GeneProductServiceImplTest {
         multiDocList.add(GeneProductDocMocker.createDocWithId(new String[]{"A0A001", "A0A002", "A0A003", "A0A004"}[3]));
         when(serviceHelper.buildIdList(ids)).thenReturn(ids);
         when(geneProductRepository.findById(ids)).thenReturn(multiDocList);
-        when(geneProductDocConverter.convert(multiDocList.get(0))).thenReturn(geneProduct0);
+        when(geneProductDocConverter.convert(multiDocList.getFirst())).thenReturn(geneProduct0);
         when(geneProductDocConverter.convert(multiDocList.get(1))).thenReturn(geneProduct1);
         when(geneProductDocConverter.convert(multiDocList.get(2))).thenReturn(geneProduct2);
         when(geneProductDocConverter.convert(multiDocList.get(3))).thenReturn(geneProduct3);

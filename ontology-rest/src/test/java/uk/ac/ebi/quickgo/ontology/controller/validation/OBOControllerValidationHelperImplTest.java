@@ -23,7 +23,7 @@ import static uk.ac.ebi.quickgo.ontology.model.OntologyRelationType.DEFAULT_TRAV
  */
 class OBOControllerValidationHelperImplTest {
 
-    private static final Predicate<String> FAKE_ID_VALIDATION_PREDICATE = id -> true;
+    private static final Predicate<String> FAKE_ID_VALIDATION_PREDICATE = _ -> true;
     private static final int FAKE_MAX_PAGE_RESULTS = 100;
     private OBOControllerValidationHelperImpl validator;
     private ArrayList<OntologyRelationType> invalidRelationships;
@@ -58,7 +58,7 @@ class OBOControllerValidationHelperImplTest {
 
     @Test
     void checkValidationWorksFor1ValidRelation() {
-        OntologyRelationType validRelation = OntologyRelationType.DEFAULT_TRAVERSAL_TYPES.get(0);
+        OntologyRelationType validRelation = OntologyRelationType.DEFAULT_TRAVERSAL_TYPES.getFirst();
         List<OntologyRelationType> validRelations =
                 validator.validateRelationTypes(validRelation.getLongName(), DEFAULT_TRAVERSAL_TYPES);
         assertThat(validRelations, contains(validRelation));
@@ -66,7 +66,7 @@ class OBOControllerValidationHelperImplTest {
 
     @Test
     void checkValidationWorksFor2ValidRelations() {
-        OntologyRelationType validRelation0 = OntologyRelationType.DEFAULT_TRAVERSAL_TYPES.get(0);
+        OntologyRelationType validRelation0 = OntologyRelationType.DEFAULT_TRAVERSAL_TYPES.getFirst();
         OntologyRelationType validRelation1 = OntologyRelationType.DEFAULT_TRAVERSAL_TYPES.get(1);
 
         List<OntologyRelationType> validRelations = validator.validateRelationTypes(toCSV
@@ -79,13 +79,13 @@ class OBOControllerValidationHelperImplTest {
 
     @Test
     void checkValidationWorksFor1InvalidRelation() {
-        assertThrows(ParameterException.class, () -> validator.validateRelationTypes(invalidRelationships.get(0).getLongName(), DEFAULT_TRAVERSAL_TYPES));
+        assertThrows(ParameterException.class, () -> validator.validateRelationTypes(invalidRelationships.getFirst().getLongName(), DEFAULT_TRAVERSAL_TYPES));
     }
 
     @Test
     void checkValidationWorksFor2InvalidRelations() {
         assertThrows(ParameterException.class, () -> validator.validateRelationTypes(
-                toCSV(invalidRelationships.get(0).getLongName(), invalidRelationships.get(1)
+                toCSV(invalidRelationships.getFirst().getLongName(), invalidRelationships.get(1)
                         .getLongName()),
                 DEFAULT_TRAVERSAL_TYPES));
     }

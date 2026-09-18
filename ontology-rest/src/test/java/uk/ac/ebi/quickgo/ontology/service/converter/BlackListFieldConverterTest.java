@@ -57,7 +57,7 @@ class BlackListFieldConverterTest {
 
         List<GOTerm.BlacklistItem> blacklistItems = converter.convertFieldList(rawBlacklist);
         assertThat(blacklistItems.size(), is(2));
-        assertThat(blacklistItems.get(0).goId, is("GO:0000001"));
+        assertThat(blacklistItems.getFirst().goId, is("GO:0000001"));
         assertThat(blacklistItems.get(1).category, is("IS-qualified manual"));
         assertThat(blacklistItems.get(1).methodId, is(nullValue()));
     }

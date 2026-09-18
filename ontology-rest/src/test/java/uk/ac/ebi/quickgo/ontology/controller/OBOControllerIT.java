@@ -109,7 +109,7 @@ public abstract class OBOControllerIT extends SolrContainerTestSetup {
         List<OntologyDocument> basicDocs = createBasicDocs();
         assertThat(basicDocs.size(), is(greaterThan(1)));
 
-        validId = basicDocs.get(0).id;
+        validId = basicDocs.getFirst().id;
         validIdList = basicDocs.stream().map(doc -> doc.id).collect(Collectors.toList());
         validIdsCSV = toCSV(validIdList);
 
@@ -133,7 +133,7 @@ public abstract class OBOControllerIT extends SolrContainerTestSetup {
     @Test
     void whenNoGraphDataExistsForTermWeCanStillRetrieveOtherTermInfo() throws Exception {
         List<OntologyDocument> docsWithGraphIds = createNDocs(RELATIONSHIP_CHAIN_LENGTH + 1);
-        OntologyDocument validDocWithNoGraphData = docsWithGraphIds.get(docsWithGraphIds.size() - 1);
+        OntologyDocument validDocWithNoGraphData = docsWithGraphIds.getLast();
         ontologyRepository.save(validDocWithNoGraphData);
 
         ResultActions response = mockMvc.perform(get(buildTermsURL(validDocWithNoGraphData.id)));
@@ -563,7 +563,7 @@ public abstract class OBOControllerIT extends SolrContainerTestSetup {
 
     @Test
     void canFetchAllAncestorsFrom1Term() throws Exception {
-        String lowestChild = relationships.get(0).child;
+        String lowestChild = relationships.getFirst().child;
         ResultActions response = mockMvc.perform(
                 get(buildTermsURLWithSubResource(lowestChild, ANCESTORS_SUB_RESOURCE)));
 
@@ -574,7 +574,7 @@ public abstract class OBOControllerIT extends SolrContainerTestSetup {
 
     @Test
     void canFetchAllAncestorsFrom2Terms() throws Exception {
-        String bottom = relationships.get(0).child;
+        String bottom = relationships.getFirst().child;
         String secondBottom = relationships.get(1).child;
 
         ResultActions response = mockMvc.perform(
@@ -589,7 +589,7 @@ public abstract class OBOControllerIT extends SolrContainerTestSetup {
     @Test
     void canFetchAllAncestorsFromRelation() throws Exception {
 
-        String bottom = relationships.get(0).child;
+        String bottom = relationships.getFirst().child;
 
         ResultActions response = mockMvc.perform(
                 get(buildTermsURLWithSubResource(bottom, ANCESTORS_SUB_RESOURCE))
@@ -610,7 +610,7 @@ public abstract class OBOControllerIT extends SolrContainerTestSetup {
 
     @Test
     void invalidAncestorsRelationProduces400AndErrorMessage() throws Exception {
-        String bottom = relationships.get(0).child;
+        String bottom = relationships.getFirst().child;
 
         ResultActions response = mockMvc.perform(
                 get(buildTermsURLWithSubResource(bottom, ANCESTORS_SUB_RESOURCE))
@@ -630,7 +630,7 @@ public abstract class OBOControllerIT extends SolrContainerTestSetup {
     @Test
     void noChildren_notHaveChildrenInJson() throws Exception {
         int relCount = relationships.size();
-        String highestParent = relationships.get(0).child;
+        String highestParent = relationships.getFirst().child;
 
         ontologyRepository.deleteAll();
         createAndSaveDocs(relCount);
@@ -677,7 +677,7 @@ public abstract class OBOControllerIT extends SolrContainerTestSetup {
           .andExpect(jsonPath("$.results[0].children", hasSize(1)))
           .andExpect(jsonPath("$.results[0].children[0].hasChildren", is(true)))
           .andExpect(jsonPath("$.results[1].children", hasSize(1)))
-          .andExpect(jsonPath("$.results[1].children[0].hasChildren", is(true)));;
+          .andExpect(jsonPath("$.results[1].children[0].hasChildren", is(true)));
     }
 
     @Test
@@ -750,7 +750,7 @@ public abstract class OBOControllerIT extends SolrContainerTestSetup {
 
     @Test
     void invalidDescendantsRelationProduces400AndErrorMessage() throws Exception {
-        String highestParent = relationships.get(relationships.size() - 1).parent;
+        String highestParent = relationships.getLast().parent;
 
         ResultActions response = mockMvc.perform(
                 get(buildTermsURLWithSubResource(highestParent, DESCENDANTS_SUB_RESOURCE))
@@ -761,8 +761,8 @@ public abstract class OBOControllerIT extends SolrContainerTestSetup {
 
     @Test
     void canFetchAllPathsFrom1Term() throws Exception {
-        String bottomChild = relationships.get(0).child;
-        String highestParent = relationships.get(relationships.size() - 1).parent;
+        String bottomChild = relationships.getFirst().child;
+        String highestParent = relationships.getLast().parent;
 
         ResultActions response = mockMvc.perform(
                 get(buildPathsURL(bottomChild, highestParent)));
@@ -774,9 +774,9 @@ public abstract class OBOControllerIT extends SolrContainerTestSetup {
 
     @Test
     void canFetchAllPathsFrom2Terms() throws Exception {
-        String bottom = relationships.get(0).child;
+        String bottom = relationships.getFirst().child;
         String secondBottom = relationships.get(1).child;
-        String highest = relationships.get(relationships.size() - 1).parent;
+        String highest = relationships.getLast().parent;
 
         ResultActions response = mockMvc.perform(
                 get(buildPathsURL(toCSV(bottom, secondBottom), highest)));
@@ -788,9 +788,9 @@ public abstract class OBOControllerIT extends SolrContainerTestSetup {
 
     @Test
     void canFetchAllPathsTo2Terms() throws Exception {
-        String bottom = relationships.get(0).child;
+        String bottom = relationships.getFirst().child;
 
-        String top = relationships.get(relationships.size() - 1).parent;
+        String top = relationships.getLast().parent;
         String secondTop = relationships.get(relationships.size() - 2).parent;
 
         ResultActions response = mockMvc.perform(
@@ -803,8 +803,8 @@ public abstract class OBOControllerIT extends SolrContainerTestSetup {
 
     @Test
     void canFetchAllPathsFrom1TermWithRelation() throws Exception {
-        String bottomChild = relationships.get(0).child;
-        String highestParent = relationships.get(relationships.size() - 1).parent;
+        String bottomChild = relationships.getFirst().child;
+        String highestParent = relationships.getLast().parent;
 
         ResultActions response = mockMvc.perform(
                 get(buildPathsURL(bottomChild, highestParent))
@@ -817,7 +817,7 @@ public abstract class OBOControllerIT extends SolrContainerTestSetup {
 
     @Test
     void invalidStartPathsProduces400AndErrorMessage() throws Exception {
-        String highest = relationships.get(relationships.size() - 1).parent;
+        String highest = relationships.getLast().parent;
         ResultActions response = mockMvc.perform(
                 get(buildPathsURL(invalidId(), highest)));
 
@@ -826,7 +826,7 @@ public abstract class OBOControllerIT extends SolrContainerTestSetup {
 
     @Test
     void invalidEndPathsProduces400AndErrorMessage() throws Exception {
-        String bottom = relationships.get(0).child;
+        String bottom = relationships.getFirst().child;
         ResultActions response = mockMvc.perform(
                 get(buildPathsURL(bottom, invalidId())));
 
@@ -835,8 +835,8 @@ public abstract class OBOControllerIT extends SolrContainerTestSetup {
 
     @Test
     void invalidPathsRelationProduces400AndErrorMessage() throws Exception {
-        String bottomChild = relationships.get(0).child;
-        String highestParent = relationships.get(relationships.size() - 1).parent;
+        String bottomChild = relationships.getFirst().child;
+        String highestParent = relationships.getLast().parent;
 
         ResultActions response = mockMvc.perform(
                 get(buildPathsURL(bottomChild, highestParent))
@@ -962,7 +962,7 @@ public abstract class OBOControllerIT extends SolrContainerTestSetup {
 
     @Test
     void canFetchAncestorGraphFor1Term() throws Exception {
-        String startIds = relationships.get(0).child;
+        String startIds = relationships.getFirst().child;
         ResultActions response = mockMvc.perform(get(resourceUrl + "/terms/graph").param("startIds", startIds));
 
         response.andDo(print())
@@ -993,7 +993,7 @@ public abstract class OBOControllerIT extends SolrContainerTestSetup {
 
     @Test
     void canUseValidRelationsForSubGraph() throws Exception {
-        String startIds = relationships.get(0).child;
+        String startIds = relationships.getFirst().child;
         ResultActions response = mockMvc.perform(get(getResourceURL() + "/terms/graph")
                                                          .param("startIds", startIds)
                                                          .param(RELATIONS_PARAM, getValidRelations()));
@@ -1005,7 +1005,7 @@ public abstract class OBOControllerIT extends SolrContainerTestSetup {
 
     @Test
     void cannotUseInvalidRelationsForSubGraph() throws Exception {
-        String startIds = relationships.get(0).child;
+        String startIds = relationships.getFirst().child;
         ResultActions response = mockMvc.perform(get(getResourceURL() + "/terms/graph")
                                                          .param("startIds", startIds)
                                                          .param(RELATIONS_PARAM, getInvalidRelations()));
@@ -1342,7 +1342,7 @@ public abstract class OBOControllerIT extends SolrContainerTestSetup {
         String graphParmsString =
                 "?showKey=%s&showIds=%s&termBoxWidth=%s&termBoxHeight=%s&showSlimColours=%s&showChildren" +
                         "=%s&fontSize=%s";
-        return String.format(graphParmsString,
+        return graphParmsString.formatted(
                 !GraphPresentation.defaultShowKey,
                 !GraphPresentation.defaultShowTermIds,
                 GraphPresentation.defaultWidth + 200,

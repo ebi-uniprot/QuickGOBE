@@ -45,7 +45,7 @@ class OBOControllerTest {
     private static final int DEFAULT_PAGE_SIZE = 25;
     private static final LocalTime START_TIME = LocalTime.of(18, 0);
     private static final LocalTime END_TIME = LocalTime.of(17, 0);
-    private static Function<LocalTime, Long> remainingCacheCalculator = (t) -> 1L;
+    private static Function<LocalTime, Long> remainingCacheCalculator = (_) -> 1L;
     @Mock
     private SearchServiceConfig.OntologyCompositeRetrievalConfig retrievalConfig;
     @Mock

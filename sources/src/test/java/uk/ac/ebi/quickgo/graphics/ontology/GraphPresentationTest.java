@@ -215,7 +215,7 @@ class GraphPresentationTest {
     class arrowLineRelativeFont{
         @Test
         void onlyAcceptsBasicStroke() {
-            Stroke stroke = p -> null;
+            Stroke stroke = _ -> null;
 
             assertThrows(ClassCastException.class, ()->style.arrowLineRelativeFont(stroke));
         }

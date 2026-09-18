@@ -41,7 +41,7 @@ class OntologyRelationshipValidator
     void checkValidRelationship(String relationship) {
         try {
             OntologyRelationType.getByShortName(relationship);
-        } catch (IllegalArgumentException ie) {
+        } catch (IllegalArgumentException _) {
             String errorMessage = "Could not find ontology relationship: " + relationship;
             LOGGER.error(errorMessage);
             throw new ValidationException(errorMessage);
@@ -62,7 +62,7 @@ class OntologyRelationshipValidator
         try {
             OntologyNameSpace.getName(childNameSpace);
             OntologyNameSpace.getName(parentNameSpace);
-        } catch (IllegalArgumentException ie) {
+        } catch (IllegalArgumentException _) {
             String errorMessage = "Could not find ontology namespace: " + childNameSpace;
             LOGGER.error(errorMessage);
             throw new ValidationException(errorMessage);

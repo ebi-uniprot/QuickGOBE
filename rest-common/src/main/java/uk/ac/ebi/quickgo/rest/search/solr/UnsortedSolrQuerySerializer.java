@@ -71,7 +71,7 @@ public class UnsortedSolrQuerySerializer implements QueryVisitor<String> {
         for (String value : values) {
             stringJoiner.add(value.toLowerCase());
         }
-        return String.format(TERMS_LOCAL_PARAMS_QUERY_FORMAT, field, stringJoiner.toString());
+        return TERMS_LOCAL_PARAMS_QUERY_FORMAT.formatted(field, stringJoiner.toString());
     }
 
     private boolean isTermsQueryCompatible(FieldQuery query) {

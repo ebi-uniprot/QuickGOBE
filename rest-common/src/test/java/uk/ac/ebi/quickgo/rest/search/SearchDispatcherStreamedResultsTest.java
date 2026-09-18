@@ -169,7 +169,7 @@ class SearchDispatcherStreamedResultsTest {
         ArgumentCaptor<QueryRequest> argument = ArgumentCaptor.forClass(QueryRequest.class);
 
         verify(searchService, times(2)).findByQuery(argument.capture());
-        assertThat(argument.getAllValues().get(0).getPage().getPageSize(), is(10));
+        assertThat(argument.getAllValues().getFirst().getPage().getPageSize(), is(10));
         assertThat(argument.getAllValues().get(1).getPage().getPageSize(), is(10));
     }
 
@@ -204,7 +204,7 @@ class SearchDispatcherStreamedResultsTest {
         ArgumentCaptor<QueryRequest> argument = ArgumentCaptor.forClass(QueryRequest.class);
 
         verify(searchService, times(2)).findByQuery(argument.capture());
-        assertThat(argument.getAllValues().get(0).getPage().getPageSize(), is(10));
+        assertThat(argument.getAllValues().getFirst().getPage().getPageSize(), is(10));
         assertThat(argument.getAllValues().get(1).getPage().getPageSize(), is(5));
     }
 

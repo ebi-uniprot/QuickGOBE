@@ -79,7 +79,7 @@ class CoTermsForSelectedTermTest {
         CoTermsForSelectedTerm coTermsForSelectedTerm = builder.build();
         List<CoTerm> terms = coTermsForSelectedTerm.highestSimilarity();
 
-        assertThat(terms.get(0).getSimilarityRatio(), is(float5));
+        assertThat(terms.getFirst().getSimilarityRatio(), is(float5));
         assertThat(terms.get(1).getSimilarityRatio(), is(float3));
         assertThat(terms.get(2).getSimilarityRatio(), is(float2));
         assertThat(terms.get(3).getSimilarityRatio(), is(float1));

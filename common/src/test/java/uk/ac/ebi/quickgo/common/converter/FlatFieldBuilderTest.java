@@ -194,11 +194,11 @@ class FlatFieldBuilderTest {
                 .addField(FlatFieldLeaf.newFlatFieldLeaf("1"))
                 .addField(FlatFieldLeaf.newFlatFieldLeaf(""))
                 .addField(FlatFieldLeaf.newFlatFieldLeaf("3")).buildString();
-        System.out.println(origStr);
+        IO.println(origStr);
 
         FlatField flatFieldBuilderParsed = parse(origStr);
         String parsedStr = flatFieldBuilderParsed.buildString();
-        System.out.println(parsedStr);
+        IO.println(parsedStr);
 
         assertThat(origStr, is(parsedStr));
     }
@@ -214,7 +214,7 @@ class FlatFieldBuilderTest {
                 .addField(FlatFieldLeaf.newFlatFieldLeaf());
         String origStr = origFlatFieldBuilder // no parameter means it's got no value
                 .buildString();
-        System.out.println(origStr);
+        IO.println(origStr);
 
         FlatField flatFieldBuilder = parse(origStr);
         assertThat(origFlatFieldBuilder.getFields().size(), is(flatFieldBuilder.getFields().size()));
@@ -242,7 +242,7 @@ class FlatFieldBuilderTest {
 
         assertThat(parsedStr, is(origStr));
 
-        System.out.println(parsedStr);
+        IO.println(parsedStr);
     }
 
     @Test
@@ -266,7 +266,7 @@ class FlatFieldBuilderTest {
 
         assertThat(parsedStr, is(origStr));
 
-        System.out.println(parsedStr);
+        IO.println(parsedStr);
     }
 
     @Test
@@ -300,7 +300,7 @@ class FlatFieldBuilderTest {
 
         assertThat(parsedStr, is(origStr));
 
-        System.out.println(parsedStr);
+        IO.println(parsedStr);
     }
 
     @Test
@@ -311,11 +311,11 @@ class FlatFieldBuilderTest {
                 .addField(FlatFieldLeaf.newFlatFieldLeaf("level1:C"))
                 .addField(FlatFieldLeaf.newFlatFieldLeaf(null));
         String ff1Str = ff1Model.buildString();
-        System.out.println(ff1Str);
+        IO.println(ff1Str);
 
         FlatField ff2FromFf1Model = parse(ff1Str);
         String ff2FromFf1Str = ff2FromFf1Model.buildString();
-        System.out.println(ff2FromFf1Str);
+        IO.println(ff2FromFf1Str);
 
         assertThat(ff2FromFf1Model, is(ff1Model));
         assertThat(ff2FromFf1Str, is(ff1Str));
@@ -330,11 +330,11 @@ class FlatFieldBuilderTest {
                 .addField(FlatFieldLeaf.newFlatFieldLeaf(""));
         String ff1Str = ff1Model
                 .buildString();
-        System.out.println(ff1Str);
+        IO.println(ff1Str);
 
         FlatField ff2FromFf1Model = parse(ff1Str);
         String ff2FromFf1Str = ff2FromFf1Model.buildString();
-        System.out.println(ff2FromFf1Str);
+        IO.println(ff2FromFf1Str);
 
         assertThat(ff2FromFf1Model, is(ff1Model));
         assertThat(ff2FromFf1Str, is(ff1Str));
@@ -402,7 +402,7 @@ class FlatFieldBuilderTest {
                 expectedField("level2:" + specialChars,
                         expectedField("level3:" + specialChars)));
 
-        System.out.println(flatFieldText);
+        IO.println(flatFieldText);
         FlatField actualFlatField =
                 parse(flatFieldText);
 

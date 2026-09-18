@@ -117,7 +117,7 @@ public class ReferencePresetsConfig {
     }
 
     private String buildGORefID(String name) {
-        return String.format(GO_REF_FORMAT, name);
+        return GO_REF_FORMAT.formatted(name);
     }
 
     private ItemProcessor<RawNamedPreset, RawNamedPreset> rawPresetFilter(List<String> validPresetNames) {

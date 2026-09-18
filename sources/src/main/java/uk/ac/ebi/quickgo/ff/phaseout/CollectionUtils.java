@@ -212,7 +212,7 @@ public class CollectionUtils {
         try {
             return Enum.valueOf(fallback.getDeclaringClass(), name);
         }
-        catch (Exception e) {
+        catch (Exception _) {
             return fallback;
         }
 

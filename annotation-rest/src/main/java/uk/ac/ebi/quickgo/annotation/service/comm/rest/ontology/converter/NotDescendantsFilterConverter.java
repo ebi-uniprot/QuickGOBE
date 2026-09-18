@@ -37,7 +37,7 @@ public class NotDescendantsFilterConverter extends AbstractOntologyFilterConvert
     if (isValidGOTermId().test(id)) {
       return QuickGOQuery.createQuery(AnnotationFields.Searchable.GP_RELATED_GO_IDS, id);
     } else {
-      throw new RetrievalException(String.format(UNKNOWN_ID_FORMAT, id));
+      throw new RetrievalException(UNKNOWN_ID_FORMAT.formatted(id));
     }
   }
 }

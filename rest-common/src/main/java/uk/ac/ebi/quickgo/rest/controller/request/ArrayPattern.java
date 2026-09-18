@@ -117,7 +117,7 @@ public @interface ArrayPattern {
 
             try {
                 pattern = Pattern.compile(validator.regexp(), intFlag);
-            } catch (PatternSyntaxException e) {
+            } catch (PatternSyntaxException _) {
                 throw new IllegalArgumentException("Unable to create pattern for validation");
             }
         }
@@ -160,7 +160,7 @@ public @interface ArrayPattern {
                     String invalidItemsText = invalidItems.stream().collect(Collectors.joining(", "));
 
                     context.buildConstraintViolationWithTemplate(
-                            String.format(DEFAULT_ERROR_MSG, paramName, invalidItemsText)).addConstraintViolation();
+                            DEFAULT_ERROR_MSG.formatted(paramName, invalidItemsText)).addConstraintViolation();
                 }
             }
 

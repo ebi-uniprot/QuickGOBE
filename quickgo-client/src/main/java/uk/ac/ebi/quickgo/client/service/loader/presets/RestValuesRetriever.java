@@ -36,7 +36,7 @@ public class RestValuesRetriever {
             ConvertedFilter<T> convertedFilter = converterFactory.convert(restRequest);
             return Optional.of(convertedFilter.getConvertedValue());
         } catch (RetrievalException | IllegalStateException e) {
-            LOGGER.error(String.format("Failed to retrieve values for %s via REST", lookupKey), e);
+            LOGGER.error("Failed to retrieve values for %s via REST".formatted(lookupKey), e);
         }
         return Optional.empty();
     }

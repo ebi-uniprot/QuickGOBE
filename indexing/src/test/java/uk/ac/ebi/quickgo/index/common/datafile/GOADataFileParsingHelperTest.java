@@ -166,7 +166,7 @@ class GOADataFileParsingHelperTest {
         List<Integer> splitValues = splitValueToIntegerList(value, "whatever");
         assertThat(splitValues, is(notNullValue()));
         assertThat(splitValues.size(), is(1));
-        assertThat(splitValues.get(0), is(Integer.valueOf(value)));
+        assertThat(splitValues.getFirst(), is(Integer.valueOf(value)));
     }
 
     @Test

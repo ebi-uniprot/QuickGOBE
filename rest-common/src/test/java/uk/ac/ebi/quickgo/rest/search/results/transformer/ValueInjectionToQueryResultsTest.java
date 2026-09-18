@@ -77,7 +77,7 @@ class ValueInjectionToQueryResultsTest {
     // -------------------- helpers --------------------
     private QueryResult<FakeResponseModel> createMockedAnnotationList(int docCount) {
         List<FakeResponseModel> annotations =
-                IntStream.range(0, docCount).mapToObj(i -> new FakeResponseModel()).collect(Collectors.toList());
+                IntStream.range(0, docCount).mapToObj(_ -> new FakeResponseModel()).collect(Collectors.toList());
 
         QueryResult.Builder<FakeResponseModel> builder = new QueryResult.Builder<>(docCount, annotations);
         return builder.build();

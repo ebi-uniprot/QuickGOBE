@@ -31,7 +31,7 @@ class AnnotationGuideLineFieldConverter implements FieldConverter<OBOTerm.Annota
 
         if (fields.size() == FIELD_COUNT) {
             OBOTerm.AnnotationGuideLine ag = new OBOTerm.AnnotationGuideLine();
-            ag.description = cleanFieldValue(fields.get(0).buildString());
+            ag.description = cleanFieldValue(fields.getFirst().buildString());
             ag.url = cleanFieldValue(fields.get(1).buildString());
             return Optional.of(ag);
         } else {

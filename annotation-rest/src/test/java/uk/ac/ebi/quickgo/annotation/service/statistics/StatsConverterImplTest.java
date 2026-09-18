@@ -97,8 +97,8 @@ class StatsConverterImplTest {
         Map<String, List<AggregateRequest>> nestedAggrMap = extractNestedAggregates(aggregate);
         assertThat(nestedAggrMap.get(type1), hasSize(1));
         assertThat(nestedAggrMap.get(type2), hasSize(1));
-        AggregateRequest type1Aggregate = nestedAggrMap.get(type1).get(0);
-        AggregateRequest type2Aggregate = nestedAggrMap.get(type2).get(0);
+        AggregateRequest type1Aggregate = nestedAggrMap.get(type1).getFirst();
+        AggregateRequest type2Aggregate = nestedAggrMap.get(type2).getFirst();
 
         assertThat(type1Aggregate.getAggregateFunctionRequests(), contains(aggrField(groupField, COUNT_FUNCTION)));
         assertThat(type1Aggregate.getNestedAggregateRequests(), is(empty()));
@@ -136,9 +136,9 @@ class StatsConverterImplTest {
         assertThat(nestedAggrMap.get(type1), hasSize(1));
         assertThat(nestedAggrMap.get(type2), hasSize(1));
         assertThat(nestedAggrMap.get(type3), hasSize(1));
-        AggregateRequest type1Aggregate = nestedAggrMap.get(type1).get(0);
-        AggregateRequest type2Aggregate = nestedAggrMap.get(type2).get(0);
-        AggregateRequest type3Aggregate = nestedAggrMap.get(type3).get(0);
+        AggregateRequest type1Aggregate = nestedAggrMap.get(type1).getFirst();
+        AggregateRequest type2Aggregate = nestedAggrMap.get(type2).getFirst();
+        AggregateRequest type3Aggregate = nestedAggrMap.get(type3).getFirst();
 
         assertThat(type1Aggregate.getAggregateFunctionRequests(),
                 containsInAnyOrder(aggrField(groupField1, UNIQUE_FUNCTION), aggrField(groupField2, UNIQUE_FUNCTION)));

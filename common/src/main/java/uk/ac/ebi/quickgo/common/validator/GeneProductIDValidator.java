@@ -40,7 +40,7 @@ public class GeneProductIDValidator implements ConstraintValidator<GeneProductID
 
             if (!invalidGpIds.isEmpty()) {
                 context.disableDefaultConstraintViolation();
-                context.buildConstraintViolationWithTemplate(String.format(DEFAULT_ERROR_MESSAGE, invalidGpIds))
+                context.buildConstraintViolationWithTemplate(DEFAULT_ERROR_MESSAGE.formatted(invalidGpIds))
                         .addConstraintViolation();
             }
         }

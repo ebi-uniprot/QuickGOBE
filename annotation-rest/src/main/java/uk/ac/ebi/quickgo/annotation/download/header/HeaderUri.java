@@ -28,7 +28,7 @@ public class HeaderUri {
         return request.getParameterMap()
                       .entrySet()
                       .stream()
-                      .map(s -> String.format("%s=%s", s.getKey(), stream(s.getValue())
+                      .map(s -> "%s=%s".formatted(s.getKey(), stream(s.getValue())
                               .collect(Collectors.joining(","))))
                       .collect(Collectors.joining("&"));
     }

@@ -59,13 +59,13 @@ public class OntologyGraphicsSourceLoader {
             GOSourceFiles goSourceFiles = new GOSourceFiles(requireNonNull(sourceDir));
             geneOntology = new GOLoader(goSourceFiles).load();
             goAnnotationExtensionRelations = new AnnotationExtensionRelsLoader(goSourceFiles, geneOntology).load();
-        } catch (Exception e) {
+        } catch (Exception _) {
             LOGGER.warn("Could not load Gene Ontology or its Annotation Extension Relations correctly. No graphics can be provided.");
         }
 
         try {
             evidenceCodeOntology = new ECOLoader(new ECOSourceFiles(requireNonNull(sourceDir))).load();
-        } catch (Exception e) {
+        } catch (Exception _) {
             LOGGER.warn("Could not load ECO Ontology correctly. No graphics can be provided.");
         }
     }

@@ -35,7 +35,7 @@ class BlackListFieldConverter implements FieldConverter<GOTerm.BlacklistItem> {
 
         if (fields.size() == FIELD_COUNT) {
             GOTerm.BlacklistItem blacklistItem = new GOTerm.BlacklistItem();
-            blacklistItem.goId = cleanFieldValue(fields.get(0).buildString());
+            blacklistItem.goId = cleanFieldValue(fields.getFirst().buildString());
             blacklistItem.category = cleanFieldValue(fields.get(1).buildString());
             blacklistItem.entityType = cleanFieldValue(fields.get(2).buildString());
             blacklistItem.entityId = cleanFieldValue(fields.get(3).buildString());

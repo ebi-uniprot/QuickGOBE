@@ -52,8 +52,8 @@ class XRefsFieldConverterTest {
 
         List<OBOTerm.XRef> xRefs = converter.convertFieldList(rawXrefs);
         assertThat(xRefs.size(), is(2));
-        assertThat(xRefs.get(0).dbCode, is(dbCode0));
-        assertThat(xRefs.get(0).name, is(dbName0));
+        assertThat(xRefs.getFirst().dbCode, is(dbCode0));
+        assertThat(xRefs.getFirst().name, is(dbName0));
         assertThat(xRefs.get(1).dbCode, is(dbCode1));
         assertThat(xRefs.get(1).name, is(dbName1));
     }

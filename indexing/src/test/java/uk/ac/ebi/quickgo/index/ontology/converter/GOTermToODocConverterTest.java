@@ -252,7 +252,7 @@ class GOTermToODocConverterTest {
 
         final List<String> history = result.history;
         assertThat(history, hasSize(1));
-        assertThat(history.get(0), containsString("SLIM"));
+        assertThat(history.getFirst(), containsString("SLIM"));
     }
 
     @Test
@@ -263,7 +263,7 @@ class GOTermToODocConverterTest {
 
         final List<String> history = document.history;
         assertThat(history, hasSize(1));
-        assertThat(history.get(0), containsString("CONSTRAINT"));
+        assertThat(history.getFirst(), containsString("CONSTRAINT"));
     }
 
     private TermOntologyHistory termOntologyHistoryForSlim() {

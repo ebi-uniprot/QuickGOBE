@@ -598,8 +598,7 @@ public class AnnotationRequest {
 
         Stream.of(FILTER_REQUEST_FIELDS)
                 .map(this::createSimpleFilter)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
+                .flatMap(Optional::stream)
                 .forEach(filterRequests::add);
 
         createGeneProductTypeFilter().ifPresent(filterRequests::add);
@@ -813,12 +812,12 @@ public class AnnotationRequest {
                 .filter(p -> GeneProduct.GeneProductType.PROTEIN.getName().equals(p)).findFirst();
 
         // gene product subset filter only valid when geneProductType protein is set
-        if(filterMap.containsKey(GENE_PRODUCT_SUBSET) && !protein.isPresent()){
+        if(filterMap.containsKey(GENE_PRODUCT_SUBSET) && protein.isEmpty()){
             throw new ParameterException("Annotation " + GENE_PRODUCT_SUBSET + " requires '" + GENE_PRODUCT_TYPE +
                     "=" + GeneProduct.GeneProductType.PROTEIN.getName()+"' to be set.");
         }
         // proteome filter only valid when geneProductType protein is set
-        if(filterMap.containsKey(PROTEOME) && !protein.isPresent()){
+        if(filterMap.containsKey(PROTEOME) && protein.isEmpty()){
             throw new ParameterException("Annotation " + PROTEOME + " requires '" + GENE_PRODUCT_TYPE +
                     "=" + GeneProduct.GeneProductType.PROTEIN.getName()+"' to be set.");
         }

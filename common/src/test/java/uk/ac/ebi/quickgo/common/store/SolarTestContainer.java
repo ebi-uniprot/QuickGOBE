@@ -53,7 +53,7 @@ public class SolarTestContainer extends SolrContainer {
         HttpUrl url = generateSolrURL(hostname, port, Arrays.asList("admin", "collections"), Map.of("action","LIST"));
         try {
             return getSolrCollections(url).contains(collectionName);
-        } catch (IOException | JSONException e) {
+        } catch (IOException | JSONException _) {
             return false;
         }
     }

@@ -152,7 +152,7 @@ class UnsortedSolrQuerySerializerTest {
 
             String solrJoinString = serializer.visit(query);
 
-            assertThat(solrJoinString, is(String.format(CROSS_CORE_JOIN_SYNTAX, joinFromAttribute, joinToAttribute,
+            assertThat(solrJoinString, is(CROSS_CORE_JOIN_SYNTAX.formatted(joinFromAttribute, joinToAttribute,
                     joinFromTable, fromFilterString)));
         }
 
@@ -174,7 +174,7 @@ class UnsortedSolrQuerySerializerTest {
 
             String solrJoinString = serializer.visit(query);
 
-            assertThat(solrJoinString, is(String.format(CROSS_CORE_JOIN_SYNTAX, joinFromAttribute, joinToAttribute,
+            assertThat(solrJoinString, is(CROSS_CORE_JOIN_SYNTAX.formatted(joinFromAttribute, joinToAttribute,
                     joinFromTable, fromFilterString)));
         }
 
@@ -205,7 +205,7 @@ class UnsortedSolrQuerySerializerTest {
             FieldQuery query = new FieldQuery(TERMS_COMPATIBLE_FIELD_1, "value1");
 
             String queryString = serializer.visit(query);
-            System.out.println(queryString);
+            IO.println(queryString);
 
             assertThat(queryString, is(
                     buildTermsQuery(query.field(), query.value())
@@ -220,7 +220,7 @@ class UnsortedSolrQuerySerializerTest {
             QuickGOQuery compositeQuery = or(query1, query2);
 
             String queryString = serializer.visit((CompositeQuery) compositeQuery);
-            System.out.println(queryString);
+            IO.println(queryString);
 
             assertThat(queryString, is(
                     buildTermsQuery(query1.field(), query1.value(), query2.value())
@@ -236,7 +236,7 @@ class UnsortedSolrQuerySerializerTest {
             QuickGOQuery compositeQuery = or(query1, query2, query3);
 
             String queryString = serializer.visit((CompositeQuery) compositeQuery);
-            System.out.println(queryString);
+            IO.println(queryString);
 
             assertThat(queryString, is(
                     buildTermsQuery(query1.field(), query1.value(), query2.value(), query3.value())
@@ -255,7 +255,7 @@ class UnsortedSolrQuerySerializerTest {
             QuickGOQuery compositeQuery = and(otherQuery, orQuery);
 
             String queryString = serializer.visit((CompositeQuery) compositeQuery);
-            System.out.println(queryString);
+            IO.println(queryString);
 
             assertThat(queryString, is(
                     "(" +
@@ -330,7 +330,7 @@ class UnsortedSolrQuerySerializerTest {
                     buildTermsQuery(query3.field(), query3.value()) + " OR " +
                     buildTermsQuery(innerQuery1.field(), innerQuery1.value(), innerQuery2.value()) +
                     ")"));
-            System.out.println(queryString);
+            IO.println(queryString);
         }
 
         String buildTermsQuery(String field, String... values) {
@@ -338,7 +338,7 @@ class UnsortedSolrQuerySerializerTest {
             for (String value : values) {
                 stringJoiner.add(value);
             }
-            return String.format(TERMS_LOCAL_PARAMS_QUERY_FORMAT, field, stringJoiner.toString());
+            return TERMS_LOCAL_PARAMS_QUERY_FORMAT.formatted(field, stringJoiner.toString());
         }
     }
 }

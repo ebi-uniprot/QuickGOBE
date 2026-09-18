@@ -166,7 +166,7 @@ class RESTRequesterImplTest {
 
         String failed = "Failed";
         CompletableFuture<FakeDTO> completableFuture = requester.get(SERVICE_ENDPOINT, restTemplateMock, FakeDTO.class)
-                .exceptionally(ex -> new FakeDTO(failed));
+                .exceptionally(_ -> new FakeDTO(failed));
 
         FakeDTO fakeDTO = completableFuture.get();
         assertThat(fakeDTO.value, is(failed));

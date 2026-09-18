@@ -72,7 +72,7 @@ class AnnotationRepositoryIT extends SolrContainerTestSetup {
         annotationRepository.save(doc1);
         annotationRepository.save(doc2);
 
-        AnnotationDocument firstReturnedDoc = annotationRepository.findAll(PageRequest.of(0, 10)).getContent().get(0);
+        AnnotationDocument firstReturnedDoc = annotationRepository.findAll(PageRequest.of(0, 10)).getContent().getFirst();
         assertThat(firstReturnedDoc.geneProductId, is("A0A001"));
     }
 }

@@ -53,7 +53,7 @@ public class AlarmClockDayTime implements AlarmClock {
         } else {
             remaining = Duration.ZERO;
         }
-        LOGGER.debug(String.format("Remaining time is %s", remaining));
+        LOGGER.debug("Remaining time is %s".formatted(remaining));
         return remaining;
     }
 

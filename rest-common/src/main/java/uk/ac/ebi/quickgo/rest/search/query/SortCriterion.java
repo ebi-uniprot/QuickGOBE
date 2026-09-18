@@ -31,7 +31,7 @@ public class SortCriterion {
      * Captures the sort order required, e.g., ascending.
      */
     public enum SortOrder {
-        ASC, DESC;
+        ASC, DESC
     }
 
     @Override public boolean equals(Object o) {

@@ -34,7 +34,7 @@ class GODiscussionConverter implements FieldConverter<GOTerm.GODiscussion> {
 
         if (fields.size() == FIELD_COUNT) {
             GOTerm.GODiscussion discussion = new GOTerm.GODiscussion();
-            discussion.title = cleanFieldValue(fields.get(0).buildString());
+            discussion.title = cleanFieldValue(fields.getFirst().buildString());
             discussion.url = cleanFieldValue(fields.get(1).buildString());
 
             goDiscussionOpt = Optional.of(discussion);

@@ -40,7 +40,7 @@ public class EvidenceNameInjector extends AbstractValueInjector<BasicOntology, C
 
         List<BasicOntology.Result> results = response.getResults();
         if (!results.isEmpty()) {
-            completableValue.setValue(results.get(0).getName());
+            completableValue.setValue(results.getFirst().getName());
         }
     }
 }

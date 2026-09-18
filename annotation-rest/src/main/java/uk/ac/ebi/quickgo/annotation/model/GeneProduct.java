@@ -75,7 +75,7 @@ public class GeneProduct {
             String id = complexPortalMatcher.group(COMPLEX_PORTAL_ID_NUMBER);
             return new GeneProduct(new GeneProductId(db, id, curieId, null), COMPLEX);
         }
-        throw new IllegalStateException(String.format("Gene Product Id %s is not valid", curieId));
+        throw new IllegalStateException("Gene Product Id %s is not valid".formatted(curieId));
     }
 
     public String canonicalId() {

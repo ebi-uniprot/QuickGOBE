@@ -255,13 +255,13 @@ class CoTermMatrix {
      * @param termsInBatch a list of all terms encountered in annotations for a particular gene product.
      */
     void incrementCoTerms(String termId, Set<String> termsInBatch) {
-        Map<String, AtomicLong> coTerms = coTermMatrix.computeIfAbsent(termId, k -> new HashMap<>());
+        Map<String, AtomicLong> coTerms = coTermMatrix.computeIfAbsent(termId, _ -> new HashMap<>());
 
         //Loop through all the terms we have encountered in this batch and update the quantities
         for (String term : termsInBatch) {
 
             //Get 'permanent' record for this termId/termId permutation
-            AtomicLong permutationCount = coTerms.computeIfAbsent(term, k -> new AtomicLong());
+            AtomicLong permutationCount = coTerms.computeIfAbsent(term, _ -> new AtomicLong());
 
             //Update it with a count of 'one' as this batch is for one gene protein and so the count must be one
             permutationCount.incrementAndGet();

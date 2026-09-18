@@ -34,7 +34,7 @@ class CreditsFieldConverter implements FieldConverter<OBOTerm.Credit> {
 
         if (fields.size() == FIELD_COUNT) {
             OBOTerm.Credit credit = new OBOTerm.Credit();
-            credit.code = cleanFieldValue(fields.get(0).buildString());
+            credit.code = cleanFieldValue(fields.getFirst().buildString());
             credit.url = cleanFieldValue(fields.get(1).buildString());
 
             creditOpt = Optional.of(credit);

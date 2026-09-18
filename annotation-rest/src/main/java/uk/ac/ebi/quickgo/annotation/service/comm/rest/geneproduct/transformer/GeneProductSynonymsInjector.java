@@ -40,7 +40,7 @@ public class GeneProductSynonymsInjector extends AbstractValueInjector<BasicGene
 
         List<BasicGeneProduct.Result> results = response.getResults();
         if (!results.isEmpty()) {
-            annotation.synonyms = toCSV(results.get(0).getSynonyms());
+            annotation.synonyms = toCSV(results.getFirst().getSynonyms());
         }
     }
 }

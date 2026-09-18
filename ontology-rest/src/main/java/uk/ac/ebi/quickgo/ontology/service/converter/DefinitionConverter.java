@@ -36,7 +36,7 @@ class DefinitionConverter implements MultiDocFieldToFieldConverter<OBOTerm.Defin
         List<FlatField> fields = FlatFieldBuilder.parse(xrefText).getFields();
 
         OBOTerm.XRef xref = new OBOTerm.XRef();
-        xref.dbCode = fields.get(0).buildString();
+        xref.dbCode = fields.getFirst().buildString();
         xref.dbId = fields.get(1).buildString();
 
         return xref;

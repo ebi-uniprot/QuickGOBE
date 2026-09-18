@@ -45,7 +45,7 @@ class ExternalRequestConfigRetrievalIT {
             };
         }
 
-        public static void main(String[] args) {
+        void main() {
             SpringApplication.run(TestApplication.class);
         }
     }

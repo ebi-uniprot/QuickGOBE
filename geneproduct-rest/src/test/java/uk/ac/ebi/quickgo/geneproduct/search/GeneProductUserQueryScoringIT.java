@@ -1216,12 +1216,12 @@ class GeneProductUserQueryScoringIT extends SolrContainerTestSetup {
                 .append("-- Unsuccessful tests returned results in the order, [doc1,doc2], as indicated by, \"FAIL\"")
                 .append("\n")
                 .append("========== end of test report ==========").append("\n");
-        System.out.println(report);
+        IO.println(report);
 
         if (report.indexOf("FAIL") > 0) {
             throw new AssertionError("There were test failures");
         } else {
-            System.out.println("Tests passed -- nice one!");
+            IO.println("Tests passed -- nice one!");
         }
     }
 
@@ -1266,7 +1266,7 @@ class GeneProductUserQueryScoringIT extends SolrContainerTestSetup {
                     .andExpect(jsonPath("$.results[1].id").value(VALID_ID_1))
                     .andExpect(jsonPath("$.results.*", hasSize(2)));
             result.append("    PASS:").append("\n");
-        } catch (AssertionError | Exception e) {
+        } catch (AssertionError | Exception _) {
             result.append("    FAIL:").append("\n");
         }
         return result;

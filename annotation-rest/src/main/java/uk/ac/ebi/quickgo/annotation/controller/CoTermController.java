@@ -25,7 +25,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static java.lang.String.format;
 import static uk.ac.ebi.quickgo.common.validator.OntologyIdPredicate.isValidGOTermId;
 
 /**
@@ -112,7 +111,7 @@ public class CoTermController {
                 throw new ParameterException("The value for limit should be a positive integer, or 'ALL'");
             }
             return numLimit;
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException _) {
             throw new ParameterException("The value for limit should be a positive integer, or 'ALL'");
         }
     }
@@ -141,7 +140,7 @@ public class CoTermController {
     private CoTermSource toCoTermSource(String source) {
         final String asUpperCase = source.toUpperCase();
         if (!CoTermSource.isValidValue(asUpperCase)) {
-            throw new ParameterException(format(INVALID_CO_TERM_SOURCE, CoTermSource.valuesAsCSV(), source));
+            throw new ParameterException(INVALID_CO_TERM_SOURCE.formatted(CoTermSource.valuesAsCSV(), source));
 
         }
         return CoTermSource.valueOf(asUpperCase);

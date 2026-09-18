@@ -71,7 +71,7 @@ public class FlatFieldBuilder implements FlatField {
         LOGGER.debug("flatFieldText: [{}], has been broken down into {}", flatFieldText, values);
         FlatFieldBuilder builder;
 
-        if (!values.isEmpty() && values.get(0).equals(LEVEL_SEPARATOR_START)) {
+        if (!values.isEmpty() && values.getFirst().equals(LEVEL_SEPARATOR_START)) {
             builder = parse(values.subList(1, values.size()).iterator(), newFlatField(), 0);
         } else {
             builder = parse(values.iterator(), newFlatField(), 0);

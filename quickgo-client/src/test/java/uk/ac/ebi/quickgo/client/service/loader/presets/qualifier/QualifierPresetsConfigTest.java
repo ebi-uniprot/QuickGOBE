@@ -47,8 +47,8 @@ class QualifierPresetsConfigTest {
 
         final List<PresetItem> qualifiers = presetBuilder.getQualifiers();
         assertThat(qualifiers, hasSize(1));
-        assertThat(qualifiers.get(0).getProperty(PresetItem.Property.NAME), is("NOT|part_of"));
-        assertThat(qualifiers.get(0).getProperty(PresetItem.Property.ID), is("NOT|part_of"));
+        assertThat(qualifiers.getFirst().getProperty(PresetItem.Property.NAME), is("NOT|part_of"));
+        assertThat(qualifiers.getFirst().getProperty(PresetItem.Property.ID), is("NOT|part_of"));
     }
 
     @Test
@@ -67,8 +67,8 @@ class QualifierPresetsConfigTest {
 
         final List<PresetItem> qualifiers = presetBuilder.getQualifiers();
         assertThat(qualifiers, hasSize(1));
-        assertThat(qualifiers.get(0).getProperty(PresetItem.Property.NAME), is(part_of));
-        assertThat(qualifiers.get(0).getProperty(PresetItem.Property.ID), is(part_of));
+        assertThat(qualifiers.getFirst().getProperty(PresetItem.Property.NAME), is(part_of));
+        assertThat(qualifiers.getFirst().getProperty(PresetItem.Property.ID), is(part_of));
     }
 
     @Test

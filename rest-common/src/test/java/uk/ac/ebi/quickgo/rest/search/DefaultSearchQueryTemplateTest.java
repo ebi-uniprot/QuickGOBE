@@ -219,7 +219,7 @@ class DefaultSearchQueryTemplateTest {
                         .getSortCriteria();
 
         assertThat(sortCriteria, hasSize(1));
-        checkSortCriterion(sortCriteria.get(0), sortField, sortOrder);
+        checkSortCriterion(sortCriteria.getFirst(), sortField, sortOrder);
     }
 
     @Test
@@ -241,7 +241,7 @@ class DefaultSearchQueryTemplateTest {
                         .getSortCriteria();
 
         assertThat(sortCriteria, hasSize(3));
-        checkSortCriterion(sortCriteria.get(0), sortField0, sortOrder0);
+        checkSortCriterion(sortCriteria.getFirst(), sortField0, sortOrder0);
         checkSortCriterion(sortCriteria.get(1), sortField1, sortOrder1);
         checkSortCriterion(sortCriteria.get(2), sortField2, sortOrder2);
     }
@@ -264,7 +264,7 @@ class DefaultSearchQueryTemplateTest {
                 .getSortCriteria();
 
         assertThat(sortCriteria, hasSize(3));
-        checkSortCriterion(sortCriteria.get(0), sortField0, sortOrder0);
+        checkSortCriterion(sortCriteria.getFirst(), sortField0, sortOrder0);
         checkSortCriterion(sortCriteria.get(1), sortField1, sortOrder1);
         checkSortCriterion(sortCriteria.get(2), sortField2, sortOrder2);
     }

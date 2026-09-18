@@ -32,7 +32,7 @@ class SynonymsFieldConverter implements FieldConverter<OBOTerm.Synonym> {
         List<FlatField> fields = FlatFieldBuilder.parse(fieldsStr).getFields();
         if (fields.size() == FIELD_COUNT) {
             OBOTerm.Synonym synonym = new OBOTerm.Synonym();
-            synonym.name = cleanFieldValue(fields.get(0).buildString());
+            synonym.name = cleanFieldValue(fields.getFirst().buildString());
             synonym.type = cleanFieldValue(fields.get(1).buildString());
             return Optional.of(synonym);
         } else {

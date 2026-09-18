@@ -133,10 +133,10 @@ public class AnnotationController {
     private static final String DOWNLOAD_FILE_NAME_PREFIX = "QuickGO-annotations";
     private static final String GO_USAGE_SLIM = "goUsage=slim";
     private static final String DOWNLOAD_STATISTICS_FILE_NAME = "annotation_statistics";
-    private static final Function<MediaType, String> TO_DOWNLOAD_STATISTICS_FILENAME = mt -> String.format("%s.%s",
+    private static final Function<MediaType, String> TO_DOWNLOAD_STATISTICS_FILENAME = mt -> "%s.%s".formatted(
             DOWNLOAD_STATISTICS_FILE_NAME,
             fileExtension(mt));
-    private static final Function<MediaType, String> TO_DOWNLOAD_FILENAME = mt -> String.format("%s%s.%s",
+    private static final Function<MediaType, String> TO_DOWNLOAD_FILENAME = mt -> "%s%s.%s".formatted(
             DOWNLOAD_FILE_NAME_PREFIX,
             formattedDateStringForNow(),
             fileExtension(mt));
@@ -269,7 +269,7 @@ public class AnnotationController {
         LOGGER.info("Download Request:: " + request + ", " + Arrays.toString(incomingAcceptHeader));
         checkBindingErrors(bindingResult);
 
-        Supplier<String> errMsg = () -> String.format("Provide at least one from '%s', '%s' or '%s' as 'accept' header",
+        Supplier<String> errMsg = () -> "Provide at least one from '%s', '%s' or '%s' as 'accept' header".formatted(
                 GPAD_MEDIA_TYPE_STRING, GAF_MEDIA_TYPE_STRING, TSV_MEDIA_TYPE_STRING);
         Supplier<MediaType> firstSupportingTypeFromHeaders = () -> Stream.of(incomingAcceptHeader).map(MimeType::getSubtype)
             .filter(sbt -> sbt.equals(GPAD_SUB_TYPE) || sbt.equals(GAF_SUB_TYPE) || sbt.equals(TSV_SUB_TYPE))

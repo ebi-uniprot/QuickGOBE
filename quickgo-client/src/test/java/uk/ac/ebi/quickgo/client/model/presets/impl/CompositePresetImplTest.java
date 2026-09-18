@@ -5,6 +5,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import uk.ac.ebi.quickgo.client.model.presets.PresetItem;
 
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
@@ -177,7 +178,7 @@ class CompositePresetImplTest {
                 var presetItem = presetBuilder.getGoSlimSets().getFirst();
 
                 assertThat(presetItem.getProperty("aspect"), emptyOrNullString());
-                System.out.println(presetItem);
+                IO.println(presetItem);
                 var association = presetItem.getAssociations().getFirst();
                 assertThat(association.getProperty("aspect"), is("cellular_component"));
             }
@@ -273,7 +274,7 @@ class CompositePresetImplTest {
     }
 
     private static String anyId() {
-        return ID + Math.random();
+        return ID + ThreadLocalRandom.current().nextDouble();
     }
 
 

@@ -39,7 +39,7 @@ public class OntologyNameInjector extends AbstractValueInjector<BasicOntology, A
 
         List<BasicOntology.Result> results = response.getResults();
         if (!results.isEmpty()) {
-            annotation.goName = results.get(0).getName();
+            annotation.goName = results.getFirst().getName();
         }
     }
 }

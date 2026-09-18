@@ -31,23 +31,23 @@ class CoTermRepositorySimpleMapSuccessfulRetrievalIT {
     @Test
     void retrievalIsSuccessfulFromAll() {
         List<CoTerm> coTerms = coTermRepository.findCoTerms(GO_TERM_ID_ALL_ONLY, CoTermSource.ALL);
-        assertThat(coTerms.get(0).getTarget(), is(GO_TERM_ID_ALL_ONLY));
-        assertThat(coTerms.get(0).getComparedTerm(), is("GO:0003333"));
-        assertThat(coTerms.get(0).getProbabilityRatio(), is(486.4f));
-        assertThat(coTerms.get(0).getSimilarityRatio(), is(22.28f));
-        assertThat(coTerms.get(0).getTogether(), is(8632L));
-        assertThat(coTerms.get(0).getCompared(), is(5778L));
+        assertThat(coTerms.getFirst().getTarget(), is(GO_TERM_ID_ALL_ONLY));
+        assertThat(coTerms.getFirst().getComparedTerm(), is("GO:0003333"));
+        assertThat(coTerms.getFirst().getProbabilityRatio(), is(486.4f));
+        assertThat(coTerms.getFirst().getSimilarityRatio(), is(22.28f));
+        assertThat(coTerms.getFirst().getTogether(), is(8632L));
+        assertThat(coTerms.getFirst().getCompared(), is(5778L));
     }
 
     @Test
     void retrievalIsSuccessfulFromManual() {
         List<CoTerm> coTerms = coTermRepository.findCoTerms(GO_TERM_ID_MANUAL_ONLY, CoTermSource.MANUAL);
-        assertThat(coTerms.get(0).getTarget(), is(GO_TERM_ID_MANUAL_ONLY));
-        assertThat(coTerms.get(0).getComparedTerm(), is("GO:0004444"));
-        assertThat(coTerms.get(0).getProbabilityRatio(), is(302.4f));
-        assertThat(coTerms.get(0).getSimilarityRatio(), is(78.28f));
-        assertThat(coTerms.get(0).getTogether(), is(1933L));
-        assertThat(coTerms.get(0).getCompared(), is(5219L));
+        assertThat(coTerms.getFirst().getTarget(), is(GO_TERM_ID_MANUAL_ONLY));
+        assertThat(coTerms.getFirst().getComparedTerm(), is("GO:0004444"));
+        assertThat(coTerms.getFirst().getProbabilityRatio(), is(302.4f));
+        assertThat(coTerms.getFirst().getSimilarityRatio(), is(78.28f));
+        assertThat(coTerms.getFirst().getTogether(), is(1933L));
+        assertThat(coTerms.getFirst().getCompared(), is(5219L));
     }
 
     @Test

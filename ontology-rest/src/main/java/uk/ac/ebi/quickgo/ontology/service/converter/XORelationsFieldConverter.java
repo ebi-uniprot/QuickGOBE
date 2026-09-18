@@ -33,7 +33,7 @@ class XORelationsFieldConverter implements FieldConverter<OBOTerm.XORelation> {
         List<FlatField> fields = FlatFieldBuilder.parse(fieldsStr).getFields();
         if (fields.size() == FIELD_COUNT) {
             OBOTerm.XORelation xORel = new OBOTerm.XORelation();
-            xORel.id = cleanFieldValue(fields.get(0).buildString());
+            xORel.id = cleanFieldValue(fields.getFirst().buildString());
             xORel.term = cleanFieldValue(fields.get(1).buildString());
             xORel.namespace = cleanFieldValue(fields.get(2).buildString());
             xORel.url = cleanFieldValue(fields.get(3).buildString());

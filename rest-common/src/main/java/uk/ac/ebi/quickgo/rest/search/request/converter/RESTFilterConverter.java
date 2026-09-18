@@ -189,7 +189,7 @@ class RESTFilterConverter<T> implements FilterConverter<FilterRequest, T> {
             String timeoutValue = filterConfig.getProperties().get(TIMEOUT);
             try {
                 timeout = Integer.parseInt(timeoutValue);
-            } catch (NumberFormatException nfe) {
+            } catch (NumberFormatException _) {
                 validTimeout = false;
             }
             Preconditions

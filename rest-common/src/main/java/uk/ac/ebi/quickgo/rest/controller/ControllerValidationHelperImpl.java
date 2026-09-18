@@ -52,13 +52,13 @@ public class ControllerValidationHelperImpl implements ControllerValidationHelpe
     public ControllerValidationHelperImpl(int maxPageResults) {
         this(
                 maxPageResults,
-                anyId -> true);
+                _ -> true);
     }
 
     public ControllerValidationHelperImpl() {
         this(
                 MAX_PAGE_RESULTS,
-                anyId -> true);
+                _ -> true);
     }
 
     @Override public List<String> validateCSVIds(String ids) {

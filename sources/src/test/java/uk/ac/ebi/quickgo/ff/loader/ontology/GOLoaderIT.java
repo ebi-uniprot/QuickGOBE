@@ -40,7 +40,7 @@ class GOLoaderIT {
             assertThat(geneOntology, is(notNullValue()));
 
             //Highly input data specific
-            assertEquals(((GOTerm) geneOntology.getTerm("GO:0003774")).getBlacklist().get(0).getMethodId(),
+            assertEquals(((GOTerm) geneOntology.getTerm("GO:0003774")).getBlacklist().getFirst().getMethodId(),
                     "IPR001609|IPR002928");
         } catch (Exception e) {
             assertThat(e, is(nullValue()));

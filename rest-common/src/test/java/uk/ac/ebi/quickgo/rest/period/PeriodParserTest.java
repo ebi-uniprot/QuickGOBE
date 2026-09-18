@@ -18,7 +18,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
  */
 class PeriodParserTest {
 
-    private static final AlarmClock ALARM_CLOCK = target -> null;
+    private static final AlarmClock ALARM_CLOCK = _ -> null;
     private final PeriodParser periodParser = getPeriodParser();
 
     @Test

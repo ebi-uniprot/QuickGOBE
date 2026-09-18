@@ -172,7 +172,7 @@ class OntologyRequestValidationIT {
 
         assertThat(violations, hasSize(1));
         assertThat(violations.iterator().next().getMessage(),
-                is(String.format(DEFAULT_ERROR_MSG, "aspect", incorrectAspect)));
+                is(DEFAULT_ERROR_MSG.formatted("aspect", incorrectAspect)));
     }
 
     @Test

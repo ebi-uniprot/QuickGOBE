@@ -98,6 +98,6 @@ public class StatisticsByType {
             return approximateCount;
         }
         int value = new BigDecimal(approximateCount).divide(new BigDecimal(1000), RoundingMode.HALF_UP).intValue();
-        return Integer.parseInt(String.format("%d000", value));
+        return Integer.parseInt("%d000".formatted(value));
     }
 }

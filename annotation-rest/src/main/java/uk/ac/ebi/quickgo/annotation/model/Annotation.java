@@ -272,7 +272,7 @@ public class Annotation {
         }
 
         public String asXref() {
-            return String.format("%s:%s", db, id);
+            return "%s:%s".formatted(db, id);
         }
 
         @Override public boolean equals(Object o) {
@@ -350,7 +350,7 @@ public class Annotation {
 
         @Override
         public String asXref() {
-            return String.format("%s(%s:%s)", relation, db, id);
+            return "%s(%s:%s)".formatted(relation, db, id);
         }
 
         @Override public int hashCode() {

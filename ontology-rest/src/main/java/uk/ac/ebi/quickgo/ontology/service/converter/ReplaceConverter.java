@@ -31,7 +31,7 @@ class ReplaceConverter implements FieldConverter<OBOTerm.Replace> {
 
         if(fields.size() == FIELD_COUNT) {
             OBOTerm.Replace replace = new OBOTerm.Replace();
-            replace.id = cleanFieldValue(fields.get(0).buildString());
+            replace.id = cleanFieldValue(fields.getFirst().buildString());
             replace.type = cleanFieldValue(fields.get(1).buildString());
 
             return Optional.of(replace);

@@ -96,7 +96,7 @@ class GeneProductRepositoryIT extends SolrContainerTestSetup {
         List<GeneProductDocument> retrievedDoc = geneProductRepository.findById(Collections.singletonList(id));
 
         assertThat(retrievedDoc.isEmpty(), is(false));
-        assertThat(retrievedDoc.get(0).id, is(id));
+        assertThat(retrievedDoc.getFirst().id, is(id));
 
     }
 

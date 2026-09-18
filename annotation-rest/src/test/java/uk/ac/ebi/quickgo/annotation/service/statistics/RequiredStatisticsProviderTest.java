@@ -42,15 +42,15 @@ class RequiredStatisticsProviderTest {
         RequiredStatisticsProvider provider = new RequiredStatisticsProvider(standard, download);
 
         List<RequiredStatistic> requiredStatistics = provider.getStandardUsage();
-        assertThat(requiredStatistics.get(0).getTypes(), hasSize(6));
+        assertThat(requiredStatistics.getFirst().getTypes(), hasSize(6));
 
         requiredStatistics = provider.getDownloadUsage();
-        assertThat(requiredStatistics.get(0).getTypes(), hasSize(6));
+        assertThat(requiredStatistics.getFirst().getTypes(), hasSize(6));
 
         requiredStatistics = provider.getStandardUsageWithGeneProductFiltering();
-        assertThat(requiredStatistics.get(0).getTypes(), hasSize(7));
+        assertThat(requiredStatistics.getFirst().getTypes(), hasSize(7));
 
         requiredStatistics = provider.getDownloadUsageWithGeneProductFiltering();
-        assertThat(requiredStatistics.get(0).getTypes(), hasSize(7));
+        assertThat(requiredStatistics.getFirst().getTypes(), hasSize(7));
     }
 }

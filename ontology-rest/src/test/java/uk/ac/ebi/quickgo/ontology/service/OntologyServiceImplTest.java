@@ -123,7 +123,7 @@ class OntologyServiceImplTest {
                     goOntologyService.findCompleteInfoByOntologyId(singletonList(goId));
             assertThat(goTerms.size(), is(1));
 
-            GOTerm expectedGoTerm = goTerms.get(0);
+            GOTerm expectedGoTerm = goTerms.getFirst();
             assertThat(expectedGoTerm.id, is(equalTo(goId)));
         }
 
@@ -188,7 +188,7 @@ class OntologyServiceImplTest {
             assertThat(goTerms, is(not(nullValue())));
             assertThat(goTerms.size(), is(1));
 
-            GOTerm expectedGoTerm = goTerms.get(0);
+            GOTerm expectedGoTerm = goTerms.getFirst();
             assertThat(expectedGoTerm.id, is(equalTo(id)));
         }
 
@@ -206,7 +206,7 @@ class OntologyServiceImplTest {
             List<GOTerm> goTerms = goOntologyService.findHistoryInfoByOntologyId(singletonList(id));
             assertThat(goTerms.size(), is(1));
 
-            GOTerm expectedGoTerm = goTerms.get(0);
+            GOTerm expectedGoTerm = goTerms.getFirst();
             assertThat(expectedGoTerm.id, is(equalTo(id)));
         }
 
@@ -225,7 +225,7 @@ class OntologyServiceImplTest {
                     goOntologyService.findXRefsInfoByOntologyId(singletonList(id));
             assertThat(goTerms.size(), is(1));
 
-            GOTerm expectedGoTerm = goTerms.get(0);
+            GOTerm expectedGoTerm = goTerms.getFirst();
             assertThat(expectedGoTerm.id, is(equalTo(id)));
         }
 
@@ -243,7 +243,7 @@ class OntologyServiceImplTest {
             List<GOTerm> goTerms = goOntologyService.findTaxonConstraintsInfoByOntologyId(singletonList(id));
             assertThat(goTerms.size(), is(1));
 
-            GOTerm expectedGoTerm = goTerms.get(0);
+            GOTerm expectedGoTerm = goTerms.getFirst();
             assertThat(expectedGoTerm.id, is(equalTo(id)));
         }
 
@@ -261,7 +261,7 @@ class OntologyServiceImplTest {
             List<GOTerm> goTerms = goOntologyService.findXORelationsInfoByOntologyId(singletonList(id));
             assertThat(goTerms.size(), is(1));
 
-            GOTerm expectedGoTerm = goTerms.get(0);
+            GOTerm expectedGoTerm = goTerms.getFirst();
             assertThat(expectedGoTerm.id, is(equalTo(id)));
         }
 
@@ -279,7 +279,7 @@ class OntologyServiceImplTest {
             List<GOTerm> goTerms = goOntologyService.findAnnotationGuideLinesInfoByOntologyId(singletonList(id));
             assertThat(goTerms.size(), is(1));
 
-            GOTerm expectedGoTerm = goTerms.get(0);
+            GOTerm expectedGoTerm = goTerms.getFirst();
             assertThat(expectedGoTerm.id, is(equalTo(id)));
         }
 
@@ -308,7 +308,7 @@ class OntologyServiceImplTest {
             List<GOTerm> ancestors = goOntologyService.findAncestorsInfoByOntologyId(singletonList(id));
 
             assertThat(ancestors.size(), is(1));
-            assertThat(ancestors.get(0).ancestors, is(myAncestors));
+            assertThat(ancestors.getFirst().ancestors, is(myAncestors));
         }
 
         @Test
@@ -330,7 +330,7 @@ class OntologyServiceImplTest {
                     goOntologyService.findAncestorsInfoByOntologyId(singletonList(id), OntologyRelationType.CAPABLE_OF);
 
             assertThat(ancestors.size(), is(1));
-            assertThat(ancestors.get(0).ancestors, is(myAncestors));
+            assertThat(ancestors.getFirst().ancestors, is(myAncestors));
         }
 
         @Test
@@ -367,9 +367,9 @@ class OntologyServiceImplTest {
               .findChildrenInfoByOntologyId(singletonList(parentId));
 
             assertThat(children.size(), is(1));
-            assertThat(children.get(0).children.size(), is(1));
-            assertThat(children.get(0).children.get(0).hasChildren, is(false));
-            assertThat(children.get(0).children.get(0).relation, is(OntologyRelationType.IS_A));
+            assertThat(children.getFirst().children.size(), is(1));
+            assertThat(children.getFirst().children.getFirst().hasChildren, is(false));
+            assertThat(children.getFirst().children.getFirst().relation, is(OntologyRelationType.IS_A));
         }
 
         @Test
@@ -399,7 +399,7 @@ class OntologyServiceImplTest {
                     .findDescendantsInfoByOntologyId(singletonList(id));
 
             assertThat(descendants.size(), is(1));
-            assertThat(descendants.get(0).descendants, is(myDescendants));
+            assertThat(descendants.getFirst().descendants, is(myDescendants));
         }
 
         @Test
@@ -421,7 +421,7 @@ class OntologyServiceImplTest {
                     .findDescendantsInfoByOntologyId(singletonList(id), OntologyRelationType.CAPABLE_OF);
 
             assertThat(descendants.size(), is(1));
-            assertThat(descendants.get(0).descendants, is(myDescendants));
+            assertThat(descendants.getFirst().descendants, is(myDescendants));
         }
 
         //PATHS
@@ -567,7 +567,7 @@ class OntologyServiceImplTest {
             List<GOTerm> goTerms = goOntologyService.findSecondaryIdsByOntologyId(singletonList(id));
             assertThat(goTerms.size(), is(1));
 
-            GOTerm expectedGoTerm = goTerms.get(0);
+            GOTerm expectedGoTerm = goTerms.getFirst();
             assertThat(expectedGoTerm.id, is(equalTo(id)));
         }
 
@@ -618,7 +618,7 @@ class OntologyServiceImplTest {
             List<ECOTerm> ecoTerms = ecoOntologyService.findCompleteInfoByOntologyId(singletonList(ecoId));
             assertThat(ecoTerms.size(), is(1));
 
-            ECOTerm expectedEcoTerm = ecoTerms.get(0);
+            ECOTerm expectedEcoTerm = ecoTerms.getFirst();
             assertThat(expectedEcoTerm.id, is(equalTo(ecoId)));
         }
 
@@ -650,7 +650,7 @@ class OntologyServiceImplTest {
             assertThat(ecoTerms, is(not(nullValue())));
             assertThat(ecoTerms.size(), is(1));
 
-            ECOTerm expectedEcoTerm = ecoTerms.get(0);
+            ECOTerm expectedEcoTerm = ecoTerms.getFirst();
             assertThat(expectedEcoTerm.id, is(equalTo(ecoId)));
         }
 
@@ -668,7 +668,7 @@ class OntologyServiceImplTest {
             List<ECOTerm> ecoTerms = ecoOntologyService.findHistoryInfoByOntologyId(singletonList(id));
             assertThat(ecoTerms.size(), is(1));
 
-            ECOTerm expectedTerm = ecoTerms.get(0);
+            ECOTerm expectedTerm = ecoTerms.getFirst();
             assertThat(expectedTerm.id, is(equalTo(id)));
         }
 
@@ -687,7 +687,7 @@ class OntologyServiceImplTest {
                     ecoOntologyService.findXRefsInfoByOntologyId(singletonList(id));
             assertThat(ecoTerms.size(), is(1));
 
-            ECOTerm expectedTerm = ecoTerms.get(0);
+            ECOTerm expectedTerm = ecoTerms.getFirst();
             assertThat(expectedTerm.id, is(equalTo(id)));
         }
 
@@ -705,7 +705,7 @@ class OntologyServiceImplTest {
             List<ECOTerm> ecoTerms = ecoOntologyService.findTaxonConstraintsInfoByOntologyId(singletonList(id));
             assertThat(ecoTerms.size(), is(1));
 
-            ECOTerm expectedTerm = ecoTerms.get(0);
+            ECOTerm expectedTerm = ecoTerms.getFirst();
             assertThat(expectedTerm.id, is(equalTo(id)));
         }
 
@@ -723,7 +723,7 @@ class OntologyServiceImplTest {
             List<ECOTerm> ecoTerms = ecoOntologyService.findXORelationsInfoByOntologyId(singletonList(id));
             assertThat(ecoTerms.size(), is(1));
 
-            ECOTerm expectedTerm = ecoTerms.get(0);
+            ECOTerm expectedTerm = ecoTerms.getFirst();
             assertThat(expectedTerm.id, is(equalTo(id)));
         }
 
@@ -741,7 +741,7 @@ class OntologyServiceImplTest {
             List<ECOTerm> ecoTerms = ecoOntologyService.findAnnotationGuideLinesInfoByOntologyId(singletonList(id));
             assertThat(ecoTerms.size(), is(1));
 
-            ECOTerm expectedTerm = ecoTerms.get(0);
+            ECOTerm expectedTerm = ecoTerms.getFirst();
             assertThat(expectedTerm.id, is(equalTo(id)));
         }
 
@@ -770,7 +770,7 @@ class OntologyServiceImplTest {
             List<ECOTerm> ancestors = ecoOntologyService.findAncestorsInfoByOntologyId(singletonList(id));
 
             assertThat(ancestors.size(), is(1));
-            assertThat(ancestors.get(0).ancestors, is(myAncestors));
+            assertThat(ancestors.getFirst().ancestors, is(myAncestors));
         }
 
         @Test
@@ -792,7 +792,7 @@ class OntologyServiceImplTest {
                     .findAncestorsInfoByOntologyId(singletonList(id), OntologyRelationType.CAPABLE_OF);
 
             assertThat(ancestors.size(), is(1));
-            assertThat(ancestors.get(0).ancestors, is(myAncestors));
+            assertThat(ancestors.getFirst().ancestors, is(myAncestors));
         }
 
         @Test
@@ -820,7 +820,7 @@ class OntologyServiceImplTest {
             List<ECOTerm> descendants = ecoOntologyService.findDescendantsInfoByOntologyId(singletonList(id));
 
             assertThat(descendants.size(), is(1));
-            assertThat(descendants.get(0).descendants, is(myDescendants));
+            assertThat(descendants.getFirst().descendants, is(myDescendants));
         }
 
         @Test
@@ -843,7 +843,7 @@ class OntologyServiceImplTest {
                                                                                                    .CAPABLE_OF);
 
             assertThat(descendants.size(), is(1));
-            assertThat(descendants.get(0).descendants, is(myDescendants));
+            assertThat(descendants.getFirst().descendants, is(myDescendants));
         }
 
         @Test
@@ -913,7 +913,7 @@ class OntologyServiceImplTest {
             List<ECOTerm> ecoTerms = ecoOntologyService.findSecondaryIdsByOntologyId(singletonList(id));
             assertThat(ecoTerms.size(), is(1));
 
-            ECOTerm expectedTerm = ecoTerms.get(0);
+            ECOTerm expectedTerm = ecoTerms.getFirst();
             assertThat(expectedTerm.id, is(equalTo(id)));
         }
 

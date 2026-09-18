@@ -80,7 +80,7 @@ public class PresetsConfigHelper {
      * @param reader the resource reader
      */
     private static <T> void setResourceComparator(MultiResourceItemReader<T> reader) {
-        reader.setComparator((o1, o2) -> 0);
+        reader.setComparator((_, _) -> 0);
     }
 
     private static class GZIPResource extends InputStreamResource implements Resource {

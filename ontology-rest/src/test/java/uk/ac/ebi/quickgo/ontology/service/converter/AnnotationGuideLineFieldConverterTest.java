@@ -43,7 +43,7 @@ class AnnotationGuideLineFieldConverterTest {
 
         List<OBOTerm.AnnotationGuideLine> annotationGuideLines = converter.convertFieldList(rawAnnotationGuideLines);
         assertThat(annotationGuideLines.size(), is(2));
-        assertThat(annotationGuideLines.get(0).description, is(description0));
+        assertThat(annotationGuideLines.getFirst().description, is(description0));
         assertThat(annotationGuideLines.get(1).url, is(url1));
     }
 

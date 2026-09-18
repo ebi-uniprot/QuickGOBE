@@ -43,6 +43,6 @@ public class OntologyNameInjectorTestHelper {
 
     public static void injectValueSuccessfully(String goName){
         assertThat(goName, is(not(nullValue())));
-        assertThat(goName, is(basicOntology.getResults().get(0).getName()));
+        assertThat(goName, is(basicOntology.getResults().getFirst().getName()));
     }
 }

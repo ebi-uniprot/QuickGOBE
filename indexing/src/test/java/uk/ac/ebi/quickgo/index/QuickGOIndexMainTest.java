@@ -95,7 +95,7 @@ class QuickGOIndexMainTest {
             return System.out::println;
         }
 
-        public static void main(String[] args) {
+        void main(String[] args) {
             System.exit(QuickGOIndexMain.run(SuccessfulTestApp.class, args));
         }
     }
@@ -112,12 +112,12 @@ class QuickGOIndexMainTest {
                 if (itemCount >= WHEN_TO_FAIL) {
                     throw new SolrServerException("localhost 999 No registered leader");
                 } else {
-                    System.out.println(list);
+                    IO.println(list);
                 }
             };
         }
 
-        public static void main(String[] args) {
+        void main(String[] args) {
             System.exit(QuickGOIndexMain.run(FailingTestApp.class, args));
         }
     }

@@ -66,7 +66,7 @@ class OntologyRepositoryIT extends SolrContainerTestSetup {
                 ontologyRepository.findCoreAttrByTermId(OntologyType.GO.name(), buildIdList(id));
         assertThat(results.size(), is(1));
 
-        OntologyDocument ontologyDocument = results.get(0);
+        OntologyDocument ontologyDocument = results.getFirst();
         assertThat(copyAsCoreDoc(ontologyDocument), is(equalTo(ontologyDocument)));
     }
 
@@ -98,7 +98,7 @@ class OntologyRepositoryIT extends SolrContainerTestSetup {
         assertThat(resultList, is(notNullValue()));
         assertThat(resultList.size(), is(1));
 
-        OntologyDocument ontologyDocument = resultList.get(0);
+        OntologyDocument ontologyDocument = resultList.getFirst();
         assertThat(ontologyDocument.replaces, hasSize(doc.replaces.size()));
     }
 
@@ -114,7 +114,7 @@ class OntologyRepositoryIT extends SolrContainerTestSetup {
         assertThat(resultList, is(notNullValue()));
         assertThat(resultList.size(), is(1));
 
-        OntologyDocument ontologyDocument = resultList.get(0);
+        OntologyDocument ontologyDocument = resultList.getFirst();
         assertThat(ontologyDocument.replacements, hasSize(doc.replacements.size()));
     }
 
@@ -129,7 +129,7 @@ class OntologyRepositoryIT extends SolrContainerTestSetup {
         assertThat(resultList, is(notNullValue()));
         assertThat(resultList.size(), is(1));
 
-        OntologyDocument doc = resultList.get(0);
+        OntologyDocument doc = resultList.getFirst();
         OntologyDocument docToMatch = copyAsBasicDoc(doc);
         docToMatch.history = doc.history;
         assertThat(doc, is(equalTo(docToMatch)));
@@ -146,7 +146,7 @@ class OntologyRepositoryIT extends SolrContainerTestSetup {
         assertThat(resultList, is(notNullValue()));
         assertThat(resultList.size(), is(1));
 
-        OntologyDocument doc = resultList.get(0);
+        OntologyDocument doc = resultList.getFirst();
         OntologyDocument docToMatch = copyAsBasicDoc(doc);
         docToMatch.xrefs = doc.xrefs;
         assertThat(doc, is(equalTo(docToMatch)));
@@ -164,7 +164,7 @@ class OntologyRepositoryIT extends SolrContainerTestSetup {
         assertThat(resultList, is(notNullValue()));
         assertThat(resultList.size(), is(1));
 
-        OntologyDocument doc = resultList.get(0);
+        OntologyDocument doc = resultList.getFirst();
         OntologyDocument docToMatch = copyAsBasicDoc(doc);
         docToMatch.annotationGuidelines = doc.annotationGuidelines;
         assertThat(doc, is(equalTo(docToMatch)));
@@ -182,7 +182,7 @@ class OntologyRepositoryIT extends SolrContainerTestSetup {
         assertThat(resultList, is(notNullValue()));
         assertThat(resultList.size(), is(1));
 
-        OntologyDocument doc = resultList.get(0);
+        OntologyDocument doc = resultList.getFirst();
         OntologyDocument docToMatch = copyAsBasicDoc(doc);
         docToMatch.taxonConstraints = doc.taxonConstraints;
         docToMatch.blacklist = doc.blacklist;
@@ -201,7 +201,7 @@ class OntologyRepositoryIT extends SolrContainerTestSetup {
         assertThat(resultList, is(notNullValue()));
         assertThat(resultList.size(), is(1));
 
-        OntologyDocument doc = resultList.get(0);
+        OntologyDocument doc = resultList.getFirst();
         OntologyDocument docToMatch = copyAsBasicDoc(doc);
         docToMatch.xRelations = doc.xRelations;
         assertThat(doc, is(equalTo(docToMatch)));
@@ -237,7 +237,7 @@ class OntologyRepositoryIT extends SolrContainerTestSetup {
                 ontologyRepository.findAllByOntologyType(OntologyType.GO.name(), PageRequest.of(0, 2));
 
         assertThat(pagedDocs.getTotalElements(), is(1L));
-        assertThat(pagedDocs.getContent().get(0).getUniqueName(), is(goDoc.getUniqueName()));
+        assertThat(pagedDocs.getContent().getFirst().getUniqueName(), is(goDoc.getUniqueName()));
     }
 
     @Test
@@ -256,7 +256,7 @@ class OntologyRepositoryIT extends SolrContainerTestSetup {
                     ontologyRepository.findAllByOntologyType(OntologyType.GO.name(), PageRequest.of(count++, 1));
 
             assertThat(pagedDocs.getContent(), hasSize(1));
-            assertThat(pagedDocs.getContent().get(0).getUniqueName(), is(ontologyDocument.getUniqueName()));
+            assertThat(pagedDocs.getContent().getFirst().getUniqueName(), is(ontologyDocument.getUniqueName()));
         }
     }
 
@@ -305,7 +305,7 @@ class OntologyRepositoryIT extends SolrContainerTestSetup {
         assertThat(resultList, is(notNullValue()));
         assertThat(resultList.size(), is(1));
 
-        OntologyDocument doc = resultList.get(0);
+        OntologyDocument doc = resultList.getFirst();
         OntologyDocument docToMatch = copyAsBasicDoc(doc);
         docToMatch.secondaryIds = doc.secondaryIds;
         assertThat(doc, is(equalTo(docToMatch)));

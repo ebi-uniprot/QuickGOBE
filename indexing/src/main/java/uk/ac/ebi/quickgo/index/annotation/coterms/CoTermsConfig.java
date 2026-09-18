@@ -53,7 +53,7 @@ public class CoTermsConfig {
     private static final Predicate<AnnotationDocument>
             EXCLUDE_ANNOTATIONS_PRODUCED_BY_ELECTRONIC_MEANS =
             annotationDocument -> !ELECTRONIC.equals(annotationDocument.goEvidence);
-    private static final Predicate<AnnotationDocument> INCLUDE_ALL_ANNOTATIONS = annotationDocument -> true;
+    private static final Predicate<AnnotationDocument> INCLUDE_ALL_ANNOTATIONS = _ -> true;
     private static final Logger LOGGER = LoggerFactory.getLogger(CoTermsConfig.class);
 
     public static final String CO_TERM_MANUAL_SUMMARIZATION_STEP = "coTermManualSummarizationStep";

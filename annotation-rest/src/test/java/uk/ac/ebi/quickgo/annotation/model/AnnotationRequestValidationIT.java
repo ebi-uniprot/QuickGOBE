@@ -694,8 +694,8 @@ class AnnotationRequestValidationIT {
     void exceedingMaximumNumberOfReferencesSendsError() {
         int numRefs = AnnotationRequest.MAX_REFERENCES + 1;
         List<String> refs = IntStream.range(0, numRefs)
-                .mapToObj(i -> "PMID:123456")
-                .collect(toList());
+                .mapToObj(_ -> "PMID:123456")
+                .toList();
         annotationRequest.setReference(refs.toArray(new String[0]));
         Set<ConstraintViolation<AnnotationRequest>> violations = validator.validate(annotationRequest);
 
@@ -870,7 +870,7 @@ class AnnotationRequestValidationIT {
     // Helpers
     private String createRegexErrorMessage(String paramName, String... invalidItems) {
         String csvInvalidItems = Stream.of(invalidItems).collect(Collectors.joining(", "));
-        return String.format(ArrayPattern.DEFAULT_ERROR_MSG, paramName, csvInvalidItems);
+        return ArrayPattern.DEFAULT_ERROR_MSG.formatted(paramName, csvInvalidItems);
     }
 
     private String createMaxSizeErrorMessage(String paramName, int maxSize) {

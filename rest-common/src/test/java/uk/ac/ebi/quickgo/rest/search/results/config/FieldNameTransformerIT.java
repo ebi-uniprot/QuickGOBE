@@ -45,7 +45,7 @@ class FieldNameTransformerIT {
     @ComponentScan
     @EnableConfigurationProperties
     public static class TestApplication {
-        public static void main(String[] args) {
+        void main() {
             SpringApplication.run(TestApplication.class);
         }
     }

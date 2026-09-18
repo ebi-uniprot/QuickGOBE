@@ -162,7 +162,7 @@ public class OntologyGraphConfig {
      * @param reader the resource reader
      */
     private void setResourceComparator(MultiResourceItemReader<RawOntologyRelationship> reader) {
-        reader.setComparator((o1, o2) -> 0);
+        reader.setComparator((_, _) -> 0);
     }
 
     private static class GZipBufferedReaderFactory implements BufferedReaderFactory {

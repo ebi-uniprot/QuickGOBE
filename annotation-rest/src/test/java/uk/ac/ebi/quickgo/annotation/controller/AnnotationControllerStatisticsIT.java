@@ -487,7 +487,7 @@ class AnnotationControllerStatisticsIT extends SolrContainerTestSetup {
     }
 
     private String createId(int idNum) {
-        return String.format("A0A%03d", idNum);
+        return "A0A%03d".formatted(idNum);
     }
 
     private String[] expectedNames(int expectedSize, String source) {

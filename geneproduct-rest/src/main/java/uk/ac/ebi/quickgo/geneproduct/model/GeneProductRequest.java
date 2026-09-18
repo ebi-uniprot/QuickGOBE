@@ -187,8 +187,7 @@ public class GeneProductRequest {
 
         Stream.of(TARGET_FIELDS)
                 .map(this::createFilter)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
+                .flatMap(Optional::stream)
                 .forEach(filterRequests::add);
 
         return filterRequests;

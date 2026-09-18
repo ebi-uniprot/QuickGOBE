@@ -44,7 +44,7 @@ public class GraphImageServiceImpl implements GraphImageService {
             String description;
             int idsSize = ids.size();
             if (idsSize == 1) {
-                description = "Ancestor chart for " + ids.get(0);
+                description = "Ancestor chart for " + ids.getFirst();
             } else if (idsSize < TERM_DISPLAY_THRESHOLD) {
                 description = "Comparison chart for " + ids.stream().collect(joining(","));
             } else {

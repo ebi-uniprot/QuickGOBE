@@ -76,7 +76,7 @@ class GeneProductSolrQueryResultConverterTest {
         List<GeneProduct> results = converter.convertResults(solrDocList);
 
         assertThat(results, hasSize(1));
-        assertThat(results.get(0), is(goTerm));
+        assertThat(results.getFirst(), is(goTerm));
     }
 
     private void mockSolrDocToGeneProductDocConversion(SolrDocumentList solrDocList, List<GeneProductDocument> termDocs) {

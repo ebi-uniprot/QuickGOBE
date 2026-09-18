@@ -42,7 +42,7 @@ class ItemRateWriterListenerTest {
         itemRateWriterListener.afterWrite(mockedWrittenDocList);
         ItemRateWriterListener.StatsInfo statsInfo = itemRateWriterListener.computeWriteRateStats(fiveSecsAfterStart);
 
-        System.out.println(statsInfo.toString());
+        IO.println(statsInfo.toString());
         assertThat(statsInfo.totalSeconds, is(5L));
         assertThat(statsInfo.totalWriteCount, is(numDocs));
     }
@@ -65,7 +65,7 @@ class ItemRateWriterListenerTest {
 
         ItemRateWriterListener.StatsInfo statsInfo = itemRateWriterListener.computeWriteRateStats(twoSecsAfterStart);
 
-        System.out.println(statsInfo);
+        IO.println(statsInfo);
         assertThat(statsInfo.deltaWriteCount, is(tenDocs));
         // do not test delta time, because it internally uses
         assertThat(statsInfo.totalSeconds, is(twoSeconds));

@@ -86,7 +86,7 @@ class SolrQueryResultConverterTest {
         List<OBOTerm> results = converter.convertResults(solrDocList);
 
         assertThat(results, hasSize(1));
-        assertThat(results.get(0), is(goTerm));
+        assertThat(results.getFirst(), is(goTerm));
     }
 
     @Test
@@ -107,7 +107,7 @@ class SolrQueryResultConverterTest {
         List<OBOTerm> results = converter.convertResults(solrDocList);
 
         assertThat(results, hasSize(1));
-        assertThat(results.get(0), is(ecoTerm));
+        assertThat(results.getFirst(), is(ecoTerm));
     }
 
     private void mockSolrDocToOntologyDocConversion(SolrDocumentList solrDocList, List<OntologyDocument> termDocs) {

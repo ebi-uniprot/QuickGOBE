@@ -68,7 +68,7 @@ class GeneProductControllerIT extends SolrContainerTestSetup {
         List<GeneProductDocument> basicDocs = createBasicDocs();
         assertThat(basicDocs.size(), is(greaterThan(1)));
 
-        validId = basicDocs.get(0).id;
+        validId = basicDocs.getFirst().id;
         validIdsCSV = basicDocs.stream().map(doc -> doc.id).collect(Collectors.joining(","));
         validIdList = Arrays.asList(validIdsCSV.split(COMMA));
 
@@ -91,7 +91,7 @@ class GeneProductControllerIT extends SolrContainerTestSetup {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
         List<GeneProductDocument> basicDocs = createBasicComplexPortalDocs();
         geneProductRepository.saveAll(basicDocs);
-        ResultActions response = mockMvc.perform(get(buildGeneProductURL(basicDocs.get(0).id)));
+        ResultActions response = mockMvc.perform(get(buildGeneProductURL(basicDocs.getFirst().id)));
 
         response.andDo(print())
                 .andExpect(jsonPath("$.results.*.id", hasSize(1)))

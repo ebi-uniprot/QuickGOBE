@@ -100,7 +100,7 @@ class GeneProductRequestTest {
 
         assertThat(filters, hasSize(1));
 
-        FilterRequest filterRequest = filters.get(0);
+        FilterRequest filterRequest = filters.getFirst();
 
         assertValueInFilter(filterRequest, dbSubset);
     }
@@ -115,7 +115,7 @@ class GeneProductRequestTest {
 
         assertThat(filters, hasSize(1));
 
-        FilterRequest filterRequest = filters.get(0);
+        FilterRequest filterRequest = filters.getFirst();
 
         assertValueInFilter(filterRequest, taxonId);
     }
@@ -130,7 +130,7 @@ class GeneProductRequestTest {
 
         assertThat(filters, hasSize(1));
 
-        FilterRequest filterRequest = filters.get(0);
+        FilterRequest filterRequest = filters.getFirst();
 
         assertValueInFilter(filterRequest, protein);
     }
@@ -145,7 +145,7 @@ class GeneProductRequestTest {
 
         assertThat(filters, hasSize(1));
 
-        FilterRequest filterRequest = filters.get(0);
+        FilterRequest filterRequest = filters.getFirst();
 
         assertValueInFilter(filterRequest, proteomeStatus);
     }

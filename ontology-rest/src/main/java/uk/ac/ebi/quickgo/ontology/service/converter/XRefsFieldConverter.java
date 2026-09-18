@@ -35,7 +35,7 @@ class XRefsFieldConverter implements FieldConverter<OBOTerm.XRef> {
         List<FlatField> fields = FlatFieldBuilder.parse(fieldsStr).getFields();
         if (fields.size() == FIELD_COUNT) {
             OBOTerm.XRef xref = new OBOTerm.XRef();
-            xref.dbCode = cleanFieldValue(fields.get(0).buildString());
+            xref.dbCode = cleanFieldValue(fields.getFirst().buildString());
             xref.dbId = cleanFieldValue(fields.get(1).buildString());
             xref.name = cleanFieldValue(fields.get(2).buildString());
             return Optional.of(xref);

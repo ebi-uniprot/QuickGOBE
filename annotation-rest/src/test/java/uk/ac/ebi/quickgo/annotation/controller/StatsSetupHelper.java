@@ -49,7 +49,7 @@ public class StatsSetupHelper {
 
     void expectEcoCodeHasNameViaRest(String id, String name, int number) {
         IntStream.range(0, number)
-                .forEach(i -> expectResultViaOntologyRest(ECO_TERM_RESOURCE_FORMAT, id, name));
+                .forEach(_ -> expectResultViaOntologyRest(ECO_TERM_RESOURCE_FORMAT, id, name));
     }
 
     void expectFailureToGetNameForGoTermViaRest(int number, Function<Integer, String> toId) {
@@ -60,7 +60,7 @@ public class StatsSetupHelper {
 
     void expectFailureToGetTaxonomyNameViaRest(String id, int number) {
         IntStream.range(0, number)
-                .forEach(i -> expectRestCall(buildTaxResource(id), withStatus(NOT_FOUND)));
+                .forEach(_ -> expectRestCall(buildTaxResource(id), withStatus(NOT_FOUND)));
     }
 
     void expectTaxonIdHasNameViaRest(String id, String name) {
@@ -70,7 +70,7 @@ public class StatsSetupHelper {
 
     void expectFailureToGetEcoNameViaRest(String id, int number) {
         IntStream.range(0, number)
-                .forEach(i -> expectRestCall(buildECOResource(id), withStatus(NOT_FOUND)));
+                .forEach(_ -> expectRestCall(buildECOResource(id), withStatus(NOT_FOUND)));
     }
 
     private void expectResultViaOntologyRest(String resourceFormat, String id, String response) {
@@ -124,7 +124,7 @@ public class StatsSetupHelper {
                 args.add("");
             }
         }
-        return String.format(format, args.toArray());
+        return format.formatted(args.toArray());
     }
 
     private <T> String getResponseAsString(T response) {

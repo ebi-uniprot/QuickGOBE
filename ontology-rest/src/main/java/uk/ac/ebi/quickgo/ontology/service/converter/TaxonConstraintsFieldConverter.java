@@ -35,7 +35,7 @@ class TaxonConstraintsFieldConverter implements FieldConverter<OBOTerm.TaxonCons
 
         if (fields.size() == FIELD_COUNT) {
             OBOTerm.TaxonConstraint taxonConstraint = new OBOTerm.TaxonConstraint();
-            taxonConstraint.ancestorId = cleanFieldValue(fields.get(0).buildString());
+            taxonConstraint.ancestorId = cleanFieldValue(fields.getFirst().buildString());
             taxonConstraint.ancestorName = cleanFieldValue(fields.get(1).buildString());
             taxonConstraint.relationship = cleanFieldValue(fields.get(2).buildString());
             taxonConstraint.taxId = cleanFieldValue(fields.get(3).buildString());

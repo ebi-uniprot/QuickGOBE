@@ -65,8 +65,8 @@ class SynonymsFieldConverterTest {
                 .buildString());
         List<OBOTerm.Synonym> synonyms = converter.convertFieldList(rawSynonyms);
         assertThat(synonyms.size(), is(1));
-        assertThat(synonyms.get(0).name, is(equalTo("syn name 0")));
-        assertThat(synonyms.get(0).type, is(equalTo("syn type 0")));
+        assertThat(synonyms.getFirst().name, is(equalTo("syn name 0")));
+        assertThat(synonyms.getFirst().type, is(equalTo("syn type 0")));
     }
 
     /**
@@ -88,8 +88,8 @@ class SynonymsFieldConverterTest {
         );
         List<OBOTerm.Synonym> synonyms = converter.convertFieldList(rawSynonyms);
         assertThat(synonyms.size(), is(2));
-        assertThat(synonyms.get(0).name, is(equalTo("syn name 0")));
-        assertThat(synonyms.get(0).type, is(equalTo("syn type 0")));
+        assertThat(synonyms.getFirst().name, is(equalTo("syn name 0")));
+        assertThat(synonyms.getFirst().type, is(equalTo("syn type 0")));
 
         assertThat(synonyms.get(1).name, is(equalTo("syn name 1")));
         assertThat(synonyms.get(1).type, is(equalTo("syn type 1")));

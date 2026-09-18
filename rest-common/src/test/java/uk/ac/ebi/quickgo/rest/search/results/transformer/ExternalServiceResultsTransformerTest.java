@@ -88,7 +88,7 @@ class ExternalServiceResultsTransformerTest {
         QueryResult<FakeResponseModel> queryResult = createQueryResult(annotations);
         resultsTransformer.transform(queryResult, filterContext);
 
-        verify(mockGoNameInjector, times(1)).inject(mockRestFetcher, annotations.get(0));
+        verify(mockGoNameInjector, times(1)).inject(mockRestFetcher, annotations.getFirst());
         verify(mockGoNameInjector, times(1)).inject(mockRestFetcher, annotations.get(1));
         verify(mockTaxonNameInjector, times(0)).inject(any(), any());
     }
@@ -108,9 +108,9 @@ class ExternalServiceResultsTransformerTest {
         QueryResult<FakeResponseModel> queryResult = createQueryResult(annotations);
         resultsTransformer.transform(queryResult, filterContext);
 
-        verify(mockGoNameInjector, times(1)).inject(mockRestFetcher, annotations.get(0));
+        verify(mockGoNameInjector, times(1)).inject(mockRestFetcher, annotations.getFirst());
         verify(mockGoNameInjector, times(1)).inject(mockRestFetcher, annotations.get(1));
-        verify(mockTaxonNameInjector, times(1)).inject(mockRestFetcher, annotations.get(0));
+        verify(mockTaxonNameInjector, times(1)).inject(mockRestFetcher, annotations.getFirst());
         verify(mockTaxonNameInjector, times(1)).inject(mockRestFetcher, annotations.get(1));
     }
 
@@ -122,18 +122,18 @@ class ExternalServiceResultsTransformerTest {
                 new ExecutionException(new HttpClientErrorException(HttpStatus.NOT_FOUND));
 
         List<FakeResponseModel> annotations = createMockedAnnotationList(1);
-        assertThat(annotations.get(0).goName, is(nullValue()));
+        assertThat(annotations.getFirst().goName, is(nullValue()));
 
         resultsTransformer.transform(createQueryResult(annotations), filterContext);
 
-        verify(mockGoNameInjector, times(1)).inject(mockRestFetcher, annotations.get(0));
-        assertThat(annotations.get(0).goName, is(nullValue()));
+        verify(mockGoNameInjector, times(1)).inject(mockRestFetcher, annotations.getFirst());
+        assertThat(annotations.getFirst().goName, is(nullValue()));
     }
 
     // -------------------- helpers --------------------
     private List<FakeResponseModel> createMockedAnnotationList(int docCount) {
         return IntStream.range(0, docCount)
-                .mapToObj(i -> new FakeResponseModel())
+                .mapToObj(_ -> new FakeResponseModel())
                 .collect(Collectors.toList());
     }
 

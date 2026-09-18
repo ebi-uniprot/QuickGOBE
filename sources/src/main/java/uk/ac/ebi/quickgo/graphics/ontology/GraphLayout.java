@@ -460,12 +460,12 @@ public class GraphLayout<N extends IPositionableNode, E extends IRoutableEdge<N>
         }
 
         int getWidth() {
-            final HierarchicalNode nd = nodes.get(nodes.size() - 1);
+            final HierarchicalNode nd = nodes.getLast();
             return nd.location + nd.withinLevelSize / 2;
         }
 
         int getStart() {
-            final HierarchicalNode nd = nodes.get(0);
+            final HierarchicalNode nd = nodes.getFirst();
             return nd.location - nd.withinLevelSize / 2;
         }
 

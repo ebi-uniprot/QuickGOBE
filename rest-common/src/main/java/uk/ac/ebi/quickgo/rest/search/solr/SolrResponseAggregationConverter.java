@@ -156,7 +156,7 @@ public class SolrResponseAggregationConverter implements AggregationConverter<So
 
         try {
             AggregateFunction.typeOf(fieldPrefix);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException _) {
             isAggregateFunction = false;
         }
 
@@ -241,14 +241,11 @@ public class SolrResponseAggregationConverter implements AggregationConverter<So
     private double convertToDouble(Object number) {
         double convertedValue;
 
-        if (number instanceof Double no) {
-            convertedValue = no;
-        } else if (number instanceof Long no) {
-            convertedValue = no;
-        } else if (number instanceof Integer no) {
-            convertedValue = no.doubleValue();
-        } else {
-            throw new IllegalArgumentException("Unable to convert number: " + number);
+        switch (number) {
+            case Double no -> convertedValue = no;
+            case Long no -> convertedValue = no;
+            case Integer no -> convertedValue = no.doubleValue();
+            default -> throw new IllegalArgumentException("Unable to convert number: " + number);
         }
 
         return convertedValue;

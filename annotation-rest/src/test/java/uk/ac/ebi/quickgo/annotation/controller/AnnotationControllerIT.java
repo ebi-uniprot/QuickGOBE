@@ -933,7 +933,7 @@ class AnnotationControllerIT extends SolrContainerTestSetup {
         String geneProductId = "Z0Z000";
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search").param(GENE_PRODUCT_ID_PARAM.getName(), geneProductId)
-                        .param(GENE_PRODUCT_ID_PARAM.getName(), genericDocs.get(0).geneProductId)
+                        .param(GENE_PRODUCT_ID_PARAM.getName(), genericDocs.getFirst().geneProductId)
                         .param(GENE_PRODUCT_ID_PARAM.getName(), genericDocs.get(1).geneProductId));
 
         response.andDo(print())
@@ -941,7 +941,7 @@ class AnnotationControllerIT extends SolrContainerTestSetup {
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(2))
                 .andExpect(fieldsInAllResultsExist(2))
-                .andExpect(itemExistsExpectedTimes(GENEPRODUCT_ID_FIELD, genericDocs.get(0).geneProductId, 1))
+                .andExpect(itemExistsExpectedTimes(GENEPRODUCT_ID_FIELD, genericDocs.getFirst().geneProductId, 1))
                 .andExpect(itemExistsExpectedTimes(GENEPRODUCT_ID_FIELD, genericDocs.get(1).geneProductId, 1));
     }
 
@@ -949,15 +949,15 @@ class AnnotationControllerIT extends SolrContainerTestSetup {
     void filterByGeneProductIDAndAssignedBySuccessfully() throws Exception {
         ResultActions response = mockMvc.perform(
                 get(RESOURCE_URL + "/search")
-                        .param(GENE_PRODUCT_ID_PARAM.getName(), genericDocs.get(0).geneProductId)
-                        .param(ASSIGNED_BY_PARAM.getName(), genericDocs.get(0).assignedBy));
+                        .param(GENE_PRODUCT_ID_PARAM.getName(), genericDocs.getFirst().geneProductId)
+                        .param(ASSIGNED_BY_PARAM.getName(), genericDocs.getFirst().assignedBy));
 
         response.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(contentTypeToBeJson())
                 .andExpect(totalNumOfResults(1))
                 .andExpect(fieldsInAllResultsExist(1))
-                .andExpect(itemExistsExpectedTimes(GENEPRODUCT_ID_FIELD, genericDocs.get(0).geneProductId, 1))
+                .andExpect(itemExistsExpectedTimes(GENEPRODUCT_ID_FIELD, genericDocs.getFirst().geneProductId, 1))
                 .andExpect(itemExistsExpectedTimes(ASSIGNED_BY_FIELD, genericDocs.get(1).assignedBy, 1));
     }
 
@@ -2022,7 +2022,7 @@ class AnnotationControllerIT extends SolrContainerTestSetup {
         mockRestServiceServer = MockRestServiceServer.createServer((RestTemplate) restOperations);
 
         String term = createGoId(1);
-        String url = String.format("https://localhost/QuickGO/services/ontology/go/terms/%s/descendants?relations=is_a,part_of,occurs_in",term);
+        String url = "https://localhost/QuickGO/services/ontology/go/terms/%s/descendants?relations=is_a,part_of,occurs_in".formatted(term);
 
         mockRestServiceServer.expect(requestTo(url)).andExpect(method(HttpMethod.GET))
           .andRespond(withSuccess("{\"results\": [{\"descendants\": [\"GO:0000001\"]}]}", MediaType.APPLICATION_JSON));
@@ -2134,14 +2134,14 @@ class AnnotationControllerIT extends SolrContainerTestSetup {
             List<Integer> lineage) {
 
         AnnotationDocument doc = AnnotationDocMocker.createAnnotationDoc(geneProductId);
-        doc.taxonId = lineage.get(0);
+        doc.taxonId = lineage.getFirst();
         doc.taxonAncestors = lineage;
 
         return doc;
     }
 
     private String getRequiredDateString(int year, int month, int date) {
-        return String.format(DATE_STRING_FORMAT, year, month, date);
+        return DATE_STRING_FORMAT.formatted(year, month, date);
     }
 
     //----- Setup data ---------------------//

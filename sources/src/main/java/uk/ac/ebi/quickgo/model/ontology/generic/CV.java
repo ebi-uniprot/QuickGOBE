@@ -121,7 +121,7 @@ public class CV {
 		logger.info("Dump of CV: " + tag);
 		for (String key : vocabulary.keySet()) {
 			Item item = vocabulary.get(key);
-			System.out.println(key + " => " + item);
+            IO.println(key + " => " + item);
 		}
 	}
 }

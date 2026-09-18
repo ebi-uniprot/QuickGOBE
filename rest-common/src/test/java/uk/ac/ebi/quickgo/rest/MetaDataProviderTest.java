@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class MetaDataProviderTest {
 
     private static final MetaData METADATA = new MetaData();
-    private static final  Function<Path,MetaData> FAKE_MAPPER = (Path p) -> METADATA;
+    private static final  Function<Path,MetaData> FAKE_MAPPER = (Path _) -> METADATA;
     private static final Path PATH_TO_NOWHERE = Path.of("/path/to/nowhere");
 
     @Test

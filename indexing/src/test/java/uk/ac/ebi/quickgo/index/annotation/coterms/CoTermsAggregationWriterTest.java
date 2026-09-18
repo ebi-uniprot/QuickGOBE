@@ -26,7 +26,7 @@ class CoTermsAggregationWriterTest {
 
     @BeforeEach
     void setup() {
-        aggregator = new CoTermsAggregationWriter(t -> true);
+        aggregator = new CoTermsAggregationWriter(_ -> true);
     }
 
     @Test

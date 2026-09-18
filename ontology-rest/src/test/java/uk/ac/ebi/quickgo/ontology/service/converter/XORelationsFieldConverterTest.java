@@ -60,8 +60,8 @@ class XORelationsFieldConverterTest {
 
         List<OBOTerm.XORelation> xORefs = converter.convertFieldList(rawXORels);
         assertThat(xORefs.size(), is(2));
-        assertThat(xORefs.get(0).id, is(id0));
-        assertThat(xORefs.get(0).url, is(url0));
+        assertThat(xORefs.getFirst().id, is(id0));
+        assertThat(xORefs.getFirst().url, is(url0));
         assertThat(xORefs.get(1).namespace, is(namespace1));
         assertThat(xORefs.get(1).url, is(url1));
     }

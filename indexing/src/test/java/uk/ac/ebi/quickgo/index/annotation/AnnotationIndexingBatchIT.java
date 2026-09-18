@@ -71,7 +71,7 @@ class AnnotationIndexingBatchIT extends SolrContainerTestSetup {
                 .collect(Collectors.toList());
         assertThat(jobsSingleStepAsList, hasSize(1));
 
-        StepExecution indexingStep = jobsSingleStepAsList.get(0);
+        StepExecution indexingStep = jobsSingleStepAsList.getFirst();
 
         assertThat(indexingStep.getReadCount(), is(8L));
         assertThat(indexingStep.getReadSkipCount(), is(0L));
@@ -96,7 +96,7 @@ class AnnotationIndexingBatchIT extends SolrContainerTestSetup {
                 .filter(step -> step.getStepName().equals(CO_TERM_MANUAL_SUMMARIZATION_STEP))
                 .collect(Collectors.toList());
         assertThat(summarizeCoTermManualSteps, hasSize(1));
-        StepExecution coTermsManualStep = summarizeCoTermManualSteps.get(0);
+        StepExecution coTermsManualStep = summarizeCoTermManualSteps.getFirst();
         assertThat(coTermsManualStep.getReadCount(), is(4L));
         assertThat(coTermsManualStep.getReadSkipCount(), is(0L));
         assertThat(coTermsManualStep.getProcessSkipCount(), is(0L));
@@ -107,7 +107,7 @@ class AnnotationIndexingBatchIT extends SolrContainerTestSetup {
                 .filter(step -> step.getStepName().equals(CO_TERM_ALL_SUMMARIZATION_STEP))
                 .collect(Collectors.toList());
         assertThat(summarizeCoTermAllSteps, hasSize(1));
-        StepExecution coTermsAllStep = summarizeCoTermAllSteps.get(0);
+        StepExecution coTermsAllStep = summarizeCoTermAllSteps.getFirst();
         assertThat(coTermsAllStep.getReadCount(), is(5L));
         assertThat(coTermsAllStep.getReadSkipCount(), is(0L));
         assertThat(coTermsAllStep.getProcessSkipCount(), is(0L));

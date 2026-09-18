@@ -66,7 +66,7 @@ class SlimResultsTransformerTest {
         QueryResult<Annotation> transformedResults = transformer.transform(queryResult, context);
 
         assertThat(transformedResults.getResults(), hasSize(1));
-        Annotation transformedAnnotation = transformedResults.getResults().get(0);
+        Annotation transformedAnnotation = transformedResults.getResults().getFirst();
         assertThat(transformedAnnotation.goId, is(goId1));
         assertThat(transformedAnnotation.slimmedIds, contains(slimmedId1));
     }
@@ -85,7 +85,7 @@ class SlimResultsTransformerTest {
         QueryResult<Annotation> transformedResults = transformer.transform(queryResult, context);
 
         assertThat(transformedResults.getResults(), hasSize(1));
-        Annotation transformedAnnotation = transformedResults.getResults().get(0);
+        Annotation transformedAnnotation = transformedResults.getResults().getFirst();
         assertThat(transformedAnnotation.goId, is(goId1));
         assertThat(transformedAnnotation.slimmedIds, contains(slimmedId1, slimmedId2));
     }
@@ -104,7 +104,7 @@ class SlimResultsTransformerTest {
 
         assertThat(transformedResults.getResults(), hasSize(1));
 
-        Annotation nonTransformedAnnotation1 = transformedResults.getResults().get(0);
+        Annotation nonTransformedAnnotation1 = transformedResults.getResults().getFirst();
         assertThat(nonTransformedAnnotation1.goId, is(goId1));
         assertThat(nonTransformedAnnotation1.slimmedIds, is(nullValue()));
     }

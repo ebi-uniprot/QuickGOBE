@@ -157,7 +157,7 @@ class SlimmedStatsInjectorTest {
         assertThat(slimGroup, is(not(nullValue())));
         List<StatisticsByType> slimmingGroupTypes = slimGroup.getTypes();
         assertThat(slimmingGroupTypes, hasSize(1));
-        StatisticsByType slimmedGoStatsType = slimmingGroupTypes.get(0);
+        StatisticsByType slimmedGoStatsType = slimmingGroupTypes.getFirst();
         assertThat(slimmedGoStatsType.getType(), is(ANNOTATIONS_FOR_GO_SLIMS_NAME));
         assertThat(slimmedGoStatsType.getApproximateCount(), is(slimmedGoStatsType.getValues().size()));
         return slimmedGoStatsType.getValues();

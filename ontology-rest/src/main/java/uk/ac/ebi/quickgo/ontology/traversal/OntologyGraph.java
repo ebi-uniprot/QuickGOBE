@@ -341,7 +341,7 @@ public class OntologyGraph implements OntologyGraphTraversal {
             Matcher ontologyTypeMatcher = entry.getValue().reset(vertex);
             if (ontologyTypeMatcher.matches()) {
                 typeToVertexMap
-                        .computeIfAbsent(entry.getKey(), key -> new HashSet<>())
+                        .computeIfAbsent(entry.getKey(), _ -> new HashSet<>())
                         .add(vertex);
             }
         }

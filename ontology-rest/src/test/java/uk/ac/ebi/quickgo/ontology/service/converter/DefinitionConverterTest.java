@@ -74,7 +74,7 @@ class DefinitionConverterTest {
         List<OBOTerm.XRef> retrievedXrefs = def.xrefs;
         assertThat(def.xrefs, hasSize(1));
 
-        OBOTerm.XRef retrievedXref = retrievedXrefs.get(0);
+        OBOTerm.XRef retrievedXref = retrievedXrefs.getFirst();
         assertThat(retrievedXref.dbId, is(xrefId));
         assertThat(retrievedXref.dbCode, is(xrefDb));
     }

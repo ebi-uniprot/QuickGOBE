@@ -109,22 +109,15 @@ public class AuditRecord {
         }
 
         public static AuditAction fromString(String s) {
-            switch (s.toLowerCase()) {
-                case "added":
-                    return A;
-                case "a":
-                    return A;
-                case "updated":
-                    return U;
-                case "u":
-                    return U;
-                case "deleted":
-                    return D;
-                case "d":
-                    return D;
-                default:
-                    return X;
-            }
+            return switch (s.toLowerCase()) {
+                case "added" -> A;
+                case "a" -> A;
+                case "updated" -> U;
+                case "u" -> U;
+                case "deleted" -> D;
+                case "d" -> D;
+                default -> X;
+            };
         }
     }
 
@@ -148,30 +141,19 @@ public class AuditRecord {
         }
 
         public static AuditCategory fromString(String s) {
-            switch (s.toLowerCase()) {
-                case "term":
-                    return TERM;
-                case "relation":
-                    return RELATION;
-                case "definition":
-                    return DEFINITION;
-                case "synonym":
-                    return SYNONYM;
-                case "xref":
-                    return XREF;
-                case "obsoletion":
-                    return OBSOLETION;
-                case "secondary":
-                    return SECONDARY;
-                case "subset":
-                    return SUBSET;
-                case "slim":
-                    return SLIM;
-                case "constraint":
-                    return CONSTRAINT;
-                default:
-                    return OTHER;
-            }
+            return switch (s.toLowerCase()) {
+                case "term" -> TERM;
+                case "relation" -> RELATION;
+                case "definition" -> DEFINITION;
+                case "synonym" -> SYNONYM;
+                case "xref" -> XREF;
+                case "obsoletion" -> OBSOLETION;
+                case "secondary" -> SECONDARY;
+                case "subset" -> SUBSET;
+                case "slim" -> SLIM;
+                case "constraint" -> CONSTRAINT;
+                default -> OTHER;
+            };
         }
     }
 }

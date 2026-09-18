@@ -55,33 +55,33 @@ public class TSVHeaderCreator extends AbstractHeaderCreator {
     }
 
     private static void initialiseContentMappings() {
-        selected2Content.put(GENE_PRODUCT_FIELD_NAME, (hc, j) -> {
+        selected2Content.put(GENE_PRODUCT_FIELD_NAME, (_, j) -> {
             j.add(GENE_PRODUCT_DB);
             j.add(GENE_PRODUCT_ID);
         });
-        selected2Content.put(SYMBOL_FIELD_NAME, (hc, j) -> j.add(SYMBOL));
-        selected2Content.put(QUALIFIER_FIELD_NAME, (hc, j) -> j.add(QUALIFIER));
+        selected2Content.put(SYMBOL_FIELD_NAME, (_, j) -> j.add(SYMBOL));
+        selected2Content.put(QUALIFIER_FIELD_NAME, (_, j) -> j.add(QUALIFIER));
         selected2Content.put(GO_TERM_FIELD_NAME, (hc, j) -> {
             j.add(GO_TERM);
             if (hc.isSlimmed()) {
                 j.add(SLIMMED_FROM);
             }
         });
-        selected2Content.put(GO_ASPECT_FIELD_NAME, (hc, j) -> j.add(GO_ASPECT));
-        selected2Content.put(GO_NAME_FIELD_NAME, (hc, j) -> j.add(GO_NAME));
-        selected2Content.put(ECO_ID_FIELD_NAME, (hc, j) -> j.add(ECO_ID));
-        selected2Content.put(GO_EVIDENCE_CODE_FIELD_NAME, (hc, j) -> j.add(GO_EVIDENCE_CODE));
-        selected2Content.put(REFERENCE_FIELD_NAME, (hc, j) -> j.add(REFERENCE));
-        selected2Content.put(WITH_FROM_FIELD_NAME, (hc, j) -> j.add(WITH_FROM));
-        selected2Content.put(TAXON_ID_FIELD_NAME, (hc, j) -> j.add(TAXON_ID));
-        selected2Content.put(INTERACTING_TAXON_ID_FIELD_NAME, (hc, j) -> j.add(INTERACTING_TAXON_ID));
-        selected2Content.put(ASSIGNED_BY_FIELD_NAME, (hc, j) -> j.add(ASSIGNED_BY));
-        selected2Content.put(ANNOTATION_EXTENSION_FIELD_NAME, (hc, j) -> j.add(ANNOTATION_EXTENSION));
-        selected2Content.put(DATE_FIELD_NAME, (hc, j) -> j.add(DATE));
-        selected2Content.put(TAXON_NAME_FIELD_NAME, (hc, j) -> j.add(TAXON_NAME));
-        selected2Content.put(GENE_PRODUCT_NAME_FIELD_NAME, (hc, j) -> j.add(GENE_PRODUCT_NAME));
-        selected2Content.put(GENE_PRODUCT_SYNONYMS_FIELD_NAME, (hc, j) -> j.add(GENE_PRODUCT_SYNONYMS));
-        selected2Content.put(GENE_PRODUCT_TYPE_FIELD_NAME, (hc, j) -> j.add(GENE_PRODUCT_TYPE));
+        selected2Content.put(GO_ASPECT_FIELD_NAME, (_, j) -> j.add(GO_ASPECT));
+        selected2Content.put(GO_NAME_FIELD_NAME, (_, j) -> j.add(GO_NAME));
+        selected2Content.put(ECO_ID_FIELD_NAME, (_, j) -> j.add(ECO_ID));
+        selected2Content.put(GO_EVIDENCE_CODE_FIELD_NAME, (_, j) -> j.add(GO_EVIDENCE_CODE));
+        selected2Content.put(REFERENCE_FIELD_NAME, (_, j) -> j.add(REFERENCE));
+        selected2Content.put(WITH_FROM_FIELD_NAME, (_, j) -> j.add(WITH_FROM));
+        selected2Content.put(TAXON_ID_FIELD_NAME, (_, j) -> j.add(TAXON_ID));
+        selected2Content.put(INTERACTING_TAXON_ID_FIELD_NAME, (_, j) -> j.add(INTERACTING_TAXON_ID));
+        selected2Content.put(ASSIGNED_BY_FIELD_NAME, (_, j) -> j.add(ASSIGNED_BY));
+        selected2Content.put(ANNOTATION_EXTENSION_FIELD_NAME, (_, j) -> j.add(ANNOTATION_EXTENSION));
+        selected2Content.put(DATE_FIELD_NAME, (_, j) -> j.add(DATE));
+        selected2Content.put(TAXON_NAME_FIELD_NAME, (_, j) -> j.add(TAXON_NAME));
+        selected2Content.put(GENE_PRODUCT_NAME_FIELD_NAME, (_, j) -> j.add(GENE_PRODUCT_NAME));
+        selected2Content.put(GENE_PRODUCT_SYNONYMS_FIELD_NAME, (_, j) -> j.add(GENE_PRODUCT_SYNONYMS));
+        selected2Content.put(GENE_PRODUCT_TYPE_FIELD_NAME, (_, j) -> j.add(GENE_PRODUCT_TYPE));
     }
 
     /**

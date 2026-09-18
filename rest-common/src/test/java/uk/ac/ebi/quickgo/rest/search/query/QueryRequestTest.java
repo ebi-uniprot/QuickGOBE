@@ -132,7 +132,7 @@ class QueryRequestTest {
         request.addFilter(filterQuery);
 
         assertThat(request.getFilters(), hasSize(1));
-        assertThat(request.getFilters().get(0), is(filterQuery));
+        assertThat(request.getFilters().getFirst(), is(filterQuery));
     }
 
     @Test
@@ -207,8 +207,8 @@ class QueryRequestTest {
                 .build();
 
         assertThat(request.getSortCriteria(), hasSize(1));
-        assertThat(request.getSortCriteria().get(0).getSortField().getField(), is(sortField));
-        assertThat(request.getSortCriteria().get(0).getSortOrder(), is(sortOrder));
+        assertThat(request.getSortCriteria().getFirst().getSortField().getField(), is(sortField));
+        assertThat(request.getSortCriteria().getFirst().getSortOrder(), is(sortOrder));
     }
 
     @Test
@@ -227,8 +227,8 @@ class QueryRequestTest {
                 .build();
 
         assertThat(request.getSortCriteria(), hasSize(3));
-        assertThat(request.getSortCriteria().get(0).getSortField().getField(), is(sortField0));
-        assertThat(request.getSortCriteria().get(0).getSortOrder(), is(sortOrder0));
+        assertThat(request.getSortCriteria().getFirst().getSortField().getField(), is(sortField0));
+        assertThat(request.getSortCriteria().getFirst().getSortOrder(), is(sortOrder0));
         assertThat(request.getSortCriteria().get(1).getSortField().getField(), is(sortField1));
         assertThat(request.getSortCriteria().get(1).getSortOrder(), is(sortOrder1));
         assertThat(request.getSortCriteria().get(2).getSortField().getField(), is(sortField2));

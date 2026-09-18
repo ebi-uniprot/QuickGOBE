@@ -167,8 +167,7 @@ public class OntologyRequest {
     public List<FilterRequest> createFilterRequests() {
         return Stream.of(TARGET_FIELDS)
                 .map(this::createFilter)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
+                .flatMap(Optional::stream)
                 .collect(Collectors.toList());
     }
 

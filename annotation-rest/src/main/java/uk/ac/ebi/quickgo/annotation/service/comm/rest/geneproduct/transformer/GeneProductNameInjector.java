@@ -38,7 +38,7 @@ public class GeneProductNameInjector extends AbstractValueInjector<BasicGeneProd
 
         List<BasicGeneProduct.Result> results = response.getResults();
         if (!results.isEmpty()) {
-            annotation.name = results.get(0).getName();
+            annotation.name = results.getFirst().getName();
         }
     }
 }

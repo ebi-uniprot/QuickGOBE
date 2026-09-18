@@ -60,7 +60,7 @@ class AnnotationPartitionKeyGeneratorTest {
 
     @Test
     void nullShardingKeyThrowsException() {
-        generator = new AnnotationPartitionKeyGenerator((AnnotationDocument aDoc) -> null);
+        generator = new AnnotationPartitionKeyGenerator((AnnotationDocument _) -> null);
 
         Throwable exception = assertThrows(RuntimeException.class, () -> generator.process(doc));
         assertTrue(exception.getMessage().startsWith("Unable to generate a sharding key for:"));
@@ -68,7 +68,7 @@ class AnnotationPartitionKeyGeneratorTest {
 
     @Test
     void emptyShardingKeyReturnsJust() throws Exception {
-        generator = new AnnotationPartitionKeyGenerator((AnnotationDocument aDoc) -> "");
+        generator = new AnnotationPartitionKeyGenerator((AnnotationDocument _) -> "");
 
         AnnotationDocument modifiedDoc = generator.process(doc);
 

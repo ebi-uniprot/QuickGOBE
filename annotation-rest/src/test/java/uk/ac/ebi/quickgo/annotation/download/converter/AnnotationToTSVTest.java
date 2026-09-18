@@ -87,7 +87,7 @@ class AnnotationToTSVTest {
         assertThat(elements[DefaultColumnsWithSlimming.COL_GENE_PRODUCT_ID], is(ID_COMPLEX_PORTAL));
         assertThat(elements[DefaultColumnsWithSlimming.COL_DB_OBJECT_SYMBOL], is(SYMBOL));
         assertThat(elements[DefaultColumnsWithSlimming.COL_QUALIFIER], is(QUALIFIER));
-        assertThat(elements[DefaultColumnsWithSlimming.COL_GO_ID], is(SLIMMED_TO_IDS.get(0)));
+        assertThat(elements[DefaultColumnsWithSlimming.COL_GO_ID], is(SLIMMED_TO_IDS.getFirst()));
         assertThat(elements[DefaultColumnsWithSlimming.COL_GO_ASPECT],
                    is(Aspect.fromScientificName(GO_ASPECT).get().getCharacter()));
         assertThat(elements[DefaultColumnsWithSlimming.COL_SLIMMED_FROM], is(GO_ID));
@@ -112,7 +112,7 @@ class AnnotationToTSVTest {
         List<String> converted = annotationToTSV.apply(annotation, selectedFields);
 
         assertThat(converted, hasSize(annotation.slimmedIds.size()));
-        checkReturned(slimmedToGoId0, converted.get(0));
+        checkReturned(slimmedToGoId0, converted.getFirst());
         checkReturned(slimmedToGoId1, converted.get(1));
         checkReturned(slimmedToGoId2, converted.get(2));
     }
@@ -284,7 +284,7 @@ class AnnotationToTSVTest {
         List<String> converted = annotationToTSV.apply(annotation, selectedFields);
 
         assertThat(converted, hasSize(1));
-        assertThat(converted.get(0), equalTo(QUALIFIER));
+        assertThat(converted.getFirst(), equalTo(QUALIFIER));
     }
 
     private String[] annotationToElements(Annotation annotation) {
@@ -293,7 +293,7 @@ class AnnotationToTSVTest {
     }
 
     private String[] annotationToElements(Annotation annotation, List<String> selectedFields) {
-        return annotationToTSV.apply(annotation, selectedFields).get(0)
+        return annotationToTSV.apply(annotation, selectedFields).getFirst()
                               .split(AnnotationToTSV.OUTPUT_DELIMITER, -1);
     }
 

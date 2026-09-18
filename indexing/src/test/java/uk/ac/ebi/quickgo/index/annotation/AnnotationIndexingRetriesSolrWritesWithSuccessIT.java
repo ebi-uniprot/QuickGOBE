@@ -87,7 +87,7 @@ class AnnotationIndexingRetriesSolrWritesWithSuccessIT extends SolrContainerTest
                 .collect(Collectors.toList());
         assertThat(jobsSingleStepAsList, hasSize(1));
 
-        StepExecution indexingStep = jobsSingleStepAsList.get(0);
+        StepExecution indexingStep = jobsSingleStepAsList.getFirst();
 
         assertThat(indexingStep.getReadCount(), is(8L));
         assertThat(indexingStep.getReadSkipCount(), is(0L));

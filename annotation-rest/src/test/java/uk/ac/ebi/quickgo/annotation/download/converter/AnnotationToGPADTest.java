@@ -244,7 +244,7 @@ class AnnotationToGPADTest {
         List<String> converted = annotationToGPAD.apply(annotation, null);
 
         assertThat(converted, hasSize(annotation.slimmedIds.size()));
-        checkReturned(slimmedToGoId0, converted.get(0));
+        checkReturned(slimmedToGoId0, converted.getFirst());
         checkReturned(slimmedToGoId1, converted.get(1));
         checkReturned(slimmedToGoId2, converted.get(2));
     }
@@ -257,7 +257,7 @@ class AnnotationToGPADTest {
 
     private String[] annotationToDownloadColumns(Annotation annotation) {
         return annotationToGPAD.apply(annotation, null)
-                .get(0)
+                .getFirst()
                 .split(AnnotationToGAF.OUTPUT_DELIMITER, -1);
     }
 
