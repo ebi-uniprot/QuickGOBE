@@ -33,6 +33,21 @@ public class AnnotationExtensionRelations {
 		public boolean hasScope(String namespace, String idSyntax) {
 			return this.namespace.equals(namespace) && this.idSyntax.equals(idSyntax);
 		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (!(o instanceof EntityMatcher)) return false;
+			EntityMatcher that = (EntityMatcher) o;
+			return namespace.equals(that.namespace) && idSyntax.equals(that.idSyntax);
+		}
+
+		@Override
+		public int hashCode() {
+			int result = namespace.hashCode();
+			result = 31 * result + idSyntax.hashCode();
+			return result;
+		}
 	}
 
 	public static class EntityMatcherSet {
