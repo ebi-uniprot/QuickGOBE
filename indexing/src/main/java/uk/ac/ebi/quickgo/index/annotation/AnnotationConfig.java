@@ -7,17 +7,17 @@ import uk.ac.ebi.quickgo.index.common.GZipBufferedReaderFactory;
 import uk.ac.ebi.quickgo.index.common.SolrServerWriter;
 
 import java.util.function.Function;
-import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.file.FlatFileItemReader;
-import org.springframework.batch.item.file.LineMapper;
-import org.springframework.batch.item.file.MultiResourceItemReader;
-import org.springframework.batch.item.file.mapping.DefaultLineMapper;
-import org.springframework.batch.item.file.mapping.FieldSetMapper;
-import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
-import org.springframework.batch.item.file.transform.LineTokenizer;
-import org.springframework.batch.item.validator.ValidatingItemProcessor;
-import org.springframework.batch.item.validator.Validator;
+import org.springframework.batch.infrastructure.item.ItemProcessor;
+import org.springframework.batch.infrastructure.item.ItemWriter;
+import org.springframework.batch.infrastructure.item.file.FlatFileItemReader;
+import org.springframework.batch.infrastructure.item.file.LineMapper;
+import org.springframework.batch.infrastructure.item.file.MultiResourceItemReader;
+import org.springframework.batch.infrastructure.item.file.mapping.DefaultLineMapper;
+import org.springframework.batch.infrastructure.item.file.mapping.FieldSetMapper;
+import org.springframework.batch.infrastructure.item.file.transform.DelimitedLineTokenizer;
+import org.springframework.batch.infrastructure.item.file.transform.LineTokenizer;
+import org.springframework.batch.infrastructure.item.validator.ValidatingItemProcessor;
+import org.springframework.batch.infrastructure.item.validator.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -51,17 +51,15 @@ public class AnnotationConfig {
 
     @Bean
     MultiResourceItemReader<Annotation> annotationMultiFileReader() {
-        MultiResourceItemReader<Annotation> reader = new MultiResourceItemReader<>();
+        MultiResourceItemReader<Annotation> reader = new MultiResourceItemReader<>(annotationSingleFileReader());
         reader.setResources(resources);
-        reader.setDelegate(annotationSingleFileReader());
         return reader;
     }
 
     @Bean
     FlatFileItemReader<Annotation> annotationSingleFileReader() {
-        FlatFileItemReader<Annotation> reader = new FlatFileItemReader<>();
+        FlatFileItemReader<Annotation> reader = new FlatFileItemReader<>(annotationLineMapper());
         reader.setBufferedReaderFactory(new GZipBufferedReaderFactory());
-        reader.setLineMapper(annotationLineMapper());
         reader.setLinesToSkip(headerLines);
         return reader;
     }

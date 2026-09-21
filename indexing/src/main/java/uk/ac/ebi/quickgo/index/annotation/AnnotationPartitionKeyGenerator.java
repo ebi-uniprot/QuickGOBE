@@ -4,7 +4,7 @@ import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 
 import com.google.common.base.Preconditions;
 import java.util.function.Function;
-import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.infrastructure.item.ItemProcessor;
 
 /**
  * Uses the gene product identifier as the sharding key.The sharding key is used by Solr cloud to direct the record to

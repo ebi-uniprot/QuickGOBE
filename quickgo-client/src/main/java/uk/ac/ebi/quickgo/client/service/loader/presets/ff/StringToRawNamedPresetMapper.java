@@ -1,9 +1,9 @@
 package uk.ac.ebi.quickgo.client.service.loader.presets.ff;
 
 import java.util.function.Supplier;
-import org.springframework.batch.item.file.mapping.FieldSetMapper;
-import org.springframework.batch.item.file.transform.FieldSet;
-import org.springframework.batch.item.file.transform.IncorrectTokenCountException;
+import org.springframework.batch.infrastructure.item.file.mapping.FieldSetMapper;
+import org.springframework.batch.infrastructure.item.file.transform.FieldSet;
+import org.springframework.batch.infrastructure.item.file.transform.IncorrectTokenCountException;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPresetColumnsBuilder.UNINITIALIZED_POSITION;

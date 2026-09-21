@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.client.service.loader.presets.slimsets;
 
-import org.springframework.batch.item.file.mapping.FieldSetMapper;
-import org.springframework.batch.item.file.transform.FieldSet;
+import org.springframework.batch.infrastructure.item.file.mapping.FieldSetMapper;
+import org.springframework.batch.infrastructure.item.file.transform.FieldSet;
 import uk.ac.ebi.quickgo.client.service.loader.presets.ff.StringToRawNamedPresetMapper;
 import uk.ac.ebi.quickgo.client.service.loader.presets.slimsets.RawSlimSetNamedPresetColumnsBuilder.RawSlimSetNamedPresetColumnsImpl;
 

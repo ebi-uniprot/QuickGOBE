@@ -1,14 +1,14 @@
 package uk.ac.ebi.quickgo.index.annotation.coterms;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.springframework.batch.item.Chunk;
+import org.springframework.batch.infrastructure.item.Chunk;
 import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 
 import com.google.common.base.Preconditions;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Predicate;
-import org.springframework.batch.item.support.AbstractItemStreamItemWriter;
+import org.springframework.batch.infrastructure.item.support.AbstractItemStreamItemWriter;
 
 import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTerm.calculateProbabilityRatio;
 import static uk.ac.ebi.quickgo.index.annotation.coterms.CoTerm.calculateSimilarityRatio;

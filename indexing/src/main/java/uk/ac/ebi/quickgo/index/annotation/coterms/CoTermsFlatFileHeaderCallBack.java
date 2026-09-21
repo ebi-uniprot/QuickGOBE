@@ -2,7 +2,7 @@ package uk.ac.ebi.quickgo.index.annotation.coterms;
 
 import java.io.IOException;
 import java.io.Writer;
-import org.springframework.batch.item.file.FlatFileHeaderCallback;
+import org.springframework.batch.infrastructure.item.file.FlatFileHeaderCallback;
 
 /**
  * Write the header to files that contain co-occurring terms and related statistics.

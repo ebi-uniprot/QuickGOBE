@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.client.service.loader.presets.ff;
 
 import java.util.List;
-import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.infrastructure.item.ItemProcessor;
 
 import static com.google.common.base.Preconditions.checkArgument;
 

@@ -4,8 +4,8 @@ import uk.ac.ebi.quickgo.client.service.loader.presets.evidence.RawEvidenceNamed
         .RawEvidenceNamedPresetColumnsImpl;
 import uk.ac.ebi.quickgo.client.service.loader.presets.ff.StringToRawNamedPresetMapper;
 
-import org.springframework.batch.item.file.mapping.FieldSetMapper;
-import org.springframework.batch.item.file.transform.FieldSet;
+import org.springframework.batch.infrastructure.item.file.mapping.FieldSetMapper;
+import org.springframework.batch.infrastructure.item.file.transform.FieldSet;
 
 import static uk.ac.ebi.quickgo.client.service.loader.presets.ff.StringToRawNamedPresetMapper.extractStringValue;
 import static uk.ac.ebi.quickgo.client.service.loader.presets.ff.StringToRawNamedPresetMapper.trimIfNotNull;

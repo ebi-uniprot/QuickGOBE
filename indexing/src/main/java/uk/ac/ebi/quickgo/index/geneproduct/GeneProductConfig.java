@@ -2,23 +2,29 @@ package uk.ac.ebi.quickgo.index.geneproduct;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.springframework.batch.core.*;
+import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.listener.ItemWriteListener;
+import org.springframework.batch.core.listener.JobExecutionListener;
+import org.springframework.batch.core.listener.SkipListener;
+import org.springframework.batch.core.listener.StepExecutionListener;
+import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.builder.StepBuilder;
-import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.file.FlatFileItemReader;
-import org.springframework.batch.item.file.FlatFileParseException;
-import org.springframework.batch.item.file.LineMapper;
-import org.springframework.batch.item.file.MultiResourceItemReader;
-import org.springframework.batch.item.file.mapping.DefaultLineMapper;
-import org.springframework.batch.item.file.mapping.FieldSetMapper;
-import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
-import org.springframework.batch.item.file.transform.LineTokenizer;
-import org.springframework.batch.item.support.CompositeItemProcessor;
-import org.springframework.batch.item.validator.ValidatingItemProcessor;
-import org.springframework.batch.item.validator.ValidationException;
-import org.springframework.batch.item.validator.Validator;
+import org.springframework.batch.infrastructure.item.ItemProcessor;
+import org.springframework.batch.infrastructure.item.ItemWriter;
+import org.springframework.batch.infrastructure.item.file.FlatFileItemReader;
+import org.springframework.batch.infrastructure.item.file.FlatFileParseException;
+import org.springframework.batch.infrastructure.item.file.LineMapper;
+import org.springframework.batch.infrastructure.item.file.MultiResourceItemReader;
+import org.springframework.batch.infrastructure.item.file.mapping.DefaultLineMapper;
+import org.springframework.batch.infrastructure.item.file.mapping.FieldSetMapper;
+import org.springframework.batch.infrastructure.item.file.transform.DelimitedLineTokenizer;
+import org.springframework.batch.infrastructure.item.file.transform.LineTokenizer;
+import org.springframework.batch.infrastructure.item.support.CompositeItemProcessor;
+import org.springframework.batch.infrastructure.item.validator.ValidatingItemProcessor;
+import org.springframework.batch.infrastructure.item.validator.ValidationException;
+import org.springframework.batch.infrastructure.item.validator.Validator;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -132,17 +138,15 @@ public class GeneProductConfig {
 
     @Bean
     MultiResourceItemReader<GeneProduct> geneProductMultiFileReader() {
-        MultiResourceItemReader<GeneProduct> reader = new MultiResourceItemReader<>();
+        MultiResourceItemReader<GeneProduct> reader = new MultiResourceItemReader<>(geneProductSingleFileReader());
         reader.setResources(resources);
-        reader.setDelegate(geneProductSingleFileReader());
         return reader;
     }
 
     @Bean
     FlatFileItemReader<GeneProduct> geneProductSingleFileReader() {
-        FlatFileItemReader<GeneProduct> reader = new FlatFileItemReader<>();
+        FlatFileItemReader<GeneProduct> reader = new FlatFileItemReader<>(geneProductLineMapper());
         reader.setBufferedReaderFactory(new GZipBufferedReaderFactory());
-        reader.setLineMapper(geneProductLineMapper());
         reader.setLinesToSkip(headerLines);
         return reader;
     }

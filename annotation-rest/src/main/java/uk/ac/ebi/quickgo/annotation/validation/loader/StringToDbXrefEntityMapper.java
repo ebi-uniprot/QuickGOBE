@@ -3,9 +3,9 @@ package uk.ac.ebi.quickgo.annotation.validation.loader;
 import uk.ac.ebi.quickgo.annotation.validation.model.DBXRefEntity;
 
 import java.util.regex.Pattern;
-import org.springframework.batch.item.file.mapping.FieldSetMapper;
-import org.springframework.batch.item.file.transform.FieldSet;
-import org.springframework.batch.item.file.transform.IncorrectTokenCountException;
+import org.springframework.batch.infrastructure.item.file.mapping.FieldSetMapper;
+import org.springframework.batch.infrastructure.item.file.transform.FieldSet;
+import org.springframework.batch.infrastructure.item.file.transform.IncorrectTokenCountException;
 import org.springframework.validation.BindException;
 
 import static uk.ac.ebi.quickgo.annotation.validation.loader.DBXrefEntityColumns.*;

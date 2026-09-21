@@ -18,7 +18,7 @@ import uk.ac.ebi.quickgo.ontology.service.ServiceConfig;
 @ComponentScan({
         "uk.ac.ebi.quickgo.ontology.controller",
         "uk.ac.ebi.quickgo.rest"})
-@Import({ServiceConfig.class, OntologyRestConfig.class, MetaDataConfig.class})
+@Import({ServiceConfig.class, OntologyRestConfig.class, MetaDataConfig.class, BatchConfig.class})
 public class OntologyREST {
 
     public static void main(String[] args) {

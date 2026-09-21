@@ -4,14 +4,13 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.junit.jupiter.api.Test;
 import uk.ac.ebi.quickgo.index.common.listener.LogJobListener;
 
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.Step;
+import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.builder.StepBuilder;
-import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.infrastructure.item.ItemReader;
+import org.springframework.batch.infrastructure.item.ItemWriter;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -53,9 +52,6 @@ class QuickGOIndexMainTest {
         @Autowired
         private JobRepository jobRepository;
 
-        @Autowired
-        private PlatformTransactionManager transactionManager;
-
         @Bean
         public Job testJob() throws Exception {
             return new JobBuilder("test job", jobRepository)
@@ -67,7 +63,7 @@ class QuickGOIndexMainTest {
         @Bean
         protected Step testStep() {
             return new StepBuilder("test step", jobRepository)
-                    .<String, String>chunk(1, transactionManager)
+                    .<String, String>chunk(1)
                     .reader(getStringItemReader())
                     .writer(createWriter())
                     .build();

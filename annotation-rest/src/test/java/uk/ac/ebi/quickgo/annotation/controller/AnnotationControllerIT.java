@@ -1,7 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -2080,7 +2079,7 @@ class AnnotationControllerIT extends SolrContainerTestSetup {
           .andExpect(status().isBadRequest());
     }
 
-    private String json(Object object) throws JsonProcessingException {
+    private String json(Object object) {
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.writeValueAsString(object);
     }

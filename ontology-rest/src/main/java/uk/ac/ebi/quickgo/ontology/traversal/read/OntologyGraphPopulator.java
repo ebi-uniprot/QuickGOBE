@@ -1,12 +1,12 @@
 package uk.ac.ebi.quickgo.ontology.traversal.read;
 
-import org.springframework.batch.item.Chunk;
+import org.springframework.batch.infrastructure.item.Chunk;
 import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
 import uk.ac.ebi.quickgo.ontology.traversal.OntologyGraph;
 
 import java.util.List;
 import org.slf4j.Logger;
-import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.infrastructure.item.ItemWriter;
 
 import static org.slf4j.LoggerFactory.getLogger;
 

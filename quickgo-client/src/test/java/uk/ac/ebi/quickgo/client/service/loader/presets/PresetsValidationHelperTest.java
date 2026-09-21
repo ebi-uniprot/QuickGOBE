@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.client.service.loader.presets;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.batch.item.validator.ValidationException;
+import org.springframework.batch.infrastructure.item.validator.ValidationException;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 

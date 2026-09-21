@@ -2,7 +2,7 @@ package uk.ac.ebi.quickgo.index;
 
 import org.apache.solr.client.solrj.SolrServerException;
 import org.mockito.stubbing.Stubber;
-import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.infrastructure.item.ItemWriter;
 
 import java.util.Collections;
 import java.util.Iterator;

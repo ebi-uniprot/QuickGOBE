@@ -4,8 +4,8 @@ import uk.ac.ebi.quickgo.client.service.loader.presets.RestValuesRetriever;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.item.validator.ValidationException;
+import org.springframework.batch.infrastructure.item.ItemProcessor;
+import org.springframework.batch.infrastructure.item.validator.ValidationException;
 
 import static uk.ac.ebi.quickgo.client.service.loader.presets.PresetsValidationHelper.checkIsNullOrEmpty;
 

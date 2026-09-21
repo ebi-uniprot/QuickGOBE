@@ -2,17 +2,17 @@ package uk.ac.ebi.quickgo.index.annotation.coterms;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.batch.core.ItemWriteListener;
-import org.springframework.batch.core.Step;
-import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.core.listener.ItemWriteListener;
+import org.springframework.batch.core.listener.StepExecutionListener;
+import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.builder.StepBuilder;
-import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.file.FlatFileHeaderCallback;
-import org.springframework.batch.item.file.FlatFileItemWriter;
-import org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor;
-import org.springframework.batch.item.file.transform.DelimitedLineAggregator;
-import org.springframework.batch.item.file.transform.LineAggregator;
+import org.springframework.batch.infrastructure.item.ItemReader;
+import org.springframework.batch.infrastructure.item.ItemWriter;
+import org.springframework.batch.infrastructure.item.file.FlatFileHeaderCallback;
+import org.springframework.batch.infrastructure.item.file.FlatFileItemWriter;
+import org.springframework.batch.infrastructure.item.file.transform.BeanWrapperFieldExtractor;
+import org.springframework.batch.infrastructure.item.file.transform.DelimitedLineAggregator;
+import org.springframework.batch.infrastructure.item.file.transform.LineAggregator;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -155,8 +155,7 @@ public class CoTermsConfig {
     }
 
     private FlatFileItemWriter<CoTerm> flatFileWriter(WritableResource outputFile) {
-        FlatFileItemWriter<CoTerm> ffw = new FlatFileItemWriter<>();
-        ffw.setLineAggregator(lineAggregator());
+        FlatFileItemWriter<CoTerm> ffw = new FlatFileItemWriter<>(lineAggregator());
         LOGGER.info("Write out co-occurring terms to {}", outputFile.toString());
         ffw.setResource(outputFile);
         FlatFileHeaderCallback headerCallBack = new CoTermsFlatFileHeaderCallBack();

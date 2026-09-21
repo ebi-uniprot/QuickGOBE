@@ -1,21 +1,31 @@
 package uk.ac.ebi.quickgo.client.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
+import org.jspecify.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.springframework.core.MethodParameter;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
+import org.springframework.http.server.ServerHttpRequest;
+import org.springframework.http.server.ServerHttpResponse;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
+import tools.jackson.databind.ser.FilterProvider;
+import tools.jackson.databind.ser.std.SimpleBeanPropertyFilter;
+import tools.jackson.databind.ser.std.SimpleFilterProvider;
 import uk.ac.ebi.quickgo.client.model.presets.CompositePreset;
 
-import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
-import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import io.swagger.v3.oas.annotations.Operation;
 
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.json.MappingJacksonValue;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
@@ -48,46 +58,62 @@ public class PresetsController {
     @Operation(summary = "Provides preset filtering information indicating valid terms and a corresponding " +
             "description; all of which are ordered by relevancy.")
     @GetMapping( produces = {MediaType.APPLICATION_JSON_VALUE})
-    public FilteredCompositePreset compositePreset(@RequestParam(name = "fields", required = false) String... fields) {
-        return createFilteredPreset(fields);
+    public CompositePreset compositePreset(@RequestParam(name = "fields", required = false) String... fields) {
+        return presets;
     }
 
-    /**
-     * Creates a filtered version of the {@link CompositePreset} instance, which, when serialized to the
-     * end-point, will show only the fields desired by the user.
-     * @param fields the fields required by the user. If the value is null, all fields will be shown.
-     * @return the filtered {@link CompositePreset} instance, showing only the desired fields.
-     */
-    private FilteredCompositePreset createFilteredPreset(String[] fields) {
-        FilteredCompositePreset filteredPreset = new FilteredCompositePreset(presets);
-        if (fields != null) {
-            filteredPreset.showFields(fields);
-        }
-        return filteredPreset;
-    }
+    @ControllerAdvice(assignableTypes = { PresetsController.class })
+    public static class CompositePresetFilterAdvice implements ResponseBodyAdvice<Object> {
 
-    private static class FilteredCompositePreset extends MappingJacksonValue {
         private static final String COMPOSITE_PRESET_FILTER = "CompositePreset";
 
-        FilteredCompositePreset(CompositePreset compositePreset) {
-            super(compositePreset);
-
-            checkArgument(compositePreset != null, "CompositePreset cannot be null");
-            this.setFilters(filterNothing());
+        @Override
+        public boolean supports(@NonNull MethodParameter returnType,
+                                @NonNull Class<? extends HttpMessageConverter<?>> converterType) {
+            return converterType == JacksonJsonHttpMessageConverter.class;
         }
 
-        private static SimpleFilterProvider filterNothing() {
-            return new SimpleFilterProvider().addFilter(COMPOSITE_PRESET_FILTER, SimpleBeanPropertyFilter.serializeAllExcept());
-        }
+        @Override
+        public @Nullable Map<String, Object> determineWriteHints(
+          @Nullable Object body,
+          @NonNull MethodParameter returnType,
+          @NonNull MediaType selectedContentType,
+          @NonNull Class<? extends HttpMessageConverter<?>> selectedConverterType) {
 
-        void showFields(String[] csvFields) {
-            Set<String> fieldsSet = Stream.of(csvFields).collect(Collectors.toSet());
-            if (fieldsSet.size() > 0) {
-                SimpleFilterProvider filterProvider =
-                        new SimpleFilterProvider()
-                                .addFilter(COMPOSITE_PRESET_FILTER, SimpleBeanPropertyFilter.filterOutAllExcept(fieldsSet));
-                this.setFilters(filterProvider);
+            if (!(body instanceof CompositePreset)) return null;
+
+            var request = getCurrentHttpRequest();
+            var filterProvider = new SimpleFilterProvider().setFailOnUnknownId(false);
+
+            if (request != null) {
+                String fields = request.getParameter("fields");
+                if (fields != null && !fields.isBlank()) {
+                    Set<String> fieldsSet = Arrays.stream(fields.split(","))
+                      .map(String::trim)
+                      .filter(s -> !s.isEmpty())
+                      .collect(Collectors.toSet());
+                    if (!fieldsSet.isEmpty()) {
+                        filterProvider.addFilter(COMPOSITE_PRESET_FILTER, SimpleBeanPropertyFilter.filterOutAllExcept(fieldsSet));
+                    }
+                }
             }
+
+            return Map.of(FilterProvider.class.getName(), filterProvider);
+        }
+
+        @Override
+        public @Nullable Object beforeBodyWrite(@Nullable Object body, @NonNull MethodParameter returnType,
+                                                @NonNull MediaType selectedContentType, @NonNull Class<? extends HttpMessageConverter<?>> selectedConverterType,
+                                                @NonNull ServerHttpRequest request, @NonNull ServerHttpResponse response) {
+            return body;
+        }
+
+        private @Nullable HttpServletRequest getCurrentHttpRequest() {
+            return Optional.ofNullable(RequestContextHolder.getRequestAttributes())
+              .filter(ServletRequestAttributes.class::isInstance)
+              .map(ServletRequestAttributes.class::cast)
+              .map(ServletRequestAttributes::getRequest)
+              .orElse(null);
         }
     }
 }

@@ -2,9 +2,9 @@ package uk.ac.ebi.quickgo.client.service.loader.presets.slimsets;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.batch.item.file.transform.DefaultFieldSet;
-import org.springframework.batch.item.file.transform.FieldSet;
-import org.springframework.batch.item.file.transform.IncorrectTokenCountException;
+import org.springframework.batch.infrastructure.item.file.transform.DefaultFieldSet;
+import org.springframework.batch.infrastructure.item.file.transform.FieldSet;
+import org.springframework.batch.infrastructure.item.file.transform.IncorrectTokenCountException;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;

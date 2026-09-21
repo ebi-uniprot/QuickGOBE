@@ -5,8 +5,8 @@ import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
 
 import com.google.common.base.Preconditions;
 import java.util.Map;
-import org.springframework.batch.item.validator.ValidationException;
-import org.springframework.batch.item.validator.Validator;
+import org.springframework.batch.infrastructure.item.validator.ValidationException;
+import org.springframework.batch.infrastructure.item.validator.Validator;
 
 import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.convertLinePropertiesToMap;
 import static uk.ac.ebi.quickgo.index.common.datafile.GOADataFileParsingHelper.splitValue;

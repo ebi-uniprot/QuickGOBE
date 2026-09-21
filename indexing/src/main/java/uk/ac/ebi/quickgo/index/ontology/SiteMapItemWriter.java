@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.index.ontology;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.springframework.batch.item.Chunk;
+import org.springframework.batch.infrastructure.item.Chunk;
 import uk.ac.ebi.quickgo.ontology.common.OntologyDocument;
 
 import com.redfin.sitemapgenerator.ChangeFreq;
@@ -9,7 +9,7 @@ import com.redfin.sitemapgenerator.WebSitemapGenerator;
 import com.redfin.sitemapgenerator.WebSitemapUrl;
 import java.util.Date;
 import java.util.List;
-import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.infrastructure.item.ItemWriter;
 
 import static com.google.common.base.Preconditions.checkArgument;
 

@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -55,6 +56,7 @@ import static uk.ac.ebi.quickgo.ontology.controller.OBOController.*;
  */
 @SpringBootTest
 @WebAppConfiguration
+@DirtiesContext
 public abstract class OBOControllerIT extends SolrContainerTestSetup {
     private static final int WAIT_PERIOD = 10;
     private static final String QUERY_PARAM = "query";

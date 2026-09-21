@@ -4,8 +4,8 @@ import uk.ac.ebi.quickgo.annotation.common.AnnotationDocument;
 
 import com.google.common.base.Preconditions;
 import java.util.Iterator;
-import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.infrastructure.item.ItemReader;
+import org.springframework.batch.infrastructure.item.ItemWriter;
 
 /**
  * Iterates (reads) through the list of all GO terms which have a co-occurring go term. Note that, by definition,

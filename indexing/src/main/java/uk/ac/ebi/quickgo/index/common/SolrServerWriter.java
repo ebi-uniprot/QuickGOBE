@@ -1,12 +1,12 @@
 package uk.ac.ebi.quickgo.index.common;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.springframework.batch.item.Chunk;
+import org.springframework.batch.infrastructure.item.Chunk;
 import uk.ac.ebi.quickgo.common.QuickGODocument;
 
 import java.util.List;
 import org.apache.solr.client.solrj.SolrClient;
-import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.infrastructure.item.ItemWriter;
 
 /**
  * A simple {@link ItemWriter} implementation used for indexing

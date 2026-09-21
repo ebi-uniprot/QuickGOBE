@@ -1,21 +1,22 @@
 package uk.ac.ebi.quickgo.ontology.traversal.read;
 
 import org.slf4j.Logger;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecutionListener;
-import org.springframework.batch.core.Step;
+import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.listener.JobExecutionListener;
+import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.builder.StepBuilder;
-import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.file.BufferedReaderFactory;
-import org.springframework.batch.item.file.FlatFileItemReader;
-import org.springframework.batch.item.file.LineMapper;
-import org.springframework.batch.item.file.MultiResourceItemReader;
-import org.springframework.batch.item.file.mapping.DefaultLineMapper;
-import org.springframework.batch.item.file.mapping.FieldSetMapper;
-import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
-import org.springframework.batch.item.support.CompositeItemProcessor;
+import org.springframework.batch.core.step.skip.NeverSkipItemSkipPolicy;
+import org.springframework.batch.infrastructure.item.ItemProcessor;
+import org.springframework.batch.infrastructure.item.ItemWriter;
+import org.springframework.batch.infrastructure.item.file.BufferedReaderFactory;
+import org.springframework.batch.infrastructure.item.file.FlatFileItemReader;
+import org.springframework.batch.infrastructure.item.file.LineMapper;
+import org.springframework.batch.infrastructure.item.file.MultiResourceItemReader;
+import org.springframework.batch.infrastructure.item.file.mapping.DefaultLineMapper;
+import org.springframework.batch.infrastructure.item.file.mapping.FieldSetMapper;
+import org.springframework.batch.infrastructure.item.file.transform.DelimitedLineTokenizer;
+import org.springframework.batch.infrastructure.item.support.CompositeItemProcessor;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,8 +65,6 @@ public class OntologyGraphConfig {
     @Value("${ontology.traversal.header.lines:1}")
     private int headerLines;
 
-    private static final int SKIP_LIMIT = 0;
-
     @Bean
     public OntologyGraph ontologyGraph() {
         return new OntologyGraph();
@@ -87,9 +86,10 @@ public class OntologyGraphConfig {
     @Bean
     public Step ontologyGraphBuildStep(OntologyGraph ontologyGraph) {
         return new StepBuilder(ONTOLOGY_TRAVERSAL_LOADING_STEP_NAME, jobRepository)
-                .<RawOntologyRelationship, OntologyRelationship>chunk(chunkSize, transactionManager)
+                .<RawOntologyRelationship, OntologyRelationship>chunk(chunkSize)
+                .transactionManager(transactionManager)
                 .faultTolerant()
-                .skipLimit(SKIP_LIMIT)
+                .skipPolicy(new NeverSkipItemSkipPolicy())
                 .<RawOntologyRelationship>reader(ontologyTraversalMultiFileReader())
                 .processor(ontologyRelationshipCompositeProcessor())
                 .writer(ontologyGraphPopulator(ontologyGraph))
@@ -116,18 +116,16 @@ public class OntologyGraphConfig {
 
     @Bean
     MultiResourceItemReader<RawOntologyRelationship> ontologyTraversalMultiFileReader() {
-        MultiResourceItemReader<RawOntologyRelationship> reader = new MultiResourceItemReader<>();
+        MultiResourceItemReader<RawOntologyRelationship> reader = new MultiResourceItemReader<>(ontologyTraversalSingleFileReader());
         setResourceComparator(reader);
         reader.setResources(resources);
-        reader.setDelegate(ontologyTraversalSingleFileReader());
         return reader;
     }
 
     @Bean
     FlatFileItemReader<RawOntologyRelationship> ontologyTraversalSingleFileReader() {
-        FlatFileItemReader<RawOntologyRelationship> reader = new FlatFileItemReader<>();
+        FlatFileItemReader<RawOntologyRelationship> reader = new FlatFileItemReader<>(ontologyRelationshipLineMapper());
         reader.setBufferedReaderFactory(new GZipBufferedReaderFactory());
-        reader.setLineMapper(ontologyRelationshipLineMapper());
         reader.setLinesToSkip(headerLines);
         return reader;
     }

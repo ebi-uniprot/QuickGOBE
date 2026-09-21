@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 
-import org.springframework.batch.item.file.BufferedReaderFactory;
+import org.springframework.batch.infrastructure.item.file.BufferedReaderFactory;
 import org.springframework.core.io.Resource;
 
 public class GZipBufferedReaderFactory implements BufferedReaderFactory {

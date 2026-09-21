@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.annotation.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -15,9 +15,6 @@ import uk.ac.ebi.quickgo.rest.controller.response.NoNextCursorPageInfo;
 import uk.ac.ebi.quickgo.rest.search.results.PageInfo;
 import uk.ac.ebi.quickgo.rest.search.results.QueryResult;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import static uk.ac.ebi.quickgo.annotation.download.http.MediaTypeFactory.*;
 import static uk.ac.ebi.quickgo.annotation.service.converter.StatisticsWorkBookLayout.SHEET_LAYOUT_SET;
 
@@ -29,13 +26,11 @@ import static uk.ac.ebi.quickgo.annotation.service.converter.StatisticsWorkBookL
 @Configuration class ResponseConfig {
     @Primary
     @Bean
-    static ObjectMapper objectMapper() {
-        ObjectMapper mapper = new ObjectMapper();
-        Map<Class<?>, Class<?>> mixinMap = new HashMap<>();
-        mixinMap.put(QueryResult.class, NoFacetNoHighlightNoAggregateQueryResult.class);
-        mixinMap.put(PageInfo.class, NoNextCursorPageInfo.class);
-        mapper.setMixIns(Collections.unmodifiableMap(mixinMap));
-        return mapper;
+    static JsonMapper objectMapper() {
+        return JsonMapper.builder()
+          .addMixIn(QueryResult.class, NoFacetNoHighlightNoAggregateQueryResult.class)
+          .addMixIn(PageInfo.class, NoNextCursorPageInfo.class)
+          .build();
     }
 
     @Bean

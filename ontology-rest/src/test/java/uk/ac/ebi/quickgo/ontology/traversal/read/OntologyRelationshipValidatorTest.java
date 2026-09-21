@@ -5,7 +5,7 @@ import uk.ac.ebi.quickgo.ontology.model.OntologyRelationship;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.batch.item.validator.ValidationException;
+import org.springframework.batch.infrastructure.item.validator.ValidationException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;

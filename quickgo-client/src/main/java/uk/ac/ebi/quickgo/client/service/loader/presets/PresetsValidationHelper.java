@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.client.service.loader.presets;
 
-import org.springframework.batch.item.validator.ValidationException;
+import org.springframework.batch.infrastructure.item.validator.ValidationException;
 
 /**
  * Provides validation helper methods used whilst populating preset information.

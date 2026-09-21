@@ -58,6 +58,10 @@
             <version>${commons-collections.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.jspecify</groupId>
+            <artifactId>jspecify</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.github.dfabulich</groupId>
             <artifactId>sitemapgen4j</artifactId>
             <version>${sitemapgen4j.version}</version>

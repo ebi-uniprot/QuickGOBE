@@ -4,8 +4,8 @@ import uk.ac.ebi.quickgo.annotation.validation.model.DBXRefEntity;
 
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
-import org.springframework.batch.item.file.transform.DefaultFieldSet;
-import org.springframework.batch.item.file.transform.FieldSet;
+import org.springframework.batch.infrastructure.item.file.transform.DefaultFieldSet;
+import org.springframework.batch.infrastructure.item.file.transform.FieldSet;
 import org.springframework.validation.BindException;
 
 import static org.hamcrest.MatcherAssert.assertThat;

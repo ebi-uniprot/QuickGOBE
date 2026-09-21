@@ -1,10 +1,9 @@
 package uk.ac.ebi.quickgo.annotation.controller;
-
+import tools.jackson.core.JacksonException;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.BasicOntology;
 import uk.ac.ebi.quickgo.annotation.service.comm.rest.ontology.model.BasicTaxonomyNode;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -130,7 +129,7 @@ public class StatsSetupHelper {
     private <T> String getResponseAsString(T response) {
         try {
             return dtoMapper.writeValueAsString(response);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new IllegalStateException("Problem constructing mocked GO term REST response:", e);
         }
     }

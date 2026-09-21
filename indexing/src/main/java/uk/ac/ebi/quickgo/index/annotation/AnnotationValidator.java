@@ -1,8 +1,8 @@
 package uk.ac.ebi.quickgo.index.annotation;
 
 import com.google.common.base.Strings;
-import org.springframework.batch.item.validator.ValidationException;
-import org.springframework.batch.item.validator.Validator;
+import org.springframework.batch.infrastructure.item.validator.ValidationException;
+import org.springframework.batch.infrastructure.item.validator.Validator;
 import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
 
 import static uk.ac.ebi.quickgo.index.annotation.AnnotationParsingHelper.*;

@@ -1,7 +1,7 @@
 package uk.ac.ebi.quickgo.index.common.validation;
 
 import org.slf4j.Logger;
-import org.springframework.batch.item.validator.ValidationException;
+import org.springframework.batch.infrastructure.item.validator.ValidationException;
 
 import static org.slf4j.LoggerFactory.getLogger;
 

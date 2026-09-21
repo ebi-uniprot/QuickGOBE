@@ -9,7 +9,7 @@ import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.batch.item.validator.ValidationException;
+import org.springframework.batch.infrastructure.item.validator.ValidationException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static uk.ac.ebi.quickgo.index.geneproduct.Columns.*;

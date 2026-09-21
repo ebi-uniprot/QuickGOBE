@@ -2,9 +2,9 @@ package uk.ac.ebi.quickgo.index.common.writer;
 
 import java.util.List;
 
-import org.springframework.batch.item.*;
-import org.springframework.batch.item.file.FlatFileItemWriter;
-import org.springframework.lang.NonNull;
+import org.jspecify.annotations.NonNull;
+import org.springframework.batch.infrastructure.item.*;
+import org.springframework.batch.infrastructure.item.file.FlatFileItemWriter;
 
 /**
  * Custom Spring Batch writer can process a list produced by an item processor.

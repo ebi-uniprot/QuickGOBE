@@ -1,6 +1,6 @@
 package uk.ac.ebi.quickgo.client.service.loader.presets;
 
-import org.springframework.batch.item.file.BufferedReaderFactory;
+import org.springframework.batch.infrastructure.item.file.BufferedReaderFactory;
 import uk.ac.ebi.quickgo.client.service.loader.presets.ff.RawNamedPreset;
 import uk.ac.ebi.quickgo.rest.search.RetrievalException;
 import uk.ac.ebi.quickgo.rest.search.request.FilterRequest;
@@ -13,15 +13,15 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.GZIPInputStream;
 import org.slf4j.Logger;
-import org.springframework.batch.core.JobExecutionListener;
-import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.file.FlatFileItemReader;
-import org.springframework.batch.item.file.MultiResourceItemReader;
-import org.springframework.batch.item.file.mapping.DefaultLineMapper;
-import org.springframework.batch.item.file.mapping.FieldSetMapper;
-import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
-import org.springframework.batch.item.support.CompositeItemProcessor;
+import org.springframework.batch.core.listener.JobExecutionListener;
+import org.springframework.batch.infrastructure.item.ItemProcessor;
+import org.springframework.batch.infrastructure.item.ItemReader;
+import org.springframework.batch.infrastructure.item.file.FlatFileItemReader;
+import org.springframework.batch.infrastructure.item.file.MultiResourceItemReader;
+import org.springframework.batch.infrastructure.item.file.mapping.DefaultLineMapper;
+import org.springframework.batch.infrastructure.item.file.mapping.FieldSetMapper;
+import org.springframework.batch.infrastructure.item.file.transform.DelimitedLineTokenizer;
+import org.springframework.batch.infrastructure.item.support.CompositeItemProcessor;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 
@@ -49,20 +49,17 @@ public class PresetsConfigHelper {
 
     public static <T> MultiResourceItemReader<T> rawPresetMultiFileReader(
             Resource[] resources, FlatFileItemReader<T> itemReader) {
-        MultiResourceItemReader<T> reader = new MultiResourceItemReader<>();
+        MultiResourceItemReader<T> reader = new MultiResourceItemReader<>(itemReader);
         setResourceComparator(reader);
         reader.setResources(resources);
-        reader.setDelegate(itemReader);
         return reader;
     }
 
     public static <T> FlatFileItemReader<T> fileReader(FieldSetMapper<T> fieldSetMapper) {
-        FlatFileItemReader<T> reader = new FlatFileItemReader<>();
-
         DefaultLineMapper<T> lineMapper = new DefaultLineMapper<>();
         lineMapper.setLineTokenizer(new DelimitedLineTokenizer(PresetsConfig.TAB_DELIMITER));
         lineMapper.setFieldSetMapper(fieldSetMapper);
-        reader.setLineMapper(lineMapper);
+        FlatFileItemReader<T> reader = new FlatFileItemReader<>(lineMapper);
         reader.setBufferedReaderFactory(new ResourceBufferedReaderFactory());
 
         return reader;

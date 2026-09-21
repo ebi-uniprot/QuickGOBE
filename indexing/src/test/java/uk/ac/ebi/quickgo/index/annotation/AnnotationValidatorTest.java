@@ -5,7 +5,7 @@ import uk.ac.ebi.quickgo.index.common.DocumentReaderException;
 import java.util.Arrays;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.batch.item.validator.ValidationException;
+import org.springframework.batch.infrastructure.item.validator.ValidationException;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.ac.ebi.quickgo.index.annotation.AnnotationMocker.createValidAnnotation;

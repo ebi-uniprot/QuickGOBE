@@ -2,7 +2,7 @@ package uk.ac.ebi.quickgo.rest.headers;
 
 import java.util.List;
 
-import org.springframework.http.HttpHeaders;
+import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 /**
@@ -30,7 +30,7 @@ public class HttpHeadersProvider {
      * @return header map
      */
     public MultiValueMap<String, String> provide(){
-        MultiValueMap<String, String> headers = new HttpHeaders();
+        MultiValueMap<String, String> headers = new LinkedMultiValueMap();
         headerSources.forEach(e -> headers.add(e.getHeaderName(), e.getHeaderArgument()));
         return headers;
     }

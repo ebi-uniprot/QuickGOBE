@@ -7,7 +7,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
-import org.springframework.batch.core.ItemWriteListener;
+import org.springframework.batch.core.listener.ItemWriteListener;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
