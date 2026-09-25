@@ -4,12 +4,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.autoconfigure.web.server.LocalManagementPort;
-import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthEndpoint;
 import org.springframework.boot.actuate.health.Status;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -18,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ExtendWith(TemporarySolrDataStore.class)
 @SpringBootTest(classes = {OntologyREST.class},
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 class HealthEndpointIT {
 
     @Autowired
