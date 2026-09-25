@@ -1,0 +1,48 @@
+package uk.ac.ebi.quickgo.geneproduct;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.autoconfigure.web.server.LocalManagementPort;
+import org.springframework.boot.actuate.health.HealthEndpoint;
+import org.springframework.boot.actuate.health.Status;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.ResponseEntity;
+import org.springframework.test.annotation.DirtiesContext;
+import uk.ac.ebi.quickgo.common.store.TemporarySolrDataStore;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+@ExtendWith(TemporarySolrDataStore.class)
+@SpringBootTest(classes = {GeneProductREST.class},
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
+class HealthEndpointIT {
+
+    @Autowired
+    private TestRestTemplate restTemplate;
+
+    @Autowired
+    private HealthEndpoint healthEndpoint;
+
+    @LocalManagementPort
+    private int managementPort;
+
+    @Test
+    void aggregateHealthIsUp() {
+        org.springframework.boot.actuate.health.HealthComponent health = healthEndpoint.health();
+        assertEquals(Status.UP, health.getStatus());
+    }
+
+    @Test
+    void healthEndpointOnManagementPortReturnsUp() {
+        ResponseEntity<String> response = restTemplate.getForEntity(
+                "http://localhost:" + managementPort + "/actuator/health",
+                String.class);
+
+        assertTrue(response.getStatusCode().is2xxSuccessful());
+        assertTrue(response.getBody().contains("\"status\":\"UP\""));
+    }
+}
