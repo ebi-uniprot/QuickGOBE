@@ -9,7 +9,9 @@ exposes a Kubernetes-ready health endpoint from spring-boot-actuator on a separa
 management port (default `9090`, override with the `MANAGEMENT_PORT` env var):
 
 ```
-GET http://<host>:9090/actuator/health   ->  {"status": "UP"}
+GET http://<host>:9090/actuator/health             ->  {"status": "UP"}
+GET http://<host>:9090/actuator/health/readiness   ->  {"status": "UP"}
+GET http://<host>:9090/actuator/health/liveness    ->  {"status": "UP"}
 ```
 
 The health status is aggregated by `uk.ac.ebi.quickgo.rest.health.SolrHealthIndicator`

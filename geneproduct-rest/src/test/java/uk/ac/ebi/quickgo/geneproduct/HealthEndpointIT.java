@@ -45,4 +45,16 @@ class HealthEndpointIT {
         assertTrue(response.getStatusCode().is2xxSuccessful());
         assertTrue(response.getBody().contains("\"status\":\"UP\""));
     }
+
+    @Test
+    void readinessAndLivenessEndpointsAreAvailableOnManagementPort() {
+        for (String probe : new String[]{"readiness", "liveness"}) {
+            ResponseEntity<String> response = restTemplate.getForEntity(
+                    "http://localhost:" + managementPort + "/actuator/health/" + probe,
+                    String.class);
+
+            assertTrue(response.getStatusCode().is2xxSuccessful(), probe);
+            assertTrue(response.getBody().contains("\"status\":\"UP\""), probe);
+        }
+    }
 }
